@@ -71,11 +71,11 @@ Error GetClock_RealTime(uint64_t & curTime)
 
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     curTime = (tv.tv_sec * UINT64_C(1000000)) + tv.tv_usec;
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 Error GetClock_RealTimeMS(uint64_t & curTime)
@@ -90,12 +90,12 @@ Error GetClock_RealTimeMS(uint64_t & curTime)
 
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
 
     curTime = (tv.tv_sec * UINT64_C(1000)) + (tv.tv_usec/1000);
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 Error SetClock_RealTime(uint64_t newCurTime)
@@ -103,7 +103,7 @@ Error SetClock_RealTime(uint64_t newCurTime)
     rtc_init();
     rtc_write(newCurTime);
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Layer

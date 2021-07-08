@@ -33,43 +33,43 @@ using chip::DeviceLayer::Internal::DeviceNetworkInfo;
 CHIP_ERROR AmebaUtils::IsAPEnabled(bool & apEnabled)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 bool AmebaUtils::IsStationProvisioned(void)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return false;
 }
 
 CHIP_ERROR AmebaUtils::IsStationConnected(bool & connected)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR AmebaUtils::StartWiFiLayer(void)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR AmebaUtils::EnableStationMode(void)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR AmebaUtils::SetAPMode(bool enabled)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 int AmebaUtils::OrderScanResultsByRSSI(const void * _res1, const void * _res2)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 
@@ -83,41 +83,41 @@ const char * AmebaUtils::WiFiModeToStr(int wifiMode)
 struct netif * AmebaUtils::GetStationNetif(void)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return NULL;
 }
 
 struct netif * AmebaUtils::GetNetif(const char * ifKey)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return NULL;
 }
 
 bool AmebaUtils::IsInterfaceUp(const char * ifKey)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 bool AmebaUtils::HasIPv6LinkLocalAddress(const char * ifKey)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR AmebaUtils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR AmebaUtils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR AmebaUtils::ClearWiFiStationProvision(void)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
