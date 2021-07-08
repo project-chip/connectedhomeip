@@ -30,7 +30,8 @@ constexpr uint16_t kUndefinedVendorId = 0U;
 class PeerId
 {
 public:
-    PeerId() {}
+    constexpr PeerId() {}
+    constexpr PeerId(NodeId nodeId, FabricId fabricId) : mNodeId(nodeId), mFabricId(fabricId) {}
 
     NodeId GetNodeId() const { return mNodeId; }
     PeerId & SetNodeId(NodeId id)

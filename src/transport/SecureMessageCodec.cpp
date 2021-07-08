@@ -53,9 +53,10 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
         .SetMessageId(msgId)          //
         .SetEncryptionKeyID(state->GetPeerKeyID());
 
-    if (state->GetPeerNodeId() != kUndefinedNodeId)
+    NodeId peerNodeId = state->GetPeerInfo().GetPeer().GetNodeId();
+    if (peerNodeId != kUndefinedNodeId)
     {
-        packetHeader.SetDestinationNodeId(state->GetPeerNodeId());
+        packetHeader.SetDestinationNodeId(peerNodeId);
     }
 
     packetHeader.GetFlags().Set(Header::FlagValues::kEncryptedMessage);

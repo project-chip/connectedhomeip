@@ -22,11 +22,12 @@
 #pragma once
 
 #include <transport/FabricTable.h>
+#include <transport/PeerCache.h>
 #include <transport/SecureSession.h>
+#include <transport/SecureSessionHandle.h>
 #include <transport/SessionMessageCounter.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
-#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace Transport {
@@ -37,66 +38,39 @@ static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
  * Defines state of a peer connection at a transport layer.
  *
  * Information contained within the state:
- *   - PeerAddress represents how to talk to the peer
- *   - PeerNodeId is the unique ID of the peer
- *   - SendMessageIndex is an ever increasing index for sending messages
- *   - LastActivityTimeMs is a monotonic timestamp of when this connection was
- *     last used. Inactive connections can expire.
+ *   - PeerHandle holds node id, admin id, address of the peer.
+ *   - LastActivityTimeMs is a monotonic timestamp of when this connection was last used. Inactive connections can expire.
  *   - SecureSession contains the encryption context of a connection
- *
- * TODO: to add any message ACK information
  */
 class PeerConnectionState
 {
 public:
-    PeerConnectionState() : mPeerAddress(PeerAddress::Uninitialized()) {}
-    PeerConnectionState(const PeerAddress & addr) : mPeerAddress(addr) {}
-    PeerConnectionState(PeerAddress && addr) : mPeerAddress(addr) {}
+    PeerConnectionState(PeerCacheEntry & peer, FabricIndex fabric, uint16_t peerKeyID, uint16_t localKeyID) :
+        mPeer(peer), mFabric(fabric), mPeerKeyID(peerKeyID), mLocalKeyID(localKeyID)
+    {}
 
-    PeerConnectionState(PeerConnectionState &&)      = default;
-    PeerConnectionState(const PeerConnectionState &) = default;
-    PeerConnectionState & operator=(const PeerConnectionState &) = default;
-    PeerConnectionState & operator=(PeerConnectionState &&) = default;
+    PeerConnectionState(const PeerConnectionState &) = delete;
+    PeerConnectionState & operator=(const PeerConnectionState &) = delete;
+    PeerConnectionState(PeerConnectionState &&)                  = delete;
+    PeerConnectionState & operator=(PeerConnectionState &&) = delete;
 
-    const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-    PeerAddress & GetPeerAddress() { return mPeerAddress; }
-    void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
+    SecureSessionHandle ToSessionHandle() const
+    {
+        return SecureSessionHandle{ GetPeerInfo().GetPeer().GetNodeId(), GetPeerKeyID(), GetFabricIndex() };
+    }
 
-    NodeId GetPeerNodeId() const { return mPeerNodeId; }
-    void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
+    FabricIndex GetFabricIndex() const { return mFabric; }
 
+    PeerCacheEntry & GetPeerInfo() const { return mPeer.Get(); }
     uint16_t GetPeerKeyID() const { return mPeerKeyID; }
-    void SetPeerKeyID(uint16_t id) { mPeerKeyID = id; }
 
     // TODO: Rename KeyID to SessionID
     uint16_t GetLocalKeyID() const { return mLocalKeyID; }
-    void SetLocalKeyID(uint16_t id) { mLocalKeyID = id; }
 
     uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
     void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
 
     SecureSession & GetSecureSession() { return mSecureSession; }
-
-    FabricIndex GetFabricIndex() const { return mFabric; }
-    void SetFabricIndex(FabricIndex fabricIndex) { mFabric = fabricIndex; }
-
-    bool IsInitialized()
-    {
-        return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerKeyID != UINT16_MAX ||
-                mLocalKeyID != UINT16_MAX);
-    }
-
-    /**
-     *  Reset the connection state to a completely uninitialized status.
-     */
-    void Reset()
-    {
-        mPeerAddress        = PeerAddress::Uninitialized();
-        mPeerNodeId         = kUndefinedNodeId;
-        mLastActivityTimeMs = 0;
-        mSecureSession.Reset();
-        mSessionMessageCounter.Reset();
-    }
 
     CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
                                  MessageAuthenticationCode & mac) const
@@ -113,14 +87,13 @@ public:
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
-    PeerAddress mPeerAddress;
-    NodeId mPeerNodeId           = kUndefinedNodeId;
-    uint16_t mPeerKeyID          = UINT16_MAX;
-    uint16_t mLocalKeyID         = UINT16_MAX;
+    const PeerHandle mPeer;
+    const FabricIndex mFabric;
+    const uint16_t mPeerKeyID;
+    const uint16_t mLocalKeyID;
     uint64_t mLastActivityTimeMs = 0;
     SecureSession mSecureSession;
     SessionMessageCounter mSessionMessageCounter;
-    FabricIndex mFabric = kUndefinedFabricIndex;
 };
 
 } // namespace Transport

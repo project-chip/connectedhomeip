@@ -36,6 +36,8 @@ public:
     bool operator==(const ReferenceCountedHandle & that) const { return &mTarget == &that.mTarget; }
     bool operator!=(const ReferenceCountedHandle & that) const { return !(*this == that); }
 
+    Target & Get() const { return mTarget; }
+
 private:
     Target & mTarget;
 };

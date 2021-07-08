@@ -107,7 +107,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
     // If sending via UDP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
-    if (state != nullptr && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
+    if (state != nullptr && state->GetPeerInfo().GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
     {
         reliableTransmissionRequested = false;
     }
