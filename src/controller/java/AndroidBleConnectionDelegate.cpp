@@ -27,7 +27,7 @@ void AndroidBleConnectionDelegate::NewConnection(chip::Ble::BleLayer * bleLayer,
     }
 }
 
-BLE_ERROR AndroidBleConnectionDelegate::CancelConnection()
+CHIP_ERROR AndroidBleConnectionDelegate::CancelConnection()
 {
-    return BLE_ERROR_NOT_IMPLEMENTED;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }

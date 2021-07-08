@@ -131,7 +131,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        requiredSize = snprintf(buffer, bufferLen, "_S%03u", subtype.code);
+        requiredSize = snprintf(buffer, bufferLen, "_S%u", subtype.code);
         break;
     case DiscoveryFilterType::kLong:
         // 12-bit number
@@ -139,16 +139,16 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        requiredSize = snprintf(buffer, bufferLen, "_L%04u", subtype.code);
+        requiredSize = snprintf(buffer, bufferLen, "_L%u", subtype.code);
         break;
     case DiscoveryFilterType::kVendor:
         // Vendor ID is 16-bit, so if it fits in the code, it's good.
         // NOTE: size here is wrong, will be changed in upcming PR to remove leading zeros.
-        requiredSize = snprintf(buffer, bufferLen, "_V%03u", subtype.code);
+        requiredSize = snprintf(buffer, bufferLen, "_V%u", subtype.code);
         break;
     case DiscoveryFilterType::kDeviceType:
         // TODO: Not totally clear the size required here: see spec issue #3226
-        requiredSize = snprintf(buffer, bufferLen, "_T%03u", subtype.code);
+        requiredSize = snprintf(buffer, bufferLen, "_T%u", subtype.code);
         break;
     case DiscoveryFilterType::kCommissioningMode:
         if (subtype.code > 1)
@@ -172,6 +172,9 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         }
         requiredSize = snprintf(buffer, bufferLen, "_A1");
         break;
+    case DiscoveryFilterType::kInstanceName:
+        requiredSize = snprintf(buffer, bufferLen, "%s", subtype.instanceName);
+        break;
     case DiscoveryFilterType::kNone:
         requiredSize = 0;
         buffer[0]    = '\0';
@@ -180,19 +183,42 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
     return (requiredSize <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR MakeCommissionableNodeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter nameDesc)
+CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter nameDesc, DiscoveryType type)
 {
     size_t requiredSize;
     if (nameDesc.type == DiscoveryFilterType::kNone)
     {
-        requiredSize = snprintf(buffer, bufferLen, "_chipc");
+        if (type == DiscoveryType::kCommissionableNode)
+        {
+            requiredSize = snprintf(buffer, bufferLen, kCommissionableServiceName);
+        }
+        else if (type == DiscoveryType::kCommissionerNode)
+        {
+            requiredSize = snprintf(buffer, bufferLen, kCommissionerServiceName);
+        }
+        else
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
     }
     else
     {
         ReturnErrorOnFailure(MakeServiceSubtype(buffer, bufferLen, nameDesc));
         size_t subtypeLen = strlen(buffer);
-        requiredSize =
-            snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", kSubtypeServiceNamePart, kCommissionableServiceName);
+        if (type == DiscoveryType::kCommissionableNode)
+        {
+            requiredSize = snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", kSubtypeServiceNamePart,
+                                    kCommissionableServiceName);
+        }
+        else if (type == DiscoveryType::kCommissionerNode)
+        {
+            requiredSize =
+                snprintf(buffer + subtypeLen, bufferLen - subtypeLen, ".%s.%s", kSubtypeServiceNamePart, kCommissionerServiceName);
+        }
+        else
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
     }
 
     return (requiredSize <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;

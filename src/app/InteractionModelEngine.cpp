@@ -138,7 +138,7 @@ CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCom
     return CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient)
+CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, intptr_t aAppIdentifier)
 {
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
@@ -147,7 +147,7 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
         if (readClient.IsFree())
         {
             *apReadClient = &readClient;
-            err           = readClient.Init(mpExchangeMgr, mpDelegate);
+            err           = readClient.Init(mpExchangeMgr, mpDelegate, aAppIdentifier);
             if (CHIP_NO_ERROR != err)
             {
                 *apReadClient = nullptr;
@@ -319,26 +319,30 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
-// The default implementation to make compiler happy before codegen for this is ready.
-// TODO: Remove this after codegen is ready.
-CHIP_ERROR __attribute__((weak)) ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter & aWriter)
+CHIP_ERROR InteractionModelEngine::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId,
+                                                   SecureSessionHandle * apSecureSession, EventPathParams * apEventPathParamsList,
+                                                   size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
+                                                   size_t aAttributePathParamsListSize, EventNumber aEventNumber,
+                                                   intptr_t aAppIdentifier)
 {
-    ChipLogDetail(DataManagement,
-                  "Received Cluster Command: Cluster=%" PRIx16 " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx8 " FieldId=%" PRIx8
-                  " ListIndex=%" PRIx16,
-                  aClusterInfo.mClusterId, ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId, aClusterInfo.mFieldId,
-                  aClusterInfo.mListIndex);
-    ChipLogError(DataManagement,
-                 "Default ReadSingleClusterData is called, this should be replaced by actual dispatched for cluster");
-    return CHIP_NO_ERROR;
+    ReadClient * client = nullptr;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    ReturnErrorOnFailure(NewReadClient(&client, aAppIdentifier));
+    err = client->SendReadRequest(aNodeId, aAdminId, apSecureSession, apEventPathParamsList, aEventPathParamsListSize,
+                                  apAttributePathParamsList, aAttributePathParamsListSize, aEventNumber);
+    if (err != CHIP_NO_ERROR)
+    {
+        client->Shutdown();
+    }
+    return err;
 }
 
 CHIP_ERROR __attribute__((weak))
 WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     ChipLogDetail(DataManagement,
-                  "Received Cluster Attribute: Cluster=%" PRIx16 " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx8
-                  " FieldId=%" PRIx8 " ListIndex=%" PRIx16,
+                  "Received Cluster Attribute: Cluster=%" PRIx32 " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx16
+                  " FieldId=%" PRIx32 " ListIndex=%" PRIx16,
                   aClusterInfo.mClusterId, ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId, aClusterInfo.mFieldId,
                   aClusterInfo.mListIndex);
     ChipLogError(DataManagement,

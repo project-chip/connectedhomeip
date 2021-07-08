@@ -54,7 +54,7 @@ static ErrorFormatter * sErrorFormatterList = nullptr;
  * @return A pointer to a NULL-terminated C string describing the
  *         provided error.
  */
-DLL_EXPORT const char * ErrorStr(int32_t err)
+DLL_EXPORT const char * ErrorStr(CHIP_ERROR err)
 {
     if (err == 0)
     {
@@ -137,7 +137,7 @@ DLL_EXPORT void DeregisterErrorFormatter(ErrorFormatter * errFormatter)
  * @param[in] desc                  A string describing the cause or meaning of the error,
  *                                  or NULL if no such information is available.
  */
-DLL_EXPORT void FormatError(char * buf, uint16_t bufSize, const char * subsys, int32_t err, const char * desc)
+DLL_EXPORT void FormatError(char * buf, uint16_t bufSize, const char * subsys, CHIP_ERROR err, const char * desc)
 {
 #if CHIP_CONFIG_SHORT_ERROR_STR
 
@@ -166,8 +166,8 @@ DLL_EXPORT void FormatError(char * buf, uint16_t bufSize, const char * subsys, i
         descSep = "";
     }
 
-    (void) snprintf(buf, bufSize, "%s%sError %" PRId32 " (0x%08" PRIX32 ")%s%s", subsys, subsysSep, err, static_cast<uint32_t>(err),
-                    descSep, desc);
+    (void) snprintf(buf, bufSize, "%s%sError %" CHIP_ERROR_FORMAT " (0x%08" PRIX32 ")%s%s", subsys, subsysSep, err,
+                    static_cast<uint32_t>(err), descSep, desc);
 
 #endif // CHIP_CONFIG_SHORT_ERROR_STR
 }

@@ -69,9 +69,13 @@ public:
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
-                               size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
-                               size_t aAttributePathParamsListSize, EventNumber aEventNumber);
+    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * aSecureSession,
+                               EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
+                               AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
+                               EventNumber aEventNumber);
+
+    intptr_t GetAppIdentifier() const { return mAppIdentifier; }
+    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
 private:
     friend class TestReadInteraction;
@@ -92,12 +96,13 @@ private:
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apDelegate       InteractionModelDelegate set by application.
+     *  @param[in]    aAppState        Application defined object to distinguish different read requests.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, intptr_t aAppIdentifier);
 
     virtual ~ReadClient() = default;
 
@@ -111,6 +116,8 @@ private:
      */
     bool IsFree() const { return mState == ClientState::Uninitialized; };
 
+    CHIP_ERROR GenerateEventPathList(ReadRequest::Builder & aRequest, EventPathParams * apEventPathParamsList,
+                                     size_t aEventPathParamsListSize, EventNumber & aEventNumber);
     CHIP_ERROR GenerateAttributePathList(ReadRequest::Builder & aRequest, AttributePathParams * apAttributePathParamsList,
                                          size_t aAttributePathParamsListSize);
     CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
@@ -124,6 +131,7 @@ private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
+    intptr_t mAppIdentifier                    = 0;
 };
 
 }; // namespace app

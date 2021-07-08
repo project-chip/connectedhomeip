@@ -413,7 +413,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        err = CHIP_ERROR_MAX;
+        err = CHIP_ERROR_INTERNAL;
     }
 
     if (err == CHIP_NO_ERROR)
@@ -635,6 +635,6 @@ void AppTask::UpdateClusterState(void)
                                                  (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx32, status);
+        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx8, status);
     }
 }

@@ -25,6 +25,8 @@
 
 #include "streamer.h"
 
+#include <core/CHIPError.h>
+
 #include <stdarg.h>
 #include <stddef.h>
 
@@ -33,7 +35,7 @@
 #endif // CHIP_SHELL_PROMPT
 
 #ifndef CHIP_SHELL_MAX_MODULES
-#define CHIP_SHELL_MAX_MODULES 10
+#define CHIP_SHELL_MAX_MODULES 32
 #endif // CHIP_SHELL_MAX_MODULES
 
 #ifndef CHIP_SHELL_MAX_LINE_SIZE
@@ -55,7 +57,7 @@ namespace Shell {
  *
  * @return                      0 on success; CHIP_ERROR[...] on failure.
  */
-typedef int shell_command_fn(int argc, char * argv[]);
+typedef CHIP_ERROR shell_command_fn(int argc, char * argv[]);
 
 /**
  * Descriptor structure for a single command.
@@ -87,9 +89,9 @@ typedef const struct shell_command shell_command_t;
  * @param command               The shell command being iterated.
  * @param arg                   A context variable passed to the iterator function.
  *
- * @return                      0 continue iteration; 1 break iteration.
+ * @return                      CHIP_NO_ERROR to continue iteration; anything else to break iteration.
  */
-typedef int shell_command_iterator_t(shell_command_t * command, void * arg);
+typedef CHIP_ERROR shell_command_iterator_t(shell_command_t * command, void * arg);
 
 class Engine
 {
@@ -130,9 +132,9 @@ public:
      * @param argc                  Number of arguments in argv.
      * @param argv                  Array of arguments in the tokenized command line to execute.
      *
-     * @return                      0 on success; CHIP_ERROR[...] on failure.
+     * @return                      CHIP_NO_ERROR on success; CHIP_ERROR[...] on failure.
      */
-    int ExecCommand(int argc, char * argv[]);
+    CHIP_ERROR ExecCommand(int argc, char * argv[]);
 
     /**
      * Registers a command set, or array of commands with the shell.

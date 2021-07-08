@@ -39,6 +39,8 @@ namespace app {
 /**
  *  @brief The read client represents the initiator side of a Write Interaction, and is responsible
  *  for generating one Write Request for a particular set of attributes, and handling the Write response.
+ *  Consumer can allocate one write client, then call PrepareAttribute, insert attribute value, followed by FinishAttribute for
+ * every attribute it wants to insert in write request, then call SendWriteRequest
  *
  */
 class WriteClient : public Messaging::ExchangeDelegate
@@ -51,15 +53,11 @@ public:
     void Shutdown();
 
     /**
-     * Finalize Write Request Message TLV Builder and retrieve final data from tlv builder for later sending
-     */
-    CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & aPacket);
-
-    /**
-     *  Send a Write Request.  There can be one Write Request outstanding on a given WriteClient.
-     *  If SendWriteRequest returns success, no more Write Requests can be sent on this WriteClient
-     *  until the corresponding InteractionModelDelegate::WriteResponseProcessed or InteractionModelDelegate::WriteResponseError
-     *  call happens with guarantee.
+     *  Once SendWriteRequest returns successfully, the WriteClient will
+     *  handle calling Shutdown on itself once it decides it's done with waiting
+     *  for a response (i.e. times out or gets a response).
+     *  If SendWriteRequest is never called, or the call fails, the API
+     *  consumer is responsible for calling Shutdown on the WriteClient.
      */
     CHIP_ERROR SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession);
 
@@ -102,6 +100,11 @@ private:
      *  Check if current write client is being used
      */
     bool IsFree() const { return mState == State::Uninitialized; };
+
+    /**
+     * Finalize Write Request Message TLV Builder and retrieve final data from tlv builder for later sending
+     */
+    CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & aPacket);
 
     void MoveToState(const State aTargetState);
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);

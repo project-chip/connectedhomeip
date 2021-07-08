@@ -383,6 +383,17 @@ address of the node in the device controller:
 chip-device-ctrl > resolve 5544332211 1234
 ```
 
+### `setup-payload generate [-v <Vendor ID>] [-p <Product ID>] [-cf <Custom Flow>] [-dc <Discovery Capabilities>] [-dv <Discriminator Value>] [-ps <Passcode>]`
+
+Print the generated Onboarding Payload Contents in human-readable (Manual
+Pairing Code) and machine-readable (QR Code) format:
+
+```
+chip-device-ctrl > setup-payload generate -v 9050 -p 65279 -cf 0 -dc 2 -dv 2976 -ps 34567890
+Manual pairing code: [26318621095]
+SetupQRCode: [MT:YNJV7VSC00CMVH7SR00]
+```
+
 ### `setup-payload parse-manual <manual-pairing-code>`
 
 Print the commissioning information encoded in the Manual Pairing Code:

@@ -30,7 +30,7 @@ if (EXISTS boards/${BOARD}.conf)
 endif()
 
 # TODO: temporary fix to remove after solving static addressing problem on nrf5340
-if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
+if(BOARD STREQUAL "nrf5340dk_nrf5340_cpuapp")
     list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-bt_private_addresses.conf)
 endif()
 
@@ -75,6 +75,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/client-api.cpp
                ${CHIP_ROOT}/src/app/util/ember-compatibility-functions.cpp
                ${CHIP_ROOT}/src/app/util/ember-print.cpp
+               ${CHIP_ROOT}/src/app/util/error-mapping.cpp
                ${CHIP_ROOT}/src/app/util/message.cpp
                ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
@@ -92,9 +93,15 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
                ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
+               ${CHIP_ROOT}/src/app/clusters/color-control-server/color-control-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
                )
+
+if (BOARD STREQUAL "nrf52840dongle_nrf52840")
+  target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUTrigger.cpp)
+endif()
 
 if (CONFIG_CHIP_PW_RPC)
 

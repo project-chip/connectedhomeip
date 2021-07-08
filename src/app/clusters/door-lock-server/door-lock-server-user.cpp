@@ -595,13 +595,13 @@ static void printSuccessOrFailure(bool success)
 static bool verifyPin(uint8_t * pin, uint8_t * userId)
 {
     bool pinRequired = false;
-    EmberStatus status;
+    EmberAfStatus status;
     uint8_t i;
 
     status =
         emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID,
                                    ZCL_REQUIRE_PIN_FOR_RF_OPERATION_ATTRIBUTE_ID, (uint8_t *) &pinRequired, sizeof(pinRequired));
-    if (EMBER_SUCCESS != status || !pinRequired)
+    if (EMBER_ZCL_STATUS_SUCCESS != status || !pinRequired)
     {
         return true;
     }

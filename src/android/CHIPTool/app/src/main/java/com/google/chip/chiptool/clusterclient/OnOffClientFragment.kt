@@ -100,7 +100,7 @@ class OnOffClientFragment : Fragment() {
         fabricIdEd.text.toString().toLong(),
         deviceIdEd.text.toString().toLong()
       )
-      serviceType = "_chip._tcp"
+      serviceType = "_matter._tcp"
     }
 
     // TODO: implement the common CHIP mDNS interface for Android and make CHIP stack call the resolver

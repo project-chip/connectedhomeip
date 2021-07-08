@@ -31,11 +31,11 @@ namespace System {
 namespace Platform {
 namespace Layer {
 
-System::Error PostEvent(System::Layer & aLayer, void * aContext, System::Object & aTarget, System::EventType aType,
-                        uintptr_t aArgument);
-System::Error DispatchEvents(System::Layer & aLayer, void * aContext);
-System::Error DispatchEvent(System::Layer & aLayer, void * aContext, System::Event aEvent);
-System::Error StartTimer(System::Layer & aLayer, void * aContext, uint32_t aMilliseconds);
+CHIP_ERROR PostEvent(System::Layer & aLayer, void * aContext, System::Object & aTarget, System::EventType aType,
+                     uintptr_t aArgument);
+CHIP_ERROR DispatchEvents(System::Layer & aLayer, void * aContext);
+CHIP_ERROR DispatchEvent(System::Layer & aLayer, void * aContext, System::Event aEvent);
+CHIP_ERROR StartTimer(System::Layer & aLayer, void * aContext, uint32_t aMilliseconds);
 
 } // namespace Layer
 } // namespace Platform
@@ -119,8 +119,8 @@ public:
      * StartEventLoopTask processes items asynchronously.  It can return before
      * any items are processed, or after some items have been processed, or
      * while an item is being processed, or even after StopEventLoopTask() has
-     * been called (e.g. if ScheduleWork() was called with a work item that
-     * calls StopEventLoopTask before StartEventLoopTask was called).
+     * been called (e.g. if ScheduleWork() was called before StartEventLoopTask
+     * was called, with a work item that calls StopEventLoopTask).
      *
      * Consumers that call StartEventLoopTask must not call RunEventLoop.
      *
@@ -133,8 +133,8 @@ public:
      *
      * If called from outside work item processing, StopEventLoopTask guarantees
      * that any currently-executing work item completes execution and no more
-     * work items will run before it returns.  This is generally how
-     * StopEventLoopTask is used in conjunction with StartEventLoopTask.
+     * work items will run after StopEventLoopTask returns.  This is generally
+     * how StopEventLoopTask is used in conjunction with StartEventLoopTask.
      *
      * If called from inside work item processing, StopEventLoopTask makes no
      * guarantees about exactly when work item processing will stop.  What it
@@ -183,14 +183,14 @@ private:
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
     // Parentheses used to fix clang parsing issue with these declarations
-    friend ::chip::System::Error(::chip::System::Platform::Layer::PostEvent)(::chip::System::Layer & aLayer, void * aContext,
-                                                                             ::chip::System::Object & aTarget,
-                                                                             ::chip::System::EventType aType, uintptr_t aArgument);
-    friend ::chip::System::Error(::chip::System::Platform::Layer::DispatchEvents)(::chip::System::Layer & aLayer, void * aContext);
-    friend ::chip::System::Error(::chip::System::Platform::Layer::DispatchEvent)(::chip::System::Layer & aLayer, void * aContext,
-                                                                                 ::chip::System::Event aEvent);
-    friend ::chip::System::Error(::chip::System::Platform::Layer::StartTimer)(::chip::System::Layer & aLayer, void * aContext,
-                                                                              uint32_t aMilliseconds);
+    friend ::CHIP_ERROR(::chip::System::Platform::Layer::PostEvent)(::chip::System::Layer & aLayer, void * aContext,
+                                                                    ::chip::System::Object & aTarget,
+                                                                    ::chip::System::EventType aType, uintptr_t aArgument);
+    friend ::CHIP_ERROR(::chip::System::Platform::Layer::DispatchEvents)(::chip::System::Layer & aLayer, void * aContext);
+    friend ::CHIP_ERROR(::chip::System::Platform::Layer::DispatchEvent)(::chip::System::Layer & aLayer, void * aContext,
+                                                                        ::chip::System::Event aEvent);
+    friend ::CHIP_ERROR(::chip::System::Platform::Layer::StartTimer)(::chip::System::Layer & aLayer, void * aContext,
+                                                                     uint32_t aMilliseconds);
 
     void PostEvent(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);

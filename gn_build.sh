@@ -97,8 +97,8 @@ shift $((OPTIND - 1))
 
 for arg; do
     case $arg in
-        enable_qpg6100_builds=true)
-            qpg6100_enabled=1
+        enable_qpg_builds=true)
+            qpg_enabled=1
             ;;
         enable_efr32_builds=true)
             efr32_enabled=1
@@ -147,11 +147,11 @@ else
 fi
 echo
 
-if [[ -z "$qpg6100_enabled" ]]; then
-    echo "Hint: Pass enable_qpg6100_builds=true to this script to enable building for QPG6100"
+if [[ -z "$qpg_enabled" ]]; then
+    echo "Hint: Pass enable_qpg_builds=true to this script to enable building for QPG"
 else
     echo 'To build the QPG6100 lock sample as a standalone project:'
-    echo "(cd $CHIP_ROOT/examples/lock-app/qpg6100; gn gen out/debug; ninja -C out/debug)"
+    echo "(cd $CHIP_ROOT/examples/lock-app/qpg; gn gen out/debug; ninja -C out/debug)"
 fi
 
 echo

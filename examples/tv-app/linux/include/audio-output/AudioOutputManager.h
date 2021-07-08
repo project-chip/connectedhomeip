@@ -26,7 +26,5 @@ class AudioOutputManager
 {
 public:
     CHIP_ERROR Init();
-    bool proxySelectOutputRequest(uint8_t index);
-    bool proxyRenameOutputRequest(uint8_t index, uint8_t * name);
     std::vector<EmberAfAudioOutputInfo> proxyGetListOfAudioOutputInfo();
 };

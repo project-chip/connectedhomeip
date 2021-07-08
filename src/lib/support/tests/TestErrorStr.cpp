@@ -34,19 +34,19 @@ using namespace chip;
         : (fprintf(stderr, "%s:%d: error: CHECK_EQ_STR(\"%s\", \"%s\") failed\n", __FUNCTION__, __LINE__, (a), (b)), false)
 
 static int falseFormatCalled = 0;
-static bool falseFormat(char * buf, uint16_t bufSize, int32_t err)
+static bool falseFormat(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     falseFormatCalled += 1;
     return false; // means keep going
 }
 static int falseFormat2Called = 0;
-static bool falseFormat2(char * buf, uint16_t bufSize, int32_t err)
+static bool falseFormat2(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     falseFormat2Called += 1;
     return false; // means keep going
 }
 static int trueFormatCalled = 0;
-static bool trueFormat(char * buf, uint16_t bufSize, int32_t err)
+static bool trueFormat(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     trueFormatCalled += 1;
     return true; // means I handled it
@@ -154,7 +154,7 @@ static bool testFormatErr()
     ret &= CHECK_EQ_STR(buf, "Error 1 (0x00000001)");
 
     // negative
-    FormatError(buf, kBufSize, nullptr, -1, nullptr);
+    FormatError(buf, kBufSize, nullptr, static_cast<CHIP_ERROR>(-1), nullptr);
     ret &= CHECK_EQ_STR(buf, "Error -1 (0xFFFFFFFF)");
 #endif
 

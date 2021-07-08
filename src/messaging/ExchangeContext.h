@@ -118,6 +118,8 @@ public:
      *
      *  @param[in]    peerAddress   The address of the sender
      *
+     *  @param[in]    msgFlags      The message flags corresponding to the received message
+     *
      *  @param[in]    msgBuf        A handle to the packet buffer holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
@@ -126,7 +128,8 @@ public:
      *                                                       protocol layer.
      */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msgBuf);
+                             const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+                             System::PacketBufferHandle && msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
@@ -223,7 +226,7 @@ private:
     CHIP_ERROR StartResponseTimer();
 
     void CancelResponseTimer();
-    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
+    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
 
     void DoClose(bool clearRetransTable);
 };

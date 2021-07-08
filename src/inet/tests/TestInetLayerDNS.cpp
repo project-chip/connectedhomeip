@@ -66,7 +66,7 @@ struct DNSResolutionTestCase
     const char * hostName;
     uint8_t dnsOptions;
     uint8_t maxResults;
-    INET_ERROR expectErr;
+    CHIP_ERROR expectErr;
     bool expectIPv4Addrs;
     bool expectIPv6Addrs;
 };
@@ -81,7 +81,7 @@ struct DNSResolutionTestContext
 
 static void RunTestCase(nlTestSuite * testSuite, const DNSResolutionTestCase & testCase);
 static void StartTestCase(DNSResolutionTestContext & testContext);
-static void HandleResolutionComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray);
+static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t addrCount, IPAddress * addrArray);
 static void ServiceNetworkUntilDone(uint32_t timeoutMS);
 static void HandleSIGUSR1(int sig);
 
@@ -100,7 +100,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
             "ipv4.google.com",
             kDNSOption_Default,
             kMaxResults,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             true,
             false
         }
@@ -113,7 +113,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
             "ipv6.google.com",
             kDNSOption_Default,
             kMaxResults,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             false,
             true
         }
@@ -126,7 +126,7 @@ static void TestDNSResolution_Basic(nlTestSuite * testSuite, void * testContext)
             "google.com",
             kDNSOption_Default,
             kMaxResults,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             true,
             true
         }
@@ -151,7 +151,7 @@ static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * 
             "google.com",
             kDNSOption_AddrFamily_IPv4Only,
             kMaxResults,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             true,
             false
         }
@@ -165,7 +165,7 @@ static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * 
             "google.com",
             kDNSOption_AddrFamily_IPv6Only,
             kMaxResults,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             false,
             true
         }
@@ -179,7 +179,7 @@ static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * 
             "google.com",
             kDNSOption_AddrFamily_IPv4Preferred,
             kMaxResults,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             true,
             true
         }
@@ -193,7 +193,7 @@ static void TestDNSResolution_AddressTypeOption(nlTestSuite * testSuite, void * 
             "google.com",
             kDNSOption_AddrFamily_IPv6Preferred,
             kMaxResults,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             true,
             true
         }
@@ -218,7 +218,7 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
             "google.com",
             kDNSOption_AddrFamily_IPv4Only,
             2,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             true,
             false
         }
@@ -232,7 +232,7 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
             "google.com",
             kDNSOption_AddrFamily_IPv6Only,
             2,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             false,
             true
         }
@@ -247,7 +247,7 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
             "google.com",
             kDNSOption_AddrFamily_IPv4Preferred,
             2,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             true,
             true
         }
@@ -262,7 +262,7 @@ static void TestDNSResolution_RestrictedResults(nlTestSuite * testSuite, void * 
             "google.com",
             kDNSOption_AddrFamily_IPv6Preferred,
             2,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             true,
             true
         }
@@ -357,7 +357,7 @@ static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testConte
             "216.58.194.174",
             kDNSOption_AddrFamily_Any,
             1,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             true,
             false
         }
@@ -369,7 +369,7 @@ static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testConte
             "2607:f8b0:4005:804::200e",
             kDNSOption_AddrFamily_Any,
             1,
-            INET_NO_ERROR,
+            CHIP_NO_ERROR,
             false,
             true
         }
@@ -407,7 +407,7 @@ static void TestDNSResolution_TextForm(nlTestSuite * testSuite, void * testConte
 static void TestDNSResolution_Cancel(nlTestSuite * testSuite, void * inContext)
 {
     DNSResolutionTestContext testContext{
-        testSuite, DNSResolutionTestCase{ "www.google.com", kDNSOption_Default, kMaxResults, INET_NO_ERROR, true, false }
+        testSuite, DNSResolutionTestCase{ "www.google.com", kDNSOption_Default, kMaxResults, CHIP_NO_ERROR, true, false }
     };
 
     // Start DNS resolution.
@@ -444,7 +444,7 @@ static void TestDNSResolution_Simultaneous(nlTestSuite * testSuite, void * inCon
                 "www.nest.com",
                 kDNSOption_Default,
                 kMaxResults,
-                INET_NO_ERROR,
+                CHIP_NO_ERROR,
                 true,
                 false
             }
@@ -456,7 +456,7 @@ static void TestDNSResolution_Simultaneous(nlTestSuite * testSuite, void * inCon
                 "10.0.0.1",
                 kDNSOption_Default,
                 kMaxResults,
-                INET_NO_ERROR,
+                CHIP_NO_ERROR,
                 true,
                 false
             }
@@ -468,7 +468,7 @@ static void TestDNSResolution_Simultaneous(nlTestSuite * testSuite, void * inCon
                 "www.google.com",
                 kDNSOption_Default,
                 kMaxResults,
-                INET_NO_ERROR,
+                CHIP_NO_ERROR,
                 true,
                 true
             }
@@ -480,7 +480,7 @@ static void TestDNSResolution_Simultaneous(nlTestSuite * testSuite, void * inCon
                 "pool.ntp.org",
                 kDNSOption_Default,
                 kMaxResults,
-                INET_NO_ERROR,
+                CHIP_NO_ERROR,
                 true,
                 false
             }
@@ -523,7 +523,7 @@ static void RunTestCase(nlTestSuite * testSuite, const DNSResolutionTestCase & t
 
 static void StartTestCase(DNSResolutionTestContext & testContext)
 {
-    INET_ERROR err                   = INET_NO_ERROR;
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
     DNSResolutionTestCase & testCase = testContext.testCase;
     nlTestSuite * testSuite          = testContext.testSuite;
 
@@ -534,7 +534,7 @@ static void StartTestCase(DNSResolutionTestContext & testContext)
     err = gInet.ResolveHostAddress(testCase.hostName, strlen(testCase.hostName), testCase.dnsOptions, testCase.maxResults,
                                    testContext.resultsBuf, HandleResolutionComplete, &testContext);
 
-    if (err != INET_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         printf("ResolveHostAddress failed for %s: %s\n", testCase.hostName, ::chip::ErrorStr(err));
 
@@ -552,13 +552,13 @@ static void StartTestCase(DNSResolutionTestContext & testContext)
     }
 }
 
-static void HandleResolutionComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray)
+static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t addrCount, IPAddress * addrArray)
 {
     DNSResolutionTestContext & testContext = *static_cast<DNSResolutionTestContext *>(appState);
     DNSResolutionTestCase & testCase       = testContext.testCase;
     nlTestSuite * testSuite                = testContext.testSuite;
 
-    if (err == INET_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
         printf("DNS resolution complete for %s: %" PRIu8 " result%s returned\n", testCase.hostName, addrCount,
                (addrCount != 1) ? "s" : "");
@@ -577,7 +577,7 @@ static void HandleResolutionComplete(void * appState, INET_ERROR err, uint8_t ad
     // Verify the expected result.
     NL_TEST_ASSERT(testSuite, err == testCase.expectErr);
 
-    if (err == INET_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
         // Make sure the number of addresses is within the max expected.
         NL_TEST_ASSERT(testSuite, addrCount <= testCase.maxResults);

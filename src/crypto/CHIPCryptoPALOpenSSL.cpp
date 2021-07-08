@@ -407,6 +407,39 @@ exit:
     return error;
 }
 
+CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                 uint8_t * out_buffer, size_t out_length)
+{
+    VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(key_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(message != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(message_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_length >= CHIP_CRYPTO_HASH_LEN_BYTES, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    CHIP_ERROR error         = CHIP_ERROR_INTERNAL;
+    int error_openssl        = 0;
+    unsigned int mac_out_len = 0;
+
+    HMAC_CTX * mac_ctx = HMAC_CTX_new();
+    VerifyOrExit(mac_ctx != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    error_openssl = HMAC_Init_ex(mac_ctx, Uint8::to_const_uchar(key), static_cast<int>(key_length), EVP_sha256(), nullptr);
+    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
+
+    error_openssl = HMAC_Update(mac_ctx, Uint8::to_const_uchar(message), message_length);
+    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
+
+    mac_out_len   = static_cast<unsigned int>(CHIP_CRYPTO_HASH_LEN_BYTES);
+    error_openssl = HMAC_Final(mac_ctx, Uint8::to_uchar(out_buffer), &mac_out_len);
+    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
+
+    error = CHIP_NO_ERROR;
+exit:
+    HMAC_CTX_free(mac_ctx);
+    return error;
+}
+
 CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
                                         unsigned int iteration_count, uint32_t key_length, uint8_t * output)
 {
@@ -921,6 +954,9 @@ exit:
 CHIP_ERROR P256Keypair::Initialize()
 {
     ERR_clear_error();
+
+    Clear();
+
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     EC_KEY * ec_key  = nullptr;
@@ -988,6 +1024,8 @@ exit:
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
     Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
+
+    Clear();
 
     BIGNUM * pvt_key     = nullptr;
     EC_GROUP * group     = nullptr;
@@ -1064,13 +1102,19 @@ exit:
     return error;
 }
 
-P256Keypair::~P256Keypair()
+void P256Keypair::Clear()
 {
     if (mInitialized)
     {
         EC_KEY * ec_key = to_EC_KEY(&mKeypair);
         EC_KEY_free(ec_key);
+        mInitialized = false;
     }
+}
+
+P256Keypair::~P256Keypair()
+{
+    Clear();
 }
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length)
@@ -1287,31 +1331,8 @@ void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl()
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out)
 {
-    CHIP_ERROR error         = CHIP_ERROR_INTERNAL;
-    int error_openssl        = 0;
-    unsigned int mac_out_len = 0;
-
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-
-    HMAC_CTX * mac_ctx = HMAC_CTX_new();
-    VerifyOrExit(mac_ctx != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    VerifyOrExit(CanCastTo<int>(key_len), error = CHIP_ERROR_INTERNAL);
-    error_openssl = HMAC_Init_ex(mac_ctx, Uint8::to_const_uchar(key), static_cast<int>(key_len), context->md_info, nullptr);
-    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
-
-    error_openssl = HMAC_Update(mac_ctx, Uint8::to_const_uchar(in), in_len);
-    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
-
-    VerifyOrExit(CanCastTo<int>(hash_size), error = CHIP_ERROR_INTERNAL);
-    mac_out_len   = static_cast<unsigned int>(hash_size);
-    error_openssl = HMAC_Final(mac_ctx, Uint8::to_uchar(out), &mac_out_len);
-    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
-
-    error = CHIP_NO_ERROR;
-exit:
-    HMAC_CTX_free(mac_ctx);
-    return error;
+    HMAC_sha hmac;
+    return hmac.HMAC_SHA256(key, key_len, in, in_len, out, kSHA256_Hash_Length);
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len,
@@ -1644,6 +1665,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen)
 {
     CHIP_ERROR err             = CHIP_NO_ERROR;
+    int status                 = 0;
     X509_STORE_CTX * verifyCtx = nullptr;
     X509_STORE * store         = nullptr;
     X509 * x509RootCertificate = nullptr;
@@ -1659,23 +1681,23 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     x509RootCertificate = d2i_X509(NULL, &rootCertificate, static_cast<long>(rootCertificateLen));
     VerifyOrExit(x509RootCertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = X509_STORE_add_cert(store, x509RootCertificate);
-    VerifyOrExit(err == 1, err = CHIP_ERROR_INTERNAL);
+    status = X509_STORE_add_cert(store, x509RootCertificate);
+    VerifyOrExit(status == 1, err = CHIP_ERROR_INTERNAL);
 
     x509CACertificate = d2i_X509(NULL, &caCertificate, static_cast<long>(caCertificateLen));
     VerifyOrExit(x509CACertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = X509_STORE_add_cert(store, x509CACertificate);
-    VerifyOrExit(err == 1, err = CHIP_ERROR_INTERNAL);
+    status = X509_STORE_add_cert(store, x509CACertificate);
+    VerifyOrExit(status == 1, err = CHIP_ERROR_INTERNAL);
 
     x509LeafCertificate = d2i_X509(NULL, &leafCertificate, static_cast<long>(leafCertificateLen));
     VerifyOrExit(x509LeafCertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = X509_STORE_CTX_init(verifyCtx, store, x509LeafCertificate, NULL);
-    VerifyOrExit(err == 1, err = CHIP_ERROR_INTERNAL);
+    status = X509_STORE_CTX_init(verifyCtx, store, x509LeafCertificate, NULL);
+    VerifyOrExit(status == 1, err = CHIP_ERROR_INTERNAL);
 
-    err = X509_verify_cert(verifyCtx);
-    VerifyOrExit(err == 1, err = CHIP_ERROR_CERT_NOT_TRUSTED);
+    status = X509_verify_cert(verifyCtx);
+    VerifyOrExit(status == 1, err = CHIP_ERROR_CERT_NOT_TRUSTED);
 
     err = CHIP_NO_ERROR;
 

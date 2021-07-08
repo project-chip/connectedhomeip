@@ -162,7 +162,7 @@ void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeou
     // TODO(#5556): Integrate timer platform details with WatchableEventManager.
     mSystemLayer->GetTimeout(nextTimeout);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
     chip::Mdns::GetMdnsTimeout(nextTimeout);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
@@ -200,7 +200,7 @@ void WatchableEventManager::HandleEvents()
         }
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
     chip::Mdns::HandleMdnsTimeout();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 }

@@ -40,7 +40,7 @@ struct ccm_128_test_vector
     const uint8_t * tag;
     size_t tag_len;
     unsigned tcId;
-    int result;
+    CHIP_ERROR result;
 };
 
 static const uint8_t chiptest_dac9e1195a0d_pt_1[]                           = { 0xee };

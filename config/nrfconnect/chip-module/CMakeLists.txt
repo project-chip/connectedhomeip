@@ -47,30 +47,30 @@ list(APPEND CHIP_CFLAGS_CC)
 list(APPEND CHIP_LIBRARIES)
 
 # GN meta-build system arguments passed to the make_gn_args.py script
-list(APPEND CHIP_GN_ARGS)
+string(APPEND CHIP_GN_ARGS)
 
 # ==============================================================================
 # Helper macros
 # ==============================================================================
 
 macro(chip_gn_arg_import FILE)
-    list(APPEND CHIP_GN_ARGS --module "${FILE}")
+    string(APPEND CHIP_GN_ARGS "--module\n${FILE}\n")
 endmacro()
 
 macro(chip_gn_arg_string ARG STRING)
-    list(APPEND CHIP_GN_ARGS --arg-string "${ARG}" "${STRING}")
+    string(APPEND CHIP_GN_ARGS "--arg-string\n${ARG}\n${STRING}\n")
 endmacro()
 
 macro(chip_gn_arg_bool ARG BOOLEAN)
     if (${BOOLEAN})
-        list(APPEND CHIP_GN_ARGS --arg "${ARG}" "true")
+        string(APPEND CHIP_GN_ARGS "--arg\n${ARG}\ntrue\n")
     else()
-        list(APPEND CHIP_GN_ARGS --arg "${ARG}" "false")
+        string(APPEND CHIP_GN_ARGS "--arg\n${ARG}\nfalse\n")
     endif()
 endmacro()
 
 macro(chip_gn_arg_cflags ARG CFLAGS)
-    list(APPEND CHIP_GN_ARGS --arg-cflags "${ARG}" "${CFLAGS}")
+    string(APPEND CHIP_GN_ARGS "--arg-cflags\n${ARG}\n${CFLAGS}\n")
 endmacro()
 
 # ==============================================================================
@@ -189,6 +189,7 @@ chip_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 chip_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
 chip_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER})
 chip_gn_arg_bool  ("is_debug"                               CONFIG_DEBUG)
+chip_gn_arg_bool  ("chip_logging"                           CONFIG_LOG)
 chip_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
 chip_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
 chip_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_NET_IPV4)
@@ -216,6 +217,8 @@ elseif (BOARD STREQUAL "native_posix_64")
     chip_gn_arg_string("target_cpu" "x64")
 endif()
 
+file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/args.tmp" CONTENT ${CHIP_GN_ARGS})
+
 # ==============================================================================
 # Define 'chip-gn' target that builds CHIP library(ies) with GN build system
 # ==============================================================================
@@ -224,19 +227,19 @@ ExternalProject_Add(
     PREFIX                  ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
-    CONFIGURE_COMMAND       ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make_gn_args.py
-                                ${CHIP_GN_ARGS} > ${CMAKE_CURRENT_BINARY_DIR}/args.gn &&
+    CONFIGURE_COMMAND       ""
+    BUILD_COMMAND           ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make_gn_args.py
+                                @args.tmp > args.gn &&
                             ${GN_EXECUTABLE}
                                 --root=${CHIP_ROOT}
                                 --root-target=${GN_ROOT_TARGET}
                                 --dotfile=${GN_ROOT_TARGET}/.gn
                                 --script-executable=${Python3_EXECUTABLE}
                                 --export-compile-commands
-                                gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
-    BUILD_COMMAND           ninja
+                                gen --check --fail-on-unused-args . &&
+                            ninja
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}
-    CONFIGURE_ALWAYS        TRUE
     BUILD_ALWAYS            TRUE
     USES_TERMINAL_CONFIGURE TRUE
     USES_TERMINAL_BUILD     TRUE

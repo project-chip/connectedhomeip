@@ -17,7 +17,7 @@ name: Cirque
 on: workflow_dispatch
 
 concurrency:
-    group: ${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 jobs:
@@ -78,7 +78,7 @@ jobs:
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Run Tests
-              timeout-minutes: 15
+              timeout-minutes: 25
               run: |
                   integrations/docker/images/chip-build-cirque/run.sh \
                      --env LOG_DIR=/tmp/cirque_test_output \

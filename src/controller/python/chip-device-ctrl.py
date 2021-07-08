@@ -26,6 +26,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from chip import ChipDeviceCtrl
+from chip import ChipCommissionableNodeCtrl
 from chip import exceptions
 import argparse
 import ctypes
@@ -156,6 +157,8 @@ class DeviceMgrCmd(Cmd):
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
             controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter)
 
+        self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController()
+            
         # If we are on Linux and user selects non-default bluetooth adapter.
         if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
             try:
@@ -320,20 +323,42 @@ class DeviceMgrCmd(Cmd):
 
     def do_setuppayload(self, line):
         """
+        setup-payload generate [options]
+
+        Options:
+          -v   Vendor ID
+          -p   Product ID
+          -cf  Custom Flow [Standard = 0, UserActionRequired = 1, Custom = 2]
+          -dc  Discovery Capabilities [SoftAP = 1 | BLE = 2 | OnNetwork = 4]
+          -dv  Discriminator Value
+          -ps  Passcode
+
         setup-payload parse-manual <manual-pairing-code>
         setup-payload parse-qr <qr-code-payload>
         """
         try:
-            args = shlex.split(line)
-            if (len(args) != 2) or (args[0] not in ("parse-manual", "parse-qr")):
+            arglist = shlex.split(line)
+            if arglist[0] not in ("generate", "parse-manual", "parse-qr"):
                 self.do_help("setup-payload")
                 return
 
-            if args[0] == "parse-manual":
-                SetupPayload().ParseManualPairingCode(args[1]).Print()
+            if arglist[0] == "generate":
+                parser = argparse.ArgumentParser()
+                parser.add_argument("-v", type=int, default=0, dest='vendorId')
+                parser.add_argument("-p", type=int, default=0, dest='productId')
+                parser.add_argument('-cf', type=int, default=0, dest='customFlow')
+                parser.add_argument("-dc", type=int, default=0, dest='capabilities')
+                parser.add_argument("-dv", type=int, default=0, dest='discriminator')
+                parser.add_argument("-ps", type=int, dest='passcode')                
+                args = parser.parse_args(arglist[1:])
 
-            if args[0] == "parse-qr":
-                SetupPayload().ParseQrCode(args[1]).Print()
+                SetupPayload().PrintOnboardingCodes(args.passcode, args.vendorId, args.productId, args.discriminator, args.customFlow, args.capabilities)
+
+            if arglist[0] == "parse-manual":
+                SetupPayload().ParseManualPairingCode(arglist[1]).Print()
+
+            if arglist[0] == "parse-qr":
+                SetupPayload().ParseQrCode(arglist[1]).Print()
 
         except exceptions.ChipStackException as ex:
             print(str(ex))
@@ -562,16 +587,19 @@ class DeviceMgrCmd(Cmd):
                 return
             parser = argparse.ArgumentParser()
             group = parser.add_mutually_exclusive_group()
-            group.add_argument('-all', help='discover all commissionable nodes', action='store_true')
-            group.add_argument('-qr', help='discover devices matching provided QR code', type=str)
-            group.add_argument('-l', help='discover devices with given long discriminator', type=int)
-            group.add_argument('-s', help='discover devices with given short discriminator', type=int)
-            group.add_argument('-v', help='discover devices wtih given vendor ID', type=int)
-            group.add_argument('-t', help='discover devices with given device type', type=int)
-            group.add_argument('-c', help='discover devices with given commissioning mode', type=int)
-            group.add_argument('-a', help='discover devices put in commissioning mode from command', action='store_true')
+            group.add_argument('-all', help='discover all commissionable nodes and commissioners', action='store_true')
+            group.add_argument('-qr', help='discover commissionable nodes matching provided QR code', type=str)
+            group.add_argument('-l', help='discover commissionable nodes with given long discriminator', type=int)
+            group.add_argument('-s', help='discover commissionable nodes with given short discriminator', type=int)
+            group.add_argument('-v', help='discover commissionable nodes wtih given vendor ID', type=int)
+            group.add_argument('-t', help='discover commissionable nodes with given device type', type=int)
+            group.add_argument('-c', help='discover commissionable nodes with given commissioning mode', type=int)
+            group.add_argument('-a', help='discover commissionable nodes put in commissioning mode from command', action='store_true')
             args=parser.parse_args(arglist)
             if args.all:
+                self.commissionableNodeCtrl.DiscoverCommissioners()
+                self.wait_for_many_discovered_devices()
+                self.commissionableNodeCtrl.PrintDiscoveredCommissioners()
                 self.devCtrl.DiscoverAllCommissioning()
                 self.wait_for_many_discovered_devices()
             elif args.qr is not None:

@@ -5,6 +5,7 @@
 
 #include "chip-zcl-zpro-codec-api.h"
 #include <lib/support/Span.h>
+#include <gen/CHIPClientCallbacks.h>
 
 namespace chip {
 namespace Controller {
@@ -74,9 +75,18 @@ CHIP_ERROR {{asCamelCased name false}}Cluster::DiscoverAttributes(Callback::Canc
 {{#chip_server_cluster_attributes}}
 CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encode{{asCamelCased parent.name false}}ClusterRead{{asCamelCased name false}}Attribute(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = {{asHex code 4}};
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+{{#if isList}}
+        {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAttributeFilter
+{{else}}
+         BasicAttributeFilter<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>
+{{/if}}
+        );
 }
 
 {{#if (isWritableAttribute)}}
@@ -89,10 +99,10 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCas
 
 {{/if}}
 {{#if (isReportableAttribute)}}
-CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ConfigureAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}})
+CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ConfigureAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}})
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(seqNum, mEndpoint, minInterval, maxInterval{{#unless (isDiscreteType)}}, change{{/unless}});
+    System::PacketBufferHandle encodedCommand = encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(seqNum, mEndpoint, minInterval, maxInterval{{#if isAnalog}}, change{{/if}});
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 

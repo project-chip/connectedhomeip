@@ -1,0 +1,12 @@
+chip.rpc.Ssid.ssid max_size:32
+chip.rpc.ScanConfig.ssid max_count:1;max_size:32
+chip.rpc.ScanConfig.bssid max_count:1;max_size:6
+chip.rpc.ScanResult.ssid max_size:32
+chip.rpc.ScanResult.bssid max_size:6
+chip.rpc.ScanResults.aps max_count:20
+chip.rpc.MacAddress.mac_address max_size:18
+chip.rpc.WiFiInterface.interface max_size:20
+chip.rpc.IP4Address.address max_size:16
+chip.rpc.IP6Address.address max_size:46
+chip.rpc.ConnectionData.ssid max_size:32
+chip.rpc.ConnectionData.secret max_size:64

@@ -49,7 +49,7 @@ static constexpr int16_t kAnyMessageType = -1;
  *    It works on be behalf of higher layers, creating ExchangeContexts and
  *    handling the registration/unregistration of unsolicited message handlers.
  */
-class DLL_EXPORT ExchangeManager : public SecureSessionMgrDelegate, public TransportMgrDelegate
+class DLL_EXPORT ExchangeManager : public SecureSessionMgrDelegate
 {
     friend class ExchangeContext;
 
@@ -242,21 +242,17 @@ private:
     CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source) override;
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
-                           SecureSessionMgr * msgLayer) override;
+                           const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
+                           System::PacketBufferHandle && msgBuf) override;
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+    void OnNewConnection(SecureSessionHandle session) override;
 #if CHIP_CONFIG_TEST
 public: // Allow OnConnectionExpired to be called directly from tests.
 #endif  // CHIP_CONFIG_TEST
-    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
-
-    // TransportMgrDelegate interface for rendezvous sessions
-private:
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
+    void OnConnectionExpired(SecureSessionHandle session) override;
 };
 
 } // namespace Messaging

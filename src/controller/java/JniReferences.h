@@ -73,6 +73,8 @@ public:
                           jmethodID * methodId);
     void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument);
 
+    CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray);
+
 private:
     JniReferences() {}
 

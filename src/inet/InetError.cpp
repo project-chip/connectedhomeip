@@ -55,11 +55,11 @@ void RegisterLayerErrorFormatter()
  * @return false                    If the supplied error was not an Inet Layer error.
  *
  */
-bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
+bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (err < INET_ERROR_MIN || err > INET_ERROR_MAX)
+    if (err < INET_CONFIG_ERROR_MIN || err > INET_CONFIG_ERROR_MAX)
     {
         return false;
     }
@@ -70,28 +70,28 @@ bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
     case INET_ERROR_WRONG_ADDRESS_TYPE:
         desc = "Wrong address type";
         break;
-    case INET_ERROR_CONNECTION_ABORTED:
+    case CHIP_ERROR_CONNECTION_ABORTED:
         desc = "TCP connection aborted";
         break;
     case INET_ERROR_PEER_DISCONNECTED:
         desc = "Peer disconnected";
         break;
-    case INET_ERROR_INCORRECT_STATE:
+    case CHIP_ERROR_INCORRECT_STATE:
         desc = "Incorrect state";
         break;
-    case INET_ERROR_MESSAGE_TOO_LONG:
+    case CHIP_ERROR_MESSAGE_TOO_LONG:
         desc = "Message too long";
         break;
-    case INET_ERROR_NO_CONNECTION_HANDLER:
+    case CHIP_ERROR_NO_CONNECTION_HANDLER:
         desc = "No TCP connection handler";
         break;
-    case INET_ERROR_NO_MEMORY:
+    case CHIP_ERROR_NO_MEMORY:
         desc = "No memory";
         break;
-    case INET_ERROR_OUTBOUND_MESSAGE_TRUNCATED:
+    case CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG:
         desc = "Outbound message truncated";
         break;
-    case INET_ERROR_INBOUND_MESSAGE_TOO_BIG:
+    case CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG:
         desc = "Inbound message too big";
         break;
     case INET_ERROR_HOST_NOT_FOUND:
@@ -103,7 +103,7 @@ bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
     case INET_ERROR_DNS_NO_RECOVERY:
         desc = "DNS no recovery";
         break;
-    case INET_ERROR_BAD_ARGS:
+    case CHIP_ERROR_INVALID_ARGUMENT:
         desc = "Bad arguments";
         break;
     case INET_ERROR_WRONG_PROTOCOL_TYPE:
@@ -112,7 +112,7 @@ bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
     case INET_ERROR_UNKNOWN_INTERFACE:
         desc = "Unknown interface";
         break;
-    case INET_ERROR_NOT_IMPLEMENTED:
+    case CHIP_ERROR_NOT_IMPLEMENTED:
         desc = "Not implemented";
         break;
     case INET_ERROR_ADDRESS_NOT_FOUND:
@@ -124,16 +124,16 @@ bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err)
     case INET_ERROR_INVALID_HOST_NAME:
         desc = "Invalid host name";
         break;
-    case INET_ERROR_NOT_SUPPORTED:
+    case CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE:
         desc = "Not supported";
         break;
-    case INET_ERROR_NO_ENDPOINTS:
+    case CHIP_ERROR_ENDPOINT_POOL_FULL:
         desc = "No more TCP endpoints";
         break;
     case INET_ERROR_IDLE_TIMEOUT:
         desc = "Idle timeout";
         break;
-    case INET_ERROR_UNEXPECTED_EVENT:
+    case CHIP_ERROR_UNEXPECTED_EVENT:
         desc = "Unexpected event";
         break;
     case INET_ERROR_INVALID_IPV6_PKT:

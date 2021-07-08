@@ -21,6 +21,7 @@
 #include <app/MessageDef/EventPath.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
+#include <support/TypeTraits.h>
 
 namespace chip {
 namespace app {
@@ -63,7 +64,7 @@ void WriteHandler::ClearExistingExchangeContext()
     }
 }
 
-CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle aPayload)
+CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     mpExchangeCtx  = apExchangeContext;
@@ -257,8 +258,7 @@ CHIP_ERROR WriteHandler::AddAttributeStatusCode(const AttributePathParams & aAtt
 
     statusElementBuilder = attributeStatusElement.CreateStatusElementBuilder();
     statusElementBuilder
-        .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(),
-                             Protocols::InteractionModel::ToUint16(aProtocolCode))
+        .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), chip::to_underlying(aProtocolCode))
         .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);

@@ -40,7 +40,7 @@ int LightingManager::Init()
     if (sLightTimer == NULL)
     {
         EFR32_LOG("sLightTimer timer create failed");
-        appError(CHIP_ERROR_MAX);
+        appError(CHIP_CONFIG_CORE_ERROR_MAX);
     }
 
     mState                 = kState_OffCompleted;
@@ -135,7 +135,7 @@ void LightingManager::StartTimer(uint32_t aTimeoutMs)
     if (xTimerChangePeriod(sLightTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
     {
         EFR32_LOG("sLightTimer timer start() failed");
-        appError(CHIP_ERROR_MAX);
+        appError(CHIP_CONFIG_CORE_ERROR_MAX);
     }
 }
 
@@ -144,7 +144,7 @@ void LightingManager::CancelTimer(void)
     if (xTimerStop(sLightTimer, 0) == pdFAIL)
     {
         EFR32_LOG("sLightTimer stop() failed");
-        appError(CHIP_ERROR_MAX);
+        appError(CHIP_CONFIG_CORE_ERROR_MAX);
     }
 }
 

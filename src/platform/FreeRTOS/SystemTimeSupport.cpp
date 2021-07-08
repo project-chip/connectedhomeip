@@ -104,27 +104,27 @@ uint64_t GetClock_MonotonicHiRes(void)
     return GetClock_Monotonic();
 }
 
-Error GetClock_RealTime(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTime(uint64_t & curTime)
 {
     if (sBootTimeUS == 0)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     curTime = sBootTimeUS + GetClock_Monotonic();
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-Error GetClock_RealTimeMS(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTime)
 {
     if (sBootTimeUS == 0)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     curTime = (sBootTimeUS + GetClock_Monotonic()) / 1000;
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-Error SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
 {
     uint64_t timeSinceBootUS = GetClock_Monotonic();
     if (newCurTime > timeSinceBootUS)
@@ -135,7 +135,7 @@ Error SetClock_RealTime(uint64_t newCurTime)
     {
         sBootTimeUS = 0;
     }
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Layer

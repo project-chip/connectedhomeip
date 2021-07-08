@@ -103,7 +103,7 @@ public:
     static const uint16_t sMaxFragmentSize;
 
     // Public functions:
-    BLE_ERROR Init(void * an_app_state, bool expect_first_ack);
+    CHIP_ERROR Init(void * an_app_state, bool expect_first_ack);
 
     inline void SetTxFragmentSize(uint16_t size) { mTxFragmentSize = size; }
     inline void SetRxFragmentSize(uint16_t size) { mRxFragmentSize = size; }
@@ -150,10 +150,10 @@ public:
 
     bool HasUnackedData() const;
 
-    BLE_ERROR HandleCharacteristicReceived(System::PacketBufferHandle && data, SequenceNumber_t & receivedAck,
-                                           bool & didReceiveAck);
+    CHIP_ERROR HandleCharacteristicReceived(System::PacketBufferHandle && data, SequenceNumber_t & receivedAck,
+                                            bool & didReceiveAck);
     bool HandleCharacteristicSend(System::PacketBufferHandle data, bool send_ack);
-    BLE_ERROR EncodeStandAloneAck(const PacketBufferHandle & data);
+    CHIP_ERROR EncodeStandAloneAck(const PacketBufferHandle & data);
 
     PacketBufferHandle TakeRxPacket();
     PacketBufferHandle BorrowRxPacket() { return mRxBuf.Retain(); }
@@ -198,7 +198,7 @@ private:
 
     // Private functions:
     bool IsValidAck(SequenceNumber_t ack_num) const;
-    BLE_ERROR HandleAckReceived(SequenceNumber_t ack_num);
+    CHIP_ERROR HandleAckReceived(SequenceNumber_t ack_num);
 };
 
 } /* namespace Ble */

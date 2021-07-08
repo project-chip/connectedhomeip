@@ -1,0 +1,47 @@
+{{> header}}
+
+#pragma once
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+namespace Globals {
+namespace Attributes {
+namespace Ids {
+{{#zcl_attributes}}
+{{#if (isServer side)}}
+{{#unless clusterRef}}
+static constexpr AttributeId {{asUpperCamelCase label}} = {{asHex code 4}};
+{{/unless}}
+{{/if}}
+{{/zcl_attributes}}
+} // namespace Ids
+} // namespace Attributes
+} // namespace Globals
+
+
+{{#zcl_clusters}}
+{{#zcl_attributes_server}}
+{{#if (hasSpecificAttributes)}}
+{{#first}}
+namespace {{asUpperCamelCase parent.label}} {
+namespace Attributes {
+namespace Ids {
+{{/first}}
+{{#if clusterRef}}
+static constexpr AttributeId {{asUpperCamelCase label}} = {{asHex code 4}};
+{{/if}}
+{{#last}}
+} // namespace Ids
+} // namespace Attributes
+} // namespace {{asUpperCamelCase parent.label}}
+
+{{/last}}
+{{/if}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -208,12 +208,12 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void bind(
-        DefaultClusterCallback callback, long nodeId, int groupId, int endpointId, int clusterId) {
+        DefaultClusterCallback callback, long nodeId, int groupId, int endpointId, long clusterId) {
       bind(chipClusterPtr, callback, nodeId, groupId, endpointId, clusterId);
     }
 
     public void unbind(
-        DefaultClusterCallback callback, long nodeId, int groupId, int endpointId, int clusterId) {
+        DefaultClusterCallback callback, long nodeId, int groupId, int endpointId, long clusterId) {
       unbind(chipClusterPtr, callback, nodeId, groupId, endpointId, clusterId);
     }
 
@@ -223,7 +223,7 @@ public class ChipClusters {
         long nodeId,
         int groupId,
         int endpointId,
-        int clusterId);
+        long clusterId);
 
     private native void unbind(
         long chipClusterPtr,
@@ -231,7 +231,7 @@ public class ChipClusters {
         long nodeId,
         int groupId,
         int endpointId,
-        int clusterId);
+        long clusterId);
   }
 
   public static class BridgedDeviceBasicCluster extends BaseChipCluster {
@@ -250,6 +250,87 @@ public class ChipClusters {
 
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void colorLoopSet(
+        DefaultClusterCallback callback,
+        int updateFlags,
+        int action,
+        int direction,
+        int time,
+        int startHue,
+        int optionsMask,
+        int optionsOverride) {
+      colorLoopSet(
+          chipClusterPtr,
+          callback,
+          updateFlags,
+          action,
+          direction,
+          time,
+          startHue,
+          optionsMask,
+          optionsOverride);
+    }
+
+    public void enhancedMoveHue(
+        DefaultClusterCallback callback,
+        int moveMode,
+        int rate,
+        int optionsMask,
+        int optionsOverride) {
+      enhancedMoveHue(chipClusterPtr, callback, moveMode, rate, optionsMask, optionsOverride);
+    }
+
+    public void enhancedMoveToHue(
+        DefaultClusterCallback callback,
+        int enhancedHue,
+        int direction,
+        int transitionTime,
+        int optionsMask,
+        int optionsOverride) {
+      enhancedMoveToHue(
+          chipClusterPtr,
+          callback,
+          enhancedHue,
+          direction,
+          transitionTime,
+          optionsMask,
+          optionsOverride);
+    }
+
+    public void enhancedMoveToHueAndSaturation(
+        DefaultClusterCallback callback,
+        int enhancedHue,
+        int saturation,
+        int transitionTime,
+        int optionsMask,
+        int optionsOverride) {
+      enhancedMoveToHueAndSaturation(
+          chipClusterPtr,
+          callback,
+          enhancedHue,
+          saturation,
+          transitionTime,
+          optionsMask,
+          optionsOverride);
+    }
+
+    public void enhancedStepHue(
+        DefaultClusterCallback callback,
+        int stepMode,
+        int stepSize,
+        int transitionTime,
+        int optionsMask,
+        int optionsOverride) {
+      enhancedStepHue(
+          chipClusterPtr,
+          callback,
+          stepMode,
+          stepSize,
+          transitionTime,
+          optionsMask,
+          optionsOverride);
+    }
 
     public void moveColor(
         DefaultClusterCallback callback,
@@ -420,6 +501,52 @@ public class ChipClusters {
         DefaultClusterCallback callback, int optionsMask, int optionsOverride) {
       stopMoveStep(chipClusterPtr, callback, optionsMask, optionsOverride);
     }
+
+    private native void colorLoopSet(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int updateFlags,
+        int action,
+        int direction,
+        int time,
+        int startHue,
+        int optionsMask,
+        int optionsOverride);
+
+    private native void enhancedMoveHue(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int moveMode,
+        int rate,
+        int optionsMask,
+        int optionsOverride);
+
+    private native void enhancedMoveToHue(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int enhancedHue,
+        int direction,
+        int transitionTime,
+        int optionsMask,
+        int optionsOverride);
+
+    private native void enhancedMoveToHueAndSaturation(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int enhancedHue,
+        int saturation,
+        int transitionTime,
+        int optionsMask,
+        int optionsOverride);
+
+    private native void enhancedStepHue(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int stepMode,
+        int stepSize,
+        int transitionTime,
+        int optionsMask,
+        int optionsOverride);
 
     private native void moveColor(
         long chipClusterPtr,
@@ -1017,6 +1144,15 @@ public class ChipClusters {
     }
   }
 
+  public static class ElectricalMeasurementCluster extends BaseChipCluster {
+    public ElectricalMeasurementCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+  }
+
   public static class EthernetNetworkDiagnosticsCluster extends BaseChipCluster {
     public EthernetNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -1034,6 +1170,15 @@ public class ChipClusters {
 
   public static class FixedLabelCluster extends BaseChipCluster {
     public FixedLabelCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+  }
+
+  public static class FlowMeasurementCluster extends BaseChipCluster {
+    public FlowMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -1441,6 +1586,10 @@ public class ChipClusters {
       mediaRewind(chipClusterPtr, callback);
     }
 
+    public void mediaSeek(MediaSeekResponseCallback callback, long position) {
+      mediaSeek(chipClusterPtr, callback, position);
+    }
+
     public void mediaSkipBackward(
         MediaSkipBackwardResponseCallback callback, long deltaPositionMilliseconds) {
       mediaSkipBackward(chipClusterPtr, callback, deltaPositionMilliseconds);
@@ -1449,10 +1598,6 @@ public class ChipClusters {
     public void mediaSkipForward(
         MediaSkipForwardResponseCallback callback, long deltaPositionMilliseconds) {
       mediaSkipForward(chipClusterPtr, callback, deltaPositionMilliseconds);
-    }
-
-    public void mediaSkipSeek(MediaSkipSeekResponseCallback callback, long position) {
-      mediaSkipSeek(chipClusterPtr, callback, position);
     }
 
     public void mediaStartOver(MediaStartOverResponseCallback callback) {
@@ -1476,6 +1621,9 @@ public class ChipClusters {
 
     private native void mediaRewind(long chipClusterPtr, MediaRewindResponseCallback callback);
 
+    private native void mediaSeek(
+        long chipClusterPtr, MediaSeekResponseCallback callback, long position);
+
     private native void mediaSkipBackward(
         long chipClusterPtr,
         MediaSkipBackwardResponseCallback callback,
@@ -1485,9 +1633,6 @@ public class ChipClusters {
         long chipClusterPtr,
         MediaSkipForwardResponseCallback callback,
         long deltaPositionMilliseconds);
-
-    private native void mediaSkipSeek(
-        long chipClusterPtr, MediaSkipSeekResponseCallback callback, long position);
 
     private native void mediaStartOver(
         long chipClusterPtr, MediaStartOverResponseCallback callback);
@@ -1530,6 +1675,12 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
+    public interface MediaSeekResponseCallback {
+      void onSuccess(int mediaPlaybackStatus);
+
+      void onError(Exception error);
+    }
+
     public interface MediaSkipBackwardResponseCallback {
       void onSuccess(int mediaPlaybackStatus);
 
@@ -1537,12 +1688,6 @@ public class ChipClusters {
     }
 
     public interface MediaSkipForwardResponseCallback {
-      void onSuccess(int mediaPlaybackStatus);
-
-      void onError(Exception error);
-    }
-
-    public interface MediaSkipSeekResponseCallback {
       void onSuccess(int mediaPlaybackStatus);
 
       void onError(Exception error);
@@ -1745,8 +1890,8 @@ public class ChipClusters {
     }
   }
 
-  public static class OtaSoftwareUpdateServerCluster extends BaseChipCluster {
-    public OtaSoftwareUpdateServerCluster(long devicePtr, int endpointId) {
+  public static class OtaSoftwareUpdateProviderCluster extends BaseChipCluster {
+    public OtaSoftwareUpdateProviderCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -1772,8 +1917,8 @@ public class ChipClusters {
         long currentVersion,
         int protocolsSupported,
         String location,
-        int clientCanConsent,
-        byte[] metadataForServer) {
+        int requestorCanConsent,
+        byte[] metadataForProvider) {
       queryImage(
           chipClusterPtr,
           callback,
@@ -1784,8 +1929,8 @@ public class ChipClusters {
           currentVersion,
           protocolsSupported,
           location,
-          clientCanConsent,
-          metadataForServer);
+          requestorCanConsent,
+          metadataForProvider);
     }
 
     private native void applyUpdateRequest(
@@ -1810,8 +1955,8 @@ public class ChipClusters {
         long currentVersion,
         int protocolsSupported,
         String location,
-        int clientCanConsent,
-        byte[] metadataForServer);
+        int requestorCanConsent,
+        byte[] metadataForProvider);
 
     public interface ApplyUpdateRequestResponseCallback {
       void onSuccess(int action, long delayedActionTime);
@@ -1826,10 +1971,19 @@ public class ChipClusters {
           long softwareVersion,
           byte[] updateToken,
           int userConsentNeeded,
-          byte[] metadataForClient);
+          byte[] metadataForRequestor);
 
       void onError(Exception error);
     }
+  }
+
+  public static class OccupancySensingCluster extends BaseChipCluster {
+    public OccupancySensingCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
   }
 
   public static class OnOffCluster extends BaseChipCluster {
@@ -1869,11 +2023,11 @@ public class ChipClusters {
 
     public void addOpCert(
         OpCertResponseCallback callback,
-        byte[] operationalCert,
+        byte[] nOCArray,
         byte[] iPKValue,
         long caseAdminNode,
         int adminVendorId) {
-      addOpCert(chipClusterPtr, callback, operationalCert, iPKValue, caseAdminNode, adminVendorId);
+      addOpCert(chipClusterPtr, callback, nOCArray, iPKValue, caseAdminNode, adminVendorId);
     }
 
     public void addTrustedRootCertificate(DefaultClusterCallback callback, byte[] rootCertificate) {
@@ -1909,7 +2063,7 @@ public class ChipClusters {
     private native void addOpCert(
         long chipClusterPtr,
         OpCertResponseCallback callback,
-        byte[] operationalCert,
+        byte[] nOCArray,
         byte[] iPKValue,
         long caseAdminNode,
         int adminVendorId);
@@ -2004,7 +2158,7 @@ public class ChipClusters {
         int sceneId,
         int transitionTime,
         String sceneName,
-        int clusterId,
+        long clusterId,
         int length,
         int value) {
       addScene(
@@ -2051,7 +2205,7 @@ public class ChipClusters {
         int sceneId,
         int transitionTime,
         String sceneName,
-        int clusterId,
+        long clusterId,
         int length,
         int value);
 
@@ -2330,6 +2484,15 @@ public class ChipClusters {
 
   public static class WakeOnLanCluster extends BaseChipCluster {
     public WakeOnLanCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+  }
+
+  public static class WiFiNetworkDiagnosticsCluster extends BaseChipCluster {
+    public WiFiNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 

@@ -36,7 +36,7 @@ struct pbkdf2_test_vector
     uint32_t key_len;
     const uint8_t * key;
     unsigned tcId;
-    int result;
+    CHIP_ERROR result;
 };
 
 static const uint8_t chiptest_key1[]                          = { 0x9a, 0x87, 0xd2, 0x5e, 0x37, 0x40, 0x8f, 0xd7, 0x2f, 0x42,

@@ -128,8 +128,7 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
         Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
 
         // Check if the connection state has the correct transport information
-        if (connectionState == nullptr || connectionState->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined ||
-            connectionState->GetTransport() != nullptr)
+        if (connectionState == nullptr || connectionState->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
         {
             mState = ConnectionState::NotConnected;
             ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
@@ -252,7 +251,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         LOCK_TCPIP_CORE();
 #endif
-        INET_ERROR inetErr = Inet::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), interfaceId);
+        CHIP_ERROR inetErr = Inet::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), interfaceId);
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         UNLOCK_TCPIP_CORE();
 #endif
@@ -291,7 +290,7 @@ CHIP_ERROR Device::Persist()
                           error = mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed to persist device %" PRId32, error);
+            ChipLogError(Controller, "Failed to persist device %" CHIP_ERROR_FORMAT, error);
         }
     }
     return error;
@@ -390,7 +389,14 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
-    VerifyOrReturnError(connectionState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    if (connectionState == nullptr)
+    {
+        // Nothing needs to be done here.  It's not an error to not have a
+        // connectionState.  For one thing, we could have gotten an different
+        // UpdateAddress already and that caused connections to be torn down and
+        // whatnot.
+        return CHIP_NO_ERROR;
+    }
 
     mDeviceAddress = addr;
     connectionState->SetPeerAddress(addr);
@@ -480,7 +486,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "LoadSecureSessionParameters returning error %" PRId32, err);
+        ChipLogError(Controller, "LoadSecureSessionParameters returning error %" CHIP_ERROR_FORMAT, err);
     }
     return err;
 }
@@ -558,7 +564,7 @@ void Device::OnSessionEstablished()
     mCASESession.PeerConnection().SetPeerNodeId(mDeviceId);
 
     CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mCASESession,
-                                                 SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
+                                                 SecureSession::SessionRole::kInitiator, mAdminId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));
@@ -609,9 +615,10 @@ CHIP_ERROR Device::EstablishConnectivity(Callback::Callback<OnDeviceConnected> *
     return CHIP_NO_ERROR;
 }
 
-void Device::AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+void Device::AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                app::TLVDataFilter tlvDataFilter)
 {
-    mCallbacksMgr.AddResponseCallback(mDeviceId, seqNum, onSuccessCallback, onFailureCallback);
+    mCallbacksMgr.AddResponseCallback(mDeviceId, seqNum, onSuccessCallback, onFailureCallback, tlvDataFilter);
 }
 
 void Device::CancelResponseHandler(uint8_t seqNum)
@@ -645,6 +652,31 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeI
                               Callback::Cancelable * onReportCallback)
 {
     mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback);
+}
+
+CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
+                                            Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter)
+{
+    bool loadedSecureSession = false;
+    uint8_t seqNum           = GetNextSequenceNumber();
+    aPath.mNodeId            = GetDeviceId();
+
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback, aTlvDataFilter);
+    }
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        GetDeviceId(), 0, &mSecureSession, nullptr /*event path params list*/, 0, &aPath, 1, 0 /* event number */,
+        seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        CancelResponseHandler(seqNum);
+    }
+    return err;
 }
 
 Device::~Device()

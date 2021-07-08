@@ -19,6 +19,7 @@
 
 #include <cstdint>
 
+#include "lib/support/logging/CHIPLogging.h"
 #include <core/CHIPError.h>
 #include <core/PeerId.h>
 #include <inet/IPAddress.h>
@@ -30,6 +31,18 @@ namespace Mdns {
 
 struct ResolvedNodeData
 {
+    void LogNodeIdResolved()
+    {
+#if CHIP_PROGRESS_LOGGING
+        char addrBuffer[Inet::kMaxIPAddressStringLength + 1];
+        mAddress.ToString(addrBuffer);
+        // Would be nice to log the interface id, but sorting out how to do so
+        // across our differnet InterfaceId implementations is a pain.
+        ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64 " to [%s]:%" PRIu16,
+                        ChipLogValueX64(mPeerId.GetNodeId()), addrBuffer, mPort);
+#endif // CHIP_PROGRESS_LOGGING
+    }
+
     PeerId mPeerId;
     Inet::InterfaceId mInterfaceId;
     Inet::IPAddress mAddress;
@@ -39,13 +52,16 @@ struct ResolvedNodeData
 constexpr size_t kMaxDeviceNameLen         = 32;
 constexpr size_t kMaxRotatingIdLen         = 50;
 constexpr size_t kMaxPairingInstructionLen = 128;
+
+// Largest host name is 64-bits in hex.
+static constexpr int kMaxHostNameSize     = 16;
+static constexpr int kMaxInstanceNameSize = 16;
 struct DiscoveredNodeData
 {
     // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
     static constexpr int kMaxIPAddresses = 5;
-    // Largest host name is 64-bits in hex.
-    static constexpr int kHostNameSize = 16;
-    char hostName[kHostNameSize + 1];
+    char hostName[kMaxHostNameSize + 1];
+    char instanceName[kMaxInstanceNameSize + 1];
     uint16_t longDiscriminator;
     uint16_t vendorId;
     uint16_t productId;
@@ -63,6 +79,7 @@ struct DiscoveredNodeData
     void Reset()
     {
         memset(hostName, 0, sizeof(hostName));
+        memset(instanceName, 0, sizeof(instanceName));
         longDiscriminator = 0;
         vendorId          = 0;
         productId         = 0;
@@ -94,14 +111,24 @@ enum class DiscoveryFilterType : uint8_t
     kDeviceType,
     kCommissioningMode,
     kCommissioningModeFromCommand,
+    kInstanceName,
     kCommissioner
 };
 struct DiscoveryFilter
 {
     DiscoveryFilterType type;
     uint16_t code;
+    char * instanceName;
     DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
     DiscoveryFilter(DiscoveryFilterType newType, uint16_t newCode) : type(newType), code(newCode) {}
+    DiscoveryFilter(DiscoveryFilterType newType, char * newInstanceName) : type(newType), instanceName(newInstanceName) {}
+};
+enum class DiscoveryType
+{
+    kUnknown,
+    kOperational,
+    kCommissionableNode,
+    kCommissionerNode
 };
 /// Groups callbacks for CHIP service resolution requests
 class ResolverDelegate

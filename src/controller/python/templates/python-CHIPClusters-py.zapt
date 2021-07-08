@@ -142,7 +142,7 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
 {{#if (isReportableAttribute)}}
         # Cluster {{asCamelCased parent.name false}} ConfigureAttribute {{asCamelCased name false}}
-        self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16{{#unless (isDiscreteType)}}, ctypes.{{asPythonCType chipType}}{{/unless}}]
+        self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16{{#if isAnalog}}, ctypes.{{asPythonCType chipType}}{{/if}}]
         self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
 {{/if}}
 {{#if (isWritableAttribute)}}
@@ -156,8 +156,12 @@ class ChipClusters:
         def HandleSuccess():
             self._ChipStack.callbackRes = 0
             self._ChipStack.completeEvent.set()
+
         def HandleFailure(status):
             self._ChipStack.callbackRes = status
             self._ChipStack.completeEvent.set()
-        self._chipLib.chip_ime_SetSuccessResponseDelegate(ChipClusters.SUCCESS_DELEGATE(HandleSuccess))
-        self._chipLib.chip_ime_SetFailureResponseDelegate(ChipClusters.FAILURE_DELEGATE(HandleFailure))
+
+        self._HandleSuccess = ChipClusters.SUCCESS_DELEGATE(HandleSuccess)
+        self._HandleFailure = ChipClusters.FAILURE_DELEGATE(HandleFailure)
+        self._chipLib.chip_ime_SetSuccessResponseDelegate(self._HandleSuccess)
+        self._chipLib.chip_ime_SetFailureResponseDelegate(self._HandleFailure)

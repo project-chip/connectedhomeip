@@ -55,7 +55,8 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
         }
         else
         {
-            ChipLogError(Discovery, "Commissioning errored out with error %" PRId32, event->CommissioningComplete.status);
+            ChipLogError(Discovery, "Commissioning errored out with error %" CHIP_ERROR_FORMAT,
+                         event->CommissioningComplete.status);
         }
         // TODO: Commissioning complete means we can finalize the admin in our storage
     }
@@ -148,7 +149,7 @@ void RendezvousServer::OnSessionEstablished()
     CHIP_ERROR err =
         mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
                                 mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession,
-                                SecureSession::SessionRole::kResponder, mAdmin->GetAdminId(), nullptr);
+                                SecureSession::SessionRole::kResponder, mAdmin->GetAdminId());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));

@@ -21,6 +21,7 @@
 #include "AES_CCM_256_test_vectors.h"
 #include "ECDH_P256_test_vectors.h"
 #include "HKDF_SHA256_test_vectors.h"
+#include "HMAC_SHA256_test_vectors.h"
 #include "Hash_SHA256_test_vectors.h"
 #include "PBKDF2_SHA256_test_vectors.h"
 
@@ -88,6 +89,12 @@ using TestPBKDF2_sha256                 = PBKDF2_sha256;
 using TestHKDF_sha = HKDF_shaHSM;
 #else
 using TestHKDF_sha                      = HKDF_sha;
+#endif
+
+#ifdef ENABLE_HSM_HMAC
+using TestHMAC_sha = HMAC_shaHSM;
+#else
+using TestHMAC_sha                      = HMAC_sha;
 #endif
 
 static uint32_t gs_test_entropy_source_called = 0;
@@ -652,6 +659,26 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsExecuted == ArraySize(hash_sha256_test_vectors));
 }
 
+static void TestHMAC_SHA256(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors);
+    int numOfTestsExecuted = 0;
+    TestHMAC_sha mHMAC;
+
+    for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        hmac_sha256_vector v = hmac_sha256_test_vectors[numOfTestsExecuted];
+        size_t out_length    = v.output_hash_length;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_buffer;
+        out_buffer.Alloc(out_length);
+        NL_TEST_ASSERT(inSuite, out_buffer);
+        mHMAC.HMAC_SHA256(v.key, v.key_length, v.message, v.message_length, out_buffer.Get(), v.output_hash_length);
+        bool success = memcmp(v.output_hash, out_buffer.Get(), out_length) == 0;
+        NL_TEST_ASSERT(inSuite, success);
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == numOfTestCases);
+}
+
 static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestCases     = ArraySize(hkdf_sha256_test_vectors);
@@ -997,7 +1024,7 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
     static uint8_t csr[kMAX_CSR_Length];
     size_t length = sizeof(csr);
 
-    static P256Keypair keypair;
+    static Test_P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, keypair.NewCertificateSigningRequest(csr, length) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, length > 0);
@@ -1439,20 +1466,21 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
 static void TestX509_PKCS7Extraction(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    int status     = 0;
     X509DerCertificate x509list[3];
     uint32_t max_certs = sizeof(x509list) / sizeof(X509DerCertificate);
 
     err = LoadCertsFromPKCS7(pem_pkcs7_blob, x509list, &max_certs);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = memcmp(certificate_blob_leaf, x509list[0], x509list[0].Length());
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    status = memcmp(certificate_blob_leaf, x509list[0], x509list[0].Length());
+    NL_TEST_ASSERT(inSuite, status == 0);
 
-    err = memcmp(certificate_blob_intermediate, x509list[1], x509list[1].Length());
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    status = memcmp(certificate_blob_intermediate, x509list[1], x509list[1].Length());
+    NL_TEST_ASSERT(inSuite, status == 0);
 
-    err = memcmp(certificate_blob_root, x509list[2], x509list[2].Length());
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    status = memcmp(certificate_blob_root, x509list[2], x509list[2].Length());
+    NL_TEST_ASSERT(inSuite, status == 0);
 }
 
 static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
@@ -1462,8 +1490,7 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     P256PublicKey publicKey;
 
-    const uint8_t * cert;
-    uint32_t certLen;
+    ByteSpan cert;
     const uint8_t * certPubkey;
     uint32_t certPubkeyLen;
 
@@ -1471,12 +1498,12 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
     {
         uint8_t certType = TestCerts::gTestCerts[i];
 
-        err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert, certLen);
+        err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         err = GetTestCertPubkey(certType, certPubkey, certPubkeyLen);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = ExtractPubkeyFromX509Cert(ByteSpan(cert, certLen), publicKey);
+        err = ExtractPubkeyFromX509Cert(cert, publicKey);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, memcmp(publicKey, certPubkey, certPubkeyLen) == 0);
     }
@@ -1521,6 +1548,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Hash SHA 256", TestHash_SHA256),
     NL_TEST_DEF("Test Hash SHA 256 Stream", TestHash_SHA256_Stream),
     NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
+    NL_TEST_DEF("Test HMAC SHA 256", TestHMAC_SHA256),
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
     NL_TEST_DEF("Test ECDH derive shared secret", TestECDH_EstablishSecret),

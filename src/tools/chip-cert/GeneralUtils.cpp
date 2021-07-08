@@ -20,12 +20,14 @@
 /**
  *    @file
  *      This file implements utility functions for OpenSSL, base-64
- *      encoding and decoding, date and time parsing, EUI64 parsing,
+ *      encoding and decoding, date and time parsing, integer parsing,
  *      OID translation, and file reading.
  *
  */
 
 #include "chip-cert.h"
+
+#include <support/SafeInt.h>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -38,6 +40,8 @@ int gNIDChipRootId;
 int gNIDChipFabricId;
 int gNIDChipAuthTag1;
 int gNIDChipAuthTag2;
+int gNIDChipAttAttrVID;
+int gNIDChipAttAttrPID;
 int gNIDChipCurveP256 = EC_curve_nist2nid("P-256");
 
 bool InitOpenSSL()
@@ -91,6 +95,18 @@ bool InitOpenSSL()
         ReportOpenSSLErrorAndExit("OBJ_create", res = false);
     }
 
+    gNIDChipAttAttrVID = OBJ_create("1.3.6.1.4.1.37244.2.1", "ChipAttestationAttrVID", "ChipAttestationAttrVID");
+    if (gNIDChipAttAttrVID == 0)
+    {
+        ReportOpenSSLErrorAndExit("OBJ_create", res = false);
+    }
+
+    gNIDChipAttAttrPID = OBJ_create("1.3.6.1.4.1.37244.2.2", "ChipAttestationAttrPID", "ChipAttestationAttrPID");
+    if (gNIDChipAttAttrPID == 0)
+    {
+        ReportOpenSSLErrorAndExit("OBJ_create", res = false);
+    }
+
     ASN1_STRING_TABLE_add(gNIDChipNodeId, 16, 16, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipFirmwareSigningId, 16, 16, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipICAId, 16, 16, B_ASN1_UTF8STRING, 0);
@@ -98,6 +114,8 @@ bool InitOpenSSL()
     ASN1_STRING_TABLE_add(gNIDChipFabricId, 16, 16, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipAuthTag1, 8, 8, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipAuthTag2, 8, 8, B_ASN1_UTF8STRING, 0);
+    ASN1_STRING_TABLE_add(gNIDChipAttAttrVID, 4, 4, B_ASN1_UTF8STRING, 0);
+    ASN1_STRING_TABLE_add(gNIDChipAttAttrPID, 4, 4, B_ASN1_UTF8STRING, 0);
 
 exit:
     return res;
