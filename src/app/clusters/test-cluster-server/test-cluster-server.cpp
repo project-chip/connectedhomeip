@@ -29,6 +29,7 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <core/CHIPSafeCasts.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -173,6 +174,33 @@ exit:
     {
         ChipLogError(Zcl, "Test Cluster: failed to send TestSpecific response: %x", err);
     }
+    return true;
+}
+
+namespace {
+app::CommandHandler::CommandHandlerAsyncHandle sTestAsyncTransaction = nullptr;
+EndpointId responseEndPointId                                        = 0;
+
+void SendAsyncTransactionResponse(intptr_t notUsed)
+{
+    if (sTestAsyncTransaction == nullptr)
+    {
+        return;
+    }
+    app::CommandPathParams cmdParams = { responseEndPointId, /* group id */ 0, ZCL_TEST_CLUSTER_ID,
+                                         ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+    sTestAsyncTransaction->AddStatusCode(cmdParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                         Protocols::InteractionModel::Id, Protocols::InteractionModel::ProtocolCode::Success);
+    sTestAsyncTransaction = nullptr; // Release transaction.
+}
+} // namespace
+
+bool emberAfTestClusterClusterTestAsyncTransactionCallback(chip::app::CommandHandler * apCommandObj)
+{
+    responseEndPointId = emberAfCurrentEndpoint();
+    VerifyOrReturnError(apCommandObj != nullptr, false);
+    sTestAsyncTransaction = apCommandObj->PreparePendingWork();
+    DeviceLayer::PlatformMgr().ScheduleWork(SendAsyncTransactionResponse, 0);
     return true;
 }
 

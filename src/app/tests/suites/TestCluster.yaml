@@ -22,6 +22,9 @@ tests:
     - label: "Send Test Command"
       command: "test"
 
+    - label: "Send Test Async Command"
+      command: "testAsyncTransaction"
+
     - label: "Send Test Not Handled Command"
       command: "testNotHandled"
       response:
