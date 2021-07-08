@@ -2173,6 +2173,14 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_FABRIC_MISMATCH_ON_ICA                          CHIP_CORE_ERROR(0xc6)
 
 /**
+ * @def CHIP_ERROR_MESSAGE_ID_OUT_OF_WINDOW
+ *
+ * @brief
+ *   The message id of the received message is out of receiving window
+ */
+#define CHIP_ERROR_MESSAGE_ID_OUT_OF_WINDOW                        CHIP_CORE_ERROR(0xc7)
+
+/**
  *  @}
  */
 

@@ -37,7 +37,8 @@ class MessagingContext
 {
 public:
     MessagingContext() :
-        mInitialized(false), mPeer(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)),
+        mInitialized(false), mLocalAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)),
+        mPeerAddress(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT + 1)),
         mPairingPeerToLocal(GetLocalKeyId(), GetPeerKeyId()), mPairingLocalToPeer(GetPeerKeyId(), GetLocalKeyId())
     {}
     ~MessagingContext() { VerifyOrDie(mInitialized == false); }
@@ -80,6 +81,9 @@ public:
     SessionHandle GetSessionLocalToPeer();
     SessionHandle GetSessionPeerToLocal();
 
+    Messaging::ExchangeContext * NewUnauthenticatedExchangeToPeer(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeContext * NewUnauthenticatedExchangeToLocal(Messaging::ExchangeDelegate * delegate);
+
     Messaging::ExchangeContext * NewExchangeToPeer(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewExchangeToLocal(Messaging::ExchangeDelegate * delegate);
 
@@ -98,7 +102,8 @@ private:
     NodeId mDestinationNodeId = 111222333;
     uint16_t mLocalKeyId      = 1;
     uint16_t mPeerKeyId       = 2;
-    Optional<Transport::PeerAddress> mPeer;
+    Transport::PeerAddress mLocalAddress;
+    Transport::PeerAddress mPeerAddress;
     SecurePairingUsingTestSecret mPairingPeerToLocal;
     SecurePairingUsingTestSecret mPairingLocalToPeer;
     Transport::FabricTable mFabrics;
