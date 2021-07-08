@@ -40,7 +40,7 @@
 
 #include "scenes.h"
 #include "app/util/common.h"
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
@@ -213,19 +213,19 @@ void emAfPluginScenesServerPrintInfo(void)
     }
 }
 
-bool emberAfScenesClusterAddSceneCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t sceneId,
+bool emberAfScenesClusterAddSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId,
                                           uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets)
 {
     return emberAfPluginScenesServerParseAddScene(commandObj, emberAfCurrentCommand(), groupId, sceneId, transitionTime, sceneName,
                                                   extensionFieldSets);
 }
 
-bool emberAfScenesClusterViewSceneCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t sceneId)
+bool emberAfScenesClusterViewSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId)
 {
     return emberAfPluginScenesServerParseViewScene(commandObj, emberAfCurrentCommand(), groupId, sceneId);
 }
 
-bool emberAfScenesClusterRemoveSceneCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t sceneId)
+bool emberAfScenesClusterRemoveSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -280,7 +280,7 @@ exit:
     return true;
 }
 
-bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::Command * commandObj, GroupId groupId)
+bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::CommandHandler * commandObj, GroupId groupId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -329,7 +329,7 @@ exit:
     return true;
 }
 
-bool emberAfScenesClusterStoreSceneCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t sceneId)
+bool emberAfScenesClusterStoreSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId)
 {
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -361,7 +361,7 @@ exit:
     return true;
 }
 
-bool emberAfScenesClusterRecallSceneCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t sceneId,
+bool emberAfScenesClusterRecallSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId,
                                              uint16_t transitionTime)
 {
     // NOTE: TransitionTime field in the RecallScene command is currently
@@ -395,7 +395,7 @@ bool emberAfScenesClusterRecallSceneCallback(chip::app::Command * commandObj, Gr
     return true;
 }
 
-bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::Command * commandObj, GroupId groupId)
+bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::CommandHandler * commandObj, GroupId groupId)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -695,8 +695,8 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, 
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId,
-                                            uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+bool emberAfPluginScenesServerParseAddScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
+                                            GroupId groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
                                             uint8_t * extensionFieldSets)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -752,7 +752,7 @@ bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, con
     if (enhanced)
     {
         entry.transitionTime      = transitionTime / 10;
-        entry.transitionTime100ms = (uint8_t)(transitionTime - entry.transitionTime * 10);
+        entry.transitionTime100ms = (uint8_t) (transitionTime - entry.transitionTime * 10);
     }
     else
     {
@@ -1034,8 +1034,8 @@ exit:
     return true;
 }
 
-bool emberAfPluginScenesServerParseViewScene(chip::app::Command * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId,
-                                             uint8_t sceneId)
+bool emberAfPluginScenesServerParseViewScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
+                                             GroupId groupId, uint8_t sceneId)
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     EmberAfSceneTableEntry entry = {};

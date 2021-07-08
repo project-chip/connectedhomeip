@@ -41,7 +41,7 @@
 
 #include <app/util/af.h>
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
@@ -419,8 +419,9 @@ static bool moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t tr
  * @param saturation   Ver.: always
  * @param transitionTime   Ver.: always
  */
-bool emberAfColorControlClusterMoveToHueAndSaturationCallback(chip::app::Command * commandObj, uint8_t hue, uint8_t saturation,
-                                                              uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+bool emberAfColorControlClusterMoveToHueAndSaturationCallback(chip::app::CommandHandler * commandObj, uint8_t hue,
+                                                              uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
+                                                              uint8_t optionsOverride)
 {
     return moveToHueAndSaturation(static_cast<uint16_t>(hue), saturation, transitionTime, optionsMask, optionsOverride, false);
 }
@@ -517,13 +518,13 @@ static bool moveHue(uint8_t moveMode, uint16_t rate, uint8_t optionsMask, uint8_
     return true;
 }
 
-bool emberAfColorControlClusterMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
-                                               uint8_t optionsOverride)
+bool emberAfColorControlClusterMoveHueCallback(chip::app::CommandHandler * commandObj, uint8_t moveMode, uint8_t rate,
+                                               uint8_t optionsMask, uint8_t optionsOverride)
 {
     return moveHue(moveMode, static_cast<uint16_t>(rate), optionsMask, optionsOverride, false);
 }
 
-bool emberAfColorControlClusterMoveSaturationCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate,
+bool emberAfColorControlClusterMoveSaturationCallback(chip::app::CommandHandler * commandObj, uint8_t moveMode, uint8_t rate,
                                                       uint8_t optionsMask, uint8_t optionsOverride)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
@@ -688,13 +689,13 @@ static bool moveToHue(uint16_t hue, uint8_t hueMoveMode, uint16_t transitionTime
     return true;
 }
 
-bool emberAfColorControlClusterMoveToHueCallback(chip::app::Command * commandObj, uint8_t hue, uint8_t hueMoveMode,
+bool emberAfColorControlClusterMoveToHueCallback(chip::app::CommandHandler * commandObj, uint8_t hue, uint8_t hueMoveMode,
                                                  uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
     return moveToHue(static_cast<uint16_t>(hue), hueMoveMode, transitionTime, optionsMask, optionsOverride, false);
 }
 
-bool emberAfColorControlClusterMoveToSaturationCallback(chip::app::Command * commandObj, uint8_t saturation,
+bool emberAfColorControlClusterMoveToSaturationCallback(chip::app::CommandHandler * commandObj, uint8_t saturation,
                                                         uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
@@ -827,14 +828,14 @@ static bool stepHue(uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime
     return true;
 }
 
-bool emberAfColorControlClusterStepHueCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
+bool emberAfColorControlClusterStepHueCallback(chip::app::CommandHandler * commandObj, uint8_t stepMode, uint8_t stepSize,
                                                uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
     return stepHue(stepMode, static_cast<uint16_t>(stepSize), static_cast<uint16_t>(transitionTime), optionsMask, optionsOverride,
                    false);
 }
 
-bool emberAfColorControlClusterStepSaturationCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
+bool emberAfColorControlClusterStepSaturationCallback(chip::app::CommandHandler * commandObj, uint8_t stepMode, uint8_t stepSize,
                                                       uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
@@ -967,7 +968,7 @@ static uint16_t readEnhancedHue(EndpointId endpoint)
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
 
-bool emberAfColorControlClusterMoveToColorCallback(chip::app::Command * commandObj, uint16_t colorX, uint16_t colorY,
+bool emberAfColorControlClusterMoveToColorCallback(chip::app::CommandHandler * commandObj, uint16_t colorX, uint16_t colorY,
                                                    uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
@@ -1017,8 +1018,8 @@ bool emberAfColorControlClusterMoveToColorCallback(chip::app::Command * commandO
     return true;
 }
 
-bool emberAfColorControlClusterMoveColorCallback(chip::app::Command * commandObj, int16_t rateX, int16_t rateY, uint8_t optionsMask,
-                                                 uint8_t optionsOverride)
+bool emberAfColorControlClusterMoveColorCallback(chip::app::CommandHandler * commandObj, int16_t rateX, int16_t rateY,
+                                                 uint8_t optionsMask, uint8_t optionsOverride)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
 
@@ -1054,7 +1055,7 @@ bool emberAfColorControlClusterMoveColorCallback(chip::app::Command * commandObj
     else
     {
         colorXTransitionState.finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                     = (uint16_t)(rateX * -1);
+        unsignedRate                     = (uint16_t) (rateX * -1);
     }
     transitionTimeX                      = computeTransitionTimeFromStateAndRate(&colorXTransitionState, unsignedRate);
     colorXTransitionState.stepsRemaining = transitionTimeX;
@@ -1073,7 +1074,7 @@ bool emberAfColorControlClusterMoveColorCallback(chip::app::Command * commandObj
     else
     {
         colorYTransitionState.finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                     = (uint16_t)(rateY * -1);
+        unsignedRate                     = (uint16_t) (rateY * -1);
     }
     transitionTimeY                      = computeTransitionTimeFromStateAndRate(&colorYTransitionState, unsignedRate);
     colorYTransitionState.stepsRemaining = transitionTimeY;
@@ -1098,7 +1099,7 @@ bool emberAfColorControlClusterMoveColorCallback(chip::app::Command * commandObj
     return true;
 }
 
-bool emberAfColorControlClusterStepColorCallback(chip::app::Command * commandObj, int16_t stepX, int16_t stepY,
+bool emberAfColorControlClusterStepColorCallback(chip::app::CommandHandler * commandObj, int16_t stepX, int16_t stepY,
                                                  uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
@@ -1236,7 +1237,7 @@ static void moveToColorTemp(EndpointId endpoint, uint16_t colorTemperature, uint
     emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
 }
 
-bool emberAfColorControlClusterMoveToColorTemperatureCallback(chip::app::Command * commandObj, uint16_t colorTemperature,
+bool emberAfColorControlClusterMoveToColorTemperatureCallback(chip::app::CommandHandler * commandObj, uint16_t colorTemperature,
                                                               uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
@@ -1253,7 +1254,7 @@ bool emberAfColorControlClusterMoveToColorTemperatureCallback(chip::app::Command
     return true;
 }
 
-bool emberAfColorControlClusterMoveColorTemperatureCallback(chip::app::Command * commandObj, uint8_t moveMode, uint16_t rate,
+bool emberAfColorControlClusterMoveColorTemperatureCallback(chip::app::CommandHandler * commandObj, uint8_t moveMode, uint16_t rate,
                                                             uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
                                                             uint8_t optionsMask, uint8_t optionsOverride)
 {
@@ -1337,10 +1338,10 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(chip::app::Command *
     return true;
 }
 
-bool emberAfColorControlClusterStepColorTemperatureCallback(chip::app::Command * commandObj, uint8_t stepMode, uint16_t stepSize,
-                                                            uint16_t transitionTime, uint16_t colorTemperatureMinimum,
-                                                            uint16_t colorTemperatureMaximum, uint8_t optionsMask,
-                                                            uint8_t optionsOverride)
+bool emberAfColorControlClusterStepColorTemperatureCallback(chip::app::CommandHandler * commandObj, uint8_t stepMode,
+                                                            uint16_t stepSize, uint16_t transitionTime,
+                                                            uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
+                                                            uint8_t optionsMask, uint8_t optionsOverride)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
 
@@ -1464,8 +1465,8 @@ void emberAfPluginLevelControlCoupledColorTempChangeCallback(EndpointId endpoint
         else
         {
             uint32_t tempDelta = (((uint32_t) tempPhysMax - (uint32_t) tempCoupleMin) * currentLevel) /
-                (uint32_t)(MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
-            newColorTemp = (uint16_t)((uint32_t) tempPhysMax - tempDelta);
+                (uint32_t) (MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
+            newColorTemp = (uint16_t) ((uint32_t) tempPhysMax - tempDelta);
         }
 
         // Apply new color temp.
@@ -1475,7 +1476,8 @@ void emberAfPluginLevelControlCoupledColorTempChangeCallback(EndpointId endpoint
 
 #endif //#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-bool emberAfColorControlClusterStopMoveStepCallback(chip::app::Command * commandObj, uint8_t optionsMask, uint8_t optionsOverride)
+bool emberAfColorControlClusterStopMoveStepCallback(chip::app::CommandHandler * commandObj, uint8_t optionsMask,
+                                                    uint8_t optionsOverride)
 {
     // Received a stop command.  This is all we need to do.
     EndpointId endpoint = emberAfCurrentEndpoint();
@@ -1489,7 +1491,7 @@ bool emberAfColorControlClusterStopMoveStepCallback(chip::app::Command * command
     return true;
 }
 
-bool emberAfColorControlClusterColorLoopSetCallback(chip::app::Command * commandObj, uint8_t updateFlags, uint8_t action,
+bool emberAfColorControlClusterColorLoopSetCallback(chip::app::CommandHandler * commandObj, uint8_t updateFlags, uint8_t action,
                                                     uint8_t direction, uint16_t time, uint16_t startHue, uint8_t optionsMask,
                                                     uint8_t optionsOverride)
 {
@@ -1498,26 +1500,27 @@ bool emberAfColorControlClusterColorLoopSetCallback(chip::app::Command * command
     return true;
 }
 
-bool emberAfColorControlClusterEnhancedMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint16_t rate,
+bool emberAfColorControlClusterEnhancedMoveHueCallback(chip::app::CommandHandler * commandObj, uint8_t moveMode, uint16_t rate,
                                                        uint8_t optionsMask, uint8_t optionsOverride)
 {
     return moveHue(moveMode, rate, optionsMask, optionsOverride, true);
 }
 
-bool emberAfColorControlClusterEnhancedMoveToHueCallback(chip::app::Command * commandObj, uint16_t enhancedHue, uint8_t direction,
-                                                         uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+bool emberAfColorControlClusterEnhancedMoveToHueCallback(chip::app::CommandHandler * commandObj, uint16_t enhancedHue,
+                                                         uint8_t direction, uint16_t transitionTime, uint8_t optionsMask,
+                                                         uint8_t optionsOverride)
 {
     return moveToHue(enhancedHue, direction, transitionTime, optionsMask, optionsOverride, true);
 }
 
-bool emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(chip::app::Command * commandObj, uint16_t enhancedHue,
+bool emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(chip::app::CommandHandler * commandObj, uint16_t enhancedHue,
                                                                       uint8_t saturation, uint16_t transitionTime,
                                                                       uint8_t optionsMask, uint8_t optionsOverride)
 {
     return moveToHueAndSaturation(enhancedHue, saturation, transitionTime, optionsMask, optionsOverride, true);
 }
 
-bool emberAfColorControlClusterEnhancedStepHueCallback(chip::app::Command * commandObj, uint8_t stepMode, uint16_t stepSize,
+bool emberAfColorControlClusterEnhancedStepHueCallback(chip::app::CommandHandler * commandObj, uint8_t stepMode, uint16_t stepSize,
                                                        uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
     return stepHue(stepMode, stepSize, transitionTime, optionsMask, optionsOverride, true);
@@ -1796,16 +1799,16 @@ static bool computeNewColor16uValue(Color16uTransitionState * p)
     }
     else if (p->finalValue > p->initialValue)
     {
-        newValue32u = ((uint32_t)(p->finalValue - p->initialValue));
-        newValue32u *= ((uint32_t)(p->stepsRemaining));
-        newValue32u /= ((uint32_t)(p->stepsTotal));
+        newValue32u = ((uint32_t) (p->finalValue - p->initialValue));
+        newValue32u *= ((uint32_t) (p->stepsRemaining));
+        newValue32u /= ((uint32_t) (p->stepsTotal));
         p->currentValue = static_cast<uint16_t>(p->finalValue - static_cast<uint16_t>(newValue32u));
     }
     else
     {
-        newValue32u = ((uint32_t)(p->initialValue - p->finalValue));
-        newValue32u *= ((uint32_t)(p->stepsRemaining));
-        newValue32u /= ((uint32_t)(p->stepsTotal));
+        newValue32u = ((uint32_t) (p->initialValue - p->finalValue));
+        newValue32u *= ((uint32_t) (p->stepsRemaining));
+        newValue32u /= ((uint32_t) (p->stepsTotal));
         p->currentValue = static_cast<uint16_t>(p->finalValue + static_cast<uint16_t>(newValue32u));
     }
 
@@ -2013,8 +2016,8 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
                 // if startup color temp was set to 0xFFFF).
                 updatedColorTemp = startUpColorTemp;
                 status           = emberAfWriteAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                               ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                               reinterpret_cast<uint8_t *>(&updatedColorTemp), ZCL_INT16U_ATTRIBUTE_TYPE);
+                                                         ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                         reinterpret_cast<uint8_t *>(&updatedColorTemp), ZCL_INT16U_ATTRIBUTE_TYPE);
                 if (status == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     // Set ColorMode attributes to reflect ColorTemperature.
@@ -2024,8 +2027,8 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
                                               CLUSTER_MASK_SERVER, &updateColorMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
                     updateColorMode = EMBER_ZCL_ENHANCED_COLOR_MODE_COLOR_TEMPERATURE;
                     status          = emberAfWriteAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                                   ZCL_COLOR_CONTROL_ENHANCED_COLOR_MODE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                   &updateColorMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
+                                                            ZCL_COLOR_CONTROL_ENHANCED_COLOR_MODE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                            &updateColorMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
                 }
             }
         }
