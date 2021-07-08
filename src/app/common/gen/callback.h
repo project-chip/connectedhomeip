@@ -25,6 +25,8 @@
 #include <app/util/basic-types.h>
 
 #include <app/Command.h>
+#include <app/CommandHandler.h>
+#include <app/CommandSender.h>
 #include <lib/support/Span.h>
 
 /** @brief Cluster Init
@@ -15079,1930 +15081,3917 @@ void emberAfSampleMfgSpecificCluster2ClusterClientTickCallback(chip::EndpointId 
 // Cluster Commands Callback
 
 /**
- * @brief  Cluster Identify Command callback
+ * @brief  Cluster Identify Command callback (client side)
  */
-bool emberAfIdentifyClusterIdentifyCallback(chip::app::Command * commandObj, uint16_t identifyTime);
+bool emberAfIdentifyClusterIdentifyCallback(chip::app::CommandSender * commandObj, uint16_t identifyTime);
 
 /**
- * @brief  Cluster IdentifyQueryResponse Command callback
+ * @brief  Cluster Identify Command callback (server side)
  */
-bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::app::Command * commandObj, uint16_t timeout);
+bool emberAfIdentifyClusterIdentifyCallback(chip::app::CommandHandler * commandObj, uint16_t identifyTime);
 
 /**
- * @brief  Cluster IdentifyQuery Command callback
+ * @brief  Cluster IdentifyQueryResponse Command callback (client side)
  */
-bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::Command * commandObj);
+bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::app::CommandSender * commandObj, uint16_t timeout);
 
 /**
- * @brief  Cluster EZModeInvoke Command callback
+ * @brief  Cluster IdentifyQueryResponse Command callback (server side)
  */
-bool emberAfIdentifyClusterEZModeInvokeCallback(chip::app::Command * commandObj, uint8_t action);
+bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::app::CommandHandler * commandObj, uint16_t timeout);
 
 /**
- * @brief  Cluster UpdateCommissionState Command callback
+ * @brief  Cluster IdentifyQuery Command callback (client side)
  */
-bool emberAfIdentifyClusterUpdateCommissionStateCallback(chip::app::Command * commandObj, uint8_t action,
+bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster IdentifyQuery Command callback (server side)
+ */
+bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster EZModeInvoke Command callback (client side)
+ */
+bool emberAfIdentifyClusterEZModeInvokeCallback(chip::app::CommandSender * commandObj, uint8_t action);
+
+/**
+ * @brief  Cluster EZModeInvoke Command callback (server side)
+ */
+bool emberAfIdentifyClusterEZModeInvokeCallback(chip::app::CommandHandler * commandObj, uint8_t action);
+
+/**
+ * @brief  Cluster UpdateCommissionState Command callback (client side)
+ */
+bool emberAfIdentifyClusterUpdateCommissionStateCallback(chip::app::CommandSender * commandObj, uint8_t action,
                                                          uint8_t commissionStateMask);
 
 /**
- * @brief  Cluster TriggerEffect Command callback
+ * @brief  Cluster UpdateCommissionState Command callback (server side)
  */
-bool emberAfIdentifyClusterTriggerEffectCallback(chip::app::Command * commandObj, uint8_t effectId, uint8_t effectVariant);
+bool emberAfIdentifyClusterUpdateCommissionStateCallback(chip::app::CommandHandler * commandObj, uint8_t action,
+                                                         uint8_t commissionStateMask);
 
 /**
- * @brief  Cluster AddGroup Command callback
+ * @brief  Cluster TriggerEffect Command callback (client side)
  */
-bool emberAfGroupsClusterAddGroupCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t * groupName);
+bool emberAfIdentifyClusterTriggerEffectCallback(chip::app::CommandSender * commandObj, uint8_t effectId, uint8_t effectVariant);
 
 /**
- * @brief  Cluster AddGroupResponse Command callback
+ * @brief  Cluster TriggerEffect Command callback (server side)
  */
-bool emberAfGroupsClusterAddGroupResponseCallback(chip::app::Command * commandObj, uint8_t status, uint16_t groupId);
+bool emberAfIdentifyClusterTriggerEffectCallback(chip::app::CommandHandler * commandObj, uint8_t effectId, uint8_t effectVariant);
 
 /**
- * @brief  Cluster ViewGroup Command callback
+ * @brief  Cluster AddGroup Command callback (client side)
  */
-bool emberAfGroupsClusterViewGroupCallback(chip::app::Command * commandObj, uint16_t groupId);
+bool emberAfGroupsClusterAddGroupCallback(chip::app::CommandSender * commandObj, uint16_t groupId, uint8_t * groupName);
 
 /**
- * @brief  Cluster ViewGroupResponse Command callback
+ * @brief  Cluster AddGroup Command callback (server side)
  */
-bool emberAfGroupsClusterViewGroupResponseCallback(chip::app::Command * commandObj, uint8_t status, uint16_t groupId,
+bool emberAfGroupsClusterAddGroupCallback(chip::app::CommandHandler * commandObj, uint16_t groupId, uint8_t * groupName);
+
+/**
+ * @brief  Cluster AddGroupResponse Command callback (client side)
+ */
+bool emberAfGroupsClusterAddGroupResponseCallback(chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupId);
+
+/**
+ * @brief  Cluster AddGroupResponse Command callback (server side)
+ */
+bool emberAfGroupsClusterAddGroupResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, uint16_t groupId);
+
+/**
+ * @brief  Cluster ViewGroup Command callback (client side)
+ */
+bool emberAfGroupsClusterViewGroupCallback(chip::app::CommandSender * commandObj, uint16_t groupId);
+
+/**
+ * @brief  Cluster ViewGroup Command callback (server side)
+ */
+bool emberAfGroupsClusterViewGroupCallback(chip::app::CommandHandler * commandObj, uint16_t groupId);
+
+/**
+ * @brief  Cluster ViewGroupResponse Command callback (client side)
+ */
+bool emberAfGroupsClusterViewGroupResponseCallback(chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupId,
                                                    uint8_t * groupName);
 
 /**
- * @brief  Cluster GetGroupMembership Command callback
+ * @brief  Cluster ViewGroupResponse Command callback (server side)
  */
-bool emberAfGroupsClusterGetGroupMembershipCallback(chip::app::Command * commandObj, uint8_t groupCount,
+bool emberAfGroupsClusterViewGroupResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, uint16_t groupId,
+                                                   uint8_t * groupName);
+
+/**
+ * @brief  Cluster GetGroupMembership Command callback (client side)
+ */
+bool emberAfGroupsClusterGetGroupMembershipCallback(chip::app::CommandSender * commandObj, uint8_t groupCount,
                                                     /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 
 /**
- * @brief  Cluster GetGroupMembershipResponse Command callback
+ * @brief  Cluster GetGroupMembership Command callback (server side)
  */
-bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::app::Command * commandObj, uint8_t capacity, uint8_t groupCount,
+bool emberAfGroupsClusterGetGroupMembershipCallback(chip::app::CommandHandler * commandObj, uint8_t groupCount,
+                                                    /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
+
+/**
+ * @brief  Cluster GetGroupMembershipResponse Command callback (client side)
+ */
+bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::app::CommandSender * commandObj, uint8_t capacity,
+                                                            uint8_t groupCount,
                                                             /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 
 /**
- * @brief  Cluster RemoveGroup Command callback
+ * @brief  Cluster GetGroupMembershipResponse Command callback (server side)
  */
-bool emberAfGroupsClusterRemoveGroupCallback(chip::app::Command * commandObj, uint16_t groupId);
+bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::app::CommandHandler * commandObj, uint8_t capacity,
+                                                            uint8_t groupCount,
+                                                            /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 
 /**
- * @brief  Cluster RemoveGroupResponse Command callback
+ * @brief  Cluster RemoveGroup Command callback (client side)
  */
-bool emberAfGroupsClusterRemoveGroupResponseCallback(chip::app::Command * commandObj, uint8_t status, uint16_t groupId);
+bool emberAfGroupsClusterRemoveGroupCallback(chip::app::CommandSender * commandObj, uint16_t groupId);
 
 /**
- * @brief  Cluster RemoveAllGroups Command callback
+ * @brief  Cluster RemoveGroup Command callback (server side)
  */
-bool emberAfGroupsClusterRemoveAllGroupsCallback(chip::app::Command * commandObj);
+bool emberAfGroupsClusterRemoveGroupCallback(chip::app::CommandHandler * commandObj, uint16_t groupId);
 
 /**
- * @brief  Cluster AddGroupIfIdentifying Command callback
+ * @brief  Cluster RemoveGroupResponse Command callback (client side)
  */
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t * groupName);
+bool emberAfGroupsClusterRemoveGroupResponseCallback(chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupId);
 
 /**
- * @brief  Cluster AddScene Command callback
+ * @brief  Cluster RemoveGroupResponse Command callback (server side)
  */
-bool emberAfScenesClusterAddSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId,
+bool emberAfGroupsClusterRemoveGroupResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, uint16_t groupId);
+
+/**
+ * @brief  Cluster RemoveAllGroups Command callback (client side)
+ */
+bool emberAfGroupsClusterRemoveAllGroupsCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster RemoveAllGroups Command callback (server side)
+ */
+bool emberAfGroupsClusterRemoveAllGroupsCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster AddGroupIfIdentifying Command callback (client side)
+ */
+bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(chip::app::CommandSender * commandObj, uint16_t groupId,
+                                                       uint8_t * groupName);
+
+/**
+ * @brief  Cluster AddGroupIfIdentifying Command callback (server side)
+ */
+bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(chip::app::CommandHandler * commandObj, uint16_t groupId,
+                                                       uint8_t * groupName);
+
+/**
+ * @brief  Cluster AddScene Command callback (client side)
+ */
+bool emberAfScenesClusterAddSceneCallback(chip::app::CommandSender * commandObj, uint16_t groupId, uint8_t sceneId,
                                           uint16_t transitionTime, uint8_t * sceneName,
                                           /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 /**
- * @brief  Cluster AddSceneResponse Command callback
+ * @brief  Cluster AddScene Command callback (server side)
  */
-bool emberAfScenesClusterAddSceneResponseCallback(chip::app::Command * commandObj, uint8_t status, uint16_t groupId,
+bool emberAfScenesClusterAddSceneCallback(chip::app::CommandHandler * commandObj, uint16_t groupId, uint8_t sceneId,
+                                          uint16_t transitionTime, uint8_t * sceneName,
+                                          /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+
+/**
+ * @brief  Cluster AddSceneResponse Command callback (client side)
+ */
+bool emberAfScenesClusterAddSceneResponseCallback(chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupId,
                                                   uint8_t sceneId);
 
 /**
- * @brief  Cluster ViewScene Command callback
+ * @brief  Cluster AddSceneResponse Command callback (server side)
  */
-bool emberAfScenesClusterViewSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterAddSceneResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, uint16_t groupId,
+                                                  uint8_t sceneId);
 
 /**
- * @brief  Cluster ViewSceneResponse Command callback
+ * @brief  Cluster ViewScene Command callback (client side)
  */
-bool emberAfScenesClusterViewSceneResponseCallback(chip::app::Command * commandObj, uint8_t status, uint16_t groupId,
+bool emberAfScenesClusterViewSceneCallback(chip::app::CommandSender * commandObj, uint16_t groupId, uint8_t sceneId);
+
+/**
+ * @brief  Cluster ViewScene Command callback (server side)
+ */
+bool emberAfScenesClusterViewSceneCallback(chip::app::CommandHandler * commandObj, uint16_t groupId, uint8_t sceneId);
+
+/**
+ * @brief  Cluster ViewSceneResponse Command callback (client side)
+ */
+bool emberAfScenesClusterViewSceneResponseCallback(chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupId,
                                                    uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
                                                    /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 /**
- * @brief  Cluster RemoveScene Command callback
+ * @brief  Cluster ViewSceneResponse Command callback (server side)
  */
-bool emberAfScenesClusterRemoveSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterViewSceneResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, uint16_t groupId,
+                                                   uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+                                                   /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 /**
- * @brief  Cluster RemoveSceneResponse Command callback
+ * @brief  Cluster RemoveScene Command callback (client side)
  */
-bool emberAfScenesClusterRemoveSceneResponseCallback(chip::app::Command * commandObj, uint8_t status, uint16_t groupId,
+bool emberAfScenesClusterRemoveSceneCallback(chip::app::CommandSender * commandObj, uint16_t groupId, uint8_t sceneId);
+
+/**
+ * @brief  Cluster RemoveScene Command callback (server side)
+ */
+bool emberAfScenesClusterRemoveSceneCallback(chip::app::CommandHandler * commandObj, uint16_t groupId, uint8_t sceneId);
+
+/**
+ * @brief  Cluster RemoveSceneResponse Command callback (client side)
+ */
+bool emberAfScenesClusterRemoveSceneResponseCallback(chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupId,
                                                      uint8_t sceneId);
 
 /**
- * @brief  Cluster RemoveAllScenes Command callback
+ * @brief  Cluster RemoveSceneResponse Command callback (server side)
  */
-bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::Command * commandObj, uint16_t groupId);
+bool emberAfScenesClusterRemoveSceneResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, uint16_t groupId,
+                                                     uint8_t sceneId);
 
 /**
- * @brief  Cluster RemoveAllScenesResponse Command callback
+ * @brief  Cluster RemoveAllScenes Command callback (client side)
  */
-bool emberAfScenesClusterRemoveAllScenesResponseCallback(chip::app::Command * commandObj, uint8_t status, uint16_t groupId);
+bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::CommandSender * commandObj, uint16_t groupId);
 
 /**
- * @brief  Cluster StoreScene Command callback
+ * @brief  Cluster RemoveAllScenes Command callback (server side)
  */
-bool emberAfScenesClusterStoreSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::CommandHandler * commandObj, uint16_t groupId);
 
 /**
- * @brief  Cluster StoreSceneResponse Command callback
+ * @brief  Cluster RemoveAllScenesResponse Command callback (client side)
  */
-bool emberAfScenesClusterStoreSceneResponseCallback(chip::app::Command * commandObj, uint8_t status, uint16_t groupId,
+bool emberAfScenesClusterRemoveAllScenesResponseCallback(chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupId);
+
+/**
+ * @brief  Cluster RemoveAllScenesResponse Command callback (server side)
+ */
+bool emberAfScenesClusterRemoveAllScenesResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, uint16_t groupId);
+
+/**
+ * @brief  Cluster StoreScene Command callback (client side)
+ */
+bool emberAfScenesClusterStoreSceneCallback(chip::app::CommandSender * commandObj, uint16_t groupId, uint8_t sceneId);
+
+/**
+ * @brief  Cluster StoreScene Command callback (server side)
+ */
+bool emberAfScenesClusterStoreSceneCallback(chip::app::CommandHandler * commandObj, uint16_t groupId, uint8_t sceneId);
+
+/**
+ * @brief  Cluster StoreSceneResponse Command callback (client side)
+ */
+bool emberAfScenesClusterStoreSceneResponseCallback(chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupId,
                                                     uint8_t sceneId);
 
 /**
- * @brief  Cluster RecallScene Command callback
+ * @brief  Cluster StoreSceneResponse Command callback (server side)
  */
-bool emberAfScenesClusterRecallSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId,
+bool emberAfScenesClusterStoreSceneResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, uint16_t groupId,
+                                                    uint8_t sceneId);
+
+/**
+ * @brief  Cluster RecallScene Command callback (client side)
+ */
+bool emberAfScenesClusterRecallSceneCallback(chip::app::CommandSender * commandObj, uint16_t groupId, uint8_t sceneId,
                                              uint16_t transitionTime);
 
 /**
- * @brief  Cluster GetSceneMembership Command callback
+ * @brief  Cluster RecallScene Command callback (server side)
  */
-bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::Command * commandObj, uint16_t groupId);
+bool emberAfScenesClusterRecallSceneCallback(chip::app::CommandHandler * commandObj, uint16_t groupId, uint8_t sceneId,
+                                             uint16_t transitionTime);
 
 /**
- * @brief  Cluster GetSceneMembershipResponse Command callback
+ * @brief  Cluster GetSceneMembership Command callback (client side)
  */
-bool emberAfScenesClusterGetSceneMembershipResponseCallback(chip::app::Command * commandObj, uint8_t status, uint8_t capacity,
+bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::CommandSender * commandObj, uint16_t groupId);
+
+/**
+ * @brief  Cluster GetSceneMembership Command callback (server side)
+ */
+bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::CommandHandler * commandObj, uint16_t groupId);
+
+/**
+ * @brief  Cluster GetSceneMembershipResponse Command callback (client side)
+ */
+bool emberAfScenesClusterGetSceneMembershipResponseCallback(chip::app::CommandSender * commandObj, uint8_t status, uint8_t capacity,
                                                             uint16_t groupId, uint8_t sceneCount,
                                                             /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
 
 /**
- * @brief  Cluster EnhancedAddScene Command callback
+ * @brief  Cluster GetSceneMembershipResponse Command callback (server side)
  */
-bool emberAfScenesClusterEnhancedAddSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId,
+bool emberAfScenesClusterGetSceneMembershipResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status,
+                                                            uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
+                                                            /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
+
+/**
+ * @brief  Cluster EnhancedAddScene Command callback (client side)
+ */
+bool emberAfScenesClusterEnhancedAddSceneCallback(chip::app::CommandSender * commandObj, uint16_t groupId, uint8_t sceneId,
                                                   uint16_t transitionTime, uint8_t * sceneName,
                                                   /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 /**
- * @brief  Cluster EnhancedAddSceneResponse Command callback
+ * @brief  Cluster EnhancedAddScene Command callback (server side)
  */
-bool emberAfScenesClusterEnhancedAddSceneResponseCallback(chip::app::Command * commandObj, uint8_t status, uint16_t groupId,
+bool emberAfScenesClusterEnhancedAddSceneCallback(chip::app::CommandHandler * commandObj, uint16_t groupId, uint8_t sceneId,
+                                                  uint16_t transitionTime, uint8_t * sceneName,
+                                                  /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+
+/**
+ * @brief  Cluster EnhancedAddSceneResponse Command callback (client side)
+ */
+bool emberAfScenesClusterEnhancedAddSceneResponseCallback(chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupId,
                                                           uint8_t sceneId);
 
 /**
- * @brief  Cluster EnhancedViewScene Command callback
+ * @brief  Cluster EnhancedAddSceneResponse Command callback (server side)
  */
-bool emberAfScenesClusterEnhancedViewSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterEnhancedAddSceneResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, uint16_t groupId,
+                                                          uint8_t sceneId);
 
 /**
- * @brief  Cluster EnhancedViewSceneResponse Command callback
+ * @brief  Cluster EnhancedViewScene Command callback (client side)
+ */
+bool emberAfScenesClusterEnhancedViewSceneCallback(chip::app::CommandSender * commandObj, uint16_t groupId, uint8_t sceneId);
+
+/**
+ * @brief  Cluster EnhancedViewScene Command callback (server side)
+ */
+bool emberAfScenesClusterEnhancedViewSceneCallback(chip::app::CommandHandler * commandObj, uint16_t groupId, uint8_t sceneId);
+
+/**
+ * @brief  Cluster EnhancedViewSceneResponse Command callback (client side)
  */
 bool emberAfScenesClusterEnhancedViewSceneResponseCallback(
-    chip::app::Command * commandObj, uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
+    chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
     uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 /**
- * @brief  Cluster CopyScene Command callback
+ * @brief  Cluster EnhancedViewSceneResponse Command callback (server side)
  */
-bool emberAfScenesClusterCopySceneCallback(chip::app::Command * commandObj, uint8_t mode, uint16_t groupIdFrom, uint8_t sceneIdFrom,
-                                           uint16_t groupIdTo, uint8_t sceneIdTo);
+bool emberAfScenesClusterEnhancedViewSceneResponseCallback(
+    chip::app::CommandHandler * commandObj, uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
+    uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 /**
- * @brief  Cluster CopySceneResponse Command callback
+ * @brief  Cluster CopyScene Command callback (client side)
  */
-bool emberAfScenesClusterCopySceneResponseCallback(chip::app::Command * commandObj, uint8_t status, uint16_t groupIdFrom,
+bool emberAfScenesClusterCopySceneCallback(chip::app::CommandSender * commandObj, uint8_t mode, uint16_t groupIdFrom,
+                                           uint8_t sceneIdFrom, uint16_t groupIdTo, uint8_t sceneIdTo);
+
+/**
+ * @brief  Cluster CopyScene Command callback (server side)
+ */
+bool emberAfScenesClusterCopySceneCallback(chip::app::CommandHandler * commandObj, uint8_t mode, uint16_t groupIdFrom,
+                                           uint8_t sceneIdFrom, uint16_t groupIdTo, uint8_t sceneIdTo);
+
+/**
+ * @brief  Cluster CopySceneResponse Command callback (client side)
+ */
+bool emberAfScenesClusterCopySceneResponseCallback(chip::app::CommandSender * commandObj, uint8_t status, uint16_t groupIdFrom,
                                                    uint8_t sceneIdFrom);
 
 /**
- * @brief  Cluster Off Command callback
+ * @brief  Cluster CopySceneResponse Command callback (server side)
  */
-bool emberAfOnOffClusterOffCallback(chip::app::Command * commandObj);
+bool emberAfScenesClusterCopySceneResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, uint16_t groupIdFrom,
+                                                   uint8_t sceneIdFrom);
 
 /**
- * @brief  Cluster SampleMfgSpecificOffWithTransition Command callback
+ * @brief  Cluster Off Command callback (client side)
  */
-bool emberAfOnOffClusterSampleMfgSpecificOffWithTransitionCallback(chip::app::Command * commandObj);
+bool emberAfOnOffClusterOffCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster On Command callback
+ * @brief  Cluster Off Command callback (server side)
  */
-bool emberAfOnOffClusterOnCallback(chip::app::Command * commandObj);
+bool emberAfOnOffClusterOffCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster SampleMfgSpecificOnWithTransition Command callback
+ * @brief  Cluster SampleMfgSpecificOffWithTransition Command callback (client side)
  */
-bool emberAfOnOffClusterSampleMfgSpecificOnWithTransitionCallback(chip::app::Command * commandObj);
+bool emberAfOnOffClusterSampleMfgSpecificOffWithTransitionCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster SampleMfgSpecificOnWithTransition2 Command callback
+ * @brief  Cluster SampleMfgSpecificOffWithTransition Command callback (server side)
  */
-bool emberAfOnOffClusterSampleMfgSpecificOnWithTransition2Callback(chip::app::Command * commandObj);
+bool emberAfOnOffClusterSampleMfgSpecificOffWithTransitionCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster Toggle Command callback
+ * @brief  Cluster On Command callback (client side)
  */
-bool emberAfOnOffClusterToggleCallback(chip::app::Command * commandObj);
+bool emberAfOnOffClusterOnCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster SampleMfgSpecificToggleWithTransition Command callback
+ * @brief  Cluster On Command callback (server side)
  */
-bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransitionCallback(chip::app::Command * commandObj);
+bool emberAfOnOffClusterOnCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster SampleMfgSpecificToggleWithTransition2 Command callback
+ * @brief  Cluster SampleMfgSpecificOnWithTransition Command callback (client side)
  */
-bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransition2Callback(chip::app::Command * commandObj);
+bool emberAfOnOffClusterSampleMfgSpecificOnWithTransitionCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster OffWithEffect Command callback
+ * @brief  Cluster SampleMfgSpecificOnWithTransition Command callback (server side)
  */
-bool emberAfOnOffClusterOffWithEffectCallback(chip::app::Command * commandObj, uint8_t effectId, uint8_t effectVariant);
+bool emberAfOnOffClusterSampleMfgSpecificOnWithTransitionCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster OnWithRecallGlobalScene Command callback
+ * @brief  Cluster SampleMfgSpecificOnWithTransition2 Command callback (client side)
  */
-bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(chip::app::Command * commandObj);
+bool emberAfOnOffClusterSampleMfgSpecificOnWithTransition2Callback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster OnWithTimedOff Command callback
+ * @brief  Cluster SampleMfgSpecificOnWithTransition2 Command callback (server side)
  */
-bool emberAfOnOffClusterOnWithTimedOffCallback(chip::app::Command * commandObj, uint8_t onOffControl, uint16_t onTime,
+bool emberAfOnOffClusterSampleMfgSpecificOnWithTransition2Callback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster Toggle Command callback (client side)
+ */
+bool emberAfOnOffClusterToggleCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster Toggle Command callback (server side)
+ */
+bool emberAfOnOffClusterToggleCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster SampleMfgSpecificToggleWithTransition Command callback (client side)
+ */
+bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransitionCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster SampleMfgSpecificToggleWithTransition Command callback (server side)
+ */
+bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransitionCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster SampleMfgSpecificToggleWithTransition2 Command callback (client side)
+ */
+bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransition2Callback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster SampleMfgSpecificToggleWithTransition2 Command callback (server side)
+ */
+bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransition2Callback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster OffWithEffect Command callback (client side)
+ */
+bool emberAfOnOffClusterOffWithEffectCallback(chip::app::CommandSender * commandObj, uint8_t effectId, uint8_t effectVariant);
+
+/**
+ * @brief  Cluster OffWithEffect Command callback (server side)
+ */
+bool emberAfOnOffClusterOffWithEffectCallback(chip::app::CommandHandler * commandObj, uint8_t effectId, uint8_t effectVariant);
+
+/**
+ * @brief  Cluster OnWithRecallGlobalScene Command callback (client side)
+ */
+bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster OnWithRecallGlobalScene Command callback (server side)
+ */
+bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster OnWithTimedOff Command callback (client side)
+ */
+bool emberAfOnOffClusterOnWithTimedOffCallback(chip::app::CommandSender * commandObj, uint8_t onOffControl, uint16_t onTime,
                                                uint16_t offWaitTime);
 
 /**
- * @brief  Cluster MoveToLevel Command callback
+ * @brief  Cluster OnWithTimedOff Command callback (server side)
  */
-bool emberAfLevelControlClusterMoveToLevelCallback(chip::app::Command * commandObj, uint8_t level, uint16_t transitionTime,
+bool emberAfOnOffClusterOnWithTimedOffCallback(chip::app::CommandHandler * commandObj, uint8_t onOffControl, uint16_t onTime,
+                                               uint16_t offWaitTime);
+
+/**
+ * @brief  Cluster MoveToLevel Command callback (client side)
+ */
+bool emberAfLevelControlClusterMoveToLevelCallback(chip::app::CommandSender * commandObj, uint8_t level, uint16_t transitionTime,
                                                    uint8_t optionMask, uint8_t optionOverride);
 
 /**
- * @brief  Cluster Move Command callback
+ * @brief  Cluster MoveToLevel Command callback (server side)
  */
-bool emberAfLevelControlClusterMoveCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate, uint8_t optionMask,
-                                            uint8_t optionOverride);
+bool emberAfLevelControlClusterMoveToLevelCallback(chip::app::CommandHandler * commandObj, uint8_t level, uint16_t transitionTime,
+                                                   uint8_t optionMask, uint8_t optionOverride);
 
 /**
- * @brief  Cluster Step Command callback
+ * @brief  Cluster Move Command callback (client side)
  */
-bool emberAfLevelControlClusterStepCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
+bool emberAfLevelControlClusterMoveCallback(chip::app::CommandSender * commandObj, uint8_t moveMode, uint8_t rate,
+                                            uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief  Cluster Move Command callback (server side)
+ */
+bool emberAfLevelControlClusterMoveCallback(chip::app::CommandHandler * commandObj, uint8_t moveMode, uint8_t rate,
+                                            uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief  Cluster Step Command callback (client side)
+ */
+bool emberAfLevelControlClusterStepCallback(chip::app::CommandSender * commandObj, uint8_t stepMode, uint8_t stepSize,
                                             uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
 
 /**
- * @brief  Cluster Stop Command callback
+ * @brief  Cluster Step Command callback (server side)
  */
-bool emberAfLevelControlClusterStopCallback(chip::app::Command * commandObj, uint8_t optionMask, uint8_t optionOverride);
+bool emberAfLevelControlClusterStepCallback(chip::app::CommandHandler * commandObj, uint8_t stepMode, uint8_t stepSize,
+                                            uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
 
 /**
- * @brief  Cluster MoveToLevelWithOnOff Command callback
+ * @brief  Cluster Stop Command callback (client side)
  */
-bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(chip::app::Command * commandObj, uint8_t level,
+bool emberAfLevelControlClusterStopCallback(chip::app::CommandSender * commandObj, uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief  Cluster Stop Command callback (server side)
+ */
+bool emberAfLevelControlClusterStopCallback(chip::app::CommandHandler * commandObj, uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief  Cluster MoveToLevelWithOnOff Command callback (client side)
+ */
+bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(chip::app::CommandSender * commandObj, uint8_t level,
                                                             uint16_t transitionTime);
 
 /**
- * @brief  Cluster MoveWithOnOff Command callback
+ * @brief  Cluster MoveToLevelWithOnOff Command callback (server side)
  */
-bool emberAfLevelControlClusterMoveWithOnOffCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate);
+bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(chip::app::CommandHandler * commandObj, uint8_t level,
+                                                            uint16_t transitionTime);
 
 /**
- * @brief  Cluster StepWithOnOff Command callback
+ * @brief  Cluster MoveWithOnOff Command callback (client side)
  */
-bool emberAfLevelControlClusterStepWithOnOffCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
+bool emberAfLevelControlClusterMoveWithOnOffCallback(chip::app::CommandSender * commandObj, uint8_t moveMode, uint8_t rate);
+
+/**
+ * @brief  Cluster MoveWithOnOff Command callback (server side)
+ */
+bool emberAfLevelControlClusterMoveWithOnOffCallback(chip::app::CommandHandler * commandObj, uint8_t moveMode, uint8_t rate);
+
+/**
+ * @brief  Cluster StepWithOnOff Command callback (client side)
+ */
+bool emberAfLevelControlClusterStepWithOnOffCallback(chip::app::CommandSender * commandObj, uint8_t stepMode, uint8_t stepSize,
                                                      uint16_t transitionTime);
 
 /**
- * @brief  Cluster StopWithOnOff Command callback
+ * @brief  Cluster StepWithOnOff Command callback (server side)
  */
-bool emberAfLevelControlClusterStopWithOnOffCallback(chip::app::Command * commandObj);
+bool emberAfLevelControlClusterStepWithOnOffCallback(chip::app::CommandHandler * commandObj, uint8_t stepMode, uint8_t stepSize,
+                                                     uint16_t transitionTime);
 
 /**
- * @brief  Cluster ResetAlarm Command callback
+ * @brief  Cluster StopWithOnOff Command callback (client side)
  */
-bool emberAfAlarmsClusterResetAlarmCallback(chip::app::Command * commandObj, uint8_t alarmCode, chip::ClusterId clusterId);
+bool emberAfLevelControlClusterStopWithOnOffCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster Alarm Command callback
+ * @brief  Cluster StopWithOnOff Command callback (server side)
  */
-bool emberAfAlarmsClusterAlarmCallback(chip::app::Command * commandObj, uint8_t alarmCode, chip::ClusterId clusterId);
+bool emberAfLevelControlClusterStopWithOnOffCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster ResetAllAlarms Command callback
+ * @brief  Cluster ResetAlarm Command callback (client side)
  */
-bool emberAfAlarmsClusterResetAllAlarmsCallback(chip::app::Command * commandObj);
+bool emberAfAlarmsClusterResetAlarmCallback(chip::app::CommandSender * commandObj, uint8_t alarmCode, chip::ClusterId clusterId);
 
 /**
- * @brief  Cluster GetAlarmResponse Command callback
+ * @brief  Cluster ResetAlarm Command callback (server side)
  */
-bool emberAfAlarmsClusterGetAlarmResponseCallback(chip::app::Command * commandObj, uint8_t status, uint8_t alarmCode,
+bool emberAfAlarmsClusterResetAlarmCallback(chip::app::CommandHandler * commandObj, uint8_t alarmCode, chip::ClusterId clusterId);
+
+/**
+ * @brief  Cluster Alarm Command callback (client side)
+ */
+bool emberAfAlarmsClusterAlarmCallback(chip::app::CommandSender * commandObj, uint8_t alarmCode, chip::ClusterId clusterId);
+
+/**
+ * @brief  Cluster Alarm Command callback (server side)
+ */
+bool emberAfAlarmsClusterAlarmCallback(chip::app::CommandHandler * commandObj, uint8_t alarmCode, chip::ClusterId clusterId);
+
+/**
+ * @brief  Cluster ResetAllAlarms Command callback (client side)
+ */
+bool emberAfAlarmsClusterResetAllAlarmsCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster ResetAllAlarms Command callback (server side)
+ */
+bool emberAfAlarmsClusterResetAllAlarmsCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster GetAlarmResponse Command callback (client side)
+ */
+bool emberAfAlarmsClusterGetAlarmResponseCallback(chip::app::CommandSender * commandObj, uint8_t status, uint8_t alarmCode,
                                                   chip::ClusterId clusterId, uint32_t timeStamp);
 
 /**
- * @brief  Cluster GetAlarm Command callback
+ * @brief  Cluster GetAlarmResponse Command callback (server side)
  */
-bool emberAfAlarmsClusterGetAlarmCallback(chip::app::Command * commandObj);
+bool emberAfAlarmsClusterGetAlarmResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, uint8_t alarmCode,
+                                                  chip::ClusterId clusterId, uint32_t timeStamp);
 
 /**
- * @brief  Cluster ResetAlarmLog Command callback
+ * @brief  Cluster GetAlarm Command callback (client side)
  */
-bool emberAfAlarmsClusterResetAlarmLogCallback(chip::app::Command * commandObj);
+bool emberAfAlarmsClusterGetAlarmCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster PowerProfileRequest Command callback
+ * @brief  Cluster GetAlarm Command callback (server side)
  */
-bool emberAfPowerProfileClusterPowerProfileRequestCallback(chip::app::Command * commandObj, uint8_t powerProfileId);
+bool emberAfAlarmsClusterGetAlarmCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster PowerProfileNotification Command callback
+ * @brief  Cluster ResetAlarmLog Command callback (client side)
+ */
+bool emberAfAlarmsClusterResetAlarmLogCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster ResetAlarmLog Command callback (server side)
+ */
+bool emberAfAlarmsClusterResetAlarmLogCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster PowerProfileRequest Command callback (client side)
+ */
+bool emberAfPowerProfileClusterPowerProfileRequestCallback(chip::app::CommandSender * commandObj, uint8_t powerProfileId);
+
+/**
+ * @brief  Cluster PowerProfileRequest Command callback (server side)
+ */
+bool emberAfPowerProfileClusterPowerProfileRequestCallback(chip::app::CommandHandler * commandObj, uint8_t powerProfileId);
+
+/**
+ * @brief  Cluster PowerProfileNotification Command callback (client side)
  */
 bool emberAfPowerProfileClusterPowerProfileNotificationCallback(
-    chip::app::Command * commandObj, uint8_t totalProfileNum, uint8_t powerProfileId, uint8_t numOfTransferredPhases,
+    chip::app::CommandSender * commandObj, uint8_t totalProfileNum, uint8_t powerProfileId, uint8_t numOfTransferredPhases,
     /* TYPE WARNING: array array defaults to */ uint8_t * transferredPhases);
 
 /**
- * @brief  Cluster PowerProfileStateRequest Command callback
+ * @brief  Cluster PowerProfileNotification Command callback (server side)
  */
-bool emberAfPowerProfileClusterPowerProfileStateRequestCallback(chip::app::Command * commandObj);
+bool emberAfPowerProfileClusterPowerProfileNotificationCallback(
+    chip::app::CommandHandler * commandObj, uint8_t totalProfileNum, uint8_t powerProfileId, uint8_t numOfTransferredPhases,
+    /* TYPE WARNING: array array defaults to */ uint8_t * transferredPhases);
 
 /**
- * @brief  Cluster PowerProfileResponse Command callback
+ * @brief  Cluster PowerProfileStateRequest Command callback (client side)
+ */
+bool emberAfPowerProfileClusterPowerProfileStateRequestCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster PowerProfileStateRequest Command callback (server side)
+ */
+bool emberAfPowerProfileClusterPowerProfileStateRequestCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster PowerProfileResponse Command callback (client side)
  */
 bool emberAfPowerProfileClusterPowerProfileResponseCallback(
-    chip::app::Command * commandObj, uint8_t totalProfileNum, uint8_t powerProfileId, uint8_t numOfTransferredPhases,
+    chip::app::CommandSender * commandObj, uint8_t totalProfileNum, uint8_t powerProfileId, uint8_t numOfTransferredPhases,
     /* TYPE WARNING: array array defaults to */ uint8_t * transferredPhases);
 
 /**
- * @brief  Cluster GetPowerProfilePriceResponse Command callback
+ * @brief  Cluster PowerProfileResponse Command callback (server side)
  */
-bool emberAfPowerProfileClusterGetPowerProfilePriceResponseCallback(chip::app::Command * commandObj, uint8_t powerProfileId,
+bool emberAfPowerProfileClusterPowerProfileResponseCallback(
+    chip::app::CommandHandler * commandObj, uint8_t totalProfileNum, uint8_t powerProfileId, uint8_t numOfTransferredPhases,
+    /* TYPE WARNING: array array defaults to */ uint8_t * transferredPhases);
+
+/**
+ * @brief  Cluster GetPowerProfilePriceResponse Command callback (client side)
+ */
+bool emberAfPowerProfileClusterGetPowerProfilePriceResponseCallback(chip::app::CommandSender * commandObj, uint8_t powerProfileId,
                                                                     uint16_t currency, uint32_t price, uint8_t priceTrailingDigit);
 
 /**
- * @brief  Cluster PowerProfileStateResponse Command callback
+ * @brief  Cluster GetPowerProfilePriceResponse Command callback (server side)
+ */
+bool emberAfPowerProfileClusterGetPowerProfilePriceResponseCallback(chip::app::CommandHandler * commandObj, uint8_t powerProfileId,
+                                                                    uint16_t currency, uint32_t price, uint8_t priceTrailingDigit);
+
+/**
+ * @brief  Cluster PowerProfileStateResponse Command callback (client side)
  */
 bool emberAfPowerProfileClusterPowerProfileStateResponseCallback(
-    chip::app::Command * commandObj, uint8_t powerProfileCount,
+    chip::app::CommandSender * commandObj, uint8_t powerProfileCount,
     /* TYPE WARNING: array array defaults to */ uint8_t * powerProfileRecords);
 
 /**
- * @brief  Cluster GetOverallSchedulePriceResponse Command callback
+ * @brief  Cluster PowerProfileStateResponse Command callback (server side)
  */
-bool emberAfPowerProfileClusterGetOverallSchedulePriceResponseCallback(chip::app::Command * commandObj, uint16_t currency,
+bool emberAfPowerProfileClusterPowerProfileStateResponseCallback(
+    chip::app::CommandHandler * commandObj, uint8_t powerProfileCount,
+    /* TYPE WARNING: array array defaults to */ uint8_t * powerProfileRecords);
+
+/**
+ * @brief  Cluster GetOverallSchedulePriceResponse Command callback (client side)
+ */
+bool emberAfPowerProfileClusterGetOverallSchedulePriceResponseCallback(chip::app::CommandSender * commandObj, uint16_t currency,
                                                                        uint32_t price, uint8_t priceTrailingDigit);
 
 /**
- * @brief  Cluster GetPowerProfilePrice Command callback
+ * @brief  Cluster GetOverallSchedulePriceResponse Command callback (server side)
  */
-bool emberAfPowerProfileClusterGetPowerProfilePriceCallback(chip::app::Command * commandObj, uint8_t powerProfileId);
+bool emberAfPowerProfileClusterGetOverallSchedulePriceResponseCallback(chip::app::CommandHandler * commandObj, uint16_t currency,
+                                                                       uint32_t price, uint8_t priceTrailingDigit);
 
 /**
- * @brief  Cluster EnergyPhasesScheduleNotification Command callback
+ * @brief  Cluster GetPowerProfilePrice Command callback (client side)
+ */
+bool emberAfPowerProfileClusterGetPowerProfilePriceCallback(chip::app::CommandSender * commandObj, uint8_t powerProfileId);
+
+/**
+ * @brief  Cluster GetPowerProfilePrice Command callback (server side)
+ */
+bool emberAfPowerProfileClusterGetPowerProfilePriceCallback(chip::app::CommandHandler * commandObj, uint8_t powerProfileId);
+
+/**
+ * @brief  Cluster EnergyPhasesScheduleNotification Command callback (client side)
  */
 bool emberAfPowerProfileClusterEnergyPhasesScheduleNotificationCallback(
-    chip::app::Command * commandObj, uint8_t powerProfileId, uint8_t numOfScheduledPhases,
+    chip::app::CommandSender * commandObj, uint8_t powerProfileId, uint8_t numOfScheduledPhases,
     /* TYPE WARNING: array array defaults to */ uint8_t * scheduledPhases);
 
 /**
- * @brief  Cluster PowerProfilesStateNotification Command callback
+ * @brief  Cluster EnergyPhasesScheduleNotification Command callback (server side)
+ */
+bool emberAfPowerProfileClusterEnergyPhasesScheduleNotificationCallback(
+    chip::app::CommandHandler * commandObj, uint8_t powerProfileId, uint8_t numOfScheduledPhases,
+    /* TYPE WARNING: array array defaults to */ uint8_t * scheduledPhases);
+
+/**
+ * @brief  Cluster PowerProfilesStateNotification Command callback (client side)
  */
 bool emberAfPowerProfileClusterPowerProfilesStateNotificationCallback(
-    chip::app::Command * commandObj, uint8_t powerProfileCount,
+    chip::app::CommandSender * commandObj, uint8_t powerProfileCount,
     /* TYPE WARNING: array array defaults to */ uint8_t * powerProfileRecords);
 
 /**
- * @brief  Cluster EnergyPhasesScheduleResponse Command callback
+ * @brief  Cluster PowerProfilesStateNotification Command callback (server side)
+ */
+bool emberAfPowerProfileClusterPowerProfilesStateNotificationCallback(
+    chip::app::CommandHandler * commandObj, uint8_t powerProfileCount,
+    /* TYPE WARNING: array array defaults to */ uint8_t * powerProfileRecords);
+
+/**
+ * @brief  Cluster EnergyPhasesScheduleResponse Command callback (client side)
  */
 bool emberAfPowerProfileClusterEnergyPhasesScheduleResponseCallback(
-    chip::app::Command * commandObj, uint8_t powerProfileId, uint8_t numOfScheduledPhases,
+    chip::app::CommandSender * commandObj, uint8_t powerProfileId, uint8_t numOfScheduledPhases,
     /* TYPE WARNING: array array defaults to */ uint8_t * scheduledPhases);
 
 /**
- * @brief  Cluster GetOverallSchedulePrice Command callback
+ * @brief  Cluster EnergyPhasesScheduleResponse Command callback (server side)
  */
-bool emberAfPowerProfileClusterGetOverallSchedulePriceCallback(chip::app::Command * commandObj);
+bool emberAfPowerProfileClusterEnergyPhasesScheduleResponseCallback(
+    chip::app::CommandHandler * commandObj, uint8_t powerProfileId, uint8_t numOfScheduledPhases,
+    /* TYPE WARNING: array array defaults to */ uint8_t * scheduledPhases);
 
 /**
- * @brief  Cluster PowerProfileScheduleConstraintsRequest Command callback
+ * @brief  Cluster GetOverallSchedulePrice Command callback (client side)
  */
-bool emberAfPowerProfileClusterPowerProfileScheduleConstraintsRequestCallback(chip::app::Command * commandObj,
+bool emberAfPowerProfileClusterGetOverallSchedulePriceCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster GetOverallSchedulePrice Command callback (server side)
+ */
+bool emberAfPowerProfileClusterGetOverallSchedulePriceCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster PowerProfileScheduleConstraintsRequest Command callback (client side)
+ */
+bool emberAfPowerProfileClusterPowerProfileScheduleConstraintsRequestCallback(chip::app::CommandSender * commandObj,
                                                                               uint8_t powerProfileId);
 
 /**
- * @brief  Cluster EnergyPhasesScheduleRequest Command callback
+ * @brief  Cluster PowerProfileScheduleConstraintsRequest Command callback (server side)
  */
-bool emberAfPowerProfileClusterEnergyPhasesScheduleRequestCallback(chip::app::Command * commandObj, uint8_t powerProfileId);
+bool emberAfPowerProfileClusterPowerProfileScheduleConstraintsRequestCallback(chip::app::CommandHandler * commandObj,
+                                                                              uint8_t powerProfileId);
 
 /**
- * @brief  Cluster EnergyPhasesScheduleStateRequest Command callback
+ * @brief  Cluster EnergyPhasesScheduleRequest Command callback (client side)
  */
-bool emberAfPowerProfileClusterEnergyPhasesScheduleStateRequestCallback(chip::app::Command * commandObj, uint8_t powerProfileId);
+bool emberAfPowerProfileClusterEnergyPhasesScheduleRequestCallback(chip::app::CommandSender * commandObj, uint8_t powerProfileId);
 
 /**
- * @brief  Cluster EnergyPhasesScheduleStateResponse Command callback
+ * @brief  Cluster EnergyPhasesScheduleRequest Command callback (server side)
+ */
+bool emberAfPowerProfileClusterEnergyPhasesScheduleRequestCallback(chip::app::CommandHandler * commandObj, uint8_t powerProfileId);
+
+/**
+ * @brief  Cluster EnergyPhasesScheduleStateRequest Command callback (client side)
+ */
+bool emberAfPowerProfileClusterEnergyPhasesScheduleStateRequestCallback(chip::app::CommandSender * commandObj,
+                                                                        uint8_t powerProfileId);
+
+/**
+ * @brief  Cluster EnergyPhasesScheduleStateRequest Command callback (server side)
+ */
+bool emberAfPowerProfileClusterEnergyPhasesScheduleStateRequestCallback(chip::app::CommandHandler * commandObj,
+                                                                        uint8_t powerProfileId);
+
+/**
+ * @brief  Cluster EnergyPhasesScheduleStateResponse Command callback (client side)
  */
 bool emberAfPowerProfileClusterEnergyPhasesScheduleStateResponseCallback(
-    chip::app::Command * commandObj, uint8_t powerProfileId, uint8_t numOfScheduledPhases,
+    chip::app::CommandSender * commandObj, uint8_t powerProfileId, uint8_t numOfScheduledPhases,
     /* TYPE WARNING: array array defaults to */ uint8_t * scheduledPhases);
 
 /**
- * @brief  Cluster GetPowerProfilePriceExtendedResponse Command callback
+ * @brief  Cluster EnergyPhasesScheduleStateResponse Command callback (server side)
  */
-bool emberAfPowerProfileClusterGetPowerProfilePriceExtendedResponseCallback(chip::app::Command * commandObj, uint8_t powerProfileId,
-                                                                            uint16_t currency, uint32_t price,
-                                                                            uint8_t priceTrailingDigit);
+bool emberAfPowerProfileClusterEnergyPhasesScheduleStateResponseCallback(
+    chip::app::CommandHandler * commandObj, uint8_t powerProfileId, uint8_t numOfScheduledPhases,
+    /* TYPE WARNING: array array defaults to */ uint8_t * scheduledPhases);
 
 /**
- * @brief  Cluster EnergyPhasesScheduleStateNotification Command callback
+ * @brief  Cluster GetPowerProfilePriceExtendedResponse Command callback (client side)
+ */
+bool emberAfPowerProfileClusterGetPowerProfilePriceExtendedResponseCallback(chip::app::CommandSender * commandObj,
+                                                                            uint8_t powerProfileId, uint16_t currency,
+                                                                            uint32_t price, uint8_t priceTrailingDigit);
+
+/**
+ * @brief  Cluster GetPowerProfilePriceExtendedResponse Command callback (server side)
+ */
+bool emberAfPowerProfileClusterGetPowerProfilePriceExtendedResponseCallback(chip::app::CommandHandler * commandObj,
+                                                                            uint8_t powerProfileId, uint16_t currency,
+                                                                            uint32_t price, uint8_t priceTrailingDigit);
+
+/**
+ * @brief  Cluster EnergyPhasesScheduleStateNotification Command callback (client side)
  */
 bool emberAfPowerProfileClusterEnergyPhasesScheduleStateNotificationCallback(
-    chip::app::Command * commandObj, uint8_t powerProfileId, uint8_t numOfScheduledPhases,
+    chip::app::CommandSender * commandObj, uint8_t powerProfileId, uint8_t numOfScheduledPhases,
     /* TYPE WARNING: array array defaults to */ uint8_t * scheduledPhases);
 
 /**
- * @brief  Cluster PowerProfileScheduleConstraintsNotification Command callback
+ * @brief  Cluster EnergyPhasesScheduleStateNotification Command callback (server side)
  */
-bool emberAfPowerProfileClusterPowerProfileScheduleConstraintsNotificationCallback(chip::app::Command * commandObj,
+bool emberAfPowerProfileClusterEnergyPhasesScheduleStateNotificationCallback(
+    chip::app::CommandHandler * commandObj, uint8_t powerProfileId, uint8_t numOfScheduledPhases,
+    /* TYPE WARNING: array array defaults to */ uint8_t * scheduledPhases);
+
+/**
+ * @brief  Cluster PowerProfileScheduleConstraintsNotification Command callback (client side)
+ */
+bool emberAfPowerProfileClusterPowerProfileScheduleConstraintsNotificationCallback(chip::app::CommandSender * commandObj,
                                                                                    uint8_t powerProfileId, uint16_t startAfter,
                                                                                    uint16_t stopBefore);
 
 /**
- * @brief  Cluster PowerProfileScheduleConstraintsResponse Command callback
+ * @brief  Cluster PowerProfileScheduleConstraintsNotification Command callback (server side)
  */
-bool emberAfPowerProfileClusterPowerProfileScheduleConstraintsResponseCallback(chip::app::Command * commandObj,
+bool emberAfPowerProfileClusterPowerProfileScheduleConstraintsNotificationCallback(chip::app::CommandHandler * commandObj,
+                                                                                   uint8_t powerProfileId, uint16_t startAfter,
+                                                                                   uint16_t stopBefore);
+
+/**
+ * @brief  Cluster PowerProfileScheduleConstraintsResponse Command callback (client side)
+ */
+bool emberAfPowerProfileClusterPowerProfileScheduleConstraintsResponseCallback(chip::app::CommandSender * commandObj,
                                                                                uint8_t powerProfileId, uint16_t startAfter,
                                                                                uint16_t stopBefore);
 
 /**
- * @brief  Cluster GetPowerProfilePriceExtended Command callback
+ * @brief  Cluster PowerProfileScheduleConstraintsResponse Command callback (server side)
  */
-bool emberAfPowerProfileClusterGetPowerProfilePriceExtendedCallback(chip::app::Command * commandObj, uint8_t options,
+bool emberAfPowerProfileClusterPowerProfileScheduleConstraintsResponseCallback(chip::app::CommandHandler * commandObj,
+                                                                               uint8_t powerProfileId, uint16_t startAfter,
+                                                                               uint16_t stopBefore);
+
+/**
+ * @brief  Cluster GetPowerProfilePriceExtended Command callback (client side)
+ */
+bool emberAfPowerProfileClusterGetPowerProfilePriceExtendedCallback(chip::app::CommandSender * commandObj, uint8_t options,
                                                                     uint8_t powerProfileId, uint16_t powerProfileStartTime);
 
 /**
- * @brief  Cluster ExecutionOfACommand Command callback
+ * @brief  Cluster GetPowerProfilePriceExtended Command callback (server side)
  */
-bool emberAfApplianceControlClusterExecutionOfACommandCallback(chip::app::Command * commandObj, uint8_t commandId);
+bool emberAfPowerProfileClusterGetPowerProfilePriceExtendedCallback(chip::app::CommandHandler * commandObj, uint8_t options,
+                                                                    uint8_t powerProfileId, uint16_t powerProfileStartTime);
 
 /**
- * @brief  Cluster SignalStateResponse Command callback
+ * @brief  Cluster ExecutionOfACommand Command callback (client side)
  */
-bool emberAfApplianceControlClusterSignalStateResponseCallback(chip::app::Command * commandObj, uint8_t applianceStatus,
+bool emberAfApplianceControlClusterExecutionOfACommandCallback(chip::app::CommandSender * commandObj, uint8_t commandId);
+
+/**
+ * @brief  Cluster ExecutionOfACommand Command callback (server side)
+ */
+bool emberAfApplianceControlClusterExecutionOfACommandCallback(chip::app::CommandHandler * commandObj, uint8_t commandId);
+
+/**
+ * @brief  Cluster SignalStateResponse Command callback (client side)
+ */
+bool emberAfApplianceControlClusterSignalStateResponseCallback(chip::app::CommandSender * commandObj, uint8_t applianceStatus,
                                                                uint8_t remoteEnableFlagsAndDeviceStatus2,
                                                                uint32_t applianceStatus2);
 
 /**
- * @brief  Cluster SignalState Command callback
+ * @brief  Cluster SignalStateResponse Command callback (server side)
  */
-bool emberAfApplianceControlClusterSignalStateCallback(chip::app::Command * commandObj);
+bool emberAfApplianceControlClusterSignalStateResponseCallback(chip::app::CommandHandler * commandObj, uint8_t applianceStatus,
+                                                               uint8_t remoteEnableFlagsAndDeviceStatus2,
+                                                               uint32_t applianceStatus2);
 
 /**
- * @brief  Cluster SignalStateNotification Command callback
+ * @brief  Cluster SignalState Command callback (client side)
  */
-bool emberAfApplianceControlClusterSignalStateNotificationCallback(chip::app::Command * commandObj, uint8_t applianceStatus,
+bool emberAfApplianceControlClusterSignalStateCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster SignalState Command callback (server side)
+ */
+bool emberAfApplianceControlClusterSignalStateCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster SignalStateNotification Command callback (client side)
+ */
+bool emberAfApplianceControlClusterSignalStateNotificationCallback(chip::app::CommandSender * commandObj, uint8_t applianceStatus,
                                                                    uint8_t remoteEnableFlagsAndDeviceStatus2,
                                                                    uint32_t applianceStatus2);
 
 /**
- * @brief  Cluster WriteFunctions Command callback
+ * @brief  Cluster SignalStateNotification Command callback (server side)
  */
-bool emberAfApplianceControlClusterWriteFunctionsCallback(chip::app::Command * commandObj, uint16_t functionId,
+bool emberAfApplianceControlClusterSignalStateNotificationCallback(chip::app::CommandHandler * commandObj, uint8_t applianceStatus,
+                                                                   uint8_t remoteEnableFlagsAndDeviceStatus2,
+                                                                   uint32_t applianceStatus2);
+
+/**
+ * @brief  Cluster WriteFunctions Command callback (client side)
+ */
+bool emberAfApplianceControlClusterWriteFunctionsCallback(chip::app::CommandSender * commandObj, uint16_t functionId,
                                                           uint8_t functionDataType,
                                                           /* TYPE WARNING: array array defaults to */ uint8_t * functionData);
 
 /**
- * @brief  Cluster OverloadPauseResume Command callback
+ * @brief  Cluster WriteFunctions Command callback (server side)
  */
-bool emberAfApplianceControlClusterOverloadPauseResumeCallback(chip::app::Command * commandObj);
+bool emberAfApplianceControlClusterWriteFunctionsCallback(chip::app::CommandHandler * commandObj, uint16_t functionId,
+                                                          uint8_t functionDataType,
+                                                          /* TYPE WARNING: array array defaults to */ uint8_t * functionData);
 
 /**
- * @brief  Cluster OverloadPause Command callback
+ * @brief  Cluster OverloadPauseResume Command callback (client side)
  */
-bool emberAfApplianceControlClusterOverloadPauseCallback(chip::app::Command * commandObj);
+bool emberAfApplianceControlClusterOverloadPauseResumeCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster OverloadWarning Command callback
+ * @brief  Cluster OverloadPauseResume Command callback (server side)
  */
-bool emberAfApplianceControlClusterOverloadWarningCallback(chip::app::Command * commandObj, uint8_t warningEvent);
+bool emberAfApplianceControlClusterOverloadPauseResumeCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster CheckIn Command callback
+ * @brief  Cluster OverloadPause Command callback (client side)
  */
-bool emberAfPollControlClusterCheckInCallback(chip::app::Command * commandObj);
+bool emberAfApplianceControlClusterOverloadPauseCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster CheckInResponse Command callback
+ * @brief  Cluster OverloadPause Command callback (server side)
  */
-bool emberAfPollControlClusterCheckInResponseCallback(chip::app::Command * commandObj, uint8_t startFastPolling,
+bool emberAfApplianceControlClusterOverloadPauseCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster OverloadWarning Command callback (client side)
+ */
+bool emberAfApplianceControlClusterOverloadWarningCallback(chip::app::CommandSender * commandObj, uint8_t warningEvent);
+
+/**
+ * @brief  Cluster OverloadWarning Command callback (server side)
+ */
+bool emberAfApplianceControlClusterOverloadWarningCallback(chip::app::CommandHandler * commandObj, uint8_t warningEvent);
+
+/**
+ * @brief  Cluster CheckIn Command callback (client side)
+ */
+bool emberAfPollControlClusterCheckInCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster CheckIn Command callback (server side)
+ */
+bool emberAfPollControlClusterCheckInCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster CheckInResponse Command callback (client side)
+ */
+bool emberAfPollControlClusterCheckInResponseCallback(chip::app::CommandSender * commandObj, uint8_t startFastPolling,
                                                       uint16_t fastPollTimeout);
 
 /**
- * @brief  Cluster FastPollStop Command callback
+ * @brief  Cluster CheckInResponse Command callback (server side)
  */
-bool emberAfPollControlClusterFastPollStopCallback(chip::app::Command * commandObj);
+bool emberAfPollControlClusterCheckInResponseCallback(chip::app::CommandHandler * commandObj, uint8_t startFastPolling,
+                                                      uint16_t fastPollTimeout);
 
 /**
- * @brief  Cluster SetLongPollInterval Command callback
+ * @brief  Cluster FastPollStop Command callback (client side)
  */
-bool emberAfPollControlClusterSetLongPollIntervalCallback(chip::app::Command * commandObj, uint32_t newLongPollInterval);
+bool emberAfPollControlClusterFastPollStopCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster SetShortPollInterval Command callback
+ * @brief  Cluster FastPollStop Command callback (server side)
  */
-bool emberAfPollControlClusterSetShortPollIntervalCallback(chip::app::Command * commandObj, uint16_t newShortPollInterval);
+bool emberAfPollControlClusterFastPollStopCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster StartUp Command callback
+ * @brief  Cluster SetLongPollInterval Command callback (client side)
  */
-bool emberAfBasicClusterStartUpCallback(chip::app::Command * commandObj);
+bool emberAfPollControlClusterSetLongPollIntervalCallback(chip::app::CommandSender * commandObj, uint32_t newLongPollInterval);
 
 /**
- * @brief  Cluster MfgSpecificPing Command callback
+ * @brief  Cluster SetLongPollInterval Command callback (server side)
  */
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj);
+bool emberAfPollControlClusterSetLongPollIntervalCallback(chip::app::CommandHandler * commandObj, uint32_t newLongPollInterval);
 
 /**
- * @brief  Cluster ShutDown Command callback
+ * @brief  Cluster SetShortPollInterval Command callback (client side)
  */
-bool emberAfBasicClusterShutDownCallback(chip::app::Command * commandObj);
+bool emberAfPollControlClusterSetShortPollIntervalCallback(chip::app::CommandSender * commandObj, uint16_t newShortPollInterval);
 
 /**
- * @brief  Cluster Leave Command callback
+ * @brief  Cluster SetShortPollInterval Command callback (server side)
  */
-bool emberAfBasicClusterLeaveCallback(chip::app::Command * commandObj);
+bool emberAfPollControlClusterSetShortPollIntervalCallback(chip::app::CommandHandler * commandObj, uint16_t newShortPollInterval);
 
 /**
- * @brief  Cluster QueryImage Command callback
+ * @brief  Cluster StartUp Command callback (client side)
+ */
+bool emberAfBasicClusterStartUpCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster StartUp Command callback (server side)
+ */
+bool emberAfBasicClusterStartUpCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster MfgSpecificPing Command callback (client side)
+ */
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster MfgSpecificPing Command callback (server side)
+ */
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster ShutDown Command callback (client side)
+ */
+bool emberAfBasicClusterShutDownCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster ShutDown Command callback (server side)
+ */
+bool emberAfBasicClusterShutDownCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster Leave Command callback (client side)
+ */
+bool emberAfBasicClusterLeaveCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster Leave Command callback (server side)
+ */
+bool emberAfBasicClusterLeaveCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster QueryImage Command callback (client side)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-    chip::app::Command * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
+    chip::app::CommandSender * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
     uint32_t currentVersion, /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint8_t * location,
     uint8_t requestorCanConsent, chip::ByteSpan metadataForProvider);
 
 /**
- * @brief  Cluster ApplyUpdateRequest Command callback
+ * @brief  Cluster QueryImage Command callback (server side)
  */
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(chip::app::Command * commandObj, chip::ByteSpan updateToken,
-                                                                       uint32_t newVersion);
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
+    chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
+    uint32_t currentVersion, /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint8_t * location,
+    uint8_t requestorCanConsent, chip::ByteSpan metadataForProvider);
 
 /**
- * @brief  Cluster NotifyUpdateApplied Command callback
+ * @brief  Cluster ApplyUpdateRequest Command callback (client side)
  */
-bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::app::Command * commandObj, chip::ByteSpan updateToken,
-                                                                        uint32_t currentVersion);
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(chip::app::CommandSender * commandObj,
+                                                                       chip::ByteSpan updateToken, uint32_t newVersion);
 
 /**
- * @brief  Cluster QueryImageResponse Command callback
+ * @brief  Cluster ApplyUpdateRequest Command callback (server side)
  */
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::app::Command * commandObj, uint8_t status,
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(chip::app::CommandHandler * commandObj,
+                                                                       chip::ByteSpan updateToken, uint32_t newVersion);
+
+/**
+ * @brief  Cluster NotifyUpdateApplied Command callback (client side)
+ */
+bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::app::CommandSender * commandObj,
+                                                                        chip::ByteSpan updateToken, uint32_t currentVersion);
+
+/**
+ * @brief  Cluster NotifyUpdateApplied Command callback (server side)
+ */
+bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::app::CommandHandler * commandObj,
+                                                                        chip::ByteSpan updateToken, uint32_t currentVersion);
+
+/**
+ * @brief  Cluster QueryImageResponse Command callback (client side)
+ */
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::app::CommandSender * commandObj, uint8_t status,
                                                                        uint32_t delayedActionTime, uint8_t * imageURI,
                                                                        uint32_t softwareVersion, chip::ByteSpan updateToken,
                                                                        uint8_t userConsentNeeded,
                                                                        chip::ByteSpan metadataForRequestor);
 
 /**
- * @brief  Cluster ApplyUpdateRequestResponse Command callback
+ * @brief  Cluster QueryImageResponse Command callback (server side)
  */
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(chip::app::Command * commandObj, uint8_t action,
-                                                                               uint32_t delayedActionTime);
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status,
+                                                                       uint32_t delayedActionTime, uint8_t * imageURI,
+                                                                       uint32_t softwareVersion, chip::ByteSpan updateToken,
+                                                                       uint8_t userConsentNeeded,
+                                                                       chip::ByteSpan metadataForRequestor);
 
 /**
- * @brief  Cluster AnnounceOtaProvider Command callback
+ * @brief  Cluster ApplyUpdateRequestResponse Command callback (client side)
  */
-bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(chip::app::Command * commandObj,
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(chip::app::CommandSender * commandObj,
+                                                                               uint8_t action, uint32_t delayedActionTime);
+
+/**
+ * @brief  Cluster ApplyUpdateRequestResponse Command callback (server side)
+ */
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(chip::app::CommandHandler * commandObj,
+                                                                               uint8_t action, uint32_t delayedActionTime);
+
+/**
+ * @brief  Cluster AnnounceOtaProvider Command callback (client side)
+ */
+bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(chip::app::CommandSender * commandObj,
                                                                          chip::ByteSpan serverLocation, uint16_t vendorId,
                                                                          uint8_t announcementReason,
                                                                          chip::ByteSpan metadataForNode);
 
 /**
- * @brief  Cluster ArmFailSafe Command callback
+ * @brief  Cluster AnnounceOtaProvider Command callback (server side)
  */
-bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::Command * commandObj, uint16_t expiryLengthSeconds,
+bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(chip::app::CommandHandler * commandObj,
+                                                                         chip::ByteSpan serverLocation, uint16_t vendorId,
+                                                                         uint8_t announcementReason,
+                                                                         chip::ByteSpan metadataForNode);
+
+/**
+ * @brief  Cluster ArmFailSafe Command callback (client side)
+ */
+bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::CommandSender * commandObj, uint16_t expiryLengthSeconds,
                                                            uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
- * @brief  Cluster ArmFailSafeResponse Command callback
+ * @brief  Cluster ArmFailSafe Command callback (server side)
  */
-bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::CommandHandler * commandObj, uint16_t expiryLengthSeconds,
+                                                           uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief  Cluster ArmFailSafeResponse Command callback (client side)
+ */
+bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::app::CommandSender * commandObj, uint8_t errorCode,
                                                                    uint8_t * debugText);
 
 /**
- * @brief  Cluster SetRegulatoryConfig Command callback
+ * @brief  Cluster ArmFailSafeResponse Command callback (server side)
  */
-bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Command * commandObj, uint8_t location,
+bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::app::CommandHandler * commandObj, uint8_t errorCode,
+                                                                   uint8_t * debugText);
+
+/**
+ * @brief  Cluster SetRegulatoryConfig Command callback (client side)
+ */
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::CommandSender * commandObj, uint8_t location,
                                                                    uint8_t * countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
- * @brief  Cluster SetRegulatoryConfigResponse Command callback
+ * @brief  Cluster SetRegulatoryConfig Command callback (server side)
  */
-bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::CommandHandler * commandObj, uint8_t location,
+                                                                   uint8_t * countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief  Cluster SetRegulatoryConfigResponse Command callback (client side)
+ */
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip::app::CommandSender * commandObj, uint8_t errorCode,
                                                                            uint8_t * debugText);
 
 /**
- * @brief  Cluster CommissioningComplete Command callback
+ * @brief  Cluster SetRegulatoryConfigResponse Command callback (server side)
  */
-bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::Command * commandObj);
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip::app::CommandHandler * commandObj,
+                                                                           uint8_t errorCode, uint8_t * debugText);
 
 /**
- * @brief  Cluster CommissioningCompleteResponse Command callback
+ * @brief  Cluster CommissioningComplete Command callback (client side)
  */
-bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                             uint8_t * debugText);
+bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster ScanNetworks Command callback
+ * @brief  Cluster CommissioningComplete Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
+bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster CommissioningCompleteResponse Command callback (client side)
+ */
+bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chip::app::CommandSender * commandObj,
+                                                                             uint8_t errorCode, uint8_t * debugText);
+
+/**
+ * @brief  Cluster CommissioningCompleteResponse Command callback (server side)
+ */
+bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chip::app::CommandHandler * commandObj,
+                                                                             uint8_t errorCode, uint8_t * debugText);
+
+/**
+ * @brief  Cluster ScanNetworks Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::CommandSender * commandObj, chip::ByteSpan ssid,
                                                             uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
- * @brief  Cluster ScanNetworksResponse Command callback
+ * @brief  Cluster ScanNetworks Command callback (server side)
+ */
+bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::CommandHandler * commandObj, chip::ByteSpan ssid,
+                                                            uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief  Cluster ScanNetworksResponse Command callback (client side)
  */
 bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
-    chip::app::Command * commandObj, uint8_t errorCode, uint8_t * debugText,
+    chip::app::CommandSender * commandObj, uint8_t errorCode, uint8_t * debugText,
     /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
     /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults);
 
 /**
- * @brief  Cluster AddWiFiNetwork Command callback
+ * @brief  Cluster ScanNetworksResponse Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
+bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
+    chip::app::CommandHandler * commandObj, uint8_t errorCode, uint8_t * debugText,
+    /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
+    /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults);
+
+/**
+ * @brief  Cluster AddWiFiNetwork Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::CommandSender * commandObj, chip::ByteSpan ssid,
                                                               chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
- * @brief  Cluster AddWiFiNetworkResponse Command callback
+ * @brief  Cluster AddWiFiNetwork Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::CommandHandler * commandObj, chip::ByteSpan ssid,
+                                                              chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief  Cluster AddWiFiNetworkResponse Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(chip::app::CommandSender * commandObj, uint8_t errorCode,
                                                                       uint8_t * debugText);
 
 /**
- * @brief  Cluster UpdateWiFiNetwork Command callback
+ * @brief  Cluster AddWiFiNetworkResponse Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(chip::app::CommandHandler * commandObj, uint8_t errorCode,
+                                                                      uint8_t * debugText);
+
+/**
+ * @brief  Cluster UpdateWiFiNetwork Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::CommandSender * commandObj, chip::ByteSpan ssid,
                                                                  chip::ByteSpan credentials, uint64_t breadcrumb,
                                                                  uint32_t timeoutMs);
 
 /**
- * @brief  Cluster UpdateWiFiNetworkResponse Command callback
+ * @brief  Cluster UpdateWiFiNetwork Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::CommandHandler * commandObj, chip::ByteSpan ssid,
+                                                                 chip::ByteSpan credentials, uint64_t breadcrumb,
+                                                                 uint32_t timeoutMs);
+
+/**
+ * @brief  Cluster UpdateWiFiNetworkResponse Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::app::CommandSender * commandObj, uint8_t errorCode,
                                                                          uint8_t * debugText);
 
 /**
- * @brief  Cluster AddThreadNetwork Command callback
+ * @brief  Cluster UpdateWiFiNetworkResponse Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan operationalDataset,
-                                                                uint64_t breadcrumb, uint32_t timeoutMs);
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::app::CommandHandler * commandObj, uint8_t errorCode,
+                                                                         uint8_t * debugText);
 
 /**
- * @brief  Cluster AddThreadNetworkResponse Command callback
+ * @brief  Cluster AddThreadNetwork Command callback (client side)
  */
-bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::CommandSender * commandObj,
+                                                                chip::ByteSpan operationalDataset, uint64_t breadcrumb,
+                                                                uint32_t timeoutMs);
+
+/**
+ * @brief  Cluster AddThreadNetwork Command callback (server side)
+ */
+bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::CommandHandler * commandObj,
+                                                                chip::ByteSpan operationalDataset, uint64_t breadcrumb,
+                                                                uint32_t timeoutMs);
+
+/**
+ * @brief  Cluster AddThreadNetworkResponse Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(chip::app::CommandSender * commandObj, uint8_t errorCode,
                                                                         uint8_t * debugText);
 
 /**
- * @brief  Cluster UpdateThreadNetwork Command callback
+ * @brief  Cluster AddThreadNetworkResponse Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Command * commandObj,
+bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(chip::app::CommandHandler * commandObj, uint8_t errorCode,
+                                                                        uint8_t * debugText);
+
+/**
+ * @brief  Cluster UpdateThreadNetwork Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::CommandSender * commandObj,
                                                                    chip::ByteSpan operationalDataset, uint64_t breadcrumb,
                                                                    uint32_t timeoutMs);
 
 /**
- * @brief  Cluster UpdateThreadNetworkResponse Command callback
+ * @brief  Cluster UpdateThreadNetwork Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::CommandHandler * commandObj,
+                                                                   chip::ByteSpan operationalDataset, uint64_t breadcrumb,
+                                                                   uint32_t timeoutMs);
+
+/**
+ * @brief  Cluster UpdateThreadNetworkResponse Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(chip::app::CommandSender * commandObj, uint8_t errorCode,
                                                                            uint8_t * debugText);
 
 /**
- * @brief  Cluster RemoveNetwork Command callback
+ * @brief  Cluster UpdateThreadNetworkResponse Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan NetworkID,
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(chip::app::CommandHandler * commandObj,
+                                                                           uint8_t errorCode, uint8_t * debugText);
+
+/**
+ * @brief  Cluster RemoveNetwork Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::CommandSender * commandObj, chip::ByteSpan NetworkID,
                                                              uint64_t Breadcrumb, uint32_t TimeoutMs);
 
 /**
- * @brief  Cluster RemoveNetworkResponse Command callback
+ * @brief  Cluster RemoveNetwork Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::CommandHandler * commandObj, chip::ByteSpan NetworkID,
+                                                             uint64_t Breadcrumb, uint32_t TimeoutMs);
+
+/**
+ * @brief  Cluster RemoveNetworkResponse Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(chip::app::CommandSender * commandObj, uint8_t errorCode,
                                                                      uint8_t * debugText);
 
 /**
- * @brief  Cluster EnableNetwork Command callback
+ * @brief  Cluster RemoveNetworkResponse Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID,
+bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(chip::app::CommandHandler * commandObj, uint8_t errorCode,
+                                                                     uint8_t * debugText);
+
+/**
+ * @brief  Cluster EnableNetwork Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::CommandSender * commandObj, chip::ByteSpan networkID,
                                                              uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
- * @brief  Cluster EnableNetworkResponse Command callback
+ * @brief  Cluster EnableNetwork Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::CommandHandler * commandObj, chip::ByteSpan networkID,
+                                                             uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief  Cluster EnableNetworkResponse Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(chip::app::CommandSender * commandObj, uint8_t errorCode,
                                                                      uint8_t * debugText);
 
 /**
- * @brief  Cluster DisableNetwork Command callback
+ * @brief  Cluster EnableNetworkResponse Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID,
+bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(chip::app::CommandHandler * commandObj, uint8_t errorCode,
+                                                                     uint8_t * debugText);
+
+/**
+ * @brief  Cluster DisableNetwork Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::CommandSender * commandObj, chip::ByteSpan networkID,
                                                               uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
- * @brief  Cluster DisableNetworkResponse Command callback
+ * @brief  Cluster DisableNetwork Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::CommandHandler * commandObj, chip::ByteSpan networkID,
+                                                              uint64_t breadcrumb, uint32_t timeoutMs);
+
+/**
+ * @brief  Cluster DisableNetworkResponse Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(chip::app::CommandSender * commandObj, uint8_t errorCode,
                                                                       uint8_t * debugText);
 
 /**
- * @brief  Cluster GetLastNetworkCommissioningResult Command callback
+ * @brief  Cluster DisableNetworkResponse Command callback (server side)
  */
-bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(chip::app::Command * commandObj,
+bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(chip::app::CommandHandler * commandObj, uint8_t errorCode,
+                                                                      uint8_t * debugText);
+
+/**
+ * @brief  Cluster GetLastNetworkCommissioningResult Command callback (client side)
+ */
+bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(chip::app::CommandSender * commandObj,
                                                                                  uint32_t timeoutMs);
 
 /**
- * @brief  Cluster RetrieveLogsRequest Command callback
+ * @brief  Cluster GetLastNetworkCommissioningResult Command callback (server side)
  */
-bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::Command * commandObj, uint8_t intent,
+bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(chip::app::CommandHandler * commandObj,
+                                                                                 uint32_t timeoutMs);
+
+/**
+ * @brief  Cluster RetrieveLogsRequest Command callback (client side)
+ */
+bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::CommandSender * commandObj, uint8_t intent,
                                                              uint8_t requestedProtocol, chip::ByteSpan transferFileDesignator);
 
 /**
- * @brief  Cluster RetrieveLogsResponse Command callback
+ * @brief  Cluster RetrieveLogsRequest Command callback (server side)
  */
-bool emberAfDiagnosticLogsClusterRetrieveLogsResponseCallback(chip::app::Command * commandObj, uint8_t status,
+bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::CommandHandler * commandObj, uint8_t intent,
+                                                             uint8_t requestedProtocol, chip::ByteSpan transferFileDesignator);
+
+/**
+ * @brief  Cluster RetrieveLogsResponse Command callback (client side)
+ */
+bool emberAfDiagnosticLogsClusterRetrieveLogsResponseCallback(chip::app::CommandSender * commandObj, uint8_t status,
                                                               chip::ByteSpan content,
                                                               /* TYPE WARNING: unknown defaults to */ uint8_t * timeStamp,
                                                               uint32_t timeSinceBoot);
 
 /**
- * @brief  Cluster ResetWatermarks Command callback
+ * @brief  Cluster RetrieveLogsResponse Command callback (server side)
  */
-bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(chip::app::Command * commandObj);
+bool emberAfDiagnosticLogsClusterRetrieveLogsResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status,
+                                                              chip::ByteSpan content,
+                                                              /* TYPE WARNING: unknown defaults to */ uint8_t * timeStamp,
+                                                              uint32_t timeSinceBoot);
 
 /**
- * @brief  Cluster ResetCounts Command callback
+ * @brief  Cluster ResetWatermarks Command callback (client side)
  */
-bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(chip::app::Command * commandObj);
+bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster ResetCounts Command callback
+ * @brief  Cluster ResetWatermarks Command callback (server side)
  */
-bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(chip::app::Command * commandObj);
+bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster ResetCounts Command callback
+ * @brief  Cluster ResetCounts Command callback (client side)
  */
-bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(chip::app::Command * commandObj);
+bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster StartUp Command callback
+ * @brief  Cluster ResetCounts Command callback (server side)
  */
-bool emberAfBridgedDeviceBasicClusterStartUpCallback(chip::app::Command * commandObj);
+bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster ShutDown Command callback
+ * @brief  Cluster ResetCounts Command callback (client side)
  */
-bool emberAfBridgedDeviceBasicClusterShutDownCallback(chip::app::Command * commandObj);
+bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster Leave Command callback
+ * @brief  Cluster ResetCounts Command callback (server side)
  */
-bool emberAfBridgedDeviceBasicClusterLeaveCallback(chip::app::Command * commandObj);
+bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster ReachableChanged Command callback
+ * @brief  Cluster ResetCounts Command callback (client side)
  */
-bool emberAfBridgedDeviceBasicClusterReachableChangedCallback(chip::app::Command * commandObj);
+bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster SetFabric Command callback
+ * @brief  Cluster ResetCounts Command callback (server side)
  */
-bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * commandObj, uint16_t VendorId);
+bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster SetFabricResponse Command callback
+ * @brief  Cluster StartUp Command callback (client side)
  */
-bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId);
+bool emberAfBridgedDeviceBasicClusterStartUpCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster OpCSRRequest Command callback
+ * @brief  Cluster StartUp Command callback (server side)
  */
-bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::Command * commandObj, chip::ByteSpan CSRNonce);
+bool emberAfBridgedDeviceBasicClusterStartUpCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster OpCSRResponse Command callback
+ * @brief  Cluster ShutDown Command callback (client side)
  */
-bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, chip::ByteSpan CSR,
+bool emberAfBridgedDeviceBasicClusterShutDownCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster ShutDown Command callback (server side)
+ */
+bool emberAfBridgedDeviceBasicClusterShutDownCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster Leave Command callback (client side)
+ */
+bool emberAfBridgedDeviceBasicClusterLeaveCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster Leave Command callback (server side)
+ */
+bool emberAfBridgedDeviceBasicClusterLeaveCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster ReachableChanged Command callback (client side)
+ */
+bool emberAfBridgedDeviceBasicClusterReachableChangedCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster ReachableChanged Command callback (server side)
+ */
+bool emberAfBridgedDeviceBasicClusterReachableChangedCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster SetFabric Command callback (client side)
+ */
+bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::CommandSender * commandObj, uint16_t VendorId);
+
+/**
+ * @brief  Cluster SetFabric Command callback (server side)
+ */
+bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::CommandHandler * commandObj, uint16_t VendorId);
+
+/**
+ * @brief  Cluster SetFabricResponse Command callback (client side)
+ */
+bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::CommandSender * commandObj, chip::FabricId FabricId);
+
+/**
+ * @brief  Cluster SetFabricResponse Command callback (server side)
+ */
+bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::CommandHandler * commandObj, chip::FabricId FabricId);
+
+/**
+ * @brief  Cluster OpCSRRequest Command callback (client side)
+ */
+bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::CommandSender * commandObj, chip::ByteSpan CSRNonce);
+
+/**
+ * @brief  Cluster OpCSRRequest Command callback (server side)
+ */
+bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::CommandHandler * commandObj, chip::ByteSpan CSRNonce);
+
+/**
+ * @brief  Cluster OpCSRResponse Command callback (client side)
+ */
+bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::CommandSender * commandObj, chip::ByteSpan CSR,
                                                                chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
                                                                chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3,
                                                                chip::ByteSpan Signature);
 
 /**
- * @brief  Cluster AddOpCert Command callback
+ * @brief  Cluster OpCSRResponse Command callback (server side)
  */
-bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOCArray,
+bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::CommandHandler * commandObj, chip::ByteSpan CSR,
+                                                               chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
+                                                               chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3,
+                                                               chip::ByteSpan Signature);
+
+/**
+ * @brief  Cluster AddOpCert Command callback (client side)
+ */
+bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::CommandSender * commandObj, chip::ByteSpan NOCArray,
                                                            chip::ByteSpan IPKValue, chip::NodeId CaseAdminNode,
                                                            uint16_t AdminVendorId);
 
 /**
- * @brief  Cluster OpCertResponse Command callback
+ * @brief  Cluster AddOpCert Command callback (server side)
  */
-bool emberAfOperationalCredentialsClusterOpCertResponseCallback(chip::app::Command * commandObj, uint8_t StatusCode,
+bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::CommandHandler * commandObj, chip::ByteSpan NOCArray,
+                                                           chip::ByteSpan IPKValue, chip::NodeId CaseAdminNode,
+                                                           uint16_t AdminVendorId);
+
+/**
+ * @brief  Cluster OpCertResponse Command callback (client side)
+ */
+bool emberAfOperationalCredentialsClusterOpCertResponseCallback(chip::app::CommandSender * commandObj, uint8_t StatusCode,
                                                                 uint64_t FabricIndex, uint8_t * DebugText);
 
 /**
- * @brief  Cluster UpdateFabricLabel Command callback
+ * @brief  Cluster OpCertResponse Command callback (server side)
  */
-bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, uint8_t * Label);
+bool emberAfOperationalCredentialsClusterOpCertResponseCallback(chip::app::CommandHandler * commandObj, uint8_t StatusCode,
+                                                                uint64_t FabricIndex, uint8_t * DebugText);
 
 /**
- * @brief  Cluster RemoveFabric Command callback
+ * @brief  Cluster UpdateFabricLabel Command callback (client side)
  */
-bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command * commandObj, chip::FabricId FabricId,
+bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::CommandSender * commandObj, uint8_t * Label);
+
+/**
+ * @brief  Cluster UpdateFabricLabel Command callback (server side)
+ */
+bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::CommandHandler * commandObj, uint8_t * Label);
+
+/**
+ * @brief  Cluster RemoveFabric Command callback (client side)
+ */
+bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::CommandSender * commandObj, chip::FabricId FabricId,
                                                               chip::NodeId NodeId, uint16_t VendorId);
 
 /**
- * @brief  Cluster RemoveAllFabrics Command callback
+ * @brief  Cluster RemoveFabric Command callback (server side)
  */
-bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::Command * commandObj);
+bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::CommandHandler * commandObj, chip::FabricId FabricId,
+                                                              chip::NodeId NodeId, uint16_t VendorId);
 
 /**
- * @brief  Cluster AddTrustedRootCertificate Command callback
+ * @brief  Cluster RemoveAllFabrics Command callback (client side)
  */
-bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(chip::app::Command * commandObj,
+bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster RemoveAllFabrics Command callback (server side)
+ */
+bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster AddTrustedRootCertificate Command callback (client side)
+ */
+bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(chip::app::CommandSender * commandObj,
                                                                            chip::ByteSpan RootCertificate);
 
 /**
- * @brief  Cluster RemoveTrustedRootCertificate Command callback
+ * @brief  Cluster AddTrustedRootCertificate Command callback (server side)
  */
-bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(chip::app::Command * commandObj,
+bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(chip::app::CommandHandler * commandObj,
+                                                                           chip::ByteSpan RootCertificate);
+
+/**
+ * @brief  Cluster RemoveTrustedRootCertificate Command callback (client side)
+ */
+bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(chip::app::CommandSender * commandObj,
                                                                               chip::ByteSpan TrustedRootIdentifier);
 
 /**
- * @brief  Cluster LockDoor Command callback
+ * @brief  Cluster RemoveTrustedRootCertificate Command callback (server side)
  */
-bool emberAfDoorLockClusterLockDoorCallback(chip::app::Command * commandObj, uint8_t * PIN);
+bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(chip::app::CommandHandler * commandObj,
+                                                                              chip::ByteSpan TrustedRootIdentifier);
 
 /**
- * @brief  Cluster LockDoorResponse Command callback
+ * @brief  Cluster LockDoor Command callback (client side)
  */
-bool emberAfDoorLockClusterLockDoorResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandSender * commandObj, uint8_t * PIN);
 
 /**
- * @brief  Cluster UnlockDoor Command callback
+ * @brief  Cluster LockDoor Command callback (server side)
  */
-bool emberAfDoorLockClusterUnlockDoorCallback(chip::app::Command * commandObj, uint8_t * PIN);
+bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj, uint8_t * PIN);
 
 /**
- * @brief  Cluster UnlockDoorResponse Command callback
+ * @brief  Cluster LockDoorResponse Command callback (client side)
  */
-bool emberAfDoorLockClusterUnlockDoorResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterLockDoorResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster Toggle Command callback
+ * @brief  Cluster LockDoorResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterToggleCallback(chip::app::Command * commandObj, uint8_t * pin);
+bool emberAfDoorLockClusterLockDoorResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster ToggleResponse Command callback
+ * @brief  Cluster UnlockDoor Command callback (client side)
  */
-bool emberAfDoorLockClusterToggleResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterUnlockDoorCallback(chip::app::CommandSender * commandObj, uint8_t * PIN);
 
 /**
- * @brief  Cluster UnlockWithTimeout Command callback
+ * @brief  Cluster UnlockDoor Command callback (server side)
  */
-bool emberAfDoorLockClusterUnlockWithTimeoutCallback(chip::app::Command * commandObj, uint16_t timeoutInSeconds, uint8_t * pin);
+bool emberAfDoorLockClusterUnlockDoorCallback(chip::app::CommandHandler * commandObj, uint8_t * PIN);
 
 /**
- * @brief  Cluster UnlockWithTimeoutResponse Command callback
+ * @brief  Cluster UnlockDoorResponse Command callback (client side)
  */
-bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterUnlockDoorResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster GetLogRecord Command callback
+ * @brief  Cluster UnlockDoorResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * commandObj, uint16_t logIndex);
+bool emberAfDoorLockClusterUnlockDoorResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster GetLogRecordResponse Command callback
+ * @brief  Cluster Toggle Command callback (client side)
  */
-bool emberAfDoorLockClusterGetLogRecordResponseCallback(chip::app::Command * commandObj, uint16_t logEntryId, uint32_t timestamp,
-                                                        uint8_t eventType, uint8_t source, uint8_t eventIdOrAlarmCode,
-                                                        uint16_t userId, uint8_t * pin);
+bool emberAfDoorLockClusterToggleCallback(chip::app::CommandSender * commandObj, uint8_t * pin);
 
 /**
- * @brief  Cluster SetPin Command callback
+ * @brief  Cluster Toggle Command callback (server side)
  */
-bool emberAfDoorLockClusterSetPinCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                          uint8_t * pin);
+bool emberAfDoorLockClusterToggleCallback(chip::app::CommandHandler * commandObj, uint8_t * pin);
 
 /**
- * @brief  Cluster SetPinResponse Command callback
+ * @brief  Cluster ToggleResponse Command callback (client side)
  */
-bool emberAfDoorLockClusterSetPinResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterToggleResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster GetPin Command callback
+ * @brief  Cluster ToggleResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterGetPinCallback(chip::app::Command * commandObj, uint16_t userId);
+bool emberAfDoorLockClusterToggleResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster GetPinResponse Command callback
+ * @brief  Cluster UnlockWithTimeout Command callback (client side)
  */
-bool emberAfDoorLockClusterGetPinResponseCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus,
+bool emberAfDoorLockClusterUnlockWithTimeoutCallback(chip::app::CommandSender * commandObj, uint16_t timeoutInSeconds,
+                                                     uint8_t * pin);
+
+/**
+ * @brief  Cluster UnlockWithTimeout Command callback (server side)
+ */
+bool emberAfDoorLockClusterUnlockWithTimeoutCallback(chip::app::CommandHandler * commandObj, uint16_t timeoutInSeconds,
+                                                     uint8_t * pin);
+
+/**
+ * @brief  Cluster UnlockWithTimeoutResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster UnlockWithTimeoutResponse Command callback (server side)
+ */
+bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster GetLogRecord Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::CommandSender * commandObj, uint16_t logIndex);
+
+/**
+ * @brief  Cluster GetLogRecord Command callback (server side)
+ */
+bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::CommandHandler * commandObj, uint16_t logIndex);
+
+/**
+ * @brief  Cluster GetLogRecordResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetLogRecordResponseCallback(chip::app::CommandSender * commandObj, uint16_t logEntryId,
+                                                        uint32_t timestamp, uint8_t eventType, uint8_t source,
+                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin);
+
+/**
+ * @brief  Cluster GetLogRecordResponse Command callback (server side)
+ */
+bool emberAfDoorLockClusterGetLogRecordResponseCallback(chip::app::CommandHandler * commandObj, uint16_t logEntryId,
+                                                        uint32_t timestamp, uint8_t eventType, uint8_t source,
+                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin);
+
+/**
+ * @brief  Cluster SetPin Command callback (client side)
+ */
+bool emberAfDoorLockClusterSetPinCallback(chip::app::CommandSender * commandObj, uint16_t userId, uint8_t userStatus,
+                                          uint8_t userType, uint8_t * pin);
+
+/**
+ * @brief  Cluster SetPin Command callback (server side)
+ */
+bool emberAfDoorLockClusterSetPinCallback(chip::app::CommandHandler * commandObj, uint16_t userId, uint8_t userStatus,
+                                          uint8_t userType, uint8_t * pin);
+
+/**
+ * @brief  Cluster SetPinResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterSetPinResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster SetPinResponse Command callback (server side)
+ */
+bool emberAfDoorLockClusterSetPinResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster GetPin Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetPinCallback(chip::app::CommandSender * commandObj, uint16_t userId);
+
+/**
+ * @brief  Cluster GetPin Command callback (server side)
+ */
+bool emberAfDoorLockClusterGetPinCallback(chip::app::CommandHandler * commandObj, uint16_t userId);
+
+/**
+ * @brief  Cluster GetPinResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetPinResponseCallback(chip::app::CommandSender * commandObj, uint16_t userId, uint8_t userStatus,
                                                   uint8_t userType, uint8_t * pin);
 
 /**
- * @brief  Cluster ClearPin Command callback
+ * @brief  Cluster GetPinResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterClearPinCallback(chip::app::Command * commandObj, uint16_t userId);
+bool emberAfDoorLockClusterGetPinResponseCallback(chip::app::CommandHandler * commandObj, uint16_t userId, uint8_t userStatus,
+                                                  uint8_t userType, uint8_t * pin);
 
 /**
- * @brief  Cluster ClearPinResponse Command callback
+ * @brief  Cluster ClearPin Command callback (client side)
  */
-bool emberAfDoorLockClusterClearPinResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterClearPinCallback(chip::app::CommandSender * commandObj, uint16_t userId);
 
 /**
- * @brief  Cluster ClearAllPins Command callback
+ * @brief  Cluster ClearPin Command callback (server side)
  */
-bool emberAfDoorLockClusterClearAllPinsCallback(chip::app::Command * commandObj);
+bool emberAfDoorLockClusterClearPinCallback(chip::app::CommandHandler * commandObj, uint16_t userId);
 
 /**
- * @brief  Cluster ClearAllPinsResponse Command callback
+ * @brief  Cluster ClearPinResponse Command callback (client side)
  */
-bool emberAfDoorLockClusterClearAllPinsResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterClearPinResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster SetUserStatus Command callback
+ * @brief  Cluster ClearPinResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterSetUserStatusCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus);
+bool emberAfDoorLockClusterClearPinResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster SetUserStatusResponse Command callback
+ * @brief  Cluster ClearAllPins Command callback (client side)
  */
-bool emberAfDoorLockClusterSetUserStatusResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterClearAllPinsCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster GetUserStatus Command callback
+ * @brief  Cluster ClearAllPins Command callback (server side)
  */
-bool emberAfDoorLockClusterGetUserStatusCallback(chip::app::Command * commandObj, uint16_t userId);
+bool emberAfDoorLockClusterClearAllPinsCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster GetUserStatusResponse Command callback
+ * @brief  Cluster ClearAllPinsResponse Command callback (client side)
  */
-bool emberAfDoorLockClusterGetUserStatusResponseCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t status);
+bool emberAfDoorLockClusterClearAllPinsResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster SetWeekdaySchedule Command callback
+ * @brief  Cluster ClearAllPinsResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterSetWeekdayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId,
+bool emberAfDoorLockClusterClearAllPinsResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster SetUserStatus Command callback (client side)
+ */
+bool emberAfDoorLockClusterSetUserStatusCallback(chip::app::CommandSender * commandObj, uint16_t userId, uint8_t userStatus);
+
+/**
+ * @brief  Cluster SetUserStatus Command callback (server side)
+ */
+bool emberAfDoorLockClusterSetUserStatusCallback(chip::app::CommandHandler * commandObj, uint16_t userId, uint8_t userStatus);
+
+/**
+ * @brief  Cluster SetUserStatusResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterSetUserStatusResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster SetUserStatusResponse Command callback (server side)
+ */
+bool emberAfDoorLockClusterSetUserStatusResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster GetUserStatus Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetUserStatusCallback(chip::app::CommandSender * commandObj, uint16_t userId);
+
+/**
+ * @brief  Cluster GetUserStatus Command callback (server side)
+ */
+bool emberAfDoorLockClusterGetUserStatusCallback(chip::app::CommandHandler * commandObj, uint16_t userId);
+
+/**
+ * @brief  Cluster GetUserStatusResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetUserStatusResponseCallback(chip::app::CommandSender * commandObj, uint16_t userId, uint8_t status);
+
+/**
+ * @brief  Cluster GetUserStatusResponse Command callback (server side)
+ */
+bool emberAfDoorLockClusterGetUserStatusResponseCallback(chip::app::CommandHandler * commandObj, uint16_t userId, uint8_t status);
+
+/**
+ * @brief  Cluster SetWeekdaySchedule Command callback (client side)
+ */
+bool emberAfDoorLockClusterSetWeekdayScheduleCallback(chip::app::CommandSender * commandObj, uint8_t scheduleId, uint16_t userId,
                                                       uint8_t daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour,
                                                       uint8_t endMinute);
 
 /**
- * @brief  Cluster SetWeekdayScheduleResponse Command callback
+ * @brief  Cluster SetWeekdaySchedule Command callback (server side)
  */
-bool emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterSetWeekdayScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t scheduleId, uint16_t userId,
+                                                      uint8_t daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour,
+                                                      uint8_t endMinute);
 
 /**
- * @brief  Cluster GetWeekdaySchedule Command callback
+ * @brief  Cluster SetWeekdayScheduleResponse Command callback (client side)
  */
-bool emberAfDoorLockClusterGetWeekdayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId);
+bool emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster GetWeekdayScheduleResponse Command callback
+ * @brief  Cluster SetWeekdayScheduleResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId,
-                                                              uint8_t status, uint8_t daysMask, uint8_t startHour,
+bool emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster GetWeekdaySchedule Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetWeekdayScheduleCallback(chip::app::CommandSender * commandObj, uint8_t scheduleId, uint16_t userId);
+
+/**
+ * @brief  Cluster GetWeekdaySchedule Command callback (server side)
+ */
+bool emberAfDoorLockClusterGetWeekdayScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t scheduleId, uint16_t userId);
+
+/**
+ * @brief  Cluster GetWeekdayScheduleResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(chip::app::CommandSender * commandObj, uint8_t scheduleId,
+                                                              uint16_t userId, uint8_t status, uint8_t daysMask, uint8_t startHour,
                                                               uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
 
 /**
- * @brief  Cluster ClearWeekdaySchedule Command callback
+ * @brief  Cluster GetWeekdayScheduleResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterClearWeekdayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId);
+bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(chip::app::CommandHandler * commandObj, uint8_t scheduleId,
+                                                              uint16_t userId, uint8_t status, uint8_t daysMask, uint8_t startHour,
+                                                              uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
 
 /**
- * @brief  Cluster ClearWeekdayScheduleResponse Command callback
+ * @brief  Cluster ClearWeekdaySchedule Command callback (client side)
  */
-bool emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterClearWeekdayScheduleCallback(chip::app::CommandSender * commandObj, uint8_t scheduleId, uint16_t userId);
 
 /**
- * @brief  Cluster SetYeardaySchedule Command callback
+ * @brief  Cluster ClearWeekdaySchedule Command callback (server side)
  */
-bool emberAfDoorLockClusterSetYeardayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId,
+bool emberAfDoorLockClusterClearWeekdayScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t scheduleId,
+                                                        uint16_t userId);
+
+/**
+ * @brief  Cluster ClearWeekdayScheduleResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster ClearWeekdayScheduleResponse Command callback (server side)
+ */
+bool emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster SetYeardaySchedule Command callback (client side)
+ */
+bool emberAfDoorLockClusterSetYeardayScheduleCallback(chip::app::CommandSender * commandObj, uint8_t scheduleId, uint16_t userId,
                                                       uint32_t localStartTime, uint32_t localEndTime);
 
 /**
- * @brief  Cluster SetYeardayScheduleResponse Command callback
+ * @brief  Cluster SetYeardaySchedule Command callback (server side)
  */
-bool emberAfDoorLockClusterSetYeardayScheduleResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterSetYeardayScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t scheduleId, uint16_t userId,
+                                                      uint32_t localStartTime, uint32_t localEndTime);
 
 /**
- * @brief  Cluster GetYeardaySchedule Command callback
+ * @brief  Cluster SetYeardayScheduleResponse Command callback (client side)
  */
-bool emberAfDoorLockClusterGetYeardayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId);
+bool emberAfDoorLockClusterSetYeardayScheduleResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster GetYeardayScheduleResponse Command callback
+ * @brief  Cluster SetYeardayScheduleResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterGetYeardayScheduleResponseCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId,
-                                                              uint8_t status, uint32_t localStartTime, uint32_t localEndTime);
+bool emberAfDoorLockClusterSetYeardayScheduleResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster ClearYeardaySchedule Command callback
+ * @brief  Cluster GetYeardaySchedule Command callback (client side)
  */
-bool emberAfDoorLockClusterClearYeardayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId);
+bool emberAfDoorLockClusterGetYeardayScheduleCallback(chip::app::CommandSender * commandObj, uint8_t scheduleId, uint16_t userId);
 
 /**
- * @brief  Cluster ClearYeardayScheduleResponse Command callback
+ * @brief  Cluster GetYeardaySchedule Command callback (server side)
  */
-bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterGetYeardayScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t scheduleId, uint16_t userId);
 
 /**
- * @brief  Cluster SetHolidaySchedule Command callback
+ * @brief  Cluster GetYeardayScheduleResponse Command callback (client side)
  */
-bool emberAfDoorLockClusterSetHolidayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint32_t localStartTime,
-                                                      uint32_t localEndTime, uint8_t operatingModeDuringHoliday);
+bool emberAfDoorLockClusterGetYeardayScheduleResponseCallback(chip::app::CommandSender * commandObj, uint8_t scheduleId,
+                                                              uint16_t userId, uint8_t status, uint32_t localStartTime,
+                                                              uint32_t localEndTime);
 
 /**
- * @brief  Cluster SetHolidayScheduleResponse Command callback
+ * @brief  Cluster GetYeardayScheduleResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterSetHolidayScheduleResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterGetYeardayScheduleResponseCallback(chip::app::CommandHandler * commandObj, uint8_t scheduleId,
+                                                              uint16_t userId, uint8_t status, uint32_t localStartTime,
+                                                              uint32_t localEndTime);
 
 /**
- * @brief  Cluster GetHolidaySchedule Command callback
+ * @brief  Cluster ClearYeardaySchedule Command callback (client side)
  */
-bool emberAfDoorLockClusterGetHolidayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId);
+bool emberAfDoorLockClusterClearYeardayScheduleCallback(chip::app::CommandSender * commandObj, uint8_t scheduleId, uint16_t userId);
 
 /**
- * @brief  Cluster GetHolidayScheduleResponse Command callback
+ * @brief  Cluster ClearYeardaySchedule Command callback (server side)
  */
-bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint8_t status,
-                                                              uint32_t localStartTime, uint32_t localEndTime,
+bool emberAfDoorLockClusterClearYeardayScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t scheduleId,
+                                                        uint16_t userId);
+
+/**
+ * @brief  Cluster ClearYeardayScheduleResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster ClearYeardayScheduleResponse Command callback (server side)
+ */
+bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster SetHolidaySchedule Command callback (client side)
+ */
+bool emberAfDoorLockClusterSetHolidayScheduleCallback(chip::app::CommandSender * commandObj, uint8_t scheduleId,
+                                                      uint32_t localStartTime, uint32_t localEndTime,
+                                                      uint8_t operatingModeDuringHoliday);
+
+/**
+ * @brief  Cluster SetHolidaySchedule Command callback (server side)
+ */
+bool emberAfDoorLockClusterSetHolidayScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t scheduleId,
+                                                      uint32_t localStartTime, uint32_t localEndTime,
+                                                      uint8_t operatingModeDuringHoliday);
+
+/**
+ * @brief  Cluster SetHolidayScheduleResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterSetHolidayScheduleResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster SetHolidayScheduleResponse Command callback (server side)
+ */
+bool emberAfDoorLockClusterSetHolidayScheduleResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster GetHolidaySchedule Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetHolidayScheduleCallback(chip::app::CommandSender * commandObj, uint8_t scheduleId);
+
+/**
+ * @brief  Cluster GetHolidaySchedule Command callback (server side)
+ */
+bool emberAfDoorLockClusterGetHolidayScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t scheduleId);
+
+/**
+ * @brief  Cluster GetHolidayScheduleResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(chip::app::CommandSender * commandObj, uint8_t scheduleId,
+                                                              uint8_t status, uint32_t localStartTime, uint32_t localEndTime,
                                                               uint8_t operatingModeDuringHoliday);
 
 /**
- * @brief  Cluster ClearHolidaySchedule Command callback
+ * @brief  Cluster GetHolidayScheduleResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterClearHolidayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId);
+bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(chip::app::CommandHandler * commandObj, uint8_t scheduleId,
+                                                              uint8_t status, uint32_t localStartTime, uint32_t localEndTime,
+                                                              uint8_t operatingModeDuringHoliday);
 
 /**
- * @brief  Cluster ClearHolidayScheduleResponse Command callback
+ * @brief  Cluster ClearHolidaySchedule Command callback (client side)
  */
-bool emberAfDoorLockClusterClearHolidayScheduleResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterClearHolidayScheduleCallback(chip::app::CommandSender * commandObj, uint8_t scheduleId);
 
 /**
- * @brief  Cluster SetUserType Command callback
+ * @brief  Cluster ClearHolidaySchedule Command callback (server side)
  */
-bool emberAfDoorLockClusterSetUserTypeCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userType);
+bool emberAfDoorLockClusterClearHolidayScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t scheduleId);
 
 /**
- * @brief  Cluster SetUserTypeResponse Command callback
+ * @brief  Cluster ClearHolidayScheduleResponse Command callback (client side)
  */
-bool emberAfDoorLockClusterSetUserTypeResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterClearHolidayScheduleResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster GetUserType Command callback
+ * @brief  Cluster ClearHolidayScheduleResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterGetUserTypeCallback(chip::app::Command * commandObj, uint16_t userId);
+bool emberAfDoorLockClusterClearHolidayScheduleResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster GetUserTypeResponse Command callback
+ * @brief  Cluster SetUserType Command callback (client side)
  */
-bool emberAfDoorLockClusterGetUserTypeResponseCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userType);
+bool emberAfDoorLockClusterSetUserTypeCallback(chip::app::CommandSender * commandObj, uint16_t userId, uint8_t userType);
 
 /**
- * @brief  Cluster SetRfid Command callback
+ * @brief  Cluster SetUserType Command callback (server side)
  */
-bool emberAfDoorLockClusterSetRfidCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                           uint8_t * id);
+bool emberAfDoorLockClusterSetUserTypeCallback(chip::app::CommandHandler * commandObj, uint16_t userId, uint8_t userType);
 
 /**
- * @brief  Cluster SetRfidResponse Command callback
+ * @brief  Cluster SetUserTypeResponse Command callback (client side)
  */
-bool emberAfDoorLockClusterSetRfidResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterSetUserTypeResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster GetRfid Command callback
+ * @brief  Cluster SetUserTypeResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterGetRfidCallback(chip::app::Command * commandObj, uint16_t userId);
+bool emberAfDoorLockClusterSetUserTypeResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster GetRfidResponse Command callback
+ * @brief  Cluster GetUserType Command callback (client side)
  */
-bool emberAfDoorLockClusterGetRfidResponseCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus,
+bool emberAfDoorLockClusterGetUserTypeCallback(chip::app::CommandSender * commandObj, uint16_t userId);
+
+/**
+ * @brief  Cluster GetUserType Command callback (server side)
+ */
+bool emberAfDoorLockClusterGetUserTypeCallback(chip::app::CommandHandler * commandObj, uint16_t userId);
+
+/**
+ * @brief  Cluster GetUserTypeResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetUserTypeResponseCallback(chip::app::CommandSender * commandObj, uint16_t userId, uint8_t userType);
+
+/**
+ * @brief  Cluster GetUserTypeResponse Command callback (server side)
+ */
+bool emberAfDoorLockClusterGetUserTypeResponseCallback(chip::app::CommandHandler * commandObj, uint16_t userId, uint8_t userType);
+
+/**
+ * @brief  Cluster SetRfid Command callback (client side)
+ */
+bool emberAfDoorLockClusterSetRfidCallback(chip::app::CommandSender * commandObj, uint16_t userId, uint8_t userStatus,
+                                           uint8_t userType, uint8_t * id);
+
+/**
+ * @brief  Cluster SetRfid Command callback (server side)
+ */
+bool emberAfDoorLockClusterSetRfidCallback(chip::app::CommandHandler * commandObj, uint16_t userId, uint8_t userStatus,
+                                           uint8_t userType, uint8_t * id);
+
+/**
+ * @brief  Cluster SetRfidResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterSetRfidResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster SetRfidResponse Command callback (server side)
+ */
+bool emberAfDoorLockClusterSetRfidResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster GetRfid Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetRfidCallback(chip::app::CommandSender * commandObj, uint16_t userId);
+
+/**
+ * @brief  Cluster GetRfid Command callback (server side)
+ */
+bool emberAfDoorLockClusterGetRfidCallback(chip::app::CommandHandler * commandObj, uint16_t userId);
+
+/**
+ * @brief  Cluster GetRfidResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterGetRfidResponseCallback(chip::app::CommandSender * commandObj, uint16_t userId, uint8_t userStatus,
                                                    uint8_t userType, uint8_t * rfid);
 
 /**
- * @brief  Cluster ClearRfid Command callback
+ * @brief  Cluster GetRfidResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterClearRfidCallback(chip::app::Command * commandObj, uint16_t userId);
+bool emberAfDoorLockClusterGetRfidResponseCallback(chip::app::CommandHandler * commandObj, uint16_t userId, uint8_t userStatus,
+                                                   uint8_t userType, uint8_t * rfid);
 
 /**
- * @brief  Cluster ClearRfidResponse Command callback
+ * @brief  Cluster ClearRfid Command callback (client side)
  */
-bool emberAfDoorLockClusterClearRfidResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterClearRfidCallback(chip::app::CommandSender * commandObj, uint16_t userId);
 
 /**
- * @brief  Cluster ClearAllRfids Command callback
+ * @brief  Cluster ClearRfid Command callback (server side)
  */
-bool emberAfDoorLockClusterClearAllRfidsCallback(chip::app::Command * commandObj);
+bool emberAfDoorLockClusterClearRfidCallback(chip::app::CommandHandler * commandObj, uint16_t userId);
 
 /**
- * @brief  Cluster ClearAllRfidsResponse Command callback
+ * @brief  Cluster ClearRfidResponse Command callback (client side)
  */
-bool emberAfDoorLockClusterClearAllRfidsResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfDoorLockClusterClearRfidResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster OperationEventNotification Command callback
+ * @brief  Cluster ClearRfidResponse Command callback (server side)
  */
-bool emberAfDoorLockClusterOperationEventNotificationCallback(chip::app::Command * commandObj, uint8_t source, uint8_t eventCode,
-                                                              uint16_t userId, uint8_t * pin, uint32_t timeStamp, uint8_t * data);
+bool emberAfDoorLockClusterClearRfidResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster ProgrammingEventNotification Command callback
+ * @brief  Cluster ClearAllRfids Command callback (client side)
  */
-bool emberAfDoorLockClusterProgrammingEventNotificationCallback(chip::app::Command * commandObj, uint8_t source, uint8_t eventCode,
-                                                                uint16_t userId, uint8_t * pin, uint8_t userType,
+bool emberAfDoorLockClusterClearAllRfidsCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster ClearAllRfids Command callback (server side)
+ */
+bool emberAfDoorLockClusterClearAllRfidsCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster ClearAllRfidsResponse Command callback (client side)
+ */
+bool emberAfDoorLockClusterClearAllRfidsResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster ClearAllRfidsResponse Command callback (server side)
+ */
+bool emberAfDoorLockClusterClearAllRfidsResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster OperationEventNotification Command callback (client side)
+ */
+bool emberAfDoorLockClusterOperationEventNotificationCallback(chip::app::CommandSender * commandObj, uint8_t source,
+                                                              uint8_t eventCode, uint16_t userId, uint8_t * pin, uint32_t timeStamp,
+                                                              uint8_t * data);
+
+/**
+ * @brief  Cluster OperationEventNotification Command callback (server side)
+ */
+bool emberAfDoorLockClusterOperationEventNotificationCallback(chip::app::CommandHandler * commandObj, uint8_t source,
+                                                              uint8_t eventCode, uint16_t userId, uint8_t * pin, uint32_t timeStamp,
+                                                              uint8_t * data);
+
+/**
+ * @brief  Cluster ProgrammingEventNotification Command callback (client side)
+ */
+bool emberAfDoorLockClusterProgrammingEventNotificationCallback(chip::app::CommandSender * commandObj, uint8_t source,
+                                                                uint8_t eventCode, uint16_t userId, uint8_t * pin, uint8_t userType,
                                                                 uint8_t userStatus, uint32_t timeStamp, uint8_t * data);
 
 /**
- * @brief  Cluster UpOrOpen Command callback
+ * @brief  Cluster ProgrammingEventNotification Command callback (server side)
  */
-bool emberAfWindowCoveringClusterUpOrOpenCallback(chip::app::Command * commandObj);
+bool emberAfDoorLockClusterProgrammingEventNotificationCallback(chip::app::CommandHandler * commandObj, uint8_t source,
+                                                                uint8_t eventCode, uint16_t userId, uint8_t * pin, uint8_t userType,
+                                                                uint8_t userStatus, uint32_t timeStamp, uint8_t * data);
 
 /**
- * @brief  Cluster DownOrClose Command callback
+ * @brief  Cluster UpOrOpen Command callback (client side)
  */
-bool emberAfWindowCoveringClusterDownOrCloseCallback(chip::app::Command * commandObj);
+bool emberAfWindowCoveringClusterUpOrOpenCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster StopMotion Command callback
+ * @brief  Cluster UpOrOpen Command callback (server side)
  */
-bool emberAfWindowCoveringClusterStopMotionCallback(chip::app::Command * commandObj);
+bool emberAfWindowCoveringClusterUpOrOpenCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster GoToLiftValue Command callback
+ * @brief  Cluster DownOrClose Command callback (client side)
  */
-bool emberAfWindowCoveringClusterGoToLiftValueCallback(chip::app::Command * commandObj, uint16_t liftValue);
+bool emberAfWindowCoveringClusterDownOrCloseCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster GoToLiftPercentage Command callback
+ * @brief  Cluster DownOrClose Command callback (server side)
  */
-bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::app::Command * commandObj, uint8_t liftPercentageValue,
+bool emberAfWindowCoveringClusterDownOrCloseCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster StopMotion Command callback (client side)
+ */
+bool emberAfWindowCoveringClusterStopMotionCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster StopMotion Command callback (server side)
+ */
+bool emberAfWindowCoveringClusterStopMotionCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster GoToLiftValue Command callback (client side)
+ */
+bool emberAfWindowCoveringClusterGoToLiftValueCallback(chip::app::CommandSender * commandObj, uint16_t liftValue);
+
+/**
+ * @brief  Cluster GoToLiftValue Command callback (server side)
+ */
+bool emberAfWindowCoveringClusterGoToLiftValueCallback(chip::app::CommandHandler * commandObj, uint16_t liftValue);
+
+/**
+ * @brief  Cluster GoToLiftPercentage Command callback (client side)
+ */
+bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::app::CommandSender * commandObj, uint8_t liftPercentageValue,
                                                             uint16_t liftPercent100thsValue);
 
 /**
- * @brief  Cluster GoToTiltValue Command callback
+ * @brief  Cluster GoToLiftPercentage Command callback (server side)
  */
-bool emberAfWindowCoveringClusterGoToTiltValueCallback(chip::app::Command * commandObj, uint16_t tiltValue);
+bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(chip::app::CommandHandler * commandObj, uint8_t liftPercentageValue,
+                                                            uint16_t liftPercent100thsValue);
 
 /**
- * @brief  Cluster GoToTiltPercentage Command callback
+ * @brief  Cluster GoToTiltValue Command callback (client side)
  */
-bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(chip::app::Command * commandObj, uint8_t tiltPercentageValue,
+bool emberAfWindowCoveringClusterGoToTiltValueCallback(chip::app::CommandSender * commandObj, uint16_t tiltValue);
+
+/**
+ * @brief  Cluster GoToTiltValue Command callback (server side)
+ */
+bool emberAfWindowCoveringClusterGoToTiltValueCallback(chip::app::CommandHandler * commandObj, uint16_t tiltValue);
+
+/**
+ * @brief  Cluster GoToTiltPercentage Command callback (client side)
+ */
+bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(chip::app::CommandSender * commandObj, uint8_t tiltPercentageValue,
                                                             uint16_t tiltPercent100thsValue);
 
 /**
- * @brief  Cluster BarrierControlGoToPercent Command callback
+ * @brief  Cluster GoToTiltPercentage Command callback (server side)
  */
-bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(chip::app::Command * commandObj, uint8_t percentOpen);
+bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(chip::app::CommandHandler * commandObj, uint8_t tiltPercentageValue,
+                                                            uint16_t tiltPercent100thsValue);
 
 /**
- * @brief  Cluster BarrierControlStop Command callback
+ * @brief  Cluster BarrierControlGoToPercent Command callback (client side)
  */
-bool emberAfBarrierControlClusterBarrierControlStopCallback(chip::app::Command * commandObj);
+bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(chip::app::CommandSender * commandObj, uint8_t percentOpen);
 
 /**
- * @brief  Cluster SetpointRaiseLower Command callback
+ * @brief  Cluster BarrierControlGoToPercent Command callback (server side)
  */
-bool emberAfThermostatClusterSetpointRaiseLowerCallback(chip::app::Command * commandObj, uint8_t mode, int8_t amount);
+bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(chip::app::CommandHandler * commandObj, uint8_t percentOpen);
 
 /**
- * @brief  Cluster CurrentWeeklySchedule Command callback
+ * @brief  Cluster BarrierControlStop Command callback (client side)
  */
-bool emberAfThermostatClusterCurrentWeeklyScheduleCallback(chip::app::Command * commandObj, uint8_t numberOfTransitionsForSequence,
-                                                           uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
+bool emberAfBarrierControlClusterBarrierControlStopCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster BarrierControlStop Command callback (server side)
+ */
+bool emberAfBarrierControlClusterBarrierControlStopCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster SetpointRaiseLower Command callback (client side)
+ */
+bool emberAfThermostatClusterSetpointRaiseLowerCallback(chip::app::CommandSender * commandObj, uint8_t mode, int8_t amount);
+
+/**
+ * @brief  Cluster SetpointRaiseLower Command callback (server side)
+ */
+bool emberAfThermostatClusterSetpointRaiseLowerCallback(chip::app::CommandHandler * commandObj, uint8_t mode, int8_t amount);
+
+/**
+ * @brief  Cluster CurrentWeeklySchedule Command callback (client side)
+ */
+bool emberAfThermostatClusterCurrentWeeklyScheduleCallback(chip::app::CommandSender * commandObj,
+                                                           uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
+                                                           uint8_t modeForSequence,
                                                            /* TYPE WARNING: array array defaults to */ uint8_t * payload);
 
 /**
- * @brief  Cluster SetWeeklySchedule Command callback
+ * @brief  Cluster CurrentWeeklySchedule Command callback (server side)
  */
-bool emberAfThermostatClusterSetWeeklyScheduleCallback(chip::app::Command * commandObj, uint8_t numberOfTransitionsForSequence,
-                                                       uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
+bool emberAfThermostatClusterCurrentWeeklyScheduleCallback(chip::app::CommandHandler * commandObj,
+                                                           uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
+                                                           uint8_t modeForSequence,
+                                                           /* TYPE WARNING: array array defaults to */ uint8_t * payload);
+
+/**
+ * @brief  Cluster SetWeeklySchedule Command callback (client side)
+ */
+bool emberAfThermostatClusterSetWeeklyScheduleCallback(chip::app::CommandSender * commandObj,
+                                                       uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
+                                                       uint8_t modeForSequence,
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * payload);
 
 /**
- * @brief  Cluster RelayStatusLog Command callback
+ * @brief  Cluster SetWeeklySchedule Command callback (server side)
  */
-bool emberAfThermostatClusterRelayStatusLogCallback(chip::app::Command * commandObj, uint16_t timeOfDay, uint16_t relayStatus,
+bool emberAfThermostatClusterSetWeeklyScheduleCallback(chip::app::CommandHandler * commandObj,
+                                                       uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
+                                                       uint8_t modeForSequence,
+                                                       /* TYPE WARNING: array array defaults to */ uint8_t * payload);
+
+/**
+ * @brief  Cluster RelayStatusLog Command callback (client side)
+ */
+bool emberAfThermostatClusterRelayStatusLogCallback(chip::app::CommandSender * commandObj, uint16_t timeOfDay, uint16_t relayStatus,
                                                     int16_t localTemperature, uint8_t humidityInPercentage, int16_t setpoint,
                                                     uint16_t unreadEntries);
 
 /**
- * @brief  Cluster GetWeeklySchedule Command callback
+ * @brief  Cluster RelayStatusLog Command callback (server side)
  */
-bool emberAfThermostatClusterGetWeeklyScheduleCallback(chip::app::Command * commandObj, uint8_t daysToReturn, uint8_t modeToReturn);
+bool emberAfThermostatClusterRelayStatusLogCallback(chip::app::CommandHandler * commandObj, uint16_t timeOfDay,
+                                                    uint16_t relayStatus, int16_t localTemperature, uint8_t humidityInPercentage,
+                                                    int16_t setpoint, uint16_t unreadEntries);
 
 /**
- * @brief  Cluster ClearWeeklySchedule Command callback
+ * @brief  Cluster GetWeeklySchedule Command callback (client side)
  */
-bool emberAfThermostatClusterClearWeeklyScheduleCallback(chip::app::Command * commandObj);
+bool emberAfThermostatClusterGetWeeklyScheduleCallback(chip::app::CommandSender * commandObj, uint8_t daysToReturn,
+                                                       uint8_t modeToReturn);
 
 /**
- * @brief  Cluster GetRelayStatusLog Command callback
+ * @brief  Cluster GetWeeklySchedule Command callback (server side)
  */
-bool emberAfThermostatClusterGetRelayStatusLogCallback(chip::app::Command * commandObj);
+bool emberAfThermostatClusterGetWeeklyScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t daysToReturn,
+                                                       uint8_t modeToReturn);
 
 /**
- * @brief  Cluster MoveToHue Command callback
+ * @brief  Cluster ClearWeeklySchedule Command callback (client side)
  */
-bool emberAfColorControlClusterMoveToHueCallback(chip::app::Command * commandObj, uint8_t hue, uint8_t direction,
+bool emberAfThermostatClusterClearWeeklyScheduleCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster ClearWeeklySchedule Command callback (server side)
+ */
+bool emberAfThermostatClusterClearWeeklyScheduleCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster GetRelayStatusLog Command callback (client side)
+ */
+bool emberAfThermostatClusterGetRelayStatusLogCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster GetRelayStatusLog Command callback (server side)
+ */
+bool emberAfThermostatClusterGetRelayStatusLogCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster MoveToHue Command callback (client side)
+ */
+bool emberAfColorControlClusterMoveToHueCallback(chip::app::CommandSender * commandObj, uint8_t hue, uint8_t direction,
                                                  uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster MoveHue Command callback
+ * @brief  Cluster MoveToHue Command callback (server side)
  */
-bool emberAfColorControlClusterMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
-                                               uint8_t optionsOverride);
+bool emberAfColorControlClusterMoveToHueCallback(chip::app::CommandHandler * commandObj, uint8_t hue, uint8_t direction,
+                                                 uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster StepHue Command callback
+ * @brief  Cluster MoveHue Command callback (client side)
  */
-bool emberAfColorControlClusterStepHueCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
+bool emberAfColorControlClusterMoveHueCallback(chip::app::CommandSender * commandObj, uint8_t moveMode, uint8_t rate,
+                                               uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster MoveHue Command callback (server side)
+ */
+bool emberAfColorControlClusterMoveHueCallback(chip::app::CommandHandler * commandObj, uint8_t moveMode, uint8_t rate,
+                                               uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster StepHue Command callback (client side)
+ */
+bool emberAfColorControlClusterStepHueCallback(chip::app::CommandSender * commandObj, uint8_t stepMode, uint8_t stepSize,
                                                uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster MoveToSaturation Command callback
+ * @brief  Cluster StepHue Command callback (server side)
  */
-bool emberAfColorControlClusterMoveToSaturationCallback(chip::app::Command * commandObj, uint8_t saturation,
+bool emberAfColorControlClusterStepHueCallback(chip::app::CommandHandler * commandObj, uint8_t stepMode, uint8_t stepSize,
+                                               uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster MoveToSaturation Command callback (client side)
+ */
+bool emberAfColorControlClusterMoveToSaturationCallback(chip::app::CommandSender * commandObj, uint8_t saturation,
                                                         uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster MoveSaturation Command callback
+ * @brief  Cluster MoveToSaturation Command callback (server side)
  */
-bool emberAfColorControlClusterMoveSaturationCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate,
+bool emberAfColorControlClusterMoveToSaturationCallback(chip::app::CommandHandler * commandObj, uint8_t saturation,
+                                                        uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster MoveSaturation Command callback (client side)
+ */
+bool emberAfColorControlClusterMoveSaturationCallback(chip::app::CommandSender * commandObj, uint8_t moveMode, uint8_t rate,
                                                       uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster StepSaturation Command callback
+ * @brief  Cluster MoveSaturation Command callback (server side)
  */
-bool emberAfColorControlClusterStepSaturationCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
+bool emberAfColorControlClusterMoveSaturationCallback(chip::app::CommandHandler * commandObj, uint8_t moveMode, uint8_t rate,
+                                                      uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster StepSaturation Command callback (client side)
+ */
+bool emberAfColorControlClusterStepSaturationCallback(chip::app::CommandSender * commandObj, uint8_t stepMode, uint8_t stepSize,
                                                       uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster MoveToHueAndSaturation Command callback
+ * @brief  Cluster StepSaturation Command callback (server side)
  */
-bool emberAfColorControlClusterMoveToHueAndSaturationCallback(chip::app::Command * commandObj, uint8_t hue, uint8_t saturation,
-                                                              uint16_t transitionTime, uint8_t optionsMask,
+bool emberAfColorControlClusterStepSaturationCallback(chip::app::CommandHandler * commandObj, uint8_t stepMode, uint8_t stepSize,
+                                                      uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster MoveToHueAndSaturation Command callback (client side)
+ */
+bool emberAfColorControlClusterMoveToHueAndSaturationCallback(chip::app::CommandSender * commandObj, uint8_t hue,
+                                                              uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
                                                               uint8_t optionsOverride);
 
 /**
- * @brief  Cluster MoveToColor Command callback
+ * @brief  Cluster MoveToHueAndSaturation Command callback (server side)
  */
-bool emberAfColorControlClusterMoveToColorCallback(chip::app::Command * commandObj, uint16_t colorX, uint16_t colorY,
+bool emberAfColorControlClusterMoveToHueAndSaturationCallback(chip::app::CommandHandler * commandObj, uint8_t hue,
+                                                              uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
+                                                              uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster MoveToColor Command callback (client side)
+ */
+bool emberAfColorControlClusterMoveToColorCallback(chip::app::CommandSender * commandObj, uint16_t colorX, uint16_t colorY,
                                                    uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster MoveColor Command callback
+ * @brief  Cluster MoveToColor Command callback (server side)
  */
-bool emberAfColorControlClusterMoveColorCallback(chip::app::Command * commandObj, int16_t rateX, int16_t rateY, uint8_t optionsMask,
-                                                 uint8_t optionsOverride);
+bool emberAfColorControlClusterMoveToColorCallback(chip::app::CommandHandler * commandObj, uint16_t colorX, uint16_t colorY,
+                                                   uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster StepColor Command callback
+ * @brief  Cluster MoveColor Command callback (client side)
  */
-bool emberAfColorControlClusterStepColorCallback(chip::app::Command * commandObj, int16_t stepX, int16_t stepY,
+bool emberAfColorControlClusterMoveColorCallback(chip::app::CommandSender * commandObj, int16_t rateX, int16_t rateY,
+                                                 uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster MoveColor Command callback (server side)
+ */
+bool emberAfColorControlClusterMoveColorCallback(chip::app::CommandHandler * commandObj, int16_t rateX, int16_t rateY,
+                                                 uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster StepColor Command callback (client side)
+ */
+bool emberAfColorControlClusterStepColorCallback(chip::app::CommandSender * commandObj, int16_t stepX, int16_t stepY,
                                                  uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster MoveToColorTemperature Command callback
+ * @brief  Cluster StepColor Command callback (server side)
  */
-bool emberAfColorControlClusterMoveToColorTemperatureCallback(chip::app::Command * commandObj, uint16_t colorTemperature,
+bool emberAfColorControlClusterStepColorCallback(chip::app::CommandHandler * commandObj, int16_t stepX, int16_t stepY,
+                                                 uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster MoveToColorTemperature Command callback (client side)
+ */
+bool emberAfColorControlClusterMoveToColorTemperatureCallback(chip::app::CommandSender * commandObj, uint16_t colorTemperature,
                                                               uint16_t transitionTime, uint8_t optionsMask,
                                                               uint8_t optionsOverride);
 
 /**
- * @brief  Cluster EnhancedMoveToHue Command callback
+ * @brief  Cluster MoveToColorTemperature Command callback (server side)
  */
-bool emberAfColorControlClusterEnhancedMoveToHueCallback(chip::app::Command * commandObj, uint16_t enhancedHue, uint8_t direction,
-                                                         uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+bool emberAfColorControlClusterMoveToColorTemperatureCallback(chip::app::CommandHandler * commandObj, uint16_t colorTemperature,
+                                                              uint16_t transitionTime, uint8_t optionsMask,
+                                                              uint8_t optionsOverride);
 
 /**
- * @brief  Cluster EnhancedMoveHue Command callback
+ * @brief  Cluster EnhancedMoveToHue Command callback (client side)
  */
-bool emberAfColorControlClusterEnhancedMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint16_t rate,
+bool emberAfColorControlClusterEnhancedMoveToHueCallback(chip::app::CommandSender * commandObj, uint16_t enhancedHue,
+                                                         uint8_t direction, uint16_t transitionTime, uint8_t optionsMask,
+                                                         uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster EnhancedMoveToHue Command callback (server side)
+ */
+bool emberAfColorControlClusterEnhancedMoveToHueCallback(chip::app::CommandHandler * commandObj, uint16_t enhancedHue,
+                                                         uint8_t direction, uint16_t transitionTime, uint8_t optionsMask,
+                                                         uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster EnhancedMoveHue Command callback (client side)
+ */
+bool emberAfColorControlClusterEnhancedMoveHueCallback(chip::app::CommandSender * commandObj, uint8_t moveMode, uint16_t rate,
                                                        uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster EnhancedStepHue Command callback
+ * @brief  Cluster EnhancedMoveHue Command callback (server side)
  */
-bool emberAfColorControlClusterEnhancedStepHueCallback(chip::app::Command * commandObj, uint8_t stepMode, uint16_t stepSize,
+bool emberAfColorControlClusterEnhancedMoveHueCallback(chip::app::CommandHandler * commandObj, uint8_t moveMode, uint16_t rate,
+                                                       uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster EnhancedStepHue Command callback (client side)
+ */
+bool emberAfColorControlClusterEnhancedStepHueCallback(chip::app::CommandSender * commandObj, uint8_t stepMode, uint16_t stepSize,
                                                        uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster EnhancedMoveToHueAndSaturation Command callback
+ * @brief  Cluster EnhancedStepHue Command callback (server side)
  */
-bool emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(chip::app::Command * commandObj, uint16_t enhancedHue,
+bool emberAfColorControlClusterEnhancedStepHueCallback(chip::app::CommandHandler * commandObj, uint8_t stepMode, uint16_t stepSize,
+                                                       uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster EnhancedMoveToHueAndSaturation Command callback (client side)
+ */
+bool emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(chip::app::CommandSender * commandObj, uint16_t enhancedHue,
                                                                       uint8_t saturation, uint16_t transitionTime,
                                                                       uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster ColorLoopSet Command callback
+ * @brief  Cluster EnhancedMoveToHueAndSaturation Command callback (server side)
  */
-bool emberAfColorControlClusterColorLoopSetCallback(chip::app::Command * commandObj, uint8_t updateFlags, uint8_t action,
+bool emberAfColorControlClusterEnhancedMoveToHueAndSaturationCallback(chip::app::CommandHandler * commandObj, uint16_t enhancedHue,
+                                                                      uint8_t saturation, uint16_t transitionTime,
+                                                                      uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster ColorLoopSet Command callback (client side)
+ */
+bool emberAfColorControlClusterColorLoopSetCallback(chip::app::CommandSender * commandObj, uint8_t updateFlags, uint8_t action,
                                                     uint8_t direction, uint16_t time, uint16_t startHue, uint8_t optionsMask,
                                                     uint8_t optionsOverride);
 
 /**
- * @brief  Cluster StopMoveStep Command callback
+ * @brief  Cluster ColorLoopSet Command callback (server side)
  */
-bool emberAfColorControlClusterStopMoveStepCallback(chip::app::Command * commandObj, uint8_t optionsMask, uint8_t optionsOverride);
+bool emberAfColorControlClusterColorLoopSetCallback(chip::app::CommandHandler * commandObj, uint8_t updateFlags, uint8_t action,
+                                                    uint8_t direction, uint16_t time, uint16_t startHue, uint8_t optionsMask,
+                                                    uint8_t optionsOverride);
 
 /**
- * @brief  Cluster MoveColorTemperature Command callback
+ * @brief  Cluster StopMoveStep Command callback (client side)
  */
-bool emberAfColorControlClusterMoveColorTemperatureCallback(chip::app::Command * commandObj, uint8_t moveMode, uint16_t rate,
+bool emberAfColorControlClusterStopMoveStepCallback(chip::app::CommandSender * commandObj, uint8_t optionsMask,
+                                                    uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster StopMoveStep Command callback (server side)
+ */
+bool emberAfColorControlClusterStopMoveStepCallback(chip::app::CommandHandler * commandObj, uint8_t optionsMask,
+                                                    uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster MoveColorTemperature Command callback (client side)
+ */
+bool emberAfColorControlClusterMoveColorTemperatureCallback(chip::app::CommandSender * commandObj, uint8_t moveMode, uint16_t rate,
                                                             uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
                                                             uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster StepColorTemperature Command callback
+ * @brief  Cluster MoveColorTemperature Command callback (server side)
  */
-bool emberAfColorControlClusterStepColorTemperatureCallback(chip::app::Command * commandObj, uint8_t stepMode, uint16_t stepSize,
-                                                            uint16_t transitionTime, uint16_t colorTemperatureMinimum,
-                                                            uint16_t colorTemperatureMaximum, uint8_t optionsMask,
-                                                            uint8_t optionsOverride);
+bool emberAfColorControlClusterMoveColorTemperatureCallback(chip::app::CommandHandler * commandObj, uint8_t moveMode, uint16_t rate,
+                                                            uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
+                                                            uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster ZoneEnrollResponse Command callback
+ * @brief  Cluster StepColorTemperature Command callback (client side)
  */
-bool emberAfIasZoneClusterZoneEnrollResponseCallback(chip::app::Command * commandObj, uint8_t enrollResponseCode, uint8_t zoneId);
+bool emberAfColorControlClusterStepColorTemperatureCallback(chip::app::CommandSender * commandObj, uint8_t stepMode,
+                                                            uint16_t stepSize, uint16_t transitionTime,
+                                                            uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
+                                                            uint8_t optionsMask, uint8_t optionsOverride);
 
 /**
- * @brief  Cluster ZoneStatusChangeNotification Command callback
+ * @brief  Cluster StepColorTemperature Command callback (server side)
  */
-bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(chip::app::Command * commandObj, uint16_t zoneStatus,
+bool emberAfColorControlClusterStepColorTemperatureCallback(chip::app::CommandHandler * commandObj, uint8_t stepMode,
+                                                            uint16_t stepSize, uint16_t transitionTime,
+                                                            uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
+                                                            uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief  Cluster ZoneEnrollResponse Command callback (client side)
+ */
+bool emberAfIasZoneClusterZoneEnrollResponseCallback(chip::app::CommandSender * commandObj, uint8_t enrollResponseCode,
+                                                     uint8_t zoneId);
+
+/**
+ * @brief  Cluster ZoneEnrollResponse Command callback (server side)
+ */
+bool emberAfIasZoneClusterZoneEnrollResponseCallback(chip::app::CommandHandler * commandObj, uint8_t enrollResponseCode,
+                                                     uint8_t zoneId);
+
+/**
+ * @brief  Cluster ZoneStatusChangeNotification Command callback (client side)
+ */
+bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(chip::app::CommandSender * commandObj, uint16_t zoneStatus,
                                                                uint8_t extendedStatus, uint8_t zoneId, uint16_t delay);
 
 /**
- * @brief  Cluster InitiateNormalOperationMode Command callback
+ * @brief  Cluster ZoneStatusChangeNotification Command callback (server side)
  */
-bool emberAfIasZoneClusterInitiateNormalOperationModeCallback(chip::app::Command * commandObj);
+bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(chip::app::CommandHandler * commandObj, uint16_t zoneStatus,
+                                                               uint8_t extendedStatus, uint8_t zoneId, uint16_t delay);
 
 /**
- * @brief  Cluster ZoneEnrollRequest Command callback
+ * @brief  Cluster InitiateNormalOperationMode Command callback (client side)
  */
-bool emberAfIasZoneClusterZoneEnrollRequestCallback(chip::app::Command * commandObj, uint16_t zoneType, uint16_t manufacturerCode);
+bool emberAfIasZoneClusterInitiateNormalOperationModeCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster InitiateTestMode Command callback
+ * @brief  Cluster InitiateNormalOperationMode Command callback (server side)
  */
-bool emberAfIasZoneClusterInitiateTestModeCallback(chip::app::Command * commandObj, uint8_t testModeDuration,
+bool emberAfIasZoneClusterInitiateNormalOperationModeCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster ZoneEnrollRequest Command callback (client side)
+ */
+bool emberAfIasZoneClusterZoneEnrollRequestCallback(chip::app::CommandSender * commandObj, uint16_t zoneType,
+                                                    uint16_t manufacturerCode);
+
+/**
+ * @brief  Cluster ZoneEnrollRequest Command callback (server side)
+ */
+bool emberAfIasZoneClusterZoneEnrollRequestCallback(chip::app::CommandHandler * commandObj, uint16_t zoneType,
+                                                    uint16_t manufacturerCode);
+
+/**
+ * @brief  Cluster InitiateTestMode Command callback (client side)
+ */
+bool emberAfIasZoneClusterInitiateTestModeCallback(chip::app::CommandSender * commandObj, uint8_t testModeDuration,
                                                    uint8_t currentZoneSensitivityLevel);
 
 /**
- * @brief  Cluster InitiateNormalOperationModeResponse Command callback
+ * @brief  Cluster InitiateTestMode Command callback (server side)
  */
-bool emberAfIasZoneClusterInitiateNormalOperationModeResponseCallback(chip::app::Command * commandObj);
+bool emberAfIasZoneClusterInitiateTestModeCallback(chip::app::CommandHandler * commandObj, uint8_t testModeDuration,
+                                                   uint8_t currentZoneSensitivityLevel);
 
 /**
- * @brief  Cluster InitiateTestModeResponse Command callback
+ * @brief  Cluster InitiateNormalOperationModeResponse Command callback (client side)
  */
-bool emberAfIasZoneClusterInitiateTestModeResponseCallback(chip::app::Command * commandObj);
+bool emberAfIasZoneClusterInitiateNormalOperationModeResponseCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster Arm Command callback
+ * @brief  Cluster InitiateNormalOperationModeResponse Command callback (server side)
  */
-bool emberAfIasAceClusterArmCallback(chip::app::Command * commandObj, uint8_t armMode, uint8_t * armDisarmCode, uint8_t zoneId);
+bool emberAfIasZoneClusterInitiateNormalOperationModeResponseCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster ArmResponse Command callback
+ * @brief  Cluster InitiateTestModeResponse Command callback (client side)
  */
-bool emberAfIasAceClusterArmResponseCallback(chip::app::Command * commandObj, uint8_t armNotification);
+bool emberAfIasZoneClusterInitiateTestModeResponseCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster Bypass Command callback
+ * @brief  Cluster InitiateTestModeResponse Command callback (server side)
  */
-bool emberAfIasAceClusterBypassCallback(chip::app::Command * commandObj, uint8_t numberOfZones,
+bool emberAfIasZoneClusterInitiateTestModeResponseCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster Arm Command callback (client side)
+ */
+bool emberAfIasAceClusterArmCallback(chip::app::CommandSender * commandObj, uint8_t armMode, uint8_t * armDisarmCode,
+                                     uint8_t zoneId);
+
+/**
+ * @brief  Cluster Arm Command callback (server side)
+ */
+bool emberAfIasAceClusterArmCallback(chip::app::CommandHandler * commandObj, uint8_t armMode, uint8_t * armDisarmCode,
+                                     uint8_t zoneId);
+
+/**
+ * @brief  Cluster ArmResponse Command callback (client side)
+ */
+bool emberAfIasAceClusterArmResponseCallback(chip::app::CommandSender * commandObj, uint8_t armNotification);
+
+/**
+ * @brief  Cluster ArmResponse Command callback (server side)
+ */
+bool emberAfIasAceClusterArmResponseCallback(chip::app::CommandHandler * commandObj, uint8_t armNotification);
+
+/**
+ * @brief  Cluster Bypass Command callback (client side)
+ */
+bool emberAfIasAceClusterBypassCallback(chip::app::CommandSender * commandObj, uint8_t numberOfZones,
                                         /* TYPE WARNING: array array defaults to */ uint8_t * zoneIds, uint8_t * armDisarmCode);
 
 /**
- * @brief  Cluster GetZoneIdMapResponse Command callback
+ * @brief  Cluster Bypass Command callback (server side)
  */
-bool emberAfIasAceClusterGetZoneIdMapResponseCallback(chip::app::Command * commandObj, uint16_t section0, uint16_t section1,
+bool emberAfIasAceClusterBypassCallback(chip::app::CommandHandler * commandObj, uint8_t numberOfZones,
+                                        /* TYPE WARNING: array array defaults to */ uint8_t * zoneIds, uint8_t * armDisarmCode);
+
+/**
+ * @brief  Cluster GetZoneIdMapResponse Command callback (client side)
+ */
+bool emberAfIasAceClusterGetZoneIdMapResponseCallback(chip::app::CommandSender * commandObj, uint16_t section0, uint16_t section1,
                                                       uint16_t section2, uint16_t section3, uint16_t section4, uint16_t section5,
                                                       uint16_t section6, uint16_t section7, uint16_t section8, uint16_t section9,
                                                       uint16_t section10, uint16_t section11, uint16_t section12,
                                                       uint16_t section13, uint16_t section14, uint16_t section15);
 
 /**
- * @brief  Cluster Emergency Command callback
+ * @brief  Cluster GetZoneIdMapResponse Command callback (server side)
  */
-bool emberAfIasAceClusterEmergencyCallback(chip::app::Command * commandObj);
+bool emberAfIasAceClusterGetZoneIdMapResponseCallback(chip::app::CommandHandler * commandObj, uint16_t section0, uint16_t section1,
+                                                      uint16_t section2, uint16_t section3, uint16_t section4, uint16_t section5,
+                                                      uint16_t section6, uint16_t section7, uint16_t section8, uint16_t section9,
+                                                      uint16_t section10, uint16_t section11, uint16_t section12,
+                                                      uint16_t section13, uint16_t section14, uint16_t section15);
 
 /**
- * @brief  Cluster GetZoneInformationResponse Command callback
+ * @brief  Cluster Emergency Command callback (client side)
  */
-bool emberAfIasAceClusterGetZoneInformationResponseCallback(chip::app::Command * commandObj, uint8_t zoneId, uint16_t zoneType,
-                                                            chip::NodeId ieeeAddress, uint8_t * zoneLabel);
+bool emberAfIasAceClusterEmergencyCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster Fire Command callback
+ * @brief  Cluster Emergency Command callback (server side)
  */
-bool emberAfIasAceClusterFireCallback(chip::app::Command * commandObj);
+bool emberAfIasAceClusterEmergencyCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster ZoneStatusChanged Command callback
+ * @brief  Cluster GetZoneInformationResponse Command callback (client side)
  */
-bool emberAfIasAceClusterZoneStatusChangedCallback(chip::app::Command * commandObj, uint8_t zoneId, uint16_t zoneStatus,
+bool emberAfIasAceClusterGetZoneInformationResponseCallback(chip::app::CommandSender * commandObj, uint8_t zoneId,
+                                                            uint16_t zoneType, chip::NodeId ieeeAddress, uint8_t * zoneLabel);
+
+/**
+ * @brief  Cluster GetZoneInformationResponse Command callback (server side)
+ */
+bool emberAfIasAceClusterGetZoneInformationResponseCallback(chip::app::CommandHandler * commandObj, uint8_t zoneId,
+                                                            uint16_t zoneType, chip::NodeId ieeeAddress, uint8_t * zoneLabel);
+
+/**
+ * @brief  Cluster Fire Command callback (client side)
+ */
+bool emberAfIasAceClusterFireCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster Fire Command callback (server side)
+ */
+bool emberAfIasAceClusterFireCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster ZoneStatusChanged Command callback (client side)
+ */
+bool emberAfIasAceClusterZoneStatusChangedCallback(chip::app::CommandSender * commandObj, uint8_t zoneId, uint16_t zoneStatus,
                                                    uint8_t audibleNotification, uint8_t * zoneLabel);
 
 /**
- * @brief  Cluster Panic Command callback
+ * @brief  Cluster ZoneStatusChanged Command callback (server side)
  */
-bool emberAfIasAceClusterPanicCallback(chip::app::Command * commandObj);
+bool emberAfIasAceClusterZoneStatusChangedCallback(chip::app::CommandHandler * commandObj, uint8_t zoneId, uint16_t zoneStatus,
+                                                   uint8_t audibleNotification, uint8_t * zoneLabel);
 
 /**
- * @brief  Cluster PanelStatusChanged Command callback
+ * @brief  Cluster Panic Command callback (client side)
  */
-bool emberAfIasAceClusterPanelStatusChangedCallback(chip::app::Command * commandObj, uint8_t panelStatus, uint8_t secondsRemaining,
-                                                    uint8_t audibleNotification, uint8_t alarmStatus);
+bool emberAfIasAceClusterPanicCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster GetZoneIdMap Command callback
+ * @brief  Cluster Panic Command callback (server side)
  */
-bool emberAfIasAceClusterGetZoneIdMapCallback(chip::app::Command * commandObj);
+bool emberAfIasAceClusterPanicCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster GetPanelStatusResponse Command callback
+ * @brief  Cluster PanelStatusChanged Command callback (client side)
  */
-bool emberAfIasAceClusterGetPanelStatusResponseCallback(chip::app::Command * commandObj, uint8_t panelStatus,
+bool emberAfIasAceClusterPanelStatusChangedCallback(chip::app::CommandSender * commandObj, uint8_t panelStatus,
+                                                    uint8_t secondsRemaining, uint8_t audibleNotification, uint8_t alarmStatus);
+
+/**
+ * @brief  Cluster PanelStatusChanged Command callback (server side)
+ */
+bool emberAfIasAceClusterPanelStatusChangedCallback(chip::app::CommandHandler * commandObj, uint8_t panelStatus,
+                                                    uint8_t secondsRemaining, uint8_t audibleNotification, uint8_t alarmStatus);
+
+/**
+ * @brief  Cluster GetZoneIdMap Command callback (client side)
+ */
+bool emberAfIasAceClusterGetZoneIdMapCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster GetZoneIdMap Command callback (server side)
+ */
+bool emberAfIasAceClusterGetZoneIdMapCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster GetPanelStatusResponse Command callback (client side)
+ */
+bool emberAfIasAceClusterGetPanelStatusResponseCallback(chip::app::CommandSender * commandObj, uint8_t panelStatus,
                                                         uint8_t secondsRemaining, uint8_t audibleNotification, uint8_t alarmStatus);
 
 /**
- * @brief  Cluster GetZoneInformation Command callback
+ * @brief  Cluster GetPanelStatusResponse Command callback (server side)
  */
-bool emberAfIasAceClusterGetZoneInformationCallback(chip::app::Command * commandObj, uint8_t zoneId);
+bool emberAfIasAceClusterGetPanelStatusResponseCallback(chip::app::CommandHandler * commandObj, uint8_t panelStatus,
+                                                        uint8_t secondsRemaining, uint8_t audibleNotification, uint8_t alarmStatus);
 
 /**
- * @brief  Cluster SetBypassedZoneList Command callback
+ * @brief  Cluster GetZoneInformation Command callback (client side)
  */
-bool emberAfIasAceClusterSetBypassedZoneListCallback(chip::app::Command * commandObj, uint8_t numberOfZones,
+bool emberAfIasAceClusterGetZoneInformationCallback(chip::app::CommandSender * commandObj, uint8_t zoneId);
+
+/**
+ * @brief  Cluster GetZoneInformation Command callback (server side)
+ */
+bool emberAfIasAceClusterGetZoneInformationCallback(chip::app::CommandHandler * commandObj, uint8_t zoneId);
+
+/**
+ * @brief  Cluster SetBypassedZoneList Command callback (client side)
+ */
+bool emberAfIasAceClusterSetBypassedZoneListCallback(chip::app::CommandSender * commandObj, uint8_t numberOfZones,
                                                      /* TYPE WARNING: array array defaults to */ uint8_t * zoneIds);
 
 /**
- * @brief  Cluster GetPanelStatus Command callback
+ * @brief  Cluster SetBypassedZoneList Command callback (server side)
  */
-bool emberAfIasAceClusterGetPanelStatusCallback(chip::app::Command * commandObj);
+bool emberAfIasAceClusterSetBypassedZoneListCallback(chip::app::CommandHandler * commandObj, uint8_t numberOfZones,
+                                                     /* TYPE WARNING: array array defaults to */ uint8_t * zoneIds);
 
 /**
- * @brief  Cluster BypassResponse Command callback
+ * @brief  Cluster GetPanelStatus Command callback (client side)
  */
-bool emberAfIasAceClusterBypassResponseCallback(chip::app::Command * commandObj, uint8_t numberOfZones,
+bool emberAfIasAceClusterGetPanelStatusCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster GetPanelStatus Command callback (server side)
+ */
+bool emberAfIasAceClusterGetPanelStatusCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster BypassResponse Command callback (client side)
+ */
+bool emberAfIasAceClusterBypassResponseCallback(chip::app::CommandSender * commandObj, uint8_t numberOfZones,
                                                 /* TYPE WARNING: array array defaults to */ uint8_t * bypassResult);
 
 /**
- * @brief  Cluster GetBypassedZoneList Command callback
+ * @brief  Cluster BypassResponse Command callback (server side)
  */
-bool emberAfIasAceClusterGetBypassedZoneListCallback(chip::app::Command * commandObj);
+bool emberAfIasAceClusterBypassResponseCallback(chip::app::CommandHandler * commandObj, uint8_t numberOfZones,
+                                                /* TYPE WARNING: array array defaults to */ uint8_t * bypassResult);
 
 /**
- * @brief  Cluster GetZoneStatusResponse Command callback
+ * @brief  Cluster GetBypassedZoneList Command callback (client side)
  */
-bool emberAfIasAceClusterGetZoneStatusResponseCallback(chip::app::Command * commandObj, uint8_t zoneStatusComplete,
+bool emberAfIasAceClusterGetBypassedZoneListCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster GetBypassedZoneList Command callback (server side)
+ */
+bool emberAfIasAceClusterGetBypassedZoneListCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster GetZoneStatusResponse Command callback (client side)
+ */
+bool emberAfIasAceClusterGetZoneStatusResponseCallback(chip::app::CommandSender * commandObj, uint8_t zoneStatusComplete,
                                                        uint8_t numberOfZones,
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * zoneStatusResult);
 
 /**
- * @brief  Cluster GetZoneStatus Command callback
+ * @brief  Cluster GetZoneStatusResponse Command callback (server side)
  */
-bool emberAfIasAceClusterGetZoneStatusCallback(chip::app::Command * commandObj, uint8_t startingZoneId, uint8_t maxNumberOfZoneIds,
-                                               uint8_t zoneStatusMaskFlag, uint16_t zoneStatusMask);
+bool emberAfIasAceClusterGetZoneStatusResponseCallback(chip::app::CommandHandler * commandObj, uint8_t zoneStatusComplete,
+                                                       uint8_t numberOfZones,
+                                                       /* TYPE WARNING: array array defaults to */ uint8_t * zoneStatusResult);
 
 /**
- * @brief  Cluster StartWarning Command callback
+ * @brief  Cluster GetZoneStatus Command callback (client side)
  */
-bool emberAfIasWdClusterStartWarningCallback(chip::app::Command * commandObj, uint8_t warningInfo, uint16_t warningDuration,
+bool emberAfIasAceClusterGetZoneStatusCallback(chip::app::CommandSender * commandObj, uint8_t startingZoneId,
+                                               uint8_t maxNumberOfZoneIds, uint8_t zoneStatusMaskFlag, uint16_t zoneStatusMask);
+
+/**
+ * @brief  Cluster GetZoneStatus Command callback (server side)
+ */
+bool emberAfIasAceClusterGetZoneStatusCallback(chip::app::CommandHandler * commandObj, uint8_t startingZoneId,
+                                               uint8_t maxNumberOfZoneIds, uint8_t zoneStatusMaskFlag, uint16_t zoneStatusMask);
+
+/**
+ * @brief  Cluster StartWarning Command callback (client side)
+ */
+bool emberAfIasWdClusterStartWarningCallback(chip::app::CommandSender * commandObj, uint8_t warningInfo, uint16_t warningDuration,
                                              uint8_t strobeDutyCycle, uint8_t strobeLevel);
 
 /**
- * @brief  Cluster Squawk Command callback
+ * @brief  Cluster StartWarning Command callback (server side)
  */
-bool emberAfIasWdClusterSquawkCallback(chip::app::Command * commandObj, uint8_t squawkInfo);
+bool emberAfIasWdClusterStartWarningCallback(chip::app::CommandHandler * commandObj, uint8_t warningInfo, uint16_t warningDuration,
+                                             uint8_t strobeDutyCycle, uint8_t strobeLevel);
 
 /**
- * @brief  Cluster ChangeChannel Command callback
+ * @brief  Cluster Squawk Command callback (client side)
  */
-bool emberAfTvChannelClusterChangeChannelCallback(chip::app::Command * commandObj, uint8_t * match);
+bool emberAfIasWdClusterSquawkCallback(chip::app::CommandSender * commandObj, uint8_t squawkInfo);
 
 /**
- * @brief  Cluster ChangeChannelResponse Command callback
+ * @brief  Cluster Squawk Command callback (server side)
  */
-bool emberAfTvChannelClusterChangeChannelResponseCallback(chip::app::Command * commandObj,
+bool emberAfIasWdClusterSquawkCallback(chip::app::CommandHandler * commandObj, uint8_t squawkInfo);
+
+/**
+ * @brief  Cluster ChangeChannel Command callback (client side)
+ */
+bool emberAfTvChannelClusterChangeChannelCallback(chip::app::CommandSender * commandObj, uint8_t * match);
+
+/**
+ * @brief  Cluster ChangeChannel Command callback (server side)
+ */
+bool emberAfTvChannelClusterChangeChannelCallback(chip::app::CommandHandler * commandObj, uint8_t * match);
+
+/**
+ * @brief  Cluster ChangeChannelResponse Command callback (client side)
+ */
+bool emberAfTvChannelClusterChangeChannelResponseCallback(chip::app::CommandSender * commandObj,
                                                           /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch,
                                                           uint8_t ErrorType);
 
 /**
- * @brief  Cluster ChangeChannelByNumber Command callback
+ * @brief  Cluster ChangeChannelResponse Command callback (server side)
  */
-bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::Command * commandObj, uint16_t majorNumber,
+bool emberAfTvChannelClusterChangeChannelResponseCallback(chip::app::CommandHandler * commandObj,
+                                                          /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch,
+                                                          uint8_t ErrorType);
+
+/**
+ * @brief  Cluster ChangeChannelByNumber Command callback (client side)
+ */
+bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::CommandSender * commandObj, uint16_t majorNumber,
                                                           uint16_t minorNumber);
 
 /**
- * @brief  Cluster SkipChannel Command callback
+ * @brief  Cluster ChangeChannelByNumber Command callback (server side)
  */
-bool emberAfTvChannelClusterSkipChannelCallback(chip::app::Command * commandObj, uint16_t Count);
+bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::CommandHandler * commandObj, uint16_t majorNumber,
+                                                          uint16_t minorNumber);
 
 /**
- * @brief  Cluster NavigateTarget Command callback
+ * @brief  Cluster SkipChannel Command callback (client side)
  */
-bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::app::Command * commandObj, uint8_t target, uint8_t * data);
+bool emberAfTvChannelClusterSkipChannelCallback(chip::app::CommandSender * commandObj, uint16_t Count);
 
 /**
- * @brief  Cluster NavigateTargetResponse Command callback
+ * @brief  Cluster SkipChannel Command callback (server side)
  */
-bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::app::Command * commandObj, uint8_t status, uint8_t * data);
+bool emberAfTvChannelClusterSkipChannelCallback(chip::app::CommandHandler * commandObj, uint16_t Count);
 
 /**
- * @brief  Cluster MediaPlay Command callback
+ * @brief  Cluster NavigateTarget Command callback (client side)
  */
-bool emberAfMediaPlaybackClusterMediaPlayCallback(chip::app::Command * commandObj);
+bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::app::CommandSender * commandObj, uint8_t target, uint8_t * data);
 
 /**
- * @brief  Cluster MediaPlayResponse Command callback
+ * @brief  Cluster NavigateTarget Command callback (server side)
  */
-bool emberAfMediaPlaybackClusterMediaPlayResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus);
+bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::app::CommandHandler * commandObj, uint8_t target, uint8_t * data);
 
 /**
- * @brief  Cluster MediaPause Command callback
+ * @brief  Cluster NavigateTargetResponse Command callback (client side)
  */
-bool emberAfMediaPlaybackClusterMediaPauseCallback(chip::app::Command * commandObj);
+bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::app::CommandSender * commandObj, uint8_t status,
+                                                                 uint8_t * data);
 
 /**
- * @brief  Cluster MediaPauseResponse Command callback
+ * @brief  Cluster NavigateTargetResponse Command callback (server side)
  */
-bool emberAfMediaPlaybackClusterMediaPauseResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus);
+bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status,
+                                                                 uint8_t * data);
 
 /**
- * @brief  Cluster MediaStop Command callback
+ * @brief  Cluster MediaPlay Command callback (client side)
  */
-bool emberAfMediaPlaybackClusterMediaStopCallback(chip::app::Command * commandObj);
+bool emberAfMediaPlaybackClusterMediaPlayCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster MediaStopResponse Command callback
+ * @brief  Cluster MediaPlay Command callback (server side)
  */
-bool emberAfMediaPlaybackClusterMediaStopResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus);
+bool emberAfMediaPlaybackClusterMediaPlayCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster MediaStartOver Command callback
+ * @brief  Cluster MediaPlayResponse Command callback (client side)
  */
-bool emberAfMediaPlaybackClusterMediaStartOverCallback(chip::app::Command * commandObj);
+bool emberAfMediaPlaybackClusterMediaPlayResponseCallback(chip::app::CommandSender * commandObj, uint8_t mediaPlaybackStatus);
 
 /**
- * @brief  Cluster MediaStartOverResponse Command callback
+ * @brief  Cluster MediaPlayResponse Command callback (server side)
  */
-bool emberAfMediaPlaybackClusterMediaStartOverResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus);
+bool emberAfMediaPlaybackClusterMediaPlayResponseCallback(chip::app::CommandHandler * commandObj, uint8_t mediaPlaybackStatus);
 
 /**
- * @brief  Cluster MediaPrevious Command callback
+ * @brief  Cluster MediaPause Command callback (client side)
  */
-bool emberAfMediaPlaybackClusterMediaPreviousCallback(chip::app::Command * commandObj);
+bool emberAfMediaPlaybackClusterMediaPauseCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster MediaPreviousResponse Command callback
+ * @brief  Cluster MediaPause Command callback (server side)
  */
-bool emberAfMediaPlaybackClusterMediaPreviousResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus);
+bool emberAfMediaPlaybackClusterMediaPauseCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster MediaNext Command callback
+ * @brief  Cluster MediaPauseResponse Command callback (client side)
  */
-bool emberAfMediaPlaybackClusterMediaNextCallback(chip::app::Command * commandObj);
+bool emberAfMediaPlaybackClusterMediaPauseResponseCallback(chip::app::CommandSender * commandObj, uint8_t mediaPlaybackStatus);
 
 /**
- * @brief  Cluster MediaNextResponse Command callback
+ * @brief  Cluster MediaPauseResponse Command callback (server side)
  */
-bool emberAfMediaPlaybackClusterMediaNextResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus);
+bool emberAfMediaPlaybackClusterMediaPauseResponseCallback(chip::app::CommandHandler * commandObj, uint8_t mediaPlaybackStatus);
 
 /**
- * @brief  Cluster MediaRewind Command callback
+ * @brief  Cluster MediaStop Command callback (client side)
  */
-bool emberAfMediaPlaybackClusterMediaRewindCallback(chip::app::Command * commandObj);
+bool emberAfMediaPlaybackClusterMediaStopCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster MediaRewindResponse Command callback
+ * @brief  Cluster MediaStop Command callback (server side)
  */
-bool emberAfMediaPlaybackClusterMediaRewindResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus);
+bool emberAfMediaPlaybackClusterMediaStopCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster MediaFastForward Command callback
+ * @brief  Cluster MediaStopResponse Command callback (client side)
  */
-bool emberAfMediaPlaybackClusterMediaFastForwardCallback(chip::app::Command * commandObj);
+bool emberAfMediaPlaybackClusterMediaStopResponseCallback(chip::app::CommandSender * commandObj, uint8_t mediaPlaybackStatus);
 
 /**
- * @brief  Cluster MediaFastForwardResponse Command callback
+ * @brief  Cluster MediaStopResponse Command callback (server side)
  */
-bool emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus);
+bool emberAfMediaPlaybackClusterMediaStopResponseCallback(chip::app::CommandHandler * commandObj, uint8_t mediaPlaybackStatus);
 
 /**
- * @brief  Cluster MediaSkipForward Command callback
+ * @brief  Cluster MediaStartOver Command callback (client side)
  */
-bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(chip::app::Command * commandObj, uint64_t deltaPositionMilliseconds);
+bool emberAfMediaPlaybackClusterMediaStartOverCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster MediaSkipForwardResponse Command callback
+ * @brief  Cluster MediaStartOver Command callback (server side)
  */
-bool emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus);
+bool emberAfMediaPlaybackClusterMediaStartOverCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster MediaSkipBackward Command callback
+ * @brief  Cluster MediaStartOverResponse Command callback (client side)
  */
-bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(chip::app::Command * commandObj, uint64_t deltaPositionMilliseconds);
+bool emberAfMediaPlaybackClusterMediaStartOverResponseCallback(chip::app::CommandSender * commandObj, uint8_t mediaPlaybackStatus);
 
 /**
- * @brief  Cluster MediaSkipBackwardResponse Command callback
+ * @brief  Cluster MediaStartOverResponse Command callback (server side)
  */
-bool emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus);
+bool emberAfMediaPlaybackClusterMediaStartOverResponseCallback(chip::app::CommandHandler * commandObj, uint8_t mediaPlaybackStatus);
 
 /**
- * @brief  Cluster MediaSeek Command callback
+ * @brief  Cluster MediaPrevious Command callback (client side)
  */
-bool emberAfMediaPlaybackClusterMediaSeekCallback(chip::app::Command * commandObj, uint64_t position);
+bool emberAfMediaPlaybackClusterMediaPreviousCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster MediaSeekResponse Command callback
+ * @brief  Cluster MediaPrevious Command callback (server side)
  */
-bool emberAfMediaPlaybackClusterMediaSeekResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus);
+bool emberAfMediaPlaybackClusterMediaPreviousCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster SelectInput Command callback
+ * @brief  Cluster MediaPreviousResponse Command callback (client side)
  */
-bool emberAfMediaInputClusterSelectInputCallback(chip::app::Command * commandObj, uint8_t index);
+bool emberAfMediaPlaybackClusterMediaPreviousResponseCallback(chip::app::CommandSender * commandObj, uint8_t mediaPlaybackStatus);
 
 /**
- * @brief  Cluster ShowInputStatus Command callback
+ * @brief  Cluster MediaPreviousResponse Command callback (server side)
  */
-bool emberAfMediaInputClusterShowInputStatusCallback(chip::app::Command * commandObj);
+bool emberAfMediaPlaybackClusterMediaPreviousResponseCallback(chip::app::CommandHandler * commandObj, uint8_t mediaPlaybackStatus);
 
 /**
- * @brief  Cluster HideInputStatus Command callback
+ * @brief  Cluster MediaNext Command callback (client side)
  */
-bool emberAfMediaInputClusterHideInputStatusCallback(chip::app::Command * commandObj);
+bool emberAfMediaPlaybackClusterMediaNextCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster RenameInput Command callback
+ * @brief  Cluster MediaNext Command callback (server side)
  */
-bool emberAfMediaInputClusterRenameInputCallback(chip::app::Command * commandObj, uint8_t index, uint8_t * name);
+bool emberAfMediaPlaybackClusterMediaNextCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster Sleep Command callback
+ * @brief  Cluster MediaNextResponse Command callback (client side)
  */
-bool emberAfLowPowerClusterSleepCallback(chip::app::Command * commandObj);
+bool emberAfMediaPlaybackClusterMediaNextResponseCallback(chip::app::CommandSender * commandObj, uint8_t mediaPlaybackStatus);
 
 /**
- * @brief  Cluster SendKey Command callback
+ * @brief  Cluster MediaNextResponse Command callback (server side)
  */
-bool emberAfKeypadInputClusterSendKeyCallback(chip::app::Command * commandObj, uint8_t keyCode);
+bool emberAfMediaPlaybackClusterMediaNextResponseCallback(chip::app::CommandHandler * commandObj, uint8_t mediaPlaybackStatus);
 
 /**
- * @brief  Cluster SendKeyResponse Command callback
+ * @brief  Cluster MediaRewind Command callback (client side)
  */
-bool emberAfKeypadInputClusterSendKeyResponseCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfMediaPlaybackClusterMediaRewindCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster LaunchContent Command callback
+ * @brief  Cluster MediaRewind Command callback (server side)
  */
-bool emberAfContentLauncherClusterLaunchContentCallback(chip::app::Command * commandObj, uint8_t autoPlay, uint8_t * data);
+bool emberAfMediaPlaybackClusterMediaRewindCallback(chip::app::CommandHandler * commandObj);
 
 /**
- * @brief  Cluster LaunchContentResponse Command callback
+ * @brief  Cluster MediaRewindResponse Command callback (client side)
  */
-bool emberAfContentLauncherClusterLaunchContentResponseCallback(chip::app::Command * commandObj, uint8_t * data,
+bool emberAfMediaPlaybackClusterMediaRewindResponseCallback(chip::app::CommandSender * commandObj, uint8_t mediaPlaybackStatus);
+
+/**
+ * @brief  Cluster MediaRewindResponse Command callback (server side)
+ */
+bool emberAfMediaPlaybackClusterMediaRewindResponseCallback(chip::app::CommandHandler * commandObj, uint8_t mediaPlaybackStatus);
+
+/**
+ * @brief  Cluster MediaFastForward Command callback (client side)
+ */
+bool emberAfMediaPlaybackClusterMediaFastForwardCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster MediaFastForward Command callback (server side)
+ */
+bool emberAfMediaPlaybackClusterMediaFastForwardCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster MediaFastForwardResponse Command callback (client side)
+ */
+bool emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(chip::app::CommandSender * commandObj,
+                                                                 uint8_t mediaPlaybackStatus);
+
+/**
+ * @brief  Cluster MediaFastForwardResponse Command callback (server side)
+ */
+bool emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(chip::app::CommandHandler * commandObj,
+                                                                 uint8_t mediaPlaybackStatus);
+
+/**
+ * @brief  Cluster MediaSkipForward Command callback (client side)
+ */
+bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(chip::app::CommandSender * commandObj, uint64_t deltaPositionMilliseconds);
+
+/**
+ * @brief  Cluster MediaSkipForward Command callback (server side)
+ */
+bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(chip::app::CommandHandler * commandObj,
+                                                         uint64_t deltaPositionMilliseconds);
+
+/**
+ * @brief  Cluster MediaSkipForwardResponse Command callback (client side)
+ */
+bool emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(chip::app::CommandSender * commandObj,
+                                                                 uint8_t mediaPlaybackStatus);
+
+/**
+ * @brief  Cluster MediaSkipForwardResponse Command callback (server side)
+ */
+bool emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(chip::app::CommandHandler * commandObj,
+                                                                 uint8_t mediaPlaybackStatus);
+
+/**
+ * @brief  Cluster MediaSkipBackward Command callback (client side)
+ */
+bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(chip::app::CommandSender * commandObj,
+                                                          uint64_t deltaPositionMilliseconds);
+
+/**
+ * @brief  Cluster MediaSkipBackward Command callback (server side)
+ */
+bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(chip::app::CommandHandler * commandObj,
+                                                          uint64_t deltaPositionMilliseconds);
+
+/**
+ * @brief  Cluster MediaSkipBackwardResponse Command callback (client side)
+ */
+bool emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(chip::app::CommandSender * commandObj,
+                                                                  uint8_t mediaPlaybackStatus);
+
+/**
+ * @brief  Cluster MediaSkipBackwardResponse Command callback (server side)
+ */
+bool emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(chip::app::CommandHandler * commandObj,
+                                                                  uint8_t mediaPlaybackStatus);
+
+/**
+ * @brief  Cluster MediaSeek Command callback (client side)
+ */
+bool emberAfMediaPlaybackClusterMediaSeekCallback(chip::app::CommandSender * commandObj, uint64_t position);
+
+/**
+ * @brief  Cluster MediaSeek Command callback (server side)
+ */
+bool emberAfMediaPlaybackClusterMediaSeekCallback(chip::app::CommandHandler * commandObj, uint64_t position);
+
+/**
+ * @brief  Cluster MediaSeekResponse Command callback (client side)
+ */
+bool emberAfMediaPlaybackClusterMediaSeekResponseCallback(chip::app::CommandSender * commandObj, uint8_t mediaPlaybackStatus);
+
+/**
+ * @brief  Cluster MediaSeekResponse Command callback (server side)
+ */
+bool emberAfMediaPlaybackClusterMediaSeekResponseCallback(chip::app::CommandHandler * commandObj, uint8_t mediaPlaybackStatus);
+
+/**
+ * @brief  Cluster SelectInput Command callback (client side)
+ */
+bool emberAfMediaInputClusterSelectInputCallback(chip::app::CommandSender * commandObj, uint8_t index);
+
+/**
+ * @brief  Cluster SelectInput Command callback (server side)
+ */
+bool emberAfMediaInputClusterSelectInputCallback(chip::app::CommandHandler * commandObj, uint8_t index);
+
+/**
+ * @brief  Cluster ShowInputStatus Command callback (client side)
+ */
+bool emberAfMediaInputClusterShowInputStatusCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster ShowInputStatus Command callback (server side)
+ */
+bool emberAfMediaInputClusterShowInputStatusCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster HideInputStatus Command callback (client side)
+ */
+bool emberAfMediaInputClusterHideInputStatusCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster HideInputStatus Command callback (server side)
+ */
+bool emberAfMediaInputClusterHideInputStatusCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster RenameInput Command callback (client side)
+ */
+bool emberAfMediaInputClusterRenameInputCallback(chip::app::CommandSender * commandObj, uint8_t index, uint8_t * name);
+
+/**
+ * @brief  Cluster RenameInput Command callback (server side)
+ */
+bool emberAfMediaInputClusterRenameInputCallback(chip::app::CommandHandler * commandObj, uint8_t index, uint8_t * name);
+
+/**
+ * @brief  Cluster Sleep Command callback (client side)
+ */
+bool emberAfLowPowerClusterSleepCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster Sleep Command callback (server side)
+ */
+bool emberAfLowPowerClusterSleepCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster SendKey Command callback (client side)
+ */
+bool emberAfKeypadInputClusterSendKeyCallback(chip::app::CommandSender * commandObj, uint8_t keyCode);
+
+/**
+ * @brief  Cluster SendKey Command callback (server side)
+ */
+bool emberAfKeypadInputClusterSendKeyCallback(chip::app::CommandHandler * commandObj, uint8_t keyCode);
+
+/**
+ * @brief  Cluster SendKeyResponse Command callback (client side)
+ */
+bool emberAfKeypadInputClusterSendKeyResponseCallback(chip::app::CommandSender * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster SendKeyResponse Command callback (server side)
+ */
+bool emberAfKeypadInputClusterSendKeyResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status);
+
+/**
+ * @brief  Cluster LaunchContent Command callback (client side)
+ */
+bool emberAfContentLauncherClusterLaunchContentCallback(chip::app::CommandSender * commandObj, uint8_t autoPlay, uint8_t * data);
+
+/**
+ * @brief  Cluster LaunchContent Command callback (server side)
+ */
+bool emberAfContentLauncherClusterLaunchContentCallback(chip::app::CommandHandler * commandObj, uint8_t autoPlay, uint8_t * data);
+
+/**
+ * @brief  Cluster LaunchContentResponse Command callback (client side)
+ */
+bool emberAfContentLauncherClusterLaunchContentResponseCallback(chip::app::CommandSender * commandObj, uint8_t * data,
                                                                 uint8_t contentLaunchStatus);
 
 /**
- * @brief  Cluster LaunchURL Command callback
+ * @brief  Cluster LaunchContentResponse Command callback (server side)
  */
-bool emberAfContentLauncherClusterLaunchURLCallback(chip::app::Command * commandObj, uint8_t * contentURL, uint8_t * displayString);
+bool emberAfContentLauncherClusterLaunchContentResponseCallback(chip::app::CommandHandler * commandObj, uint8_t * data,
+                                                                uint8_t contentLaunchStatus);
 
 /**
- * @brief  Cluster LaunchURLResponse Command callback
+ * @brief  Cluster LaunchURL Command callback (client side)
  */
-bool emberAfContentLauncherClusterLaunchURLResponseCallback(chip::app::Command * commandObj, uint8_t * data,
+bool emberAfContentLauncherClusterLaunchURLCallback(chip::app::CommandSender * commandObj, uint8_t * contentURL,
+                                                    uint8_t * displayString);
+
+/**
+ * @brief  Cluster LaunchURL Command callback (server side)
+ */
+bool emberAfContentLauncherClusterLaunchURLCallback(chip::app::CommandHandler * commandObj, uint8_t * contentURL,
+                                                    uint8_t * displayString);
+
+/**
+ * @brief  Cluster LaunchURLResponse Command callback (client side)
+ */
+bool emberAfContentLauncherClusterLaunchURLResponseCallback(chip::app::CommandSender * commandObj, uint8_t * data,
                                                             uint8_t contentLaunchStatus);
 
 /**
- * @brief  Cluster SelectOutput Command callback
+ * @brief  Cluster LaunchURLResponse Command callback (server side)
  */
-bool emberAfAudioOutputClusterSelectOutputCallback(chip::app::Command * commandObj, uint8_t index);
+bool emberAfContentLauncherClusterLaunchURLResponseCallback(chip::app::CommandHandler * commandObj, uint8_t * data,
+                                                            uint8_t contentLaunchStatus);
 
 /**
- * @brief  Cluster RenameOutput Command callback
+ * @brief  Cluster SelectOutput Command callback (client side)
  */
-bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * commandObj, uint8_t index, uint8_t * name);
+bool emberAfAudioOutputClusterSelectOutputCallback(chip::app::CommandSender * commandObj, uint8_t index);
 
 /**
- * @brief  Cluster LaunchApp Command callback
+ * @brief  Cluster SelectOutput Command callback (server side)
  */
-bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * commandObj, uint8_t * data, uint16_t catalogVendorId,
-                                                        uint8_t * applicationId);
+bool emberAfAudioOutputClusterSelectOutputCallback(chip::app::CommandHandler * commandObj, uint8_t index);
 
 /**
- * @brief  Cluster LaunchAppResponse Command callback
+ * @brief  Cluster RenameOutput Command callback (client side)
  */
-bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::app::Command * commandObj, uint8_t status, uint8_t * data);
+bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::CommandSender * commandObj, uint8_t index, uint8_t * name);
 
 /**
- * @brief  Cluster ChangeStatus Command callback
+ * @brief  Cluster RenameOutput Command callback (server side)
  */
-bool emberAfApplicationBasicClusterChangeStatusCallback(chip::app::Command * commandObj, uint8_t status);
+bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::CommandHandler * commandObj, uint8_t index, uint8_t * name);
 
 /**
- * @brief  Cluster GetSetupPIN Command callback
+ * @brief  Cluster LaunchApp Command callback (client side)
  */
-bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::Command * commandObj, uint8_t * tempAccountIdentifier);
+bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::CommandSender * commandObj, uint8_t * data,
+                                                        uint16_t catalogVendorId, uint8_t * applicationId);
 
 /**
- * @brief  Cluster GetSetupPINResponse Command callback
+ * @brief  Cluster LaunchApp Command callback (server side)
  */
-bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::app::Command * commandObj, uint8_t * setupPIN);
+bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::CommandHandler * commandObj, uint8_t * data,
+                                                        uint16_t catalogVendorId, uint8_t * applicationId);
 
 /**
- * @brief  Cluster Login Command callback
+ * @brief  Cluster LaunchAppResponse Command callback (client side)
  */
-bool emberAfAccountLoginClusterLoginCallback(chip::app::Command * commandObj, uint8_t * tempAccountIdentifier, uint8_t * setupPIN);
+bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::app::CommandSender * commandObj, uint8_t status,
+                                                                uint8_t * data);
 
 /**
- * @brief  Cluster Test Command callback
+ * @brief  Cluster LaunchAppResponse Command callback (server side)
  */
-bool emberAfTestClusterClusterTestCallback(chip::app::Command * commandObj);
+bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status,
+                                                                uint8_t * data);
 
 /**
- * @brief  Cluster TestSpecificResponse Command callback
+ * @brief  Cluster ChangeStatus Command callback (client side)
  */
-bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::app::Command * commandObj, uint8_t returnValue);
+bool emberAfApplicationBasicClusterChangeStatusCallback(chip::app::CommandSender * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster TestNotHandled Command callback
+ * @brief  Cluster ChangeStatus Command callback (server side)
  */
-bool emberAfTestClusterClusterTestNotHandledCallback(chip::app::Command * commandObj);
+bool emberAfApplicationBasicClusterChangeStatusCallback(chip::app::CommandHandler * commandObj, uint8_t status);
 
 /**
- * @brief  Cluster TestSpecific Command callback
+ * @brief  Cluster GetSetupPIN Command callback (client side)
  */
-bool emberAfTestClusterClusterTestSpecificCallback(chip::app::Command * commandObj);
+bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::CommandSender * commandObj, uint8_t * tempAccountIdentifier);
 
 /**
- * @brief  Cluster TestUnknownCommand Command callback
+ * @brief  Cluster GetSetupPIN Command callback (server side)
  */
-bool emberAfTestClusterClusterTestUnknownCommandCallback(chip::app::Command * commandObj);
+bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::CommandHandler * commandObj, uint8_t * tempAccountIdentifier);
 
 /**
- * @brief  Cluster DisplayMessage Command callback
+ * @brief  Cluster GetSetupPINResponse Command callback (client side)
  */
-bool emberAfMessagingClusterDisplayMessageCallback(chip::app::Command * commandObj, uint32_t messageId, uint8_t messageControl,
+bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::app::CommandSender * commandObj, uint8_t * setupPIN);
+
+/**
+ * @brief  Cluster GetSetupPINResponse Command callback (server side)
+ */
+bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::app::CommandHandler * commandObj, uint8_t * setupPIN);
+
+/**
+ * @brief  Cluster Login Command callback (client side)
+ */
+bool emberAfAccountLoginClusterLoginCallback(chip::app::CommandSender * commandObj, uint8_t * tempAccountIdentifier,
+                                             uint8_t * setupPIN);
+
+/**
+ * @brief  Cluster Login Command callback (server side)
+ */
+bool emberAfAccountLoginClusterLoginCallback(chip::app::CommandHandler * commandObj, uint8_t * tempAccountIdentifier,
+                                             uint8_t * setupPIN);
+
+/**
+ * @brief  Cluster Test Command callback (client side)
+ */
+bool emberAfTestClusterClusterTestCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster Test Command callback (server side)
+ */
+bool emberAfTestClusterClusterTestCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster TestSpecificResponse Command callback (client side)
+ */
+bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::app::CommandSender * commandObj, uint8_t returnValue);
+
+/**
+ * @brief  Cluster TestSpecificResponse Command callback (server side)
+ */
+bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::app::CommandHandler * commandObj, uint8_t returnValue);
+
+/**
+ * @brief  Cluster TestNotHandled Command callback (client side)
+ */
+bool emberAfTestClusterClusterTestNotHandledCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster TestNotHandled Command callback (server side)
+ */
+bool emberAfTestClusterClusterTestNotHandledCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster TestSpecific Command callback (client side)
+ */
+bool emberAfTestClusterClusterTestSpecificCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster TestSpecific Command callback (server side)
+ */
+bool emberAfTestClusterClusterTestSpecificCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster TestUnknownCommand Command callback (client side)
+ */
+bool emberAfTestClusterClusterTestUnknownCommandCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster TestUnknownCommand Command callback (server side)
+ */
+bool emberAfTestClusterClusterTestUnknownCommandCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster DisplayMessage Command callback (client side)
+ */
+bool emberAfMessagingClusterDisplayMessageCallback(chip::app::CommandSender * commandObj, uint32_t messageId,
+                                                   uint8_t messageControl,
                                                    /* TYPE WARNING: unknown defaults to */ uint8_t * startTime,
                                                    uint16_t durationInMinutes, uint8_t * message,
                                                    uint8_t optionalExtendedMessageControl);
 
 /**
- * @brief  Cluster GetLastMessage Command callback
+ * @brief  Cluster DisplayMessage Command callback (server side)
  */
-bool emberAfMessagingClusterGetLastMessageCallback(chip::app::Command * commandObj);
+bool emberAfMessagingClusterDisplayMessageCallback(chip::app::CommandHandler * commandObj, uint32_t messageId,
+                                                   uint8_t messageControl,
+                                                   /* TYPE WARNING: unknown defaults to */ uint8_t * startTime,
+                                                   uint16_t durationInMinutes, uint8_t * message,
+                                                   uint8_t optionalExtendedMessageControl);
 
 /**
- * @brief  Cluster CancelMessage Command callback
+ * @brief  Cluster GetLastMessage Command callback (client side)
  */
-bool emberAfMessagingClusterCancelMessageCallback(chip::app::Command * commandObj, uint32_t messageId, uint8_t messageControl);
+bool emberAfMessagingClusterGetLastMessageCallback(chip::app::CommandSender * commandObj);
 
 /**
- * @brief  Cluster MessageConfirmation Command callback
+ * @brief  Cluster GetLastMessage Command callback (server side)
  */
-bool emberAfMessagingClusterMessageConfirmationCallback(chip::app::Command * commandObj, uint32_t messageId,
+bool emberAfMessagingClusterGetLastMessageCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster CancelMessage Command callback (client side)
+ */
+bool emberAfMessagingClusterCancelMessageCallback(chip::app::CommandSender * commandObj, uint32_t messageId,
+                                                  uint8_t messageControl);
+
+/**
+ * @brief  Cluster CancelMessage Command callback (server side)
+ */
+bool emberAfMessagingClusterCancelMessageCallback(chip::app::CommandHandler * commandObj, uint32_t messageId,
+                                                  uint8_t messageControl);
+
+/**
+ * @brief  Cluster MessageConfirmation Command callback (client side)
+ */
+bool emberAfMessagingClusterMessageConfirmationCallback(chip::app::CommandSender * commandObj, uint32_t messageId,
                                                         /* TYPE WARNING: unknown defaults to */ uint8_t * confirmationTime,
                                                         uint8_t messageConfirmationControl, chip::ByteSpan messageResponse);
 
 /**
- * @brief  Cluster DisplayProtectedMessage Command callback
+ * @brief  Cluster MessageConfirmation Command callback (server side)
  */
-bool emberAfMessagingClusterDisplayProtectedMessageCallback(chip::app::Command * commandObj, uint32_t messageId,
+bool emberAfMessagingClusterMessageConfirmationCallback(chip::app::CommandHandler * commandObj, uint32_t messageId,
+                                                        /* TYPE WARNING: unknown defaults to */ uint8_t * confirmationTime,
+                                                        uint8_t messageConfirmationControl, chip::ByteSpan messageResponse);
+
+/**
+ * @brief  Cluster DisplayProtectedMessage Command callback (client side)
+ */
+bool emberAfMessagingClusterDisplayProtectedMessageCallback(chip::app::CommandSender * commandObj, uint32_t messageId,
                                                             uint8_t messageControl,
                                                             /* TYPE WARNING: unknown defaults to */ uint8_t * startTime,
                                                             uint16_t durationInMinutes, uint8_t * message,
                                                             uint8_t optionalExtendedMessageControl);
 
 /**
- * @brief  Cluster GetMessageCancellation Command callback
+ * @brief  Cluster DisplayProtectedMessage Command callback (server side)
  */
-bool emberAfMessagingClusterGetMessageCancellationCallback(
-    chip::app::Command * commandObj, /* TYPE WARNING: unknown defaults to */ uint8_t * earliestImplementationTime);
+bool emberAfMessagingClusterDisplayProtectedMessageCallback(chip::app::CommandHandler * commandObj, uint32_t messageId,
+                                                            uint8_t messageControl,
+                                                            /* TYPE WARNING: unknown defaults to */ uint8_t * startTime,
+                                                            uint16_t durationInMinutes, uint8_t * message,
+                                                            uint8_t optionalExtendedMessageControl);
 
 /**
- * @brief  Cluster CancelAllMessages Command callback
+ * @brief  Cluster GetMessageCancellation Command callback (client side)
  */
-bool emberAfMessagingClusterCancelAllMessagesCallback(chip::app::Command * commandObj,
+bool emberAfMessagingClusterGetMessageCancellationCallback(
+    chip::app::CommandSender * commandObj, /* TYPE WARNING: unknown defaults to */ uint8_t * earliestImplementationTime);
+
+/**
+ * @brief  Cluster GetMessageCancellation Command callback (server side)
+ */
+bool emberAfMessagingClusterGetMessageCancellationCallback(
+    chip::app::CommandHandler * commandObj, /* TYPE WARNING: unknown defaults to */ uint8_t * earliestImplementationTime);
+
+/**
+ * @brief  Cluster CancelAllMessages Command callback (client side)
+ */
+bool emberAfMessagingClusterCancelAllMessagesCallback(chip::app::CommandSender * commandObj,
                                                       /* TYPE WARNING: unknown defaults to */ uint8_t * implementationDateTime);
 
 /**
- * @brief  Cluster GetAlerts Command callback
+ * @brief  Cluster CancelAllMessages Command callback (server side)
  */
-bool emberAfApplianceEventsAndAlertClusterGetAlertsCallback(chip::app::Command * commandObj);
+bool emberAfMessagingClusterCancelAllMessagesCallback(chip::app::CommandHandler * commandObj,
+                                                      /* TYPE WARNING: unknown defaults to */ uint8_t * implementationDateTime);
 
 /**
- * @brief  Cluster GetAlertsResponse Command callback
+ * @brief  Cluster GetAlerts Command callback (client side)
+ */
+bool emberAfApplianceEventsAndAlertClusterGetAlertsCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster GetAlerts Command callback (server side)
+ */
+bool emberAfApplianceEventsAndAlertClusterGetAlertsCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster GetAlertsResponse Command callback (client side)
  */
 bool emberAfApplianceEventsAndAlertClusterGetAlertsResponseCallback(
-    chip::app::Command * commandObj, uint8_t alertsCount, /* TYPE WARNING: array array defaults to */ uint8_t * alertStructures);
+    chip::app::CommandSender * commandObj, uint8_t alertsCount,
+    /* TYPE WARNING: array array defaults to */ uint8_t * alertStructures);
 
 /**
- * @brief  Cluster AlertsNotification Command callback
+ * @brief  Cluster GetAlertsResponse Command callback (server side)
+ */
+bool emberAfApplianceEventsAndAlertClusterGetAlertsResponseCallback(
+    chip::app::CommandHandler * commandObj, uint8_t alertsCount,
+    /* TYPE WARNING: array array defaults to */ uint8_t * alertStructures);
+
+/**
+ * @brief  Cluster AlertsNotification Command callback (client side)
  */
 bool emberAfApplianceEventsAndAlertClusterAlertsNotificationCallback(
-    chip::app::Command * commandObj, uint8_t alertsCount, /* TYPE WARNING: array array defaults to */ uint8_t * alertStructures);
+    chip::app::CommandSender * commandObj, uint8_t alertsCount,
+    /* TYPE WARNING: array array defaults to */ uint8_t * alertStructures);
 
 /**
- * @brief  Cluster EventsNotification Command callback
+ * @brief  Cluster AlertsNotification Command callback (server side)
  */
-bool emberAfApplianceEventsAndAlertClusterEventsNotificationCallback(chip::app::Command * commandObj, uint8_t eventHeader,
+bool emberAfApplianceEventsAndAlertClusterAlertsNotificationCallback(
+    chip::app::CommandHandler * commandObj, uint8_t alertsCount,
+    /* TYPE WARNING: array array defaults to */ uint8_t * alertStructures);
+
+/**
+ * @brief  Cluster EventsNotification Command callback (client side)
+ */
+bool emberAfApplianceEventsAndAlertClusterEventsNotificationCallback(chip::app::CommandSender * commandObj, uint8_t eventHeader,
                                                                      uint8_t eventId);
 
 /**
- * @brief  Cluster LogNotification Command callback
+ * @brief  Cluster EventsNotification Command callback (server side)
  */
-bool emberAfApplianceStatisticsClusterLogNotificationCallback(chip::app::Command * commandObj,
+bool emberAfApplianceEventsAndAlertClusterEventsNotificationCallback(chip::app::CommandHandler * commandObj, uint8_t eventHeader,
+                                                                     uint8_t eventId);
+
+/**
+ * @brief  Cluster LogNotification Command callback (client side)
+ */
+bool emberAfApplianceStatisticsClusterLogNotificationCallback(chip::app::CommandSender * commandObj,
                                                               /* TYPE WARNING: unknown defaults to */ uint8_t * timeStamp,
                                                               uint32_t logId, uint32_t logLength,
                                                               /* TYPE WARNING: array array defaults to */ uint8_t * logPayload);
 
 /**
- * @brief  Cluster LogRequest Command callback
+ * @brief  Cluster LogNotification Command callback (server side)
  */
-bool emberAfApplianceStatisticsClusterLogRequestCallback(chip::app::Command * commandObj, uint32_t logId);
+bool emberAfApplianceStatisticsClusterLogNotificationCallback(chip::app::CommandHandler * commandObj,
+                                                              /* TYPE WARNING: unknown defaults to */ uint8_t * timeStamp,
+                                                              uint32_t logId, uint32_t logLength,
+                                                              /* TYPE WARNING: array array defaults to */ uint8_t * logPayload);
 
 /**
- * @brief  Cluster LogResponse Command callback
+ * @brief  Cluster LogRequest Command callback (client side)
  */
-bool emberAfApplianceStatisticsClusterLogResponseCallback(chip::app::Command * commandObj,
+bool emberAfApplianceStatisticsClusterLogRequestCallback(chip::app::CommandSender * commandObj, uint32_t logId);
+
+/**
+ * @brief  Cluster LogRequest Command callback (server side)
+ */
+bool emberAfApplianceStatisticsClusterLogRequestCallback(chip::app::CommandHandler * commandObj, uint32_t logId);
+
+/**
+ * @brief  Cluster LogResponse Command callback (client side)
+ */
+bool emberAfApplianceStatisticsClusterLogResponseCallback(chip::app::CommandSender * commandObj,
                                                           /* TYPE WARNING: unknown defaults to */ uint8_t * timeStamp,
                                                           uint32_t logId, uint32_t logLength,
                                                           /* TYPE WARNING: array array defaults to */ uint8_t * logPayload);
 
 /**
- * @brief  Cluster LogQueueRequest Command callback
+ * @brief  Cluster LogResponse Command callback (server side)
  */
-bool emberAfApplianceStatisticsClusterLogQueueRequestCallback(chip::app::Command * commandObj);
+bool emberAfApplianceStatisticsClusterLogResponseCallback(chip::app::CommandHandler * commandObj,
+                                                          /* TYPE WARNING: unknown defaults to */ uint8_t * timeStamp,
+                                                          uint32_t logId, uint32_t logLength,
+                                                          /* TYPE WARNING: array array defaults to */ uint8_t * logPayload);
 
 /**
- * @brief  Cluster LogQueueResponse Command callback
+ * @brief  Cluster LogQueueRequest Command callback (client side)
  */
-bool emberAfApplianceStatisticsClusterLogQueueResponseCallback(chip::app::Command * commandObj, uint8_t logQueueSize,
+bool emberAfApplianceStatisticsClusterLogQueueRequestCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster LogQueueRequest Command callback (server side)
+ */
+bool emberAfApplianceStatisticsClusterLogQueueRequestCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster LogQueueResponse Command callback (client side)
+ */
+bool emberAfApplianceStatisticsClusterLogQueueResponseCallback(chip::app::CommandSender * commandObj, uint8_t logQueueSize,
                                                                /* TYPE WARNING: array array defaults to */ uint8_t * logIds);
 
 /**
- * @brief  Cluster StatisticsAvailable Command callback
+ * @brief  Cluster LogQueueResponse Command callback (server side)
  */
-bool emberAfApplianceStatisticsClusterStatisticsAvailableCallback(chip::app::Command * commandObj, uint8_t logQueueSize,
+bool emberAfApplianceStatisticsClusterLogQueueResponseCallback(chip::app::CommandHandler * commandObj, uint8_t logQueueSize,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * logIds);
+
+/**
+ * @brief  Cluster StatisticsAvailable Command callback (client side)
+ */
+bool emberAfApplianceStatisticsClusterStatisticsAvailableCallback(chip::app::CommandSender * commandObj, uint8_t logQueueSize,
                                                                   /* TYPE WARNING: array array defaults to */ uint8_t * logIds);
 
 /**
- * @brief  Cluster GetProfileInfoResponseCommand Command callback
+ * @brief  Cluster StatisticsAvailable Command callback (server side)
+ */
+bool emberAfApplianceStatisticsClusterStatisticsAvailableCallback(chip::app::CommandHandler * commandObj, uint8_t logQueueSize,
+                                                                  /* TYPE WARNING: array array defaults to */ uint8_t * logIds);
+
+/**
+ * @brief  Cluster GetProfileInfoResponseCommand Command callback (client side)
  */
 bool emberAfElectricalMeasurementClusterGetProfileInfoResponseCommandCallback(
-    chip::app::Command * commandObj, uint8_t profileCount, uint8_t profileIntervalPeriod, uint8_t maxNumberOfIntervals,
+    chip::app::CommandSender * commandObj, uint8_t profileCount, uint8_t profileIntervalPeriod, uint8_t maxNumberOfIntervals,
     /* TYPE WARNING: array array defaults to */ uint8_t * listOfAttributes);
 
 /**
- * @brief  Cluster GetProfileInfoCommand Command callback
+ * @brief  Cluster GetProfileInfoResponseCommand Command callback (server side)
  */
-bool emberAfElectricalMeasurementClusterGetProfileInfoCommandCallback(chip::app::Command * commandObj);
+bool emberAfElectricalMeasurementClusterGetProfileInfoResponseCommandCallback(
+    chip::app::CommandHandler * commandObj, uint8_t profileCount, uint8_t profileIntervalPeriod, uint8_t maxNumberOfIntervals,
+    /* TYPE WARNING: array array defaults to */ uint8_t * listOfAttributes);
 
 /**
- * @brief  Cluster GetMeasurementProfileResponseCommand Command callback
+ * @brief  Cluster GetProfileInfoCommand Command callback (client side)
+ */
+bool emberAfElectricalMeasurementClusterGetProfileInfoCommandCallback(chip::app::CommandSender * commandObj);
+
+/**
+ * @brief  Cluster GetProfileInfoCommand Command callback (server side)
+ */
+bool emberAfElectricalMeasurementClusterGetProfileInfoCommandCallback(chip::app::CommandHandler * commandObj);
+
+/**
+ * @brief  Cluster GetMeasurementProfileResponseCommand Command callback (client side)
  */
 bool emberAfElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback(
-    chip::app::Command * commandObj, uint32_t startTime, uint8_t status, uint8_t profileIntervalPeriod,
+    chip::app::CommandSender * commandObj, uint32_t startTime, uint8_t status, uint8_t profileIntervalPeriod,
     uint8_t numberOfIntervalsDelivered, uint16_t attributeId, /* TYPE WARNING: array array defaults to */ uint8_t * intervals);
 
 /**
- * @brief  Cluster GetMeasurementProfileCommand Command callback
+ * @brief  Cluster GetMeasurementProfileResponseCommand Command callback (server side)
  */
-bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(chip::app::Command * commandObj, uint16_t attributeId,
-                                                                             uint32_t startTime, uint8_t numberOfIntervals);
+bool emberAfElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback(
+    chip::app::CommandHandler * commandObj, uint32_t startTime, uint8_t status, uint8_t profileIntervalPeriod,
+    uint8_t numberOfIntervalsDelivered, uint16_t attributeId, /* TYPE WARNING: array array defaults to */ uint8_t * intervals);
 
 /**
- * @brief  Cluster Bind Command callback
+ * @brief  Cluster GetMeasurementProfileCommand Command callback (client side)
  */
-bool emberAfBindingClusterBindCallback(chip::app::Command * commandObj, chip::NodeId nodeId, chip::GroupId groupId,
+bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(chip::app::CommandSender * commandObj,
+                                                                             uint16_t attributeId, uint32_t startTime,
+                                                                             uint8_t numberOfIntervals);
+
+/**
+ * @brief  Cluster GetMeasurementProfileCommand Command callback (server side)
+ */
+bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(chip::app::CommandHandler * commandObj,
+                                                                             uint16_t attributeId, uint32_t startTime,
+                                                                             uint8_t numberOfIntervals);
+
+/**
+ * @brief  Cluster Bind Command callback (client side)
+ */
+bool emberAfBindingClusterBindCallback(chip::app::CommandSender * commandObj, chip::NodeId nodeId, chip::GroupId groupId,
                                        chip::EndpointId endpointId, chip::ClusterId clusterId);
 
 /**
- * @brief  Cluster Unbind Command callback
+ * @brief  Cluster Bind Command callback (server side)
  */
-bool emberAfBindingClusterUnbindCallback(chip::app::Command * commandObj, chip::NodeId nodeId, chip::GroupId groupId,
+bool emberAfBindingClusterBindCallback(chip::app::CommandHandler * commandObj, chip::NodeId nodeId, chip::GroupId groupId,
+                                       chip::EndpointId endpointId, chip::ClusterId clusterId);
+
+/**
+ * @brief  Cluster Unbind Command callback (client side)
+ */
+bool emberAfBindingClusterUnbindCallback(chip::app::CommandSender * commandObj, chip::NodeId nodeId, chip::GroupId groupId,
                                          chip::EndpointId endpointId, chip::ClusterId clusterId);
 
 /**
- * @brief  Cluster CommandOne Command callback
+ * @brief  Cluster Unbind Command callback (server side)
  */
-bool emberAfSampleMfgSpecificClusterClusterCommandOneCallback(chip::app::Command * commandObj, uint8_t argOne);
+bool emberAfBindingClusterUnbindCallback(chip::app::CommandHandler * commandObj, chip::NodeId nodeId, chip::GroupId groupId,
+                                         chip::EndpointId endpointId, chip::ClusterId clusterId);
 
 /**
- * @brief  Cluster CommandTwo Command callback
+ * @brief  Cluster CommandOne Command callback (client side)
  */
-bool emberAfSampleMfgSpecificCluster2ClusterCommandTwoCallback(chip::app::Command * commandObj, uint8_t argOne);
+bool emberAfSampleMfgSpecificClusterClusterCommandOneCallback(chip::app::CommandSender * commandObj, uint8_t argOne);
+
+/**
+ * @brief  Cluster CommandOne Command callback (server side)
+ */
+bool emberAfSampleMfgSpecificClusterClusterCommandOneCallback(chip::app::CommandHandler * commandObj, uint8_t argOne);
+
+/**
+ * @brief  Cluster CommandTwo Command callback (client side)
+ */
+bool emberAfSampleMfgSpecificCluster2ClusterCommandTwoCallback(chip::app::CommandSender * commandObj, uint8_t argOne);
+
+/**
+ * @brief  Cluster CommandTwo Command callback (server side)
+ */
+bool emberAfSampleMfgSpecificCluster2ClusterCommandTwoCallback(chip::app::CommandHandler * commandObj, uint8_t argOne);
 
 /** @brief Add To Current App Tasks
  *

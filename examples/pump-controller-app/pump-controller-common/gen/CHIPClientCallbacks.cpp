@@ -109,7 +109,7 @@ constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
 #define GET_CLUSTER_RESPONSE_CALLBACKS(name)                                                                                       \
     Callback::Cancelable * onSuccessCallback = nullptr;                                                                            \
     Callback::Cancelable * onFailureCallback = nullptr;                                                                            \
-    NodeId sourceIdentifier                  = reinterpret_cast<NodeId>(commandObj);                                               \
+    NodeId sourceIdentifier                  = reinterpret_cast<NodeId>(reinterpret_cast<const chip::app::Command *>(commandObj)); \
     /* #6559: Currently, we only have one commands for the IMInvokeCommands and to a device, so the seqNum is always set to 0. */  \
     CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceIdentifier, 0, &onSuccessCallback, &onFailureCallback);                  \
                                                                                                                                    \
