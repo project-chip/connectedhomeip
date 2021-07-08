@@ -49,8 +49,7 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
         _channel = channel;
         _panID = panID;
         _cppThreadOperationalDataset = chip::Thread::OperationalDataset();
-        if ([self _populateCppOperationalDataset])
-        {
+        if ([self _populateCppOperationalDataset]) {
             return self;
         }
     }
@@ -62,8 +61,7 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
     _cppThreadOperationalDataset.Clear();
     _cppThreadOperationalDataset.SetNetworkName([self.networkName cStringUsingEncoding:NSUTF8StringEncoding]);
 
-    if (![self _checkDataLength:self.extendedPANID expectedLength:chip::Thread::kSizeExtendedPanId])
-    {
+    if (![self _checkDataLength:self.extendedPANID expectedLength:chip::Thread::kSizeExtendedPanId]) {
         CHIP_LOG_ERROR("Invalid ExtendedPANID");
         return NO;
     }
@@ -71,8 +69,7 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
     [self.extendedPANID getBytes:&extendedPanId length:chip::Thread::kSizeExtendedPanId];
     _cppThreadOperationalDataset.SetExtendedPanId(extendedPanId);
 
-    if (![self _checkDataLength:self.masterKey expectedLength:chip::Thread::kSizeMasterKey])
-    {
+    if (![self _checkDataLength:self.masterKey expectedLength:chip::Thread::kSizeMasterKey]) {
         CHIP_LOG_ERROR("Invalid MasterKey");
         return NO;
     }
@@ -80,8 +77,7 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
     [self.masterKey getBytes:&masterKey length:chip::Thread::kSizeMasterKey];
     _cppThreadOperationalDataset.SetMasterKey(masterKey);
 
-    if (![self _checkDataLength:self.PSKc expectedLength:chip::Thread::kSizePSKc])
-    {
+    if (![self _checkDataLength:self.PSKc expectedLength:chip::Thread::kSizePSKc]) {
         CHIP_LOG_ERROR("Invalid PKSc");
         return NO;
     }
@@ -102,8 +98,7 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
 
 - (BOOL)_checkDataLength:(NSData *)data expectedLength:(size_t)expectedLength
 {
-    if (data.length < expectedLength)
-    {
+    if (data.length < expectedLength) {
         CHIP_LOG_ERROR("Length Check Failed. Length:%tu is too short, must be at least %tu", data.length, expectedLength);
         return NO;
     }
