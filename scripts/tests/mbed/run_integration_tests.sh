@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 if [ $# -lt 5 ]; then
     echo "Illegal number of parameters. Please define Github parameters: repository name, build apps and chip-tools action IDs, access token and CHIP source directory paths"
     exit 1
@@ -14,6 +12,8 @@ GITHUB_TOKEN=$4
 CHIP_DIR=$5
 CHIP_TOOLS_DIR=chip-tools
 CHIP_TOOLS_ARTIFACT_NAME=chip-build-$(uname -i)
+
+set -e
 
 source $CHIP_DIR/scripts/tests/mbed/common.sh
 
@@ -31,12 +31,27 @@ mapfile -t test_sets <$CHIP_DIR/src/test_driver/mbed/integration_tests/test_set.
 
 target_number=$(cat devices.json | jq length)
 
+set +e
+
+errorCounter=0
+
 for index in $(eval echo "{0..$(($target_number - 1))}"); do
     platform_name=$(cat devices.json | jq -r ".[$index] .platform_name")
     for test in "${test_sets[@]}"; do
         echo "Flash $test application image to $platform_name device"
         flash_image_to_device "$test" "$platform_name" app_images
-        echo "Run integration test for $test application image on $platform_name device"
-        pytest -rAV --platforms="$platform_name" --network=$AP_SSID:$AP_PASSWORD --echo_server=$AP_GATEWAY:$ECHO_SERVER_PORT --chip_tools_dir=$CHIP_TOOLS_DIR $CHIP_DIR/src/test_driver/mbed/integration_tests/"$test"
+        if [ $? -eq 0 ]; then
+            echo "Run integration test for $test application image on $platform_name device"
+            pytest -rAV --platforms="$platform_name" --network=$AP_SSID:$AP_PASSWORD --echo_server=$AP_GATEWAY:$ECHO_SERVER_PORT --chip_tools_dir=$CHIP_TOOLS_DIR $CHIP_DIR/src/test_driver/mbed/integration_tests/"$test"
+            if [ $? -ne 0 ]; then
+                echo "Integration test for $test application image on $platform_name device failed"
+                ((errorCounter++))
+            fi
+        else
+            echo "Flash $test application image to $platform_name device failed"
+            ((errorCounter++))
+        fi
     done
 done
+
+exit $errorCounter

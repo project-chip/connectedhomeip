@@ -179,8 +179,6 @@ flash_image_to_device() {
         echo "flash_image_to_device requires at least 3 arguments. Please define image and target name and images directory" && exit 1
     fi
 
-    set +e
-
     image_name=$1
     target_name=$2
     images_dir=$3
@@ -213,6 +211,4 @@ flash_image_to_device() {
         exit 1
     fi
     sleep 5
-
-    set -e
 }
