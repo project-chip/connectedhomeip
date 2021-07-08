@@ -236,7 +236,7 @@ void emberAfOnOffClusterServerInitCallback(EndpointId endpoint)
             // Initialise updated value to 0
             bool updatedOnOff = 0;
             status            = emberAfReadAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                     (uint8_t *) &updatedOnOff, sizeof(updatedOnOff), NULL);
+                                          (uint8_t *) &updatedOnOff, sizeof(updatedOnOff), NULL);
             if (status == EMBER_ZCL_STATUS_SUCCESS)
             {
                 switch (startUpOnOff)

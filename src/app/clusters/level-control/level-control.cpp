@@ -979,7 +979,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
         {
             uint8_t currentLevel = 0;
             status               = emberAfReadAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID,
-                                                        CLUSTER_MASK_SERVER, (uint8_t *) &currentLevel, sizeof(currentLevel), NULL);
+                                          CLUSTER_MASK_SERVER, (uint8_t *) &currentLevel, sizeof(currentLevel), NULL);
             if (status == EMBER_ZCL_STATUS_SUCCESS)
             {
                 switch (startUpCurrentLevel)

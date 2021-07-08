@@ -1055,7 +1055,7 @@ bool emberAfColorControlClusterMoveColorCallback(chip::app::CommandHandler * com
     else
     {
         colorXTransitionState.finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                     = (uint16_t) (rateX * -1);
+        unsignedRate                     = (uint16_t)(rateX * -1);
     }
     transitionTimeX                      = computeTransitionTimeFromStateAndRate(&colorXTransitionState, unsignedRate);
     colorXTransitionState.stepsRemaining = transitionTimeX;
@@ -1074,7 +1074,7 @@ bool emberAfColorControlClusterMoveColorCallback(chip::app::CommandHandler * com
     else
     {
         colorYTransitionState.finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                     = (uint16_t) (rateY * -1);
+        unsignedRate                     = (uint16_t)(rateY * -1);
     }
     transitionTimeY                      = computeTransitionTimeFromStateAndRate(&colorYTransitionState, unsignedRate);
     colorYTransitionState.stepsRemaining = transitionTimeY;
@@ -1465,8 +1465,8 @@ void emberAfPluginLevelControlCoupledColorTempChangeCallback(EndpointId endpoint
         else
         {
             uint32_t tempDelta = (((uint32_t) tempPhysMax - (uint32_t) tempCoupleMin) * currentLevel) /
-                (uint32_t) (MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
-            newColorTemp = (uint16_t) ((uint32_t) tempPhysMax - tempDelta);
+                (uint32_t)(MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
+            newColorTemp = (uint16_t)((uint32_t) tempPhysMax - tempDelta);
         }
 
         // Apply new color temp.
@@ -1799,16 +1799,16 @@ static bool computeNewColor16uValue(Color16uTransitionState * p)
     }
     else if (p->finalValue > p->initialValue)
     {
-        newValue32u = ((uint32_t) (p->finalValue - p->initialValue));
-        newValue32u *= ((uint32_t) (p->stepsRemaining));
-        newValue32u /= ((uint32_t) (p->stepsTotal));
+        newValue32u = ((uint32_t)(p->finalValue - p->initialValue));
+        newValue32u *= ((uint32_t)(p->stepsRemaining));
+        newValue32u /= ((uint32_t)(p->stepsTotal));
         p->currentValue = static_cast<uint16_t>(p->finalValue - static_cast<uint16_t>(newValue32u));
     }
     else
     {
-        newValue32u = ((uint32_t) (p->initialValue - p->finalValue));
-        newValue32u *= ((uint32_t) (p->stepsRemaining));
-        newValue32u /= ((uint32_t) (p->stepsTotal));
+        newValue32u = ((uint32_t)(p->initialValue - p->finalValue));
+        newValue32u *= ((uint32_t)(p->stepsRemaining));
+        newValue32u /= ((uint32_t)(p->stepsTotal));
         p->currentValue = static_cast<uint16_t>(p->finalValue + static_cast<uint16_t>(newValue32u));
     }
 
@@ -2016,8 +2016,8 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
                 // if startup color temp was set to 0xFFFF).
                 updatedColorTemp = startUpColorTemp;
                 status           = emberAfWriteAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                                         ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                         reinterpret_cast<uint8_t *>(&updatedColorTemp), ZCL_INT16U_ATTRIBUTE_TYPE);
+                                               ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                               reinterpret_cast<uint8_t *>(&updatedColorTemp), ZCL_INT16U_ATTRIBUTE_TYPE);
                 if (status == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     // Set ColorMode attributes to reflect ColorTemperature.
@@ -2027,8 +2027,8 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
                                               CLUSTER_MASK_SERVER, &updateColorMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
                     updateColorMode = EMBER_ZCL_ENHANCED_COLOR_MODE_COLOR_TEMPERATURE;
                     status          = emberAfWriteAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                                            ZCL_COLOR_CONTROL_ENHANCED_COLOR_MODE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                            &updateColorMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
+                                                   ZCL_COLOR_CONTROL_ENHANCED_COLOR_MODE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                   &updateColorMode, ZCL_ENUM8_ATTRIBUTE_TYPE);
                 }
             }
         }
