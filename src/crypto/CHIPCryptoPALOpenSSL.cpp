@@ -1331,31 +1331,8 @@ void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl()
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out)
 {
-    CHIP_ERROR error         = CHIP_ERROR_INTERNAL;
-    int error_openssl        = 0;
-    unsigned int mac_out_len = 0;
-
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-
-    HMAC_CTX * mac_ctx = HMAC_CTX_new();
-    VerifyOrExit(mac_ctx != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    VerifyOrExit(CanCastTo<int>(key_len), error = CHIP_ERROR_INTERNAL);
-    error_openssl = HMAC_Init_ex(mac_ctx, Uint8::to_const_uchar(key), static_cast<int>(key_len), context->md_info, nullptr);
-    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
-
-    error_openssl = HMAC_Update(mac_ctx, Uint8::to_const_uchar(in), in_len);
-    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
-
-    VerifyOrExit(CanCastTo<int>(hash_size), error = CHIP_ERROR_INTERNAL);
-    mac_out_len   = static_cast<unsigned int>(hash_size);
-    error_openssl = HMAC_Final(mac_ctx, Uint8::to_uchar(out), &mac_out_len);
-    VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
-
-    error = CHIP_NO_ERROR;
-exit:
-    HMAC_CTX_free(mac_ctx);
-    return error;
+    HMAC_sha hmac;
+    return hmac.HMAC_SHA256(key, key_len, in, in_len, out, kSHA256_Hash_Length);
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len,

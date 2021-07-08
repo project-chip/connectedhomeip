@@ -21,8 +21,7 @@
  * See https://tools.ietf.org/html/rfc4231#section-4.7
  */
 
-#ifndef _HMAC_SHA256_TEST_VECTOR
-#define _HMAC_SHA256_TEST_VECTOR
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -67,4 +66,3 @@ hmac_sha256_vector kHmacSha256TestCase1 = { .key                = kHmacTestCase1
                                             .output_hash_length = sizeof(kHmacTestCase1Expected) };
 
 hmac_sha256_vector hmac_sha256_test_vectors[] = { kHmacSha256TestCase1 };
-#endif

@@ -20,8 +20,7 @@
  *      Header that exposes the platform agnostic CHIP crypto primitives
  */
 
-#ifndef _CHIP_CRYPTO_PAL_HSM_H_
-#define _CHIP_CRYPTO_PAL_HSM_H_
+#pragma once
 
 #include "CHIPCryptoPALHsm_config.h"
 
@@ -210,5 +209,3 @@ private:
 
 } // namespace Crypto
 } // namespace chip
-
-#endif //#ifndef _CHIP_CRYPTO_PAL_HSM_H_

@@ -951,31 +951,8 @@ void Spake2p_P256_SHA256_HKDF_HMAC::FreeImpl(void)
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-
-    mbedtls_md_context_t hmac_ctx;
-    mbedtls_md_init(&hmac_ctx);
-
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-
-    result = mbedtls_md_setup(&hmac_ctx, context->md_info, 1);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_md_hmac_starts(&hmac_ctx, Uint8::to_const_uchar(key), key_len);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_md_hmac_update(&hmac_ctx, Uint8::to_const_uchar(in), in_len);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_md_hmac_finish(&hmac_ctx, Uint8::to_uchar(out));
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-exit:
-    _log_mbedTLS_error(result);
-
-    mbedtls_md_free(&hmac_ctx);
-    return error;
+    HMAC_sha hmac;
+    return hmac.HMAC_SHA256(key, key_len, in, in_len, out, kSHA256_Hash_Length);
 }
 
 /**
