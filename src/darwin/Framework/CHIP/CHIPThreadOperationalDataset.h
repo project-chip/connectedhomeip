@@ -21,10 +21,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPThreadOperationalDataset : NSObject
 
+/**
+ * The expected lengths of each of the NSData fields in the CHIPThreadOperationalDataset
+ *
+ * initWithNetworkName must be provided NSData fields with at least these lengths otherwise
+ * the object will fail to init.
+ */
 extern size_t const CHIPSizeThreadNetworkName;
 extern size_t const CHIPSizeThreadExtendedPanId;
 extern size_t const CHIPSizeThreadMasterKey;
-extern size_t const CHIPSizeThreadMeshLocalPrefix;
 extern size_t const CHIPSizeThreadPSKc;
 
 /**
@@ -57,7 +62,7 @@ extern size_t const CHIPSizeThreadPSKc;
 
 /**
  *  Create a Thread Operational Dataset object with the individual network fields.
- *  This initializer will return nil if the underlying Active Operational Dataset is malformed.
+ *  This initializer will return nil if any of the NSData fields are smaller than expected.
  */
 - (nullable instancetype)initWithNetworkName:(NSString *)networkName
                                extendedPANID:(NSData *)extendedPANID

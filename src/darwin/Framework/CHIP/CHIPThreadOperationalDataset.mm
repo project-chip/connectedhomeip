@@ -24,7 +24,6 @@
 size_t const CHIPSizeThreadNetworkName = chip::Thread::kSizeNetworkName;
 size_t const CHIPSizeThreadExtendedPanId = chip::Thread::kSizeExtendedPanId;
 size_t const CHIPSizeThreadMasterKey = chip::Thread::kSizeMasterKey;
-size_t const CHIPSizeThreadMeshLocalPrefix = chip::Thread::kSizeMeshLocalPrefix;
 size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
 
 @interface CHIPThreadOperationalDataset ()
@@ -50,29 +49,42 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
         _channel = channel;
         _panID = panID;
         _cppThreadOperationalDataset = chip::Thread::OperationalDataset();
-        [self _populateCppOperationalDataset];
-        if (!_cppThreadOperationalDataset.IsValid(_cppThreadOperationalDataset.AsByteSpan())) {
-            CHIP_LOG_ERROR("Error: Thread Operational Dataset is malformed, cannot initialize.");
-            return nil;
+        if ([self _populateCppOperationalDataset])
+        {
+            return self;
         }
-        return self;
     }
     return nil;
 }
 
-- (void)_populateCppOperationalDataset
+- (BOOL)_populateCppOperationalDataset
 {
     _cppThreadOperationalDataset.Clear();
     _cppThreadOperationalDataset.SetNetworkName([self.networkName cStringUsingEncoding:NSUTF8StringEncoding]);
 
+    if (![self _checkDataLength:self.extendedPANID expectedLength:chip::Thread::kSizeExtendedPanId])
+    {
+        CHIP_LOG_ERROR("Invalid ExtendedPANID");
+        return NO;
+    }
     uint8_t extendedPanId[chip::Thread::kSizeExtendedPanId];
     [self.extendedPANID getBytes:&extendedPanId length:chip::Thread::kSizeExtendedPanId];
     _cppThreadOperationalDataset.SetExtendedPanId(extendedPanId);
 
+    if (![self _checkDataLength:self.masterKey expectedLength:chip::Thread::kSizeMasterKey])
+    {
+        CHIP_LOG_ERROR("Invalid MasterKey");
+        return NO;
+    }
     uint8_t masterKey[chip::Thread::kSizeMasterKey];
     [self.masterKey getBytes:&masterKey length:chip::Thread::kSizeMasterKey];
     _cppThreadOperationalDataset.SetMasterKey(masterKey);
 
+    if (![self _checkDataLength:self.PSKc expectedLength:chip::Thread::kSizePSKc])
+    {
+        CHIP_LOG_ERROR("Invalid PKSc");
+        return NO;
+    }
     uint8_t PSKc[chip::Thread::kSizePSKc];
     [self.PSKc getBytes:&PSKc length:chip::Thread::kSizePSKc];
     _cppThreadOperationalDataset.SetPSKc(PSKc);
@@ -80,9 +92,22 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
     _cppThreadOperationalDataset.SetChannel(self.channel);
 
     uint16_t * valuePtr = (uint16_t *) [self.panID bytes];
-    if (valuePtr != nullptr) {
-        _cppThreadOperationalDataset.SetPanId(*valuePtr);
+    if (valuePtr == nullptr) {
+        return NO;
     }
+    _cppThreadOperationalDataset.SetPanId(*valuePtr);
+
+    return YES;
+}
+
+- (BOOL)_checkDataLength:(NSData *)data expectedLength:(size_t)expectedLength
+{
+    if (data.length < expectedLength)
+    {
+        CHIP_LOG_ERROR("Length Check Failed. Length:%tu is too short, must be at least %tu", data.length, expectedLength);
+        return NO;
+    }
+    return YES;
 }
 
 - (NSData *)asData

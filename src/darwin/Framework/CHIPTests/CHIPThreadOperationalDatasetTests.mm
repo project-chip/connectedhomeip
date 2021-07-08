@@ -48,4 +48,22 @@
     XCTAssertNotNil(data);
 }
 
+- (void)testThreadOperationalDatasetInvalid
+{
+    const unsigned char extendedPANID[] = { 0x67 };
+    const unsigned char masterKey[]
+        = { };
+    const unsigned char PKSc[] = { 0xb7, 0x8d, 0x23 };
+    const uint16_t panID = 0x0;
+    CHIPThreadOperationalDataset * dataset = [[CHIPThreadOperationalDataset alloc]
+        initWithNetworkName:@"TestNetwork"
+              extendedPANID:[NSData dataWithBytes:&extendedPANID length:CHIPSizeThreadExtendedPanId]
+                  masterKey:[NSData dataWithBytes:&masterKey length:CHIPSizeThreadMasterKey]
+                       PSKc:[NSData dataWithBytes:&PKSc length:CHIPSizeThreadPSKc]
+                    channel:25
+                      panID:[NSData dataWithBytes:&panID length:sizeof(panID)]];
+
+    XCTAssertNil(dataset);
+}
+
 @end
