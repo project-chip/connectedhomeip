@@ -96,26 +96,26 @@ set_default_toolchain(_default_toolchain)
 
 set_defaults("static_library") {
   configs = _chip_defaults.default_configs
-  configs -= ["//build/config/compiler:rtti_default"]
-  configs += ["//build/config/compiler:rtti"]
+  configs -= [ "//build/config/compiler:rtti_default" ]
+  configs += [ "//build/config/compiler:rtti" ]
 }
 set_defaults("source_set") {
   configs = _chip_defaults.default_configs
-  configs -= ["//build/config/compiler:rtti_default"]
-  configs += ["//build/config/compiler:rtti"]
+  configs -= [ "//build/config/compiler:rtti_default" ]
+  configs += [ "//build/config/compiler:rtti" ]
 }
 set_defaults("executable") {
   configs = _chip_defaults.default_configs
-  configs -= ["//build/config/compiler:rtti_default"]
-  configs += ["//build/config/compiler:rtti"]
+  configs -= [ "//build/config/compiler:rtti_default" ]
+  configs += [ "//build/config/compiler:rtti" ]
 }
 set_defaults("shared_library") {
   configs = _chip_defaults.default_configs
-  configs -= ["//build/config/compiler:rtti_default"]
-  configs += ["//build/config/compiler:rtti"]
+  configs -= [ "//build/config/compiler:rtti_default" ]
+  configs += [ "//build/config/compiler:rtti" ]
 }
 set_defaults("loadable_module") {
   configs = _chip_defaults.default_configs
-  configs -= ["//build/config/compiler:rtti_default"]
-  configs += ["//build/config/compiler:rtti"]
+  configs -= [ "//build/config/compiler:rtti_default" ]
+  configs += [ "//build/config/compiler:rtti" ]
 }
