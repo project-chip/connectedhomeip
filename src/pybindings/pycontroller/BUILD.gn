@@ -60,6 +60,7 @@ shared_library("CHIPController") {
     "ControllerBindings/PyChip_ControllerInitParams.cpp",
     "ControllerBindings/PyChip_DeviceAddressUpdateDelegate.cpp",
     "ControllerBindings/PyChip_Inet_IPAddress.cpp",
+    "ControllerBindings/PyChip_Logging.cpp",
     "ControllerBindings/PyChip_MDNS.cpp",
     "ControllerBindings/PyChip_Main.cpp",
     "ControllerBindings/PyChip_Memory.cpp",
@@ -67,7 +68,6 @@ shared_library("CHIPController") {
     "ControllerBindings/PyChip_Rendezvous.cpp",
     "ControllerBindings/PyChip_SetupPayload.cpp",
     "ControllerBindings/PyChip_TransportType.cpp",
-    "ControllerBindings/PyChip_Logging.cpp",
     "clusters/CHIPClusters.cpp",
   ]
 
