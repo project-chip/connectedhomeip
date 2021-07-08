@@ -11,15 +11,15 @@ class LinuxBuilder(Builder):
 
   def generate(self):
     if not os.path.exists(self.output_dir):
-      self._ActivatedExecute(
-          'gn gen %s' % self.output_dir,
-          cwd=os.path.join(self.root, 'examples/all-clusters-app/linux/'))
+      self._Execute(['gn', 'gen', self.output_dir],
+                    cwd=os.path.join(self.root,
+                                     'examples/all-clusters-app/linux/'))
 
   def build(self):
     logging.info('Compiling Linux at %s', self.output_dir)
 
     self.generate()
-    self._ActivatedExecute('ninja -C %s' % self.output_dir)
+    self._Execute(['ninja', '-C', self.output_dir])
 
   def outputs(self):
     return {

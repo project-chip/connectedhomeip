@@ -4,6 +4,7 @@ import shutil
 
 from enum import Enum, auto
 
+
 class Platform(Enum):
   """Represents a supported build platform for compilation."""
   LINUX = auto()

@@ -13,15 +13,14 @@ class QpgBuilder(Builder):
 
   def generate(self):
     if not os.path.exists(self.output_dir):
-      self._ActivatedExecute(
-          'gn gen %s' % self.output_dir,
-          cwd=os.path.join(self.root, 'examples/lock-app/qpg/'))
+      self._Execute(['gn', 'gen', self.output_dir],
+                    cwd=os.path.join(self.root, 'examples/lock-app/qpg/'))
 
   def build(self):
     logging.info('Compiling QPG at %s', self.output_dir)
 
     self.generate()
-    self._ActivatedExecute('ninja -C %s' % self.output_dir)
+    self._Execute(['ninja', '-C', self.output_dir])
 
   def outputs(self):
     return {

@@ -20,8 +20,8 @@ PLATFORMS = [x.ArgName for x in Platform]
 BOARDS = [x.ArgName for x in Board]
 APPLICATIONS = [x.ArgName for x in Application]
 
+
 class BuildSteps(Enum):
-  BOOTSTRAPED = auto()
   GENERATED = auto()
 
 
@@ -37,7 +37,8 @@ class Context:
     self.output_prefix = output_prefix
     self.completed_steps = set()
 
-  def SetupBuilders(self, platforms: Sequence[Platform], boards: Sequence[Board],
+  def SetupBuilders(self, platforms: Sequence[Platform],
+                    boards: Sequence[Board],
                     applications: Sequence[Application]):
     """Configures internal builders for the given platform/board/app combionation.
 
@@ -47,19 +48,27 @@ class Context:
         """
     if not platforms and not boards:
       if applications:
-        platforms = set().union(*[TargetRelations.PlatformsForApplication(app) for app in applications])
+        platforms = set().union(*[
+            TargetRelations.PlatformsForApplication(app) for app in applications
+        ])
       else:
         # when nothing is specified, start with a default host build
         platforms = [Platform.LINUX]
 
     # at this point, at least one of 'platforms' or 'boards' is non-empty
     if not boards:
-      boards = set().union(*[TargetRelations.BoardsForPlatform(platform) for platform in platforms])
+      boards = set().union(*[
+          TargetRelations.BoardsForPlatform(platform) for platform in platforms
+      ])
     elif not platforms:
-      platforms = set().union(*[TargetRelations.PlatformsForBoard(board) for board in boards])
+      platforms = set().union(
+          *[TargetRelations.PlatformsForBoard(board) for board in boards])
 
     if not applications:
-      applications = set().union(*[TargetRelations.ApplicationsForPlatform(platform) for platform in platforms])
+      applications = set().union(*[
+          TargetRelations.ApplicationsForPlatform(platform)
+          for platform in platforms
+      ])
 
     platforms = set(platforms)
     boards = set(boards)
@@ -73,7 +82,6 @@ class Context:
     platforms_with_builders = set()
     boards_with_builders = set()
     applications_with_builders = set()
-
 
     factory = BuilderFactory(self.repository_path, self.output_prefix)
 
@@ -107,24 +115,10 @@ class Context:
     # whenever builders change, assume generation is required again
     self.completed_steps.discard(BuildSteps.GENERATED)
 
-  def Bootstrap(self):
-    """Performs a bootstrap IFF a bootstrap has not yet been performed."""
-    if BuildSteps.BOOTSTRAPED in self.completed_steps:
-      return
-
-    # Bootstrap is generic. assumption is that any builder can
-    # bootstrap just the same, so run only once
-    if self.builders:
-      self.builders[0].Bootstrap()
-
-    self.completed_steps.add(BuildSteps.BOOTSTRAPED)
-
   def Generate(self):
     """Performs a build generation IFF code generation has not yet been performed."""
     if BuildSteps.GENERATED in self.completed_steps:
       return
-
-    self.Bootstrap()
 
     for builder in self.builders:
       logging.info('Generating %s', builder.output_dir)
@@ -148,10 +142,10 @@ class Context:
     self.completed_steps.discard(BuildSteps.GENERATED)
 
   def CopyArtifactsTo(self, path: str):
-    logging.info("Copying build artifacts to %s" % path)
+    logging.info('Copying build artifacts to %s', path)
     if not os.path.exists(path):
-       os.makedirs(path)
+      os.makedirs(path)
 
     for builder in self.builders:
-        # FIXME: builder subdir...
-       builder.CopyArtifacts(os.path.join(path, builder.identifier))
+      # FIXME: builder subdir...
+      builder.CopyArtifacts(os.path.join(path, builder.identifier))

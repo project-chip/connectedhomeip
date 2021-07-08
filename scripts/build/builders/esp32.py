@@ -27,7 +27,8 @@ class Esp32Builder(Builder):
     self.board = board
 
   def _IdfEnvExecute(self, cmd, **kargs):
-    self._ActivatedExecute('source "$IDF_PATH/export.sh"; %s' % cmd, **kargs)
+    self._Execute(
+        ['bash', '-c', 'source $IDF_PATH/export.sh; %s' % cmd], **kargs)
 
   def generate(self):
     if not os.path.exists(os.path.join(self.output_dir, 'build.ninja')):

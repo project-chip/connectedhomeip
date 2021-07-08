@@ -43,27 +43,6 @@ class Builder(ABC):
   def _Execute(self, cmdarray, **args):
     self._runner.Run(cmdarray, **args)
 
-  def _ActivatedExecute(self, cmdstring: str, **args):
-    """Switches to top level to activate then runs the given command in the original run directory."""
-    self._runner.Run([
-        'bash', '-c',
-        'cd "%s"; source ./scripts/activate.sh; cd -; %s' %
-        (self.root, cmdstring)
-    ], **args)
-
-  def Bootstrap(self):
-    envpath = os.environ.get('PW_ENVIRONMENT_ROOT',
-                             os.path.join(self.root, '.environment'))
-
-    if not os.path.exists(os.path.join(envpath, 'activate.sh')):
-      logging.info('Bootstrapping in %s (%s does not look valid )', self.root,
-                   envpath)
-      self._Execute(['bash', '-c', 'source ./scripts/bootstrap.sh'],
-                    cwd=self.root)
-    else:
-      logging.info('Project already bootstrapped in %s (environment in %s)',
-                   self.root, envpath)
-
   def CopyArtifacts(self, target_dir: str):
     for target_name, source_name in self.outputs().items():
       target_full_name = os.path.join(target_dir, target_name)

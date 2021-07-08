@@ -63,16 +63,18 @@ class Efr32Builder(Builder):
 
   def generate(self):
     if not os.path.exists(self.output_dir):
-      self._ActivatedExecute(
-          'gn gen --check --fail-on-unused-args --root="%s" --args="efr32_board=\\"%s\\"" %s'
-          % (os.path.join(self.root, 'examples', self.app.ExampleName(),
-                          'efr32'), self.board.GnArgName(), self.output_dir))
+      self._Execute([
+          'gn', 'gen', '--check', '--fail-on-unused-args',
+          '--root=%s' %
+          os.path.join(self.root, 'examples', self.app.ExampleName(), 'efr32'),
+          '--args=efr32_board="%s"' % self.board.GnArgName(), self.output_dir
+      ])
 
   def build(self):
     logging.info('Compiling EFR32 at %s', self.output_dir)
 
     self.generate()
-    self._ActivatedExecute('ninja -C %s' % self.output_dir)
+    self._Execute(['ninja', '-C', self.output_dir])
 
   def outputs(self):
     items = {

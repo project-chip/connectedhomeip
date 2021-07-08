@@ -80,6 +80,14 @@ def main(context, log_level, platform, board, app, repo, out_prefix, clean):
       level=__LOG_LEVELS__[log_level],
       fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
 
+  if not 'PW_PROJECT_ROOT' in os.environ:
+    raise click.UsageError("""
+PW_PROJECT_ROOT not in current environment.
+
+Please make sure you `source scripts/bootstra.sh` or `source scripts/activate.sh`
+before running this script.
+""".strip())
+
   # Support an 'all platforms' choice
   if 'all' in platform:
     platform = build.PLATFORMS
@@ -95,24 +103,13 @@ def main(context, log_level, platform, board, app, repo, out_prefix, clean):
 
 
 @main.command(
-    'bootstrap',
-    help='Run build environment bootstrapping/download required binaries')
-@click.pass_context
-def cmd_build(context):
-  context.obj.Bootstrap()
-
-
-@main.command(
-    'gen',
-    help='Bootstrap and generate ninja/makefiles (but does not run the compilation)'
-)
+    'gen', help='Generate ninja/makefiles (but does not run the compilation)')
 @click.pass_context
 def cmd_generate(context):
   context.obj.Generate()
 
 
-@main.command(
-    'build', help='Bootstrap, generate and run ninja/make as needed to compile')
+@main.command('build', help='generate and run ninja/make as needed to compile')
 @click.option(
     '--copy-artifacts-to',
     default=None,

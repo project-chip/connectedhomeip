@@ -25,7 +25,8 @@ class Matcher():
   def AcceptBoard(self, __board_key: Board, **kargs):
     self.board_arguments[__board_key] = kargs
 
-  def Create(self, __board_key: Board, __app_key: Application, repo_path: str, **kargs):
+  def Create(self, __board_key: Board, __app_key: Application, repo_path: str,
+             **kargs):
     """Creates a new builder for the given board/app. """
     if not __board_key in self.board_arguments:
       return None
@@ -60,12 +61,10 @@ _MATCHERS[Platform.QPG].AcceptApplication(Application.LOCK)
 _MATCHERS[Platform.QPG].AcceptBoard(Board.QPG6100)
 
 _MATCHERS[Platform.EFR32].AcceptApplication(Application.LOCK)
-_MATCHERS[Platform.EFR32].AcceptBoard(
-    Board.BRD4161A, board=Efr32Board.BRD4161A)
+_MATCHERS[Platform.EFR32].AcceptBoard(Board.BRD4161A, board=Efr32Board.BRD4161A)
 _MATCHERS[Platform.EFR32].AcceptApplication(
     Application.LIGHT, app=Efr32App.LIGHT)
-_MATCHERS[Platform.EFR32].AcceptApplication(
-    Application.LOCK, app=Efr32App.LOCK)
+_MATCHERS[Platform.EFR32].AcceptApplication(Application.LOCK, app=Efr32App.LOCK)
 _MATCHERS[Platform.EFR32].AcceptApplication(
     Application.WINDOW_COVERING, app=Efr32App.WINDOW_COVERING)
 
