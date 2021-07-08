@@ -29,7 +29,7 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 
 #define MAX_MESSAGE_SOURCE_STR_LENGTH (100)
-#define NETWORK_SLEEP_TIME_MSECS (100 * 1000)
+#define NETWORK_SLEEP_TIME_MsS (100 * 1000)
 
 extern chip::Messaging::ExchangeManager gExchangeManager;
 extern chip::SecureSessionMgr gSessionManager;
