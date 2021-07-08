@@ -51,5 +51,5 @@ cd $HOME
 virtualenv FunctionalTests/.venv
 source FunctionalTests/.venv/bin/activate
 pip install $CHIP_TOOLS_DIR/controller/python/chip*.whl
-pip install -r $HOME/CHIP/src/test_driver/mbed/integration_tests/requirements.txt
+pip install mbed-ls mbed-host-tests pytest
 deactivate
