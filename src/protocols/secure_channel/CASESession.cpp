@@ -1220,8 +1220,6 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHead
     CHIP_ERROR err = ValidateReceivedMessage(ec, packetHeader, payloadHeader, msg);
     SuccessOrExit(err);
 
-    SetPeerAddress(mMessageDispatch.GetPeerAddress());
-
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {
     case Protocols::SecureChannel::MsgType::CASE_SigmaR1:

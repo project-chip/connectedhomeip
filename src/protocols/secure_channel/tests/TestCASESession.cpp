@@ -176,8 +176,8 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
     NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
-    NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    ExchangeContext * context = ctx.NewExchangeToLocal(&pairing);
+    NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    ExchangeContext * context = ctx.NewUnauthenticatedExchangeToLocal(&pairing);
 
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), nullptr, Node01_01, 0, nullptr,
@@ -191,14 +191,19 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
 
+    // Clear pending packet in CRMP
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageContext * rc = context->GetReliableMessageContext();
+    rm->ClearRetransTable(rc);
+
     gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
     CASESession pairing1;
-    NL_TEST_ASSERT(inSuite, pairing1.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairing1.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
 
     gLoopback.mSentMessageCount = 0;
     gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
-    ExchangeContext * context1  = ctx.NewExchangeToLocal(&pairing1);
+    ExchangeContext * context1  = ctx.NewUnauthenticatedExchangeToLocal(&pairing1);
 
     NL_TEST_ASSERT(inSuite,
                    pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0, context1,
@@ -218,14 +223,14 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     CASESessionSerializable serializableAccessory;
 
     gLoopback.mSentMessageCount = 0;
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
                    ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
                        Protocols::SecureChannel::MsgType::CASE_SigmaR1, &pairingAccessory) == CHIP_NO_ERROR);
 
-    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
+    ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToLocal(&pairingCommissioner);
 
     FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
     NL_TEST_ASSERT(inSuite, fabric != nullptr);
@@ -236,7 +241,7 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
                    pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
                                                         contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
@@ -343,8 +348,8 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     gLoopback.mSentMessageCount = 0;
-    NL_TEST_ASSERT(inSuite, pairingCommissioner->MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gPairingServer.GetSession().MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingCommissioner->MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gPairingServer.GetSession().MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
 
     SessionIDAllocator idAllocator;
 
@@ -353,7 +358,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                                                                 &ctx.GetSecureSessionManager(), &gDeviceFabrics,
                                                                 &idAllocator) == CHIP_NO_ERROR);
 
-    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(pairingCommissioner);
+    ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToLocal(pairingCommissioner);
 
     FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
     NL_TEST_ASSERT(inSuite, fabric != nullptr);
@@ -362,12 +367,12 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                    pairingCommissioner->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
                                                          contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
     auto * pairingCommissioner1 = chip::Platform::New<TestCASESessionIPK>();
-    NL_TEST_ASSERT(inSuite, pairingCommissioner1->MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    ExchangeContext * contextCommissioner1 = ctx.NewExchangeToLocal(pairingCommissioner1);
+    NL_TEST_ASSERT(inSuite, pairingCommissioner1->MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    ExchangeContext * contextCommissioner1 = ctx.NewUnauthenticatedExchangeToLocal(pairingCommissioner1);
 
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner1->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,

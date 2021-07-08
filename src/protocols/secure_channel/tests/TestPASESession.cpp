@@ -122,8 +122,8 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     gLoopback.Reset();
 
-    NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    ExchangeContext * context = ctx.NewExchangeToLocal(&pairing);
+    NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    ExchangeContext * context = ctx.NewUnauthenticatedExchangeToLocal(&pairing);
 
     NL_TEST_ASSERT(inSuite,
                    pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, nullptr, nullptr) != CHIP_NO_ERROR);
@@ -134,13 +134,18 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
 
+    // Clear pending packet in CRMP
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageContext * rc = context->GetReliableMessageContext();
+    rm->ClearRetransTable(rc);
+
     gLoopback.Reset();
     gLoopback.mSentMessageCount = 0;
     gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
     PASESession pairing1;
-    NL_TEST_ASSERT(inSuite, pairing1.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    ExchangeContext * context1 = ctx.NewExchangeToLocal(&pairing1);
+    NL_TEST_ASSERT(inSuite, pairing1.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    ExchangeContext * context1 = ctx.NewUnauthenticatedExchangeToLocal(&pairing1);
     NL_TEST_ASSERT(inSuite,
                    pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, context1, &delegate) ==
                        CHIP_ERROR_BAD_REQUEST);
@@ -157,16 +162,13 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
 
     gLoopback.mSentMessageCount = 0;
 
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
 
-    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
+    ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToLocal(&pairingCommissioner);
 
     if (gLoopback.mNumMessagesToDrop != 0)
     {
-        pairingCommissioner.MessageDispatch().SetPeerAddress(PeerAddress(Type::kUdp));
-        pairingAccessory.MessageDispatch().SetPeerAddress(PeerAddress(Type::kUdp));
-
         ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
         ReliableMessageContext * rc = contextCommissioner->GetReliableMessageContext();
         NL_TEST_ASSERT(inSuite, rm != nullptr);
@@ -221,6 +223,8 @@ void SecurePairingHandshakeWithPacketLossTest(nlTestSuite * inSuite, void * inCo
 
 void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
     TestSecurePairingDelegate delegateCommissioner;
     PASESession pairingCommissioner;
 
@@ -230,14 +234,10 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
     gLoopback.Reset();
     gLoopback.mSentMessageCount = 0;
 
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
 
-    TestContext & ctx                     = *reinterpret_cast<TestContext *>(inContext);
-    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
-
-    pairingCommissioner.MessageDispatch().SetPeerAddress(PeerAddress(Type::kUdp));
-    pairingAccessory.MessageDispatch().SetPeerAddress(PeerAddress(Type::kUdp));
+    ExchangeContext * contextCommissioner = ctx.NewUnauthenticatedExchangeToLocal(&pairingCommissioner);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
     ReliableMessageContext * rc = contextCommissioner->GetReliableMessageContext();

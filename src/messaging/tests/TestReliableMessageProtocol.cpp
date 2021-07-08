@@ -124,26 +124,9 @@ public:
     nlTestSuite * mTestSuite       = nullptr;
 };
 
-class MockSessionEstablishmentExchangeDispatch : public Messaging::ExchangeMessageDispatch
+class MockSessionEstablishmentExchangeDispatch : public Messaging::ApplicationExchangeDispatch
 {
 public:
-    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
-                              EncryptedPacketBufferHandle & preparedMessage) override
-    {
-        PacketHeader packetHeader;
-
-        ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
-        ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
-
-        preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const override
-    {
-        return gTransportMgr.SendMessage(Transport::PeerAddress(), preparedMessage.CastToWritable());
-    }
-
     bool IsReliableTransmissionAllowed() const override { return mRetainMessageOnSend; }
 
     bool MessagePermitted(uint16_t protocol, uint8_t type) override { return true; }
@@ -367,6 +350,9 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockSessionEstablishmentDelegate mockSender;
+    err = mockSender.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
@@ -379,9 +365,6 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
         1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
         1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
-
-    err = mockSender.mMessageDispatch.Init();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     mockSender.mMessageDispatch.mRetainMessageOnSend = false;
 
@@ -414,23 +397,26 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     MockSessionEstablishmentDelegate mockReceiver;
-    CHIP_ERROR err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    CHIP_ERROR err = mockReceiver.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Expect the received messages to be encrypted
     mockReceiver.mMessageDispatch.mRequireEncryption = true;
 
     MockSessionEstablishmentDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    err = mockSender.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    ExchangeContext * exchange = ctx.NewUnauthenticatedExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
     ReliableMessageContext * rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
-
-    err = mockSender.mMessageDispatch.Init();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
@@ -584,23 +570,23 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     CHIP_ERROR err = ctx.Init(inSuite, &gTransportMgr, &gIOContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.SetSourceNodeId(kPlaceholderNodeId);
-    ctx.SetDestinationNodeId(kPlaceholderNodeId);
-    ctx.SetLocalKeyId(0);
-    ctx.SetPeerKeyId(0);
-    ctx.SetFabricIndex(kUndefinedFabricIndex);
-
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     MockSessionEstablishmentDelegate mockReceiver;
+    err = mockReceiver.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     mockReceiver.mTestSuite = inSuite;
 
     MockSessionEstablishmentDelegate mockSender;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    err = mockSender.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    ExchangeContext * exchange = ctx.NewUnauthenticatedExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -612,9 +598,6 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
         1, // CHIP_CONFIG_MRP_DEFAULT_INITIAL_RETRY_INTERVAL
         1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
-
-    err = mockSender.mMessageDispatch.Init();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Let's drop the initial message
     gLoopback.mSentMessageCount    = 0;

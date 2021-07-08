@@ -37,11 +37,12 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer,
-                                                      SecureSession::SessionRole::kInitiator, mSrcFabricIndex));
+    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(mPeerAddress), GetDestinationNodeId(),
+                                                      &mPairingLocalToPeer, SecureSession::SessionRole::kInitiator,
+                                                      mSrcFabricIndex));
 
-    return mSecureSessionMgr.NewPairing(mPeer, GetSourceNodeId(), &mPairingPeerToLocal, SecureSession::SessionRole::kResponder,
-                                        mDestFabricIndex);
+    return mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(mLocalAddress), GetSourceNodeId(),
+                                        &mPairingPeerToLocal, SecureSession::SessionRole::kResponder, mDestFabricIndex);
 }
 
 // Shutdown all layers, finalize operations
@@ -65,6 +66,16 @@ SessionHandle MessagingContext::GetSessionPeerToLocal()
 {
     // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
     return SessionHandle(GetSourceNodeId(), GetPeerKeyId(), GetLocalKeyId(), mDestFabricIndex);
+}
+
+Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToPeer(Messaging::ExchangeDelegate * delegate)
+{
+    return mExchangeManager.NewContext(mSecureSessionMgr.CreateUnauthenticatedSession(mPeerAddress).Value(), delegate);
+}
+
+Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToLocal(Messaging::ExchangeDelegate * delegate)
+{
+    return mExchangeManager.NewContext(mSecureSessionMgr.CreateUnauthenticatedSession(mLocalAddress).Value(), delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)

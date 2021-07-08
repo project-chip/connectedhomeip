@@ -23,10 +23,6 @@
  */
 #pragma once
 
-#include <lib/core/CHIPCore.h>
-#include <lib/core/InPlace.h>
-#include <lib/support/Variant.h>
-
 namespace chip {
 
 /// InPlace is disambiguation tags that can be passed to the constructors to indicate that the contained object should be

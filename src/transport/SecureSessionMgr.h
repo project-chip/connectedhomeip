@@ -40,6 +40,7 @@
 #include <transport/SecureSession.h>
 #include <transport/SessionHandle.h>
 #include <transport/TransportMgr.h>
+#include <transport/UnauthenticatedSessionTable.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 #include <transport/raw/Tuple.h>
@@ -191,8 +192,8 @@ public:
      *    3. Encode the packet header and prepend it to message.
      *   Returns a encrypted message in encryptedMessage.
      */
-    CHIP_ERROR BuildEncryptedMessagePayload(SessionHandle session, PayloadHeader & payloadHeader,
-                                            System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle & encryptedMessage);
+    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
+                              EncryptedPacketBufferHandle & encryptedMessage);
 
     /**
      * @brief
@@ -262,6 +263,15 @@ public:
      */
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
 
+    Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress)
+    {
+        Transport::UnauthenticatedSession * session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
+        if (session == nullptr)
+            return Optional<SessionHandle>::Missing();
+
+        return Optional<SessionHandle>::Value(SessionHandle(Transport::UnauthenticatedSessionHandle(*session)));
+    }
+
 private:
     /**
      *    The State of a secure transport object.
@@ -279,6 +289,7 @@ private:
     };
 
     System::Layer * mSystemLayer = nullptr;
+    Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
     State mState;                                                                       // < Initialization state of the object
 

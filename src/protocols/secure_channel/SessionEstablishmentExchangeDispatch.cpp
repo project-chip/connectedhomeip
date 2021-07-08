@@ -32,19 +32,13 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(SessionHandle se
                                                                 System::PacketBufferHandle && message,
                                                                 EncryptedPacketBufferHandle & preparedMessage)
 {
-    PacketHeader packetHeader;
-    ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
-    ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
-
-    preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
-    return CHIP_NO_ERROR;
+    return mSessionMgr->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage);
 }
 
 CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(SessionHandle session,
                                                                      const EncryptedPacketBufferHandle & preparedMessage) const
 {
-    ReturnErrorCodeIf(mTransportMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mTransportMgr->SendMessage(mPeerAddress, preparedMessage.CastToWritable());
+    return mSessionMgr->SendPreparedMessage(session, preparedMessage);
 }
 
 CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const Header::Flags & headerFlags,
@@ -53,7 +47,6 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const Header:
                                                                    Messaging::MessageFlags msgFlags,
                                                                    ReliableMessageContext * reliableMessageContext)
 {
-    mPeerAddress = peerAddress;
     return ExchangeMessageDispatch::OnMessageReceived(headerFlags, payloadHeader, messageId, peerAddress, msgFlags,
                                                       reliableMessageContext);
 }
