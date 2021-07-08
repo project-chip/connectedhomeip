@@ -224,7 +224,7 @@ public:
                           SecureSession::SessionRole direction, FabricIndex fabric);
 
     void ExpirePairing(SecureSessionHandle session);
-    void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
+    void ExpireAllPairings(const PeerId & peer);
 
     /**
      * @brief
@@ -279,6 +279,7 @@ private:
     };
 
     System::Layer * mSystemLayer = nullptr;
+    Transport::PeerCache<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeers;                 // < Active peers
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
     State mState;                                                                       // < Initialization state of the object
 

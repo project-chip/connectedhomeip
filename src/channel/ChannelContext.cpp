@@ -51,7 +51,7 @@ bool ChannelContext::MatchNodeId(NodeId nodeId)
         auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(GetReadyVars().mSession);
         if (state == nullptr)
             return false;
-        return nodeId == state->GetPeerNodeId();
+        return nodeId == state->GetPeerInfo().GetPeer().GetNodeId();
     }
     default:
         return false;
@@ -76,7 +76,7 @@ bool ChannelContext::MatchTransport(Transport::Type transport)
         auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(GetReadyVars().mSession);
         if (state == nullptr)
             return false;
-        return transport == state->GetPeerAddress().GetTransportType();
+        return transport == state->GetPeerInfo().GetPeerAddress().GetTransportType();
     }
     default:
         return false;
@@ -130,7 +130,7 @@ bool ChannelContext::MatchesSession(SecureSessionHandle session, SecureSessionMg
         {
         case PrepareState::kCasePairing: {
             auto state = ssm->GetPeerConnectionState(session);
-            return (state->GetPeerNodeId() == GetPrepareVars().mBuilder.GetPeerNodeId() &&
+            return (state->GetPeerInfo().GetPeer().GetNodeId() == GetPrepareVars().mBuilder.GetPeerNodeId() &&
                     state->GetPeerKeyID() == GetPrepareVars().mBuilder.GetPeerKeyID());
         }
         default:

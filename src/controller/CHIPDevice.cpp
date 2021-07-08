@@ -129,7 +129,8 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
         Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
 
         // Check if the connection state has the correct transport information
-        if (connectionState == nullptr || connectionState->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
+        if (connectionState == nullptr ||
+            connectionState->GetPeerInfo().GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
         {
             mState = ConnectionState::NotConnected;
             ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
@@ -407,7 +408,7 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
         return CHIP_NO_ERROR;
     }
 
-    connectionState->SetPeerAddress(addr);
+    connectionState->GetPeerInfo().SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
 }
