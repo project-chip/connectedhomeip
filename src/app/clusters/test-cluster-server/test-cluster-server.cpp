@@ -29,6 +29,7 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <core/CHIPSafeCasts.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -172,6 +173,44 @@ exit:
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(Zcl, "Test Cluster: failed to send TestSpecific response: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+    }
+    return true;
+}
+
+namespace {
+app::CommandHandler::CommandHandlerAsyncHolder sTestAsyncTransaction;
+EndpointId responseEndPointId = 0;
+
+void SendAsyncTransactionResponse(intptr_t notUsed)
+{
+    if (!sTestAsyncTransaction.IsValid())
+    {
+        return;
+    }
+    app::CommandPathParams cmdParams = { responseEndPointId, /* group id */ 0, ZCL_TEST_CLUSTER_ID,
+                                         ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+    sTestAsyncTransaction->AddStatusCode(cmdParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                         Protocols::InteractionModel::Id, Protocols::InteractionModel::ProtocolCode::Success);
+    sTestAsyncTransaction.FinishPendingWorkAndRelease();
+}
+} // namespace
+
+bool emberAfTestClusterClusterTestAsyncTransactionCallback(chip::app::CommandHandler * apCommandObj)
+{
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    responseEndPointId = emberAfCurrentEndpoint();
+    VerifyOrReturnError(apCommandObj != nullptr, false);
+    if ((err = sTestAsyncTransaction.AcquirePendingWork(apCommandObj)) != CHIP_NO_ERROR)
+    {
+        app::CommandPathParams cmdParams = { responseEndPointId, /* group id */ 0, ZCL_TEST_CLUSTER_ID,
+                                             ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID,
+                                             (chip::app::CommandPathFlags::kEndpointIdValid) };
+        apCommandObj->AddStatusCode(cmdParams, Protocols::SecureChannel::GeneralStatusCode::kFailure,
+                                    Protocols::InteractionModel::Id, Protocols::InteractionModel::ProtocolCode::ResourceExhausted);
+    }
+    else
+    {
+        DeviceLayer::PlatformMgr().ScheduleWork(SendAsyncTransactionResponse, 0);
     }
     return true;
 }

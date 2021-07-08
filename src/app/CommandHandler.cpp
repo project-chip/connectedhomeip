@@ -34,6 +34,15 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 
 namespace chip {
 namespace app {
+
+CHIP_ERROR CommandHandler::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
+{
+    ReturnErrorOnFailure(Command::Init(apExchangeMgr, apDelegate));
+    // Not pending any work.
+    mPendingWorkCount = 0;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
@@ -48,7 +57,19 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
     err = ProcessCommandMessage(std::move(payload), CommandRoleId::HandlerId);
     SuccessOrExit(err);
 
-    err = SendCommandResponse();
+    if (mPendingWorkCount == 0)
+    {
+        // We do not have pending work.
+        err = SendCommandResponse();
+    }
+    else
+    {
+        // We have background work pending, notify the exchange context to wait for it.
+        if (mpExchangeCtx)
+        {
+            mpExchangeCtx->WillSendMessage();
+        }
+    }
 
 exit:
     ChipLogFunctError(err);
@@ -156,6 +177,46 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathP
 
 exit:
     ChipLogFunctError(err);
+    return err;
+}
+
+CHIP_ERROR CommandHandler::FinishPendingWork()
+{
+    VerifyOrDie(this->mPendingWorkCount != 0);
+    this->mPendingWorkCount--;
+    if (this->mPendingWorkCount == 0)
+    {
+        return this->SendCommandResponse();
+    }
+    return CHIP_NO_ERROR;
+}
+
+void CommandHandler::Shutdown()
+{
+    VerifyOrDieWithMsg(mPendingWorkCount == 0, DataManagement, "There are background works pending!");
+    Command::Shutdown();
+}
+
+CommandHandler::CommandHandlerAsyncHolder::~CommandHandlerAsyncHolder()
+{
+    VerifyOrDieWithMsg(mCommandHandler == nullptr, DataManagement,
+                       "Destructing CommandHandlerAsyncHolder with active command handler -- memory leak!");
+}
+
+CHIP_ERROR CommandHandler::CommandHandlerAsyncHolder::AcquirePendingWork(CommandHandler * apCommandHandler)
+{
+    VerifyOrReturnError(mCommandHandler == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mCommandHandler = apCommandHandler;
+    mCommandHandler->mPendingWorkCount++;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommandHandler::CommandHandlerAsyncHolder::FinishPendingWorkAndRelease()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturnError(mCommandHandler != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    err             = mCommandHandler->FinishPendingWork();
+    mCommandHandler = nullptr;
     return err;
 }
 
