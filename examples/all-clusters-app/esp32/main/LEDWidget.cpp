@@ -35,7 +35,7 @@
 #include "led_strip.h"
 #define RMT_TX_DEFAULT_GPIO GPIO_NUM_8
 #define RMT_TX_DEFAULT_CHANNEL RMT_CHANNEL_0
-static led_strip_t *strip = NULL;
+static led_strip_t * strip = NULL;
 #else
 #include "driver/ledc.h"
 #include "hal/ledc_types.h"
@@ -54,15 +54,15 @@ void LEDWidget::Init(gpio_num_t gpioNum)
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
     if (gpioNum == RMT_TX_DEFAULT_GPIO)
     {
-       rmt_config_t config = RMT_DEFAULT_CONFIG_TX(RMT_TX_DEFAULT_GPIO, RMT_TX_DEFAULT_CHANNEL);
-       config.clk_div = 2;
-       rmt_config(&config);
-       rmt_driver_install(config.channel, 0, 0);
-       led_strip_config_t strip_config = LED_STRIP_DEFAULT_CONFIG(1,(led_strip_dev_t)config.channel);
-       strip = led_strip_new_rmt_ws2812(&strip_config);
-       mDefaultOnBrightness = UINT8_MAX;
-       mHue = 0;
-       mSaturation = 0;
+        rmt_config_t config = RMT_DEFAULT_CONFIG_TX(RMT_TX_DEFAULT_GPIO, RMT_TX_DEFAULT_CHANNEL);
+        config.clk_div      = 2;
+        rmt_config(&config);
+        rmt_driver_install(config.channel, 0, 0);
+        led_strip_config_t strip_config = LED_STRIP_DEFAULT_CONFIG(1, (led_strip_dev_t) config.channel);
+        strip                           = led_strip_new_rmt_ws2812(&strip_config);
+        mDefaultOnBrightness            = UINT8_MAX;
+        mHue                            = 0;
+        mSaturation                     = 0;
     }
 #else
     if (gpioNum < GPIO_NUM_MAX)
@@ -99,7 +99,8 @@ void LEDWidget::Set(bool state)
 void LEDWidget::SetBrightness(uint8_t brightness)
 {
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
-    if(strip){
+    if (strip)
+    {
         uint8_t red, green, blue;
         HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
         strip->set_pixel(strip, 0, red, green, blue);
@@ -186,7 +187,7 @@ void LEDWidget::DoSet(bool state)
     bool stateChange = (mState != state);
     mState           = state;
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
-    if(strip)
+    if (strip)
     {
         uint8_t red, green, blue;
         uint8_t brightness = state ? mDefaultOnBrightness : 0;
@@ -228,29 +229,29 @@ void LEDWidget::SetVLED(int id1, int id2)
 }
 #endif
 
-
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
 void LEDWidget::SetColor(uint8_t Hue, uint8_t Saturation)
 {
     uint8_t red, green, blue;
     uint8_t brightness = mState ? mDefaultOnBrightness : 0;
-    mHue = static_cast<uint16_t>(Hue) * 360 / 254; //mHue [0, 360]
-    mSaturation = static_cast<uint16_t>(Saturation) * 100 / 254; // mSaturation [0 , 100]
+    mHue               = static_cast<uint16_t>(Hue) * 360 / 254;        // mHue [0, 360]
+    mSaturation        = static_cast<uint16_t>(Saturation) * 100 / 254; // mSaturation [0 , 100]
 
     HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
     strip->set_pixel(strip, 0, red, green, blue);
     strip->refresh(strip, 100);
 }
 
-void LEDWidget::HSB2rgb(uint16_t Hue, uint8_t Saturation, uint8_t brightness, uint8_t& red, uint8_t& green, uint8_t& blue)
+void LEDWidget::HSB2rgb(uint16_t Hue, uint8_t Saturation, uint8_t brightness, uint8_t & red, uint8_t & green, uint8_t & blue)
 {
     uint16_t i       = Hue / 60;
     uint16_t rgb_max = brightness;
     uint16_t rgb_min = rgb_max * (100 - Saturation) / 100;
     uint16_t diff    = Hue % 60;
-    uint16_t rgb_adj = (rgb_max -rgb_min) * diff / 60;
+    uint16_t rgb_adj = (rgb_max - rgb_min) * diff / 60;
 
-    switch(i) {
+    switch (i)
+    {
     case 0:
         red   = rgb_max;
         green = rgb_min + rgb_adj;
