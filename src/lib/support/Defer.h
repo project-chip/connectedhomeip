@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <utility>
+
 template <typename Function>
 class Defer
 {
@@ -23,10 +25,23 @@ public:
     Defer(Function && function) : mFunction(std::move(function)) {}
     ~Defer() { mFunction(); }
 
+    Defer(Defer & that) = default;
+    Defer& operator=(Defer & that) = default;
+    Defer(Defer && that) = default;
+    Defer& operator=(Defer && that) = default;
 private:
     Function mFunction;
 };
 
+/**
+ * @brief
+ *   Defers the execution of a function until the surrounding function returns.
+ *   Create a Defer object holding a lambda:
+ *
+ *     auto deferred = MakeDefer([]() { -- do cleanup -- });
+ *
+ *   The lambda will be called as soon as the object goes out of the scope.
+ */
 template <typename Function>
 Defer<Function> MakeDefer(Function && function)
 {
