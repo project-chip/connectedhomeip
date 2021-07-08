@@ -230,7 +230,7 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
 {
     uint16_t peerKeyId          = pairing->GetPeerKeyId();
     uint16_t localKeyId         = pairing->GetLocalKeyId();
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, nullptr);
+    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, peerKeyId, nullptr);
 
     // Find any existing connection with the same node and key ID
     if (state && (state->GetAdminId() == Transport::kUndefinedAdminId || state->GetAdminId() == admin))
@@ -242,8 +242,7 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", key %d!!", ChipLogValueX64(peerNodeId),
                   peerKeyId);
     state = nullptr;
-    ReturnErrorOnFailure(
-        mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, localKeyId, &state));
+    ReturnErrorOnFailure(mPeerConnections.CreateNewPeerConnectionState(peerNodeId, peerKeyId, localKeyId, &state));
     ReturnErrorCodeIf(state == nullptr, CHIP_ERROR_NO_MEMORY);
 
     state->SetAdminId(admin);
@@ -526,7 +525,7 @@ void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, 
 
 PeerConnectionState * SecureSessionMgr::GetPeerConnectionState(SecureSessionHandle session)
 {
-    return mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(session.mPeerNodeId), session.mPeerKeyId, nullptr);
+    return mPeerConnections.FindPeerConnectionState(session.mPeerNodeId, session.mPeerKeyId, nullptr);
 }
 
 } // namespace chip
