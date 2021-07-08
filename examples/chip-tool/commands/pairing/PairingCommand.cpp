@@ -20,6 +20,9 @@
 #include "platform/PlatformManager.h"
 #include <lib/core/CHIPSafeCasts.h>
 
+#include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
+
 using namespace ::chip;
 
 constexpr uint64_t kBreadcrumb                = 0;
@@ -56,6 +59,12 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::Bypass:
         err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;
+    case PairingMode::QRCode:
+        err = PairWithQRCode(remoteId);
+        break;
+    case PairingMode::ManualCode:
+        err = PairWithManualCode(remoteId);
+        break;
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
         break;
@@ -69,6 +78,33 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     }
 
     return err;
+}
+
+CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
+{
+    SetupPayload payload;
+    ReturnErrorOnFailure(QRCodeSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
+    return PairWithCode(remoteId, payload);
+}
+
+CHIP_ERROR PairingCommand::PairWithManualCode(NodeId remoteId)
+{
+    SetupPayload payload;
+    ReturnErrorOnFailure(ManualSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
+    return PairWithCode(remoteId, payload);
+}
+
+CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId, SetupPayload payload)
+{
+    chip::RendezvousInformationFlags rendezvousInformation = payload.rendezvousInformation;
+    ReturnErrorCodeIf(rendezvousInformation != RendezvousInformationFlag::kBLE, CHIP_ERROR_INVALID_ARGUMENT);
+
+    RendezvousParameters params = RendezvousParameters()
+                                      .SetSetupPINCode(payload.setUpPINCode)
+                                      .SetDiscriminator(payload.discriminator)
+                                      .SetPeerAddress(PeerAddress::BLE());
+
+    return GetExecContext()->commissioner->PairDevice(remoteId, params);
 }
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
