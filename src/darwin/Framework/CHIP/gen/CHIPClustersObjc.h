@@ -1109,6 +1109,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestCluster : CHIPCluster
 
 - (void)test:(ResponseHandler)responseHandler;
+- (void)testAsyncTransaction:(ResponseHandler)responseHandler;
 - (void)testNotHandled:(ResponseHandler)responseHandler;
 - (void)testSpecific:(ResponseHandler)responseHandler;
 - (void)testUnknownCommand:(ResponseHandler)responseHandler;

@@ -4054,6 +4054,14 @@ CHIP_ERROR chip_ime_AppendCommand_TestCluster_Test(chip::Controller::Device * de
     cluster.Associate(device, ZCLendpointId);
     return cluster.Test(nullptr, nullptr);
 }
+CHIP_ERROR chip_ime_AppendCommand_TestCluster_TestAsyncTransaction(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.TestAsyncTransaction(nullptr, nullptr);
+}
 CHIP_ERROR chip_ime_AppendCommand_TestCluster_TestNotHandled(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                              chip::GroupId)
 {

@@ -16563,6 +16563,10 @@ bool emberAfTestClusterClusterTestSpecificCallback(chip::app::CommandHandler * c
  */
 bool emberAfTestClusterClusterTestUnknownCommandCallback(chip::app::CommandHandler * commandObj);
 /**
+ * @brief  Cluster TestAsyncTransaction Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestAsyncTransactionCallback(chip::app::CommandHandler * commandObj);
+/**
  * @brief  Cluster DisplayMessage Command callback (from server)
  */
 bool emberAfMessagingClusterDisplayMessageCallback(chip::app::CommandSender * commandObj, uint32_t messageId,

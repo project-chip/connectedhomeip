@@ -16906,6 +16906,7 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Test                                                              |   0x00 |
+| * TestAsyncTransaction                                              |   0x04 |
 | * TestNotHandled                                                    |   0x01 |
 | * TestSpecific                                                      |   0x02 |
 | * TestUnknownCommand                                                |   0x03 |
@@ -16955,6 +16956,35 @@ public:
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.Test(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command TestAsyncTransaction
+ */
+class TestClusterTestAsyncTransaction : public ModelCommand
+{
+public:
+    TestClusterTestAsyncTransaction() : ModelCommand("test-async-transaction") { ModelCommand::AddArguments(); }
+    ~TestClusterTestAsyncTransaction()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x04) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.TestAsyncTransaction(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -23680,6 +23710,7 @@ void registerClusterTestCluster(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<TestClusterTest>(),
+        make_unique<TestClusterTestAsyncTransaction>(),
         make_unique<TestClusterTestNotHandled>(),
         make_unique<TestClusterTestSpecific>(),
         make_unique<TestClusterTestUnknownCommand>(),
