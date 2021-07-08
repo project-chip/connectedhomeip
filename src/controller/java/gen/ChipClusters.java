@@ -3814,12 +3814,26 @@ public class ChipClusters {
       readFabricsListAttribute(chipClusterPtr, callback);
     }
 
+    public void readSupportedFabricsAttribute(IntegerAttributeCallback callback) {
+      readSupportedFabricsAttribute(chipClusterPtr, callback);
+    }
+
+    public void readCommissionedFabricsAttribute(IntegerAttributeCallback callback) {
+      readCommissionedFabricsAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
     private native void readFabricsListAttribute(
         long chipClusterPtr, FabricsListAttributeCallback callback);
+
+    private native void readSupportedFabricsAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readCommissionedFabricsAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
