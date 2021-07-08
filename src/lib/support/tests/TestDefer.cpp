@@ -29,18 +29,14 @@ static void TestDeferUsage(nlTestSuite * inSuite, void * inContext)
 {
     bool deferred = false;
     {
-        auto deferredFunction = MakeDefer([&]() {
-            deferred = true;
-        });
+        auto deferredFunction = MakeDefer([&]() { deferred = true; });
     }
     NL_TEST_ASSERT(inSuite, deferred);
 
     deferred = false;
     {
         std::unique_ptr<int> movable;
-        auto deferredFunction = MakeDefer([movable = std::move(movable), &deferred]() {
-            deferred = true;
-        });
+        auto deferredFunction = MakeDefer([movable = std::move(movable), &deferred]() { deferred = true; });
     }
     NL_TEST_ASSERT(inSuite, deferred);
 }

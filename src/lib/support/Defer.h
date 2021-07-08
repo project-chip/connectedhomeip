@@ -26,9 +26,10 @@ public:
     ~Defer() { mFunction(); }
 
     Defer(Defer & that) = default;
-    Defer& operator=(Defer & that) = default;
-    Defer(Defer && that) = default;
-    Defer& operator=(Defer && that) = default;
+    Defer & operator=(Defer & that) = default;
+    Defer(Defer && that)            = default;
+    Defer & operator=(Defer && that) = default;
+
 private:
     Function mFunction;
 };
