@@ -67,7 +67,7 @@ protected:
     void * At(size_t index) { return static_cast<uint8_t *>(mElements) + mElementSize * index; }
     size_t IndexOf(void * element);
 
-    using Lambda = bool (*)(void*, void*);
+    using Lambda = bool (*)(void *, void *);
     bool ForEachActiveObjectInner(void * context, Lambda lambda);
 
 private:
@@ -129,13 +129,16 @@ public:
     }
 
 private:
-    template<typename Function>
-    class LambdaProxy {
+    template <typename Function>
+    class LambdaProxy
+    {
     public:
         LambdaProxy(Function && function) : mFunction(std::move(function)) {}
-        static bool Call(void * context, void * target) {
-            return static_cast<LambdaProxy*>(context)->mFunction(static_cast<T*>(target));
+        static bool Call(void * context, void * target)
+        {
+            return static_cast<LambdaProxy *>(context)->mFunction(static_cast<T *>(target));
         }
+
     private:
         Function mFunction;
     };
