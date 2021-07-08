@@ -125,7 +125,7 @@ CHIP_ERROR SendEchoRequest(void)
 CHIP_ERROR SendUDCRequest(const char * name)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    char instanceName[16];
+    char instanceName[17];
     snprintf(instanceName, sizeof instanceName, "%s", name);
     chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(instanceName, strlen(instanceName));
 

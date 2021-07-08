@@ -53,7 +53,7 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
     System::PacketBufferHandle && payload = std::move(msg);
 
     char instanceName[chip::Mdns::kMaxInstanceNameSize + 1];
-    int instanceNameLength =
+    size_t instanceNameLength =
         (payload->DataLength() > (chip::Mdns::kMaxInstanceNameSize)) ? chip::Mdns::kMaxInstanceNameSize : payload->DataLength();
     payload->Read((uint8_t *) instanceName, instanceNameLength);
 

@@ -30,7 +30,7 @@
 #include <app/server/Server.h>
 #endif
 
-using chip::DeviceLayer::ConfigurationMgr;
+// using chip::DeviceLayer::ConfigurationMgr;
 
 namespace chip {
 namespace Shell {
@@ -141,7 +141,7 @@ static int PrintAllCommands()
     return CHIP_NO_ERROR;
 }
 
-static int CommissioningHandler(int argc, char ** argv)
+static CHIP_ERROR CommissioningHandler(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
