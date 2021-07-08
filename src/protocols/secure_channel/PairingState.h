@@ -25,9 +25,10 @@
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {
+namespace SecureChannel {
 
 /**
- * Defines state of a pairing session
+ * Defines a state of pairing session
  */
 class PairingState
 {
@@ -50,23 +51,27 @@ public:
 
     uint16_t GetPeerKeyID() const { return mPeerKeyID; }
     void SetPeerKeyID(uint16_t id) { mPeerKeyID = id; }
+    bool IsValidPeerKeyId() const { return mPeerKeyID != kInvalidKeyId; }
 
     uint16_t GetLocalKeyID() const { return mLocalKeyID; }
     void SetLocalKeyID(uint16_t id) { mLocalKeyID = id; }
+    bool IsValidLocalKeyId() const { return mLocalKeyID != kInvalidKeyId; }
 
     void Reset()
     {
         mPeerAddress = Transport::PeerAddress::Uninitialized();
         mPeerNodeId  = kUndefinedNodeId;
-        mPeerKeyID   = UINT16_MAX;
-        mLocalKeyID  = UINT16_MAX;
+        mPeerKeyID   = kInvalidKeyId;
+        mLocalKeyID  = kInvalidKeyId;
     }
 
 private:
-    Transport::PeerAddress mPeerAddress = Transport::PeerAddress::Uninitialized();
-    NodeId mPeerNodeId                  = kUndefinedNodeId;
-    uint16_t mPeerKeyID                 = UINT16_MAX;
-    uint16_t mLocalKeyID                = UINT16_MAX;
+    static constexpr uint16_t kInvalidKeyId = UINT16_MAX;
+    Transport::PeerAddress mPeerAddress     = Transport::PeerAddress::Uninitialized();
+    NodeId mPeerNodeId                      = kUndefinedNodeId;
+    uint16_t mPeerKeyID                     = kInvalidKeyId;
+    uint16_t mLocalKeyID                    = kInvalidKeyId;
 };
 
+} // namespace SecureChannel
 } // namespace chip
