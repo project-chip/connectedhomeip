@@ -296,12 +296,6 @@ void HandleWriteComplete()
            static_cast<double>(gWriteRespCount) * 100 / gWriteCount, static_cast<double>(transitTime) / 1000);
 }
 
-void Shutdown()
-{
-    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-    ShutdownChip();
-}
-
 void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -335,7 +329,7 @@ void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appSta
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        Shutdown();
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     }
 }
 
@@ -355,7 +349,7 @@ void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * app
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        Shutdown();
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     }
 }
 
@@ -388,7 +382,7 @@ void ReadRequestTimerHandler(chip::System::Layer * systemLayer, void * appState,
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        Shutdown();
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     }
 }
 
@@ -419,13 +413,13 @@ void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState
     else
     {
         // Complete all tests.
-        Shutdown();
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        Shutdown();
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     }
 }
 
@@ -595,6 +589,9 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+
+    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    ShutdownChip();
 exit:
     if (err != CHIP_NO_ERROR || (gCommandRespCount != kMaxCommandMessageCount + kTotalFailureCommandMessageCount))
     {
