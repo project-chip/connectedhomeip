@@ -52,7 +52,7 @@ void BasicAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelabl
     }
     else
     {
-        ChipLogError(Zcl, "Failed to get value from TLV data for attribute reading response: %d", err);
+        ChipLogError(Zcl, "Failed to get value from TLV data for attribute reading response: %s", chip::ErrorStr(err));
         chip::Callback::Callback<DefaultFailureCallback> * cb =
             chip::Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailure);
         cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
