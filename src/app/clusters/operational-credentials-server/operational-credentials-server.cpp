@@ -132,7 +132,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
                            ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
             continue;
         }
-        else if (writeFabric(fabricId, nodeId, vendorId, fabricLabel, (int32_t)fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+        else if (writeFabric(fabricId, nodeId, vendorId, fabricLabel, (int32_t) fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                            "OpCreds: Failed to write admin with fabricId 0x" ChipLogFormatX64 " in fabrics list",
