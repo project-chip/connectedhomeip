@@ -1352,6 +1352,8 @@ static constexpr AttributeId ListInt8u             = 0x001A;
 static constexpr AttributeId ListOctetString       = 0x001B;
 static constexpr AttributeId ListStructOctetString = 0x001C;
 static constexpr AttributeId LongOctetString       = 0x001D;
+static constexpr AttributeId CharString            = 0x001E;
+static constexpr AttributeId LongCharString        = 0x001F;
 static constexpr AttributeId Unsupported           = 0x00FF;
 } // namespace Ids
 } // namespace Attributes
