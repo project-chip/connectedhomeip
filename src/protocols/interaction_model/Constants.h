@@ -109,12 +109,6 @@ enum class ProtocolCode : uint16_t
     NoUpstreamSubscription = 0xc5,
     InvalidArgument        = 0xc6,
 };
-
-inline uint16_t ToUint16(ProtocolCode aProtocolCode)
-{
-    static_assert(std::is_same<uint16_t, std::underlying_type_t<ProtocolCode>>::value, "Cast might not be right");
-    return static_cast<uint16_t>(aProtocolCode);
-}
 } // namespace InteractionModel
 
 template <>
