@@ -155,32 +155,33 @@ uint8_t VerticalBlindPainter::Color(uint32_t x, uint32_t y)
     }
 }
 
-PixelPainter * LcdPainter::GetCoverPainter(WindowCover::CoverType type, uint8_t lift, uint8_t tilt)
+PixelPainter * LcdPainter::GetCoverPainter(EmberAfWcType type, uint8_t lift, uint8_t tilt)
 {
     switch (type)
     {
-    case WindowCover::CoverType::Rollershade:
-    case WindowCover::CoverType::Rollershade_2_motor:
-    case WindowCover::CoverType::Rollershade_exterior:
-    case WindowCover::CoverType::Rollershade_exterior_2_motor:
+    case EMBER_ZCL_WC_TYPE_ROLLERSHADE:
+    case EMBER_ZCL_WC_TYPE_ROLLERSHADE2_MOTOR:
+    case EMBER_ZCL_WC_TYPE_ROLLERSHADE_EXTERIOR:
+    case EMBER_ZCL_WC_TYPE_ROLLERSHADE_EXTERIOR2_MOTOR:
         return new VerticalShadePainter(lift, tilt);
 
-    case WindowCover::CoverType::Drapery:
-    case WindowCover::CoverType::Awning:
+    case EMBER_ZCL_WC_TYPE_DRAPERY:
+    case EMBER_ZCL_WC_TYPE_AWNING:
         return new HorizontalShadePainter(lift, tilt);
 
-    case WindowCover::CoverType::Shutter:
-    case WindowCover::CoverType::Tilt_blind:
-    case WindowCover::CoverType::Tilt_Lift_blind:
+    case EMBER_ZCL_WC_TYPE_SHUTTER:
+    case EMBER_ZCL_WC_TYPE_TILT_BLIND_TILT_ONLY:
+    case EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT:
         return new VerticalBlindPainter(lift, tilt);
 
-    case WindowCover::CoverType::Projector_screen:
+    case EMBER_ZCL_WC_TYPE_PROJECTOR_SCREEN:
+    case EMBER_ZCL_WC_TYPE_UNKNOWN:
     default:
         return new VerticalShadePainter(lift, tilt);
     }
 }
 
-void LcdPainter::Paint(WindowCover::CoverType type, uint8_t lift, uint8_t tilt, LcdIcon icon)
+void LcdPainter::Paint(EmberAfWcType type, uint8_t lift, uint8_t tilt, LcdIcon icon)
 {
     FramePainter framePaint         = FramePainter(lift, tilt);
     IconPainter iconPaint           = IconPainter(lift, tilt, icon);
