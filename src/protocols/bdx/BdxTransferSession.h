@@ -80,12 +80,22 @@ public:
         bool IsEof           = false;
     };
 
+    struct MessageTypeData
+    {
+        uint32_t ProtocolId = 0; // Should only be SecureChannel or BDX
+        uint8_t MessageType = 0;
+    };
+
     /**
      * @brief
      *   All output data processed by the TransferSession object will be passed to the caller using this struct via PollOutput().
      *
-     *   NOTE: Some sub-structs may contain pointers to data in a PacketBuffer. In this case, the MsgData field MUST be populated
-     *         with a PacketBufferHandle that encapsulates the respective PacketBuffer, in order to ensure valid memory access.
+     *   NOTE: Some sub-structs may contain pointers to data in a PacketBuffer (see Blockdata). In this case, the MsgData field MUST
+     *   be populated with a PacketBufferHandle that encapsulates the respective PacketBuffer, in order to ensure valid memory
+     *   access.
+     *
+     *   NOTE: MsgData can contain messages that have been received or messages that should be sent by the caller. The underlying
+     *   buffer will always start at the data, never at the payload header. Outgoing messages do not have a header prepended.
      */
     struct OutputEvent
     {
@@ -97,6 +107,7 @@ public:
             TransferAcceptData transferAcceptData;
             BlockData blockdata;
             StatusReportData statusData;
+            MessageTypeData msgTypeData;
         };
 
         OutputEvent() : EventType(OutputEventType::kNone) { statusData = { StatusCode::kNone }; }
@@ -107,6 +118,7 @@ public:
         static OutputEvent TransferAcceptEvent(TransferAcceptData data, System::PacketBufferHandle msg);
         static OutputEvent BlockDataEvent(BlockData data, System::PacketBufferHandle msg);
         static OutputEvent StatusReportEvent(OutputEventType type, StatusReportData data);
+        static OutputEvent MsgToSendEvent(MessageTypeData typeData, System::PacketBufferHandle msg);
     };
 
     /**
@@ -119,8 +131,8 @@ public:
      *   It is possible that consecutive calls to this method may emit different outputs depending on the state of the
      *   TransferSession object.
      *
-     *   Note that if the type outputted is kMsgToSend, it is assumed that the message will be send immediately, and the
-     *   session timeout timer will begin at curTimeMs.
+     *   Note that if the type outputted is kMsgToSend, the caller is expected to send the message immediately, and the session
+     *   timeout timer will begin at curTimeMs.
      *
      *   See OutputEventType for all possible output event types.
      *
@@ -308,11 +320,13 @@ private:
     uint64_t mTransferLength       = 0; ///< 0 represents indefinite length
     uint16_t mTransferMaxBlockSize = 0;
 
+    // Used to store event data before it is emitted via PollOutput()
     System::PacketBufferHandle mPendingMsgHandle;
     StatusReportData mStatusReportData;
     TransferInitData mTransferRequestData;
     TransferAcceptData mTransferAcceptData;
     BlockData mBlockEventData;
+    MessageTypeData mMsgTypeData;
 
     uint32_t mNumBytesProcessed = 0;
 
