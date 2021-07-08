@@ -692,6 +692,7 @@ private:
     Callback::Callback<BasicFailureCallback> mFailure;
 
     CommissioningStage GetNextCommissioningStage();
+    static CHIP_ERROR ConvertFromNOCResponseStatus(uint8_t err);
 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
     Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;

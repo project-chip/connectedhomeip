@@ -1347,6 +1347,35 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceCommissioner::ConvertFromNOCResponseStatus(uint8_t err)
+{
+    switch (err)
+    {
+    case EMBER_ZCL_NOC_RESPONSE_STATUS_SUCCESS:
+        return CHIP_NO_ERROR;
+    case EMBER_ZCL_NOC_RESPONSE_STATUS_INVALID_PUBLIC_KEY:
+        return CHIP_ERROR_INVALID_PUBLIC_KEY;
+    case EMBER_ZCL_NOC_RESPONSE_STATUS_INVALID_NODE_OP_ID:
+        return CHIP_ERROR_WRONG_NODE_ID;
+    case EMBER_ZCL_NOC_RESPONSE_STATUS_INVALID_NOC:
+        return CHIP_ERROR_CERT_LOAD_FAILED;
+    case EMBER_ZCL_NOC_RESPONSE_STATUS_MISSING_CSR:
+        return CHIP_ERROR_INCORRECT_STATE;
+    case EMBER_ZCL_NOC_RESPONSE_STATUS_TABLE_FULL:
+        return CHIP_ERROR_NO_MEMORY;
+    case EMBER_ZCL_NOC_RESPONSE_STATUS_MISSING_ACL:
+    case EMBER_ZCL_NOC_RESPONSE_STATUS_MISSING_IPK:
+    case EMBER_ZCL_NOC_RESPONSE_STATUS_INSUFFICIENT_PRIVILEGE:
+    case EMBER_ZCL_NOC_RESPONSE_STATUS_FABRIC_CONFLICT:
+    case EMBER_ZCL_NOC_RESPONSE_STATUS_LABEL_CONFLICT:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case EMBER_ZCL_NOC_RESPONSE_STATUS_INVALID_FABRIC_INDEX:
+        return CHIP_ERROR_INVALID_FABRIC_ID;
+    };
+
+    return CHIP_ERROR_CERT_LOAD_FAILED;
+}
+
 void DeviceCommissioner::OnAddNOCFailureResponse(void * context, uint8_t status)
 {
     ChipLogProgress(Controller, "Device failed to receive the operational certificate Response: 0x%02x", status);
@@ -1360,7 +1389,7 @@ void DeviceCommissioner::OnAddNOCFailureResponse(void * context, uint8_t status)
 void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex,
                                                              ByteSpan DebugText)
 {
-    ChipLogProgress(Controller, "Device confirmed that it has received the operational certificate");
+    ChipLogProgress(Controller, "Device returned status %d on receiving the NOC", StatusCode);
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     CHIP_ERROR err  = CHIP_NO_ERROR;
@@ -1373,6 +1402,9 @@ void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uin
 
     VerifyOrExit(commissioner->mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
+    err = ConvertFromNOCResponseStatus(StatusCode);
+    SuccessOrExit(err);
+
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
 
     err = commissioner->OnOperationalCredentialsProvisioningCompletion(device);
@@ -1380,6 +1412,7 @@ void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uin
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogProgress(Controller, "Add NOC failed with error %s", ErrorStr(err));
         commissioner->OnSessionEstablishmentError(err);
     }
 }

@@ -2038,6 +2038,14 @@ using CHIP_ERROR = ::chip::ChipError::ErrorType;
 #define CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED                  CHIP_CORE_ERROR(0xc4)
 
 /**
+ * @def CHIP_ERROR_INVALID_PUBLIC_KEY
+ *
+ * @brief
+ *   The received public key doesn't match locally generated key.
+ */
+#define CHIP_ERROR_INVALID_PUBLIC_KEY                          CHIP_CORE_ERROR(197)
+
+/**
  *  @}
  */
 
