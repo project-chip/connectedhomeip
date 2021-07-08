@@ -20,7 +20,7 @@ void bind_PyChip_PlatFormManager(std::function<pybind11::module &(std::string co
 void bind_PyChip_MDNS(std::function<pybind11::module &(std::string const & namespace_)> & M);
 void bind_PyChip_Inet_IPAddress(std::function<pybind11::module &(std::string const & namespace_)> & M);
 void bind_PyChip_BLEManager(std::function<pybind11::module &(std::string const & namespace_)> & M);
-void bind_PyChip_Logging(std::function< pybind11::module &(std::string const &namespace_) > &M);
+void bind_PyChip_Logging(std::function<pybind11::module &(std::string const & namespace_)> & M);
 
 PYBIND11_MODULE(PyChip, root_module)
 {
