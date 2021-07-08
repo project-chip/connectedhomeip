@@ -82,7 +82,7 @@ struct ControllerDeviceInitParams
     Inet::InetLayer * inetLayer                         = nullptr;
     PersistentStorageDelegate * storageDelegate         = nullptr;
     Credentials::OperationalCredentialSet * credentials = nullptr;
-    Credentials::CertificateKeyId * trustedRoot         = nullptr;
+    uint8_t * credentialsIndex                          = nullptr;
     SessionIDAllocator * idAllocator                    = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
@@ -177,16 +177,16 @@ public:
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, Transport::AdminId admin)
     {
-        mTransportMgr    = params.transportMgr;
-        mSessionManager  = params.sessionMgr;
-        mExchangeMgr     = params.exchangeMgr;
-        mInetLayer       = params.inetLayer;
-        mListenPort      = listenPort;
-        mAdminId         = admin;
-        mStorageDelegate = params.storageDelegate;
-        mCredentials     = params.credentials;
-        mTrustedRootId   = params.trustedRoot;
-        mIDAllocator     = params.idAllocator;
+        mTransportMgr     = params.transportMgr;
+        mSessionManager   = params.sessionMgr;
+        mExchangeMgr      = params.exchangeMgr;
+        mInetLayer        = params.inetLayer;
+        mListenPort       = listenPort;
+        mAdminId          = admin;
+        mStorageDelegate  = params.storageDelegate;
+        mCredentials      = params.credentials;
+        mCredentialsIndex = params.credentialsIndex;
+        mIDAllocator      = params.idAllocator;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -479,7 +479,7 @@ private:
     CASESession mCASESession;
 
     Credentials::OperationalCredentialSet * mCredentials = nullptr;
-    Credentials::CertificateKeyId * mTrustedRootId       = nullptr;
+    uint8_t * mCredentialsIndex                          = nullptr;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 

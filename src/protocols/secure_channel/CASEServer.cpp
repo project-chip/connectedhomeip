@@ -73,7 +73,8 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     }
     ReturnErrorCodeIf(admin == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(admin->GetCredentials(mCredentials, mCertificates, mRootKeyId));
+    uint8_t credentialsIndex;
+    ReturnErrorOnFailure(admin->GetCredentials(mCredentials, mCertificates, mRootKeyId, credentialsIndex));
 
     ReturnErrorOnFailure(mIDAllocator->Allocate(mSessionKeyId));
 

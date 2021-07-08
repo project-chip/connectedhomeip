@@ -534,7 +534,7 @@ CHIP_ERROR Device::WarmupCASESession()
     mPeerMessageCounter  = 0;
 
     ReturnErrorOnFailure(
-        mCASESession.EstablishSession(mDeviceAddress, mCredentials, *mTrustedRootId, mDeviceId, keyID, exchange, this));
+        mCASESession.EstablishSession(mDeviceAddress, mCredentials, *mCredentialsIndex, mDeviceId, keyID, exchange, this));
 
     mState = ConnectionState::Connecting;
 

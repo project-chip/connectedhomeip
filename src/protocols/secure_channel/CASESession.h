@@ -104,6 +104,7 @@ public:
      * @param peerAddress                   Address of peer with which to establish a session.
      * @param operationalCredentialSet      CHIP Certificate Set used to store the chain root of trust an validate peer node
      *                                      certificates
+     * @param opCredSetIndex                Index value used to choose the chain root of trust for establisbing a session
      * @param peerNodeId                    Node id of the peer node
      * @param myKeyId                       Key ID to be assigned to the secure session on the peer node
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
@@ -112,9 +113,9 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress,
-                                Credentials::OperationalCredentialSet * operationalCredentialSet,
-                                const Credentials::CertificateKeyId & trustedRootId, NodeId peerNodeId, uint16_t myKeyId,
-                                Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
+                                Credentials::OperationalCredentialSet * operationalCredentialSet, uint8_t opCredSetIndex,
+                                NodeId peerNodeId, uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
+                                SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -205,7 +206,6 @@ private:
 
     CHIP_ERROR Init(Credentials::OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
                     SessionEstablishmentDelegate * delegate);
-    CHIP_ERROR SetTrustedRootId(const Credentials::CertificateKeyId & trustedRootId);
 
     CHIP_ERROR SendSigmaR1();
     CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle & msg);
@@ -220,7 +220,7 @@ private:
     CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
     CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::CertificateKeyId * trustedRootId, NodeId nodeId,
-                                     MutableByteSpan & destinationId);
+                                     FabricId fabricId, MutableByteSpan & destinationId);
     CHIP_ERROR FindDestinationIdCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
     CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                     MutableByteSpan & salt);
@@ -228,7 +228,7 @@ private:
     CHIP_ERROR ConstructSaltSigmaR3(const ByteSpan & ipk, MutableByteSpan & salt);
     CHIP_ERROR ConstructTBS2Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
     CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
-    CHIP_ERROR ComputeIPK(const uint16_t sessionID, MutableByteSpan & ipk);
+    CHIP_ERROR RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk);
 
     void SendErrorMsg(SigmaErrorType errorCode);
 
@@ -256,8 +256,6 @@ private:
 #else
     Crypto::P256Keypair mEphemeralKey;
 #endif
-    // TODO: Remove mFabricSecret later
-    Crypto::P256ECDHDerivedSecret mFabricSecret;
     Crypto::P256ECDHDerivedSecret mSharedSecret;
     Credentials::OperationalCredentialSet * mOpCredSet;
     Credentials::CertificateKeyId mTrustedRootId;

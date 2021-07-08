@@ -69,6 +69,7 @@ P256Keypair commissionerOpKeys;
 P256Keypair accessoryOpKeys;
 
 CertificateKeyId trustedRootId = CertificateKeyId(sTestCert_Root01_SubjectKeyId);
+uint8_t commissionerCredentialsIndex;
 
 NodeId Node01_01 = 0xDEDEDEDE00010001;
 } // namespace
@@ -132,6 +133,7 @@ static CHIP_ERROR InitCredentialSets()
                                                           BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
 
     ReturnErrorOnFailure(commissionerDevOpCred.Init(&commissionerCertificateSet, 1));
+    commissionerCredentialsIndex = commissionerDevOpCred.GetCertCount() - 1;
 
     ReturnErrorOnFailure(commissionerDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_01_Chip,
                                                             static_cast<uint16_t>(sTestCert_Node01_01_Chip_Len)));
@@ -170,11 +172,11 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * context = ctx.NewExchangeToLocal(&pairing);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, trustedRootId,
-                                            Node01_01, 0, nullptr, nullptr) != CHIP_NO_ERROR);
+                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
+                                            commissionerCredentialsIndex, Node01_01, 0, nullptr, nullptr) != CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, trustedRootId,
-                                            Node01_01, 0, context, &delegate) == CHIP_NO_ERROR);
+                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
+                                            commissionerCredentialsIndex, Node01_01, 0, context, &delegate) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
 
@@ -188,8 +190,9 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * context1  = ctx.NewExchangeToLocal(&pairing1);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, trustedRootId,
-                                             Node01_01, 0, context1, &delegate) == CHIP_ERROR_BAD_REQUEST);
+                   pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
+                                             commissionerCredentialsIndex, Node01_01, 0, context1,
+                                             &delegate) == CHIP_ERROR_BAD_REQUEST);
     gLoopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
@@ -220,7 +223,7 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
                    pairingAccessory.ListenForSessionEstablishment(&accessoryDevOpCred, 0, &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                                        trustedRootId, Node01_01, 0, contextCommissioner,
+                                                        commissionerCredentialsIndex, Node01_01, 0, contextCommissioner,
                                                         &delegateCommissioner) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
@@ -355,7 +358,8 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     ChipCertificateSet certificates;
     OperationalCredentialSet credentials;
     CertificateKeyId rootKeyId;
-    NL_TEST_ASSERT(inSuite, admin->GetCredentials(credentials, certificates, rootKeyId) == CHIP_NO_ERROR);
+    uint8_t credentialsIndex;
+    NL_TEST_ASSERT(inSuite, admin->GetCredentials(credentials, certificates, rootKeyId, credentialsIndex) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
                    gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &gTransportMgr,
@@ -365,8 +369,8 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(pairingCommissioner);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &credentials, rootKeyId,
-                                                         Node01_01, 0, contextCommissioner,
+                   pairingCommissioner->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &credentials,
+                                                         credentialsIndex, Node01_01, 0, contextCommissioner,
                                                          &delegateCommissioner) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
@@ -377,8 +381,8 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     ExchangeContext * contextCommissioner1 = ctx.NewExchangeToLocal(pairingCommissioner1);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner1->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &credentials, rootKeyId,
-                                                          Node01_01, 0, contextCommissioner1,
+                   pairingCommissioner1->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &credentials,
+                                                          credentialsIndex, Node01_01, 0, contextCommissioner1,
                                                           &delegateCommissioner) == CHIP_NO_ERROR);
 
     chip::Platform::Delete(pairingCommissioner);
