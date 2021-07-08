@@ -197,7 +197,6 @@ public:
 private:
     enum SigmaErrorType : uint8_t
     {
-        kNoSharedTrustRoots   = 0x01,
         kInvalidSignature     = 0x04,
         kInvalidResumptionTag = 0x05,
         kUnsupportedVersion   = 0x06,
@@ -223,7 +222,6 @@ private:
     CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::CertificateKeyId * trustedRootId, NodeId nodeId,
                                      MutableByteSpan & destinationId);
     CHIP_ERROR FindDestinationIdCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
-    CHIP_ERROR FindValidTrustedRoot(const Credentials::CertificateKeyId & trustedRootId);
     CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                     MutableByteSpan & salt);
     CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID);
