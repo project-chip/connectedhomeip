@@ -16,10 +16,10 @@
  */
 
 #pragma once
-#include <app/AppBuildConfig.h>
 #include "Builder.h"
 #include "EventPathList.h"
 #include "Parser.h"
+#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
