@@ -54,13 +54,13 @@
     const unsigned char masterKey[] = {};
     const unsigned char PKSc[] = { 0xb7, 0x8d, 0x23 };
     const uint16_t panID = 0x0;
-    CHIPThreadOperationalDataset * dataset = [[CHIPThreadOperationalDataset alloc]
-        initWithNetworkName:@"TestNetwork"
-              extendedPANID:[NSData dataWithBytes:&extendedPANID length:sizeof(extendedPANID)]
-                  masterKey:[NSData dataWithBytes:&masterKey length:sizeof(masterKey)]
-                       PSKc:[NSData dataWithBytes:&PKSc length:sizeof(PKSc)]
-                    channel:25
-                      panID:[NSData dataWithBytes:&panID length:sizeof(panID)]];
+    CHIPThreadOperationalDataset * dataset =
+        [[CHIPThreadOperationalDataset alloc] initWithNetworkName:@"TestNetwork"
+                                                    extendedPANID:[NSData dataWithBytes:&extendedPANID length:sizeof(extendedPANID)]
+                                                        masterKey:[NSData dataWithBytes:&masterKey length:sizeof(masterKey)]
+                                                             PSKc:[NSData dataWithBytes:&PKSc length:sizeof(PKSc)]
+                                                          channel:25
+                                                            panID:[NSData dataWithBytes:&panID length:sizeof(panID)]];
 
     XCTAssertNil(dataset);
 }
