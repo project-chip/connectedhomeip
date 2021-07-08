@@ -799,6 +799,7 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
         .inetLayer       = mInetLayer,
         .storageDelegate = mStorageDelegate,
         .credentials     = &mCredentials,
+        .trustedRoot     = &mRootKeyId,
         .idAllocator     = &mIDAllocator,
     };
 }
