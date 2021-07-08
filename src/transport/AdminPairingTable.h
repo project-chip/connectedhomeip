@@ -124,7 +124,7 @@ public:
     }
 
     CHIP_ERROR GetCredentials(Credentials::OperationalCredentialSet & credentials, Credentials::ChipCertificateSet & certSet,
-                              Credentials::CertificateKeyId & rootKeyId);
+                              Credentials::CertificateKeyId & rootKeyId, uint8_t & credentialsIndex);
 
     const uint8_t * GetTrustedRoot(uint16_t & size)
     {
