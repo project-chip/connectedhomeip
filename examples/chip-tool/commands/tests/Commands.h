@@ -3818,6 +3818,9 @@ public:
         case 100:
             err = TestSendClusterTestClusterCommandWriteAttribute_100();
             break;
+        case 101:
+            err = TestSendClusterTestClusterCommandTest_101();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -3829,7 +3832,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 101;
+    const uint16_t mTestCount = 102;
 
     //
     // Tests methods
@@ -11293,6 +11296,75 @@ private:
         delete runner->mOnSuccessCallback_100;
 
         if (runner->mIsFailureExpected_100 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Send Test Command to unsupported endpoint
+    typedef void (*SuccessCallback_101)(void * context);
+    chip::Callback::Callback<SuccessCallback_101> * mOnSuccessCallback_101    = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_101 = nullptr;
+    bool mIsFailureExpected_101                                               = 1;
+
+    CHIP_ERROR TestSendClusterTestClusterCommandTest_101()
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Send Test Command to unsupported endpoint: Sending command...");
+
+        mOnFailureCallback_101 =
+            new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendClusterTestClusterCommandTest_101_FailureResponse, this);
+        mOnSuccessCallback_101 =
+            new chip::Callback::Callback<SuccessCallback_101>(OnTestSendClusterTestClusterCommandTest_101_SuccessResponse, this);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(mDevice, 200);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.Test(mOnSuccessCallback_101->Cancel(), mOnFailureCallback_101->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_101;
+            delete mOnSuccessCallback_101;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterTestClusterCommandTest_101_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Send Test Command to unsupported endpoint: Failure Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_101;
+        delete runner->mOnSuccessCallback_101;
+
+        if (runner->mIsFailureExpected_101 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterTestClusterCommandTest_101_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Test Cluster - Send Test Command to unsupported endpoint: Success Response");
+
+        TestCluster * runner = reinterpret_cast<TestCluster *>(context);
+
+        delete runner->mOnFailureCallback_101;
+        delete runner->mOnSuccessCallback_101;
+
+        if (runner->mIsFailureExpected_101 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);

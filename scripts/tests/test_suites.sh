@@ -112,7 +112,7 @@ for j in "${iter_array[@]}"; do
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0
-        kill -9 "$temp_background_pid" || true
+        kill -9 "$temp_background_pid"
         echo "  ===== Test complete: $i"
     done
     echo " ===== Iteration $j completed"
