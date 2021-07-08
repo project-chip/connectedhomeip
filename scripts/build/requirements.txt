@@ -1,0 +1,2 @@
+coloredlogs==15.0
+click==8.0.1
