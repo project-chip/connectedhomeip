@@ -406,8 +406,8 @@ void ReliableMessageMgr::ClearRetransTable(RetransTableEntry & rEntry)
         // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
         ExpireTicks();
 
-        rEntry.rc->ReleaseContext();
         rEntry.rc->SetOccupied(false);
+        rEntry.rc->ReleaseContext();
         rEntry.rc = nullptr;
 
         // Clear all other fields
