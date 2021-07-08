@@ -157,7 +157,7 @@ public:
 
     const char * GetR2ISessionInfo() const override { return "Sigma R2I Key"; }
 
-    PairingState & GetPairingState() { return mPairingState; }
+    SecureChannel::PairingState & GetPairingState() { return mPairingState; }
 
     /**
      * @brief Serialize the Pairing Session to a string.
@@ -280,7 +280,7 @@ private:
 protected:
     bool mPairingComplete = false;
 
-    PairingState mPairingState;
+    SecureChannel::PairingState mPairingState;
 };
 
 typedef struct CASESessionSerialized
