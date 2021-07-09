@@ -467,7 +467,7 @@ void InitServer(AppDelegate * delegate)
     err = PersistedStorage::KeyValueStoreMgrImpl().Init("chip.store");
     SuccessOrExit(err);
 #elif CHIP_DEVICE_LAYER_TARGET_LINUX
-    PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_server_kvs");
+    PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 #endif
 
     err = gRendezvousServer.Init(delegate, &gServerStorage, &gSessionIDAllocator);
