@@ -354,7 +354,8 @@ private:
  * @param[in] raw_sig Raw signature of <r,s> concatenated
  * @param[in] raw_sig_length Raw signature length (MUST be 2*`fe_length_bytes` long)
  * @param[out] out_asn1_sig ASN.1 DER signature format output buffer
- * @param[in] out_asn1_sig_length ASN.1 DER signature format output buffer length. Must have space for at least kMax_ECDSA_X9Dot62_Asn1_Overhead.
+ * @param[in] out_asn1_sig_length ASN.1 DER signature format output buffer length. Must have space for at least
+ * kMax_ECDSA_X9Dot62_Asn1_Overhead.
  * @param[out] out_asn1_sig_actual_length Final computed size of signature.
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  */

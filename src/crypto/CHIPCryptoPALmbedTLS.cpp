@@ -464,10 +464,12 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
     result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, keypair);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ecdsa_sign(&ecdsa_ctxt.grp, &r, &s, &ecdsa_ctxt.d, Uint8::to_const_uchar(hash), hash_length, CryptoRNG, nullptr);
+    result =
+        mbedtls_ecdsa_sign(&ecdsa_ctxt.grp, &r, &s, &ecdsa_ctxt.d, Uint8::to_const_uchar(hash), hash_length, CryptoRNG, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit((mbedtls_mpi_size(&r) <= kP256_FE_Length) || (mbedtls_mpi_size(&s) <= kP256_FE_Length), error=CHIP_ERROR_INTERNAL);
+    VerifyOrExit((mbedtls_mpi_size(&r) <= kP256_FE_Length) || (mbedtls_mpi_size(&s) <= kP256_FE_Length),
+                 error = CHIP_ERROR_INTERNAL);
 
     // Concatenate r and s to output. Sizes were checked above.
     result = mbedtls_mpi_write_binary(&r, out_signature.Bytes() + 0u, kP256_FE_Length);

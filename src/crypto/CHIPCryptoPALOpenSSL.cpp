@@ -540,8 +540,8 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
     int nid          = NID_undef;
     EC_KEY * ec_key  = nullptr;
     ECDSA_SIG * sig  = nullptr;
-    const BIGNUM *r  = nullptr;
-    const BIGNUM *s  = nullptr;
+    const BIGNUM * r = nullptr;
+    const BIGNUM * s = nullptr;
 
     static_assert(P256ECDSASignature::Capacity() >= kP256_ECDSA_Signature_Length_Raw, "P256ECDSASignature must be large enough");
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
@@ -557,7 +557,8 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
 
     VerifyOrExit(sig != nullptr, error = CHIP_ERROR_INTERNAL);
     ECDSA_SIG_get0(sig, &r, &s);
-    VerifyOrExit((r != nullptr) || (s != nullptr) || (BN_num_bytes(r) == kP256_FE_Length) || (BN_num_bytes(s) == kP256_FE_Length), error=CHIP_ERROR_INTERNAL);
+    VerifyOrExit((r != nullptr) || (s != nullptr) || (BN_num_bytes(r) == kP256_FE_Length) || (BN_num_bytes(s) == kP256_FE_Length),
+                 error = CHIP_ERROR_INTERNAL);
 
     // Concatenate r and s to output. Sizes were checked above.
     VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
