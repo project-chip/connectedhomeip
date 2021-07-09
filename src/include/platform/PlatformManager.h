@@ -176,8 +176,8 @@ private:
     friend ::CHIP_ERROR(::chip::System::Platform::EventSupport::DispatchEvents)(::chip::System::Layer & aLayer, void * aContext);
     friend ::CHIP_ERROR(::chip::System::Platform::EventSupport::DispatchEvent)(::chip::System::Layer & aLayer, void * aContext,
                                                                                ::chip::System::Event aEvent);
-    friend ::CHIP_ERROR(::chip::System::Platform::EventSupport::StartTimer)(::chip::System::Layer & aLayer,
-                                                                                        void * aContext, uint32_t aMilliseconds);
+    friend ::CHIP_ERROR(::chip::System::Platform::EventSupport::StartTimer)(::chip::System::Layer & aLayer, void * aContext,
+                                                                            uint32_t aMilliseconds);
 
     void PostEvent(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);
