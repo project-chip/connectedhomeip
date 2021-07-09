@@ -80,7 +80,6 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
 {
-    CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
@@ -112,6 +111,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         // Only one 'response expected' message can be outstanding at a time.
         if (IsResponseExpected())
         {
+            // TODO: add a test for this case.
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
@@ -120,7 +120,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         // Arm the response timer if a timeout has been specified.
         if (mResponseTimeout > 0)
         {
-            err = StartResponseTimer();
+            CHIP_ERROR err = StartResponseTimer();
             if (err != CHIP_NO_ERROR)
             {
                 SetResponseExpected(false);
@@ -129,16 +129,17 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         }
     }
 
-    // It is required to set `err`, which is used in the deferred `handleError`
-    err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
-                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
-    if (err != CHIP_NO_ERROR && IsResponseExpected())
     {
-        CancelResponseTimer();
-        SetResponseExpected(false);
-    }
+        CHIP_ERROR err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
+            reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
+        if (err != CHIP_NO_ERROR && IsResponseExpected())
+        {
+            CancelResponseTimer();
+            SetResponseExpected(false);
+        }
 
-    return err;
+        return err;
+    }
 }
 
 void ExchangeContext::DoClose(bool clearRetransTable)
@@ -387,8 +388,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         // The incoming message wants an ack, but we have no delegate, so
         // there's not going to be a response to piggyback on.  Just flush the
         // ack out right now.
-        err = FlushAcks();
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(FlushAcks());
     }
 
     // The SecureChannel::StandaloneAck message type is only used for MRP; do not pass such messages to the application layer.
