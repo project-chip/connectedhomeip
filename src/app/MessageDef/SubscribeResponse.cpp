@@ -117,7 +117,8 @@ SubscribeResponse::Builder & SubscribeResponse::Builder::SubscriptionId(const ui
     return *this;
 }
 
-SubscribeResponse::Builder & SubscribeResponse::Builder::FinalSyncIntervalMilliseconds(const uint16_t aFinalSyncIntervalMilliseconds)
+SubscribeResponse::Builder &
+SubscribeResponse::Builder::FinalSyncIntervalMilliseconds(const uint16_t aFinalSyncIntervalMilliseconds)
 {
     if (mError == CHIP_NO_ERROR)
     {

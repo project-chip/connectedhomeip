@@ -39,7 +39,7 @@ enum
     kCsTag_AttributeDataVersionList  = 2,
     kCsTag_EventNumber               = 3,
     kCsTag_MinIntervalMilliseconds   = 4,
-    kCsTag_MaxIntervalMilliseconds               = 5,
+    kCsTag_MaxIntervalMilliseconds   = 5,
     kCsTag_KeepExistingSubscriptions = 6,
     kCsTag_IsProxy                   = 7,
 };

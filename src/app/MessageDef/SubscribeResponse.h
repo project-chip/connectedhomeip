@@ -31,7 +31,7 @@ namespace app {
 namespace SubscribeResponse {
 enum
 {
-    kCsTag_SubscriptionId    = 0,
+    kCsTag_SubscriptionId                = 0,
     kCsTag_FinalSyncIntervalMilliseconds = 1,
 };
 
