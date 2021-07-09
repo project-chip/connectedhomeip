@@ -53,7 +53,7 @@ extern size_t const CHIPSizeThreadPSKc;
  */
 @property (nonatomic, readwrite) uint16_t channel;
 /**
- *  The Thread PAN ID
+ *  A uint16_t stored as 2-bytes in host order representing the Thread PAN ID
  */
 @property (nonatomic, nullable, readwrite) NSData * panID;
 
@@ -62,7 +62,9 @@ extern size_t const CHIPSizeThreadPSKc;
 
 /**
  *  Create a Thread Operational Dataset object with the individual network fields.
- *  This initializer will return nil if any of the NSData fields are smaller than expected.
+ *  This initializer will return nil if any of the NSData fields don't match the expected size.
+ *
+ *  Note: The panID is expected to be a uint16_t stored as 2-bytes in host order
  */
 - (nullable instancetype)initWithNetworkName:(NSString *)networkName
                                extendedPANID:(NSData *)extendedPANID
