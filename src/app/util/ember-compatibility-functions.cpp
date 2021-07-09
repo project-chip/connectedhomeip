@@ -26,10 +26,12 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/ember-compatibility-functions.h>
+#include <app/util/error-mapping.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include <app/common/gen/att-storage.h>
@@ -118,12 +120,6 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
                       "chip::NodeId is expected to be uint64_t, change this when necessary");
         return ZCL_INT64U_ATTRIBUTE_TYPE;
 
-    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Character string
-        return ZCL_OCTET_STRING_ATTRIBUTE_TYPE;
-
-    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
-        return ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE;
-
     default:
         return type;
     }
@@ -168,7 +164,8 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
         returnStatusParam,
         status == EMBER_ZCL_STATUS_SUCCESS ? chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess
                                            : chip::Protocols::SecureChannel::GeneralStatusCode::kFailure,
-        chip::Protocols::InteractionModel::Id, static_cast<Protocols::InteractionModel::ProtocolCode>(status));
+        chip::Protocols::InteractionModel::Id,
+        static_cast<Protocols::InteractionModel::ProtocolCode>(ToInteractionModelProtocolCode(status)));
     return CHIP_NO_ERROR == err;
 }
 
@@ -202,8 +199,6 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     status = emberAfReadAttribute(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId, CLUSTER_MASK_SERVER,
                                   data, sizeof(data), &attributeType);
 
-    // TODO: Currently, all errors are considered as attribute not exists, should be fixed by mapping ember error code to IM error
-    // codes.
     if (apDataExists != nullptr)
     {
         *apDataExists = (EMBER_ZCL_STATUS_SUCCESS == status);
@@ -212,9 +207,8 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        return apWriter->Put(
-            chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-            Protocols::InteractionModel::ToUint16(Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute));
+        return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
+                             chip::to_underlying(ToInteractionModelProtocolCode(status)));
     }
 
     // TODO: ZCL_STRUCT_ATTRIBUTE_TYPE is not included in this switch case currently, should add support for structures.
@@ -278,6 +272,28 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
         ReturnErrorOnFailure(apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), int64_data));
         break;
     }
+    case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
+    {
+        char * actualData  = reinterpret_cast<char *>(data + 1);
+        uint8_t dataLength = data[0];
+        if (dataLength == 0xFF /* invalid data, put empty value instead */)
+        {
+            dataLength = 0;
+        }
+        ReturnErrorOnFailure(apWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), actualData, dataLength));
+        break;
+    }
+    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE: {
+        char * actualData = reinterpret_cast<char *>(data + 2); // The pascal string contains 2 bytes length
+        uint16_t dataLength;
+        memcpy(&dataLength, data, sizeof(dataLength));
+        if (dataLength == 0xFFFF /* invalid data, put empty value instead */)
+        {
+            dataLength = 0;
+        }
+        ReturnErrorOnFailure(apWriter->PutString(TLV::ContextTag(AttributeDataElement::kCsTag_Data), actualData, dataLength));
+        break;
+    }
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
     {
         uint8_t * actualData = data + 1;
@@ -316,7 +332,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     default:
         ChipLogError(DataManagement, "Attribute type 0x%x not handled", static_cast<int>(attributeType));
         return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                             Protocols::InteractionModel::ToUint16(Protocols::InteractionModel::ProtocolCode::UnsupportedRead));
+                             chip::to_underlying(Protocols::InteractionModel::ProtocolCode::UnsupportedRead));
     }
 
     // TODO: Add DataVersion support

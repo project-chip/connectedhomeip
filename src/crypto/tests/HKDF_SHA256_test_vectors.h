@@ -19,8 +19,7 @@
  * @file - This file contains HKDF SHA256 test vectors. https://tools.ietf.org/html/rfc5869
  */
 
-#ifndef _HKDF_SHA256_TEST_VECTOR
-#define _HKDF_SHA256_TEST_VECTOR
+#pragma once
 
 #include <stddef.h>
 
@@ -121,4 +120,3 @@ hkdf_sha256_vector v3 = { .initial_key_material        = IKM3,
                           .output_key_material_length  = sizeof(expected_OKM3) };
 
 hkdf_sha256_vector hkdf_sha256_test_vectors[] = { v1, v2, v3 };
-#endif

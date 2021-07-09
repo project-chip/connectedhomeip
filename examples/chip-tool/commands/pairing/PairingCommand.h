@@ -32,6 +32,8 @@ enum class PairingMode
 {
     None,
     Bypass,
+    QRCode,
+    ManualCode,
     Ble,
     SoftAP,
     Ethernet,
@@ -75,6 +77,11 @@ public:
         case PairingMode::Bypass:
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
+            break;
+        case PairingMode::QRCode:
+        case PairingMode::ManualCode:
+            AddArgument("fabric-id", 0, UINT64_MAX, &mFabricId);
+            AddArgument("payload", &mOnboardingPayload);
             break;
         case PairingMode::Ble:
             AddArgument("fabric-id", 0, UINT64_MAX, &mFabricId);
@@ -120,6 +127,9 @@ public:
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
+    CHIP_ERROR PairWithQRCode(NodeId remoteId);
+    CHIP_ERROR PairWithManualCode(NodeId remoteId);
+    CHIP_ERROR PairWithCode(NodeId remoteId, chip::SetupPayload payload);
     CHIP_ERROR PairWithoutSecurity(NodeId remoteId, PeerAddress address);
     CHIP_ERROR Unpair(NodeId remoteId);
 
@@ -145,6 +155,7 @@ private:
     uint8_t mExtendedPanId[chip::Thread::kSizeExtendedPanId];
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
+    char * mOnboardingPayload;
 
     chip::Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback> * mOnAddThreadNetworkCallback = nullptr;
     chip::Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback> * mOnAddWiFiNetworkCallback     = nullptr;

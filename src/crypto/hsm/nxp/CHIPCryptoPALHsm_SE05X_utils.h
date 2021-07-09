@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef _CHIP_CRYPTO_PAL_HSM_SE05X_UTILS_
-#define _CHIP_CRYPTO_PAL_HSM_SE05X_UTILS_
+#pragma once
 
 #include <string.h>
 
@@ -45,6 +44,7 @@ enum keyid_values
     kKeyId_NotInitialized           = 0,
     kKeyId_pbkdf2_sha256_hmac_keyid = 0xBCBCBCBC,
     kKeyId_hkdf_sha256_hmac_keyid,
+    kKeyId_hmac_sha256_keyid,
     kKeyId_sha256_ecc_pub_keyid,
 };
 
@@ -97,5 +97,3 @@ void setObjID(SE05x_CryptoObjectID_t objId, uint8_t status);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /*_CHIP_CRYPTO_PAL_HSM_SE05X_UTILS_*/

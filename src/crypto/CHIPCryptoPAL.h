@@ -20,8 +20,7 @@
  *      Header that exposes the platform agnostic CHIP crypto primitives
  */
 
-#ifndef _CHIP_CRYPTO_PAL_H_
-#define _CHIP_CRYPTO_PAL_H_
+#pragma once
 
 #if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
@@ -39,13 +38,13 @@ namespace Crypto {
 
 constexpr size_t kMax_x509_Certificate_Length = 600;
 
-// TODO: Consider renaming these values to be closer to definisions in the spec:
-// CHIP_CRYPTO_GROUP_SIZE_BYTES
-// CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES
 constexpr size_t kP256_FE_Length                  = 32;
 constexpr size_t kP256_ECDSA_Signature_Length_Raw = (2 * kP256_FE_Length);
 constexpr size_t kP256_Point_Length               = (2 * kP256_FE_Length + 1);
 constexpr size_t kSHA256_Hash_Length              = 32;
+
+constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
+constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
 
 constexpr size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
 constexpr size_t kMax_ECDSA_Signature_Length = 72;
@@ -54,11 +53,13 @@ constexpr size_t kMAX_Point_Length           = kP256_Point_Length;
 constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 constexpr size_t kMAX_CSR_Length             = 512;
 
+constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
+
 constexpr size_t kMin_Salt_Length = 8;
 constexpr size_t kMax_Salt_Length = 16;
 
-constexpr size_t kP256_PrivateKey_Length = 32;
-constexpr size_t kP256_PublicKey_Length  = 65;
+constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
+constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
@@ -292,7 +293,13 @@ public:
      **/
     CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) override;
 
-    /** @brief A function to derive a shared secret using ECDH
+    /**
+     * @brief A function to derive a shared secret using ECDH
+     *
+     * This implements the CHIP_Crypto_ECDH(PrivateKey myPrivateKey, PublicKey theirPublicKey) cryptographic primitive
+     * from the specification, using this class's private key from `mKeypair` as `myPrivateKey` and the remote
+     * public key from `remote_public_key` as `theirPublicKey`.
+     *
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
      * ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
      * [https://www.secg.org/sec1-v2.pdf]
@@ -315,6 +322,10 @@ private:
 
 /**
  * @brief A function that implements AES-CCM encryption
+ *
+ * This implements the CHIP_Crypto_AEAD_GenerateEncrypt() cryptographic primitive
+ * from the specification.
+ *
  * @param plaintext Plaintext to encrypt
  * @param plaintext_length Length of plain_text
  * @param aad Additional authentication data
@@ -334,6 +345,10 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
 
 /**
  * @brief A function that implements AES-CCM decryption
+ *
+ * This implements the CHIP_Crypto_AEAD_DecryptVerify() cryptographic primitive
+ * from the specification.
+ *
  * @param ciphertext Ciphertext to decrypt
  * @param ciphertext_length Length of ciphertext
  * @param aad Additional authentical data.
@@ -363,6 +378,10 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr, size_t csr_lengt
 
 /**
  * @brief A function that implements SHA-256 hash
+ *
+ * This implements the CHIP_Crypto_Hash() cryptographic primitive
+ * in the the specification.
+ *
  * @param data The data to hash
  * @param data_length Length of the data
  * @param out_buffer Pointer to buffer to write output into
@@ -415,6 +434,16 @@ public:
 
     /**
      * @brief A function that implements SHA-256 based HKDF
+     *
+     * This implements the CHIP_Crypto_KDF() cryptographic primitive
+     * in the the specification.
+     *
+     *  Error values are:
+     *   - CHIP_ERROR_INVALID_ARGUMENT: for any bad arguments or nullptr input on
+     *     any pointer.
+     *   - CHIP_ERROR_INTERNAL: for any unexpected error arising in the underlying
+     *     cryptographic layers.
+     *
      * @param secret The secret to use as the key to the HKDF
      * @param secret_length Length of the secret
      * @param salt Optional salt to use as input to the HKDF
@@ -422,12 +451,46 @@ public:
      * @param info Optional info to use as input to the HKDF
      * @param info_length Length of the info
      * @param out_buffer Pointer to buffer to write output into.
-     * @param out_length Resulting length of out_buffer
+     * @param out_length Size of the underlying out_buffer. That length of output key material will be generated in out_buffer.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
 
     virtual CHIP_ERROR HKDF_SHA256(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length,
                                    const uint8_t * info, size_t info_length, uint8_t * out_buffer, size_t out_length);
+};
+
+class HMAC_sha
+{
+public:
+    HMAC_sha() {}
+    virtual ~HMAC_sha() {}
+
+    /**
+     * @brief A function that implements SHA-256 based HMAC per FIPS1981.
+     *
+     * This implements the CHIP_Crypto_HMAC() cryptographic primitive
+     * in the the specification.
+     *
+     * The `out_length` must be at least kSHA256_Hash_Length, and only
+     * kSHA256_Hash_Length bytes are written to out_buffer.
+     *
+     * Error values are:
+     *   - CHIP_ERROR_INVALID_ARGUMENT: for any bad arguments or nullptr input on
+     *     any pointer.
+     *   - CHIP_ERROR_INTERNAL: for any unexpected error arising in the underlying
+     *     cryptographic layers.
+     *
+     * @param key The key to use for the HMAC operation
+     * @param key_length Length of the key
+     * @param message Message over which to compute the HMAC
+     * @param message_length Length of the message over which to compute the HMAC
+     * @param out_buffer Pointer to buffer into which to write the output.
+     * @param out_length Underlying size of the `out_buffer`.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+
+    virtual CHIP_ERROR HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                   uint8_t * out_buffer, size_t out_length);
 };
 
 /**
@@ -920,5 +983,3 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
 
 } // namespace Crypto
 } // namespace chip
-
-#endif

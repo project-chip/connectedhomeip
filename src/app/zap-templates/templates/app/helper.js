@@ -16,64 +16,14 @@
  */
 
 // Import helpers from zap core
-const zapPath       = '../../../../../third_party/zap/repo/src-electron/';
-const templateUtil  = require(zapPath + 'generator/template-util.js')
-const queryEndpoint = require(zapPath + 'db/query-endpoint.js')
-const zclHelper     = require(zapPath + 'generator/helper-zcl.js')
-const zclQuery      = require(zapPath + 'db/query-zcl.js')
-const cHelper       = require(zapPath + 'generator/helper-c.js')
+const zapPath      = '../../../../../third_party/zap/repo/src-electron/';
+const templateUtil = require(zapPath + 'generator/template-util.js')
+const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const zclQuery     = require(zapPath + 'db/query-zcl.js')
+const cHelper      = require(zapPath + 'generator/helper-c.js')
 
 const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
-
-/**
- * Check if the cluster (name) has any enabled manufacturer commands. This works only inside
- * cluster block helpers.
- *
- * @param {*} name : Cluster name
- * @param {*} side : Cluster side
- * @param {*} options
- * @returns True if cluster has enabled commands otherwise false
- */
-function user_cluster_has_enabled_manufacturer_command(name, side, options)
-{
-  return queryEndpoint.selectEndPointTypeIds(this.global.db, this.global.sessionId)
-      .then((endpointTypes) => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(this.global.db, endpointTypes))
-      .then((endpointsAndClusters) => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(
-                this.global.db, endpointsAndClusters))
-      .then((endpointCommands) => {
-        return !!endpointCommands.find(cmd => cmd.mfgCode && zclHelper.isStrEqual(name, cmd.clusterName)
-                && zclHelper.isCommandAvailable(side, cmd.incoming, cmd.outgoing, cmd.commandSource, cmd.name));
-      })
-}
-
-function asValueIfNotPresent(type, isArray)
-{
-  if (StringHelper.isString(type) || isArray) {
-    return 'NULL';
-  }
-
-  function fn(pkgId)
-  {
-    const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      switch (zclType) {
-      case 'uint8_t':
-        return 'UINT8_MAX';
-      case 'uint16_t':
-        return 'UINT16_MAX';
-      case 'uint32_t':
-        return 'UINT32_MAX';
-      default:
-        error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
-        throw error;
-      }
-    })
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
-  return templateUtil.templatePromise(this.global, promise)
-}
 
 // TODO Expose the readTypeLength as an additional member field of {{asUnderlyingZclType}} instead
 //      of having to call this method separately.
@@ -324,16 +274,6 @@ function asPrintFormat(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function isFirstElement(index)
-{
-  return index == 0;
-}
-
-function isStrEndsWith(str, substr)
-{
-  return str.endsWith(substr);
-}
-
 function asTypeLiteralSuffix(type)
 {
   switch (type) {
@@ -355,14 +295,9 @@ function asTypeLiteralSuffix(type)
 //
 // Module exports
 //
-exports.asPrintFormat                                 = asPrintFormat;
-exports.asReadType                                    = asReadType;
-exports.asReadTypeLength                              = asReadTypeLength;
-exports.asValueIfNotPresent                           = asValueIfNotPresent;
-exports.isFirstElement                                = isFirstElement;
-exports.user_cluster_has_enabled_manufacturer_command = user_cluster_has_enabled_manufacturer_command;
-exports.chip_endpoint_generated_functions             = chip_endpoint_generated_functions
-exports.chip_endpoint_cluster_list                    = chip_endpoint_cluster_list
-exports.isSigned                                      = ChipTypesHelper.isSigned;
-exports.isStrEndsWith                                 = isStrEndsWith;
-exports.asTypeLiteralSuffix                           = asTypeLiteralSuffix;
+exports.asPrintFormat                     = asPrintFormat;
+exports.asReadType                        = asReadType;
+exports.asReadTypeLength                  = asReadTypeLength;
+exports.chip_endpoint_generated_functions = chip_endpoint_generated_functions
+exports.chip_endpoint_cluster_list        = chip_endpoint_cluster_list
+exports.asTypeLiteralSuffix               = asTypeLiteralSuffix;

@@ -62,9 +62,6 @@ public:
     PeerAddress & GetPeerAddress() { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
-    void SetTransport(Transport::Base * transport) { mTransport = transport; }
-    Transport::Base * GetTransport() { return mTransport; }
-
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
 
@@ -120,7 +117,6 @@ private:
     uint16_t mPeerKeyID          = UINT16_MAX;
     uint16_t mLocalKeyID         = UINT16_MAX;
     uint64_t mLastActivityTimeMs = 0;
-    Transport::Base * mTransport = nullptr;
     SecureSession mSecureSession;
     SessionMessageCounter mSessionMessageCounter;
     Transport::AdminId mAdmin = kUndefinedAdminId;

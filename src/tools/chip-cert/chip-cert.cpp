@@ -119,6 +119,10 @@ extern "C" int main(int argc, char * argv[])
     {
         res = Cmd_PrintCert(argc - 1, argv + 1);
     }
+    else if (strcasecmp(argv[1], "gen-att-cert") == 0 || strcasecmp(argv[1], "genattcert") == 0)
+    {
+        res = Cmd_GenAttCert(argc - 1, argv + 1);
+    }
     else
     {
         fprintf(stderr, "Unrecognized command: %s\n", argv[1]);

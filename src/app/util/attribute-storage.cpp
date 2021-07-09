@@ -44,8 +44,7 @@
 #include <app/util/attribute-storage.h>
 
 #include <app/common/gen/attribute-type.h>
-
-#include "gen/callback.h"
+#include <app/common/gen/callback.h>
 
 using namespace chip;
 
@@ -884,7 +883,7 @@ static uint16_t findClusterEndpointIndex(EndpointId endpoint, ClusterId clusterI
 
     if (emberAfFindClusterWithMfgCode(endpoint, clusterId, mask, manufacturerCode) == NULL)
     {
-        return 0xFF;
+        return 0xFFFF;
     }
 
     for (i = 0; i < emberAfEndpointCount(); i++)
@@ -914,7 +913,7 @@ static uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEn
             return epi;
         }
     }
-    return 0xFF;
+    return 0xFFFF;
 }
 
 bool emberAfEndpointIsEnabled(EndpointId endpoint)

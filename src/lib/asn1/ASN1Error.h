@@ -194,12 +194,6 @@ namespace ASN1 {
  *  @}
  */
 
-// !!!!! IMPORTANT !!!!!
-// These definitions are present temporarily in order to reduce breakage for PRs in flight.
-// TODO: remove compatibility definitions
-#define ASN1_ERROR                              CHIP_ERROR
-#define ASN1_NO_ERROR                           CHIP_NO_ERROR
-
 // clang-format on
 
 bool FormatASN1Error(char * buf, uint16_t bufSize, int32_t err);

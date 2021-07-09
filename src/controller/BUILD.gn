@@ -18,9 +18,6 @@ static_library("controller") {
   output_name = "libChipController"
 
   sources = [
-    "${chip_root}/src/app/server/Mdns.cpp",
-    "${chip_root}/src/app/server/Mdns.h",
-    "${chip_root}/src/app/server/Server.h",
     "AbstractMdnsDiscoveryController.cpp",
     "CHIPCluster.cpp",
     "CHIPCluster.h",

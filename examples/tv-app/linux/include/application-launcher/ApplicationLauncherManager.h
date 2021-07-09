@@ -24,16 +24,9 @@
 #include <string>
 #include <vector>
 
-struct ApplicationLaunchResponse
-{
-    EmberAfApplicationLauncherStatus status;
-    std::string data;
-};
-
 class ApplicationLauncherManager
 {
 public:
     CHIP_ERROR Init();
-    ApplicationLaunchResponse proxyApplicationLaunchRequest(EmberAfApplicationLauncherApp application, std::string data);
     std::vector<uint16_t> proxyGetApplicationList();
 };

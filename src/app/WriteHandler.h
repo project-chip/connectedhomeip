@@ -106,7 +106,7 @@ private:
     InteractionModelDelegate * mpDelegate      = nullptr;
     WriteResponse::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;
-    State mState;
+    State mState = State::Uninitialized;
 };
 } // namespace app
 } // namespace chip
