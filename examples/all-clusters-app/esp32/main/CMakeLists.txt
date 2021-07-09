@@ -28,6 +28,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/gen"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/common/gen/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/test-cluster-server"
