@@ -70,7 +70,7 @@
  * The size (in bytes) of the chip task stack.
  */
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE 5120
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE 4096
 #endif
 
 /**
