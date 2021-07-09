@@ -51,10 +51,6 @@ void InitServer(AppDelegate * delegate = nullptr);
 CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commissioner, uint16_t port);
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-CHIP_ERROR ResetUDCStates();
-#endif
-
 CHIP_ERROR AddTestPairing();
 
 chip::Transport::AdminPairingTable & GetGlobalAdminPairingTable();
@@ -72,6 +68,12 @@ enum class PairingWindowAdvertisement
     kBle,
     kMdns,
 };
+
+namespace Shell {
+
+void RegisterCommissioneeCommands();
+
+} // namespace Shell
 } // namespace chip
 
 /**

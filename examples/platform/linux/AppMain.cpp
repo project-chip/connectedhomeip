@@ -33,6 +33,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <controller/ShellCommands.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <platform/KeyValueStoreManager.h>
 #endif
@@ -180,46 +181,13 @@ CHIP_ERROR InitCommissioner()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiscoverCommissionableNodes()
-{
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint16_t) 0);
-    mCommissioner.DiscoverCommissionableNodes(filter);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiscoverCommissionableNodes(char * instance)
-{
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kInstanceName, instance);
-    mCommissioner.DiscoverCommissionableNodes(filter);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DisplayCommissionableNodes()
-{
-    for (int i = 0; i < 10; i++)
-    {
-        const chip::Mdns::DiscoveredNodeData * next = mCommissioner.GetDiscoveredDevice(i);
-        if (next == nullptr)
-        {
-            ChipLogProgress(AppServer, "  Entry %d null", i);
-        }
-        else
-        {
-            ChipLogProgress(AppServer, "  Entry %d instanceName=%s host=%s longDiscriminator=%d vendorId=%d productId=%d", i,
-                            next->instanceName, next->hostName, next->longDiscriminator, next->vendorId, next->productId);
-        }
-    }
-
-    return CHIP_NO_ERROR;
-}
 #endif
 
 void ChipLinuxAppMainLoop()
 {
 #if defined(ENABLE_CHIP_SHELL)
     std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
+    chip::Shell::RegisterCommissioneeCommands();
 #endif
 
     // Init ZCL Data Model and CHIP App Server
@@ -227,6 +195,7 @@ void ChipLinuxAppMainLoop()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     InitCommissioner();
+    chip::Shell::RegisterDiscoverCommands(&mCommissioner);
 #endif
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
