@@ -32,7 +32,7 @@ namespace SubscribeResponse {
 enum
 {
     kCsTag_SubscriptionId    = 0,
-    kCsTag_FinalSyncInterval = 1,
+    kCsTag_FinalSyncIntervalMilliseconds = 1,
 };
 
 class Parser : public chip::app::Parser
@@ -71,7 +71,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetFinalSyncIntervalSeconds(uint16_t * const apFinalSyncIntervalSeconds) const;
+    CHIP_ERROR GetFinalSyncIntervalMilliseconds(uint16_t * const apFinalSyncIntervalMilliseconds) const;
 };
 
 class Builder : public chip::app::Builder
@@ -87,7 +87,7 @@ public:
     /**
      *  @brief Final Sync Interval for the subscription back to the clients.
      */
-    SubscribeResponse::Builder & FinalSyncIntervalSeconds(const uint16_t aFinalSyncIntervalSeconds);
+    SubscribeResponse::Builder & FinalSyncIntervalMilliseconds(const uint16_t aFinalSyncIntervalMilliseconds);
 
     /**
      *  @brief Mark the end of this SubscribeResponse

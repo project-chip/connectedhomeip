@@ -38,8 +38,8 @@ enum
     kCsTag_EventPathList             = 1,
     kCsTag_AttributeDataVersionList  = 2,
     kCsTag_EventNumber               = 3,
-    kCsTag_MinInterval               = 4,
-    kCsTag_MaxInterval               = 5,
+    kCsTag_MinIntervalMilliseconds   = 4,
+    kCsTag_MaxIntervalMilliseconds               = 5,
     kCsTag_KeepExistingSubscriptions = 6,
     kCsTag_IsProxy                   = 7,
 };
@@ -104,14 +104,14 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetMinIntervalSeconds(uint16_t * const apMinIntervalSeconds) const;
+    CHIP_ERROR GetMinIntervalMilliseconds(uint16_t * const apMinIntervalMilliseconds) const;
 
     /**
      *  @brief Get Max Interval. Next() must be called before accessing them.
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetMaxIntervalSeconds(uint16_t * const apMaxIntervalSeconds) const;
+    CHIP_ERROR GetMaxIntervalMilliseconds(uint16_t * const apMaxIntervalMilliseconds) const;
 
     /**
      *  @brief Check if subscription is kept. Next() must be called before accessing them.
@@ -151,9 +151,9 @@ public:
      */
     SubscribeRequest::Builder & EventNumber(const uint64_t aEventNumber);
 
-    SubscribeRequest::Builder & MinIntervalSeconds(const uint16_t aMinIntervalSeconds);
+    SubscribeRequest::Builder & MinIntervalMilliseconds(const uint16_t aMinIntervalMilliseconds);
 
-    SubscribeRequest::Builder & MaxIntervalSeconds(const uint16_t aMinIntervalSeconds);
+    SubscribeRequest::Builder & MaxIntervalMilliseconds(const uint16_t aMinIntervalMilliseconds);
 
     /**
      *  @brief This is set to 'true' by the subscriber to indicate preservation of previous subscriptions. If omitted, it implies

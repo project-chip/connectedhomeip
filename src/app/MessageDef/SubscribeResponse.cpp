@@ -59,9 +59,9 @@ CHIP_ERROR SubscribeResponse::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_FinalSyncInterval:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_FinalSyncInterval)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_FinalSyncInterval);
+        case kCsTag_FinalSyncIntervalMilliseconds:
+            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_FinalSyncIntervalMilliseconds)), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_FinalSyncIntervalMilliseconds);
             VerifyOrReturnLogError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -80,7 +80,7 @@ CHIP_ERROR SubscribeResponse::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const uint16_t RequiredFields = (1 << kCsTag_SubscriptionId) | (1 << kCsTag_FinalSyncInterval);
+        const uint16_t RequiredFields = (1 << kCsTag_SubscriptionId) | (1 << kCsTag_FinalSyncIntervalMilliseconds);
 
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {
@@ -97,9 +97,9 @@ CHIP_ERROR SubscribeResponse::Parser::GetSubscriptionId(uint64_t * const apSubsc
     return GetUnsignedInteger(kCsTag_SubscriptionId, apSubscribeId);
 }
 
-CHIP_ERROR SubscribeResponse::Parser::GetFinalSyncIntervalSeconds(uint16_t * const apFinalSyncIntervalSeconds) const
+CHIP_ERROR SubscribeResponse::Parser::GetFinalSyncIntervalMilliseconds(uint16_t * const apFinalSyncIntervalMilliseconds) const
 {
-    return GetUnsignedInteger(kCsTag_FinalSyncInterval, apFinalSyncIntervalSeconds);
+    return GetUnsignedInteger(kCsTag_FinalSyncIntervalMilliseconds, apFinalSyncIntervalMilliseconds);
 }
 
 CHIP_ERROR SubscribeResponse::Builder::Init(chip::TLV::TLVWriter * const apWriter)
@@ -117,11 +117,11 @@ SubscribeResponse::Builder & SubscribeResponse::Builder::SubscriptionId(const ui
     return *this;
 }
 
-SubscribeResponse::Builder & SubscribeResponse::Builder::FinalSyncIntervalSeconds(const uint16_t aFinalSyncIntervalSeconds)
+SubscribeResponse::Builder & SubscribeResponse::Builder::FinalSyncIntervalMilliseconds(const uint16_t aFinalSyncIntervalMilliseconds)
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_FinalSyncInterval), aFinalSyncIntervalSeconds);
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_FinalSyncIntervalMilliseconds), aFinalSyncIntervalMilliseconds);
         ChipLogFunctError(mError);
     }
     return *this;
