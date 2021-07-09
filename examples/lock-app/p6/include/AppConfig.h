@@ -58,7 +58,7 @@ extern "C" {
 
 void appError(int err);
 void P6Log(const char * aFormat, ...);
-#define P6_LOG(...)         P6Log(__VA_ARGS__)
+#define P6_LOG(...) P6Log(__VA_ARGS__)
 
 #ifdef __cplusplus
 }

@@ -40,13 +40,12 @@ enum
     kP6SystemEvent = kRange_PublicPlatformSpecific,
 };
 
-
 /**
  * Enumerates internal platform-specific event types.
  */
 enum InternalPlatformSpecificEventTypes
 {
-    //TODO: maybe need remove this and handle BLEEnabledEvt direct
+    // TODO: maybe need remove this and handle BLEEnabledEvt direct
     //      from BLEManagerImpl::BLEManagerCallback.
     kP6BLEEnabledEvt = kRange_InternalPlatformSpecific,
     kP6BLEDisabledEvt

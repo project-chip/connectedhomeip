@@ -23,7 +23,7 @@
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 
-#define GPIO_INTERRUPT_PRIORITY             (5)
+#define GPIO_INTERRUPT_PRIORITY (5)
 
 class ButtonHandler
 {
@@ -32,7 +32,7 @@ public:
 
 private:
     static void GpioInit(void);
-    static void lockbuttonIsr(void *handler_arg, cyhal_gpio_event_t event);
-    static void functionbuttonIsr(void *handler_arg, cyhal_gpio_event_t event);
+    static void lockbuttonIsr(void * handler_arg, cyhal_gpio_event_t event);
+    static void functionbuttonIsr(void * handler_arg, cyhal_gpio_event_t event);
     static void TimerCallback(TimerHandle_t xTimer);
 };

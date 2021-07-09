@@ -22,8 +22,8 @@
  */
 
 #include <core/CHIPKeyIds.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/P6/P6Config.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {

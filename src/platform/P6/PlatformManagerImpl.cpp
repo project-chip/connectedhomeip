@@ -38,7 +38,6 @@ extern CHIP_ERROR InitLwIPCoreLock(void);
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;

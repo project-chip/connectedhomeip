@@ -29,8 +29,8 @@
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 
-#include <support/BitFlags.h>
 #include <cy_wcm.h>
+#include <support/BitFlags.h>
 
 namespace Inet {
 class IPAddress;
@@ -58,6 +58,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
+
 public:
     CHIP_ERROR ping_thread(void);
 
@@ -125,7 +126,7 @@ private:
     CHIP_ERROR ConfigureWiFiAP(void);
     void ChangeWiFiAPState(WiFiAPState newState);
     void UpdateInternetConnectivityState(void);
-    static void wlan_event_cb(cy_wcm_event_t event, cy_wcm_event_data_t *event_data);
+    static void wlan_event_cb(cy_wcm_event_t event, cy_wcm_event_data_t * event_data);
     CHIP_ERROR WiFi_init(void);
     CHIP_ERROR OnIPAddressAvailable(void);
 };

@@ -74,7 +74,6 @@ void appError(int err)
 extern "C" void vApplicationIdleHook(void)
 {
     // FreeRTOS Idle callback
-
 }
 
 // ================================================================================
@@ -91,7 +90,7 @@ int main(void)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
-    //chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
+    // chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
     ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)

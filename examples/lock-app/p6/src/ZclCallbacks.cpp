@@ -24,11 +24,11 @@
 #include "BoltLockManager.h"
 
 #include <app/chip-zcl-zpro-codec.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
 
 using namespace ::chip;
 
