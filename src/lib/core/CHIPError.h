@@ -29,6 +29,7 @@
 #pragma once
 
 #include <core/CHIPConfig.h>
+#include <support/TypeTraits.h>
 
 #include <inttypes.h>
 #include <stdint.h>
@@ -89,10 +90,7 @@ public:
     static constexpr bool CanEncapsulate(BaseType value) { return FitsInField(kValueLength, value); }
 
     /// Construct a `CHIP_ERROR` encapsulating @a value inside the @a range.
-    static BaseType Encapsulate(Range range, BaseType value)
-    {
-        return MakeInteger(range, (value & MakeMask(kValueStart, kValueLength)));
-    }
+    static BaseType Encapsulate(Range range, BaseType value) { return MakeInteger(range, (value & MakeMask(0, kValueLength))); }
 
     /// Test whether @a error is an SDK error belonging to @a part.
     static constexpr bool IsPart(SdkPart part, BaseType error)
@@ -133,13 +131,11 @@ private:
 
     static constexpr BaseType MakeInteger(Range range, BaseType value)
     {
-        return MakeField(kRangeStart, static_cast<std::underlying_type<Range>::type>(range)) | MakeField(kValueStart, value);
+        return MakeField(kRangeStart, to_underlying(range)) | MakeField(kValueStart, value);
     }
     static constexpr BaseType MakeInteger(SdkPart part, BaseType code)
     {
-        return MakeInteger(Range::kSDK,
-                           MakeField(kSdkPartStart, static_cast<std::underlying_type<SdkPart>::type>(part)) |
-                               MakeField(kSdkCodeStart, code));
+        return MakeInteger(Range::kSDK, MakeField(kSdkPartStart, to_underlying(part)) | MakeField(kSdkCodeStart, code));
     }
 
 public:
@@ -154,7 +150,7 @@ public:
     template <SdkPart part, BaseType code>
     struct MakeSdkErrorConstant
     {
-        static_assert(FitsInField(kSdkPartLength, static_cast<std::underlying_type<SdkPart>::type>(part)), "part is too large");
+        static_assert(FitsInField(kSdkPartLength, to_underlying(part)), "part is too large");
         static_assert(FitsInField(kSdkCodeLength, code), "code is too large");
         static_assert(MakeInteger(part, code) != 0, "value is zero");
         static constexpr BaseType value = MakeInteger(part, code);

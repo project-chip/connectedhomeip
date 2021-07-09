@@ -161,7 +161,7 @@ DLL_EXPORT const char * DescribeErrorLwIP(CHIP_ERROR aError)
         return nullptr;
     }
 
-    const err_t lError = static_cast<err_t>(-ChipError::GetValue(aError));
+    const err_t lError = static_cast<err_t>(-static_cast<err_t>(ChipError::GetValue(aError)));
 
     // If we are not compiling with LWIP_DEBUG asserted, the unmapped
     // local value may go unused.
