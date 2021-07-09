@@ -1885,11 +1885,12 @@ void PacketBufferTest::CheckHandleCloneData(nlTestSuite * inSuite, void * inCont
     // construct an oversize buffer.
 
     constexpr uint16_t kOversizeDataSize = PacketBuffer::kMaxSizeWithoutReserve + 99;
-    uint8_t buf[PacketBuffer::kStructureSize + kOversizeDataSize];
-    PacketBuffer * p = reinterpret_cast<PacketBuffer *>(buf);
+    PacketBuffer * p =
+        reinterpret_cast<PacketBuffer *>(chip::Platform::MemoryAlloc(PacketBuffer::kStructureSize + kOversizeDataSize));
+    NL_TEST_ASSERT(inSuite, p != nullptr);
 
     p->next       = nullptr;
-    p->payload    = buf + PacketBuffer::kStructureSize;
+    p->payload    = reinterpret_cast<uint8_t *>(p) + PacketBuffer::kStructureSize;
     p->tot_len    = 0;
     p->len        = 0;
     p->ref        = 1;
@@ -1916,7 +1917,8 @@ void PacketBufferTest::CheckHandleCloneData(nlTestSuite * inSuite, void * inCont
     clone = handle.CloneData();
     NL_TEST_ASSERT(inSuite, clone.IsNull());
 
-    p = std::move(handle).UnsafeRelease();
+    // Free the packet buffer memory ourselves, since we allocated it ourselves.
+    chip::Platform::MemoryFree(std::move(handle).UnsafeRelease());
 
 #endif // CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
 }
