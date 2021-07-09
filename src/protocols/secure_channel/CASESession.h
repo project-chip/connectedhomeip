@@ -254,7 +254,7 @@ private:
     P256PublicKey mRemotePubKey;
 
 #ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
-    P256KeypairHSM mEphemeralKey;
+    Crypto::P256KeypairHSM mEphemeralKey;
 #else
     Crypto::P256Keypair mEphemeralKey;
 #endif
