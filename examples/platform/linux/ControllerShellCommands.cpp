@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <controller/ShellCommands.h>
+#include <ControllerShellCommands.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>

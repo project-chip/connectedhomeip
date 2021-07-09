@@ -53,10 +53,6 @@
 #include <app/server/Mdns.h>
 #endif
 
-#include <lib/shell/Commands.h>
-#include <lib/shell/Engine.h>
-#include <lib/shell/commands/Help.h>
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
@@ -677,73 +673,3 @@ CHIP_ERROR ResetUDCStates()
     return CHIP_NO_ERROR;
 }
 #endif
-
-namespace chip {
-namespace Shell {
-
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-static CHIP_ERROR SendUDC(bool printHeader, chip::Inet::IPAddress commissioner)
-{
-    streamer_t * sout = streamer_get();
-
-    if (printHeader)
-    {
-        streamer_printf(sout, "SendUDC:        ");
-    }
-
-    SendUserDirectedCommissioningRequest(commissioner, CHIP_PORT + 3);
-
-    streamer_printf(sout, "done\r\n");
-
-    return CHIP_NO_ERROR;
-}
-#endif
-
-static int PrintAllCommands()
-{
-    streamer_t * sout = streamer_get();
-    streamer_printf(sout, "  help                       Usage: commissionee <subcommand>\r\n");
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    streamer_printf(sout, "  sendudc <address>          Send UDC message to address. Usage: commissionee sendudc 127.0.0.1\r\n");
-#endif
-    streamer_printf(sout, "\r\n");
-
-    return CHIP_NO_ERROR;
-}
-
-static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
-{
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    if (argc == 0 || strcmp(argv[0], "help") == 0)
-    {
-        return PrintAllCommands();
-    }
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    else if (strcmp(argv[0], "sendudc") == 0)
-    {
-        chip::Inet::IPAddress commissioner;
-        chip::Inet::IPAddress::FromString(argv[1], commissioner);
-        return error = SendUDC(true, commissioner);
-    }
-#endif
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    return error;
-}
-
-void RegisterCommissioneeCommands()
-{
-
-    static const shell_command_t sDeviceComand = { &CommissioneeHandler, "commissionee",
-                                                   "Commissionee commands. Usage: commissionee [command_name]" };
-
-    // Register the root `device` command with the top-level shell.
-    Engine::Root().RegisterCommands(&sDeviceComand, 1);
-    return;
-}
-
-} // namespace Shell
-} // namespace chip

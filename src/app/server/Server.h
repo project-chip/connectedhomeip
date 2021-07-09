@@ -69,11 +69,6 @@ enum class PairingWindowAdvertisement
     kMdns,
 };
 
-namespace Shell {
-
-void RegisterCommissioneeCommands();
-
-} // namespace Shell
 } // namespace chip
 
 /**

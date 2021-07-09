@@ -31,14 +31,15 @@
 #include <support/RandUtils.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#include <ControllerShellCommands.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <controller/ShellCommands.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <platform/KeyValueStoreManager.h>
 #endif
 
 #if defined(ENABLE_CHIP_SHELL)
+#include <CommissioneeShellCommands.h>
 #include <lib/shell/Engine.h>
 #endif
 
