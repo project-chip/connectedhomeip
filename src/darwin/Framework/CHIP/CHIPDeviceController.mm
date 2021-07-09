@@ -392,7 +392,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         NSError * error;
         if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:&error]) {
-            // Errors are propagated to the caller thru completionHandler.
+            // Errors are propagated to the caller through completionHandler.
             // No extra error handling is needed here.
             return;
         }
