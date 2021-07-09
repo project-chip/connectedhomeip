@@ -374,7 +374,7 @@ CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentia
 
     credentials.Release();
     ReturnErrorOnFailure(credentials.Init(&certificates, 1));
-    credentialsIndex = credentials.GetCertCount() - 1;
+    credentialsIndex = credentials.GetCertCount() - static_cast<uint8_t>(1);
 
     rootKeyId = credentials.GetTrustedRootId(0);
 
