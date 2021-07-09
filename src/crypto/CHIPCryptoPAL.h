@@ -346,11 +346,11 @@ private:
  *   - CHIP_ERROR_BUFFER_TOO_SMALL on running out of space at runtime.
  *   - CHIP_ERROR_INTERNAL on any unexpected processing error.
  *
- * @param fe_length_bytes Field Element length in bytes (e.g. 32 for P256 curve)
+ * @param[in] fe_length_bytes Field Element length in bytes (e.g. 32 for P256 curve)
  * @param[in] raw_sig Raw signature of <r,s> concatenated
  * @param[in] raw_sig_length Raw signature length (MUST be 2*`fe_length_bytes` long)
  * @param[out] out_asn1_sig ASN.1 DER signature format output buffer
- * @param[out] out_asn1_sig_length ASN.1 DER signature format output buffer length. Must have space for at least kMax_ECDSA_X9Dot62_Asn1_Overhead.
+ * @param[in] out_asn1_sig_length ASN.1 DER signature format output buffer length. Must have space for at least kMax_ECDSA_X9Dot62_Asn1_Overhead.
  * @param[out] out_asn1_sig_actual_length Final computed size of signature.
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  */
@@ -366,11 +366,11 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const uint8_t * raw_s
  *   - CHIP_ERROR_BUFFER_TOO_SMALL on running out of space at runtime.
  *   - CHIP_ERROR_INTERNAL on any unexpected processing error.
  *
- * @param fe_length_bytes Field Element length in bytes (e.g. 32 for P256 curve)
+ * @param[in] fe_length_bytes Field Element length in bytes (e.g. 32 for P256 curve)
  * @param[in] asn1_sig ASN.1 DER signature input
  * @param[in] asn1_sig_length ASN.1 DER signature length
  * @param[out] out_raw_sig Raw signature of <r,s> concatenated format output buffer
- * @param[out] out_raw_sig_length Raw signature utput buffer length. Must be at least >= `2 * fe_length_bytes`
+ * @param[in] out_raw_sig_length Raw signature output buffer length. Must be at least >= `2 * fe_length_bytes`
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  */
 
