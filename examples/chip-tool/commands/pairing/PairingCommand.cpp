@@ -19,7 +19,6 @@
 #include "PairingCommand.h"
 #include "platform/PlatformManager.h"
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/ThreadOperationalDataset.h>
 
 using namespace ::chip;
 
@@ -228,17 +227,18 @@ chip::ByteSpan PairingCommand::GetThreadNetworkId()
     // part of the dataset defined by OpenThread
 
     Thread::OperationalDataset dataset;
-    CHIP_ERROR err = dataset.Init(mOperationalDataset);
-    if (err == CHIP_NO_ERROR)
+
+    if (dataset.Init(mOperationalDataset) != CHIP_NO_ERROR)
     {
-        err = dataset.GetExtendedPanId(mExtendedPanId);
-        if (err == CHIP_NO_ERROR)
-        {
-            return ByteSpan(mExtendedPanId);
-        }
+        return ByteSpan();
     }
 
-    return ByteSpan();
+    if (dataset.GetExtendedPanId(mExtendedPanId) != CHIP_NO_ERROR)
+    {
+        return ByteSpan();
+    }
+
+    return ByteSpan(mExtendedPanId);
 }
 
 CHIP_ERROR PairingCommand::EnableNetwork()

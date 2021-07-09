@@ -24,6 +24,7 @@
 #include "gen/CHIPClusters.h"
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <support/Span.h>
 
 enum class PairingMode
@@ -140,7 +141,7 @@ private:
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
     chip::ByteSpan mOperationalDataset;
-    uint8_t mExtendedPanId[8];
+    uint8_t mExtendedPanId[chip::Thread::kSizeExtendedPanId];
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
 
