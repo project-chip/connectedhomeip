@@ -188,8 +188,8 @@ void DeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointI
         else
         {
             saturation = *value;
-            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
-                                       &hue, sizeof(uint8_t));
+            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue,
+                                       sizeof(uint8_t));
         }
         statusLED1.SetColor(hue, saturation);
     }
