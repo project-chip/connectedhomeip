@@ -48,7 +48,7 @@ _MATCHERS = {
     Platform.EFR32: Matcher(Efr32Builder),
 }
 
-# Matrix of what can be compiled using and what build options are required
+# Matrix of what can be compiled and what build options are required
 # by such compilation
 _MATCHERS[Platform.LINUX].AcceptApplication(Application.ALL_CLUSTERS)
 _MATCHERS[Platform.LINUX].AcceptBoard(Board.NATIVE)

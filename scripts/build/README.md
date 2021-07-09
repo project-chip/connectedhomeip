@@ -46,10 +46,16 @@ Usage examples:
 3. Generate all the makefiles (but do not compile) all native apps
 
     ```
-    ./scripts/build/chipbuild.py --platform native generate --out-prefix out
+    ./scripts/build/chipbuild.py --platform native generate
     ```
 
-4. Compile the qpg lock app and copy the output in a 'artifact' folder. Note the
+4. Generate all the makefiles (but do not compile) using a specific output root
+
+    ```
+    ./scripts/build/chipbuild.py --platform native generate --out-prefix ./mydir
+    ```
+
+5. Compile the qpg lock app and copy the output in a 'artifact' folder. Note the
    argument order (artifact copying is an argument for the build command)
 
     ```
