@@ -23,7 +23,7 @@ from .device import Device
 
 from .serial_connection import SerialConnection
 from .serial_device import SerialDevice
-from .utils import is_network_visible
+from .utils import is_network_visible, NETWORK_SCAN_RETRIES
 
 from chip import ChipDeviceCtrl
 
@@ -166,10 +166,16 @@ def connected_device(device, network):
         assert ret != None and len(ret) > 1
         assert "NotSupported" != ret[-2].rstrip()
 
+        network_visible = False
         # Check if network is visible
-        ret = device.send(command="device scan", expected_output="Done", wait_before_read=10)
-        assert ret != None and len(ret) > 1
-        assert is_network_visible(ret, network_ssid)
+        for i in range(NETWORK_SCAN_RETRIES):
+            ret = device.send(command="device scan", expected_output="Done", wait_before_read=5)
+            assert ret != None and len(ret) > 1
+            network_visible = is_network_visible(ret, network_ssid)
+            if network_visible:
+                break
+
+        assert network_visible
 
         # Connect to network
         ret = device.send(command="device connect {} {}".format(network_ssid, network_pass), expected_output="Done")

@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import pytest
-from common.utils import validIPAddress, is_network_visible
+from common.utils import validIPAddress, is_network_visible, NETWORK_SCAN_RETRIES
 
 import logging
 log = logging.getLogger(__name__)
@@ -22,10 +22,11 @@ log = logging.getLogger(__name__)
 DEVICE_STATUS_LABEL = ['WIFI status', 'Connection status', 'MAC', 'IP', 'Netmask', 'Gateway', 'RSSI']
 WIFI_STATION_MODE_OPTIONS = {'NotSupported' : None, 'ApplicationControlled' : 'app_ctrl', 'Disabled' : 'disable', 'Enabled' : 'enable', 'Unknown' : None}
 
+
 def get_status_value(status_list, label):
     for param in status_list:
         if label in param:
-            return param.split(':')[1]
+            return param.split(': ')[1]
     return None
 
 @pytest.mark.smoketest
@@ -95,10 +96,16 @@ def test_device_connection_check(device, network):
     assert ret != None and len(ret) > 1
     assert "NotSupported" != ret[-2].rstrip()
 
+    network_visible = False
     # Check if network is visible
-    ret = device.send(command="device scan", expected_output="Done", wait_before_read=5)
-    assert ret != None and len(ret) > 1
-    assert is_network_visible(ret, network_ssid)
+    for i in range(NETWORK_SCAN_RETRIES):
+        ret = device.send(command="device scan", expected_output="Done", wait_before_read=5)
+        assert ret != None and len(ret) > 1
+        network_visible = is_network_visible(ret, network_ssid)
+        if network_visible:
+            break
+
+    assert network_visible
 
     # Check connection status
     ret = device.send(command="device sta connected", expected_output="Done")
@@ -155,10 +162,16 @@ def test_device_internet_connection_check(device, network):
     assert ret != None and len(ret) > 1
     assert "NotSupported" != ret[-2].rstrip()
 
+    network_visible = False
     # Check if network is visible
-    ret = device.send(command="device scan", expected_output="Done", wait_before_read=5)
-    assert ret != None and len(ret) > 1
-    assert is_network_visible(ret, network_ssid)
+    for i in range(NETWORK_SCAN_RETRIES):
+        ret = device.send(command="device scan", expected_output="Done", wait_before_read=5)
+        assert ret != None and len(ret) > 1
+        network_visible = is_network_visible(ret, network_ssid)
+        if network_visible:
+            break
+
+    assert network_visible
 
     # Check connection status
     ret = device.send(command="device sta connected", expected_output="Done")

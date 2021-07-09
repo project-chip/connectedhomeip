@@ -24,6 +24,8 @@ elif sys.platform.startswith('linux'):
 import logging
 log = logging.getLogger(__name__)
 
+NETWORK_SCAN_RETRIES=5
+
 def validIPAddress(IP: str) -> str:
     try:
         return "IPv4" if type(ip_address(IP)) is IPv4Address else "IPv6"
