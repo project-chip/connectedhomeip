@@ -209,20 +209,20 @@ commissioning and cluster control.
 
 ### Cluster control
 
--   After successful commissioning, use the OnOff cluster commands to control the
-    OnOff attribute. This allows you to toggle a parameter implemented by the
-    device to be On or Off.
+-   After successful commissioning, use the OnOff cluster commands to control
+    the OnOff attribute. This allows you to toggle a parameter implemented by
+    the device to be On or Off.
 
     `chip-device-ctrl > zcl OnOff Off 135246 1 1`
 
--   Use the LevelControl cluster commands to control the CurrentLevel attribute. This
-    allows you to control the brightness of the led.
+-   Use the LevelControl cluster commands to control the CurrentLevel attribute.
+    This allows you to control the brightness of the led.
 
     `chip-device-ctrl > zcl LevelControl MoveToLevel 135246 1 1 level=10 transitionTime=0 optionMask=0 optionOverride=0`
 
--   For ESP32C3-DevKitM, use the ColorContorl cluster commands to control the 
-    CurrentHue and CurrentSaturation attribute. This allows you to control the color of
-    on-board LED.
+-   For ESP32C3-DevKitM, use the ColorContorl cluster commands to control the
+    CurrentHue and CurrentSaturation attribute. This allows you to control the
+    color of on-board LED.
 
     `zcl ColorControl MoveToHue 135246 1 1 hue=100 direction=0 transitionTime=0 optionsMask=0 optionsOverride=0`
     `zcl ColorControl MoveToSaturation 135245 1 1 saturation=200 transitionTime=0 optionsMask=0 optionsOverride=0`
