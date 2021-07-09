@@ -71,7 +71,7 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/diagnostic-logs-server"
-                     PRIV_REQUIRES bt chip QRCode tft spidriver screen-framework)
+                     PRIV_REQUIRES bt chip QRCode)
 
 idf_component_get_property(chip_lib chip COMPONENT_LIB)
 
@@ -152,7 +152,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/on-off-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
-                      PRIV_REQUIRES chip QRCode tft spidriver bt screen-framework)
+                      PRIV_REQUIRES chip QRCode bt)
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")
