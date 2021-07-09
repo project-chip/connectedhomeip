@@ -46,14 +46,14 @@ class Locking final : public generated::Locking<Locking>
 {
 
 public:
-    pw::Status Set(ServerContext &, const chip_rpc_LockingState & request, pw_protobuf_Empty & response)
+    pw::Status Set(ServerContext &, const chip_rpc_LockingState & request, chip_rpc_Empty & response)
     {
         BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock,
                                      request.locked ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
         return pw::OkStatus();
     }
 
-    pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_LockingState & response)
+    pw::Status Get(ServerContext &, const chip_rpc_Empty & request, chip_rpc_LockingState & response)
     {
         response.locked = BoltLockMgr().IsUnlocked();
         return pw::OkStatus();
