@@ -353,7 +353,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     ReliableMessageContext * rc = entry->rc;
     if (rc == nullptr)
     {
-        return CHIP_ERROR_INCORRECT_STATE;
+        return CHIP_NO_ERROR;
     }
 
     const ExchangeMessageDispatch * dispatcher = rc->GetExchangeContext()->GetMessageDispatch();
