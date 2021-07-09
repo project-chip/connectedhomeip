@@ -43,6 +43,7 @@ def get_network_interface_address(response):
     return netif_addr_set
 
 @pytest.mark.networktest
+@pytest.mark.xfail
 def test_network_interface_check(device):
     # Get network interface
     ret = device.send(command="network interface", expected_output="Done")
@@ -75,6 +76,7 @@ def test_network_interface_check(device):
     assert ret != None
 
 @pytest.mark.networktest
+@pytest.mark.xfail
 def test_network_interface_address_check(connected_device):
     # Get network interface
     ret = connected_device.send(command="network interface", expected_output="Done")

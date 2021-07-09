@@ -17,6 +17,7 @@ import logging
 log = logging.getLogger(__name__)
 
 @pytest.mark.networktest
+@pytest.mark.xfail
 def test_server_udp(connected_device, chip_tools_dir):
     # Enable server
     ret = connected_device.send(command="server on UDP", expected_output="Done", wait_before_read=5)
@@ -37,24 +38,24 @@ def test_server_udp(connected_device, chip_tools_dir):
     ret = connected_device.send(command="server off", expected_output="Done", wait_before_read=5)
     assert ret != None and len(ret) > 1
 
-# Not supported
-# @pytest.mark.networktest
-# def test_server_tcp(connected_device, chip_tools_dir):
-#     # Enable server
-#     ret = connected_device.send(command="server on TCP", expected_output="Done", wait_before_read=5)
-#     assert ret != None and len(ret) > 1
+@pytest.mark.networktest
+@pytest.mark.skip(reason="TCP server not supported yet")
+def test_server_tcp(connected_device, chip_tools_dir):
+    # Enable server
+    ret = connected_device.send(command="server on TCP", expected_output="Done", wait_before_read=5)
+    assert ret != None and len(ret) > 1
 
-#     # Get device IP address
-#     ip_address = ret[-2].rstrip().split()[-1]
-#     assert validIPAddress(ip_address) != "Invalid"
+    # Get device IP address
+    ip_address = ret[-2].rstrip().split()[-1]
+    assert validIPAddress(ip_address) != "Invalid"
 
-#     process = subprocess.Popen(['./chip-echo-requester', ip_address, '--tcp'], cwd=chip_tools_dir)
-#     process.wait()
-#     assert process.returncode == 1
+    process = subprocess.Popen(['./chip-echo-requester', ip_address, '--tcp'], cwd=chip_tools_dir)
+    process.wait()
+    assert process.returncode == 1
 
-#     ret = connected_device.wait_for_output("Echo Message")
-#     assert ret != None
+    ret = connected_device.wait_for_output("Echo Message")
+    assert ret != None
 
-#     # Disable server
-#     ret = connected_device.send(command="server off", expected_output="Done", wait_before_read=5)
-#     assert ret != None and len(ret) > 1
+    # Disable server
+    ret = connected_device.send(command="server off", expected_output="Done", wait_before_read=5)
+    assert ret != None and len(ret) > 1

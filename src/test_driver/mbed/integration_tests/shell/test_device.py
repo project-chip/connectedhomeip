@@ -41,6 +41,7 @@ def test_device_status_check(device):
         assert label in line
 
 @pytest.mark.networktest
+@pytest.mark.xfail
 def test_device_sta_check(device):
     # Check sta mode
     ret = device.send(command="device sta mode", expected_output="Done")
@@ -87,6 +88,7 @@ def test_device_sta_check(device):
     assert ret[-2].rstrip() in ("true", "false")
 
 @pytest.mark.networktest
+@pytest.mark.xfail
 def test_device_connection_check(device, network):
     network_ssid = network[0]
     network_pass = network[1]
@@ -152,7 +154,8 @@ def test_device_connection_check(device, network):
     assert ret[-2].rstrip().lower() == "false"
 
 
-pytest.mark.networktest
+@pytest.mark.networktest
+@pytest.mark.xfail
 def test_device_internet_connection_check(device, network):
     network_ssid = network[0]
     network_pass = network[1]

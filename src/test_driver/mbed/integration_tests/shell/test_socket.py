@@ -15,6 +15,7 @@ log = logging.getLogger(__name__)
 SOCKET_ECHO_TEST_MESSAGE = "Test_message"
 
 @pytest.mark.networktest
+@pytest.mark.xfail
 def test_socket_example_check(connected_device):
     # Get network interface
     ret = connected_device.send(command="socket example", expected_output="Done")
@@ -22,6 +23,7 @@ def test_socket_example_check(connected_device):
 
 
 @pytest.mark.networktest
+@pytest.mark.xfail
 def test_socket_client_echo(connected_device, echo_server):
     server_ip = echo_server[0]
     server_port = echo_server[1]
