@@ -387,12 +387,10 @@ CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert,
 {
     P256PublicKey caPublicKey;
     P256ECDSASignature signature;
-    uint16_t derSigLen;
 
-    ReturnErrorOnFailure(
-        ConvertECDSASignatureRawToDER(cert->mSignature, signature, static_cast<uint16_t>(signature.Capacity()), derSigLen));
-
-    ReturnErrorOnFailure(signature.SetLength(derSigLen));
+    VerifyOrReturnError((cert != nullptr) && (caCert != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(signature.SetLength(cert->mSignature.size()));
+    memcpy(signature, cert->mSignature.data(), cert->mSignature.size());
 
     memcpy(caPublicKey, caCert->mPublicKey.data(), caCert->mPublicKey.size());
 

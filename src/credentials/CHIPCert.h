@@ -49,7 +49,7 @@ static constexpr uint32_t kMaxCHIPCertLength = 400;
 static constexpr uint32_t kMaxDERCertLength  = 600;
 
 // The decode buffer is used to reconstruct TBS section of X.509 certificate, which doesn't include signature.
-static constexpr uint32_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Crypto::kMax_ECDSA_Signature_Length;
+static constexpr uint32_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Crypto::kMax_ECDSA_Signature_Length_Der;
 
 /** Data Element Tags for the CHIP Certificate
  */
