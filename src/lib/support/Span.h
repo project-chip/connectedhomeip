@@ -34,7 +34,7 @@ template <class T>
 class Span
 {
 public:
-    using pointer = T *;
+    using pointer       = T *;
     using const_pointer = const T *;
 
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
