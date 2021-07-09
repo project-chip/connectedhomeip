@@ -116,6 +116,8 @@ void InteractionModelEngine::Shutdown()
     }
 
     mpNextAvailableClusterInfo = nullptr;
+
+    mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
 }
 
 CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCommandSender)
