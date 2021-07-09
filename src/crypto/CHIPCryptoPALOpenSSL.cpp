@@ -66,7 +66,7 @@ enum class ECName
 };
 
 nlSTATIC_ASSERT_PRINT(kMax_ECDH_Secret_Length >= 32, "ECDH shared secret is too short");
-nlSTATIC_ASSERT_PRINT(kMax_ECDSA_Signature_Length >= 72, "ECDSA signature buffer length is too short");
+// nlSTATIC_ASSERT_PRINT(kMax_ECDSA_Signature_Length >= 72, "ECDSA signature buffer length is too short");
 
 static int _nidForCurve(ECName name)
 {
@@ -534,6 +534,9 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     DigestType digest      = DigestType::SHA256;
     size_t out_length      = 0;
 
+    // For conversion from TLS DER signature to raw signature
+    uint8_t der_signature[kP256_ECDSA_Signature_Length_Raw + kMax_ECDSA_X9Dot62_Asn1_Overhead];
+
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(msg != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -564,12 +567,16 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 
     result = EVP_DigestSignFinal(context, nullptr, &out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(out_signature.Capacity() >= out_length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(sizeof(der_signature) >= out_length, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = EVP_DigestSignFinal(context, Uint8::to_uchar(out_signature), &out_length);
+    result = EVP_DigestSignFinal(context, Uint8::to_uchar(&der_signature[0]), &out_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    // This should not happen due to the check above. But check this nonetheless
-    SuccessOrExit(out_signature.SetLength(out_length));
+
+    // Convert OpenSSL DER signature to raw signature
+    error =
+        EcdsaAsn1SignatureToRaw(kP256_FE_Length, &der_signature[0], out_length, out_signature.Bytes(), out_signature.Capacity());
+    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
+    SuccessOrExit(out_signature.SetLength(2 * kP256_FE_Length));
 
 exit:
     ec_key = nullptr;
@@ -602,6 +609,8 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
     int nid          = NID_undef;
     EC_KEY * ec_key  = nullptr;
     uint out_length  = 0;
+    // For conversion from TLS DER signature to raw signature
+    uint8_t der_signature[kP256_ECDSA_Signature_Length_Raw + kMax_ECDSA_X9Dot62_Asn1_Overhead];
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -612,10 +621,14 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
     ec_key = to_EC_KEY(&mKeypair);
     VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    result = ECDSA_sign(0, hash, static_cast<int>(hash_length), Uint8::to_uchar(out_signature), &out_length, ec_key);
+    result = ECDSA_sign(0, hash, static_cast<int>(hash_length), Uint8::to_uchar(der_signature), &out_length, ec_key);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-    // This should not happen due to the check above. But check this nonetheless
-    SuccessOrExit(out_signature.SetLength(out_length));
+
+    // Convert OpenSSL DER signature to raw signature
+    error =
+        EcdsaAsn1SignatureToRaw(kP256_FE_Length, &der_signature[0], out_length, out_signature.Bytes(), out_signature.Capacity());
+    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
+    SuccessOrExit(out_signature.SetLength(2 * kP256_FE_Length));
 
 exit:
     if (error != CHIP_NO_ERROR)
@@ -640,6 +653,15 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
     int result                  = 0;
     EVP_MD_CTX * md_context     = nullptr;
     DigestType digest           = DigestType::SHA256;
+
+    // For conversion from raw signature to TLS DER signature
+    uint8_t der_signature[kP256_ECDSA_Signature_Length_Raw + kMax_ECDSA_X9Dot62_Asn1_Overhead];
+
+    // Convert raw signature to usable form by OpenSSL
+    size_t der_sig_length = 0;
+    error = EcdsaRawSignatureToAsn1(kP256_FE_Length, signature, signature.Length(), &der_signature[0], sizeof(der_signature),
+                                    der_sig_length);
+    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrExit(msg != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -682,7 +704,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
     result = EVP_DigestVerifyUpdate(md_context, Uint8::to_const_uchar(msg), msg_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    result = EVP_DigestVerifyFinal(md_context, Uint8::to_const_uchar(signature), signature.Length());
+    result = EVP_DigestVerifyFinal(md_context, Uint8::to_const_uchar(der_signature), static_cast<int>(der_sig_length));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INVALID_SIGNATURE);
     error = CHIP_NO_ERROR;
 
@@ -727,6 +749,14 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     EC_GROUP * ec_group  = nullptr;
     int result           = 0;
 
+    // For conversion from raw signature to TLS DER signature
+    uint8_t der_signature[kP256_ECDSA_Signature_Length_Raw + kMax_ECDSA_X9Dot62_Asn1_Overhead];
+    // Convert raw signature to usable form by OpenSSL
+    size_t der_sig_length = 0;
+    error = EcdsaRawSignatureToAsn1(kP256_FE_Length, signature, signature.Length(), &der_signature[0], sizeof(der_signature),
+                                    der_sig_length);
+    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
+
     VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(hash_length == kSHA256_Hash_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
     nid = _nidForCurve(MapECName(Type()));
@@ -751,8 +781,8 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // The cast for length arguments is safe because values are small enough to fit.
-    result = ECDSA_verify(0, hash, static_cast<int>(hash_length), Uint8::to_const_uchar(signature),
-                          static_cast<int>(signature.Length()), ec_key);
+    result = ECDSA_verify(0, hash, static_cast<int>(hash_length), Uint8::to_const_uchar(der_signature),
+                          static_cast<int>(der_sig_length), ec_key);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INVALID_SIGNATURE);
     error = CHIP_NO_ERROR;
 

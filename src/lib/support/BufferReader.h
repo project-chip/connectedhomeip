@@ -147,6 +147,20 @@ public:
     }
 
     /**
+     * Read a byte string from the BufferReader
+     *
+     * @param [out] dest Where the bytes read
+     * @param [in] size How many bytes to read
+     *
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
+     */
+    CHECK_RETURN_VALUE
+    Reader & ReadBytes(uint8_t * dest, size_t size);
+
+    /**
      * Helper for our various APIs so we don't have to write out various logic
      * multiple times.  This is public so that consumers that want to read into
      * whatever size a logical thing they are reading into has don't have to

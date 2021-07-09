@@ -56,8 +56,9 @@ public:
     {
         if (this != &other)
         {
-            mBuffer       = other.mBuffer;
-            other.mBuffer = nullptr;
+            mBuffer        = other.mBuffer;
+            mAllocatedSize = other.mAllocatedSize;
+            other.mBuffer  = nullptr;
         }
         return *this;
     }
@@ -68,9 +69,13 @@ public:
     explicit operator bool() const { return mBuffer != nullptr; }
     bool operator!() const { return mBuffer == nullptr; }
 
+    /** Determine amount of memory allocated */
+    size_t AllocatedSize() const { return mAllocatedSize; }
+
     /** Release memory used */
     void Free()
     {
+        mAllocatedSize = 0;
         if (mBuffer == nullptr)
         {
             return;
@@ -84,13 +89,14 @@ protected:
     const void * Ptr() const { return mBuffer; }
 
     /**
-     * Releases the undelying buffer. Buffer stops being managed and will not be
+     * Releases the underlying buffer. Buffer stops being managed and will not be
      * auto-freed.
      */
     void * Release()
     {
-        void * buffer = mBuffer;
-        mBuffer       = nullptr;
+        void * buffer  = mBuffer;
+        mBuffer        = nullptr;
+        mAllocatedSize = 0;
         return buffer;
     }
 
@@ -98,16 +104,25 @@ protected:
     {
         Free();
         mBuffer = Impl::MemoryAlloc(size);
+        if (mBuffer != nullptr)
+        {
+            mAllocatedSize = size;
+        }
     }
 
     void Calloc(size_t elementCount, size_t elementSize)
     {
         Free();
         mBuffer = Impl::MemoryCalloc(elementCount, elementSize);
+        if (mBuffer != nullptr)
+        {
+            mAllocatedSize = elementCount * elementSize;
+        }
     }
 
 private:
-    void * mBuffer = nullptr;
+    void * mBuffer        = nullptr;
+    size_t mAllocatedSize = 0;
 };
 
 /**

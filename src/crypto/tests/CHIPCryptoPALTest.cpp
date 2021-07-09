@@ -19,6 +19,7 @@
 
 #include "AES_CCM_128_test_vectors.h"
 #include "AES_CCM_256_test_vectors.h"
+#include "DerSigConversion_test_vectors.h"
 #include "ECDH_P256_test_vectors.h"
 #include "HKDF_SHA256_test_vectors.h"
 #include "HMAC_SHA256_test_vectors.h"
@@ -49,6 +50,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <support/BytesToHex.h>
 
 #if CHIP_CRYPTO_OPENSSL
 #include "X509_PKCS7Extraction_test_vectors.h"
@@ -599,6 +602,47 @@ static void TestAES_CCM_128DecryptInvalidIVLen(nlTestSuite * inSuite, void * inC
         }
     }
     NL_TEST_ASSERT(inSuite, numOfTestsRan > 0);
+}
+
+static void TestAsn1Conversions(nlTestSuite * inSuite, void * inContext)
+{
+    static_assert(sizeof(kDerSigConvDerCase4) == (sizeof(kDerSigConvRawCase4) + chip::Crypto::kMax_ECDSA_X9Dot62_Asn1_Overhead),
+                  "kDerSigConvDerCase4 must have worst case overhead");
+
+    int numOfTestVectors = ArraySize(kDerSigConvTestVectors);
+    int numOfTestsRan    = 0;
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const der_sig_conv_vector * vector = &kDerSigConvTestVectors[vectorIndex];
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_raw_sig;
+        out_raw_sig.Calloc(vector->fe_length_bytes * 2);
+        NL_TEST_ASSERT(inSuite, out_raw_sig);
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_asn1_sig;
+        out_asn1_sig.Calloc((vector->fe_length_bytes * 2) + kMax_ECDSA_X9Dot62_Asn1_Overhead);
+        NL_TEST_ASSERT(inSuite, out_asn1_sig);
+
+        // Test converstion from ASN.1 ER to raw
+        CHIP_ERROR status = EcdsaAsn1SignatureToRaw(vector->fe_length_bytes, vector->der_version, vector->der_version_length,
+                                                    out_raw_sig.Get(), out_raw_sig.AllocatedSize());
+        NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, (memcmp(out_raw_sig.Get(), vector->raw_version, vector->raw_version_length) == 0));
+
+        // Test conversion from raw to ASN.1 DER
+        size_t der_size = 0;
+        status          = EcdsaRawSignatureToAsn1(vector->fe_length_bytes, vector->raw_version, vector->raw_version_length,
+                                         out_asn1_sig.Get(), out_asn1_sig.AllocatedSize(), der_size);
+
+        NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, der_size <= out_asn1_sig.AllocatedSize());
+        NL_TEST_ASSERT(inSuite, der_size == vector->der_version_length);
+        NL_TEST_ASSERT(inSuite, (memcmp(out_asn1_sig.Get(), vector->der_version, vector->der_version_length) == 0));
+
+        numOfTestsRan++;
+    }
+
+    NL_TEST_ASSERT(inSuite, numOfTestsRan == numOfTestVectors);
 }
 
 static void TestHash_SHA256(nlTestSuite * inSuite, void * inContext)
@@ -1535,6 +1579,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid key", TestAES_CCM_256DecryptInvalidKey),
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
+    NL_TEST_DEF("Test ASN.1 signature conversion routines", TestAsn1Conversions),
     NL_TEST_DEF("Test ECDSA signing and validation message using SHA256", TestECDSA_Signing_SHA256_Msg),
     NL_TEST_DEF("Test ECDSA signing and validation SHA256 Hash", TestECDSA_Signing_SHA256_Hash),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different msg", TestECDSA_ValidationFailsDifferentMessage),
