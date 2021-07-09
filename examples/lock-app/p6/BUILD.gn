@@ -49,7 +49,8 @@ p6_sdk_sources("lock_app_sdk_sources") {
     #"${p6_project_dir}/include/FreeRTOSConfig.h",
   ]
 
-  public_configs = ["${chip_root}/third_party/p6:p6_sdk_config"]
+  public_configs = [ "${chip_root}/third_party/p6:p6_sdk_config" ]
+
   #public_configs += ["${chip_root}/third_party/p6:project_configs"]
 }
 
@@ -82,12 +83,12 @@ p6_executable("lock_app") {
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/Service.cpp",
     "${examples_plat_dir}/init_p6Platform.cpp",
+    "${p6_project_dir}/include/CHIPProjectConfig.h",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
     "src/ButtonHandler.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
-    "${p6_project_dir}/include/CHIPProjectConfig.h",
   ]
 
   output_dir = root_out_dir

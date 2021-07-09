@@ -25,6 +25,7 @@ mbedtls_target = "${p6_sdk_build_root}:p6_build"
 chip_device_platform = "p6"
 
 lwip_platform = "p6"
+
 #lwip_ipv6 = true
 #lwip_ipv4 = true
 #lwip_api = true

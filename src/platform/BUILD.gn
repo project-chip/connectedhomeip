@@ -148,7 +148,7 @@ if (chip_device_platform != "none") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_P6=1",
         "CHIP_DEVICE_LAYER_TARGET=P6",
-      ]  
+      ]
     } else if (chip_device_platform == "linux") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_LINUX=1",
