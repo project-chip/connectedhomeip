@@ -82,8 +82,10 @@ public:
 
     struct MessageTypeData
     {
-        uint32_t ProtocolId = 0; // Should only be SecureChannel or BDX
-        uint8_t MessageType = 0;
+        Protocols::Id ProtocolId; // Should only ever be SecureChannel or BDX
+        uint8_t MessageType;
+
+        MessageTypeData() : ProtocolId(Protocols::NotSpecified), MessageType(0) {}
     };
 
     /**

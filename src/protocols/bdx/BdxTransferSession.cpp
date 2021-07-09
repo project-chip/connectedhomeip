@@ -49,7 +49,7 @@ void PrepareOutgoingMessageEvent(MessageType messageType, chip::bdx::TransferSes
     static_assert(std::is_same<std::underlying_type_t<decltype(messageType)>, uint8_t>::value, "Cast is not safe");
 
     pendingOutput             = chip::bdx::TransferSession::OutputEventType::kMsgToSend;
-    outputMsgType.ProtocolId  = chip::Protocols::MessageTypeTraits<MessageType>::ProtocolId().ToFullyQualifiedSpecForm();
+    outputMsgType.ProtocolId  = chip::Protocols::MessageTypeTraits<MessageType>::ProtocolId();
     outputMsgType.MessageType = static_cast<uint8_t>(messageType);
 }
 

@@ -84,18 +84,7 @@ CHIP_ERROR AttachHeaderAndSend(TransferSession::MessageTypeData typeData, chip::
                                TransferSession & receiver)
 {
     chip::PayloadHeader payloadHeader;
-    if (typeData.ProtocolId == Protocols::BDX::Id.ToFullyQualifiedSpecForm())
-    {
-        payloadHeader.SetMessageType(Protocols::BDX::Id, typeData.MessageType);
-    }
-    else if (typeData.ProtocolId == Protocols::SecureChannel::Id.ToFullyQualifiedSpecForm())
-    {
-        payloadHeader.SetMessageType(Protocols::SecureChannel::Id, typeData.MessageType);
-    }
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    payloadHeader.SetMessageType(typeData.ProtocolId, typeData.MessageType);
 
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
     ReturnErrorOnFailure(receiver.HandleMessageReceived(std::move(msgBuf), kNoAdvanceTime));
@@ -109,7 +98,7 @@ void VerifyBdxMessageToSend(nlTestSuite * inSuite, void * inContext, const Trans
     static_assert(std::is_same<std::underlying_type_t<decltype(expected)>, uint8_t>::value, "Cast is not safe");
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::OutputEventType::kMsgToSend);
     NL_TEST_ASSERT(inSuite, !outEvent.MsgData.IsNull());
-    NL_TEST_ASSERT(inSuite, outEvent.msgTypeData.ProtocolId == Protocols::BDX::Id.ToFullyQualifiedSpecForm());
+    NL_TEST_ASSERT(inSuite, outEvent.msgTypeData.ProtocolId == Protocols::BDX::Id);
     NL_TEST_ASSERT(inSuite, outEvent.msgTypeData.MessageType == static_cast<uint8_t>(expected));
 }
 
