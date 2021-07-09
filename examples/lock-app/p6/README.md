@@ -66,7 +66,6 @@ will then join the network.
           $ cd ~/connectedhomeip
           $ python3 out/debug/p6_lock_app/chip-p6-lock-example.flash.py
 
-
 <a name="Commissioning and cluster control"></a>
 
 ## Commissioning and cluster control
@@ -89,7 +88,6 @@ Once P6 is up and running, we need to set up a device controller on Raspberry Pi
 
            $ source ./out/python_env/bin/activate
            $ chip-device-ctrl
-
 
 <a name="Commissioning over BLE"></a>
 
