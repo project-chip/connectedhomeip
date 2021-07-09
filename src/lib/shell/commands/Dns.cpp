@@ -41,7 +41,7 @@ public:
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\n",
                         ChipLogValueX64(nodeData.mPeerId.GetFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
-        streamer_printf(streamer_get(), "   IP address: %s\n", nodeData.mAddress.ToString(ipAddressBuf, sizeof(ipAddressBuf)));
+        streamer_printf(streamer_get(), "   IP address: %s\n", nodeData.mAddress.ToString(ipAddressBuf));
         streamer_printf(streamer_get(), "   Port: %d\n", nodeData.mPort);
     }
 
@@ -66,7 +66,7 @@ public:
         for (uint8_t i = 0; i < nodeData.kMaxIPAddresses; i++)
         {
             if (nodeData.ipAddress[i] != chip::Inet::IPAddress::Any)
-                streamer_printf(streamer_get(), "      %s\n", nodeData.ipAddress[i].ToString(ipAddressBuf, sizeof(ipAddressBuf)));
+                streamer_printf(streamer_get(), "      %s\n", nodeData.ipAddress[i].ToString(ipAddressBuf));
         }
     }
 

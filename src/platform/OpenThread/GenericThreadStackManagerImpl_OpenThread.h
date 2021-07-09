@@ -202,8 +202,8 @@ private:
 
     static void OnDnsBrowseResult(otError aError, const otDnsBrowseResponse * aResponse, void * aContext);
     static void OnDnsResolveResult(otError aError, const otDnsServiceResponse * aResponse, void * aContext);
-    static void FromOtDnsResponseToMdnsData(otDnsServiceInfo & serviceInfo, const char * serviceType,
-                                            chip::Mdns::MdnsService & mdnsService, DnsServiceTxtEntries & serviceTxtEntries);
+    static CHIP_ERROR FromOtDnsResponseToMdnsData(otDnsServiceInfo & serviceInfo, const char * serviceType,
+                                                  chip::Mdns::MdnsService & mdnsService, DnsServiceTxtEntries & serviceTxtEntries);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
