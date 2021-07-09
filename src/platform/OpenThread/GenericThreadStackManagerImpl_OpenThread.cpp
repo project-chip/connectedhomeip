@@ -1075,12 +1075,14 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientStateChange
 
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(const char * aInstanceName, const char * aName,
-                                                                               uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
-                                                                               size_t aTxtEntriesSize, uint32_t aLeaseInterval,
-                                                                               uint32_t aKeyLeaseInterval)
+                                                                               uint16_t aPort,
+                                                                               const Span<const char * const> & aSubTypes,
+                                                                               const Span<const Mdns::TextEntry> & aTxtEntries,
+                                                                               uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval)
 {
     CHIP_ERROR error                         = CHIP_NO_ERROR;
     typename SrpClient::Service * srpService = nullptr;
+    size_t entryId                           = 0;
 
     Impl()->LockThreadStack();
 
@@ -1096,9 +1098,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
         // Remove possible existing entry
         if ((strcmp(service.mInstanceName, aInstanceName) == 0) && (strcmp(service.mName, aName) == 0))
         {
-            VerifyOrExit(MapOpenThreadError(otSrpClientClearService(mOTInst, &(service.mService))) == CHIP_NO_ERROR,
-                         error = MapOpenThreadError(OT_ERROR_FAILED));
-
+            SuccessOrExit(error = MapOpenThreadError(otSrpClientClearService(mOTInst, &service.mService)));
             // Clear memory immediately, as OnSrpClientNotification will not be called.
             memset(&service, 0, sizeof(service));
         }
@@ -1126,35 +1126,54 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
 
     srpService->mService.mPort = aPort;
 
-    // Check if there are some optional text entries to add.
-    if (aTxtEntries && aTxtEntriesSize != 0)
+#if OPENTHREAD_API_VERSION >= 132
+    VerifyOrExit(aSubTypes.size() <= ArraySize(srpService->mSubTypeBuffers), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    entryId = 0;
+
+    for (const char * subType : aSubTypes)
     {
-        VerifyOrExit(aTxtEntriesSize <= SrpClient::kMaxTxtEntriesNumber, error = CHIP_ERROR_INVALID_LIST_LENGTH);
+        auto & destBuffer = srpService->mSubTypeBuffers[entryId];
+        VerifyOrExit(strlen(subType) < ArraySize(destBuffer), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(destBuffer, subType);
 
-        srpService->mService.mNumTxtEntries = static_cast<uint8_t>(aTxtEntriesSize);
-
-        for (uint8_t entryId = 0; entryId < aTxtEntriesSize; entryId++)
-        {
-            VerifyOrExit(aTxtEntries[entryId].mDataSize <= SrpClient::kMaxTxtValueSize, error = CHIP_ERROR_BUFFER_TOO_SMALL);
-            VerifyOrExit((strlen(aTxtEntries[entryId].mKey) + 1) <= SrpClient::kMaxTxtKeySize, error = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-            srpService->mTxtEntries[entryId].mValueLength = static_cast<uint8_t>(aTxtEntries[entryId].mDataSize);
-            memcpy(&(srpService->mTxtValueBuffers[entryId][0]), aTxtEntries[entryId].mData, aTxtEntries[entryId].mDataSize);
-            srpService->mTxtEntries[entryId].mValue = &(srpService->mTxtValueBuffers[entryId][0]);
-
-            memcpy(&(srpService->mTxtKeyBuffers[entryId][0]), aTxtEntries[entryId].mKey, strlen(aTxtEntries[entryId].mKey) + 1);
-            srpService->mTxtEntries[entryId].mKey = &(srpService->mTxtKeyBuffers[entryId][0]);
-        }
-
-        srpService->mService.mTxtEntries = srpService->mTxtEntries;
+        srpService->mSubTypes[entryId++] = destBuffer;
     }
+
+    srpService->mSubTypes[entryId]      = nullptr;
+    srpService->mService.mSubTypeLabels = srpService->mSubTypes;
+#endif
+
+    // Check if there are some optional text entries to add.
+    VerifyOrExit(aTxtEntries.size() <= ArraySize(srpService->mTxtEntries), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    entryId = 0;
+
+    for (const chip::Mdns::TextEntry & entry : aTxtEntries)
+    {
+        VerifyOrExit(strlen(entry.mKey) < SrpClient::kMaxTxtKeySize, error = CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(srpService->mTxtKeyBuffers[entryId], entry.mKey);
+
+        VerifyOrExit(entry.mDataSize <= SrpClient::kMaxTxtValueSize, error = CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(srpService->mTxtValueBuffers[entryId], entry.mData, entry.mDataSize);
+
+        srpService->mTxtEntries[entryId].mKey         = srpService->mTxtKeyBuffers[entryId];
+        srpService->mTxtEntries[entryId].mValue       = srpService->mTxtValueBuffers[entryId];
+        srpService->mTxtEntries[entryId].mValueLength = static_cast<uint8_t>(entry.mDataSize);
+        ++entryId;
+    }
+
+    srpService->mService.mNumTxtEntries = static_cast<uint8_t>(aTxtEntries.size());
+    srpService->mService.mTxtEntries    = srpService->mTxtEntries;
 
     ChipLogProgress(DeviceLayer, "advertising srp service: %s.%s", srpService->mService.mInstanceName, srpService->mService.mName);
     error = MapOpenThreadError(otSrpClientAddService(mOTInst, &(srpService->mService)));
 
 exit:
-    Impl()->UnlockThreadStack();
+    if (srpService != nullptr && error != CHIP_NO_ERROR)
+    {
+        memset(srpService, 0, sizeof(*srpService));
+    }
 
+    Impl()->UnlockThreadStack();
     return error;
 }
 
