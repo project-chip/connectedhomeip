@@ -41,7 +41,7 @@ private:
  *
  *     auto deferred = MakeDefer([]() { -- do cleanup -- });
  *
- *   The lambda will be called as soon as the object goes out of the scope.
+ *   The lambda will be called as soon as the object goes out of scope.
  */
 template <typename Function>
 Defer<Function> MakeDefer(Function && function)

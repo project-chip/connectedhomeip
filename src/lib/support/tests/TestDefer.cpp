@@ -30,6 +30,7 @@ static void TestDeferUsage(nlTestSuite * inSuite, void * inContext)
     bool deferred = false;
     {
         auto deferredFunction = MakeDefer([&]() { deferred = true; });
+        NL_TEST_ASSERT(inSuite, !deferred);
     }
     NL_TEST_ASSERT(inSuite, deferred);
 
