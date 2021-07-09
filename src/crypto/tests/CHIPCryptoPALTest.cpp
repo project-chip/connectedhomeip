@@ -632,7 +632,7 @@ static void TestAsn1Conversions(nlTestSuite * inSuite, void * inContext)
         // Test conversion from raw to ASN.1 DER
         size_t der_size = 0;
         status          = EcdsaRawSignatureToAsn1(vector->fe_length_bytes, vector->raw_version, vector->raw_version_length,
-                                         out_asn1_sig.Get(), out_asn1_sig.AllocatedSize(), der_size);
+                                                  out_asn1_sig.Get(), out_asn1_sig.AllocatedSize(), der_size);
 
         NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, der_size <= out_asn1_sig.AllocatedSize());
@@ -1082,8 +1082,8 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(pubkey, keypair.Pubkey(), pubkey.Length()) == 0);
 
         // Let's corrupt the CSR buffer and make sure it fails to verify
-        csr[length - 2] = (uint8_t)(csr[length - 2] + 1);
-        csr[length - 1] = (uint8_t)(csr[length - 1] + 1);
+        csr[length - 2] = (uint8_t) (csr[length - 2] + 1);
+        csr[length - 1] = (uint8_t) (csr[length - 1] + 1);
 
         NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csr, length, pubkey) != CHIP_NO_ERROR);
     }

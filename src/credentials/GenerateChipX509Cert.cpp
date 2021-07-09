@@ -324,7 +324,8 @@ CHIP_ERROR EncodeChipECDSASignature(Crypto::P256ECDSASignature & signature, ASN1
         uint8_t sig_der[Crypto::kMax_ECDSA_Signature_Length_Der];
         uint16_t sig_der_size = 0;
 
-        ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan{signature}, &sig_der[0], sizeof(sig_der), sig_der_size));
+        ReturnErrorOnFailure(
+            ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan{ signature }, &sig_der[0], sizeof(sig_der), sig_der_size));
         ReturnErrorOnFailure(writer.PutConstructedType(&sig_der[0], static_cast<uint16_t>(sig_der_size)));
     }
     ASN1_END_ENCAPSULATED;
