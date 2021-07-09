@@ -163,10 +163,10 @@ namespace {
 
 CertFormat DetectCertFormat(uint8_t * cert, uint32_t certLen)
 {
-    static const uint8_t chipRawPrefix[]   = { 0xD5, 0x00, 0x00, 0x08, 0x00, 0x01, 0x00 };
-    static const char * chipB64Prefix      = "1QAACAAB";
-    static const uint32_t chipB64PrefixLen = sizeof(chipB64Prefix) - 1;
-    static const char * pemMarker          = "-----BEGIN CERTIFICATE-----";
+    static const uint8_t chipRawPrefix[] = { 0x15, 0x30, 0x01 };
+    static const char * chipB64Prefix    = "FTABC";
+    static const size_t chipB64PrefixLen = strlen(chipB64Prefix);
+    static const char * pemMarker        = "-----BEGIN CERTIFICATE-----";
 
     if (certLen > sizeof(chipRawPrefix) && memcmp(cert, chipRawPrefix, sizeof(chipRawPrefix)) == 0)
     {
