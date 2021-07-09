@@ -31,7 +31,7 @@ limitations under the License.
       <description>
         Command description for ReadAttributes
       </description>
-      <arg name="attributeIds" type="ATTRIBUTE_ID" array="true"/>
+      <arg name="attributeIds" type="ATTRIB_ID" array="true"/>
     </command>
     <command code="0x01" name="ReadAttributesResponse" source="either" disableDefaultResponse="true">
       <description>
@@ -104,7 +104,7 @@ limitations under the License.
       <description>
         Command description for DiscoverAttributes
       </description>
-      <arg name="startId" type="ATTRIBUTE_ID"/>
+      <arg name="startId" type="ATTRIB_ID"/>
       <arg name="maxAttributeIds" type="INT8U"/>
     </command>
     <command code="0x0D" name="DiscoverAttributesResponse" source="either" disableDefaultResponse="true">
@@ -154,7 +154,7 @@ limitations under the License.
     </command>
     <command code="0x15" name="DiscoverAttributesExtended" source="either">
       <description>This command is similar to the discover attributes command, but also includes a field to indicate whether the attribute is readable, writeable or reportable.</description>
-      <arg name="startId" type="ATTRIBUTE_ID"/>
+      <arg name="startId" type="ATTRIB_ID"/>
       <arg name="maxAttributeIds" type="INT8U"/>
     </command>
     <command code="0x16" name="DiscoverAttributesExtendedResponse" source="either" disableDefaultResponse="true">
@@ -389,7 +389,7 @@ limitations under the License.
     <attribute side="server" code="0x0003" define="SCENE_VALID" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">scene valid</attribute>
     <attribute side="server" code="0x0004" define="SCENE_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">name support</attribute>
     <!-- NAME_SUPPORT -->
-    <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="IEEE_ADDRESS" writable="false" optional="true">last configured by</attribute>
+    <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="EUI64" writable="false" optional="true">last configured by</attribute>
     <command source="client" code="0x00" name="AddScene" optional="false" cli="zcl scenes add">
       <description>
         Add a scene to the scene table. Extension field sets are supported, and are inputed as arrays of the form [[cluster ID] [length] [value0...n] ...]

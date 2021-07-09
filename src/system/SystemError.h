@@ -66,21 +66,6 @@ extern bool FormatLwIPError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
 // clang-format off
 
-// !!!!! IMPORTANT !!!!!
-// These definitions are present temporarily in order to reduce breakage for PRs in flight.
-// TODO: remove compatibility definitions
-using Error = CHIP_ERROR;
-#define CHIP_SYSTEM_NO_ERROR                    CHIP_NO_ERROR
-#define CHIP_SYSTEM_ERROR_ACCESS_DENIED         CHIP_ERROR_ACCESS_DENIED
-#define CHIP_SYSTEM_ERROR_BAD_ARGS              CHIP_ERROR_INVALID_ARGUMENT
-#define CHIP_SYSTEM_ERROR_NOT_SUPPORTED         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
-#define CHIP_SYSTEM_ERROR_NO_MEMORY             CHIP_ERROR_NO_MEMORY
-#define CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED  CHIP_ERROR_REAL_TIME_NOT_SYNCED
-#define CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT      CHIP_ERROR_UNEXPECTED_EVENT
-#define CHIP_SYSTEM_ERROR_UNEXPECTED_STATE      CHIP_ERROR_INCORRECT_STATE
-
-// clang-format on
-
 } // namespace System
 } // namespace chip
 

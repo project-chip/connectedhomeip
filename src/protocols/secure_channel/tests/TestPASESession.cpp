@@ -32,6 +32,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 using namespace chip;
 using namespace chip::Inet;
@@ -53,54 +54,29 @@ static void test_os_sleep_ms(uint64_t millisecs)
     nanosleep(&sleep_time, nullptr);
 }
 
-class PASETestLoopbackTransport : public Transport::Base
+class PASETestLoopbackTransport : public Test::LoopbackTransport
 {
-public:
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
+    void MessageDropped() override
     {
-        ReturnErrorOnFailure(mMessageSendError);
-        mSentMessageCount++;
-
-        if (mNumMessagesToDrop == 0)
+        // Trigger a retransmit.
+        if (mContext != nullptr)
         {
-            // The msgBuf is also being used for retransmission. So we cannot hand over the same buffer
-            // to the receive handler. The receive handler modifies the buffer for extracting headers etc.
-            // So the buffer passed to receive handler cannot be used for retransmission afterwards.
-            // Let's clone the message, and provide cloned message to the receive handler.
-            System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
-            HandleMessageReceived(address, std::move(receivedMessage));
+            test_os_sleep_ms(65);
+            ReliableMessageMgr * rm = mContext->GetExchangeManager().GetReliableMessageMgr();
+            ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm, CHIP_NO_ERROR);
         }
-        else
-        {
-            mNumMessagesToDrop--;
-            mDroppedMessageCount++;
-            if (mContext != nullptr)
-            {
-                test_os_sleep_ms(65);
-                ReliableMessageMgr * rm = mContext->GetExchangeManager().GetReliableMessageMgr();
-                ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm, CHIP_NO_ERROR);
-            }
-        }
-
-        return CHIP_NO_ERROR;
     }
 
+public:
     bool CanSendToPeer(const PeerAddress & address) override { return true; }
 
     void Reset()
     {
-        mNumMessagesToDrop   = 0;
-        mDroppedMessageCount = 0;
-        mSentMessageCount    = 0;
-        mMessageSendError    = CHIP_NO_ERROR;
-        mContext             = nullptr;
+        Test::LoopbackTransport::Reset();
+        mContext = nullptr;
     }
 
-    uint32_t mNumMessagesToDrop   = 0;
-    uint32_t mDroppedMessageCount = 0;
-    uint32_t mSentMessageCount    = 0;
-    CHIP_ERROR mMessageSendError  = CHIP_NO_ERROR;
-    TestContext * mContext        = nullptr;
+    TestContext * mContext = nullptr;
 };
 
 TransportMgrBase gTransportMgr;

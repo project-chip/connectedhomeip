@@ -23,56 +23,83 @@ void emberAfClusterInitCallback(chip::EndpointId endpoint, chip::ClusterId clust
 
 // Cluster Init Functions
 
-{{#all_user_clusters_names}}
+{{#zcl_clusters}}
 
-/** @brief {{name}} Cluster Init
+/** @brief {{label}} Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAf{{asCamelCased name false}}ClusterInitCallback(chip::EndpointId endpoint);
+void emberAf{{asUpperCamelCase label}}ClusterInitCallback(chip::EndpointId endpoint);
 
-{{/all_user_clusters_names}}
+{{/zcl_clusters}}
 
 // Cluster Server/Client Init Functions
 
-{{#all_user_clusters}}
+{{#zcl_clusters}}
 
 //
-// {{name}} Cluster {{side}}
+// {{label}} Cluster
 //
 
-/** @brief {{name}} Cluster {{asCamelCased side false}} Init
+/** @brief {{label}} Cluster Server Init
  *
- * {{asCamelCased side false}} Init
+ * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}InitCallback(chip::EndpointId endpoint);
+void emberAf{{asUpperCamelCase label}}ClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief {{name}} Cluster {{asCamelCased side false}} Attribute Changed
+/** @brief {{label}} Cluster Client Init
  *
- * {{asCamelCased side false}} Attribute Changed
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAf{{asUpperCamelCase label}}ClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief {{label}} Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
  *
  * @param endpoint    Endpoint that is being initialized
  * @param attributeId Attribute that changed
  */
-void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}AttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+void emberAf{{asUpperCamelCase label}}ClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
-/** @brief {{name}} Cluster {{asCamelCased side false}} Manufacturer Specific Attribute Changed
+/** @brief {{label}} Cluster Client Attribute Changed
  *
- * {{asCamelCased side false}} Manufacturer Specific Attribute Changed
+ * Client Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAf{{asUpperCamelCase label}}ClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief {{label}} Cluster Server Manufacturer Specific Attribute Changed
+ *
+ * Server Manufacturer Specific Attribute Changed
  *
  * @param endpoint          Endpoint that is being initialized
  * @param attributeId       Attribute that changed
  * @param manufacturerCode  Manufacturer Code of the attribute that changed
  */
-void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}ManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+void emberAf{{asUpperCamelCase label}}ClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 
-/** @brief {{name}} Cluster {{asCamelCased side false}} Message Sent
+/** @brief {{label}} Cluster Client Manufacturer Specific Attribute Changed
  *
- * {{asCamelCased side false}} Message Sent
+ * Client Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAf{{asUpperCamelCase label}}ClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
+
+/** @brief {{label}} Cluster Server Message Sent
+ *
+ * Server Message Sent
  *
  * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
@@ -81,11 +108,24 @@ void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}Manufac
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}MessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAf{{asUpperCamelCase label}}ClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief {{name}} Cluster {{asCamelCased side false}} Pre Attribute Changed
+/** @brief {{label}} Cluster Client Message Sent
  *
- * {{asCamelCased side}} Pre Attribute Changed
+ * Client Message Sent
+ *
+ * @param type               The type of message sent
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAf{{asUpperCamelCase label}}ClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+
+/** @brief {{label}} Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
  *
  * @param endpoint      Endpoint that is being initialized
  * @param attributeId   Attribute to be changed
@@ -93,39 +133,49 @@ void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}Message
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}PreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+EmberAfStatus emberAf{{asUpperCamelCase label}}ClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief {{name}} Cluster {{asCamelCased side false}} Tick
+/** @brief {{label}} Cluster Client Pre Attribute Changed
  *
- * {{asCamelCased side}} Tick
+ * Client Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAf{{asUpperCamelCase label}}ClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief {{label}} Cluster Server Tick
+ *
+ * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}TickCallback(chip::EndpointId endpoint);
-{{/all_user_clusters}}
+void emberAf{{asUpperCamelCase label}}ClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief {{label}} Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAf{{asUpperCamelCase label}}ClusterClientTickCallback(chip::EndpointId endpoint);
+
+{{/zcl_clusters}}
 
 // Cluster Commands Callback
 
-{{#all_user_clusters}}
-{{#if (isEnabled enabled)}}
-{{#all_user_cluster_commands}}
-{{#if (isStrEqual clusterName parent.name)}}
-{{#if (isCommandAvailable parent.side incoming outgoing commandSource)}}
+{{#zcl_clusters}}
+{{#zcl_commands}}
 /**
 * @brief {{parent.name}} Cluster {{name}} Command callback
 */
+bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback(chip::app::Command * commandObj{{#zcl_command_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/zcl_command_arguments}});
 
-bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(chip::app::Command * commandObj{{#zcl_command_arguments}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/zcl_command_arguments}});
-
-{{/if}}
-{{/if}}
-{{/all_user_cluster_commands}}
-{{/if}}
-{{/all_user_clusters}}
-
-//
-// Non-Cluster Related Callbacks
-//
+{{/zcl_commands}}
+{{/zcl_clusters}}
 
 /** @brief Add To Current App Tasks
  *

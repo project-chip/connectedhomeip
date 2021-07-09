@@ -60,46 +60,46 @@ uint64_t GetClock_MonotonicHiRes()
 
 // Platform-specific function for getting the current real (civil) time in microsecond Unix time format,
 // where |curTime| argument is the current time, expressed as Unix time scaled to microseconds.
-// Returns CHIP_SYSTEM_NO_ERROR if the method succeeded.
-Error GetClock_RealTime(uint64_t & curTime)
+// Returns CHIP_NO_ERROR if the method succeeded.
+CHIP_ERROR GetClock_RealTime(uint64_t & curTime)
 {
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
     if (res != 0)
     {
-        return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     curTime = (tv.tv_sec * UINT64_C(1000000)) + tv.tv_usec;
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 // Platform-specific function for getting the current real (civil) time in millisecond Unix time
 // where |curTimeMS| is the current time, expressed as Unix time scaled to milliseconds.
-// Returns CHIP_SYSTEM_NO_ERROR if the method succeeded.
-Error GetClock_RealTimeMS(uint64_t & curTimeMS)
+// Returns CHIP_NO_ERROR if the method succeeded.
+CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTimeMS)
 {
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
     if (res != 0)
     {
-        return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
     if (tv.tv_sec < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
     {
-        return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     curTimeMS = (tv.tv_sec * UINT64_C(1000)) + (tv.tv_usec / 1000);
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 // Platform-specific function for setting the current real (civil) time
 // where |newCurTime| is the  new current time, expressed as Unix time scaled to microseconds.
-// Returns CHIP_SYSTEM_NO_ERROR if the method succeeded.
-Error SetClock_RealTime(uint64_t newCurTime)
+// Returns CHIP_NO_ERROR if the method succeeded.
+CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
 {
     struct timeval tv;
     tv.tv_sec  = static_cast<time_t>(newCurTime / UINT64_C(1000000));
@@ -107,7 +107,7 @@ Error SetClock_RealTime(uint64_t newCurTime)
     int res    = settimeofday(&tv, NULL);
     if (res != 0)
     {
-        return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 #if CHIP_PROGRESS_LOGGING
     {
@@ -120,7 +120,7 @@ Error SetClock_RealTime(uint64_t newCurTime)
                         tv.tv_sec, year, month, dayOfMonth, hour, minute, second);
     }
 #endif // CHIP_PROGRESS_LOGGING
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Layer

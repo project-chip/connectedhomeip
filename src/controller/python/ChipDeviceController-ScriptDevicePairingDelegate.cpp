@@ -27,11 +27,24 @@ void ScriptDevicePairingDelegate::SetKeyExchangeCallback(DevicePairingDelegate_O
     mOnPairingCompleteCallback = callback;
 }
 
+void ScriptDevicePairingDelegate::SetCommissioningCompleteCallback(DevicePairingDelegate_OnCommissioningCompleteFunct callback)
+{
+    mOnCommissioningCompleteCallback = callback;
+}
+
 void ScriptDevicePairingDelegate::OnPairingComplete(CHIP_ERROR error)
 {
     if (mOnPairingCompleteCallback != nullptr)
     {
         mOnPairingCompleteCallback(error);
+    }
+}
+
+void ScriptDevicePairingDelegate::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR error)
+{
+    if (mOnCommissioningCompleteCallback != nullptr)
+    {
+        mOnCommissioningCompleteCallback(nodeId, error);
     }
 }
 

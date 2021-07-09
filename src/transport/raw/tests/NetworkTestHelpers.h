@@ -20,7 +20,11 @@
 
 #include <core/CHIPError.h>
 #include <inet/InetLayer.h>
+#include <lib/support/CodeUtils.h>
 #include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
+#include <transport/raw/Base.h>
+#include <transport/raw/PeerAddress.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -54,6 +58,51 @@ private:
     nlTestSuite * mSuite         = nullptr;
     System::Layer * mSystemLayer = nullptr;
     Inet::InetLayer * mInetLayer = nullptr;
+};
+
+class LoopbackTransport : public Transport::Base
+{
+public:
+    /// Transports are required to have a constructor that takes exactly one argument
+    CHIP_ERROR Init(const char *) { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override
+    {
+        ReturnErrorOnFailure(mMessageSendError);
+        mSentMessageCount++;
+
+        if (mNumMessagesToDrop == 0)
+        {
+            System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
+            HandleMessageReceived(address, std::move(receivedMessage));
+        }
+        else
+        {
+            mNumMessagesToDrop--;
+            mDroppedMessageCount++;
+            MessageDropped();
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    bool CanSendToPeer(const Transport::PeerAddress & address) override { return true; }
+
+    void Reset()
+    {
+        mNumMessagesToDrop   = 0;
+        mDroppedMessageCount = 0;
+        mSentMessageCount    = 0;
+        mMessageSendError    = CHIP_NO_ERROR;
+    }
+
+    // Hook for subclasses to perform custom logic on message drops.
+    virtual void MessageDropped() {}
+
+    uint32_t mNumMessagesToDrop   = 0;
+    uint32_t mDroppedMessageCount = 0;
+    uint32_t mSentMessageCount    = 0;
+    CHIP_ERROR mMessageSendError  = CHIP_NO_ERROR;
 };
 
 } // namespace Test

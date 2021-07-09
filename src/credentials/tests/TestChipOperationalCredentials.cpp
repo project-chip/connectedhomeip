@@ -34,12 +34,6 @@
 using namespace chip;
 using namespace chip::TestCerts;
 
-enum
-{
-    kTestCertBufSize = 1024, // Size of buffer needed to hold any of the test certificates
-                             // (in either CHIP or DER form), or to decode the certificates.
-};
-
 namespace {
 static const BitFlags<CertDecodeFlags> sGenTBSHashFlag(CertDecodeFlags::kGenerateTBSHash);
 static const BitFlags<CertDecodeFlags> sTrustAnchorFlag(CertDecodeFlags::kIsTrustAnchor);
@@ -128,7 +122,7 @@ static void TestChipOperationalCredentials_CertValidation(nlTestSuite * inSuite,
         const ValidationTestCase & testCase = sValidationTestCases[i];
 
         // Initialize the certificate set and load the specified test certificates.
-        certSet.Init(kMaxCertsPerTestCase, kTestCertBufSize);
+        certSet.Init(kMaxCertsPerTestCase, kMaxCHIPCertDecodeBufLength);
         for (size_t i2 = 0; i2 < kMaxCertsPerTestCase; i2++)
         {
             if (testCase.InputCerts[i2].Type != TestCerts::kNone)
@@ -199,7 +193,7 @@ static void TestChipOperationalCredentials_Serialization(nlTestSuite * inSuite, 
     };
 
     // Initialize the certificate set and load the specified test certificates.
-    certSet.Init(kMaxCerts, kTestCertBufSize);
+    certSet.Init(kMaxCerts, kMaxCHIPCertDecodeBufLength);
     err = LoadTestCert(certSet, TestCerts::kRoot01, sNullLoadFlag, sTrustAnchorFlag);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     err = LoadTestCert(certSet, TestCerts::kICA01, sNullLoadFlag, sGenTBSHashFlag);

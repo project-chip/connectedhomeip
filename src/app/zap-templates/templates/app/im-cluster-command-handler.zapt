@@ -4,9 +4,9 @@
 #include <cinttypes>
 
 #include "app/common/gen/af-structs.h"
-#include "app/common/gen/cluster-id.h"
-#include "app/common/gen/command-id.h"
-#include "callback.h"
+#include "app/common/gen/callback.h"
+#include "app/common/gen/ids/Clusters.h"
+#include "app/common/gen/ids/Commands.h"
 #include "app/util/util.h"
 
 #include <app/InteractionModelEngine.h>
@@ -37,9 +37,6 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, Com
     uint32_t expectArgumentCount = 0;
     uint32_t currentDecodeTagId = 0;
     bool wasHandled = false;
-    {{#if (user_cluster_has_enabled_manufacturer_command name side)}}
-    {{else}}
-    {{/if}}
     {
         switch (aCommandId)
         {
@@ -47,7 +44,7 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, Com
         {{#unless mfgCode}}
         {{#if (isStrEqual clusterName parent.name)}}
         {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
-        case ZCL_{{asDelimitedMacro name}}_COMMAND_ID: {
+        case Clusters::{{asUpperCamelCase parent.name}}::Commands::Ids::{{asUpperCamelCase name}}: {
         {{> im_command_handler_cluster_commands}}
             break;
         }
@@ -59,12 +56,12 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, Com
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                        0, // GroupId
-                                                       ZCL_{{asDelimitedMacro define}}_ID,
+                                                       Clusters::{{asUpperCamelCase name}}::Id,
                                                        aCommandId,
                                                        (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_{{asDelimitedMacro define}}_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::{{asUpperCamelCase name}}::Id);
             return;
         }
         }
@@ -74,7 +71,7 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, Com
     {
       chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                        0, // GroupId
-                                                       ZCL_{{asDelimitedMacro define}}_ID,
+                                                       Clusters::{{asUpperCamelCase name}}::Id,
                                                        aCommandId,
                                                        (chip::app::CommandPathFlags::kEndpointIdValid) };
       apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest, Protocols::SecureChannel::Id,
@@ -102,7 +99,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     {
     {{#all_user_clusters}}
     {{#if (user_cluster_has_enabled_command name side)}}
-    case ZCL_{{asDelimitedMacro define}}_ID :
+    case Clusters::{{asUpperCamelCase name}}::Id:
         clusters::{{asCamelCased name false}}::Dispatch{{asCamelCased side false}}Command(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     {{/if}}

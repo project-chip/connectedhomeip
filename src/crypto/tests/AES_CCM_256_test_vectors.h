@@ -19,8 +19,7 @@
  * @file - This file contains AES-CCM test vectors.
  */
 
-#ifndef _AES_CCM_256_TEST_VECTORS_H_
-#define _AES_CCM_256_TEST_VECTORS_H_
+#pragma once
 
 typedef struct ccm_test_vector
 {
@@ -1527,4 +1526,3 @@ static const struct ccm_test_vector chiptest_12cb0ed34854_test_vector_1471 = { .
 
 static const struct ccm_test_vector * ccm_invalid_test_vectors[] = { &chiptest_12cb0ed34854_test_vector_3781,
                                                                      &chiptest_12cb0ed34854_test_vector_1471 };
-#endif

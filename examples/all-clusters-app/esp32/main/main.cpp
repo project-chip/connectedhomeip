@@ -766,3 +766,8 @@ extern "C" void app_main()
         vTaskDelay(50 / portTICK_PERIOD_MS);
     }
 }
+
+bool lowPowerClusterSleep()
+{
+    return true;
+}

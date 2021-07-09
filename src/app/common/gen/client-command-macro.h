@@ -23,7 +23,7 @@
 /** @brief Command description for ReadAttributes
  *
  * Command: ReadAttributes
- * @param attributeIds ATTRIBUTE_ID []
+ * @param attributeIds ATTRIB_ID []
  * @param attributeIdsLen int
  */
 #define emberAfFillCommandGlobalReadAttributes(clusterId, attributeIds, attributeIdsLen)                                           \
@@ -144,7 +144,7 @@
 /** @brief Command description for DiscoverAttributes
  *
  * Command: DiscoverAttributes
- * @param startId ATTRIBUTE_ID
+ * @param startId ATTRIB_ID
  * @param maxAttributeIds INT8U
  */
 #define emberAfFillCommandGlobalDiscoverAttributes(clusterId, startId, maxAttributeIds)                                            \
@@ -238,7 +238,7 @@
 /** @brief Command description for DiscoverAttributesExtended
  *
  * Command: DiscoverAttributesExtended
- * @param startId ATTRIBUTE_ID
+ * @param startId ATTRIB_ID
  * @param maxAttributeIds INT8U
  */
 #define emberAfFillCommandGlobalDiscoverAttributesExtended(clusterId, startId, maxAttributeIds)                                    \
@@ -2130,7 +2130,7 @@
  * Command: RetrieveLogsResponse
  * @param status LogsStatus
  * @param content OCTET_STRING
- * @param timeStamp UTC_TIME
+ * @param timeStamp UTC
  * @param timeSinceBoot INT32U
  */
 #define emberAfFillCommandDiagnostic                                                                                               \
@@ -3512,24 +3512,29 @@
  * @param enhancedHue INT16U
  * @param direction HueDirection
  * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor                                                                                                    \
-    ControlClusterEnhancedMoveToHue(enhancedHue, direction, transitionTime)                                                        \
+    ControlClusterEnhancedMoveToHue(enhancedHue, direction, transitionTime, optionsMask, optionsOverride)                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ENHANCED_MOVE_TO_HUE_COMMAND_ID, "uuu", enhancedHue, direction, transitionTime);
+                                  ZCL_ENHANCED_MOVE_TO_HUE_COMMAND_ID, "uuuuu", enhancedHue, direction, transitionTime,            \
+                                  optionsMask, optionsOverride);
 
 /** @brief Command description for EnhancedMoveHue
  *
  * Command: EnhancedMoveHue
  * @param moveMode HueMoveMode
  * @param rate INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor                                                                                                    \
-    ControlClusterEnhancedMoveHue(moveMode, rate)                                                                                  \
+    ControlClusterEnhancedMoveHue(moveMode, rate, optionsMask, optionsOverride)                                                    \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ENHANCED_MOVE_HUE_COMMAND_ID, "uu", moveMode, rate);
+                                  ZCL_ENHANCED_MOVE_HUE_COMMAND_ID, "uuuu", moveMode, rate, optionsMask, optionsOverride);
 
 /** @brief Command description for EnhancedStepHue
  *
@@ -3537,12 +3542,14 @@
  * @param stepMode HueStepMode
  * @param stepSize INT16U
  * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor                                                                                                    \
-    ControlClusterEnhancedStepHue(stepMode, stepSize, transitionTime)                                                              \
-        emberAfFillExternalBuffer(mask,                                                                                            \
+    ControlClusterEnhancedStepHue(stepMode, stepSize, transitionTime, optionsMask, optionsOverride) emberAfFillExternalBuffer(     \
+        mask,                                                                                                                      \
                                                                                                                                    \
-                                  ZCL_ENHANCED_STEP_HUE_COMMAND_ID, "uuu", stepMode, stepSize, transitionTime);
+        ZCL_ENHANCED_STEP_HUE_COMMAND_ID, "uuuuu", stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
 
 /** @brief Command description for EnhancedMoveToHueAndSaturation
  *
@@ -3550,12 +3557,15 @@
  * @param enhancedHue INT16U
  * @param saturation INT8U
  * @param transitionTime INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor                                                                                                    \
-    ControlClusterEnhancedMoveToHueAndSaturation(enhancedHue, saturation, transitionTime) emberAfFillExternalBuffer(               \
-        mask,                                                                                                                      \
+    ControlClusterEnhancedMoveToHueAndSaturation(enhancedHue, saturation, transitionTime, optionsMask, optionsOverride)            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-        ZCL_ENHANCED_MOVE_TO_HUE_AND_SATURATION_COMMAND_ID, "uuu", enhancedHue, saturation, transitionTime);
+                                  ZCL_ENHANCED_MOVE_TO_HUE_AND_SATURATION_COMMAND_ID, "uuuuu", enhancedHue, saturation,            \
+                                  transitionTime, optionsMask, optionsOverride);
 
 /** @brief Command description for ColorLoopSet
  *
@@ -3565,12 +3575,15 @@
  * @param direction ColorLoopDirection
  * @param time INT16U
  * @param startHue INT16U
+ * @param optionsMask BITMAP8
+ * @param optionsOverride BITMAP8
  */
 #define emberAfFillCommandColor                                                                                                    \
-    ControlClusterColorLoopSet(updateFlags, action, direction, time, startHue)                                                     \
+    ControlClusterColorLoopSet(updateFlags, action, direction, time, startHue, optionsMask, optionsOverride)                       \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_COLOR_LOOP_SET_COMMAND_ID, "uuuuu", updateFlags, action, direction, time, startHue);
+                                  ZCL_COLOR_LOOP_SET_COMMAND_ID, "uuuuuuu", updateFlags, action, direction, time, startHue,        \
+                                  optionsMask, optionsOverride);
 
 /** @brief Command description for StopMoveStep
  *
@@ -4316,26 +4329,26 @@
                                                                                                                                    \
                                   ZCL_MEDIA_SKIP_BACKWARD_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
 
-/** @brief Command description for MediaSkipSeek
+/** @brief Command description for MediaSeek
  *
- * Command: MediaSkipSeek
+ * Command: MediaSeek
  * @param position INT64U
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterMediaSkipSeek(position) emberAfFillExternalBuffer(mask,                                                         \
+    PlaybackClusterMediaSeek(position) emberAfFillExternalBuffer(mask,                                                             \
                                                                                                                                    \
-                                                                     ZCL_MEDIA_SKIP_SEEK_COMMAND_ID, "u", position);
+                                                                 ZCL_MEDIA_SEEK_COMMAND_ID, "u", position);
 
-/** @brief Command description for MediaSkipSeekResponse
+/** @brief Command description for MediaSeekResponse
  *
- * Command: MediaSkipSeekResponse
+ * Command: MediaSeekResponse
  * @param mediaPlaybackStatus MediaPlaybackStatus
  */
 #define emberAfFillCommandMedia                                                                                                    \
-    PlaybackClusterMediaSkipSeekResponse(mediaPlaybackStatus)                                                                      \
+    PlaybackClusterMediaSeekResponse(mediaPlaybackStatus)                                                                          \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_MEDIA_SKIP_SEEK_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
+                                  ZCL_MEDIA_SEEK_RESPONSE_COMMAND_ID, "u", mediaPlaybackStatus);
 
 /** @brief Command description for SelectInput
  *
@@ -4531,14 +4544,12 @@
 /** @brief Command description for LaunchApp
  *
  * Command: LaunchApp
- * @param application ApplicationLauncherApp []
- * @param applicationLen int
+ * @param catalogVendorId INT16U
  */
 #define emberAfFillCommandApplication                                                                                              \
-    LauncherClusterLaunchApp(application, applicationLen)                                                                          \
-        emberAfFillExternalBuffer(mask,                                                                                            \
+    LauncherClusterLaunchApp(catalogVendorId) emberAfFillExternalBuffer(mask,                                                      \
                                                                                                                                    \
-                                  ZCL_LAUNCH_APP_COMMAND_ID, "b", application, applicationLen);
+                                                                        ZCL_LAUNCH_APP_COMMAND_ID, "u", catalogVendorId);
 
 /** @brief Command description for LaunchAppResponse
  *
@@ -4549,6 +4560,16 @@
     LauncherClusterLaunchAppResponse(data) emberAfFillExternalBuffer(mask,                                                         \
                                                                                                                                    \
                                                                      ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID, "u", data);
+
+/** @brief Command description for LaunchApp
+ *
+ * Command: LaunchApp
+ * @param applicationId CHAR_STRING
+ */
+#define emberAfFillCommandApplication                                                                                              \
+    LauncherClusterLaunchApp(applicationId) emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_LAUNCH_APP_COMMAND_ID, "u", applicationId);
 
 /** @brief Command description for ChangeStatus
  *
@@ -4654,7 +4675,7 @@
  * Command: DisplayMessage
  * @param messageId INT32U
  * @param messageControl MessagingControlMask
- * @param startTime UTC_TIME
+ * @param startTime UTC
  * @param durationInMinutes INT16U
  * @param message CHAR_STRING
  * @param optionalExtendedMessageControl MessagingExtendedControlMask
@@ -4699,7 +4720,7 @@
 /** @brief Command description for MessageConfirmation
  *
  * Command: MessageConfirmation
- * @param confirmationTime UTC_TIME
+ * @param confirmationTime UTC
  * @param messageConfirmationControl BITMAP8
  * @param messageResponse OCTET_STRING
  */
@@ -4722,7 +4743,7 @@
 /** @brief Command description for GetMessageCancellation
  *
  * Command: GetMessageCancellation
- * @param earliestImplementationTime UTC_TIME
+ * @param earliestImplementationTime UTC
  */
 #define emberAfFillCommandMessagingClusterGetMessageCancellation(earliestImplementationTime)                                       \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -4733,7 +4754,7 @@
  *
  * Command: DisplayProtectedMessage
  * @param messageControl MessagingControlMask
- * @param startTime UTC_TIME
+ * @param startTime UTC
  * @param durationInMinutes INT16U
  * @param message CHAR_STRING
  * @param optionalExtendedMessageControl MessagingExtendedControlMask
@@ -4748,7 +4769,7 @@
 /** @brief Command description for CancelAllMessages
  *
  * Command: CancelAllMessages
- * @param implementationDateTime UTC_TIME
+ * @param implementationDateTime UTC
  */
 #define emberAfFillCommandMessagingClusterCancelAllMessages(implementationDateTime)                                                \
     emberAfFillExternalBuffer(mask,                                                                                                \

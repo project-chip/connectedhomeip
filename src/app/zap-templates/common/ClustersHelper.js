@@ -321,12 +321,30 @@ function enhancedCommands(commands, types)
   });
 
   commands.forEach(command => {
+    command.isResponse = command.name.includes('Response');
+  });
+
+  commands.forEach(command => {
     // This filter uses the assumption that a response to a command has a well defined name, such as
     // (response name) == (command name + 'Response') or s/Request/Response. This is very often the case,
     // but this is not always true since some clusters use the same response to answer different commands, such as the
     // operational cluster.
-    const automaticFilter = response => (response.name == (command.name + 'Response')
-        || (command.name.includes('Request') && response.name == (command.name.replace('Request', 'Response'))));
+    const automaticFilter = response => {
+      if (!response.isResponse) {
+        return false;
+      }
+
+      if (response.clusterName != command.clusterName) {
+        return false;
+      }
+
+      if (response.name == command.name) {
+        return false;
+      }
+
+      return (response.name == (command.name + 'Response')) || (response.name == (command.name.replace('Request', 'Response')));
+    };
+
     const manualFilter = response => {
       switch (command.name) {
       case 'AddOpCert':
@@ -352,9 +370,23 @@ function enhancedCommands(commands, types)
     }
   });
 
+  // Filter unused responses
+  commands = commands.filter(command => {
+    if (!command.isResponse) {
+      return true;
+    }
+
+    const responseName = command.name;
+    return commands.find(command => command.responseName == responseName);
+  });
+
   // At this stage, 'command.arguments' may contains 'struct'. But controllers does not know (yet) how
   // to handle them. So those needs to be inlined.
   commands.forEach(command => {
+    if (command.isResponse) {
+      return;
+    }
+
     command.arguments = inlineStructItems(command.arguments);
   });
   return commands;
@@ -436,13 +468,13 @@ Clusters.getClusters = function()
 
 Clusters.getCommands = function(name, side)
 {
-    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase() && command.clusterSide == side && command.name.includes('Response') == false;
+    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase() && command.clusterSide == side && command.isResponse == false;
     return this.ready.then(() => this._commands.filter(filter));
 }
 
 Clusters.getResponses = function(name, side)
 {
-    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase() && command.clusterSide == side && command.name.includes('Response') == true;
+    const filter = command => command.clusterName.toLowerCase() == name.toLowerCase() && command.clusterSide == side && command.isResponse == true;
     return this.ready.then(() => this._commands.filter(filter));
 }
 

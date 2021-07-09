@@ -21,10 +21,10 @@
 #include <cstdint>
 
 #include "app/common/gen/af-structs.h"
-#include "app/common/gen/cluster-id.h"
-#include "app/common/gen/command-id.h"
+#include "app/common/gen/callback.h"
+#include "app/common/gen/ids/Clusters.h"
+#include "app/common/gen/ids/Commands.h"
 #include "app/util/util.h"
-#include "callback.h"
 
 #include <app/InteractionModelEngine.h>
 
@@ -55,7 +55,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case ZCL_ARM_FAIL_SAFE_COMMAND_ID: {
+        case Clusters::GeneralCommissioning::Commands::Ids::ArmFailSafe: {
             expectArgumentCount = 3;
             uint16_t expiryLengthSeconds;
             uint64_t breadcrumb;
@@ -123,13 +123,13 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_COMMISSIONING_COMPLETE_COMMAND_ID: {
+        case Clusters::GeneralCommissioning::Commands::Ids::CommissioningComplete: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj);
             break;
         }
-        case ZCL_SET_REGULATORY_CONFIG_COMMAND_ID: {
+        case Clusters::GeneralCommissioning::Commands::Ids::SetRegulatoryConfig: {
             expectArgumentCount = 4;
             uint8_t location;
             const uint8_t * countryCode;
@@ -206,12 +206,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               ZCL_GENERAL_COMMISSIONING_CLUSTER_ID, aCommandId,
+                                                               Clusters::GeneralCommissioning::Id, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_GENERAL_COMMISSIONING_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::GeneralCommissioning::Id);
             return;
         }
         }
@@ -221,7 +221,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           ZCL_GENERAL_COMMISSIONING_CLUSTER_ID, aCommandId,
+                                                           Clusters::GeneralCommissioning::Id, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -251,7 +251,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case ZCL_ADD_THREAD_NETWORK_COMMAND_ID: {
+        case Clusters::NetworkCommissioning::Commands::Ids::AddThreadNetwork: {
             expectArgumentCount = 3;
             chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
@@ -322,7 +322,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_ADD_WI_FI_NETWORK_COMMAND_ID: {
+        case Clusters::NetworkCommissioning::Commands::Ids::AddWiFiNetwork: {
             expectArgumentCount = 4;
             chip::ByteSpan ssid;
             chip::ByteSpan credentials;
@@ -400,7 +400,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_DISABLE_NETWORK_COMMAND_ID: {
+        case Clusters::NetworkCommissioning::Commands::Ids::DisableNetwork: {
             expectArgumentCount = 3;
             chip::ByteSpan networkID;
             uint64_t breadcrumb;
@@ -471,7 +471,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_ENABLE_NETWORK_COMMAND_ID: {
+        case Clusters::NetworkCommissioning::Commands::Ids::EnableNetwork: {
             expectArgumentCount = 3;
             chip::ByteSpan networkID;
             uint64_t breadcrumb;
@@ -542,7 +542,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID: {
+        case Clusters::NetworkCommissioning::Commands::Ids::GetLastNetworkCommissioningResult: {
             expectArgumentCount = 1;
             uint32_t timeoutMs;
             bool argExists[1];
@@ -601,7 +601,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_REMOVE_NETWORK_COMMAND_ID: {
+        case Clusters::NetworkCommissioning::Commands::Ids::RemoveNetwork: {
             expectArgumentCount = 3;
             chip::ByteSpan NetworkID;
             uint64_t Breadcrumb;
@@ -672,7 +672,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_SCAN_NETWORKS_COMMAND_ID: {
+        case Clusters::NetworkCommissioning::Commands::Ids::ScanNetworks: {
             expectArgumentCount = 3;
             chip::ByteSpan ssid;
             uint64_t breadcrumb;
@@ -742,7 +742,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID: {
+        case Clusters::NetworkCommissioning::Commands::Ids::UpdateThreadNetwork: {
             expectArgumentCount = 3;
             chip::ByteSpan operationalDataset;
             uint64_t breadcrumb;
@@ -813,7 +813,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID: {
+        case Clusters::NetworkCommissioning::Commands::Ids::UpdateWiFiNetwork: {
             expectArgumentCount = 4;
             chip::ByteSpan ssid;
             chip::ByteSpan credentials;
@@ -895,12 +895,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               ZCL_NETWORK_COMMISSIONING_CLUSTER_ID, aCommandId,
+                                                               Clusters::NetworkCommissioning::Id, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_NETWORK_COMMISSIONING_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::NetworkCommissioning::Id);
             return;
         }
         }
@@ -910,7 +910,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           ZCL_NETWORK_COMMISSIONING_CLUSTER_ID, aCommandId,
+                                                           Clusters::NetworkCommissioning::Id, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -940,7 +940,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case ZCL_ADD_OP_CERT_COMMAND_ID: {
+        case Clusters::OperationalCredentials::Commands::Ids::AddOpCert: {
             expectArgumentCount = 4;
             chip::ByteSpan NOCArray;
             chip::ByteSpan IPKValue;
@@ -1018,7 +1018,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID: {
+        case Clusters::OperationalCredentials::Commands::Ids::AddTrustedRootCertificate: {
             expectArgumentCount = 1;
             chip::ByteSpan RootCertificate;
             bool argExists[1];
@@ -1080,7 +1080,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_OP_CSR_REQUEST_COMMAND_ID: {
+        case Clusters::OperationalCredentials::Commands::Ids::OpCSRRequest: {
             expectArgumentCount = 1;
             chip::ByteSpan CSRNonce;
             bool argExists[1];
@@ -1142,13 +1142,13 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_REMOVE_ALL_FABRICS_COMMAND_ID: {
+        case Clusters::OperationalCredentials::Commands::Ids::RemoveAllFabrics: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(apCommandObj);
             break;
         }
-        case ZCL_REMOVE_FABRIC_COMMAND_ID: {
+        case Clusters::OperationalCredentials::Commands::Ids::RemoveFabric: {
             expectArgumentCount = 3;
             chip::FabricId FabricId;
             chip::NodeId NodeId;
@@ -1215,7 +1215,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID: {
+        case Clusters::OperationalCredentials::Commands::Ids::RemoveTrustedRootCertificate: {
             expectArgumentCount = 1;
             chip::ByteSpan TrustedRootIdentifier;
             bool argExists[1];
@@ -1278,7 +1278,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_SET_FABRIC_COMMAND_ID: {
+        case Clusters::OperationalCredentials::Commands::Ids::SetFabric: {
             expectArgumentCount = 1;
             uint16_t VendorId;
             bool argExists[1];
@@ -1337,7 +1337,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID: {
+        case Clusters::OperationalCredentials::Commands::Ids::UpdateFabricLabel: {
             expectArgumentCount = 1;
             const uint8_t * Label;
             bool argExists[1];
@@ -1402,13 +1402,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, aCommandId,
+                                                               Clusters::OperationalCredentials::Id, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId,
-                         ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::OperationalCredentials::Id);
             return;
         }
         }
@@ -1418,7 +1417,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, aCommandId,
+                                                           Clusters::OperationalCredentials::Id, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -1448,13 +1447,13 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case ZCL_DOWN_OR_CLOSE_COMMAND_ID: {
+        case Clusters::WindowCovering::Commands::Ids::DownOrClose: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfWindowCoveringClusterDownOrCloseCallback(apCommandObj);
             break;
         }
-        case ZCL_GO_TO_LIFT_PERCENTAGE_COMMAND_ID: {
+        case Clusters::WindowCovering::Commands::Ids::GoToLiftPercentage: {
             expectArgumentCount = 2;
             uint8_t liftPercentageValue;
             uint16_t liftPercent100thsValue;
@@ -1518,7 +1517,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_GO_TO_LIFT_VALUE_COMMAND_ID: {
+        case Clusters::WindowCovering::Commands::Ids::GoToLiftValue: {
             expectArgumentCount = 1;
             uint16_t liftValue;
             bool argExists[1];
@@ -1577,7 +1576,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_GO_TO_TILT_PERCENTAGE_COMMAND_ID: {
+        case Clusters::WindowCovering::Commands::Ids::GoToTiltPercentage: {
             expectArgumentCount = 2;
             uint8_t tiltPercentageValue;
             uint16_t tiltPercent100thsValue;
@@ -1641,7 +1640,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_GO_TO_TILT_VALUE_COMMAND_ID: {
+        case Clusters::WindowCovering::Commands::Ids::GoToTiltValue: {
             expectArgumentCount = 1;
             uint16_t tiltValue;
             bool argExists[1];
@@ -1700,13 +1699,13 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
             break;
         }
-        case ZCL_STOP_MOTION_COMMAND_ID: {
+        case Clusters::WindowCovering::Commands::Ids::StopMotion: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfWindowCoveringClusterStopMotionCallback(apCommandObj);
             break;
         }
-        case ZCL_UP_OR_OPEN_COMMAND_ID: {
+        case Clusters::WindowCovering::Commands::Ids::UpOrOpen: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             wasHandled = emberAfWindowCoveringClusterUpOrOpenCallback(apCommandObj);
@@ -1716,12 +1715,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                                0, // GroupId
-                                                               ZCL_WINDOW_COVERING_CLUSTER_ID, aCommandId,
+                                                               Clusters::WindowCovering::Id, aCommandId,
                                                                (chip::app::CommandPathFlags::kEndpointIdValid) };
             apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                         Protocols::SecureChannel::Id,
                                         Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, ZCL_WINDOW_COVERING_CLUSTER_ID);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::WindowCovering::Id);
             return;
         }
         }
@@ -1731,7 +1730,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         chip::app::CommandPathParams returnStatusParam = { aEndpointId,
                                                            0, // GroupId
-                                                           ZCL_WINDOW_COVERING_CLUSTER_ID, aCommandId,
+                                                           Clusters::WindowCovering::Id, aCommandId,
                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
@@ -1756,16 +1755,16 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     SuccessOrExit(aReader.EnterContainer(dataTlvType));
     switch (aClusterId)
     {
-    case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
+    case Clusters::GeneralCommissioning::Id:
         clusters::GeneralCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
+    case Clusters::NetworkCommissioning::Id:
         clusters::NetworkCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
+    case Clusters::OperationalCredentials::Id:
         clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    case ZCL_WINDOW_COVERING_CLUSTER_ID:
+    case Clusters::WindowCovering::Id:
         clusters::WindowCovering::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     default:

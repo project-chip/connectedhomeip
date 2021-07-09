@@ -310,20 +310,6 @@
  *  @}
  */
 
-// !!!!! IMPORTANT !!!!!
-// These definitions are present temporarily in order to reduce breakage for PRs in flight.
-// TODO: remove compatibility definitions
-#define BLE_ERROR                               CHIP_ERROR
-#define BLE_NO_ERROR                            CHIP_NO_ERROR
-#define BLE_ERROR_BAD_ARGS                      CHIP_ERROR_INVALID_ARGUMENT
-#define BLE_ERROR_INCORRECT_STATE               CHIP_ERROR_INCORRECT_STATE
-#define BLE_ERROR_MESSAGE_INCOMPLETE            CHIP_ERROR_MESSAGE_INCOMPLETE
-#define BLE_ERROR_NOT_IMPLEMENTED               CHIP_ERROR_NOT_IMPLEMENTED
-#define BLE_ERROR_NO_ENDPOINTS                  CHIP_ERROR_ENDPOINT_POOL_FULL
-#define BLE_ERROR_NO_MEMORY                     CHIP_ERROR_NO_MEMORY
-#define BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG      CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG
-#define BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG      CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG
-
 // clang-format on
 
 namespace chip {

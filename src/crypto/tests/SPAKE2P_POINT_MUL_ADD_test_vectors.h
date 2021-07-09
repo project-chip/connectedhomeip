@@ -16,11 +16,10 @@
  */
 
 /**
- * @file - This file contains point multipication & addition test vectors.
+ * @file - This file contains elliptic curve point multiplication & addition test vectors.
  */
 
-#ifndef _SPAKE2P_POINT_MUL_ADD_TEST_VECTORS_H_
-#define _SPAKE2P_POINT_MUL_ADD_TEST_VECTORS_H_
+#pragma once
 
 namespace chip {
 namespace Crypto {
@@ -772,5 +771,3 @@ static const struct spake2p_point_muladd_tv * point_muladd_tvs[] = {
 
 } // namespace Crypto
 } // namespace chip
-
-#endif

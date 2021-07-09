@@ -159,7 +159,7 @@ bool Cmd_ValidateCert(int argc, char * argv[])
     res = ParseArgs(CMD_NAME, argc, argv, gCmdOptionSets, HandleNonOptionArgs);
     VerifyTrueOrExit(res);
 
-    err = certSet.Init(kMaxCerts, kMaxDERCertLength);
+    err = certSet.Init(kMaxCerts, kMaxCHIPCertDecodeBufLength);
     if (err != CHIP_NO_ERROR)
     {
         fprintf(stderr, "Failed to initialize certificate set: %s\n", chip::ErrorStr(err));

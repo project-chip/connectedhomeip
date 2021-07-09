@@ -43,6 +43,7 @@
 #include "app/util/common.h"
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
+#include <app/common/gen/callback.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/common/gen/print-cluster.h>
@@ -50,8 +51,6 @@
 #include <app/util/af-event.h>
 #include <app/util/af-main.h>
 #include <app/util/af.h>
-
-#include "gen/callback.h"
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -845,7 +844,7 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
         emberAfPutInt16uInResp(cmd->mfgCode);
     }
     emberAfPutInt8uInResp(cmd->seqNum);
-    emberAfPutInt8uInResp(ZCL_DEFAULT_RESPONSE_COMMAND_ID);
+    emberAfPutInt32uInResp(ZCL_DEFAULT_RESPONSE_COMMAND_ID);
     emberAfPutInt32uInResp(cmd->commandId);
     emberAfPutStatusInResp(status);
 

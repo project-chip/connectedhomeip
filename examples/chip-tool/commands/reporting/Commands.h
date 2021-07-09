@@ -39,6 +39,7 @@ public:
         delete onReportColorControlColorTemperatureCallback;
         delete onReportDoorLockLockStateCallback;
         delete onReportLevelControlCurrentLevelCallback;
+        delete onReportOccupancySensingOccupancyCallback;
         delete onReportOnOffOnOffCallback;
         delete onReportPressureMeasurementMeasuredValueCallback;
         delete onReportPumpConfigurationAndControlCapacityCallback;
@@ -77,6 +78,8 @@ public:
                                        onReportDoorLockLockStateCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0008, 0x0000,
                                        onReportLevelControlCurrentLevelCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0406, 0x0000,
+                                       onReportOccupancySensingOccupancyCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0006, 0x0000, onReportOnOffOnOffCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0403, 0x0000,
                                        onReportPressureMeasurementMeasuredValueCallback->Cancel());
@@ -158,6 +161,8 @@ private:
     chip::Callback::Callback<Int8uAttributeCallback> * onReportDoorLockLockStateCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportOccupancySensingOccupancyCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);

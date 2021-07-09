@@ -25,11 +25,18 @@
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 #include <lib/core/CHIPSafeCasts.h>
 #include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
 #include <support/Span.h>
 #include <transport/raw/MessageHeader.h>
+
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+#define CASE_OPS_KEY 0xCA5EECC0
+#endif
 
 namespace chip {
 namespace Transport {
@@ -99,7 +106,12 @@ public:
     {
         if (mOperationalKey == nullptr)
         {
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+            mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
+            mOperationalKey->SetKeyId(CASE_OPS_KEY);
+#else
             mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
+#endif
             mOperationalKey->Initialize();
         }
         return mOperationalKey;
@@ -164,7 +176,11 @@ private:
 
     AccessControlList mACL;
 
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+    Crypto::P256KeypairHSM * mOperationalKey = nullptr;
+#else
     Crypto::P256Keypair * mOperationalKey = nullptr;
+#endif
 
     uint8_t * mRootCert            = nullptr;
     uint16_t mRootCertLen          = 0;

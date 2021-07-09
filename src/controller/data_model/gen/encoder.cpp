@@ -72,6 +72,7 @@ using namespace chip::Encoding::LittleEndian;
 | Descriptor                                                          | 0x001D |
 | DiagnosticLogs                                                      | 0x0032 |
 | DoorLock                                                            | 0x0101 |
+| ElectricalMeasurement                                               | 0x0B04 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
 | FixedLabel                                                          | 0x0040 |
 | FlowMeasurement                                                     | 0x0404 |
@@ -87,6 +88,7 @@ using namespace chip::Encoding::LittleEndian;
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
+| OccupancySensing                                                    | 0x0406 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PressureMeasurement                                                 | 0x0403 |
@@ -164,7 +166,7 @@ PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAttribute(uint8_t
 | * ProductId                                                         | 0x0003 |
 | * ApplicationId                                                     | 0x0005 |
 | * CatalogVendorId                                                   | 0x0006 |
-| * ApplicationSatus                                                  | 0x0007 |
+| * ApplicationStatus                                                 | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -254,15 +256,15 @@ PacketBufferHandle encodeApplicationBasicClusterReadCatalogVendorIdAttribute(uin
 }
 
 /*
- * Attribute ApplicationSatus
+ * Attribute ApplicationStatus
  */
-PacketBufferHandle encodeApplicationBasicClusterReadApplicationSatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+PacketBufferHandle encodeApplicationBasicClusterReadApplicationStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
-    COMMAND_HEADER("ReadApplicationBasicApplicationSatus", ApplicationBasic::Id);
+    COMMAND_HEADER("ReadApplicationBasicApplicationStatus", ApplicationBasic::Id);
     buf.Put8(kFrameControlGlobalCommand)
         .Put8(seqNum)
         .Put32(Globals::Commands::Ids::ReadAttributes)
-        .Put32(ApplicationBasic::Attributes::Ids::ApplicationSatus);
+        .Put32(ApplicationBasic::Attributes::Ids::ApplicationStatus);
     COMMAND_FOOTER();
 }
 
@@ -287,6 +289,8 @@ PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uin
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ApplicationLauncherList                                           | 0x0000 |
+| * CatalogVendorId                                                   | 0x0001 |
+| * ApplicationId                                                     | 0x0002 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -312,6 +316,32 @@ PacketBufferHandle encodeApplicationLauncherClusterReadApplicationLauncherListAt
 }
 
 /*
+ * Attribute CatalogVendorId
+ */
+PacketBufferHandle encodeApplicationLauncherClusterReadCatalogVendorIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationLauncherCatalogVendorId", ApplicationLauncher::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ApplicationLauncher::Attributes::Ids::CatalogVendorId);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ApplicationId
+ */
+PacketBufferHandle encodeApplicationLauncherClusterReadApplicationIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationLauncherApplicationId", ApplicationLauncher::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ApplicationLauncher::Attributes::Ids::ApplicationId);
+    COMMAND_FOOTER();
+}
+
+/*
  * Attribute ClusterRevision
  */
 PacketBufferHandle encodeApplicationLauncherClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
@@ -333,6 +363,7 @@ PacketBufferHandle encodeApplicationLauncherClusterReadClusterRevisionAttribute(
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * AudioOutputList                                                   | 0x0000 |
+| * CurrentAudioOutput                                                | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -353,6 +384,19 @@ PacketBufferHandle encodeAudioOutputClusterReadAudioOutputListAttribute(uint8_t 
         .Put8(seqNum)
         .Put32(Globals::Commands::Ids::ReadAttributes)
         .Put32(AudioOutput::Attributes::Ids::AudioOutputList);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CurrentAudioOutput
+ */
+PacketBufferHandle encodeAudioOutputClusterReadCurrentAudioOutputAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadAudioOutputCurrentAudioOutput", AudioOutput::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(AudioOutput::Attributes::Ids::CurrentAudioOutput);
     COMMAND_FOOTER();
 }
 
@@ -1200,6 +1244,11 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadClusterRevisionAttribute(u
 | Cluster ColorControl                                                | 0x0300 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ColorLoopSet                                                      |   0x44 |
+| * EnhancedMoveHue                                                   |   0x41 |
+| * EnhancedMoveToHue                                                 |   0x40 |
+| * EnhancedMoveToHueAndSaturation                                    |   0x43 |
+| * EnhancedStepHue                                                   |   0x42 |
 | * MoveColor                                                         |   0x08 |
 | * MoveColorTemperature                                              |   0x4B |
 | * MoveHue                                                           |   0x01 |
@@ -2463,6 +2512,189 @@ PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seq
 }
 
 /*----------------------------------------------------------------------------*\
+| Cluster ElectricalMeasurement                                       | 0x0B04 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MeasurementType                                                   | 0x0000 |
+| * TotalActivePower                                                  | 0x0304 |
+| * RmsVoltage                                                        | 0x0505 |
+| * RmsVoltageMin                                                     | 0x0506 |
+| * RmsVoltageMax                                                     | 0x0507 |
+| * RmsCurrent                                                        | 0x0508 |
+| * RmsCurrentMin                                                     | 0x0509 |
+| * RmsCurrentMax                                                     | 0x050A |
+| * ActivePower                                                       | 0x050B |
+| * ActivePowerMin                                                    | 0x050C |
+| * ActivePowerMax                                                    | 0x050D |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeElectricalMeasurementClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverElectricalMeasurementAttributes", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MeasurementType
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadMeasurementTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementMeasurementType", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::MeasurementType);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TotalActivePower
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadTotalActivePowerAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementTotalActivePower", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::TotalActivePower);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RmsVoltage
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementRmsVoltage", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::RmsVoltage);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RmsVoltageMin
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageMinAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementRmsVoltageMin", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::RmsVoltageMin);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RmsVoltageMax
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadRmsVoltageMaxAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementRmsVoltageMax", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::RmsVoltageMax);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RmsCurrent
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementRmsCurrent", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::RmsCurrent);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RmsCurrentMin
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentMinAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementRmsCurrentMin", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::RmsCurrentMin);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RmsCurrentMax
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadRmsCurrentMaxAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementRmsCurrentMax", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::RmsCurrentMax);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ActivePower
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementActivePower", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::ActivePower);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ActivePowerMin
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerMinAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementActivePowerMin", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::ActivePowerMin);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ActivePowerMax
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadActivePowerMaxAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementActivePowerMax", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ElectricalMeasurement::Attributes::Ids::ActivePowerMax);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeElectricalMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadElectricalMeasurementClusterRevision", ElectricalMeasurement::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Globals::Attributes::Ids::ClusterRevision);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
 | Cluster EthernetNetworkDiagnostics                                  | 0x0037 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -3111,6 +3343,7 @@ PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribute(uint8_t seq
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MediaInputList                                                    | 0x0000 |
+| * CurrentMediaInput                                                 | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3131,6 +3364,19 @@ PacketBufferHandle encodeMediaInputClusterReadMediaInputListAttribute(uint8_t se
         .Put8(seqNum)
         .Put32(Globals::Commands::Ids::ReadAttributes)
         .Put32(MediaInput::Attributes::Ids::MediaInputList);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CurrentMediaInput
+ */
+PacketBufferHandle encodeMediaInputClusterReadCurrentMediaInputAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadMediaInputCurrentMediaInput", MediaInput::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(MediaInput::Attributes::Ids::CurrentMediaInput);
     COMMAND_FOOTER();
 }
 
@@ -3157,9 +3403,9 @@ PacketBufferHandle encodeMediaInputClusterReadClusterRevisionAttribute(uint8_t s
 | * MediaPlay                                                         |   0x00 |
 | * MediaPrevious                                                     |   0x04 |
 | * MediaRewind                                                       |   0x06 |
+| * MediaSeek                                                         |   0x0A |
 | * MediaSkipBackward                                                 |   0x09 |
 | * MediaSkipForward                                                  |   0x08 |
-| * MediaSkipSeek                                                     |   0x0A |
 | * MediaStartOver                                                    |   0x03 |
 | * MediaStop                                                         |   0x02 |
 |------------------------------------------------------------------------------|
@@ -3251,6 +3497,93 @@ PacketBufferHandle encodeOtaSoftwareUpdateProviderClusterReadClusterRevisionAttr
                                                                                       EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadOtaSoftwareUpdateProviderClusterRevision", OtaSoftwareUpdateProvider::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Globals::Attributes::Ids::ClusterRevision);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster OccupancySensing                                            | 0x0406 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Occupancy                                                         | 0x0000 |
+| * OccupancySensorType                                               | 0x0001 |
+| * OccupancySensorTypeBitmap                                         | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeOccupancySensingClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverOccupancySensingAttributes", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Occupancy
+ */
+PacketBufferHandle encodeOccupancySensingClusterReadOccupancyAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOccupancySensingOccupancy", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OccupancySensing::Attributes::Ids::Occupancy);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOccupancySensingClusterConfigureOccupancyAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                            uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportOccupancySensingOccupancy", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put32(OccupancySensing::Attributes::Ids::Occupancy)
+        .Put8(24)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OccupancySensorType
+ */
+PacketBufferHandle encodeOccupancySensingClusterReadOccupancySensorTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOccupancySensingOccupancySensorType", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OccupancySensing::Attributes::Ids::OccupancySensorType);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OccupancySensorTypeBitmap
+ */
+PacketBufferHandle encodeOccupancySensingClusterReadOccupancySensorTypeBitmapAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOccupancySensingOccupancySensorTypeBitmap", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OccupancySensing::Attributes::Ids::OccupancySensorTypeBitmap);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeOccupancySensingClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOccupancySensingClusterRevision", OccupancySensing::Id);
     buf.Put8(kFrameControlGlobalCommand)
         .Put8(seqNum)
         .Put32(Globals::Commands::Ids::ReadAttributes)

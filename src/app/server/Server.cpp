@@ -175,7 +175,7 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr)
             {
                 sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
                                       session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
-                                      connection.GetAdminId(), nullptr);
+                                      connection.GetAdminId());
             }
             else
             {

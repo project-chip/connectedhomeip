@@ -60,7 +60,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GetRootCACertificate(FabricId fabricI
 {
     Initialize();
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    chip::X509CertRequestParams newCertParams = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+    chip::Credentials::X509CertRequestParams newCertParams = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
 
     size_t outCertSize  = (outCert.size() > UINT32_MAX) ? UINT32_MAX : outCert.size();
     uint32_t outCertLen = 0;
@@ -181,7 +181,7 @@ AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const Optiona
         assignedId = mNextAvailableNodeId++;
     }
 
-    chip::X509CertRequestParams request = { 1, mIssuerId, mNow, mNow + mValidity, true, fabricId, true, assignedId };
+    chip::Credentials::X509CertRequestParams request = { 1, mIssuerId, mNow, mNow + mValidity, true, fabricId, true, assignedId };
 
     chip::P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
@@ -192,8 +192,8 @@ AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const Optiona
     ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
     uint32_t nocLen = 0;
 
-    CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer,
-                                                         noc.Get(), kMaxCHIPDERCertLength, nocLen);
+    CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::Credentials::CertificateIssuerLevel::kIssuerIsRootCA,
+                                                         pubkey, mIssuer, noc.Get(), kMaxCHIPDERCertLength, nocLen);
 
     onNOCGenerated->mCall(onNOCGenerated->mContext, ByteSpan(noc.Get(), nocLen));
 

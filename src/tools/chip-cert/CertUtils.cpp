@@ -678,3 +678,109 @@ bool ResignCert(X509 * cert, X509 * caCert, EVP_PKEY * caKey)
 exit:
     return res;
 }
+
+bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID, X509 * caCert,
+                 EVP_PKEY * caKey, const struct tm & validFrom, uint32_t validDays, X509 * newCert, EVP_PKEY * newKey)
+{
+    bool res = true;
+
+    VerifyOrReturnError(subjectCN != nullptr, false);
+    VerifyOrReturnError(caCert != nullptr, false);
+    VerifyOrReturnError(caKey != nullptr, false);
+    VerifyOrReturnError(newCert != nullptr, false);
+    VerifyOrReturnError(newKey != nullptr, false);
+
+    // Set the certificate version (must be 2, a.k.a. v3).
+    if (!X509_set_version(newCert, 2))
+    {
+        ReportOpenSSLErrorAndExit("X509_set_version", res = false);
+    }
+
+    // Generate a serial number for the cert.
+    res = SetCertSerialNumber(newCert);
+    VerifyTrueOrExit(res);
+
+    // Set the certificate validity time.
+    res = SetValidityTime(newCert, validFrom, validDays);
+    VerifyTrueOrExit(res);
+
+    // Set the certificate's public key.
+    if (!X509_set_pubkey(newCert, newKey))
+    {
+        ReportOpenSSLErrorAndExit("X509_set_pubkey", res = false);
+    }
+
+    // Add common name attribute to the certificate subject DN.
+    if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), NID_commonName, MBSTRING_UTF8,
+                                    reinterpret_cast<unsigned char *>(const_cast<char *>(subjectCN)),
+                                    static_cast<int>(strlen(subjectCN)), -1, 0))
+    {
+        ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
+    }
+
+    // Add VID attribute to the certificate subject DN.
+    if (subjectVID != 0)
+    {
+        char chipAttrStr[5];
+
+        snprintf(chipAttrStr, sizeof(chipAttrStr), "%04" PRIX16 "", subjectVID);
+
+        if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), gNIDChipAttAttrVID, MBSTRING_UTF8,
+                                        reinterpret_cast<unsigned char *>(chipAttrStr), 4, -1, 0))
+        {
+            ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
+        }
+    }
+
+    // Add PID attribute to the certificate subject DN.
+    if (subjectPID != 0)
+    {
+        char chipAttrStr[5];
+
+        snprintf(chipAttrStr, sizeof(chipAttrStr), "%04" PRIX16 "", subjectPID);
+
+        if (!X509_NAME_add_entry_by_NID(X509_get_subject_name(newCert), gNIDChipAttAttrPID, MBSTRING_UTF8,
+                                        reinterpret_cast<unsigned char *>(chipAttrStr), 4, -1, 0))
+        {
+            ReportOpenSSLErrorAndExit("X509_NAME_add_entry_by_NID", res = false);
+        }
+    }
+
+    // Set the issuer name for the certificate. In the case of a self-signed cert, this will be
+    // the new cert's subject name.
+    if (!X509_set_issuer_name(newCert, X509_get_subject_name(caCert)))
+    {
+        ReportOpenSSLErrorAndExit("X509_set_issuer_name", res = false);
+    }
+
+    // Add the appropriate certificate extensions.
+    if (attCertType == kAttCertType_DAC)
+    {
+        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:FALSE") &&
+            AddExtension(newCert, NID_key_usage, "critical,digitalSignature");
+    }
+    // otherwise, it is PAI or PAA
+    else
+    {
+        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:TRUE") &&
+            AddExtension(newCert, NID_key_usage, "critical,keyCertSign,cRLSign");
+    }
+    VerifyTrueOrExit(res);
+
+    // Add a subject key id extension for the certificate.
+    res = AddSubjectKeyId(newCert);
+    VerifyTrueOrExit(res);
+
+    // Add the authority key id extension from the signing certificate.
+    res = AddAuthorityKeyId(newCert, caCert);
+    VerifyTrueOrExit(res);
+
+    // Sign the new certificate.
+    if (!X509_sign(newCert, caKey, EVP_sha256()))
+    {
+        ReportOpenSSLErrorAndExit("X509_sign", res = false);
+    }
+
+exit:
+    return res;
+}

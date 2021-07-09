@@ -185,6 +185,8 @@ limitations under the License.
       <arg name="enhancedHue" type="INT16U"/>
       <arg name="direction" type="HueDirection"/>
       <arg name="transitionTime" type="INT16U"/>
+      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl8" optional="1"/>
+      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl8" optional="1"/>
     </command>
     <command source="client" code="0x41" name="EnhancedMoveHue" optional="true" noDefaultImplementation="true" introducedIn="zll-1.0-11-0037-10" cli="zcl color-control emovehue">
       <description>
@@ -192,6 +194,8 @@ limitations under the License.
       </description>
       <arg name="moveMode" type="HueMoveMode"/>
       <arg name="rate" type="INT16U"/>
+      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl8" optional="1"/>
+      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl8" optional="1"/>
     </command>
     <command source="client" code="0x42" name="EnhancedStepHue" optional="true" noDefaultImplementation="true" introducedIn="zll-1.0-11-0037-10" cli="zcl color-control estephue">
       <description>
@@ -200,6 +204,8 @@ limitations under the License.
       <arg name="stepMode" type="HueStepMode"/>
       <arg name="stepSize" type="INT16U"/>
       <arg name="transitionTime" type="INT16U"/>
+      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl8" optional="1"/>
+      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl8" optional="1"/>
     </command>
     <command source="client" code="0x43" name="EnhancedMoveToHueAndSaturation" optional="true" noDefaultImplementation="true" introducedIn="zll-1.0-11-0037-10" cli="zcl color-control emovetohueandsat">
       <description>
@@ -208,6 +214,8 @@ limitations under the License.
       <arg name="enhancedHue" type="INT16U"/>
       <arg name="saturation" type="INT8U"/>
       <arg name="transitionTime" type="INT16U"/>
+      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl8" optional="1"/>
+      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl8" optional="1"/>
     </command>
     <command source="client" code="0x44" name="ColorLoopSet" optional="true" noDefaultImplementation="true" introducedIn="zll-1.0-11-0037-10" cli="zcl color-control loop">
       <description>
@@ -218,6 +226,8 @@ limitations under the License.
       <arg name="direction" type="ColorLoopDirection"/>
       <arg name="time" type="INT16U"/>
       <arg name="startHue" type="INT16U"/>
+      <arg name="optionsMask" type="BITMAP8" introducedIn="zcl8" optional="1"/>
+      <arg name="optionsOverride" type="BITMAP8" introducedIn="zcl8" optional="1"/>
     </command>
     <command source="client" code="0x47" name="StopMoveStep" optional="true" noDefaultImplementation="true" introducedIn="zll-1.0-11-0037-10" cli="zcl color-control stopmovestep">
       <description>

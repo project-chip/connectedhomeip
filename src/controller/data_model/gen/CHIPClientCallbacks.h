@@ -69,7 +69,7 @@ void BasicAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelabl
     }
     else
     {
-        ChipLogError(Zcl, "Failed to get value from TLV data for attribute reading response: %d", err);
+        ChipLogError(Zcl, "Failed to get value from TLV data for attribute reading response: %s", chip::ErrorStr(err));
         chip::Callback::Callback<DefaultFailureCallback> * cb =
             chip::Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailure);
         cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
@@ -137,9 +137,9 @@ typedef void (*MediaPlaybackClusterMediaPauseResponseCallback)(void * context, u
 typedef void (*MediaPlaybackClusterMediaPlayResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaPreviousResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaRewindResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
+typedef void (*MediaPlaybackClusterMediaSeekResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaSkipBackwardResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaSkipForwardResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
-typedef void (*MediaPlaybackClusterMediaSkipSeekResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaStartOverResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*MediaPlaybackClusterMediaStopResponseCallback)(void * context, uint8_t mediaPlaybackStatus);
 typedef void (*NetworkCommissioningClusterAddThreadNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);

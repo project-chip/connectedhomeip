@@ -59,13 +59,13 @@ static_library("shell") {
       "streamer_k32w.cpp",
     ]
   } else if (current_os == "zephyr") {
-    sources += [ "MainLoopZephyr.cpp" ]
+    sources += [
+      "MainLoopZephyr.cpp",
+      "streamer_zephyr.cpp",
+      "streamer_zephyr.h",
+    ]
   } else {
     sources += [ "MainLoopDefault.cpp" ]
-  }
-
-  if (current_os == "zephyr") {
-    sources += [ "streamer_zephyr.cpp" ]
   }
 
   if (current_os == "mbed") {
