@@ -69,11 +69,15 @@ set(SRC_DIRS_LIST
 )
 
 if(("${CONFIG_DEVICE_TYPE_ESP32_DEVKITC}" STREQUAL "y") OR ("${CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM}" STREQUAL "y"))
-    set(PRIV_INCLUDE_DIRS_LIST ${PRIV_INCLUDE_DIRS_LIST}
-                               "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/screen-framework/include")
+    list(APPEND PRIV_INCLUDE_DIRS_LIST
+                "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/screen-framework/include")
     set(PRIV_REQUIRES_LIST chip QRCode bt)
 elseif(("${CONFIG_DEVICE_TYPE_M5STACK}" STREQUAL "y") OR ("${CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT}" STREQUAL "y"))
     set(PRIV_REQUIRES_LIST chip QRCode bt tft spidrier screen-framework)
+endif()
+
+if("${CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM}" STREQUAL "y")
+    list(APPEND PRIV_REQUIRES_LIST led_strip)
 endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
