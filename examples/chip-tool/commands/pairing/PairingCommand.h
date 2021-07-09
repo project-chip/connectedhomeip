@@ -25,6 +25,7 @@
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <setup_payload/SetupPayload.h>
 #include <support/Span.h>
 
 enum class PairingMode
