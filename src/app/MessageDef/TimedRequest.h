@@ -16,9 +16,9 @@
  */
 
 #pragma once
-#include <app/AppBuildConfig.h>
 #include "Builder.h"
 #include "Parser.h"
+#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
@@ -30,7 +30,7 @@ namespace app {
 namespace TimedRequest {
 enum
 {
-    kCsTag_Timeout    = 0,
+    kCsTag_Timeout = 0,
 };
 
 class Parser : public chip::app::Parser

@@ -30,9 +30,9 @@
 #include <app/MessageDef/ReportData.h>
 #include <app/MessageDef/SubscribeRequest.h>
 #include <app/MessageDef/SubscribeResponse.h>
+#include <app/MessageDef/TimedRequest.h>
 #include <app/MessageDef/WriteRequest.h>
 #include <app/MessageDef/WriteResponse.h>
-#include <app/MessageDef/TimedRequest.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <support/CHIPMem.h>
 #include <support/UnitTestRegistration.h>
@@ -1028,7 +1028,7 @@ void ParseTimedRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TimedRequest::Parser timedRequestarser;
-    uint8_t timeout    = 0;
+    uint8_t timeout = 0;
 
     err = timedRequestarser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
