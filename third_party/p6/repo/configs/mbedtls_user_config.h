@@ -711,9 +711,9 @@
 #undef MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
 
 /**
- * Allow SHA-1 in the default TLS configuration for certificate signing if 
+ * Allow SHA-1 in the default TLS configuration for certificate signing if
  * enabled in the application Makefile.
- * 
+ *
  * Without this build-time option, SHA-1 support must be activated explicitly
  * through mbedtls_ssl_conf_cert_profile. Turning on this option is not
  * recommended because of it is possible to generate SHA-1 collisions, however

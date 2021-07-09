@@ -119,9 +119,9 @@
         .max_db_service_modules          = 0,                                                             /* Maximum number of service modules in the DB*/
         .max_eatt_bearers                = 0,                                                             /* Maximum number of allowed gatt bearers */
     };
-    
+
 /* Application-managed L2CAP protocol configuration */
-    const wiced_bt_cfg_l2cap_application_t cy_bt_cfg_l2cap = 
+    const wiced_bt_cfg_l2cap_application_t cy_bt_cfg_l2cap =
     {
         .max_app_l2cap_psms              = CY_BT_L2CAP_MAX_LE_PSM,                                        /* Maximum number of application-managed PSMs */
         .max_app_l2cap_channels          = CY_BT_L2CAP_MAX_LE_CHANNELS,                                   /* Maximum number of application-managed channels */
@@ -140,7 +140,7 @@
         .p_l2cap_app_cfg                 = &cy_bt_cfg_l2cap,                                              /* Application-managed L2CAP protocol configuration */
     };
 #else
-    /* Bluetooth stack configuration */    
+    /* Bluetooth stack configuration */
     const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
     {
         .device_name                         = (uint8_t*)app_gap_device_name,                             /* Local device name (NULL terminated) */

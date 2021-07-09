@@ -103,7 +103,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 
         SystemLayer.ScheduleWork(DriveStationState, NULL);
         SystemLayer.ScheduleWork(DriveAPState, NULL);
-    }    
+    }
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
@@ -428,7 +428,7 @@ void ConnectivityManagerImpl::DriveAPState()
         {
             targetState = kWiFiAPState_NotActive;
         }
-    
+
         // If the current AP state does not match the target state...
         if (mWiFiAPState != targetState)
         {

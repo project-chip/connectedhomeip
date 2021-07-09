@@ -52,7 +52,7 @@
 #define APP_EVENT_QUEUE_SIZE 10
 
 namespace {
-    
+
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
 static TaskHandle_t sAppTaskHandle;

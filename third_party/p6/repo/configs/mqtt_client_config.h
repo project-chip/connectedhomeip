@@ -1,7 +1,7 @@
 /******************************************************************************
 * File Name: mqtt_client_config.h
 *
-* Description: This file contains all the configuration macros used by the 
+* Description: This file contains all the configuration macros used by the
 *              MQTT client in this example.
 *
 * Related Document: See README.md
@@ -50,27 +50,27 @@
 #define MQTT_BROKER_ADDRESS               "MY_AWS_IOT_ENDPOINT_ADDRESS"
 #define MQTT_PORT                         8883
 
-/* Set this macro to 1 if the MQTT Broker being used is hosted by AWS IoT 
+/* Set this macro to 1 if the MQTT Broker being used is hosted by AWS IoT
  * Core service, else 0.
  */
 #define AWS_IOT_MQTT_MODE                 ( 1 )
 
-/* Set this macro to 1 if a secure (TLS) connection to the MQTT Broker is  
+/* Set this macro to 1 if a secure (TLS) connection to the MQTT Broker is
  * required to be established, else 0.
  */
 #define MQTT_SECURE_CONNECTION            ( 1 )
 
-/* The MQTT topic on which the LED control messages will be published and 
+/* The MQTT topic on which the LED control messages will be published and
  * subscribed.
  */
 #define MQTT_TOPIC                        "ledstatus"
 
-/* Configuration for the 'Last Will and Testament (LWT)'. It is an MQTT message 
- * that will be published by the MQTT broker if the MQTT connection is 
- * unexpectedly closed. This configuration is sent to the MQTT broker during 
- * MQTT connect operation and the MQTT broker will publish the Will message on 
+/* Configuration for the 'Last Will and Testament (LWT)'. It is an MQTT message
+ * that will be published by the MQTT broker if the MQTT connection is
+ * unexpectedly closed. This configuration is sent to the MQTT broker during
+ * MQTT connect operation and the MQTT broker will publish the Will message on
  * the Will topic when it recognizes an unexpected disconnection from the client.
- * 
+ *
  * If you want to use the last will message, set this macro to 1, else 0.
  */
 #define ENABLE_LWT_MESSAGE                ( 0 )
@@ -80,7 +80,7 @@
 #endif
 
 /* Set the QoS that is associated with the MQTT publish, and subscribe messages.
- * Valid choices are 0, and 1. The MQTT library currently does not support 
+ * Valid choices are 0, and 1. The MQTT library currently does not support
  * QoS 2, and hence should not be used in this macro.
  */
 #define MQTT_MESSAGES_QOS                 ( 1 )
@@ -98,10 +98,10 @@
 /* A unique client identifier to be used for every MQTT connection. */
 #define MQTT_CLIENT_IDENTIFIER            "psoc6-mqtt-client"
 
-/* Every active MQTT connection must have a unique client identifier. If you 
- * are using the above 'MQTT_CLIENT_IDENTIFIER' as client ID for multiple MQTT 
+/* Every active MQTT connection must have a unique client identifier. If you
+ * are using the above 'MQTT_CLIENT_IDENTIFIER' as client ID for multiple MQTT
  * connections simultaneously, set this macro to 1. The device will then
- * generate a unique client identifier by appending a timestamp to the 
+ * generate a unique client identifier by appending a timestamp to the
  * 'MQTT_CLIENT_IDENTIFIER' string. Example: 'psoc6-mqtt-client5927'
  */
 #define GENERATE_UNIQUE_CLIENT_ID         ( 1 )
@@ -118,17 +118,17 @@
 #define MQTT_DEVICE_ON_MESSAGE            "TURN ON"
 #define MQTT_DEVICE_OFF_MESSAGE           "TURN OFF"
 
-/* As per Internet Assigned Numbers Authority (IANA) the port numbers assigned 
+/* As per Internet Assigned Numbers Authority (IANA) the port numbers assigned
  * for MQTT protocol are 1883 for non-secure connections and 8883 for secure
  * connections. In some cases there is a need to use other ports for MQTT like
- * port 443 (which is reserved for HTTPS). Application Layer Protocol 
- * Negotiation (ALPN) is an extension to TLS that allows many protocols to be 
- * used over a secure connection. The ALPN ProtocolNameList specifies the 
+ * port 443 (which is reserved for HTTPS). Application Layer Protocol
+ * Negotiation (ALPN) is an extension to TLS that allows many protocols to be
+ * used over a secure connection. The ALPN ProtocolNameList specifies the
  * protocols that the client would like to use to communicate over TLS.
- * 
+ *
  * This macro specifies the ALPN Protocol Name to be used that is supported
  * by the MQTT broker in use.
- * Note: For AWS IoT, currently "x-amzn-mqtt-ca" is the only supported ALPN 
+ * Note: For AWS IoT, currently "x-amzn-mqtt-ca" is the only supported ALPN
  *       ProtocolName and it is only supported on port 443.
  */
 #define MQTT_ALPN_PROTOCOL_NAME           "x-amzn-mqtt-ca"

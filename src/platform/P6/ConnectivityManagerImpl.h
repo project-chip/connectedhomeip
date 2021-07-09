@@ -119,7 +119,7 @@ private:
     bool eventcallback;
 
     static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError);
-    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError); 
+    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError);
     void DriveStationState(void);
     void DriveAPState(void);
     CHIP_ERROR ConfigureWiFiAP(void);
@@ -132,7 +132,7 @@ private:
 
 inline bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
 {
-    return mWiFiStationMode == kWiFiStationMode_ApplicationControlled; 
+    return mWiFiStationMode == kWiFiStationMode_ApplicationControlled;
 }
 
 inline bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)

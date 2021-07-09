@@ -125,7 +125,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mNumCons     = 0;
     memset(mCons, 0, sizeof(mCons));
     memset(mDeviceName, 0, sizeof(mDeviceName));
-    
+
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::Init() complete");
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -234,7 +234,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     switch (event->Type)
     {
-        
+
     case DeviceEventType::kP6BLEEnabledEvt:
         mFlags.Set(Flags::kFlag_StackInitialized, true);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);

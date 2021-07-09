@@ -193,4 +193,3 @@ extern void vApplicationSleep( uint32_t xExpectedIdleTime );
 #endif
 
 #endif /* FREERTOS_CONFIG_H */
-

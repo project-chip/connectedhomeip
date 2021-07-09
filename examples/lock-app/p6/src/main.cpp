@@ -117,7 +117,7 @@ int main(void)
     vTaskStartScheduler();
 
     chip::Platform::MemoryShutdown();
-    
+
     // Should never get here.
     P6_LOG("vTaskStartScheduler() failed");
     appError(ret);

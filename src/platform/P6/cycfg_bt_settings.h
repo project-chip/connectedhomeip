@@ -35,4 +35,3 @@ extern const wiced_bt_cfg_settings_t wiced_bt_cfg_settings;
 #endif /* CYCFG_BT_SETTINGS_H */
 
 /* [] END OF FILE */
-

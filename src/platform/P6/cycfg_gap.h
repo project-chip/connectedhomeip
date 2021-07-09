@@ -125,4 +125,3 @@ extern const wiced_bt_device_address_t cy_bt_device_address;
 extern wiced_bt_ble_advert_elem_t cy_bt_adv_packet_data[];
 
 #endif /* CYCFG_GAP_H */
-

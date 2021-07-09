@@ -224,11 +224,11 @@ cy_rslt_t P6Utils::p6_wifi_set_config(wifi_interface_t interface, wifi_config_t 
 cy_rslt_t P6Utils::p6_wifi_get_config(wifi_interface_t interface, wifi_config_t *conf)
 {
     if (interface == WIFI_IF_STA)
-    {       
+    {
         populate_wifi_config_t(conf, interface, &wifi_conf.sta.ssid, &wifi_conf.sta.password, wifi_conf.sta.security);
     }
     else
-    {       
+    {
         populate_wifi_config_t(conf, interface, &wifi_conf.ap.ssid, &wifi_conf.ap.password, wifi_conf.ap.security);
         conf->ap.channel = wifi_conf.ap.channel;
         conf->ap.ip_settings.ip_address = wifi_conf.ap.ip_settings.ip_address;
@@ -342,7 +342,7 @@ CHIP_ERROR P6Utils::p6_wifi_connect(void)
     wifi_config_t stationConfig;
     cy_wcm_connect_params_t connect_param;
     cy_wcm_ip_address_t ip_addr;
-    
+
     p6_wifi_get_config(WIFI_IF_STA, &stationConfig);
     memset(&connect_param, 0, sizeof(cy_wcm_connect_params_t));
     memset(&ip_addr, 0, sizeof(cy_wcm_ip_address_t));
@@ -490,8 +490,8 @@ static err_t ping_send(int s, const ip_addr_t *addr)
     ping_prepare_echo(&iecho, (u16_t)sizeof(icmp_packet_t));
 
     printf("\r\nPinging to Gateway ");
-    print_ip4(addr->u_addr.ip4.addr); 
-    
+    print_ip4(addr->u_addr.ip4.addr);
+
     /* Send the ping request */
     to.sin_len         = sizeof(to);
     to.sin_family      = AF_INET;
