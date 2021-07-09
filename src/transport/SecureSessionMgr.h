@@ -224,7 +224,7 @@ public:
                           SecureSession::SessionRole direction, Transport::AdminId admin);
 
     void ExpirePairing(SecureSessionHandle session);
-    void ExpireAllPairings(NodeId peerNodeId, Transport::AdminId admin);
+    void ExpireAllPairings(const PeerId & peer, Transport::AdminId admin);
 
     /**
      * @brief
@@ -291,6 +291,7 @@ private:
 
     System::Layer * mSystemLayer = nullptr;
     NodeId mLocalNodeId;                                                                // < Id of the current node
+    Transport::PeerCache<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeers;                 // < Active peers
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
     State mState;                                                                       // < Initialization state of the object
 

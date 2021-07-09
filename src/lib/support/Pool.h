@@ -115,6 +115,13 @@ public:
         Deallocate(element);
     }
 
+    template <typename... Args>
+    void ResetObject(T * element, Args &&... args)
+    {
+        element->~T();
+        new (element) T(std::forward<Args>(args)...);
+    }
+
     /**
      * @brief
      *   Run a functor for each active object in the pool

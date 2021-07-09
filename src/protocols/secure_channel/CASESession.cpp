@@ -126,7 +126,7 @@ void CASESession::Clear()
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
     mCommissioningHash.Clear();
     mPairingComplete = false;
-    mConnectionState.Reset();
+    mPairingState.Reset();
     if (!mTrustedRootId.empty())
     {
         chip::Platform::MemoryFree(const_cast<uint8_t *>(mTrustedRootId.data()));
@@ -187,7 +187,7 @@ CHIP_ERROR CASESession::Deserialize(CASESessionSerialized & input)
 
 CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
 {
-    const NodeId peerNodeId = mConnectionState.GetPeerNodeId();
+    const NodeId peerNodeId = mPairingState.GetPeerNodeId();
     VerifyOrReturnError(CanCastTo<uint16_t>(mSharedSecret.Length()), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mMessageDigest)), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint64_t>(peerNodeId), CHIP_ERROR_INTERNAL);
@@ -197,8 +197,8 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mMessageDigestLen = static_cast<uint16_t>(sizeof(mMessageDigest));
     serializable.mPairingComplete  = (mPairingComplete) ? 1 : 0;
     serializable.mPeerNodeId       = peerNodeId;
-    serializable.mLocalKeyId       = mConnectionState.GetLocalKeyID();
-    serializable.mPeerKeyId        = mConnectionState.GetPeerKeyID();
+    serializable.mLocalKeyId       = mPairingState.GetLocalKeyID();
+    serializable.mPeerKeyId        = mPairingState.GetPeerKeyID();
 
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
     memcpy(serializable.mMessageDigest, mMessageDigest, sizeof(mMessageDigest));
@@ -217,9 +217,9 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     memcpy(mSharedSecret, serializable.mSharedSecret, mSharedSecret.Length());
     memcpy(mMessageDigest, serializable.mMessageDigest, serializable.mMessageDigestLen);
 
-    mConnectionState.SetPeerNodeId(serializable.mPeerNodeId);
-    mConnectionState.SetLocalKeyID(serializable.mLocalKeyId);
-    mConnectionState.SetPeerKeyID(serializable.mPeerKeyId);
+    mPairingState.SetPeerNodeId(serializable.mPeerNodeId);
+    mPairingState.SetLocalKeyID(serializable.mLocalKeyId);
+    mPairingState.SetPeerKeyID(serializable.mPeerKeyId);
 
     return CHIP_NO_ERROR;
 }
@@ -236,7 +236,7 @@ CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     mDelegate = delegate;
-    mConnectionState.SetLocalKeyID(myKeyId);
+    mPairingState.SetLocalKeyID(myKeyId);
     mOpCredSet = operationalCredentialSet;
 
     mValidContext.Reset();
@@ -280,8 +280,8 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     SuccessOrExit(err);
 
     mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout);
-    mConnectionState.SetPeerAddress(peerAddress);
-    mConnectionState.SetPeerNodeId(peerNodeId);
+    mPairingState.SetPeerAddress(peerAddress);
+    mPairingState.SetPeerNodeId(peerNodeId);
 
     err = SendSigmaR1();
     SuccessOrExit(err);
@@ -365,7 +365,7 @@ CHIP_ERROR CASESession::SendSigmaR1()
     // Step 5
     uint16_t n_trusted_roots = mOpCredSet->GetCertCount();
     // Initiator's session ID
-    ReturnErrorOnFailure(tlvWriter.Put(CASETLVTag::kSessionID, mConnectionState.GetLocalKeyID(), true));
+    ReturnErrorOnFailure(tlvWriter.Put(CASETLVTag::kSessionID, mPairingState.GetLocalKeyID(), true));
     // Step 2/3
     ReturnErrorOnFailure(tlvWriter.Put(CASETLVTag::kNumberofTrustedRootIDs, n_trusted_roots, true));
     for (uint16_t i = 0; i < n_trusted_roots; ++i)
@@ -384,7 +384,7 @@ CHIP_ERROR CASESession::SendSigmaR1()
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(msg_R1->Start(), msg_R1->DataLength()));
 
-    ReturnErrorOnFailure(ComputeIPK(mConnectionState.GetLocalKeyID(), mIPK, sizeof(mIPK)));
+    ReturnErrorOnFailure(ComputeIPK(mPairingState.GetLocalKeyID(), mIPK, sizeof(mIPK)));
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR2;
 
@@ -449,7 +449,7 @@ CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle & msg)
     SuccessOrExit(err);
 
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", encryptionKeyId);
-    mConnectionState.SetPeerKeyID(encryptionKeyId);
+    mPairingState.SetPeerKeyID(encryptionKeyId);
 
 exit:
 
@@ -511,7 +511,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
     err = mEphemeralKey.ECDH_derive_secret(mRemotePubKey, mSharedSecret);
     SuccessOrExit(err);
 
-    err = ComputeIPK(mConnectionState.GetLocalKeyID(), mIPK, sizeof(mIPK));
+    err = ComputeIPK(mPairingState.GetLocalKeyID(), mIPK, sizeof(mIPK));
     SuccessOrExit(err);
 
     // Step 5
@@ -595,7 +595,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
         tlvWriter.Init(std::move(msg_R2));
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
         SuccessOrExit(err = tlvWriter.PutBytes(CASETLVTag::kRandom, msg_rand.Get(), kSigmaParamRandomNumberSize));
-        SuccessOrExit(err = tlvWriter.Put(CASETLVTag::kSessionID, mConnectionState.GetLocalKeyID(), true));
+        SuccessOrExit(err = tlvWriter.Put(CASETLVTag::kSessionID, mPairingState.GetLocalKeyID(), true));
         SuccessOrExit(err = tlvWriter.PutBytes(CASETLVTag::kTrustedRootID, mTrustedRootId.data(),
                                                static_cast<uint32_t>(mTrustedRootId.size())));
         SuccessOrExit(err = tlvWriter.PutBytes(CASETLVTag::kResponderEphPubKey, mEphemeralKey.Pubkey(),
@@ -684,7 +684,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
     SuccessOrExit(err = suppTlvReader.Get(encryptionKeyId));
 
     ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", encryptionKeyId);
-    mConnectionState.SetPeerKeyID(encryptionKeyId);
+    mPairingState.SetPeerKeyID(encryptionKeyId);
 
     // Retrieve Responder's Random value
     err = tlvReader.FindElementWithTag(CASETLVTag::kRandom, suppTlvReader);
@@ -711,7 +711,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
 
     VerifyOrExit(msg_salt.Alloc(saltlen), err = CHIP_ERROR_NO_MEMORY);
 
-    err = ComputeIPK(mConnectionState.GetPeerKeyID(), mRemoteIPK, sizeof(mRemoteIPK));
+    err = ComputeIPK(mPairingState.GetPeerKeyID(), mRemoteIPK, sizeof(mRemoteIPK));
     SuccessOrExit(err);
 
     {
@@ -1013,7 +1013,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
 
     VerifyOrExit(msg_salt.Alloc(saltlen), err = CHIP_ERROR_NO_MEMORY);
 
-    err = ComputeIPK(mConnectionState.GetPeerKeyID(), mRemoteIPK, sizeof(mRemoteIPK));
+    err = ComputeIPK(mPairingState.GetPeerKeyID(), mRemoteIPK, sizeof(mRemoteIPK));
     SuccessOrExit(err);
 
     {
@@ -1350,14 +1350,13 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
 
     if (packetHeader.GetSourceNodeId().HasValue())
     {
-        if (mConnectionState.GetPeerNodeId() == kUndefinedNodeId)
+        if (mPairingState.GetPeerNodeId() == kUndefinedNodeId)
         {
-            mConnectionState.SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
+            mPairingState.SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
         }
         else
         {
-            VerifyOrReturnError(packetHeader.GetSourceNodeId().Value() == mConnectionState.GetPeerNodeId(),
-                                CHIP_ERROR_WRONG_NODE_ID);
+            VerifyOrReturnError(packetHeader.GetSourceNodeId().Value() == mPairingState.GetPeerNodeId(), CHIP_ERROR_WRONG_NODE_ID);
         }
     }
 
@@ -1370,7 +1369,7 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHead
     CHIP_ERROR err = ValidateReceivedMessage(ec, packetHeader, payloadHeader, msg);
     SuccessOrExit(err);
 
-    mConnectionState.SetPeerAddress(mMessageDispatch.GetPeerAddress());
+    mPairingState.SetPeerAddress(mMessageDispatch.GetPeerAddress());
 
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {

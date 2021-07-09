@@ -602,7 +602,7 @@ void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::E
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNewConnection was called in incorrect state"));
 
-    uint16_t index = FindDeviceIndex(mgr->GetSessionMgr()->GetPeerConnectionState(session)->GetPeerNodeId());
+    uint16_t index = FindDeviceIndex(mgr->GetSessionMgr()->GetPeerConnectionState(session)->GetPeerCache()->GetPeer().GetNodeId());
     VerifyOrReturn(index < kNumMaxActiveDevices,
                    ChipLogDetail(Controller, "OnNewConnection was called for unknown device, ignoring it."));
 
@@ -1146,11 +1146,11 @@ void DeviceCommissioner::OnSessionEstablished()
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
 
-    mPairingSession.PeerConnection().SetPeerNodeId(device->GetDeviceId());
+    mPairingSession.GetPairingState().SetPeerNodeId(device->GetDeviceId());
 
     CHIP_ERROR err = mSessionMgr->NewPairing(
-        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kInitiator, mAdminId);
+        Optional<Transport::PeerAddress>::Value(mPairingSession.GetPairingState().GetPeerAddress()),
+        mPairingSession.GetPairingState().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kInitiator, mAdminId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
