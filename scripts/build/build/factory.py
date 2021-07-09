@@ -82,8 +82,6 @@ _MATCHERS[Platform.ESP32].AcceptApplication(
 _MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
     Application.LOCK, Board.DEVKITC, app=Esp32App.LOCK)
 
-# TODO: match lock only on devkitc !!!
-
 _MATCHERS[Platform.QPG].AcceptApplication(Application.LOCK)
 _MATCHERS[Platform.QPG].AcceptBoard(Board.QPG6100)
 
