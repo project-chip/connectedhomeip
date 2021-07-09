@@ -104,7 +104,7 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
     auto sessionPeerToLocal = ctx.GetSecureSessionManager().GetPeerConnectionState(ec1->GetSecureSession());
-    NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerNodeId() == ctx.GetSourceNodeId());
+    NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerCache()->GetPeer().GetNodeId() == ctx.GetSourceNodeId());
     NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerKeyID() == ctx.GetLocalKeyId());
     NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
 
@@ -112,7 +112,7 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
     auto sessionLocalToPeer = ctx.GetSecureSessionManager().GetPeerConnectionState(ec2->GetSecureSession());
-    NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerNodeId() == ctx.GetDestinationNodeId());
+    NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerCache()->GetPeer().GetNodeId() == ctx.GetDestinationNodeId());
     NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerKeyID() == ctx.GetPeerKeyId());
 
     ec1->Close();

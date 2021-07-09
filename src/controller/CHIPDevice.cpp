@@ -128,7 +128,8 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
         Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
 
         // Check if the connection state has the correct transport information
-        if (connectionState == nullptr || connectionState->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
+        if (connectionState == nullptr ||
+            connectionState->GetPeerCache()->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
         {
             mState = ConnectionState::NotConnected;
             ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
@@ -399,7 +400,7 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
     }
 
     mDeviceAddress = addr;
-    connectionState->SetPeerAddress(addr);
+    connectionState->GetPeerCache()->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
 }
@@ -561,7 +562,7 @@ void Device::OnSessionEstablishmentError(CHIP_ERROR error)
 
 void Device::OnSessionEstablished()
 {
-    mCASESession.PeerConnection().SetPeerNodeId(mDeviceId);
+    mCASESession.GetPairingState().SetPeerNodeId(mDeviceId);
 
     CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mCASESession,
                                                  SecureSession::SessionRole::kInitiator, mAdminId);
