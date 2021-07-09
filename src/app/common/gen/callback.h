@@ -15824,7 +15824,7 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::Command 
  */
 bool emberAfDiagnosticLogsClusterRetrieveLogsResponseCallback(chip::app::Command * commandObj, uint8_t status,
                                                               chip::ByteSpan content,
-                                                              /* TYPE WARNING: unknown defaults to */ uint8_t * timeStamp,
+                                                              /* TYPE WARNING: utc defaults to */ uint8_t * timeStamp,
                                                               uint32_t timeSinceBoot);
 
 /**
@@ -16854,7 +16854,7 @@ bool emberAfTestClusterClusterTestUnknownCommandCallback(chip::app::Command * co
  * @brief  Cluster DisplayMessage Command callback
  */
 bool emberAfMessagingClusterDisplayMessageCallback(chip::app::Command * commandObj, uint32_t messageId, uint8_t messageControl,
-                                                   /* TYPE WARNING: unknown defaults to */ uint8_t * startTime,
+                                                   /* TYPE WARNING: utc defaults to */ uint8_t * startTime,
                                                    uint16_t durationInMinutes, uint8_t * message,
                                                    uint8_t optionalExtendedMessageControl);
 
@@ -16872,7 +16872,7 @@ bool emberAfMessagingClusterCancelMessageCallback(chip::app::Command * commandOb
  * @brief  Cluster MessageConfirmation Command callback
  */
 bool emberAfMessagingClusterMessageConfirmationCallback(chip::app::Command * commandObj, uint32_t messageId,
-                                                        /* TYPE WARNING: unknown defaults to */ uint8_t * confirmationTime,
+                                                        /* TYPE WARNING: utc defaults to */ uint8_t * confirmationTime,
                                                         uint8_t messageConfirmationControl, chip::ByteSpan messageResponse);
 
 /**
@@ -16880,7 +16880,7 @@ bool emberAfMessagingClusterMessageConfirmationCallback(chip::app::Command * com
  */
 bool emberAfMessagingClusterDisplayProtectedMessageCallback(chip::app::Command * commandObj, uint32_t messageId,
                                                             uint8_t messageControl,
-                                                            /* TYPE WARNING: unknown defaults to */ uint8_t * startTime,
+                                                            /* TYPE WARNING: utc defaults to */ uint8_t * startTime,
                                                             uint16_t durationInMinutes, uint8_t * message,
                                                             uint8_t optionalExtendedMessageControl);
 
@@ -16888,13 +16888,13 @@ bool emberAfMessagingClusterDisplayProtectedMessageCallback(chip::app::Command *
  * @brief  Cluster GetMessageCancellation Command callback
  */
 bool emberAfMessagingClusterGetMessageCancellationCallback(
-    chip::app::Command * commandObj, /* TYPE WARNING: unknown defaults to */ uint8_t * earliestImplementationTime);
+    chip::app::Command * commandObj, /* TYPE WARNING: utc defaults to */ uint8_t * earliestImplementationTime);
 
 /**
  * @brief  Cluster CancelAllMessages Command callback
  */
 bool emberAfMessagingClusterCancelAllMessagesCallback(chip::app::Command * commandObj,
-                                                      /* TYPE WARNING: unknown defaults to */ uint8_t * implementationDateTime);
+                                                      /* TYPE WARNING: utc defaults to */ uint8_t * implementationDateTime);
 
 /**
  * @brief  Cluster GetAlerts Command callback

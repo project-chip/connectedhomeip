@@ -55,10 +55,6 @@ static constexpr uint32_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Cryp
  */
 enum
 {
-    // ---- Top-level Protocol-Specific Tags ----
-    kTag_ChipCertificate      = 1, /**< [ structure ] A CHIP certificate. */
-    kTag_ChipCertificateArray = 2, /**< [ array ] An array of CHIP certificates. */
-
     // ---- Context-specific Tags for ChipCertificate Structure ----
     kTag_SerialNumber            = 1,  /**< [ byte string ] Certificate serial number, in BER integer encoding. */
     kTag_SignatureAlgorithm      = 2,  /**< [ unsigned int ] Enumerated value identifying the certificate signature algorithm. */

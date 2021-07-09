@@ -466,7 +466,7 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 #if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_POOL ||                                                  \
     CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_LWIP_CUSTOM
 
-    lPacket = static_cast<PacketBuffer *>(pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(lBlockSize), PBUF_POOL));
+    lPacket = static_cast<PacketBuffer *>(pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(lAllocSize), PBUF_POOL));
 
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 

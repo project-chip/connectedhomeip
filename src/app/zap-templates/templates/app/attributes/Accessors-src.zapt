@@ -1,0 +1,50 @@
+{{>header}}
+
+/**
+ *  @file
+ *    This file contains definitions for accessors around clusters attributes.
+ */
+
+#pragma once
+
+#include <app/common/gen/attributes/Accessors.h>
+
+#include <app/common/gen/ids/Attributes.h>
+#include <app/common/gen/ids/Clusters.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+{{#zcl_clusters}}
+{{#zcl_attributes_server}}
+{{#if (hasSpecificAttributes)}}
+{{#first}}
+namespace {{asUpperCamelCase parent.label}} {
+namespace Attributes {
+{{/first}}
+{{#if clusterRef}}
+{{#if (canHaveSimpleAccessors type)}}
+EmberAfStatus Get{{asUpperCamelCase label}}(chip::EndpointId endpoint, {{asUnderlyingZclType type}} * {{asLowerCamelCase label}})
+{
+    return emberAfReadServerAttribute(endpoint, {{asUpperCamelCase parent.label}}::Id, Ids::{{asUpperCamelCase label}}, (uint8_t *) {{asLowerCamelCase label}}, sizeof(*{{asLowerCamelCase label}}));
+
+}
+EmberAfStatus Set{{asUpperCamelCase label}}(chip::EndpointId endpoint, {{asUnderlyingZclType type}} {{asLowerCamelCase label}})
+{
+    return emberAfWriteServerAttribute(endpoint, {{asUpperCamelCase parent.label}}::Id, Ids::{{asUpperCamelCase label}}, (uint8_t *) &{{asLowerCamelCase label}}, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPE);
+}
+{{/if}}
+{{/if}}
+{{#last}}
+} // namespace Attributes
+} // {{asUpperCamelCase parent.label}}
+
+{{/last}}
+{{/if}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
+
+} // Clusters
+} // app
+} // chip

@@ -77,7 +77,7 @@ limitations under the License.
       </description>
       <arg name="messageId" type="INT32U"/>
       <arg name="messageControl" type="MessagingControlMask"/>
-      <arg name="startTime" type="UTC_TIME"/>
+      <arg name="startTime" type="UTC"/>
       <arg name="durationInMinutes" type="INT16U"/>
       <arg name="message" type="CHAR_STRING"/>
       <arg name="optionalExtendedMessageControl" type="MessagingExtendedControlMask" introducedIn="se-1.2a-07-5356-19" default="0x00"/>
@@ -95,7 +95,7 @@ limitations under the License.
       </description>
       <arg name="messageId" type="INT32U"/>
       <arg name="messageControl" type="MessagingControlMask"/>
-      <arg name="startTime" type="UTC_TIME"/>
+      <arg name="startTime" type="UTC"/>
       <arg name="durationInMinutes" type="INT16U"/>
       <arg name="message" type="CHAR_STRING"/>
       <arg name="optionalExtendedMessageControl" type="MessagingExtendedControlMask"/>
@@ -104,7 +104,7 @@ limitations under the License.
       <description>
         The CancelAllMessages command indicates to a client device that it should cancel all display messages currently held by it.
       </description>
-      <arg name="implementationDateTime" type="UTC_TIME"/>
+      <arg name="implementationDateTime" type="UTC"/>
     </command>
     <!-- Messaging Cluster Client - Commands -->
     <command source="client" code="0x00" name="GetLastMessage" optional="false" cli="zcl msg get">
@@ -117,7 +117,7 @@ limitations under the License.
         The Message Confirmation command provides an indication that a Utility Customer has acknowledged and/or accepted the contents of a previously sent message.  Enhanced Message Confirmation commands shall contain an answer of 'NO', 'YES' and/or a message confirmation string.
       </description>
       <arg name="messageId" type="INT32U"/>
-      <arg name="confirmationTime" type="UTC_TIME"/>
+      <arg name="confirmationTime" type="UTC"/>
       <arg name="messageConfirmationControl" type="BITMAP8" introducedIn="se-1.2a-07-5356-19"/>
       <arg name="messageResponse" type="OCTET_STRING" introducedIn="se-1.2a-07-5356-19"/>
     </command>
@@ -125,7 +125,7 @@ limitations under the License.
       <description>
         This command initiates the return of the first (and maybe only) Cancel All Messages command held on the associated server, and which has an implementation time equal to or later than the value indicated in the payload.
       </description>
-      <arg name="earliestImplementationTime" type="UTC_TIME"/>
+      <arg name="earliestImplementationTime" type="UTC"/>
     </command>
   </cluster>
   <!-- SE extension to the Alarms cluster. -->
