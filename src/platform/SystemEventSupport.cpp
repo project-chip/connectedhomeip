@@ -30,7 +30,7 @@
 namespace chip {
 namespace System {
 namespace Platform {
-namespace Layer {
+namespace EventSupport {
 
 using namespace ::chip::DeviceLayer;
 
@@ -48,7 +48,7 @@ CHIP_ERROR PostEvent(System::Layer & aLayer, void * aContext, System::Object & a
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DispatchEvents(Layer & aLayer, void * aContext)
+CHIP_ERROR DispatchEvents(System::Layer & aLayer, void * aContext)
 {
     PlatformMgr().RunEventLoop();
 
@@ -62,7 +62,7 @@ CHIP_ERROR DispatchEvent(System::Layer & aLayer, void * aContext, const ChipDevi
     return CHIP_NO_ERROR;
 }
 
-} // namespace Layer
+} // namespace EventSupport
 } // namespace Platform
 } // namespace System
 } // namespace chip

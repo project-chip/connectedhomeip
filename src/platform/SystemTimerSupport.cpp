@@ -30,7 +30,7 @@
 namespace chip {
 namespace System {
 namespace Platform {
-namespace Layer {
+namespace EventSupport {
 
 using namespace ::chip::DeviceLayer;
 
@@ -39,7 +39,7 @@ CHIP_ERROR StartTimer(System::Layer & aLayer, void * aContext, uint32_t aMillise
     return PlatformMgr().StartChipTimer(aMilliseconds);
 }
 
-} // namespace Layer
+} // namespace EventSupport
 } // namespace Platform
 } // namespace System
 } // namespace chip
