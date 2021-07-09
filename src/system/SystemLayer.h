@@ -31,9 +31,11 @@
 #include <core/CHIPCallback.h>
 
 #include <support/DLLUtil.h>
+#include <system/SystemClock.h>
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
 #include <system/SystemObject.h>
+#include <system/SystemTimer.h>
 
 // Include dependent headers
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -142,11 +144,12 @@ public:
 
     CHIP_ERROR NewTimer(Timer *& aTimerPtr);
 
-    void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback);
-    void DispatchTimerCallbacks(uint64_t kCurrentEpoch);
+    void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback); // XXX
+    void DispatchTimerCallbacks(Clock::MonotonicMilliseconds aCurrentTime);
 
-    typedef void (*TimerCompleteFunct)(Layer * aLayer, void * aAppState, CHIP_ERROR aError);
-    CHIP_ERROR StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState);
+    using TimerCompleteFunct = Timer::OnCompleteFunct;
+    // typedef void (*TimerCompleteFunct)(Layer * aLayer, void * aAppState, CHIP_ERROR aError);
+    CHIP_ERROR StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState); // XXX
     void CancelTimer(TimerCompleteFunct aOnComplete, void * aAppState);
 
     CHIP_ERROR ScheduleWork(TimerCompleteFunct aComplete, void * aAppState);
@@ -179,18 +182,14 @@ public:
     dispatch_queue_t GetDispatchQueue() { return mDispatchQueue; };
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
-    static uint64_t GetClock_Monotonic();
-    static uint64_t GetClock_MonotonicMS();
-    static uint64_t GetClock_MonotonicHiRes();
-    static CHIP_ERROR GetClock_RealTime(uint64_t & curTime);
-    static CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTimeMS);
-    static CHIP_ERROR SetClock_RealTime(uint64_t newCurTime);
+    Clock & GetClock() { return mClock; }
 
 private:
     LayerState mLayerState;
     void * mContext;
     void * mPlatformData;
     chip::Callback::CallbackDeque mTimerCallbacks;
+    Clock mClock;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static LwIPEventHandlerDelegate sSystemEventHandlerDelegate;
