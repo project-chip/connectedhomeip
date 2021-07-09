@@ -182,7 +182,7 @@ exit:
 CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t * out_buffer)
 {
     // zero data length hash is supported.
-
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     const int result = mbedtls_sha256_ret(Uint8::to_const_uchar(data), data_length, Uint8::to_uchar(out_buffer), 0);
@@ -430,43 +430,14 @@ static inline const mbedtls_ecp_keypair * to_const_keypair(const P256KeypairCont
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature)
 {
 #if defined(MBEDTLS_ECDSA_C)
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-    uint8_t hash[NUM_BYTES_IN_SHA256_HASH];
-    // For conversion from raw signature to OpenSSL-compatible DER signature
-    uint8_t der_signature[kP256_ECDSA_Signature_Length_Raw + kMax_ECDSA_X9Dot62_Asn1_Overhead];
-    size_t siglen = sizeof(der_signature);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
 
-    const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
+    uint8_t digest[kSHA256_Hash_Length];
+    memset(&digest[0], 0, sizeof(digest));
+    ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, &digest[0]));
 
-    mbedtls_ecdsa_context ecdsa_ctxt;
-    mbedtls_ecdsa_init(&ecdsa_ctxt);
-
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(msg != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, keypair);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_sha256_ret(Uint8::to_const_uchar(msg), msg_length, hash, 0);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_ecdsa_write_signature(&ecdsa_ctxt, MBEDTLS_MD_SHA256, hash, sizeof(hash), Uint8::to_uchar(&der_signature[0]),
-                                           &siglen, CryptoRNG, nullptr);
-
-    // Convert mbedTLS DER signature to raw signature
-    error = EcdsaAsn1SignatureToRaw(kP256_FE_Length, &der_signature[0], siglen, out_signature.Bytes(), out_signature.Capacity());
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
-    SuccessOrExit(out_signature.SetLength(2 * kP256_FE_Length));
-
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-exit:
-    keypair = nullptr;
-    mbedtls_ecdsa_free(&ecdsa_ctxt);
-    _log_mbedTLS_error(result);
-    return error;
+    return ECDSA_sign_hash(&digest[0], sizeof(digest), out_signature);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
@@ -475,37 +446,43 @@ exit:
 CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_length, P256ECDSASignature & out_signature)
 {
 #if defined(MBEDTLS_ECDSA_C)
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(hash_length == kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
+
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
-    // For conversion from raw signature to TLS DER signature
-    uint8_t der_signature[kP256_ECDSA_Signature_Length_Raw + kMax_ECDSA_X9Dot62_Asn1_Overhead];
-    size_t siglen = sizeof(der_signature);
+    mbedtls_mpi r, s;
+    mbedtls_mpi_init(&r);
+    mbedtls_mpi_init(&s);
 
     const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
 
     mbedtls_ecdsa_context ecdsa_ctxt;
     mbedtls_ecdsa_init(&ecdsa_ctxt);
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(hash_length == NUM_BYTES_IN_SHA256_HASH, error = CHIP_ERROR_INVALID_ARGUMENT);
-
     result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, keypair);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ecdsa_write_signature(&ecdsa_ctxt, MBEDTLS_MD_SHA256, hash, hash_length, Uint8::to_uchar(&der_signature[0]),
-                                           &siglen, CryptoRNG, nullptr);
-
-    // Convert mbedTLS DER signature to raw signature
-    error = EcdsaAsn1SignatureToRaw(kP256_FE_Length, &der_signature[0], siglen, out_signature.Bytes(), out_signature.Capacity());
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
-    SuccessOrExit(out_signature.SetLength(2 * kP256_FE_Length));
-
+    result = mbedtls_ecdsa_sign(&ecdsa_ctxt.grp, &r, &s, &ecdsa_ctxt.d, Uint8::to_const_uchar(hash), hash_length, CryptoRNG, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    VerifyOrExit((mbedtls_mpi_size(&r) <= kP256_FE_Length) || (mbedtls_mpi_size(&s) <= kP256_FE_Length), error=CHIP_ERROR_INTERNAL);
+
+    // Concatenate r and s to output. Sizes were checked above.
+    result = mbedtls_mpi_write_binary(&r, out_signature.Bytes() + 0u, kP256_FE_Length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_mpi_write_binary(&s, out_signature.Bytes() + kP256_FE_Length, kP256_FE_Length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
 exit:
     keypair = nullptr;
     mbedtls_ecdsa_free(&ecdsa_ctxt);
+    mbedtls_mpi_free(&s);
+    mbedtls_mpi_free(&r);
     _log_mbedTLS_error(result);
     return error;
 #else
@@ -517,49 +494,13 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
                                                        const P256ECDSASignature & signature) const
 {
 #if defined(MBEDTLS_ECDSA_C)
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-    uint8_t hash[NUM_BYTES_IN_SHA256_HASH];
+    VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
 
-    // For conversion from raw signature to TLS DER signature
-    uint8_t der_signature[kP256_ECDSA_Signature_Length_Raw + kMax_ECDSA_X9Dot62_Asn1_Overhead];
+    uint8_t digest[kSHA256_Hash_Length];
+    memset(&digest[0], 0, sizeof(digest));
+    ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, &digest[0]));
 
-    // Convert raw signature to usable form by mbedTLS
-    size_t der_sig_length = 0;
-    error = EcdsaRawSignatureToAsn1(kP256_FE_Length, signature, signature.Length(), &der_signature[0], sizeof(der_signature),
-                                    der_sig_length);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    mbedtls_ecp_keypair keypair;
-    mbedtls_ecp_keypair_init(&keypair);
-
-    mbedtls_ecdsa_context ecdsa_ctxt;
-    mbedtls_ecdsa_init(&ecdsa_ctxt);
-
-    VerifyOrExit(msg != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    result = mbedtls_ecp_group_load(&keypair.grp, MapECPGroupId(Type()));
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    result = mbedtls_ecp_point_read_binary(&keypair.grp, &keypair.Q, Uint8::to_const_uchar(*this), Length());
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, &keypair);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_sha256_ret(Uint8::to_const_uchar(msg), msg_length, hash, 0);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result =
-        mbedtls_ecdsa_read_signature(&ecdsa_ctxt, hash, sizeof(hash), Uint8::to_const_uchar(&der_signature[0]), der_sig_length);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_SIGNATURE);
-
-exit:
-    mbedtls_ecp_keypair_free(&keypair);
-    mbedtls_ecdsa_free(&ecdsa_ctxt);
-    _log_mbedTLS_error(result);
-    return error;
+    return ECDSA_validate_hash_signature(&digest[0], sizeof(digest), signature);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
@@ -569,26 +510,22 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
                                                         const P256ECDSASignature & signature) const
 {
 #if defined(MBEDTLS_ECDSA_C)
+    VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(hash_length == kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(signature.Length() == kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_INVALID_ARGUMENT);
+
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
+    mbedtls_mpi r, s;
 
-    // For conversion from raw signature to TLS DER signature
-    uint8_t der_signature[kP256_ECDSA_Signature_Length_Raw + kMax_ECDSA_X9Dot62_Asn1_Overhead];
-
-    // Convert raw signature to usable form by mbedTLS
-    size_t der_sig_length = 0;
-    error = EcdsaRawSignatureToAsn1(kP256_FE_Length, signature, signature.Length(), &der_signature[0], sizeof(der_signature),
-                                    der_sig_length);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
+    mbedtls_mpi_init(&r);
+    mbedtls_mpi_init(&s);
 
     mbedtls_ecp_keypair keypair;
     mbedtls_ecp_keypair_init(&keypair);
 
     mbedtls_ecdsa_context ecdsa_ctxt;
     mbedtls_ecdsa_init(&ecdsa_ctxt);
-
-    VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(hash_length == NUM_BYTES_IN_SHA256_HASH, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = mbedtls_ecp_group_load(&keypair.grp, MapECPGroupId(Type()));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -599,12 +536,21 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, &keypair);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ecdsa_read_signature(&ecdsa_ctxt, hash, hash_length, Uint8::to_const_uchar(&der_signature[0]), der_sig_length);
+    // Read the <r, s> big nums from the signature
+    result = mbedtls_mpi_read_binary(&r, Uint8::to_const_uchar(signature.ConstBytes()) + 0u, kP256_FE_Length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_mpi_read_binary(&s, Uint8::to_const_uchar(signature.ConstBytes()) + kP256_FE_Length, kP256_FE_Length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_ecdsa_verify(&ecdsa_ctxt.grp, Uint8::to_const_uchar(hash), hash_length, &ecdsa_ctxt.Q, &r, &s);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_SIGNATURE);
 
 exit:
-    mbedtls_ecp_keypair_free(&keypair);
     mbedtls_ecdsa_free(&ecdsa_ctxt);
+    mbedtls_ecp_keypair_free(&keypair);
+    mbedtls_mpi_free(&s);
+    mbedtls_mpi_free(&r);
     _log_mbedTLS_error(result);
     return error;
 #else

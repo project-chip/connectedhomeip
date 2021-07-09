@@ -61,6 +61,7 @@ void TestAutoFree(nlTestSuite * inSuite, void * inContext)
 
         NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
         NL_TEST_ASSERT(inSuite, buffer.Alloc(128));
+        NL_TEST_ASSERT(inSuite, buffer.AllocatedSize() == 128u);
         NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
     }
     NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
@@ -75,10 +76,13 @@ void TestFreeDuringAllocs(nlTestSuite * inSuite, void * inContext)
 
         NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
         NL_TEST_ASSERT(inSuite, buffer.Alloc(128));
+        NL_TEST_ASSERT(inSuite, buffer.AllocatedSize() == 128u);
         NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
         NL_TEST_ASSERT(inSuite, buffer.Alloc(64));
+        NL_TEST_ASSERT(inSuite, buffer.AllocatedSize() == 64u);
         NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
         NL_TEST_ASSERT(inSuite, buffer.Calloc(10));
+        NL_TEST_ASSERT(inSuite, buffer.AllocatedSize() == 10u);
         NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);
     }
     NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
@@ -95,10 +99,12 @@ void TestRelease(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 0);
         NL_TEST_ASSERT(inSuite, buffer.Alloc(128));
         NL_TEST_ASSERT(inSuite, buffer.Get() != nullptr);
+        NL_TEST_ASSERT(inSuite, buffer.AllocatedSize() == 128u);
 
         ptr = buffer.Release();
         NL_TEST_ASSERT(inSuite, ptr != nullptr);
         NL_TEST_ASSERT(inSuite, buffer.Get() == nullptr);
+        NL_TEST_ASSERT(inSuite, buffer.AllocatedSize() == 0u);
     }
 
     NL_TEST_ASSERT(inSuite, TestCounterMemoryManagement::Counter() == 1);

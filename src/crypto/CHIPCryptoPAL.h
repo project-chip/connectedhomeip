@@ -173,11 +173,15 @@ public:
 
     /** @brief Returns max capacity of the buffer
      **/
-    size_t Capacity() const { return sizeof(bytes); }
+    static constexpr size_t Capacity() { return sizeof(bytes); }
 
     /** @brief Returns pointer to start of underlying buffer
      **/
     uint8_t * Bytes() { return &bytes[0]; }
+
+    /** @brief Returns const pointer to start of underlying buffer
+     **/
+    const uint8_t * ConstBytes() const { return &bytes[0]; }
 
     /** @brief Returns buffer pointer
      **/
