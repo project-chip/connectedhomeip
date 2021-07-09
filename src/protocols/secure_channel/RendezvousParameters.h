@@ -48,17 +48,9 @@ public:
 
     bool HasPeerAddress() const { return mPeerAddress.IsInitialized(); }
     Transport::PeerAddress GetPeerAddress() const { return mPeerAddress; }
-    const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     RendezvousParameters & SetPeerAddress(const Transport::PeerAddress & peerAddress)
     {
         mPeerAddress = peerAddress;
-        return *this;
-    }
-
-    // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of RendezvousParameter object.
-    RendezvousParameters & SetCSRNonce(ByteSpan csrNonce)
-    {
-        mCSRNonce.SetValue(csrNonce);
         return *this;
     }
 
@@ -71,7 +63,6 @@ public:
     }
 
     bool HasPASEVerifier() const { return mHasPASEVerifier; }
-    bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
     const PASEVerifier & GetPASEVerifier() const { return mPASEVerifier; }
     RendezvousParameters & SetPASEVerifier(PASEVerifier & verifier)
     {
@@ -104,7 +95,6 @@ private:
     Transport::PeerAddress mPeerAddress;  ///< the peer node address
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
-    Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
 
     PASEVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;
@@ -113,6 +103,47 @@ private:
     Ble::BleLayer * mBleLayer               = nullptr;
     BLE_CONNECTION_OBJECT mConnectionObject = 0;
 #endif // CONFIG_NETWORK_LAYER_BLE
+};
+
+struct WifiCredentials
+{
+    ByteSpan ssid;
+    // TODO(cecille): We should add a PII bytespan concept.
+    ByteSpan password;
+};
+
+class CommissioningParameters
+{
+public:
+    const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
+    // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of RendezvousParameter object.
+    CommissioningParameters & SetCSRNonce(ByteSpan csrNonce)
+    {
+        mCSRNonce.SetValue(csrNonce);
+        return *this;
+    }
+    bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
+
+    const Optional<WifiCredentials> GetWifiCredentials() const { return mWifiCreds; }
+    CommissioningParameters & SetWifiCredentials(WifiCredentials wifiCreds)
+    {
+        mWifiCreds.SetValue(wifiCreds);
+        return *this;
+    }
+    bool HasWifiCredentials() const { return mWifiCreds.HasValue(); }
+    const Optional<ByteSpan> GetThreadOperationalDataset() const { return mThreadOperationalDataset; }
+    CommissioningParameters & SetThreadOperationalDataset(ByteSpan threadOperationalDataset)
+    {
+
+        mThreadOperationalDataset.SetValue(threadOperationalDataset);
+        return *this;
+    }
+    bool HasThreadOperationalDataset() const { return mThreadOperationalDataset.HasValue(); }
+
+private:
+    Optional<ByteSpan> mCSRNonce; ///< CSR Nonce passed by the commissioner
+    Optional<WifiCredentials> mWifiCreds;
+    Optional<ByteSpan> mThreadOperationalDataset;
 };
 
 } // namespace chip

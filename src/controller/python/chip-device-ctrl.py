@@ -197,6 +197,8 @@ class DeviceMgrCmd(Cmd):
         "ble-debug-log",
 
         "connect",
+        "commission",
+
         "close-ble",
         "close-session",
         "resolve",
@@ -493,6 +495,69 @@ class DeviceMgrCmd(Cmd):
                 print(f"Unable to connect: {ex}")
         return -1
 
+    def do_commission(self, line):
+        """
+        commission -qr <qr code> -nodeid <nodeid> -wifi <ssid password>
+
+        TODO: Add discriminator option? Manual?
+        TODO: Add thread
+
+        commission command is used to commission a device. It will perform discovery,
+        then connect and perform commissioning including setup of the network 
+        (if required) and provisioning of operational credentials.
+        """
+        try:
+            arglist = shlex.split(line)
+            if len(arglist) < 1:
+                print("Usage:")
+                self.do_help("commission")
+                return
+            parser = argparse.ArgumentParser()
+            parser.add_argument('-qr', help="discover and commission device with given qr code", type=str)
+            parser.add_argument('-nodeid', help="node ID to use for commissioning. Default is random", type=int)
+            parser.add_argument('-wifi', help="wifi credentials to use. Required for devices that are not on-network", type=str, nargs=2)
+            args=parser.parse_args(arglist)
+
+            setupPayload = SetupPayload()
+            if args.qr is not None:
+                print("parsing qr code here")
+                setupPayload = SetupPayload().ParseQrCode(args.qr)
+            else:
+                print("QR code is currently required for commissioning")
+                self.do_help("commission")
+                return
+
+            nodeid = random.randint(1, 1000000)  # Just a random number            
+            if args.nodeid is not None:
+                nodeid = args.nodeid
+            
+            ssid = ""
+            password = ""
+            if args.wifi is not None:
+                ssid = args.wifi[0]
+                password = args.wifi[1]
+
+            if self.ConnectFromSetupPayload(setupPayload, nodeid) == 0:
+                print("Device is assigned with nodeid = {}".format(nodeid))
+                cssid = ctypes.c_char_p(ssid.encode('utf-8'))
+                cpassword = ctypes.c_char_p(password.encode('utf-8'))
+                print("Commissioning device")
+                if self.devCtrl.Commission(cssid, cpassword, nodeid) == 0:
+                    print("Commissioned successfully")
+                else:
+                    print("Failed to commission device properly")
+            else:
+                print("Failed to connect to device")
+            
+        except exceptions.ChipStackException as ex:
+            print('exception')
+            print(str(ex))
+            return
+        except Exception as e:
+            print(str(e))
+            self.do_help("commission")
+            return
+
     def do_connect(self, line):
         """
         connect -ip <ip address> <setup pin code> [<nodeid>]
@@ -506,6 +571,7 @@ class DeviceMgrCmd(Cmd):
 
         TODO: Add more methods to connect to device (like cert for auth, and IP
               for connection)
+        TODO: Consider deprecating this in favour of paironly and commission
         """
 
         try:

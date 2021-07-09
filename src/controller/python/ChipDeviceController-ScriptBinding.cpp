@@ -108,6 +108,8 @@ ChipError::StorageType pychip_DeviceController_ConnectBLE(chip::Controller::Devi
                                                           uint32_t setupPINCode, chip::NodeId nodeid);
 ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                                          uint32_t setupPINCode, chip::NodeId nodeid);
+ChipError::StorageType pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, const char * ssid,
+                                                          const char * password, chip::NodeId nodeid);
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 
 ChipError::StorageType
@@ -320,6 +322,19 @@ ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::Devic
     return devCtrl->PairDevice(nodeid, params).AsInteger();
 }
 
+ChipError::StorageType pychip_DeviceController_Commission(chip::Controller::DeviceCommissioner * devCtrl, const char * ssid,
+                                                          const char * password, chip::NodeId nodeid)
+{
+    chip::CommissioningParameters params;
+    if (strcmp(ssid, "") != 0)
+    {
+        chip::WifiCredentials creds;
+        creds.ssid     = chip::ByteSpan(reinterpret_cast<const uint8_t *>(ssid), strlen(ssid));
+        creds.password = chip::ByteSpan(reinterpret_cast<const uint8_t *>(password), strlen(password));
+        params.SetWifiCredentials(creds);
+    }
+    return devCtrl->Commission(nodeid, params).AsInteger();
+}
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
     Device * device;

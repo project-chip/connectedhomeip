@@ -49,9 +49,7 @@ enum class PairingNetworkType
     Ethernet,
 };
 
-class PairingCommand : public Command,
-                       public chip::Controller::DevicePairingDelegate,
-                       public chip::Controller::DeviceAddressUpdateDelegate
+class PairingCommand : public Command, public chip::Controller::DevicePairingDelegate
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType) :
@@ -116,16 +114,12 @@ public:
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
     uint16_t GetWaitDurationInSeconds() const override { return 120; }
-    void Shutdown() override;
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
-
-    /////////// DeviceAddressUpdateDelegate Interface /////////
-    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
 
     /////////// Network Commissioning Callbacks /////////
     static void OnDefaultFailureResponse(void * context, uint8_t status);
@@ -134,23 +128,12 @@ public:
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
-    CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
-    CHIP_ERROR PairWithQRCode(NodeId remoteId);
-    CHIP_ERROR PairWithManualCode(NodeId remoteId);
-    CHIP_ERROR PairWithCode(NodeId remoteId, chip::SetupPayload payload);
+    CHIP_ERROR PairAndCommission(NodeId remoteId, PeerAddress address);
+    CHIP_ERROR PairAndCommissionWithQRCode(NodeId remoteId);
+    CHIP_ERROR PairAndCommissionWithManualCode(NodeId remoteId);
     CHIP_ERROR PairWithoutSecurity(NodeId remoteId, PeerAddress address);
     CHIP_ERROR Unpair(NodeId remoteId);
     CHIP_ERROR OpenCommissioningWindow();
-
-    void InitCallbacks();
-    CHIP_ERROR SetupNetwork();
-    CHIP_ERROR AddNetwork(PairingNetworkType networkType);
-    CHIP_ERROR AddThreadNetwork();
-    CHIP_ERROR AddWiFiNetwork();
-    CHIP_ERROR EnableNetwork();
-    CHIP_ERROR UpdateNetworkAddress();
-
-    chip::ByteSpan GetThreadNetworkId();
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;
@@ -169,15 +152,11 @@ private:
     chip::ByteSpan mPassword;
     char * mOnboardingPayload;
 
-    chip::Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback> * mOnAddThreadNetworkCallback = nullptr;
-    chip::Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback> * mOnAddWiFiNetworkCallback     = nullptr;
-    chip::Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback> * mOnEnableNetworkCallback       = nullptr;
-    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback                                               = nullptr;
     ChipDevice * mDevice;
-    chip::Controller::NetworkCommissioningCluster mCluster;
     chip::EndpointId mEndpointId = 0;
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
+    // These callbacks are used for the open pairing window command, which requires the device to be connected.
     static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 

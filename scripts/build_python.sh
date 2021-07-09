@@ -41,7 +41,6 @@ ENVIRONMENT_ROOT="$CHIP_ROOT/out/python_env"
 declare chip_detail_logging=false
 declare enable_pybindings=false
 declare chip_mdns
-declare clusters=true
 
 help() {
 

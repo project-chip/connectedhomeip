@@ -41,6 +41,7 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/SerializableIntegerSet.h>
 #include <lib/support/Span.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -473,16 +474,18 @@ public:
      *  issue is fixed.
      */
     CHIP_ERROR CommissioningComplete(NodeId remoteDeviceId);
+    CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 
     void RendezvousCleanup(CHIP_ERROR status);
+    void CommissioningCleanup(CHIP_ERROR status);
 
     void ReleaseDevice(Device * device) override;
 
-    void AdvanceCommissioningStage(CHIP_ERROR err);
+    CHIP_ERROR AdvanceCommissioningStage(CHIP_ERROR err);
 
 #if CONFIG_NETWORK_LAYER_BLE
     /**
@@ -571,6 +574,9 @@ private:
        contains the device object that's tracking the state of the device that's being paired.
        If no device is currently being paired, this value will be kNumMaxPairedDevices.  */
     uint16_t mDeviceBeingPaired;
+
+    /* This field indicates the device currently being commissioned  */
+    Device * mDeviceBeingCommissioned = nullptr;
 
     /* TODO: BLE rendezvous and IP rendezvous should share the same procedure, so this is just a
        workaround-like flag and should be removed in the future.
@@ -681,6 +687,13 @@ private:
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
 
     PASESession mPairingSession;
+    CommissioningParameters mCommissioningParams;
+    // TODO: this is wasteful if the nonce is passed in. We should consider making the
+    // nonce non-optional and enforcing the random nonce by the caller.
+    uint8_t mGeneratedCSRNonce[kOpCSRNonceLength]; // Storage spaces for the nonce if required.
+    // Storage area for thread extended pan id - this is calculated from the operational data set that is passed in by the
+    // comissioning parameters and used to enable the network.
+    uint8_t mExtendedPanId[chip::Thread::kSizeExtendedPanId];
 };
 
 } // namespace Controller
