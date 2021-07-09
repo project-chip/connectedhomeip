@@ -9,6 +9,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 import build
+from runner import PrintOnlyRunner, ShellRunner
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -73,8 +74,14 @@ def ValidateRepoPath(context, parameter, value):
     default=False,
     is_flag=True,
     help='Clean output directory before running the command')
+@click.option(
+    '--dry-run',
+    default=False,
+    is_flag=True,
+    help='Only print out shell commands that would be executed')
 @click.pass_context
-def main(context, log_level, platform, board, app, repo, out_prefix, clean):
+def main(context, log_level, platform, board, app, repo, out_prefix, clean,
+         dry_run):
   # Ensures somewhat pretty logging of what is going on
   coloredlogs.install(
       level=__LOG_LEVELS__[log_level],
@@ -92,7 +99,13 @@ before running this script.
   if 'all' in platform:
     platform = build.PLATFORMS
 
-  context.obj = build.Context(repository_path=repo, output_prefix=out_prefix)
+  if dry_run:
+    runner = PrintOnlyRunner()
+  else:
+    runner = ShellRunner()
+
+  context.obj = build.Context(
+      repository_path=repo, output_prefix=out_prefix, runner=runner)
   context.obj.SetupBuilders(
       platforms=[build.Platform.FromArgName(name) for name in platform],
       boards=[build.Board.FromArgName(name) for name in board],

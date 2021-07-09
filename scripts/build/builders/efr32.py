@@ -53,13 +53,15 @@ class Efr32Builder(Builder):
 
   def __init__(self,
                root,
+               runner,
                output_dir: str,
                app: Efr32App = Efr32App.LIGHT,
                board: Efr32Board = Efr32Board.BRD4161A):
-    super(Efr32Builder, self).__init__(root, output_dir)
+    super(Efr32Builder, self).__init__(root, runner, output_dir)
 
     self.app = app
     self.board = board
+    self.identifier = None
 
   def generate(self):
     if not os.path.exists(self.output_dir):
@@ -68,13 +70,15 @@ class Efr32Builder(Builder):
           '--root=%s' %
           os.path.join(self.root, 'examples', self.app.ExampleName(), 'efr32'),
           '--args=efr32_board="%s"' % self.board.GnArgName(), self.output_dir
-      ])
+      ],
+                    title='Generate %s' % self.identifier)
 
   def build(self):
     logging.info('Compiling EFR32 at %s', self.output_dir)
 
     self.generate()
-    self._Execute(['ninja', '-C', self.output_dir])
+    self._Execute(['ninja', '-C', self.output_dir],
+                  title='Build %s' % self.identifier)
 
   def outputs(self):
     items = {

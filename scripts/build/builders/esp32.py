@@ -50,16 +50,19 @@ class Esp32Builder(Builder):
 
   def __init__(self,
                root,
+               runner,
                output_dir: str,
                board: Esp32Board = Esp32Board.M5Stack,
                app: Esp32App = Esp32App.ALL_CLUSTERS):
-    super(Esp32Builder, self).__init__(root, output_dir)
+    super(Esp32Builder, self).__init__(root, runner, output_dir)
     self.board = board
     self.app = app
 
-  def _IdfEnvExecute(self, cmd, **kargs):
+  def _IdfEnvExecute(self, cmd, cwd=None, title=None):
     self._Execute(
-        ['bash', '-c', 'source $IDF_PATH/export.sh; %s' % cmd], **kargs)
+        ['bash', '-c', 'source $IDF_PATH/export.sh; %s' % cmd],
+        cwd=cwd,
+        title=title)
 
   def generate(self):
     if os.path.exists(os.path.join(self.output_dir, 'build.ninja')):
@@ -76,13 +79,15 @@ class Esp32Builder(Builder):
                                                         self.output_dir)
 
     # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
-    self._IdfEnvExecute(cmd, cwd=self.root)
+    self._IdfEnvExecute(
+        cmd, cwd=self.root, title='Generating ' + self.identifier)
 
   def build(self):
     logging.info('Compiling Esp32 at %s', self.output_dir)
 
     self.generate()
-    self._IdfEnvExecute("ninja -C '%s'" % self.output_dir)
+    self._IdfEnvExecute(
+        "ninja -C '%s'" % self.output_dir, title='Building ' + self.identifier)
 
   def outputs(self):
     return {
