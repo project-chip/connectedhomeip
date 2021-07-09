@@ -131,7 +131,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     {
         CHIP_ERROR err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
-            reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
+                                                reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
         if (err != CHIP_NO_ERROR && IsResponseExpected())
         {
             CancelResponseTimer();
