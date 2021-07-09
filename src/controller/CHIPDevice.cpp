@@ -255,7 +255,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         UNLOCK_TCPIP_CORE();
 #endif
-        VerifyOrReturnError(CHIP_NO_ERROR == inetErr, CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(inetErr);
     }
 
     static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
