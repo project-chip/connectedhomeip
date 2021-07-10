@@ -907,10 +907,10 @@ void BuildSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter
     subscribeRequestBuilder.EventNumber(1);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.MinIntervalSeconds(1);
+    subscribeRequestBuilder.MinIntervalMs(1);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.MaxIntervalSeconds(1);
+    subscribeRequestBuilder.MaxIntervalMs(1);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     subscribeRequestBuilder.KeepExistingSubscriptions(true);
@@ -932,8 +932,8 @@ void ParseSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader
     EventPathList::Parser eventPathListParser;
     AttributeDataVersionList::Parser attributeDataVersionListParser;
     uint64_t eventNumber          = 0;
-    uint16_t minIntervalSeconds   = 0;
-    uint16_t maxIntervalSeconds   = 0;
+    uint16_t minIntervalMs        = 0;
+    uint16_t maxIntervalMs        = 0;
     bool keepExistingSubscription = false;
     bool isProxy                  = false;
 
@@ -955,11 +955,11 @@ void ParseSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader
     err = subscribeRequestParser.GetEventNumber(&eventNumber);
     NL_TEST_ASSERT(apSuite, eventNumber == 1 && err == CHIP_NO_ERROR);
 
-    err = subscribeRequestParser.GetMinIntervalSeconds(&minIntervalSeconds);
-    NL_TEST_ASSERT(apSuite, minIntervalSeconds == 1 && err == CHIP_NO_ERROR);
+    err = subscribeRequestParser.GetMinIntervalMs(&minIntervalMs);
+    NL_TEST_ASSERT(apSuite, minIntervalMs == 1 && err == CHIP_NO_ERROR);
 
-    err = subscribeRequestParser.GetMaxIntervalSeconds(&maxIntervalSeconds);
-    NL_TEST_ASSERT(apSuite, maxIntervalSeconds == 1 && err == CHIP_NO_ERROR);
+    err = subscribeRequestParser.GetMaxIntervalMs(&maxIntervalMs);
+    NL_TEST_ASSERT(apSuite, maxIntervalMs == 1 && err == CHIP_NO_ERROR);
 
     err = subscribeRequestParser.GetKeepExistingSubscriptions(&keepExistingSubscription);
     NL_TEST_ASSERT(apSuite, keepExistingSubscription && err == CHIP_NO_ERROR);
@@ -979,7 +979,7 @@ void BuildSubscribeResponse(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWrite
     subscribeResponseBuilder.SubscriptionId(1);
     NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeResponseBuilder.FinalSyncIntervalSeconds(1);
+    subscribeResponseBuilder.FinalSyncIntervalMs(1);
     NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
 
     subscribeResponseBuilder.EndOfSubscribeResponse();
@@ -991,8 +991,8 @@ void ParseSubscribeResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     SubscribeResponse::Parser subscribeResponseParser;
-    uint64_t subscriptionId           = 0;
-    uint16_t finalSyncIntervalSeconds = 0;
+    uint64_t subscriptionId      = 0;
+    uint16_t finalSyncIntervalMs = 0;
 
     err = subscribeResponseParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1003,8 +1003,8 @@ void ParseSubscribeResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
     err = subscribeResponseParser.GetSubscriptionId(&subscriptionId);
     NL_TEST_ASSERT(apSuite, subscriptionId == 1 && err == CHIP_NO_ERROR);
 
-    err = subscribeResponseParser.GetFinalSyncIntervalSeconds(&finalSyncIntervalSeconds);
-    NL_TEST_ASSERT(apSuite, finalSyncIntervalSeconds == 1 && err == CHIP_NO_ERROR);
+    err = subscribeResponseParser.GetFinalSyncIntervalMs(&finalSyncIntervalMs);
+    NL_TEST_ASSERT(apSuite, finalSyncIntervalMs == 1 && err == CHIP_NO_ERROR);
 }
 
 void AttributePathTest(nlTestSuite * apSuite, void * apContext)
