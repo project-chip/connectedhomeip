@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
 import("//build/toolchain/flashable_executable.gni")
+import("//build_overrides/chip.gni")
 
 import("p6_board.gni")
 
@@ -24,27 +24,31 @@ template("p6_executable") {
   objcopy_image_format = "ihex"
   objcopy = "arm-none-eabi-objcopy"
 
-   #Copy flashing dependencies to the output directory so that the output
-   #is collectively self-contained; this allows flashing to work reliably
-   #even if the build and flashing steps take place on different machines
-   #or in different containers.
+  #Copy flashing dependencies to the output directory so that the output
+  #is collectively self-contained; this allows flashing to work reliably
+  #even if the build and flashing steps take place on different machines
+  #or in different containers.
 
   flashing_runtime_target = target_name + ".flashing_runtime"
   copy(flashing_runtime_target) {
-   sources = [
-     "${chip_root}/scripts/flashing/p6_firmware_utils.py",
-     "${chip_root}/scripts/flashing/firmware_utils.py",
-   ]
-   outputs = [ "${root_out_dir}/{{source_file_part}}" ]
+    sources = [
+      "${chip_root}/scripts/flashing/firmware_utils.py",
+      "${chip_root}/scripts/flashing/p6_firmware_utils.py",
+    ]
+    outputs = [ "${root_out_dir}/{{source_file_part}}" ]
   }
 
   flashing_script_generator =
-     "${chip_root}/scripts/flashing/gen_flashing_script.py"
+      "${chip_root}/scripts/flashing/gen_flashing_script.py"
   flashing_script_name = output_base_name + ".flash.py"
-  flashing_options = [ "p6", "--device", "${p6_board}" ]
+  flashing_options = [
+    "p6",
+    "--device",
+    "${p6_board}",
+  ]
 
   flashable_executable(target_name) {
-   forward_variables_from(invoker, "*")
-   data_deps = [ ":${flashing_runtime_target}" ]
+    forward_variables_from(invoker, "*")
+    data_deps = [ ":${flashing_runtime_target}" ]
   }
 }

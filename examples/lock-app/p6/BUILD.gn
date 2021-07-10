@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,13 +44,9 @@ p6_sdk_sources("lock_app_sdk_sources") {
     "CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
   ]
 
-  sources = [
-    "${p6_project_dir}/include/CHIPProjectConfig.h",
-    #"${p6_project_dir}/include/FreeRTOSConfig.h",
-  ]
+  sources = [ "${p6_project_dir}/include/CHIPProjectConfig.h" ]
 
-  public_configs = ["${chip_root}/third_party/p6:p6_sdk_config"]
-  #public_configs += ["${chip_root}/third_party/p6:project_configs"]
+  public_configs = [ "${chip_root}/third_party/p6:p6_sdk_config" ]
 }
 
 p6_executable("lock_app") {
@@ -80,14 +76,13 @@ p6_executable("lock_app") {
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
-    "${examples_plat_dir}/Service.cpp",
     "${examples_plat_dir}/init_p6Platform.cpp",
+    "${p6_project_dir}/include/CHIPProjectConfig.h",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
     "src/ButtonHandler.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
-    "${p6_project_dir}/include/CHIPProjectConfig.h",
   ]
 
   output_dir = root_out_dir

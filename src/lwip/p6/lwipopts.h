@@ -58,10 +58,9 @@
 #define LWIP_TCP_KEEPALIVE (1)
 
 #define LWIP_SOCKET 1
-#define LWIP_NETCONN                    (1)
+#define LWIP_NETCONN (1)
 
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 0
-
 
 // TODO: seems like this is unnecessary on Thread-only platforms
 #define LWIP_RAW 1
@@ -72,10 +71,10 @@
 
 #define LWIP_HAVE_LOOPIF (0)
 
-#define LWIP_NETIF_API                  1
+#define LWIP_NETIF_API 1
 // TODO: not sure why this is disabled
 #define LWIP_NETIF_LOOPBACK (0)
-#define PBUF_LINK_HLEN                  (WHD_PHYSICAL_HEADER)
+#define PBUF_LINK_HLEN (WHD_PHYSICAL_HEADER)
 
 #define MEMP_NUM_NETCONN (16)
 
@@ -199,11 +198,11 @@
 #define LWIP_DBG_TYPES_ON                                                                                                          \
     (LWIP_DBG_ON | LWIP_DBG_TRACE) /* (LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH|LWIP_DBG_HALT) */
 
-#define LWIP_RAND                           rand
-#define LWIP_NETIF_LINK_CALLBACK            1
-#define LWIP_NETIF_STATUS_CALLBACK          1
-#define LWIP_NETIF_EXT_STATUS_CALLBACK      1
-#define LWIP_NETIF_REMOVE_CALLBACK          1
-#define netifapi_dhcp_release_and_stop(n)   netifapi_dhcp_release(n)
+#define LWIP_RAND rand
+#define LWIP_NETIF_LINK_CALLBACK 1
+#define LWIP_NETIF_STATUS_CALLBACK 1
+#define LWIP_NETIF_EXT_STATUS_CALLBACK 1
+#define LWIP_NETIF_REMOVE_CALLBACK 1
+#define netifapi_dhcp_release_and_stop(n) netifapi_dhcp_release(n)
 
 #endif /* __LWIPOPTS_H__ */
