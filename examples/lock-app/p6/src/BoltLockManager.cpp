@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -219,8 +219,7 @@ void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 
             lock->mAutoLockTimerArmed = true;
 
-            P6_LOG("Auto Re-lock enabled. Will be triggered in %lu seconds",
-                   lock->mAutoLockDuration);
+            P6_LOG("Auto Re-lock enabled. Will be triggered in %lu seconds", lock->mAutoLockDuration);
         }
     }
 }

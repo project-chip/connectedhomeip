@@ -28,13 +28,13 @@ static cyhal_flash_block_info_t block_info;
 static cyhal_flash_t flash_obj;
 static mtb_kvstore_bd_t block_device;
 
-cy_rslt_t mtb_key_value_store_init(mtb_kvstore_t *kvstore_obj)
+cy_rslt_t mtb_key_value_store_init(mtb_kvstore_t * kvstore_obj)
 {
     cyhal_flash_info_t flash_info;
 
     // Initialize the block device
     cy_rslt_t result = cyhal_flash_init(&flash_obj);
-    if(CY_RSLT_SUCCESS != result)
+    if (CY_RSLT_SUCCESS != result)
     {
         return result;
     }
@@ -52,7 +52,7 @@ cy_rslt_t mtb_key_value_store_init(mtb_kvstore_t *kvstore_obj)
 
     // Initialize the kv-store library
     result = mtb_kvstore_init(kvstore_obj, block_info.start_address, block_info.size, &block_device);
-    if(CY_RSLT_SUCCESS != result)
+    if (CY_RSLT_SUCCESS != result)
     {
         cyhal_flash_free(&flash_obj);
     }
@@ -60,49 +60,47 @@ cy_rslt_t mtb_key_value_store_init(mtb_kvstore_t *kvstore_obj)
     return result;
 }
 
-uint32_t bd_read_size(void* context, uint32_t addr)
+uint32_t bd_read_size(void * context, uint32_t addr)
 {
     return 1;
 }
 
-uint32_t bd_program_size(void* context, uint32_t addr)
+uint32_t bd_program_size(void * context, uint32_t addr)
 {
     return block_info.page_size;
 }
 
-uint32_t bd_erase_size(void* context, uint32_t addr)
+uint32_t bd_erase_size(void * context, uint32_t addr)
 {
     return block_info.sector_size;
 }
 
-cy_rslt_t bd_read(void* context, uint32_t addr, uint32_t length, uint8_t* buf)
+cy_rslt_t bd_read(void * context, uint32_t addr, uint32_t length, uint8_t * buf)
 {
-    memcpy(buf, (const uint8_t*)(addr), length);
+    memcpy(buf, (const uint8_t *) (addr), length);
     return CY_RSLT_SUCCESS;
 }
 
-cy_rslt_t bd_program(void* context, uint32_t addr, uint32_t length, const uint8_t* buf)
+cy_rslt_t bd_program(void * context, uint32_t addr, uint32_t length, const uint8_t * buf)
 {
     uint32_t prog_size = bd_program_size(context, addr);
     CY_ASSERT(0 == (length % prog_size));
     cy_rslt_t result = CY_RSLT_SUCCESS;
-    for (uint32_t loc = addr; (result == CY_RSLT_SUCCESS) && (loc < addr + length);
-            loc += prog_size, buf += prog_size)
+    for (uint32_t loc = addr; (result == CY_RSLT_SUCCESS) && (loc < addr + length); loc += prog_size, buf += prog_size)
     {
-        result = cyhal_flash_program((cyhal_flash_t*)context, loc, (const uint32_t*)buf);
+        result = cyhal_flash_program((cyhal_flash_t *) context, loc, (const uint32_t *) buf);
     }
     return result;
 }
 
-cy_rslt_t bd_erase(void* context, uint32_t addr, uint32_t length)
+cy_rslt_t bd_erase(void * context, uint32_t addr, uint32_t length)
 {
     uint32_t erase_size = bd_erase_size(context, addr);
     CY_ASSERT(0 == (length % erase_size));
     cy_rslt_t result = CY_RSLT_SUCCESS;
-    for (uint32_t loc = addr; (result == CY_RSLT_SUCCESS) && (loc < addr + length);
-            loc += erase_size)
+    for (uint32_t loc = addr; (result == CY_RSLT_SUCCESS) && (loc < addr + length); loc += erase_size)
     {
-        result = cyhal_flash_erase((cyhal_flash_t*)context, loc);
+        result = cyhal_flash_erase((cyhal_flash_t *) context, loc);
     }
     return result;
 }

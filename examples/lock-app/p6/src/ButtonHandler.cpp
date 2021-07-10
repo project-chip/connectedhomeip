@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
-#include "AppConfig.h"
 #include "ButtonHandler.h"
+#include "AppConfig.h"
 #include "AppTask.h"
 
-#define BUTTON_COUNT      2
+#define BUTTON_COUNT 2
 
-TimerHandle_t buttonTimers[BUTTON_COUNT];   // FreeRTOS timers used for debouncing
+TimerHandle_t buttonTimers[BUTTON_COUNT]; // FreeRTOS timers used for debouncing
 // buttons. Array to hold handles to
 // the created timers.
 
@@ -47,12 +47,12 @@ void ButtonHandler::GpioInit(void)
     cy_rslt_t result = CY_RSLT_SUCCESS;
     // Set up button GPIOs to input with pullups.
     result = cyhal_gpio_init(APP_LOCK_BUTTON, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
-    if(result != CY_RSLT_SUCCESS)
+    if (result != CY_RSLT_SUCCESS)
     {
         printf(" cyhal_gpio_init failed for APP_LOCK_BUTTON\r\n");
     }
     result = cyhal_gpio_init(APP_FUNCTION_BUTTON, CYHAL_GPIO_DIR_INPUT, CYHAL_GPIO_DRIVE_PULLUP, CYBSP_BTN_OFF);
-    if(result != CY_RSLT_SUCCESS)
+    if (result != CY_RSLT_SUCCESS)
     {
         printf(" cyhal_gpio_init failed for APP_FUNCTION_BUTTON\r\n");
     }
@@ -62,13 +62,13 @@ void ButtonHandler::GpioInit(void)
     cyhal_gpio_enable_event(APP_LOCK_BUTTON, CYHAL_GPIO_IRQ_FALL, GPIO_INTERRUPT_PRIORITY, true);
     cyhal_gpio_enable_event(APP_FUNCTION_BUTTON, CYHAL_GPIO_IRQ_FALL, GPIO_INTERRUPT_PRIORITY, true);
 }
-void ButtonHandler::lockbuttonIsr(void *handler_arg, cyhal_gpio_event_t event)
+void ButtonHandler::lockbuttonIsr(void * handler_arg, cyhal_gpio_event_t event)
 {
     portBASE_TYPE taskWoken = pdFALSE;
     xTimerStartFromISR(buttonTimers[APP_LOCK_BUTTON_IDX], &taskWoken);
 }
 
-void ButtonHandler::functionbuttonIsr(void *handler_arg, cyhal_gpio_event_t event)
+void ButtonHandler::functionbuttonIsr(void * handler_arg, cyhal_gpio_event_t event)
 {
     portBASE_TYPE taskWoken = pdFALSE;
     xTimerStartFromISR(buttonTimers[APP_FUNCTION_BUTTON_IDX], &taskWoken);
@@ -79,8 +79,8 @@ void ButtonHandler::TimerCallback(TimerHandle_t xTimer)
     // Get the button index of the expired timer and call button event helper.
     uint32_t timerId;
     uint8_t buttonevent = 0;
-    timerId = (uint32_t) pvTimerGetTimerID(xTimer);
-    if(timerId)
+    timerId             = (uint32_t) pvTimerGetTimerID(xTimer);
+    if (timerId)
     {
         buttonevent = cyhal_gpio_read(APP_FUNCTION_BUTTON);
     }

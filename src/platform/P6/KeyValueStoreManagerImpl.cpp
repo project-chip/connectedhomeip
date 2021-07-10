@@ -21,8 +21,8 @@
  *          Platform-specific key value storage implementation for P6
  */
 
-#include <platform/KeyValueStoreManager.h>
 #include "cy_result.h"
+#include <platform/KeyValueStoreManager.h>
 
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
@@ -37,12 +37,13 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 KeyValueStoreManagerImpl::KeyValueStoreManagerImpl()
 {
     cy_rslt_t result = mtb_key_value_store_init(&kvstore_obj);
-    init_success = (CY_RSLT_SUCCESS == result) ? true : false;
+    init_success     = (CY_RSLT_SUCCESS == result) ? true : false;
 }
 
-CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset_bytes) const
+CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
+                                          size_t offset_bytes) const
 {
-    uint8_t  *local_value;
+    uint8_t * local_value;
     uint32_t actual_size;
     uint32_t size;
     cy_rslt_t result;
@@ -53,7 +54,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
 
     // Get the value size
-    result = mtb_kvstore_read(const_cast<mtb_kvstore_t*>(&kvstore_obj), key, NULL, &actual_size);
+    result = mtb_kvstore_read(const_cast<mtb_kvstore_t *>(&kvstore_obj), key, NULL, &actual_size);
 
     if ((result != CY_RSLT_SUCCESS) || (value == NULL))
     {
@@ -69,7 +70,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     {
         size = actual_size;
 
-        local_value = (uint8_t*)malloc(actual_size);
+        local_value = (uint8_t *) malloc(actual_size);
 
         if (local_value == NULL)
         {
@@ -80,18 +81,18 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     {
         size = value_size;
 
-        local_value = (uint8_t*)value;
+        local_value = (uint8_t *) value;
 
         if (actual_size < value_size)
         {
             // They may ask for more than what was originally stored, so we need to zero out the
             // entire value to account for that.
-            memset(&((uint8_t*)value)[actual_size], 0, value_size - actual_size);
+            memset(&((uint8_t *) value)[actual_size], 0, value_size - actual_size);
         }
     }
 
     // Read the value
-    result = mtb_kvstore_read(const_cast<mtb_kvstore_t*>(&kvstore_obj), key, local_value, &size);
+    result = mtb_kvstore_read(const_cast<mtb_kvstore_t *>(&kvstore_obj), key, local_value, &size);
 
     if (result != CY_RSLT_SUCCESS)
     {
@@ -126,18 +127,18 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    if(!init_success)
+    if (!init_success)
     {
         return CHIP_ERROR_WELL_UNINITIALIZED;
     }
 
-    cy_rslt_t result = mtb_kvstore_write(&kvstore_obj, key, static_cast<const uint8_t*>(value), value_size);
+    cy_rslt_t result = mtb_kvstore_write(&kvstore_obj, key, static_cast<const uint8_t *>(value), value_size);
     return _convert_cy_rslt_to_chip(result);
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    if(!init_success)
+    if (!init_success)
     {
         return CHIP_ERROR_WELL_UNINITIALIZED;
     }
@@ -148,23 +149,23 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 
 CHIP_ERROR KeyValueStoreManagerImpl::_convert_cy_rslt_to_chip(cy_rslt_t err) const
 {
-    switch(err)
+    switch (err)
     {
-        case CY_RSLT_SUCCESS:
-            return CHIP_NO_ERROR;
-        case MTB_KVSTORE_BAD_PARAM_ERROR:
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        case MTB_KVSTORE_STORAGE_FULL_ERROR: // Can't find a better CHIP error to translate this into
-        case MTB_KVSTORE_MEM_ALLOC_ERROR:
-            return CHIP_ERROR_BUFFER_TOO_SMALL;
-        case MTB_KVSTORE_INVALID_DATA_ERROR:
-        case MTB_KVSTORE_ERASED_DATA_ERROR:
-            return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-        case MTB_KVSTORE_ITEM_NOT_FOUND_ERROR:
-            return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        case MTB_KVSTORE_ALIGNMENT_ERROR:
-        default:
-            return CHIP_ERROR_INTERNAL;
+    case CY_RSLT_SUCCESS:
+        return CHIP_NO_ERROR;
+    case MTB_KVSTORE_BAD_PARAM_ERROR:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case MTB_KVSTORE_STORAGE_FULL_ERROR: // Can't find a better CHIP error to translate this into
+    case MTB_KVSTORE_MEM_ALLOC_ERROR:
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    case MTB_KVSTORE_INVALID_DATA_ERROR:
+    case MTB_KVSTORE_ERASED_DATA_ERROR:
+        return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
+    case MTB_KVSTORE_ITEM_NOT_FOUND_ERROR:
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    case MTB_KVSTORE_ALIGNMENT_ERROR:
+    default:
+        return CHIP_ERROR_INTERNAL;
     }
     return CHIP_ERROR_INTERNAL;
 }

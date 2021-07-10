@@ -29,7 +29,6 @@
 #ifndef MBEDTLS_USER_CONFIG_HEADER
 #define MBEDTLS_USER_CONFIG_HEADER
 
-
 /**
  * \def MBEDTLS_HAVE_TIME_DATE
  *
@@ -50,7 +49,6 @@
  * MBEDTLS_PLATFORM_GMTIME_R_ALT.
  */
 #undef MBEDTLS_HAVE_TIME_DATE
-
 
 /**
  * \def MBEDTLS_PLATFORM_EXIT_ALT
@@ -139,7 +137,6 @@
  */
 #undef MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
 
-
 /**
  * \def MBEDTLS_PK_PARSE_EC_EXTENDED
  *
@@ -154,9 +151,7 @@
  */
 #undef MBEDTLS_PK_PARSE_EC_EXTENDED
 
-
 #undef MBEDTLS_FS_IO
-
 
 /**
  * \def MBEDTLS_NO_PLATFORM_ENTROPY
@@ -375,7 +370,6 @@
  * Comment this macro to disable support for key export
  */
 #undef MBEDTLS_SSL_EXPORT_KEYS
-
 
 /**
  * \def MBEDTLS_SSL_TRUNCATED_HMAC
@@ -711,9 +705,9 @@
 #undef MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
 
 /**
- * Allow SHA-1 in the default TLS configuration for certificate signing if 
+ * Allow SHA-1 in the default TLS configuration for certificate signing if
  * enabled in the application Makefile.
- * 
+ *
  * Without this build-time option, SHA-1 support must be activated explicitly
  * through mbedtls_ssl_conf_cert_profile. Turning on this option is not
  * recommended because of it is possible to generate SHA-1 collisions, however
@@ -725,7 +719,7 @@
  *
  */
 #ifdef CY_MQTT_ENABLE_SECURE_TEST_MOSQUITTO_SUPPORT
-    #define MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_CERTIFICATES
+#define MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_CERTIFICATES
 #endif
 
 #endif /* MBEDTLS_USER_CONFIG_HEADER */
