@@ -20,8 +20,8 @@
 
 #include <stdint.h>
 
-#include "cyhal.h"
 #include "FreeRTOS.h"
+#include "cyhal.h"
 #include "timers.h" // provides FreeRTOS timer support
 
 #define GPIO_INTERRUPT_PRIORITY (5)
