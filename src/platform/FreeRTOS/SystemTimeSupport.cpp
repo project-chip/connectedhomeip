@@ -96,7 +96,7 @@ uint64_t GetMonotonicMicroseconds(void)
 
 uint64_t GetMonotonicMilliseconds(void)
 {
-    return (FreeRTOSTicksSinceBoot() * kMillisecondPerSecond) / configTICK_RATE_HZ;
+    return (FreeRTOSTicksSinceBoot() * kMillisecondsPerSecond) / configTICK_RATE_HZ;
 }
 
 CHIP_ERROR GetUnixTimeMicroseconds(uint64_t & curTime)

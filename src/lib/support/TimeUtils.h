@@ -54,7 +54,7 @@ enum
     kSecondsPerWeek         = kSecondsPerDay * kDaysPerWeek,
     kSecondsPerStandardYear = kSecondsPerDay * kDaysPerStandardYear,
 
-    kMillisecondPerSecond = 1000,
+    kMillisecondsPerSecond = 1000,
 
     kMicrosecondsPerSecond      = 1000000,
     kMicrosecondsPerMillisecond = 1000,
@@ -185,7 +185,7 @@ extern bool UnixEpochToChipEpochTime(uint32_t unixEpochTime, uint32_t & chipEpoc
  */
 inline uint32_t secondsToMilliseconds(uint32_t seconds)
 {
-    return (seconds * kMillisecondPerSecond);
+    return (seconds * kMillisecondsPerSecond);
 }
 
 } // namespace chip
