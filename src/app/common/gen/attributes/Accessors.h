@@ -1169,8 +1169,8 @@ EmberAfStatus GetMinScaledValue(chip::EndpointId endpoint, int16_t * minScaledVa
 EmberAfStatus SetMinScaledValue(chip::EndpointId endpoint, int16_t minScaledValue);
 EmberAfStatus GetMaxScaledValue(chip::EndpointId endpoint, int16_t * maxScaledValue); // int16s
 EmberAfStatus SetMaxScaledValue(chip::EndpointId endpoint, int16_t maxScaledValue);
-EmberAfStatus GetScaledTolerance(chip::EndpointId endpoint, int16_t * scaledTolerance); // int16s
-EmberAfStatus SetScaledTolerance(chip::EndpointId endpoint, int16_t scaledTolerance);
+EmberAfStatus GetScaledTolerance(chip::EndpointId endpoint, uint16_t * scaledTolerance); // int16u
+EmberAfStatus SetScaledTolerance(chip::EndpointId endpoint, uint16_t scaledTolerance);
 EmberAfStatus GetScale(chip::EndpointId endpoint, int8_t * scale); // int8s
 EmberAfStatus SetScale(chip::EndpointId endpoint, int8_t scale);
 } // namespace Attributes
