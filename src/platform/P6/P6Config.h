@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -27,8 +27,8 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <string.h>
 #include <mtb_kvstore.h>
+#include <string.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -107,14 +107,14 @@ struct P6Config::Key
     const char * Namespace;
     const char * Name;
 
-    CHIP_ERROR to_str(char *buf, size_t buf_size) const;
+    CHIP_ERROR to_str(char * buf, size_t buf_size) const;
     size_t len() const;
     bool operator==(const Key & other) const;
 };
 
-inline CHIP_ERROR P6Config::Key::to_str(char *buf, size_t buf_size) const
+inline CHIP_ERROR P6Config::Key::to_str(char * buf, size_t buf_size) const
 {
-    if(buf_size < len() + 1)
+    if (buf_size < len() + 1)
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }

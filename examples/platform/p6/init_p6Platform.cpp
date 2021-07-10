@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -46,14 +46,14 @@ extern "C" {
 #include "sl_malloc.h"
 #endif // OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
 #endif // CHIP_ENABLE_OPENTHREAD
-#include <cyhal.h>
-#include <cybsp.h>
 #include <cy_retarget_io.h>
+#include <cybsp.h>
+#include <cyhal.h>
 
 void init_p6Platform(void)
 {
     /* Initialize the board support package */
-    cybsp_init() ;
+    cybsp_init();
 
     /* Initialize retarget-io to use the debug UART port */
     cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);

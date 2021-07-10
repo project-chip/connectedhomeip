@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -19,9 +19,9 @@
 
 #include "LEDWidget.h"
 
-#include <platform/CHIPDeviceLayer.h>
 #include "cybsp.h"
 #include "cyhal.h"
+#include <platform/CHIPDeviceLayer.h>
 
 void LEDWidget::Init(int ledNum)
 {
@@ -31,7 +31,7 @@ void LEDWidget::Init(int ledNum)
     mLedNum           = ledNum;
     mState            = CYBSP_LED_STATE_OFF;
 
-    cyhal_gpio_init((cyhal_gpio_t)ledNum, CYHAL_GPIO_DIR_OUTPUT, CYHAL_GPIO_DRIVE_STRONG, CYBSP_LED_STATE_OFF);
+    cyhal_gpio_init((cyhal_gpio_t) ledNum, CYHAL_GPIO_DIR_OUTPUT, CYHAL_GPIO_DRIVE_STRONG, CYBSP_LED_STATE_OFF);
 }
 
 void LEDWidget::Invert(void)
@@ -77,7 +77,7 @@ void LEDWidget::DoSet(bool state)
 {
     if (mState != state)
     {
-        cyhal_gpio_write((cyhal_gpio_t)mLedNum, ((state) ? CYBSP_LED_STATE_ON : CYBSP_LED_STATE_OFF));
+        cyhal_gpio_write((cyhal_gpio_t) mLedNum, ((state) ? CYBSP_LED_STATE_ON : CYBSP_LED_STATE_OFF));
     }
     mState = state;
 }

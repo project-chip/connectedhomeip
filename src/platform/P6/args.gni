@@ -25,19 +25,8 @@ mbedtls_target = "${p6_sdk_build_root}:p6_build"
 chip_device_platform = "p6"
 
 lwip_platform = "p6"
-#lwip_ipv6 = true
-#lwip_ipv4 = true
-#lwip_api = true
-#lwip_ethernet = true
 
 chip_inet_config_enable_ipv4 = true
 chip_inet_config_enable_dns_resolver = false
 
 chip_build_tests = false
-
-#openthread_external_mbedtls = mbedtls_target
-#openthread_project_core_config_file = "openthread-core-p6-config.h"
-#openthread_core_config_platform_check_file = "openthread-core-p6-config-check.h"
-#openthread_core_config_deps = [ "${chip_root}/third_party/openthread/platforms/p6:libopenthread-p6-config" ]
-
-#openthread_external_platform = "${chip_root}/third_party/openthread/platforms/p6:libopenthread-p6"
