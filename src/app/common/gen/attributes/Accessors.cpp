@@ -4751,15 +4751,15 @@ EmberAfStatus SetMaxScaledValue(chip::EndpointId endpoint, int16_t maxScaledValu
     return emberAfWriteServerAttribute(endpoint, PressureMeasurement::Id, Ids::MaxScaledValue, (uint8_t *) &maxScaledValue,
                                        ZCL_INT16S_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetScaledTolerance(chip::EndpointId endpoint, int16_t * scaledTolerance)
+EmberAfStatus GetScaledTolerance(chip::EndpointId endpoint, uint16_t * scaledTolerance)
 {
     return emberAfReadServerAttribute(endpoint, PressureMeasurement::Id, Ids::ScaledTolerance, (uint8_t *) scaledTolerance,
                                       sizeof(*scaledTolerance));
 }
-EmberAfStatus SetScaledTolerance(chip::EndpointId endpoint, int16_t scaledTolerance)
+EmberAfStatus SetScaledTolerance(chip::EndpointId endpoint, uint16_t scaledTolerance)
 {
     return emberAfWriteServerAttribute(endpoint, PressureMeasurement::Id, Ids::ScaledTolerance, (uint8_t *) &scaledTolerance,
-                                       ZCL_INT16S_ATTRIBUTE_TYPE);
+                                       ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 EmberAfStatus GetScale(chip::EndpointId endpoint, int8_t * scale)
 {
