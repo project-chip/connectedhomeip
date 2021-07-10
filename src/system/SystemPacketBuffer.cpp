@@ -657,7 +657,7 @@ PacketBufferHandle PacketBufferHandle::CloneData() const
             }
             // Otherwise, reduce the requested data size. This subtraction can not underflow because the above test
             // guarantees originalReservedSize <= PacketBuffer::kMaxSizeWithoutReserve.
-            originalDataSize = PacketBuffer::kMaxSizeWithoutReserve - originalReservedSize;
+            originalDataSize = static_cast<uint16_t>(PacketBuffer::kMaxSizeWithoutReserve - originalReservedSize);
         }
 
         PacketBufferHandle clone = PacketBufferHandle::New(originalDataSize, originalReservedSize);
