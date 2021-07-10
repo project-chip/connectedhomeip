@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 
+#include "cyhal.h"
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 
