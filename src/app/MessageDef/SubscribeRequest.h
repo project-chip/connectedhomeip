@@ -38,8 +38,8 @@ enum
     kCsTag_EventPathList             = 1,
     kCsTag_AttributeDataVersionList  = 2,
     kCsTag_EventNumber               = 3,
-    kCsTag_MinIntervalMs   = 4,
-    kCsTag_MaxIntervalMs   = 5,
+    kCsTag_MinIntervalMs             = 4,
+    kCsTag_MaxIntervalMs             = 5,
     kCsTag_KeepExistingSubscriptions = 6,
     kCsTag_IsProxy                   = 7,
 };

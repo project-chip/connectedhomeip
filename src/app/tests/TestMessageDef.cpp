@@ -932,11 +932,11 @@ void ParseSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader
     AttributePathList::Parser attributePathListParser;
     EventPathList::Parser eventPathListParser;
     AttributeDataVersionList::Parser attributeDataVersionListParser;
-    uint64_t eventNumber             = 0;
-    uint16_t minIntervalMs = 0;
-    uint16_t maxIntervalMs = 0;
-    bool keepExistingSubscription    = false;
-    bool isProxy                     = false;
+    uint64_t eventNumber          = 0;
+    uint16_t minIntervalMs        = 0;
+    uint16_t maxIntervalMs        = 0;
+    bool keepExistingSubscription = false;
+    bool isProxy                  = false;
 
     err = subscribeRequestParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -992,7 +992,7 @@ void ParseSubscribeResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     SubscribeResponse::Parser subscribeResponseParser;
-    uint64_t subscriptionId                = 0;
+    uint64_t subscriptionId      = 0;
     uint16_t finalSyncIntervalMs = 0;
 
     err = subscribeResponseParser.Init(aReader);
