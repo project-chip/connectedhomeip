@@ -44,12 +44,9 @@ p6_sdk_sources("lock_app_sdk_sources") {
     "CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
   ]
 
-  sources = [
-    "${p6_project_dir}/include/CHIPProjectConfig.h",
-  ]
+  sources = [ "${p6_project_dir}/include/CHIPProjectConfig.h" ]
 
   public_configs = [ "${chip_root}/third_party/p6:p6_sdk_config" ]
-
 }
 
 p6_executable("lock_app") {
