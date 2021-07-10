@@ -98,12 +98,12 @@ void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_E
         if (err != CHIP_NO_ERROR)
         {
             printf("Send request failed: %s\n", chip::ErrorStr(err));
-            Shutdown();
+            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
         }
     }
     else
     {
-        Shutdown();
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     }
 }
 
@@ -276,12 +276,9 @@ int main(int argc, char * argv[])
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        Shutdown();
-    }
+    Shutdown();
 
+exit:
     if ((err != CHIP_NO_ERROR) || (gEchoRespCount != kMaxEchoCount))
     {
         printf("ChipEchoClient failed: %s\n", chip::ErrorStr(err));

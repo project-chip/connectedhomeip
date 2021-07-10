@@ -209,11 +209,23 @@ commissioning and cluster control.
 
 ### Cluster control
 
--   After successful commissioning, use the OnOff cluster command to control the
-    OnOff attribute. This allows you to toggle a parameter implemented by the
-    device to be On or Off.
+-   After successful commissioning, use the OnOff cluster commands to control
+    the OnOff attribute. This allows you to toggle a parameter implemented by
+    the device to be On or Off.
 
-    `chip-device-ctrl > zcl OnOff Off 135246 1 0`
+    `chip-device-ctrl > zcl OnOff Off 135246 1 1`
+
+-   Use the LevelControl cluster commands to control the CurrentLevel attribute.
+    This allows you to control the brightness of the led.
+
+    `chip-device-ctrl > zcl LevelControl MoveToLevel 135246 1 1 level=10 transitionTime=0 optionMask=0 optionOverride=0`
+
+-   For ESP32C3-DevKitM, use the ColorContorl cluster commands to control the
+    CurrentHue and CurrentSaturation attribute. This allows you to control the
+    color of on-board LED.
+
+    `zcl ColorControl MoveToHue 135246 1 1 hue=100 direction=0 transitionTime=0 optionsMask=0 optionsOverride=0`
+    `zcl ColorControl MoveToSaturation 135245 1 1 saturation=200 transitionTime=0 optionsMask=0 optionsOverride=0`
 
 ### Flashing app using script
 
@@ -243,5 +255,6 @@ through the on/off/toggle commands from the `python-controller`. For `M5Stack`,
 a virtual Green LED on the display is used for the same.
 
 If you wish to see the actual effect of the commands on `ESP32-DevKitC`,
-`ESP32-WROVER-KIT_V4.1` and `ESP32C3-DevKitM`, you will have to connect an
-external LED to GPIO `STATUS_LED_GPIO_NUM`.
+`ESP32-WROVER-KIT_V4.1`, you will have to connect an external LED to GPIO
+`STATUS_LED_GPIO_NUM`. For `ESP32C3-DevKitM`, the on-board LED will show the
+actual effect of the commands.

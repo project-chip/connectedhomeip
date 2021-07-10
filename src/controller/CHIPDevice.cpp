@@ -337,7 +337,6 @@ CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, cons
             HandleDataModelMessage(exchange, std::move(msgBuf));
         }
     }
-    exchange->Close();
     return CHIP_NO_ERROR;
 }
 

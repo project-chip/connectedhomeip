@@ -13,11 +13,33 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
+import("${build_root}/config/compiler/compiler.gni")
+import("${build_root}/toolchain/gcc_toolchain.gni")
 
 declare_args() {
-  # Root directory for lwIP.
-  lwip_root = "//third_party/lwip"
+  # C compiler to use for target build.
+  target_cc = ""
+
+  # C++ compiler to use for target build.
+  target_cxx = ""
+
+  # Archive tool to use for target build.
+  target_ar = ""
 }
 
-lwip_remove_configs = [ "${build_root}/config/compiler:warnings_default" ]
-lwip_add_configs = [ "${build_root}/config/compiler:warnings_third_party" ]
+gcc_toolchain("custom") {
+  if (target_cc == "" || target_cxx == "" || target_ar == "") {
+    assert(false,
+           "build arguments target_cc, target_cxx and target_ar need to be set")
+  }
+
+  ar = target_ar
+  cc = target_cc
+  cxx = target_cxx
+
+  toolchain_args = {
+    current_os = target_os
+    current_cpu = target_cpu
+    is_clang = is_clang
+  }
+}
