@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -35,9 +35,9 @@
 #include <lwip/nd6.h>
 #include <lwip/netif.h>
 
-#include <type_traits>
-#include <cy_lwip.h>
 #include "lwip/opt.h"
+#include <cy_lwip.h>
+#include <type_traits>
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #error "WiFi Station support must be enabled when building for PSoC6"
@@ -64,8 +64,8 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 {
-   CHIP_ERROR err = CHIP_NO_ERROR;
-   VerifyOrExit(val != kWiFiStationMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(val != kWiFiStationMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
     if (val != kWiFiStationMode_ApplicationControlled)
     {
         mWiFiStationMode = val;
@@ -73,8 +73,8 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
     }
     if (mWiFiStationMode != val)
     {
-       ChipLogProgress(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
-                       WiFiStationModeToStr(val));
+        ChipLogProgress(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
+                        WiFiStationModeToStr(val));
     }
 
     mWiFiStationMode = val;
@@ -103,7 +103,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 
         SystemLayer.ScheduleWork(DriveStationState, NULL);
         SystemLayer.ScheduleWork(DriveAPState, NULL);
-    }    
+    }
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
@@ -171,12 +171,11 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
     ChipLogProgress(DeviceLayer,
                     "Wifi-Telemetry\n"
                     "BSSID: %02x:%02x:%02x:%02x:%02x:%02x\n"
-		    "RSSI: %d\n"
+                    "RSSI: %d\n"
                     "Channel: %d\n"
-		    "Channel Width: %d Mhz\n",
-                    ap_info.BSSID[0], ap_info.BSSID[1], ap_info.BSSID[2],
-		    ap_info.BSSID[3], ap_info.BSSID[4], ap_info.BSSID[5],
-		    ap_info.signal_strength, ap_info.channel, ap_info.channel_width);
+                    "Channel Width: %d Mhz\n",
+                    ap_info.BSSID[0], ap_info.BSSID[1], ap_info.BSSID[2], ap_info.BSSID[3], ap_info.BSSID[4], ap_info.BSSID[5],
+                    ap_info.signal_strength, ap_info.channel, ap_info.channel_width);
 exit:
     return CHIP_NO_ERROR;
 }
@@ -206,10 +205,12 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
         // Set a default station configuration.
         wifi_config_t wifiConfig;
         memset(&wifiConfig, 0, sizeof(wifiConfig));
-        memcpy(wifiConfig.sta.ssid, CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID, min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID), sizeof(wifiConfig.sta.ssid)));
-        memcpy(wifiConfig.sta.password, CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD, min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD), sizeof(wifiConfig.sta.password)));
+        memcpy(wifiConfig.sta.ssid, CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID,
+               min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_SSID), sizeof(wifiConfig.sta.ssid)));
+        memcpy(wifiConfig.sta.password, CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD,
+               min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD), sizeof(wifiConfig.sta.password)));
         wifiConfig.sta.security = CHIP_DEVICE_CONFIG_DEFAULT_STA_SECURITY;
-        err                        = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+        err                     = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifiConfig);
         if (err != CY_RSLT_SUCCESS)
         {
             ChipLogError(DeviceLayer, "p6_wifi_set_config() failed: %s", chip::ErrorStr(err));
@@ -228,50 +229,48 @@ exit:
     return err;
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-}
+void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
-void ConnectivityManagerImpl::wlan_event_cb(cy_wcm_event_t event, cy_wcm_event_data_t *event_data)
+void ConnectivityManagerImpl::wlan_event_cb(cy_wcm_event_t event, cy_wcm_event_data_t * event_data)
 {
     switch (event)
     {
-        case CY_WCM_EVENT_CONNECTING:
-            ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_CONNECTING");
-            ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting);
-            break;
-        case CY_WCM_EVENT_CONNECTED:
-            ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_CONNECTED");
-            ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
-            ConnectivityMgrImpl().DriveStationState();
-            break;
-        case CY_WCM_EVENT_CONNECT_FAILED:
-            ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_CONNECT_FAILED");
-            ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
-            ConnectivityMgrImpl().DriveStationState();
-            break;
-        case CY_WCM_EVENT_RECONNECTED:
-            ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_RECONNECTED");
-            ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
-            ConnectivityMgrImpl().DriveStationState();
-            break;
-        case CY_WCM_EVENT_DISCONNECTED:
-            ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_DISCONNECTED");
-            ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Disconnecting);
-            break;
-        case CY_WCM_EVENT_IP_CHANGED:
-            ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_IP_CHANGED");
-            ConnectivityMgrImpl().OnIPAddressAvailable();
-            break;
-        case CY_WCM_EVENT_STA_JOINED_SOFTAP:
-            ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_STA_JOINED_SOFTAP");
-            break;
-        case CY_WCM_EVENT_STA_LEFT_SOFTAP:
-            ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_STA_LEFT_SOFTAP");
-            break;
-        default:
-            ChipLogProgress(DeviceLayer, "UnSupported Event");
-            break;
+    case CY_WCM_EVENT_CONNECTING:
+        ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_CONNECTING");
+        ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting);
+        break;
+    case CY_WCM_EVENT_CONNECTED:
+        ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_CONNECTED");
+        ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
+        ConnectivityMgrImpl().DriveStationState();
+        break;
+    case CY_WCM_EVENT_CONNECT_FAILED:
+        ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_CONNECT_FAILED");
+        ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
+        ConnectivityMgrImpl().DriveStationState();
+        break;
+    case CY_WCM_EVENT_RECONNECTED:
+        ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_RECONNECTED");
+        ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
+        ConnectivityMgrImpl().DriveStationState();
+        break;
+    case CY_WCM_EVENT_DISCONNECTED:
+        ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_DISCONNECTED");
+        ConnectivityMgrImpl().ChangeWiFiStationState(kWiFiStationState_Disconnecting);
+        break;
+    case CY_WCM_EVENT_IP_CHANGED:
+        ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_IP_CHANGED");
+        ConnectivityMgrImpl().OnIPAddressAvailable();
+        break;
+    case CY_WCM_EVENT_STA_JOINED_SOFTAP:
+        ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_STA_JOINED_SOFTAP");
+        break;
+    case CY_WCM_EVENT_STA_LEFT_SOFTAP:
+        ChipLogProgress(DeviceLayer, "CY_WCM_EVENT_STA_LEFT_SOFTAP");
+        break;
+    default:
+        ChipLogProgress(DeviceLayer, "UnSupported Event");
+        break;
     }
 }
 void ConnectivityManagerImpl::_OnWiFiScanDone()
@@ -313,13 +312,12 @@ void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
     }
 }
 
-#define INITIALISER_IPV4_ADDRESS1( addr_var, addr_val )  addr_var = { CY_WCM_IP_VER_V4, { .v4 = (uint32_t)(addr_val) } }
-#define MAKE_IPV4_ADDRESS1(a, b, c, d) ((((uint32_t) d) << 24) | (((uint32_t) c) << 16) | (((uint32_t) b) << 8) |((uint32_t) a))
-static const cy_wcm_ip_setting_t ap_mode_ip_settings =
-{
-    INITIALISER_IPV4_ADDRESS1( .ip_address, MAKE_IPV4_ADDRESS1( 192, 168, 0,  2 )),
-    INITIALISER_IPV4_ADDRESS1( .gateway,    MAKE_IPV4_ADDRESS1( 192, 168, 0, 2 ) ),
-    INITIALISER_IPV4_ADDRESS1( .netmask,    MAKE_IPV4_ADDRESS1( 255, 255, 255, 0 )),
+#define INITIALISER_IPV4_ADDRESS1(addr_var, addr_val) addr_var = { CY_WCM_IP_VER_V4, { .v4 = (uint32_t)(addr_val) } }
+#define MAKE_IPV4_ADDRESS1(a, b, c, d) ((((uint32_t) d) << 24) | (((uint32_t) c) << 16) | (((uint32_t) b) << 8) | ((uint32_t) a))
+static const cy_wcm_ip_setting_t ap_mode_ip_settings = {
+    INITIALISER_IPV4_ADDRESS1(.ip_address, MAKE_IPV4_ADDRESS1(192, 168, 0, 2)),
+    INITIALISER_IPV4_ADDRESS1(.gateway, MAKE_IPV4_ADDRESS1(192, 168, 0, 2)),
+    INITIALISER_IPV4_ADDRESS1(.netmask, MAKE_IPV4_ADDRESS1(255, 255, 255, 0)),
 };
 
 CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
@@ -330,12 +328,12 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     memset(&wifiConfig.ap, 0, sizeof(wifi_config_ap_t));
     snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
              CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
-    memcpy(wifiConfig.ap.password, CHIP_DEVICE_CONFIG_WIFI_AP_PASSWORD,strlen(CHIP_DEVICE_CONFIG_WIFI_AP_PASSWORD));
-    wifiConfig.ap.channel         = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
-    wifiConfig.ap.security        = CHIP_DEVICE_CONFIG_WIFI_AP_SECURITY;
+    memcpy(wifiConfig.ap.password, CHIP_DEVICE_CONFIG_WIFI_AP_PASSWORD, strlen(CHIP_DEVICE_CONFIG_WIFI_AP_PASSWORD));
+    wifiConfig.ap.channel                = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
+    wifiConfig.ap.security               = CHIP_DEVICE_CONFIG_WIFI_AP_SECURITY;
     wifiConfig.ap.ip_settings.ip_address = ap_mode_ip_settings.ip_address;
-    wifiConfig.ap.ip_settings.netmask = ap_mode_ip_settings.netmask;
-    wifiConfig.ap.ip_settings.gateway = ap_mode_ip_settings.gateway;
+    wifiConfig.ap.ip_settings.netmask    = ap_mode_ip_settings.netmask;
+    wifiConfig.ap.ip_settings.gateway    = ap_mode_ip_settings.gateway;
 
     ChipLogProgress(DeviceLayer, "Configuring WiFi AP: SSID %s, channel %u", wifiConfig.ap.ssid, wifiConfig.ap.channel);
     err = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_AP, &wifiConfig);
@@ -375,7 +373,7 @@ void ConnectivityManagerImpl::DriveAPState()
     {
         ChangeWiFiAPState(kWiFiAPState_Deactivating);
     }
-        // If the AP interface is not under application control...
+    // If the AP interface is not under application control...
     if (mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
     {
         // Determine the target (desired) state for AP interface...
@@ -428,7 +426,7 @@ void ConnectivityManagerImpl::DriveAPState()
         {
             targetState = kWiFiAPState_NotActive;
         }
-    
+
         // If the current AP state does not match the target state...
         if (mWiFiAPState != targetState)
         {
@@ -585,11 +583,11 @@ exit:
 
 void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 {
-    bool haveIPv4Conn      = false;
-    bool haveIPv6Conn      = false;
-    const bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
-    const bool hadIPv6Conn = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
-    struct netif *net_interface  = NULL;
+    bool haveIPv4Conn            = false;
+    bool haveIPv6Conn            = false;
+    const bool hadIPv4Conn       = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
+    const bool hadIPv6Conn       = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
+    struct netif * net_interface = NULL;
     IPAddress addr;
     bool stationConnected;
     Internal::P6Utils::IsStationConnected(stationConnected);
@@ -598,7 +596,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     // If the WiFi station is currently in the connected state...
     if ((mWiFiStationState == kWiFiStationState_Connected) || stationConnected)
     {
-        net_interface  = cy_lwip_get_interface(CY_LWIP_STA_NW_INTERFACE);
+        net_interface = cy_lwip_get_interface(CY_LWIP_STA_NW_INTERFACE);
         if (net_interface != NULL && netif_is_up(net_interface) && netif_is_link_up(net_interface))
         {
             if (!ip4_addr_isany(netif_ip4_addr(net_interface)) && !ip4_addr_isany(netif_ip4_gw(net_interface)))
@@ -613,7 +611,8 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
             // address (2000::/3) that is in the valid state.  If such an address is found...
             for (uint8_t i = 0; i < LWIP_IPV6_NUM_ADDRESSES; i++)
             {
-                if (ip6_addr_islinklocal(netif_ip6_addr(net_interface, i)) && ip6_addr_isvalid(netif_ip6_addr_state(net_interface, i)))
+                if (ip6_addr_islinklocal(netif_ip6_addr(net_interface, i)) &&
+                    ip6_addr_isvalid(netif_ip6_addr_state(net_interface, i)))
                 {
                     haveIPv6Conn = true;
                     ChipDeviceEvent event;
@@ -649,7 +648,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
             ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
         }
     }
-
 }
 
 CHIP_ERROR ConnectivityManagerImpl::OnIPAddressAvailable(void)
@@ -661,15 +659,15 @@ CHIP_ERROR ConnectivityManagerImpl::OnIPAddressAvailable(void)
 
 CHIP_ERROR ConnectivityManagerImpl::WiFi_init(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
     cy_rslt_t result = CY_RSLT_SUCCESS;
-    err = Internal::P6Utils::StartWiFiLayer();
+    err              = Internal::P6Utils::StartWiFiLayer();
     SuccessOrExit(err);
     /* Register event callback */
     if (eventcallback == false)
     {
         result = cy_wcm_register_event_callback(ConnectivityManagerImpl::wlan_event_cb);
-        if( result != CY_RSLT_SUCCESS )
+        if (result != CY_RSLT_SUCCESS)
         {
             ChipLogError(DeviceLayer, "cy_wcm_register_event_callback failed....! \r\n");
             err = CHIP_ERROR_INTERNAL;
@@ -684,7 +682,7 @@ exit:
 CHIP_ERROR ConnectivityManagerImpl::ping_thread()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err = Internal::P6Utils::ping_init();
+    err            = Internal::P6Utils::ping_init();
     return err;
 }
 

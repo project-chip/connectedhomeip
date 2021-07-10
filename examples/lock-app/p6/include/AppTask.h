@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -41,6 +41,7 @@ public:
     void PostEvent(const AppEvent * event);
 
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
+    void UpdateClusterState(void);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -58,8 +59,6 @@ private:
     static void FunctionHandler(AppEvent * aEvent);
     static void LockActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(TimerHandle_t xTimer);
-
-    static void UpdateClusterState(void);
 
     void StartTimer(uint32_t aTimeoutMs);
 

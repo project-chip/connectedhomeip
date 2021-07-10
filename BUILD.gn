@@ -222,7 +222,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Build the p6 lock app example.
     enable_p6_lock_app_build = enable_p6_builds
 
-
     # Build the qpgxxxx lock app example.
     enable_qpg_lock_app_build = enable_qpg_builds && !is_debug
 

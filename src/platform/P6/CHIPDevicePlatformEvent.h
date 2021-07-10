@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -40,13 +40,12 @@ enum
     kP6SystemEvent = kRange_PublicPlatformSpecific,
 };
 
-
 /**
  * Enumerates internal platform-specific event types.
  */
 enum InternalPlatformSpecificEventTypes
 {
-    //TODO: maybe need remove this and handle BLEEnabledEvt direct
+    // TODO: maybe need remove this and handle BLEEnabledEvt direct
     //      from BLEManagerImpl::BLEManagerCallback.
     kP6BLEEnabledEvt = kRange_InternalPlatformSpecific,
     kP6BLEDisabledEvt

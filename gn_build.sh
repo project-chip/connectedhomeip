@@ -136,7 +136,6 @@ else
     echo "(cd $CHIP_ROOT/examples/lock-app/efr32; gn gen out/debug; ninja -C out/debug)"
 fi
 
-
 echo
 
 # P6 Build setup

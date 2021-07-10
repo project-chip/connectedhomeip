@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -37,7 +37,6 @@ extern CHIP_ERROR InitLwIPCoreLock(void);
 }
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
-
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {

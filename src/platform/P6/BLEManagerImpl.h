@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -69,15 +69,17 @@ class BLEManagerImpl final : public BLEManager,
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const  Ble::ChipBleUUID * svcId, const  Ble::ChipBleUUID * charId) override;
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const  Ble::ChipBleUUID * svcId, const  Ble::ChipBleUUID * charId) override;
+    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                 const Ble::ChipBleUUID * charId) override;
+    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                   const Ble::ChipBleUUID * charId) override;
     bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
     bool SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                         System::PacketBufferHandle data) override;
     bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                           System::PacketBufferHandle data) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const  Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
                          System::PacketBufferHandle data) override;
     bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
                           const Ble::ChipBleUUID * charId) override;
@@ -97,13 +99,14 @@ public:
     // ===== Private members reserved for use by this class only.
     enum class Flags : uint16_t
     {
-        kFlag_AsyncInitCompleted        = 0x0001,   /**< One-time asynchronous initialization actions have been performed. */
-        kFlag_AdvertisingEnabled        = 0x0002,   /**< The application has enabled CHIPoBLE advertising. */
-        kFlag_FastAdvertisingEnabled    = 0x0004,   /**< The application has enabled fast advertising. */
-        kFlag_Advertising               = 0x0008,   /**< The system is currently CHIPoBLE advertising. */
-        kFlag_AdvertisingRefreshNeeded  = 0x0010,   /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
-        kFlag_DeviceNameSet             = 0x0020,
-        kFlag_StackInitialized          = 0x0040,
+        kFlag_AsyncInitCompleted     = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kFlag_AdvertisingEnabled     = 0x0002, /**< The application has enabled CHIPoBLE advertising. */
+        kFlag_FastAdvertisingEnabled = 0x0004, /**< The application has enabled fast advertising. */
+        kFlag_Advertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */
+        kFlag_AdvertisingRefreshNeeded =
+            0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
+        kFlag_DeviceNameSet    = 0x0020,
+        kFlag_StackInitialized = 0x0040,
     };
 
     enum
@@ -113,10 +116,10 @@ public:
 
     struct CHIPoBLEConState
     {
-        //System::PacketBuffer * PendingIndBuf;
+        // System::PacketBuffer * PendingIndBuf;
         uint16_t ConId;
         uint16_t Mtu;
-        bool     connected;
+        bool connected;
     };
 
     CHIPoBLEConState mCons[kMaxConnections];
@@ -128,14 +131,14 @@ public:
     void DriveBLEState(void);
     void SetAdvertisingData(void);
 
-    wiced_bt_gatt_status_t HandleGattConnectEvent(wiced_bt_gatt_connection_status_t * p_conn_status, CHIPoBLEConState *p_conn);
+    wiced_bt_gatt_status_t HandleGattConnectEvent(wiced_bt_gatt_connection_status_t * p_conn_status, CHIPoBLEConState * p_conn);
     wiced_bt_gatt_status_t HandleGattServiceRead(uint16_t conn_id, wiced_bt_gatt_read_t * p_read_data);
     wiced_bt_gatt_status_t HandleGattServiceWrite(uint16_t conn_id, wiced_bt_gatt_write_t * p_data);
-    wiced_bt_gatt_status_t HandleGattServiceMtuReq(wiced_bt_gatt_attribute_request_t * p_data, CHIPoBLEConState *p_conn);
+    wiced_bt_gatt_status_t HandleGattServiceMtuReq(wiced_bt_gatt_attribute_request_t * p_data, CHIPoBLEConState * p_conn);
     wiced_bt_gatt_status_t HandleGattServiceIndCfm(uint16_t conn_id, uint16_t handle);
-    wiced_bt_gatt_status_t HandleGattServiceRequestEvent(wiced_bt_gatt_attribute_request_t * p_request, CHIPoBLEConState *p_conn);
+    wiced_bt_gatt_status_t HandleGattServiceRequestEvent(wiced_bt_gatt_attribute_request_t * p_request, CHIPoBLEConState * p_conn);
 
-    static wiced_result_t BLEManagerCallback(wiced_bt_management_evt_t event, wiced_bt_management_evt_data_t *p_event_data);
+    static wiced_result_t BLEManagerCallback(wiced_bt_management_evt_t event, wiced_bt_management_evt_data_t * p_event_data);
 
     CHIPoBLEConState * AllocConnectionState(uint16_t conId);
     CHIPoBLEConState * GetConnectionState(uint16_t conId);

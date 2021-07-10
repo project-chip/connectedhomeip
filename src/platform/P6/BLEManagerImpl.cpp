@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -34,17 +34,16 @@
 #include <support/logging/CHIPLogging.h>
 
 extern "C" {
-#include "cycfg_gatt_db.h"
-#include "cycfg_bt_settings.h"
 #include "app_platform_cfg.h"
+#include "cycfg_bt_settings.h"
+#include "cycfg_gatt_db.h"
 }
 
-#include "wiced_bt_stack.h"
 #include "cy_utils.h"
+#include "wiced_bt_stack.h"
 
 #include <wiced_bt_ble.h>
 #include <wiced_bt_gatt.h>
-
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -52,7 +51,6 @@ using namespace ::chip::Ble;
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
 
 namespace {
 const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
@@ -63,17 +61,13 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 
 } // unnamed namespace
 
-
-
 BLEManagerImpl BLEManagerImpl::sInstance;
 
 wiced_bt_gatt_status_t app_gatts_callback(wiced_bt_gatt_evt_t event, wiced_bt_gatt_event_data_t * p_data);
 
-
-wiced_result_t BLEManagerImpl::BLEManagerCallback(wiced_bt_management_evt_t event,
-                                   wiced_bt_management_evt_data_t *p_event_data)
+wiced_result_t BLEManagerImpl::BLEManagerCallback(wiced_bt_management_evt_t event, wiced_bt_management_evt_data_t * p_event_data)
 {
-    switch(event)
+    switch (event)
     {
     case BTM_ENABLED_EVT:
         // Post a event to _OnPlatformEvent.
@@ -91,7 +85,7 @@ wiced_result_t BLEManagerImpl::BLEManagerCallback(wiced_bt_management_evt_t even
         break;
     }
 
-    return  WICED_BT_SUCCESS;
+    return WICED_BT_SUCCESS;
 }
 
 CHIP_ERROR BLEManagerImpl::_Init()
@@ -107,7 +101,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     // Initialize the Bluetooth stack with a callback function and stack
     // configuration structure */
-    if(WICED_SUCCESS != wiced_bt_stack_init (BLEManagerCallback, &wiced_bt_cfg_settings))
+    if (WICED_SUCCESS != wiced_bt_stack_init(BLEManagerCallback, &wiced_bt_cfg_settings))
     {
         printf("Error initializing BT stack\n");
         CY_ASSERT(0);
@@ -122,10 +116,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
     {
         mFlags.Set(Flags::kFlag_AdvertisingEnabled, false);
     }
-    mNumCons     = 0;
+    mNumCons = 0;
     memset(mCons, 0, sizeof(mCons));
     memset(mDeviceName, 0, sizeof(mDeviceName));
-    
+
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::Init() complete");
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -133,7 +127,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
 exit:
     return err;
 }
-
 
 CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
 {
@@ -217,8 +210,8 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     }
     else
     {
-        wiced_bt_cfg_settings.device_name[0] =  0;
-        mDeviceName[0] = 0;
+        wiced_bt_cfg_settings.device_name[0] = 0;
+        mDeviceName[0]                       = 0;
         mFlags.Set(Flags::kFlag_DeviceNameSet, false);
     }
 
@@ -234,7 +227,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     switch (event->Type)
     {
-        
+
     case DeviceEventType::kP6BLEEnabledEvt:
         mFlags.Set(Flags::kFlag_StackInitialized, true);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -320,7 +313,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    CHIPoBLEConState *p_conn;
+    CHIPoBLEConState * p_conn;
 
     /* Check if target connection state exists. */
     p_conn = BLEManagerImpl::sInstance.GetConnectionState(conId);
@@ -437,7 +430,6 @@ void BLEManagerImpl::DriveBLEState(void)
                 advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
                 PlatformMgr().PostEvent(&advChange);
             }
-
         }
     }
 
@@ -604,7 +596,8 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceWrite(uint16_t conn_id, 
 /*
  * Process MTU request received from the GATT client
  */
-wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceMtuReq(wiced_bt_gatt_attribute_request_t * p_data, CHIPoBLEConState *p_conn)
+wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceMtuReq(wiced_bt_gatt_attribute_request_t * p_data,
+                                                               CHIPoBLEConState * p_conn)
 {
     p_data->data.mtu = p_conn->Mtu;
 
@@ -632,7 +625,8 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceIndCfm(uint16_t conn_id,
 /*
  * Process GATT attribute requests
  */
-wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceRequestEvent(wiced_bt_gatt_attribute_request_t * p_request, CHIPoBLEConState *p_conn)
+wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceRequestEvent(wiced_bt_gatt_attribute_request_t * p_request,
+                                                                     CHIPoBLEConState * p_conn)
 {
     wiced_bt_gatt_status_t result = WICED_BT_GATT_INVALID_PDU;
 
@@ -664,7 +658,8 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceRequestEvent(wiced_bt_ga
 /*
  * Handle GATT connection events from the stack
  */
-wiced_bt_gatt_status_t BLEManagerImpl::HandleGattConnectEvent(wiced_bt_gatt_connection_status_t * p_conn_status, CHIPoBLEConState *p_conn)
+wiced_bt_gatt_status_t BLEManagerImpl::HandleGattConnectEvent(wiced_bt_gatt_connection_status_t * p_conn_status,
+                                                              CHIPoBLEConState * p_conn)
 {
     if (p_conn_status->connected)
     {
@@ -715,7 +710,7 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattConnectEvent(wiced_bt_gatt_conn
 wiced_bt_gatt_status_t app_gatts_callback(wiced_bt_gatt_evt_t event, wiced_bt_gatt_event_data_t * p_data)
 {
     uint16_t conn_id;
-    BLEManagerImpl::CHIPoBLEConState *p_conn;
+    BLEManagerImpl::CHIPoBLEConState * p_conn;
 
     /* Check parameter. */
     if (!p_data)
@@ -793,7 +788,7 @@ void BLEManagerImpl::SetAdvertisingData(void)
     uint16_t deviceDiscriminator = 0;
     uint8_t localDeviceNameLen;
     uint8_t service_data[9];
-    uint8_t *p = service_data;
+    uint8_t * p = service_data;
 
 #if 0
     uint8_t *rpa = wiced_btm_get_private_bda();
@@ -817,8 +812,9 @@ void BLEManagerImpl::SetAdvertisingData(void)
         localDeviceNameLen = strlen(sInstance.mDeviceName);
 
         strncpy((char *) app_gap_device_name, sInstance.mDeviceName, sizeof(app_gap_device_name));
-        app_gatt_db_ext_attr_tbl[0].cur_len =
-            app_gatt_db_ext_attr_tbl[0].max_len < strlen(sInstance.mDeviceName) ? app_gatt_db_ext_attr_tbl[0].max_len : strlen(sInstance.mDeviceName);
+        app_gatt_db_ext_attr_tbl[0].cur_len = app_gatt_db_ext_attr_tbl[0].max_len < strlen(sInstance.mDeviceName)
+            ? app_gatt_db_ext_attr_tbl[0].max_len
+            : strlen(sInstance.mDeviceName);
 
         ChipLogProgress(DeviceLayer, "SetAdvertisingData: device name set: %s", sInstance.mDeviceName);
     }
@@ -840,11 +836,11 @@ void BLEManagerImpl::SetAdvertisingData(void)
     /* Second element is the service data for CHIP service */
     adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_SERVICE_DATA;
     adv_elem[num_elem].len         = sizeof(service_data);
-    adv_elem[num_elem].p_data = service_data;
+    adv_elem[num_elem].p_data      = service_data;
     num_elem++;
     UINT8_TO_STREAM(p, chip_service_uuid[0]);
     UINT8_TO_STREAM(p, chip_service_uuid[1]);
-    UINT8_TO_STREAM(p, 0);      // CHIP BLE Opcode == 0x00 (Uncommissioned)
+    UINT8_TO_STREAM(p, 0); // CHIP BLE Opcode == 0x00 (Uncommissioned)
     UINT16_TO_STREAM(p, deviceDiscriminator);
     UINT8_TO_STREAM(p, mDeviceIdInfo.DeviceVendorId[0]);
     UINT8_TO_STREAM(p, mDeviceIdInfo.DeviceVendorId[1]);
@@ -853,7 +849,7 @@ void BLEManagerImpl::SetAdvertisingData(void)
 
     adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_NAME_COMPLETE;
     adv_elem[num_elem].len         = localDeviceNameLen;
-    adv_elem[num_elem].p_data      = (uint8_t*)sInstance.mDeviceName;
+    adv_elem[num_elem].p_data      = (uint8_t *) sInstance.mDeviceName;
     num_elem++;
 
     wiced_bt_ble_set_raw_advertisement_data(num_elem, adv_elem);
@@ -862,7 +858,7 @@ void BLEManagerImpl::SetAdvertisingData(void)
     num_elem                       = 0;
     adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_NAME_COMPLETE;
     adv_elem[num_elem].len         = localDeviceNameLen;
-    adv_elem[num_elem].p_data      = (uint8_t*)sInstance.mDeviceName;
+    adv_elem[num_elem].p_data      = (uint8_t *) sInstance.mDeviceName;
     num_elem++;
 
     wiced_bt_ble_set_raw_scan_response_data(num_elem, adv_elem);
@@ -871,16 +867,15 @@ exit:
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SetAdvertisingData err:%ld", err);
 }
 
-
 BLEManagerImpl::CHIPoBLEConState * BLEManagerImpl::AllocConnectionState(uint16_t conId)
 {
     for (uint16_t i = 0; i < kMaxConnections; i++)
     {
         if (mCons[i].connected == false)
         {
-            mCons[i].ConId      = conId;
-            mCons[i].Mtu        = wiced_bt_cfg_settings.gatt_cfg.max_mtu_size;
-            mCons[i].connected  = false;
+            mCons[i].ConId     = conId;
+            mCons[i].Mtu       = wiced_bt_cfg_settings.gatt_cfg.max_mtu_size;
+            mCons[i].connected = false;
 
             mNumCons++;
 

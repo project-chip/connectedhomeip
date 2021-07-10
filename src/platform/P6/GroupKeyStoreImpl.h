@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,8 +22,8 @@
  */
 
 #include <core/CHIPKeyIds.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/P6/P6Config.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -25,54 +25,58 @@ assert(p6_target_project != "", "p6_target_project must be specified")
 # Add includes, cflags, asmflags, etc in config
 config("p6_sdk_config") {
   # Pull out includes from generated json
-    # Treat these includes as system includes, so warnings in them are not fatal.
+  # Treat these includes as system includes, so warnings in them are not fatal.
   _include_dirs = []
   foreach(inc, mtb_json.includes) {
     # Strip off leading -I part
-    _include_dirs += ["/" + rebase_path(string_replace(inc, "-I", "", 1), "/", "${p6_sdk_build_root}/repo/")]
+    _include_dirs += [ "/" + rebase_path(string_replace(inc, "-I", "", 1),
+                                         "/",
+                                         "${p6_sdk_build_root}/repo/") ]
   }
 
   # Also add project include path (passed in from project build)
   proj_path = get_label_info(p6_target_project, "dir")
-  _include_dirs += ["/" + rebase_path("${proj_path}/include", "/", ".")]
+  _include_dirs += [ "/" + rebase_path("${proj_path}/include", "/", ".") ]
 
   cflags = []
   foreach(include_dir, _include_dirs) {
-    cflags += ["-isystem" + include_dir]
+    cflags += [ "-isystem" + include_dir ]
   }
 
   # Pull out defines from generated json
   defines = []
   foreach(def, mtb_json.defines) {
     # Strip off leading -D part
-    defines += [string_replace(def, "-D", "", 1)]
+    defines += [ string_replace(def, "-D", "", 1) ]
   }
 
   # Pull out static libs (.a files) from generated json
   libs = []
   foreach(lib, mtb_json.libs) {
-    libs += ["/" + rebase_path(lib, "/", "${p6_sdk_build_root}/repo/")]
+    libs += [ "/" + rebase_path(lib, "/", "${p6_sdk_build_root}/repo/") ]
   }
 
   cflags_c = mtb_json.cflags
   cflags_cc = mtb_json.cxxflags
   asmflags = mtb_json.asflags
-  ldflags = filter_exclude(mtb_json.ldflags, ["-T*"])
+  ldflags = filter_exclude(mtb_json.ldflags, [ "-T*" ])
 
   # Pull out linker flags with paths (-T flags) and make paths absolute
-  linker_script_flags = filter_include(mtb_json.ldflags, ["-T*"])
+  linker_script_flags = filter_include(mtb_json.ldflags, [ "-T*" ])
   foreach(flag, linker_script_flags) {
-    ldflags += ["-T/" + rebase_path(string_replace(flag, "-T", "", 1), "/", "${p6_sdk_build_root}/repo/")]
+    ldflags += [ "-T/" + rebase_path(string_replace(flag, "-T", "", 1),
+                                     "/",
+                                     "${p6_sdk_build_root}/repo/") ]
   }
 
   # --specs=nano.specs is getting added twice and causing compile issues so remove from cxx flags here.
-  cflags_c -= ["--specs=nano.specs"]
-  cflags_cc -= ["--specs=nano.specs"]
-  asmflags -= ["--specs=nano.specs"]
-  ldflags -= ["--specs=nano.specs"]
+  cflags_c -= [ "--specs=nano.specs" ]
+  cflags_cc -= [ "--specs=nano.specs" ]
+  asmflags -= [ "--specs=nano.specs" ]
+  ldflags -= [ "--specs=nano.specs" ]
 }
 
 group("p6_build") {
-  public_configs = [":p6_sdk_config"]
+  public_configs = [ ":p6_sdk_config" ]
   public_deps = [ p6_target_project ]
 }
