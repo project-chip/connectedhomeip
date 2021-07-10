@@ -106,8 +106,8 @@ CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
                 ReturnLogErrorOnFailure(reader.Get(minInterval));
                 PRETTY_PRINT("\tMinInterval = 0x%" PRIx16 ",", minInterval);
             }
-            break;
 #endif // CHIP_DETAIL_LOGGING
+            break;
         case kCsTag_MaxInterval:
             VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MaxInterval)), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_MaxInterval);
