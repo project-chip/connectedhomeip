@@ -38,7 +38,7 @@
  *   BLE device's GATT database and device configuration.
  *
  *******************************************************************************/
- 
+
 #include "cycfg_gatt_db.h"
 #include "wiced_bt_gatt.h"
 #include "wiced_bt_uuid.h"
