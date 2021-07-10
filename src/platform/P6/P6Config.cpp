@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -57,9 +57,9 @@ const P6Config::Key P6Config::kConfigKey_ProductRevision     = { kConfigNamespac
 const P6Config::Key P6Config::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
 const P6Config::Key P6Config::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
 const P6Config::Key P6Config::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
-const P6Config::Key P6Config::kConfigKey_RegulatoryLocation          = { kConfigNamespace_ChipConfig, "regulatory-location" };
-const P6Config::Key P6Config::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
-const P6Config::Key P6Config::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const P6Config::Key P6Config::kConfigKey_RegulatoryLocation  = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const P6Config::Key P6Config::kConfigKey_CountryCode         = { kConfigNamespace_ChipConfig, "country-code" };
+const P6Config::Key P6Config::kConfigKey_Breadcrumb          = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
 // Keys stored in the chip-config namespace
 const P6Config::Key P6Config::kConfigKey_FabricId                    = { kConfigNamespace_ChipConfig, "fabric-id" };
@@ -81,10 +81,10 @@ const char P6Config::kGroupKeyNamePrefix[] = "gk-";
 CHIP_ERROR P6Config::ReadConfigValue(Key key, bool & val)
 {
     bool in;
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
-    CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, static_cast<void*>(&in), sizeof(bool));
-    val = in;
+    CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, static_cast<void *>(&in), sizeof(bool));
+    val            = in;
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -95,10 +95,10 @@ CHIP_ERROR P6Config::ReadConfigValue(Key key, bool & val)
 CHIP_ERROR P6Config::ReadConfigValue(Key key, uint32_t & val)
 {
     uint32_t in;
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
-    CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, static_cast<void*>(&in), 4);
-    val = in;
+    CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, static_cast<void *>(&in), 4);
+    val            = in;
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -109,10 +109,10 @@ CHIP_ERROR P6Config::ReadConfigValue(Key key, uint32_t & val)
 CHIP_ERROR P6Config::ReadConfigValue(Key key, uint64_t & val)
 {
     uint64_t in;
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
-    CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, static_cast<void*>(&in), 8);
-    val = in;
+    CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, static_cast<void *>(&in), 8);
+    val            = in;
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -122,7 +122,7 @@ CHIP_ERROR P6Config::ReadConfigValue(Key key, uint64_t & val)
 
 CHIP_ERROR P6Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
     CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, buf, bufSize, &outLen);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -134,7 +134,7 @@ CHIP_ERROR P6Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, siz
 
 CHIP_ERROR P6Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
     CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, buf, bufSize, &outLen);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -146,59 +146,58 @@ CHIP_ERROR P6Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, 
 
 CHIP_ERROR P6Config::WriteConfigValue(Key key, bool val)
 {
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
-    return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void*>(&val), sizeof(bool));
+    return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void *>(&val), sizeof(bool));
 }
 
 CHIP_ERROR P6Config::WriteConfigValue(Key key, uint32_t val)
 {
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
-    return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void*>(&val), 4);
+    return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void *>(&val), 4);
 }
 
 CHIP_ERROR P6Config::WriteConfigValue(Key key, uint64_t val)
 {
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
-    return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void*>(&val), 8);
+    return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void *>(&val), 8);
 }
 
 CHIP_ERROR P6Config::WriteConfigValueStr(Key key, const char * str)
 {
-    size_t size = strlen(str) + 1;
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    size_t size                            = strlen(str) + 1;
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, str, size);
 }
 
 CHIP_ERROR P6Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, str, strLen);
 }
 CHIP_ERROR P6Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
-    return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void*>(&data), dataLen);
+    return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void *>(&data), dataLen);
 }
 
 CHIP_ERROR P6Config::ClearConfigValue(Key key)
 {
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Delete(key_str);
 }
 
 bool P6Config::ConfigValueExists(Key key)
 {
-    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = {0};
+    char key_str[MTB_KVSTORE_MAX_KEY_SIZE] = { 0 };
     key.to_str(key_str, MTB_KVSTORE_MAX_KEY_SIZE);
-    if(PersistedStorage::KeyValueStoreMgr().Get(key_str, NULL, 0) ==
-            CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    if (PersistedStorage::KeyValueStoreMgr().Get(key_str, NULL, 0) == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         return false;
     }
@@ -209,13 +208,24 @@ bool P6Config::ConfigValueExists(Key key)
 // Clear out keys in config namespace
 CHIP_ERROR P6Config::FactoryResetConfig(void)
 {
-    const Key *config_keys[] = {&kConfigKey_FabricId, &kConfigKey_ServiceConfig, &kConfigKey_PairedAccountId, &kConfigKey_ServiceId, &kConfigKey_GroupKeyIndex, &kConfigKey_LastUsedEpochKeyId, &kConfigKey_FailSafeArmed, &kConfigKey_WiFiStationSecType, &kConfigKey_OperationalDeviceId, &kConfigKey_OperationalDeviceCert, &kConfigKey_OperationalDeviceICACerts, &kConfigKey_OperationalDevicePrivateKey};
+    const Key * config_keys[] = { &kConfigKey_FabricId,
+                                  &kConfigKey_ServiceConfig,
+                                  &kConfigKey_PairedAccountId,
+                                  &kConfigKey_ServiceId,
+                                  &kConfigKey_GroupKeyIndex,
+                                  &kConfigKey_LastUsedEpochKeyId,
+                                  &kConfigKey_FailSafeArmed,
+                                  &kConfigKey_WiFiStationSecType,
+                                  &kConfigKey_OperationalDeviceId,
+                                  &kConfigKey_OperationalDeviceCert,
+                                  &kConfigKey_OperationalDeviceICACerts,
+                                  &kConfigKey_OperationalDevicePrivateKey };
 
-    for(uint32_t i = 0; i < (sizeof(config_keys)/sizeof(config_keys[0])); i++)
+    for (uint32_t i = 0; i < (sizeof(config_keys) / sizeof(config_keys[0])); i++)
     {
         CHIP_ERROR err = ClearConfigValue(*config_keys[i]);
         // Something unexpected happened
-        if(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND && err != CHIP_NO_ERROR)
+        if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND && err != CHIP_NO_ERROR)
         {
             return err;
         }

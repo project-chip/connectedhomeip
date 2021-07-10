@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -65,11 +65,11 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
     cy_rslt_t result = CY_RSLT_SUCCESS;
     cy_wcm_mac_t mac;
     result = cy_wcm_get_mac_addr(CY_WCM_INTERFACE_TYPE_STA, &mac, 1);
-    if ( result != CY_RSLT_SUCCESS )
+    if (result != CY_RSLT_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         ChipLogError(DeviceLayer, "_GetPrimaryWiFiMACAddress failed: %ld", result);
@@ -99,15 +99,15 @@ void ConfigurationManagerImpl::_InitiateFactoryReset()
 
 CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    uint32_t in = 0;
+    uint32_t in    = 0;
     CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key, &in, 4);
-    value = in;
+    value          = in;
     return err;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    return PersistedStorage::KeyValueStoreMgr().Put(key, static_cast<void*>(&value), 4);
+    return PersistedStorage::KeyValueStoreMgr().Put(key, static_cast<void *>(&value), 4);
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)

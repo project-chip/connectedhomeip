@@ -16,18 +16,26 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
 
-import("p6_board.gni")
 import("//build_overrides/p6.gni")
+import("p6_board.gni")
 
 # TODO: Don't hardcode config/toolchain
 # TODO: Convert to GN action?
-if(is_debug) {
+if (is_debug) {
   debug_str = "Debug"
-}
-else {
+} else {
   debug_str = "Release"
 }
-mtb_json = exec_script("$p6_sdk_build_root/repo/make_gni.py", ["${p6_board}", "-c", debug_str, "-t", "GCC_ARM"], "json", [])
+mtb_json = exec_script("$p6_sdk_build_root/repo/make_gni.py",
+                       [
+                         "${p6_board}",
+                         "-c",
+                         debug_str,
+                         "-t",
+                         "GCC_ARM",
+                       ],
+                       "json",
+                       [])
 
 # Defines an p6 SDK build target.
 #
@@ -35,7 +43,6 @@ mtb_json = exec_script("$p6_sdk_build_root/repo/make_gni.py", ["${p6_board}", "-
 #   sources - The sources files to build.
 #
 template("p6_sdk_sources") {
-
   if (defined(invoker.p6_project_dir)) {
     p6_project_dir = invoker.p6_project_dir
   }
@@ -48,7 +55,7 @@ template("p6_sdk_sources") {
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
     }
-    include_dirs += ["${p6_project_dir}/include"]
+    include_dirs += [ "${p6_project_dir}/include" ]
 
     defines = []
     if (defined(invoker.defines)) {
@@ -67,17 +74,23 @@ template("p6_sdk_sources") {
 
     # Pull out c sources from generated json
     foreach(src, mtb_json.c_source) {
-      sources += [rebase_path(src, "${p6_project_dir}", "${p6_sdk_build_root}/repo/")]
+      sources += [ rebase_path(src,
+                               "${p6_project_dir}",
+                               "${p6_sdk_build_root}/repo/") ]
     }
 
     # Pull out cpp sources from generated json
     foreach(src, mtb_json.cxx_source) {
-      sources += [rebase_path(src, "${p6_project_dir}", "${p6_sdk_build_root}/repo/")]
+      sources += [ rebase_path(src,
+                               "${p6_project_dir}",
+                               "${p6_sdk_build_root}/repo/") ]
     }
 
     # Pull out .S files from generated json
     foreach(asm, mtb_json.asm_source) {
-      sources += [rebase_path(asm, "${p6_project_dir}", "${p6_sdk_build_root}/repo/")]
+      sources += [ rebase_path(asm,
+                               "${p6_project_dir}",
+                               "${p6_sdk_build_root}/repo/") ]
     }
 
     public_deps = []
@@ -92,7 +105,7 @@ template("p6_sdk_sources") {
       #"${segger_rtt_root}:segger_rtt_syscalls",
     ]
 
-    public_configs = [":project_configs"]
+    public_configs = [ ":project_configs" ]
     if (defined(invoker.public_configs)) {
       public_configs += invoker.public_configs
     }

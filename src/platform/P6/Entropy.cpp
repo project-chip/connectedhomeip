@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -42,8 +42,8 @@ int GetEntropy_P6(uint8_t * buf, size_t bufSize)
     while (bufSize > 0)
     {
         uint32_t val = cyhal_trng_generate(&trng);
-        size_t n = chip::min(bufSize, sizeof(uint32_t));
-        memcpy(buf, static_cast<void*>(&val), n);
+        size_t n     = chip::min(bufSize, sizeof(uint32_t));
+        memcpy(buf, static_cast<void *>(&val), n);
 
         buf += n;
         bufSize -= n;

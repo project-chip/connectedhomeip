@@ -71,52 +71,56 @@
 /**
  * @brief Default thread priority for the threads created by AWS IoT Device SDK.
  */
-#define IOT_THREAD_DEFAULT_PRIORITY                 ( CY_RTOS_PRIORITY_NORMAL )
+#define IOT_THREAD_DEFAULT_PRIORITY (CY_RTOS_PRIORITY_NORMAL)
 /**
  * @brief Default thread stack size for the threads created by AWS IoT Device SDK.
  * The stack size may be tuned to suit the desired use case.
  */
-#define IOT_THREAD_DEFAULT_STACK_SIZE               ( 2048 )
+#define IOT_THREAD_DEFAULT_STACK_SIZE (2048)
 
 /**
- * @brief Default wait time (in milliseconds) to receive keep-alive responses from the MQTT broker. This value may be adjusted to suit the use case and network environment.
- * Refer aws-iot-device-sdk-embedded-C/doc/lib/mqtt.txt for additional info.
+ * @brief Default wait time (in milliseconds) to receive keep-alive responses from the MQTT broker. This value may be adjusted to
+ * suit the use case and network environment. Refer aws-iot-device-sdk-embedded-C/doc/lib/mqtt.txt for additional info.
  */
-#define IOT_MQTT_RESPONSE_WAIT_MS                   ( 5000U )
+#define IOT_MQTT_RESPONSE_WAIT_MS (5000U)
 
 /**
  * \cond
  * @brief Macros to enable/disable asserts in the IoT Device SDK library.
  * Asserts are disabled by default; to enable asserts, modify these macros to 1.
  */
-#define IOT_CONTAINERS_ENABLE_ASSERTS               ( 0 )
-#define IOT_MQTT_ENABLE_ASSERTS                     ( 0 )
-#define IOT_TASKPOOL_ENABLE_ASSERTS                 ( 0 )
-#define AWS_IOT_SHADOW_ENABLE_ASSERTS               ( 0 )
-#define AWS_IOT_DEFENDER_ENABLE_ASSERTS             ( 0 )
-#define AWS_IOT_JOBS_ENABLE_ASSERTS                 ( 0 )
+#define IOT_CONTAINERS_ENABLE_ASSERTS (0)
+#define IOT_MQTT_ENABLE_ASSERTS (0)
+#define IOT_TASKPOOL_ENABLE_ASSERTS (0)
+#define AWS_IOT_SHADOW_ENABLE_ASSERTS (0)
+#define AWS_IOT_DEFENDER_ENABLE_ASSERTS (0)
+#define AWS_IOT_JOBS_ENABLE_ASSERTS (0)
 /**
  * \endcond
  */
 
 /**
- * @brief Insert program diagnostics. This function should have the same signature as [assert](https://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html)
+ * @brief Insert program diagnostics. This function should have the same signature as
+ * [assert](https://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html)
  */
-#if (IOT_CONTAINERS_ENABLE_ASSERTS == 1) || (IOT_MQTT_ENABLE_ASSERTS == 1) || (IOT_TASKPOOL_ENABLE_ASSERTS == 1) || (AWS_IOT_SHADOW_ENABLE_ASSERTS == 1) || (AWS_IOT_DEFENDER_ENABLE_ASSERTS == 1) || (AWS_IOT_JOBS_ENABLE_ASSERTS == 1)
-#define Iot_DefaultAssert                           assert
+#if (IOT_CONTAINERS_ENABLE_ASSERTS == 1) || (IOT_MQTT_ENABLE_ASSERTS == 1) || (IOT_TASKPOOL_ENABLE_ASSERTS == 1) ||                \
+    (AWS_IOT_SHADOW_ENABLE_ASSERTS == 1) || (AWS_IOT_DEFENDER_ENABLE_ASSERTS == 1) || (AWS_IOT_JOBS_ENABLE_ASSERTS == 1)
+#define Iot_DefaultAssert assert
 #else
 #define Iot_DefaultAssert
 #endif
 
 /**
- * @brief Memory allocation. This function should have the same signature as [malloc](http://pubs.opengroup.org/onlinepubs/9699919799/functions/malloc.html)
+ * @brief Memory allocation. This function should have the same signature as
+ * [malloc](http://pubs.opengroup.org/onlinepubs/9699919799/functions/malloc.html)
  */
-#define Iot_DefaultMalloc                           malloc
+#define Iot_DefaultMalloc malloc
 
 /**
- * @brief Free memory. This function should have the same signature as [free](http://pubs.opengroup.org/onlinepubs/9699919799/functions/free.html)
+ * @brief Free memory. This function should have the same signature as
+ * [free](http://pubs.opengroup.org/onlinepubs/9699919799/functions/free.html)
  */
-#define Iot_DefaultFree                             free
+#define Iot_DefaultFree free
 
 /**
  * \cond
@@ -124,15 +128,15 @@
  * Refer aws-iot-device-sdk-embedded-C/libraries/standard/common/include/iot_logging.h
  * for supported log levels.
  */
-#define IOT_LOG_LEVEL_GLOBAL                        IOT_LOG_ERROR
-#define IOT_LOG_LEVEL_DEMO                          IOT_LOG_ERROR
-#define IOT_LOG_LEVEL_PLATFORM                      IOT_LOG_ERROR
-#define IOT_LOG_LEVEL_NETWORK                       IOT_LOG_ERROR
-#define IOT_LOG_LEVEL_TASKPOOL                      IOT_LOG_ERROR
-#define IOT_LOG_LEVEL_MQTT                          IOT_LOG_ERROR
-#define AWS_IOT_LOG_LEVEL_SHADOW                    IOT_LOG_ERROR
-#define AWS_IOT_LOG_LEVEL_DEFENDER                  IOT_LOG_ERROR
-#define AWS_IOT_LOG_LEVEL_JOBS                      IOT_LOG_ERROR
+#define IOT_LOG_LEVEL_GLOBAL IOT_LOG_ERROR
+#define IOT_LOG_LEVEL_DEMO IOT_LOG_ERROR
+#define IOT_LOG_LEVEL_PLATFORM IOT_LOG_ERROR
+#define IOT_LOG_LEVEL_NETWORK IOT_LOG_ERROR
+#define IOT_LOG_LEVEL_TASKPOOL IOT_LOG_ERROR
+#define IOT_LOG_LEVEL_MQTT IOT_LOG_ERROR
+#define AWS_IOT_LOG_LEVEL_SHADOW IOT_LOG_ERROR
+#define AWS_IOT_LOG_LEVEL_DEFENDER IOT_LOG_ERROR
+#define AWS_IOT_LOG_LEVEL_JOBS IOT_LOG_ERROR
 /**
  * \endcond
  */

@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,25 +24,19 @@
 #include "LEDWidget.h"
 #include "OnboardingCodesUtil.h"
 #include "Server.h"
-#include "Service.h"
 #include "qrcodegen.h"
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
+#include <app/server/Mdns.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
+#include <cy_wcm.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <platform/CHIPDeviceLayer.h>
-#if CHIP_ENABLE_OPENTHREAD
-#include <platform/P6/ThreadStackManagerImpl.h>
-#include <platform/OpenThread/OpenThreadUtils.h>
-#include <platform/ThreadStackManager.h>
-#endif
-#include <cy_wcm.h>
-#include <app/server/Mdns.h>
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -52,7 +45,7 @@
 #define APP_EVENT_QUEUE_SIZE 10
 
 namespace {
-    
+
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
 static TaskHandle_t sAppTaskHandle;
@@ -69,7 +62,7 @@ static bool sHaveServiceConnectivity  = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
-}
+} // namespace
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
 
@@ -95,8 +88,6 @@ int AppTask::StartAppTask()
 
     return err;
 }
-
-
 
 int AppTask::Init()
 {
@@ -172,7 +163,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     P6_LOG("App Task started");
-    SetDeviceName("P6LockDemo._chip._udp.local.");
 
     while (true)
     {
@@ -217,8 +207,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsWiFiStationEnabled && sIsWiFiStationProvisioned &&
-                (!sIsWiFiStationConnected || !sHaveServiceConnectivity))
+            else if (sIsWiFiStationEnabled && sIsWiFiStationProvisioned && (!sIsWiFiStationConnected || !sHaveServiceConnectivity))
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -461,7 +450,7 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        UpdateClusterState();
+        sAppTask.UpdateClusterState();
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }
@@ -504,8 +493,8 @@ void AppTask::UpdateClusterState(void)
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
+                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         P6_LOG("ERR: updating on/off %x", status);
@@ -518,5 +507,5 @@ void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTaskName)
     /* Run time stack overflow checking is performed if
     configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
     function is called if a stack overflow is detected. */
-    printf( "ERROR: stack overflow with task %s\r\n", pcTaskName );
+    printf("ERROR: stack overflow with task %s\r\n", pcTaskName);
 }

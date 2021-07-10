@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -25,7 +25,6 @@
 #include <stdint.h>
 
 #include <FreeRTOS.h>
-#include <mbedtls/threading.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
@@ -38,19 +37,6 @@
 #include "DataModelHandler.h"
 #include "Server.h"
 #include "init_p6Platform.h"
-#if CHIP_ENABLE_OPENTHREAD
-#include <mbedtls/platform.h>
-#include <openthread/cli.h>
-#include <openthread/dataset.h>
-#include <openthread/error.h>
-#include <openthread/heap.h>
-#include <openthread/icmp6.h>
-#include <openthread/instance.h>
-#include <openthread/link.h>
-#include <openthread/platform/openthread-system.h>
-#include <openthread/tasklet.h>
-#include <openthread/thread.h>
-#endif // CHIP_ENABLE_OPENTHREAD
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -74,7 +60,6 @@ void appError(int err)
 extern "C" void vApplicationIdleHook(void)
 {
     // FreeRTOS Idle callback
-
 }
 
 // ================================================================================
@@ -91,7 +76,7 @@ int main(void)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
-    //chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
+    // chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
     ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
@@ -117,7 +102,7 @@ int main(void)
     vTaskStartScheduler();
 
     chip::Platform::MemoryShutdown();
-    
+
     // Should never get here.
     P6_LOG("vTaskStartScheduler() failed");
     appError(ret);

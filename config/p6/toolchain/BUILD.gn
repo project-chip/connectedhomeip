@@ -24,4 +24,3 @@ arm_toolchain("p6_lock_app") {
     treat_warnings_as_errors = false
   }
 }
-
