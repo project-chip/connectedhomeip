@@ -135,7 +135,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     // size of textEntries array should be count of Bufs above
     TextEntry textEntries[9];
     size_t textEntrySize = 0;
-    // add underscore, character and newline to lengths for sub types (ex. _S<ddd>)
+    // add null-character to the subtypes
     char shortDiscriminatorSubtype[kSubTypeShortDiscriminatorMaxLength + 1];
     char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 1];
     char vendorSubType[kSubTypeVendorMaxLength + 1];
