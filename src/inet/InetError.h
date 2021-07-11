@@ -236,22 +236,6 @@
  *  @}
  */
 
-// !!!!! IMPORTANT !!!!!
-// These definitions are present temporarily in order to reduce breakage for PRs in flight.
-// TODO: remove compatibility definitions
-#define INET_ERROR                              CHIP_ERROR
-#define INET_NO_ERROR                           CHIP_NO_ERROR
-#define INET_ERROR_BAD_ARGS                     CHIP_ERROR_INVALID_ARGUMENT
-#define INET_ERROR_INBOUND_MESSAGE_TOO_BIG      CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG
-#define INET_ERROR_INCORRECT_STATE              CHIP_ERROR_INCORRECT_STATE
-#define INET_ERROR_MESSAGE_TOO_LONG             CHIP_ERROR_MESSAGE_TOO_LONG
-#define INET_ERROR_NO_CONNECTION_HANDLER        CHIP_ERROR_NO_CONNECTION_HANDLER
-#define INET_ERROR_NO_ENDPOINTS                 CHIP_ERROR_ENDPOINT_POOL_FULL
-#define INET_ERROR_NOT_IMPLEMENTED              CHIP_ERROR_NOT_IMPLEMENTED
-#define INET_ERROR_NOT_SUPPORTED                CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
-#define INET_ERROR_NO_MEMORY                    CHIP_ERROR_NO_MEMORY
-#define INET_ERROR_CONNECTION_ABORTED           CHIP_ERROR_CONNECTION_ABORTED
-
 // clang-format on
 
 namespace chip {

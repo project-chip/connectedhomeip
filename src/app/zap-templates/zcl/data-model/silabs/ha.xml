@@ -90,7 +90,7 @@ limitations under the License.
     <attribute side="server" code="0x0029" define="THERMOSTAT_RUNNING_STATE" type="BITMAP16" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">hvac relay state</attribute>
     <attribute side="server" code="0x0030" define="SETPOINT_CHANGE_SOURCE" type="ENUM8" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">setpoint change source</attribute>
     <attribute side="server" code="0x0031" define="SETPOINT_CHANGE_AMOUNT" type="INT16S" writable="false" default="0x8000" optional="true" introducedIn="ha-1.2-05-3520-29">setpoint change amount</attribute>
-    <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="UTC_TIME" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">setpoint change source timestamp</attribute>
+    <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="UTC" writable="false" optional="true" introducedIn="ha-1.2-05-3520-29">setpoint change source timestamp</attribute>
     <attribute side="server" code="0x0040" define="AC_TYPE" type="ENUM8" min="0x00" max="0x04" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">ac type</attribute>
     <attribute side="server" code="0x0041" define="AC_CAPACITY" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true" introducedIn="ha-1.2-05-3520-29">ac capacity</attribute>
     <attribute side="server" code="0x0042" define="AC_REFRIGERANT_TYPE" type="ENUM8" min="0x00" max="0x03" writable="true" default="0x00" optional="true" introducedIn="ha-1.2-05-3520-29">ac refrigerant type</attribute>
@@ -452,29 +452,6 @@ limitations under the License.
     <attribute side="server" code="0x0010" define="ILLUMINANCE_TARGET_LEVEL" type="INT16U" min="0x0000" max="0xFFFE" writable="true" optional="false">illuminance level target</attribute>
   </cluster>
   <cluster>
-    <name>Pressure Measurement</name>
-    <domain>Measurement &amp; Sensing</domain>
-    <description>Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements.</description>
-    <code>0x0403</code>
-    <define>PRESSURE_MEASUREMENT_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" tickFrequency="half" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="PRESSURE_MEASURED_VALUE" type="INT16S" writable="false" reportable="true" default="0x0000" optional="false">measured value</attribute>
-    <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="PRESSURE_MIN_MEASURED_VALUE" type="INT16S" min="0x8001" max="0x7FFE" writable="false" optional="false">min measured value</attribute>
-    <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="PRESSURE_MAX_MEASURED_VALUE" type="INT16S" min="0x8002" max="0x7FFF" writable="false" optional="false">max measured value</attribute>
-    <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="PRESSURE_TOLERANCE" type="INT16U" min="0x0000" max="0x0800" writable="false" reportable="true" optional="true">tolerance</attribute>
-    <!-- TOLERANCE -->
-    <attribute side="server" code="0x0010" define="PRESSURE_SCALED_VALUE" type="INT16S" writable="false" reportable="true" default="0x0000" optional="true">scaled value</attribute>
-    <attribute side="server" code="0x0011" define="PRESSURE_MIN_SCALED_VALUE" type="INT16S" min="0x8001" max="0x7FFE" writable="false" optional="true">min scaled value</attribute>
-    <attribute side="server" code="0x0012" define="PRESSURE_MAX_SCALED_VALUE" type="INT16S" min="0x8002" max="0x7FFF" writable="false" optional="true">max scaled value</attribute>
-    <attribute side="server" code="0x0013" define="PRESSURE_SCALED_TOLERANCE" type="INT16S" min="0x0000" max="0x0800" writable="false" reportable="true" optional="true">scaled tolerance</attribute>
-    <attribute side="server" code="0x0014" define="PRESSURE_SCALE" type="INT8S" min="0x81" max="0x7F" writable="false" optional="true">scale</attribute>
-  </cluster>
-  <cluster>
     <name>Occupancy Sensing</name>
     <domain>Measurement &amp; Sensing</domain>
     <description>Attributes and commands for configuring occupancy sensing, and reporting occupancy status.</description>
@@ -505,13 +482,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -523,13 +500,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -541,13 +518,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="ETHYLENE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="ETHYLENE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="ETHYLENE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="ETHYLENE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="ETHYLENE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="ETHYLENE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="ETHYLENE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="ETHYLENE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -559,13 +536,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -577,13 +554,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="HYDROGEN_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="HYDROGEN_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="HYDROGEN_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="HYDROGEN_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="HYDROGEN_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="HYDROGEN_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="HYDROGEN_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="HYDROGEN_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -595,13 +572,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -613,13 +590,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -631,13 +608,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -649,13 +626,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="OXYGEN_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="OXYGEN_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="OXYGEN_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="OXYGEN_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="OXYGEN_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="OXYGEN_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="OXYGEN_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="OXYGEN_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -667,13 +644,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="OZONE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="OZONE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="OZONE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="OZONE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="OZONE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="OZONE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="OZONE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="OZONE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -685,13 +662,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -703,13 +680,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -721,13 +698,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="BROMATE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="BROMATE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="BROMATE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="BROMATE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="BROMATE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="BROMATE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="BROMATE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="BROMATE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -739,13 +716,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="CHLORAMINES_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="CHLORAMINES_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="CHLORAMINES_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="CHLORAMINES_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="CHLORAMINES_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="CHLORAMINES_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="CHLORAMINES_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="CHLORAMINES_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -757,13 +734,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="CHLORINE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="CHLORINE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="CHLORINE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="CHLORINE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="CHLORINE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="CHLORINE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="CHLORINE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="CHLORINE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -775,13 +752,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -793,13 +770,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="FLUORIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="FLUORIDE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="FLUORIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="FLUORIDE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="FLUORIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="FLUORIDE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="FLUORIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="FLUORIDE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -811,13 +788,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -829,13 +806,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -847,13 +824,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -865,13 +842,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="TURBIDITY_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="TURBIDITY_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="TURBIDITY_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="TURBIDITY_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="TURBIDITY_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="TURBIDITY_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="TURBIDITY_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="TURBIDITY_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -883,13 +860,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="COPPER_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="COPPER_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="COPPER_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="COPPER_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="COPPER_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="COPPER_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="COPPER_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="COPPER_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -901,13 +878,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="LEAD_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="LEAD_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="LEAD_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="LEAD_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="LEAD_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="LEAD_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="LEAD_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="LEAD_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -919,13 +896,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="MANGANESE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="MANGANESE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="MANGANESE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="MANGANESE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="MANGANESE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="MANGANESE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="MANGANESE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="MANGANESE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -937,13 +914,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="SULFATE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="SULFATE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="SULFATE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="SULFATE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="SULFATE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="SULFATE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="SULFATE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="SULFATE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -955,13 +932,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -973,13 +950,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="BROMOFORM_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="BROMOFORM_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="BROMOFORM_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="BROMOFORM_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="BROMOFORM_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="BROMOFORM_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="BROMOFORM_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="BROMOFORM_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -991,13 +968,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -1009,13 +986,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="CHLOROFORM_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="CHLOROFORM_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="CHLOROFORM_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="CHLOROFORM_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="CHLOROFORM_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="CHLOROFORM_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="CHLOROFORM_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="CHLOROFORM_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>
@@ -1027,13 +1004,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="SODIUM_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="FLOAT_SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0000" define="SODIUM_CONCENTRATION_MEASUREMENT_MEASURED_VALUE" type="SINGLE" writable="false" reportable="true" optional="false">measured value</attribute>
     <!-- MEASURED_VALUE -->
-    <attribute side="server" code="0x0001" define="SODIUM_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0001" define="SODIUM_CONCENTRATION_MEASUREMENT_MIN_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">min measured value</attribute>
     <!-- MIN_MEASURED_VALUE -->
-    <attribute side="server" code="0x0002" define="SODIUM_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="FLOAT_SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0002" define="SODIUM_CONCENTRATION_MEASUREMENT_MAX_MEASURED_VALUE" type="SINGLE" min="0x0000" max="0x3F800000" writable="false" optional="false">max measured value</attribute>
     <!-- MAX_MEASURED_VALUE -->
-    <attribute side="server" code="0x0003" define="SODIUM_CONCENTRATION_MEASUREMENT_TOLERANCE" type="FLOAT_SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
+    <attribute side="server" code="0x0003" define="SODIUM_CONCENTRATION_MEASUREMENT_TOLERANCE" type="SINGLE" min="0x0000" max="0x0800" writable="false" optional="true">tolerance</attribute>
     <!-- TOLERANCE -->
   </cluster>
   <cluster>

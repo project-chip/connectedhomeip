@@ -79,6 +79,9 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
 {
+    // If we were waiting for a message send, this is it.
+    mFlags.Clear(Flags::kFlagWillSendMessage);
+
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
 
@@ -143,6 +146,8 @@ exit:
 
 void ExchangeContext::DoClose(bool clearRetransTable)
 {
+    mFlags.Set(Flags::kFlagClosed);
+
     // Clear protocol callbacks
     if (mDelegate != nullptr)
     {
@@ -379,6 +384,14 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // layer has completed its work on the ExchangeContext.
     Retain();
 
+    // Keep track of whether we're nested under an outer HandleMessage
+    // invocation.
+    bool alreadyHandlingMessage = mFlags.Has(Flags::kFlagHandlingMessage);
+    mFlags.Set(Flags::kFlagHandlingMessage);
+
+    bool isStandaloneAck = payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck);
+    bool isDuplicate     = msgFlags.Has(MessageFlagValues::kDuplicateMessage);
+
     CHIP_ERROR err = mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, msgFlags,
                                                   GetReliableMessageContext());
     SuccessOrExit(err);
@@ -393,13 +406,13 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     }
 
     // The SecureChannel::StandaloneAck message type is only used for MRP; do not pass such messages to the application layer.
-    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+    if (isStandaloneAck)
     {
         ExitNow(err = CHIP_NO_ERROR);
     }
 
     // Since the message is duplicate, let's not forward it up the stack
-    if (msgFlags.Has(MessageFlagValues::kDuplicateMessage))
+    if (isDuplicate)
     {
         ExitNow(err = CHIP_NO_ERROR);
     }
@@ -422,6 +435,32 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     }
 
 exit:
+    // Don't close ourselves if we're already closed.
+    //
+    // Don't close ourselves if this message is a standalone ack. We're still
+    // not closed and getting an ack should not affect that.  In particular,
+    // since the standalone ack was not passed to the delegate, the delegate
+    // never got a chance to say "stay open". The one exception here is if
+    // mDelegate is null: in that case this is an unsolicited message and we
+    // were just created to ack it and close after that.
+    //
+    // Don't close for duplicates for similar reasons, with the same exception.
+    //
+    // Also don't close if there's an outer HandleMessage invocation.  It'll
+    // deal with the closing.
+    if (!mFlags.Has(Flags::kFlagClosed) && !mFlags.Has(Flags::kFlagWillSendMessage) && !IsResponseExpected() &&
+        (!isStandaloneAck || (mDelegate == nullptr)) && (!isDuplicate || (mDelegate == nullptr)) && !alreadyHandlingMessage)
+    {
+        Close();
+    }
+
+    if (!alreadyHandlingMessage)
+    {
+        // We are the outermost HandleMessage invocation.  We're not handling a
+        // message anymore.
+        mFlags.Clear(Flags::kFlagHandlingMessage);
+    }
+
     // Release the reference to the ExchangeContext that was held at the beginning of this function.
     // This call should also do the needful of closing the ExchangeContext if the protocol has
     // already made a prior call to Close().

@@ -30,9 +30,11 @@ jobs:
 
         strategy:
             matrix:
-                type: [gcc_debug, gcc_release, clang, mbedtls, clang_experimental]
+                type: [gcc_debug, gcc_release, clang, mbedtls, clang_experimental, no_detail_logging, no_progress_logging]
         env:
             BUILD_TYPE: ${{ matrix.type }}
+            DETAIL_LOGGING: ${{ matrix.type != 'no_detail_logging' && matrix.type != 'no_progress_logging' }}
+            PROGRESS_LOGGING: ${{ matrix.type != 'no_progress_logging' }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -85,7 +87,7 @@ jobs:
                      *) ;;
                   esac
 
-                  scripts/build/gn_gen.sh --args="$GN_ARGS"
+                  scripts/build/gn_gen.sh --args="$GN_ARGS chip_detail_logging=${DETAIL_LOGGING} chip_progress_logging=${PROGRESS_LOGGING}"
             - name: Run Build
               timeout-minutes: 10
               run: scripts/build/gn_build.sh

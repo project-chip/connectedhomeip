@@ -2130,7 +2130,7 @@
  * Command: RetrieveLogsResponse
  * @param status LogsStatus
  * @param content OCTET_STRING
- * @param timeStamp UTC_TIME
+ * @param timeStamp UTC
  * @param timeSinceBoot INT32U
  */
 #define emberAfFillCommandDiagnostic                                                                                               \
@@ -4675,7 +4675,7 @@
  * Command: DisplayMessage
  * @param messageId INT32U
  * @param messageControl MessagingControlMask
- * @param startTime UTC_TIME
+ * @param startTime UTC
  * @param durationInMinutes INT16U
  * @param message CHAR_STRING
  * @param optionalExtendedMessageControl MessagingExtendedControlMask
@@ -4720,7 +4720,7 @@
 /** @brief Command description for MessageConfirmation
  *
  * Command: MessageConfirmation
- * @param confirmationTime UTC_TIME
+ * @param confirmationTime UTC
  * @param messageConfirmationControl BITMAP8
  * @param messageResponse OCTET_STRING
  */
@@ -4743,7 +4743,7 @@
 /** @brief Command description for GetMessageCancellation
  *
  * Command: GetMessageCancellation
- * @param earliestImplementationTime UTC_TIME
+ * @param earliestImplementationTime UTC
  */
 #define emberAfFillCommandMessagingClusterGetMessageCancellation(earliestImplementationTime)                                       \
     emberAfFillExternalBuffer(mask,                                                                                                \
@@ -4754,7 +4754,7 @@
  *
  * Command: DisplayProtectedMessage
  * @param messageControl MessagingControlMask
- * @param startTime UTC_TIME
+ * @param startTime UTC
  * @param durationInMinutes INT16U
  * @param message CHAR_STRING
  * @param optionalExtendedMessageControl MessagingExtendedControlMask
@@ -4769,7 +4769,7 @@
 /** @brief Command description for CancelAllMessages
  *
  * Command: CancelAllMessages
- * @param implementationDateTime UTC_TIME
+ * @param implementationDateTime UTC
  */
 #define emberAfFillCommandMessagingClusterCancelAllMessages(implementationDateTime)                                                \
     emberAfFillExternalBuffer(mask,                                                                                                \

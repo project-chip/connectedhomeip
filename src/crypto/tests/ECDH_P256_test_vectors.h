@@ -19,8 +19,7 @@
  * @file - This file contains ECDH P256 test vectors.
  */
 
-#ifndef _ECDH_P256_TEST_VECTORS_H_
-#define _ECDH_P256_TEST_VECTORS_H_
+#pragma once
 
 typedef struct ECDH_P256_test_vector
 {
@@ -92,4 +91,3 @@ ECDH_P256_test_vector ecdh_v3 = { .local_pvt_key         = local_private_key3,
                                   .shared_secret_length  = sizeof(shared_secret3) };
 
 ECDH_P256_test_vector ecdh_test_vectors[] = { ecdh_v1, ecdh_v2, ecdh_v3 };
-#endif

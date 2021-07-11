@@ -116,6 +116,8 @@ void InteractionModelEngine::Shutdown()
     }
 
     mpNextAvailableClusterInfo = nullptr;
+
+    mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
 }
 
 CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCommandSender)
@@ -190,7 +192,6 @@ CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext *
     // err = SendStatusReport(ec, kChipProfile_Common, kStatus_UnsupportedMessage);
     // SuccessOrExit(err);
 
-    apExchangeContext->Close();
     apExchangeContext = nullptr;
 
     ChipLogFunctError(err);

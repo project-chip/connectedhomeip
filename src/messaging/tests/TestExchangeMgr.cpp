@@ -67,7 +67,6 @@ public:
                                  System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
-        ec->Close();
         return CHIP_NO_ERROR;
     }
 

@@ -4,6 +4,7 @@
     "helpers": [
         "../../zap-templates/partials/helper.js",
         "../../zap-templates/common/StringHelper.js",
+        "../../zap-templates/common/attributes/Accessors.js",
         "../../zap-templates/templates/app/helper.js",
         "../../zap-templates/templates/chip/helper.js"
     ],
@@ -69,6 +70,16 @@
             "path": "../../zap-templates/templates/app/print-cluster.zapt",
             "name": "ZCL print-cluster header",
             "output": "src/app/common/gen/print-cluster.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/attributes/Accessors.zapt",
+            "name": "Attributes Accessors header",
+            "output": "src/app/common/gen/attributes/Accessors.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/attributes/Accessors-src.zapt",
+            "name": "Attributes Accessors",
+            "output": "src/app/common/gen/attributes/Accessors.cpp"
         },
         {
             "path": "../../zap-templates/templates/app/ids/Attributes.zapt",
