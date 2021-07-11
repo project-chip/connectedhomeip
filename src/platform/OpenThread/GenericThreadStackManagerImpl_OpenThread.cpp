@@ -52,6 +52,8 @@
 #include <support/ThreadOperationalDataset.h>
 #include <support/logging/CHIPLogging.h>
 
+#include <limits>
+
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
@@ -1143,7 +1145,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     srpService->mService.mSubTypeLabels = srpService->mSubTypes;
 #endif
 
-    // Check if there are some optional text entries to add.
+    // Initialize TXT entries
     VerifyOrExit(aTxtEntries.size() <= ArraySize(srpService->mTxtEntries), error = CHIP_ERROR_BUFFER_TOO_SMALL);
     entryId = 0;
 
@@ -1155,13 +1157,19 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
         VerifyOrExit(entry.mDataSize <= SrpClient::kMaxTxtValueSize, error = CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(srpService->mTxtValueBuffers[entryId], entry.mData, entry.mDataSize);
 
+        using OtTxtValueLength = decltype(srpService->mTxtEntries[entryId].mValueLength);
+        static_assert(SrpClient::kMaxTxtValueSize <= std::numeric_limits<OtTxtValueLength>::max(),
+                      "DNS TXT value length may not fit in otDnsTxtEntry structure");
         srpService->mTxtEntries[entryId].mKey         = srpService->mTxtKeyBuffers[entryId];
         srpService->mTxtEntries[entryId].mValue       = srpService->mTxtValueBuffers[entryId];
-        srpService->mTxtEntries[entryId].mValueLength = static_cast<uint8_t>(entry.mDataSize);
+        srpService->mTxtEntries[entryId].mValueLength = static_cast<OtTxtValueLength>(entry.mDataSize);
         ++entryId;
     }
 
-    srpService->mService.mNumTxtEntries = static_cast<uint8_t>(aTxtEntries.size());
+    using OtNumTxtEntries = decltype(srpService->mService.mNumTxtEntries);
+    static_assert(ArraySize(srpService->mTxtEntries) <= std::numeric_limits<OtNumTxtEntries>::max(),
+                  "Number of DNS TXT entries may not fit in otSrpClientService structure");
+    srpService->mService.mNumTxtEntries = static_cast<OtNumTxtEntries>(aTxtEntries.size());
     srpService->mService.mTxtEntries    = srpService->mTxtEntries;
 
     ChipLogProgress(DeviceLayer, "advertising srp service: %s.%s", srpService->mService.mInstanceName, srpService->mService.mName);

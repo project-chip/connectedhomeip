@@ -51,7 +51,9 @@ static constexpr size_t kSubTypeDeviceTypeMaxLength         = 5; // _T<ddd>
 static constexpr size_t kSubTypeCommissioningModeMaxLength  = 3; // _C<d>
 static constexpr size_t kSubTypeAdditionalPairingMaxLength  = 3; // _A<d>
 static constexpr size_t kSubTypeMaxNumber                   = 6;
-static constexpr size_t kSubTypeMaxLength                   = 7;
+static constexpr size_t kSubTypeMaxLength =
+    std::max({ kSubTypeShortDiscriminatorMaxLength, kSubTypeLongDiscriminatorMaxLength, kSubTypeVendorMaxLength,
+               kSubTypeDeviceTypeMaxLength, kSubTypeCommissioningModeMaxLength, kSubTypeAdditionalPairingMaxLength });
 
 enum class CommssionAdvertiseMode : uint8_t
 {
