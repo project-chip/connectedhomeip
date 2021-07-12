@@ -350,7 +350,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 ASN1_PARSE_ENTER_SEQUENCE
                 {
                     err = reader.Next();
-                    VerifyOrExit(err == CHIP_NO_ERROR, err = ASN1_ERROR_INVALID_ENCODING);
+                    SuccessOrExit(err);
 
                     // keyIdentifier [0] IMPLICIT KeyIdentifier,
                     // KeyIdentifier ::= OCTET STRING
