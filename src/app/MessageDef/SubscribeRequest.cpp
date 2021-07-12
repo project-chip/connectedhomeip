@@ -197,12 +197,12 @@ CHIP_ERROR SubscribeRequest::Parser::GetEventNumber(uint64_t * const apEventNumb
 
 CHIP_ERROR SubscribeRequest::Parser::GetMinIntervalSeconds(uint16_t * const apMinIntervalSeconds) const
 {
-    return GetUnsignedInteger(kCsTag_EventNumber, apMinIntervalSeconds);
+    return GetUnsignedInteger(kCsTag_MinInterval, apMinIntervalSeconds);
 }
 
 CHIP_ERROR SubscribeRequest::Parser::GetMaxIntervalSeconds(uint16_t * const apMaxIntervalSeconds) const
 {
-    return GetUnsignedInteger(kCsTag_EventNumber, apMaxIntervalSeconds);
+    return GetUnsignedInteger(kCsTag_MaxInterval, apMaxIntervalSeconds);
 }
 
 CHIP_ERROR SubscribeRequest::Parser::GetKeepExistingSubscriptions(bool * const apKeepExistingSubscription) const
