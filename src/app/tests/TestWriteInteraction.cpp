@@ -242,17 +242,14 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
     GenerateWriteRequest(apSuite, apContext, buf);
 
-    err = writeHandler.ProcessWriteRequest(std::move(buf));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    AddAttributeStatus(apSuite, apContext, writeHandler);
-
     TestExchangeDelegate delegate;
-    writeHandler.mpExchangeCtx = ctx.NewExchangeToLocal(&delegate);
-    err                        = writeHandler.SendWriteResponse();
+    Messaging::ExchangeContext * exchange = ctx.NewExchangeToLocal(&delegate);
+    err                                   = writeHandler.OnWriteRequest(exchange, std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    writeHandler.Shutdown();
+    // Manually close the exchange, because we're bypassing the normal "you
+    // received a message" flow for the exchange, so the automatic closing is
+    // not going to happen.
+    exchange->Close();
 
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
