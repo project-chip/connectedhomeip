@@ -21,7 +21,6 @@ assert(chip_device_platform == "ameba")
 static_library("Ameba") {
   sources = [
     "../FreeRTOS/SystemTimeSupport.cpp",
-    "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "ConfigurationManagerImpl.cpp",
@@ -32,20 +31,14 @@ static_library("Ameba") {
     "DeviceNetworkProvisioningDelegateImpl.h",
     "AmebaConfig.cpp",
     "AmebaConfig.h",
-    "AmebaUtils.cpp",
-    "AmebaUtils.h",
-    "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
     "LwIPCoreLock.cpp",
-    "NetworkProvisioningServerImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "ServiceProvisioning.cpp",
     "ServiceProvisioning.h",
-    "SoftwareUpdateManagerImpl.h",
     "SystemTimeSupport.cpp",
-
   ]
 
   deps = [ "${chip_root}/src/lib/mdns:platform_header" ]
