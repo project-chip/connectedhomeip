@@ -937,6 +937,7 @@ static void StartTest()
 
     // Allocate the endpoints for sending or receiving.
 
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
     if (gOptFlags & kOptFlagUseRawIP)
     {
         lStatus = gInet.NewRawEndPoint(lIPVersion, lIPProtocol, &sRawIPEndPoint);
@@ -948,7 +949,9 @@ static void StartTest()
             INET_FAIL_ERROR(lStatus, "RawEndPoint::BindInterface failed");
         }
     }
-    else if (gOptFlags & kOptFlagUseUDPIP)
+    else
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
+        if (gOptFlags & kOptFlagUseUDPIP)
     {
         lStatus = gInet.NewUDPEndPoint(&sUDPIPEndPoint);
         INET_FAIL_ERROR(lStatus, "InetLayer::NewUDPEndPoint failed");
@@ -962,6 +965,7 @@ static void StartTest()
 
     if (Common::IsReceiver())
     {
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
         if (gOptFlags & kOptFlagUseRawIP)
         {
             lStatus = sRawIPEndPoint->Bind(lIPAddressType, lAddress);
@@ -976,7 +980,9 @@ static void StartTest()
             lStatus = sRawIPEndPoint->Listen(HandleRawMessageReceived, HandleRawReceiveError);
             INET_FAIL_ERROR(lStatus, "RawEndPoint::Listen failed");
         }
-        else if (gOptFlags & kOptFlagUseUDPIP)
+        else
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
+            if (gOptFlags & kOptFlagUseUDPIP)
         {
             lStatus = sUDPIPEndPoint->Bind(lIPAddressType, IPAddress::Any, kUDPPort);
             INET_FAIL_ERROR(lStatus, "UDPEndPoint::Bind failed");
