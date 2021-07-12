@@ -133,7 +133,7 @@ static CHIP_ERROR InitCredentialSets()
                                                           BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
 
     ReturnErrorOnFailure(commissionerDevOpCred.Init(&commissionerCertificateSet, 1));
-    commissionerCredentialsIndex = commissionerDevOpCred.GetCertCount() - static_cast<uint8_t>(1);
+    commissionerCredentialsIndex = static_cast<uint8_t>(commissionerDevOpCred.GetCertCount() - 1U);
 
     ReturnErrorOnFailure(commissionerDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_01_Chip,
                                                             static_cast<uint16_t>(sTestCert_Node01_01_Chip_Len)));
