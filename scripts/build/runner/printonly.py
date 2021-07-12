@@ -2,17 +2,19 @@ import shlex
 
 
 class PrintOnlyRunner:
+  def __init__(self, output_file):
+    self.output_file = output_file
 
   def Run(self, cmd, cwd=None, title=None):
     if title:
-      print("# " + title)
+      self.output_file.write("# " + title + "\n")
 
     if cwd:
-      print('cd "%s"' % cwd)
+      self.output_file.write('cd "%s"\n' % cwd)
 
-    print(" ".join([shlex.quote(part) for part in cmd]))
+    self.output_file.write(" ".join([shlex.quote(part) for part in cmd]) + "\n")
 
     if cwd:
-      print("cd -")
+      self.output_file.write("cd -\n")
 
-    print()
+    self.output_file.write("\n")

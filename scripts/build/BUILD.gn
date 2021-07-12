@@ -1,0 +1,87 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/tests.gni")
+
+if (chip_build_tests) {
+  action("all_platform_build_example") {
+    _output_file = "$target_gen_dir/all_platform_build_commands.txt"
+
+    script = "chipbuild.py"
+    outputs = [ _output_file ]
+
+    # chipbuild script
+    inputs = [
+      "./build/__init__.py",
+      "./build/factory.py",
+      "./build/targets.py",
+      "./builders/__init__.py",
+      "./builders/builder.py",
+      "./builders/efr32.py",
+      "./builders/esp32.py",
+      "./builders/linux.py",
+      "./builders/qpg.py",
+      "./chipbuild.py",
+      "expected_all_platform_commands.txt",
+      "./runner/__init__.py",
+      "./runner/printonly.py",
+      "./runner/shell.py",
+    ]
+
+    args = [
+      "--repo",
+      rebase_path("${chip_root}"),
+      "--platform",
+      "all",
+      "--log-level",
+      "fatal",
+      "--dry-run",
+      "--dry-run-output",
+      rebase_path(_output_file, root_build_dir),
+      "build",
+    ]
+  }
+
+  action_foreach("tests_run") {
+    _stamp_file = "$target_gen_dir/$target_name.{{source_name_part}}.stamp"
+    _expected_file = "$target_gen_dir/{{source_name_part}}.expected"
+    _source_file = "$target_gen_dir/all_platform_build_commands.txt"
+
+    script = "test.py"
+    outputs = [
+      _stamp_file,
+      _expected_file,
+    ]
+
+    sources = [ _source_file ]
+
+    deps = [ ":all_platform_build_example" ]
+
+    args = [
+      "--repo",
+      rebase_path("${chip_root}"),
+      "--expected",
+      rebase_path("expected_all_platform_commands.txt", root_build_dir),
+      "--expected-out",
+      rebase_path(_expected_file, root_build_dir),
+      "--actual",
+      "{{source}}",
+      "--touch",
+      rebase_path(_stamp_file, root_build_dir),
+    ]
+  }
+}

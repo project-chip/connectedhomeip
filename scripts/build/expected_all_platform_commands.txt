@@ -1,0 +1,92 @@
+# Generating linux-native-all_clusters
+cd "{root}/examples/all-clusters-app/linux/"
+gn gen {root}/out_test/out/linux-native-all_clusters
+cd -
+
+# Generating qpg-qpg6100-lock
+cd "{root}/examples/lock-app/qpg/"
+gn gen {root}/out_test/out/qpg-qpg6100-lock
+cd -
+
+# Generating esp32-m5stack-all_clusters
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_m5stack.defaults'"'"' -C examples/all-clusters-app/esp32 -B {root}/out_test/out/esp32-m5stack-all_clusters reconfigure'
+cd -
+
+# Generating esp32-devkitc-all_clusters
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_devkit.defaults'"'"' -C examples/all-clusters-app/esp32 -B {root}/out_test/out/esp32-devkitc-all_clusters reconfigure'
+cd -
+
+# Generating esp32-devkitc-lock
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/lock-app/esp32 -B {root}/out_test/out/esp32-devkitc-lock reconfigure'
+cd -
+
+# Generate efr32-brd4161a-light
+gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {root}/out_test/out/efr32-brd4161a-light
+
+# Generate efr32-brd4161a-lock
+gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {root}/out_test/out/efr32-brd4161a-lock
+
+# Generate efr32-brd4161a-window_covering
+gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {root}/out_test/out/efr32-brd4161a-window_covering
+
+# Generating linux-native-all_clusters
+cd "{root}/examples/all-clusters-app/linux/"
+gn gen {root}/out_test/out/linux-native-all_clusters
+cd -
+
+# Building linux-native-all_clusters
+ninja -C {root}/out_test/out/linux-native-all_clusters
+
+# Generating qpg-qpg6100-lock
+cd "{root}/examples/lock-app/qpg/"
+gn gen {root}/out_test/out/qpg-qpg6100-lock
+cd -
+
+# Building qpg-qpg6100-lock
+ninja -C {root}/out_test/out/qpg-qpg6100-lock
+
+# Generating esp32-m5stack-all_clusters
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_m5stack.defaults'"'"' -C examples/all-clusters-app/esp32 -B {root}/out_test/out/esp32-m5stack-all_clusters reconfigure'
+cd -
+
+# Building esp32-m5stack-all_clusters
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{root}/out_test/out/esp32-m5stack-all_clusters'"'"''
+
+# Generating esp32-devkitc-all_clusters
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_devkit.defaults'"'"' -C examples/all-clusters-app/esp32 -B {root}/out_test/out/esp32-devkitc-all_clusters reconfigure'
+cd -
+
+# Building esp32-devkitc-all_clusters
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{root}/out_test/out/esp32-devkitc-all_clusters'"'"''
+
+# Generating esp32-devkitc-lock
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/lock-app/esp32 -B {root}/out_test/out/esp32-devkitc-lock reconfigure'
+cd -
+
+# Building esp32-devkitc-lock
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{root}/out_test/out/esp32-devkitc-lock'"'"''
+
+# Generate efr32-brd4161a-light
+gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {root}/out_test/out/efr32-brd4161a-light
+
+# Build efr32-brd4161a-light
+ninja -C {root}/out_test/out/efr32-brd4161a-light
+
+# Generate efr32-brd4161a-lock
+gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {root}/out_test/out/efr32-brd4161a-lock
+
+# Build efr32-brd4161a-lock
+ninja -C {root}/out_test/out/efr32-brd4161a-lock
+
+# Generate efr32-brd4161a-window_covering
+gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {root}/out_test/out/efr32-brd4161a-window_covering
+
+# Build efr32-brd4161a-window_covering
+ninja -C {root}/out_test/out/efr32-brd4161a-window_covering
+
