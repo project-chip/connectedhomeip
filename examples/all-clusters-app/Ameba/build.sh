@@ -21,7 +21,10 @@
 #
 # This file can also be used as an executable
 
-CURR_PATH=`test -d "${0%/*}" && cd "${0%/*}"; pwd`
+CURR_PATH=$(
+    test -d "${0%/*}" && cd "${0%/*}"
+    pwd
+)
 CHIP_PATH=$CURR_PATH/../../..
 AMEBA_PATH=$CHIP_PATH/../ambd_sdk_with_chip_non_NDA
 AMEBA_LP_PATH=$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
