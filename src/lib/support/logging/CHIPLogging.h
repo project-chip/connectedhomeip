@@ -345,5 +345,40 @@ bool IsCategoryEnabled(uint8_t category);
  */
 #define ChipLogValueX64(aValue) static_cast<uint32_t>(aValue >> 32), static_cast<uint32_t>(aValue)
 
+/*
+ *  @brief
+ *      Macro for use in a string formatter for a MEI hex print.
+ *      Will split into 2x 16-bit prints to display both the MEI prefix/suffix
+ *
+ *  Example Usage:
+ *
+ *  @code
+ *  void foo() {
+ *      chip::CommandId value = 0x12340001;
+ *      ChipLogProgress(Foo, "A MEI value: " ChipLogFormatMEI, ChipLogValueMEI(value));
+ *  }
+ *  @endcode
+ *
+ */
+#define ChipLogFormatMEI "0x%04" PRIX16 "_%04" PRIX16
+
+/*
+ *  @brief
+ *      Macro for use in a printf parameter list for MEI value.
+ *      Will split into MSB/LSB 16-bit values to separate prefix/suffix.
+ *
+ *  Example Usage:
+ *
+ *  @code
+ *  void foo() {
+ *      chip::CommandId value = 0x12340001;
+ *      ChipLogProgress(Foo, "A MEI value: " ChipLogFormatMEI, ChipLogValueMEI(value));
+ *  }
+ *  @endcode
+ *
+ *  @param[in]  aValue    "32-bit value that will be split in 16-bit MSB/LSB part
+ */
+#define ChipLogValueMEI(aValue) static_cast<uint16_t>(aValue >> 16), static_cast<uint16_t>(aValue)
+
 } // namespace Logging
 } // namespace chip

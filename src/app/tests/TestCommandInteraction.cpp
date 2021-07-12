@@ -73,8 +73,9 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
                                                        aCommandId,  // CommandId
                                                        (chip::app::CommandPathFlags::kEndpointIdValid) };
 
-    ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16, aClusterId,
-                  aCommandId, aEndPointId);
+    ChipLogDetail(Controller,
+                  "Received Cluster Command: Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " Endpoint=%" PRIx16,
+                  ChipLogValueMEI(aClusterId), ChipLogValueMEI(aCommandId), aEndPointId);
 
     apCommandObj->AddStatusCode(commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
                                 Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
