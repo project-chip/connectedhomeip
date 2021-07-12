@@ -30,6 +30,11 @@
 #include <lib/support/Span.h>
 #include <lib/support/UnitTestRegistration.h>
 
+// Forwarding of "private" function tested
+namespace chip {
+std::string extractPayload(std::string inString);
+}
+
 using namespace chip;
 using namespace std;
 

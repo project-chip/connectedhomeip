@@ -25,13 +25,23 @@
 #include <nlunit-test.h>
 #include <stdio.h>
 
-#include <setup_payload/ManualSetupPayloadGenerator.cpp>
-#include <setup_payload/ManualSetupPayloadParser.cpp>
-#include <setup_payload/SetupPayload.cpp>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
 
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/verhoeff/Verhoeff.h>
+
+#include <math.h>
+
+// Import of hidden symbols
+namespace chip {
+CHIP_ERROR readDigitsFromDecimalString(const std::string & decimalString, size_t & index, uint32_t & dest,
+                                       size_t numberOfCharsToRead);
+CHIP_ERROR checkCodeLengthValidity(const std::string & decimalString, bool isLongCode);
+CHIP_ERROR toNumber(const std::string & decimalString, uint32_t & dest);
+CHIP_ERROR checkDecimalStringValidity(std::string decimalString, std::string & decimalStringWithoutCheckDigit);
+} // namespace chip
 
 using namespace chip;
 
