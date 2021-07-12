@@ -893,7 +893,7 @@ void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
         uint8_t length = emberAfStringLength(src);
         if (size < length)
         {
-            // Here, since we have checked that size < length, so size must be able to fit into length.
+            // Since we have checked that size < length, size must be able to fit into the type of length.
             length = static_cast<decltype(length)>(size);
         }
         memmove(dest + 1, src + 1, length);
@@ -917,7 +917,7 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
         uint16_t length = emberAfLongStringLength(src);
         if (size < length)
         {
-            // Here, since we have checked that size < length, so size must be able to fit into length.
+            // Since we have checked that size < length, size must be able to fit into the type of length.
             length = static_cast<decltype(length)>(size);
         }
         memmove(dest + 2, src + 2, length);
