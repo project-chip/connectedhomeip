@@ -16,6 +16,7 @@
  */
 
 #include <CommissioneeShellCommands.h>
+#include <app/server/Server.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
