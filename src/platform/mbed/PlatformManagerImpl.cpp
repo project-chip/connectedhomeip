@@ -256,7 +256,12 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     // Call up to the base class _Shutdown() to perform the actual stack de-initialization
     // and clean-up
     //
-    return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+    auto err = GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+    if (err == CHIP_NO_ERROR)
+    {
+        mInitialized = false;
+    }
+    return err;
 }
 
 CHIP_ERROR PlatformManagerImpl::TranslateOsStatus(osStatus error)
