@@ -84,11 +84,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnResponseTimeout(ExchangeContext * ec) override
-    {
-        IsOnResponseTimeoutCalled = true;
-        ec->Close();
-    }
+    void OnResponseTimeout(ExchangeContext * ec) override { IsOnResponseTimeoutCalled = true; }
 
     bool IsOnResponseTimeoutCalled = false;
 };
