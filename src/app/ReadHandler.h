@@ -111,7 +111,8 @@ public:
     // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
     bool CheckEventClean(EventManagement & aEventManager);
 
-    // Move to the next dirty priority where last schedule event number is larger than current self vended event number
+    // Move to the next dirty priority from critical high priority to debug low priority, where last schedule event number
+    // is larger than current self vended event number
     void MoveToNextScheduledDirtyPriority();
 
 private:

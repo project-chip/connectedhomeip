@@ -303,15 +303,16 @@ bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
 {
     if (mCurrentPriority == PriorityLevel::Invalid)
     {
-        // Upload is not in middle, previous mLastScheduledEventNumber is not valid, Check for new events, and set a checkpoint
-        for (size_t index = 0; index < ArraySize(mSelfProcessedEvents); index++)
+        // Upload is not in middle, previous mLastScheduledEventNumber is not valid, Check for new events from Critical high
+        // priority to Debug low priority, and set a checkpoint when there is dirty events
+        for (int index = ArraySize(mSelfProcessedEvents) - 1; index >= 0; index--)
         {
             EventNumber lastEventNumber = aEventManager.GetLastEventNumber(static_cast<PriorityLevel>(index));
             if ((lastEventNumber != 0) && (lastEventNumber >= mSelfProcessedEvents[index]))
             {
                 // We have more events. snapshot last event IDs
                 aEventManager.SetScheduledEventEndpoint(&(mLastScheduledEventNumber[0]));
-                // initialize the next priority level to transfer
+                // initialize the next dirty priority level to transfer
                 MoveToNextScheduledDirtyPriority();
                 return false;
             }
@@ -329,7 +330,7 @@ bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
 
 void ReadHandler::MoveToNextScheduledDirtyPriority()
 {
-    for (uint8_t i = 0; i < ArraySize(mSelfProcessedEvents); i++)
+    for (int i = ArraySize(mSelfProcessedEvents) - 1; i >= 0; i--)
     {
         if ((mLastScheduledEventNumber[i] != 0) && mSelfProcessedEvents[i] <= mLastScheduledEventNumber[i])
         {
