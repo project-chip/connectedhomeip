@@ -31,15 +31,36 @@ using namespace chip::app::List;
 // and data is undefined.
 constexpr uint16_t kSizeLengthInBytes = 2u;
 
+#if BIGENDIAN_CPU
+uint8_t * reverseMemcpy(uint8_t * dest, const uint8_t * src, size_t len)
+{
+    uint8_t * d       = dest + len - 1;
+    const uint8_t * s = src;
+    while (len--)
+    {
+        *d-- = *s++;
+    }
+    return dest;
+}
+#endif
+
 void copyListMember(uint8_t * dest, uint8_t * src, bool write, uint16_t * offset, uint16_t length)
 {
     if (write)
     {
+#if BIGENDIAN_CPU
+        reverseMemcpy(dest + *offset, src, length);
+#else
         memmove(dest + *offset, src, length);
+#endif
     }
     else
     {
+#if BIGENDIAN_CPU
+        reverseMemcpy(dest, src + *offset, length);
+#else
         memmove(dest, src + *offset, length);
+#endif
     }
 
     *offset = static_cast<uint16_t>(*offset + length);
