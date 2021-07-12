@@ -78,7 +78,6 @@ private:
     virtual void OnTiltDown();
 
 protected:
-
     StateFlags mState;
     WindowEvent mLiftAction = WindowEvent::None;
     WindowEvent mTiltAction = WindowEvent::None;

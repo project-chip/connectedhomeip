@@ -82,7 +82,6 @@ public:
     virtual void PostEvent(const WindowEvent & event);
 
 protected:
-
     virtual void ProcessEvents();
     virtual example::Timer * CreateTimer(const char * name, uint32_t timeoutInMs, example::Timer::Callback callback,
                                          void * context);
