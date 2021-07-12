@@ -354,7 +354,7 @@ CHIP_ERROR InetLayer::Shutdown()
             TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
             if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
-                lEndPoint->Abort();
+                lEndPoint->Free();
             }
         }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -366,7 +366,7 @@ CHIP_ERROR InetLayer::Shutdown()
             UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
             if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
-                lEndPoint->Close();
+                lEndPoint->Free();
             }
         }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
