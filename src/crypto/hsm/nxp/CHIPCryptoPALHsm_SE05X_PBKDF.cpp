@@ -73,7 +73,7 @@ CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen
     error = CHIP_NO_ERROR;
 exit:
     sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &hmacKeyObj);
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 } // namespace Crypto
