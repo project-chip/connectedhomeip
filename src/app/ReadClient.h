@@ -51,12 +51,11 @@ namespace app {
 class ReadClient : public Messaging::ExchangeDelegate
 {
 public:
-    /**
-     *  Shut down the Client. This terminates this instance of the object and releases
-     *  all held resources.  The object must not be used after Shutdown() is called.
-     *
-     *  SDK consumer can choose when to shut down the ReadClient.
-     *  The ReadClient will never shut itself down, unless the overall InteractionModelEngine is shut down.
+    /**  Once SendReadRequest returns successfully, the ReadClient will
+     *  handle calling Shutdown on itself once it decides it's done with waiting
+     *  for a response (i.e. times out or gets a response).
+     *  If SendReadRequest is never called, or the call fails, the API
+     *  consumer is responsible for calling Shutdown on the ReadClient.
      */
     void Shutdown();
 
