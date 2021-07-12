@@ -387,7 +387,6 @@ public:
         }
 
     exit:
-        exchangeContext->Close();
         return err;
     }
 

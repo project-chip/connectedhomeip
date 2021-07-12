@@ -229,8 +229,8 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 exit:
     ChipLogFunctError(err);
 
-    // Close the exchange cleanly so that the ExchangeManager will send an ack for the message we just received.
-    mpExchangeCtx->Close();
+    // Null out mpExchangeCtx, so our Shutdown() call below won't try to abort
+    // it and fail to send an ack for the message we just received.
     mpExchangeCtx = nullptr;
     MoveToState(ClientState::Initialized);
 

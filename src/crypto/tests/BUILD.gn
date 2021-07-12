@@ -27,6 +27,7 @@ chip_test_suite("tests") {
     "CHIPCryptoPALTest.cpp",
     "ECDH_P256_test_vectors.h",
     "HKDF_SHA256_test_vectors.h",
+    "HMAC_SHA256_test_vectors.h",
     "Hash_SHA256_test_vectors.h",
     "PBKDF2_SHA256_test_vectors.h",
     "PBKDF2_SHA256_test_vectors.h",

@@ -63,7 +63,6 @@ public:
                                  System::PacketBufferHandle && msgBuf) override
     {
         ++ReceiveHandlerCallCount;
-        ec->Close();
         return CHIP_NO_ERROR;
     }
 

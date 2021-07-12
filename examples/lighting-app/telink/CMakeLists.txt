@@ -64,6 +64,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/client-api.cpp
                ${CHIP_ROOT}/src/app/util/ember-compatibility-functions.cpp
                ${CHIP_ROOT}/src/app/util/ember-print.cpp
+               ${CHIP_ROOT}/src/app/util/error-mapping.cpp
                ${CHIP_ROOT}/src/app/util/message.cpp
                ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp

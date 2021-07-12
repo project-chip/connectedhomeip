@@ -94,7 +94,7 @@ namespace Controller {
 
 using namespace chip::Encoding;
 
-constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
+constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondsPerSecond;
 
 constexpr uint32_t kMaxCHIPCSRLength = 1024;
 
@@ -572,7 +572,6 @@ CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, 
                                                const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     uint16_t index;
-    bool needClose = true;
 
     VerifyOrExit(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
 
@@ -582,14 +581,9 @@ CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, 
     index = FindDeviceIndex(packetHeader.GetSourceNodeId().Value());
     VerifyOrExit(index < kNumMaxActiveDevices, ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
-    needClose = false; // Device will handle it
     mActiveDevices[index].OnMessageReceived(ec, packetHeader, payloadHeader, std::move(msgBuf));
 
 exit:
-    if (needClose)
-    {
-        ec->Close();
-    }
     return CHIP_NO_ERROR;
 }
 

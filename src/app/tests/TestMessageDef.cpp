@@ -28,6 +28,9 @@
 #include <app/MessageDef/InvokeCommand.h>
 #include <app/MessageDef/ReadRequest.h>
 #include <app/MessageDef/ReportData.h>
+#include <app/MessageDef/SubscribeRequest.h>
+#include <app/MessageDef/SubscribeResponse.h>
+#include <app/MessageDef/TimedRequest.h>
 #include <app/MessageDef/WriteRequest.h>
 #include <app/MessageDef/WriteResponse.h>
 #include <core/CHIPTLVDebug.hpp>
@@ -882,6 +885,158 @@ void ParseWriteResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
+void BuildSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SubscribeRequest::Builder subscribeRequestBuilder;
+
+    err = subscribeRequestBuilder.Init(&aWriter);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    AttributePathList::Builder attributePathList = subscribeRequestBuilder.CreateAttributePathListBuilder();
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+    BuildAttributePathList(apSuite, attributePathList);
+
+    EventPathList::Builder eventPathList = subscribeRequestBuilder.CreateEventPathListBuilder();
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+    BuildEventPathList(apSuite, eventPathList);
+
+    AttributeDataVersionList::Builder attributeDataVersionList = subscribeRequestBuilder.CreateAttributeDataVersionListBuilder();
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+    BuildAttributeDataVersionList(apSuite, attributeDataVersionList);
+
+    subscribeRequestBuilder.EventNumber(1);
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    subscribeRequestBuilder.MinIntervalMs(1);
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    subscribeRequestBuilder.MaxIntervalMs(1);
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    subscribeRequestBuilder.KeepExistingSubscriptions(true);
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    subscribeRequestBuilder.IsProxy(true);
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    subscribeRequestBuilder.EndOfSubscribeRequest();
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+}
+
+void ParseSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    SubscribeRequest::Parser subscribeRequestParser;
+    AttributePathList::Parser attributePathListParser;
+    EventPathList::Parser eventPathListParser;
+    AttributeDataVersionList::Parser attributeDataVersionListParser;
+    uint64_t eventNumber          = 0;
+    uint16_t minIntervalMs        = 0;
+    uint16_t maxIntervalMs        = 0;
+    bool keepExistingSubscription = false;
+    bool isProxy                  = false;
+
+    err = subscribeRequestParser.Init(aReader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = subscribeRequestParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
+    err = subscribeRequestParser.GetAttributePathList(&attributePathListParser);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = subscribeRequestParser.GetEventPathList(&eventPathListParser);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = subscribeRequestParser.GetAttributeDataVersionList(&attributeDataVersionListParser);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = subscribeRequestParser.GetEventNumber(&eventNumber);
+    NL_TEST_ASSERT(apSuite, eventNumber == 1 && err == CHIP_NO_ERROR);
+
+    err = subscribeRequestParser.GetMinIntervalMs(&minIntervalMs);
+    NL_TEST_ASSERT(apSuite, minIntervalMs == 1 && err == CHIP_NO_ERROR);
+
+    err = subscribeRequestParser.GetMaxIntervalMs(&maxIntervalMs);
+    NL_TEST_ASSERT(apSuite, maxIntervalMs == 1 && err == CHIP_NO_ERROR);
+
+    err = subscribeRequestParser.GetKeepExistingSubscriptions(&keepExistingSubscription);
+    NL_TEST_ASSERT(apSuite, keepExistingSubscription && err == CHIP_NO_ERROR);
+
+    err = subscribeRequestParser.GetIsProxy(&isProxy);
+    NL_TEST_ASSERT(apSuite, isProxy && err == CHIP_NO_ERROR);
+}
+
+void BuildSubscribeResponse(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SubscribeResponse::Builder subscribeResponseBuilder;
+
+    err = subscribeResponseBuilder.Init(&aWriter);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    subscribeResponseBuilder.SubscriptionId(1);
+    NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
+
+    subscribeResponseBuilder.FinalSyncIntervalMs(1);
+    NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
+
+    subscribeResponseBuilder.EndOfSubscribeResponse();
+    NL_TEST_ASSERT(apSuite, subscribeResponseBuilder.GetError() == CHIP_NO_ERROR);
+}
+
+void ParseSubscribeResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    SubscribeResponse::Parser subscribeResponseParser;
+    uint64_t subscriptionId      = 0;
+    uint16_t finalSyncIntervalMs = 0;
+
+    err = subscribeResponseParser.Init(aReader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = subscribeResponseParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
+    err = subscribeResponseParser.GetSubscriptionId(&subscriptionId);
+    NL_TEST_ASSERT(apSuite, subscriptionId == 1 && err == CHIP_NO_ERROR);
+
+    err = subscribeResponseParser.GetFinalSyncIntervalMs(&finalSyncIntervalMs);
+    NL_TEST_ASSERT(apSuite, finalSyncIntervalMs == 1 && err == CHIP_NO_ERROR);
+}
+
+void BuildTimedRequest(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TimedRequest::Builder timedRequestBuilder;
+
+    err = timedRequestBuilder.Init(&aWriter);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    timedRequestBuilder.TimeoutMs(1);
+    NL_TEST_ASSERT(apSuite, timedRequestBuilder.GetError() == CHIP_NO_ERROR);
+}
+
+void ParseTimedRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    TimedRequest::Parser timedRequestarser;
+    uint16_t timeout = 0;
+
+    err = timedRequestarser.Init(aReader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = timedRequestarser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
+    err = timedRequestarser.GetTimeoutMs(&timeout);
+    NL_TEST_ASSERT(apSuite, timeout == 1 && err == CHIP_NO_ERROR);
+}
+
 void AttributePathTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1348,6 +1503,63 @@ void WriteResponseTest(nlTestSuite * apSuite, void * apContext)
     ParseWriteResponse(apSuite, reader);
 }
 
+void SubscribeRequestTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    BuildSubscribeRequest(apSuite, writer);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ParseSubscribeRequest(apSuite, reader);
+}
+
+void SubscribeResponseTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    BuildSubscribeResponse(apSuite, writer);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ParseSubscribeResponse(apSuite, reader);
+}
+
+void TimedRequestTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    BuildTimedRequest(apSuite, writer);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ParseTimedRequest(apSuite, reader);
+}
+
 void CheckPointRollbackTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
@@ -1429,6 +1641,9 @@ const nlTest sTests[] =
                 NL_TEST_DEF("ReadRequestTest", ReadRequestTest),
                 NL_TEST_DEF("WriteRequestTest", WriteRequestTest),
                 NL_TEST_DEF("WriteResponseTest", WriteResponseTest),
+                NL_TEST_DEF("SubscribeRequestTest", SubscribeRequestTest),
+                NL_TEST_DEF("SubscribeResponseTest", SubscribeResponseTest),
+                NL_TEST_DEF("TimedRequestTest", TimedRequestTest),
                 NL_TEST_DEF("CheckPointRollbackTest", CheckPointRollbackTest),
                 NL_TEST_SENTINEL()
         };

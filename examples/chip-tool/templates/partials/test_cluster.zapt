@@ -46,17 +46,14 @@ class {{filename}}: public TestCommand
 
     {{#chip_tests_items}}
     // Test {{label}}
-    typedef void (*SuccessCallback_{{index}})(void * context{{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asCamelCased name true}}{{/chip_tests_item_response_parameters}});
-    chip::Callback::Callback<SuccessCallback_{{index}}> * mOnSuccessCallback_{{index}} = nullptr;
-    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_{{index}} = nullptr;
+    using SuccessCallback_{{index}} = void (*)(void * context{{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asCamelCased name true}}{{/chip_tests_item_response_parameters}});
+    chip::Callback::Callback<SuccessCallback_{{index}}> mOnSuccessCallback_{{index}} { OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse, this };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_{{index}} { OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_FailureResponse, this };
     bool mIsFailureExpected_{{index}} = {{response.error}};
 
     CHIP_ERROR TestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}()
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Sending command...");
-
-        mOnFailureCallback_{{index}} = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_FailureResponse, this);
-        mOnSuccessCallback_{{index}} = new chip::Callback::Callback<SuccessCallback_{{index}}>(OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse, this);
 
         chip::Controller::{{asCamelCased cluster false}}Cluster cluster;
         cluster.Associate(mDevice, {{endpoint}});
@@ -71,9 +68,9 @@ class {{filename}}: public TestCommand
         {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
         {{/if}}
         {{/chip_tests_item_parameters}}
-        err = cluster.{{asCamelCased command false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(){{#chip_tests_item_parameters}}, {{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
+        err = cluster.{{asCamelCased command false}}(mOnSuccessCallback_{{index}}.Cancel(), mOnFailureCallback_{{index}}.Cancel(){{#chip_tests_item_parameters}}, {{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
         {{else if isReadAttribute}}
-        err = cluster.ReadAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel());
+        err = cluster.ReadAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}.Cancel(), mOnFailureCallback_{{index}}.Cancel());
         {{else if isWriteAttribute}}
         {{#chip_tests_item_parameters}}
         {{#if (isString type)}}
@@ -82,16 +79,10 @@ class {{filename}}: public TestCommand
         {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
         {{/if}}
         {{/chip_tests_item_parameters}}
-        err = cluster.WriteAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(), {{#chip_tests_item_parameters}}{{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
+        err = cluster.WriteAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}.Cancel(), mOnFailureCallback_{{index}}.Cancel(), {{#chip_tests_item_parameters}}{{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
         {{else}}
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         {{/if}}
-
-        if (CHIP_NO_ERROR != err)
-        {
-            delete mOnFailureCallback_{{index}};
-            delete mOnSuccessCallback_{{index}};
-        }
 
         return err;
     }
@@ -101,9 +92,6 @@ class {{filename}}: public TestCommand
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Failure Response");
 
         {{parent.filename}} * runner = reinterpret_cast<{{parent.filename}} *>(context);
-
-        delete runner->mOnFailureCallback_{{index}};
-        delete runner->mOnSuccessCallback_{{index}};
 
         {{#if optional}}
         if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) {
@@ -126,9 +114,6 @@ class {{filename}}: public TestCommand
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Success Response");
 
         {{parent.filename}} * runner = reinterpret_cast<{{parent.filename}} *>(context);
-
-        delete runner->mOnFailureCallback_{{index}};
-        delete runner->mOnSuccessCallback_{{index}};
 
         if (runner->mIsFailureExpected_{{index}} == true)
         {

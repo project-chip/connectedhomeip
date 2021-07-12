@@ -64,8 +64,6 @@ unsigned int sleep(unsigned int seconds)
 
 extern "C" void main_task(void const * argument)
 {
-    CHIP_ERROR ret = CHIP_CONFIG_CORE_ERROR_MAX;
-
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;
     for (; pFunc < &__init_array_end; ++pFunc)
@@ -87,7 +85,7 @@ extern "C" void main_task(void const * argument)
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
-    ret = PlatformMgr().InitChipStack();
+    CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
         K32W_LOG("Error during PlatformMgr().InitWeaveStack()");

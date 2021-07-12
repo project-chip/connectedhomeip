@@ -28,6 +28,7 @@
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
         "operational-credentials-cluster.xml",
+        "pressure-measurement-cluster.xml",
         "pump-configuration-and-control-cluster.xml",
         "pump-controller-device.xml",
         "pump-device.xml",

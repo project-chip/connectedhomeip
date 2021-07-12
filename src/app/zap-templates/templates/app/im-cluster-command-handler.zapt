@@ -37,9 +37,6 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, Com
     uint32_t expectArgumentCount = 0;
     uint32_t currentDecodeTagId = 0;
     bool wasHandled = false;
-    {{#if (user_cluster_has_enabled_manufacturer_command name side)}}
-    {{else}}
-    {{/if}}
     {
         switch (aCommandId)
         {
@@ -80,6 +77,10 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, Com
       apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest, Protocols::SecureChannel::Id,
         Protocols::InteractionModel::ProtocolCode::InvalidCommand);
       ChipLogProgress(Zcl, "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32, validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+      // A command with no arguments would never write currentDecodeTagId.  If
+      // progress logging is also disabled, it would look unused.  Silence that
+      // warning.
+      UNUSED_VAR(currentDecodeTagId);
     }
 }
 

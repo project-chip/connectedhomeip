@@ -20,8 +20,7 @@
  *      Header that exposes the options to enable HSM for required crypto operations.
  */
 
-#ifndef _CHIP_CRYPTO_PAL_HSM_CONFIG_H_
-#define _CHIP_CRYPTO_PAL_HSM_CONFIG_H_
+#pragma once
 
 /*
  * Enable HSM for SPAKE VERIFIER
@@ -48,6 +47,11 @@
  */
 #define ENABLE_HSM_HKDF_SHA256 1
 
+/*
+ * Enable HSM for HMAC SHA256
+ */
+#define ENABLE_HSM_HMAC_SHA256 1
+
 #if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
 #define ENABLE_HSM_SPAKE
 #endif
@@ -66,4 +70,6 @@
 #define ENABLE_HSM_HKDF
 #endif
 
-#endif //#ifndef _CHIP_CRYPTO_PAL_HSM_CONFIG_H_
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_HMAC_SHA256))
+#define ENABLE_HSM_HMAC
+#endif

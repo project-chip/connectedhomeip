@@ -241,7 +241,7 @@ pw::Status GDMWifiBase::Connect(ServerContext &, const chip_rpc_ConnectionData &
            std::min(sizeof(wifi_config.sta.password), static_cast<size_t>(request.secret.size)));
 
     WifiConnectionEventHandler event_handler(esp_netif_);
-    PW_TRY(EspToPwStatus(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config)));
+    PW_TRY(EspToPwStatus(esp_wifi_set_config(WIFI_IF_STA, &wifi_config)));
     esp_err_t err = esp_wifi_connect();
 
     if (ESP_ERR_WIFI_SSID == err)
