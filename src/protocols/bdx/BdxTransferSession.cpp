@@ -12,6 +12,7 @@
 #include <protocols/secure_channel/StatusReport.h>
 #include <support/BufferReader.h>
 #include <support/CodeUtils.h>
+#include <support/TypeTraits.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -754,12 +755,10 @@ CHIP_ERROR TransferSession::VerifyProposedMode(const BitFlags<TransferControlFla
 
 void TransferSession::PrepareStatusReport(StatusCode code)
 {
-    static_assert(std::is_same<std::underlying_type_t<decltype(code)>, uint16_t>::value, "Cast is not safe");
-
     mStatusReportData.statusCode = code;
 
     Protocols::SecureChannel::StatusReport report(Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                                  Protocols::BDX::Id.ToFullyQualifiedSpecForm(), static_cast<uint16_t>(code));
+                                                  Protocols::BDX::Id.ToFullyQualifiedSpecForm(), to_underlying(code));
     size_t msgSize = report.Size();
     Encoding::LittleEndian::PacketBufferWriter bbuf(chip::MessagePacketBuffer::New(msgSize), msgSize);
     VerifyOrExit(!bbuf.IsNull(), mPendingOutput = OutputEventType::kInternalError);

@@ -21,6 +21,7 @@
 
 #include <support/BufferReader.h>
 #include <support/CodeUtils.h>
+#include <support/TypeTraits.h>
 
 #include <type_traits>
 
@@ -77,8 +78,7 @@ CHIP_ERROR StatusReport::Parse(System::PacketBufferHandle buf)
 
 Encoding::LittleEndian::BufferWriter & StatusReport::WriteToBuffer(Encoding::LittleEndian::BufferWriter & buf) const
 {
-    static_assert(std::is_same<std::underlying_type_t<decltype(mGeneralCode)>, uint16_t>::value, "Cast is not safe");
-    buf.Put16(static_cast<uint16_t>(mGeneralCode)).Put32(mProtocolId).Put16(mProtocolCode);
+    buf.Put16(to_underlying(mGeneralCode)).Put32(mProtocolId).Put16(mProtocolCode);
     if (!mProtocolData.IsNull())
     {
         buf.Put(mProtocolData->Start(), mProtocolData->DataLength());

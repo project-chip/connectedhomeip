@@ -32,6 +32,7 @@
 #include <protocols/Protocols.h>
 #include <support/DLLUtil.h>
 #include <support/Pool.h>
+#include <support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 
@@ -138,9 +139,8 @@ public:
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
     CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(MessageType msgType, ExchangeDelegate * delegate)
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
         return RegisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(),
-                                                        static_cast<uint8_t>(msgType), delegate);
+                                                        to_underlying(msgType), delegate);
     }
 
     /**
@@ -173,9 +173,8 @@ public:
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
     CHIP_ERROR UnregisterUnsolicitedMessageHandlerForType(MessageType msgType)
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
         return UnregisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(),
-                                                          static_cast<uint8_t>(msgType));
+                                                          to_underlying(msgType));
     }
 
     /**

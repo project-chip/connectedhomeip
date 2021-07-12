@@ -33,6 +33,7 @@
 #include <core/PeerId.h>
 #include <protocols/Protocols.h>
 #include <support/BitFlags.h>
+#include <support/TypeTraits.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -341,8 +342,7 @@ public:
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
     bool HasMessageType(MessageType type) const
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        return HasProtocol(Protocols::MessageTypeTraits<MessageType>::ProtocolId()) && HasMessageType(static_cast<uint8_t>(type));
+        return HasProtocol(Protocols::MessageTypeTraits<MessageType>::ProtocolId()) && HasMessageType(to_underlying(type));
     }
 
     /**
@@ -373,8 +373,7 @@ public:
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
     PayloadHeader & SetMessageType(MessageType type)
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        SetMessageType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(type));
+        SetMessageType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(type));
         return *this;
     }
 

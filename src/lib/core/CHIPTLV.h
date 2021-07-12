@@ -33,6 +33,7 @@
 
 #include <support/DLLUtil.h>
 #include <support/Span.h>
+#include <support/TypeTraits.h>
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -1115,7 +1116,7 @@ public:
     template <typename T>
     CHIP_ERROR Put(uint64_t tag, T data)
     {
-        return Put(tag, static_cast<std::underlying_type_t<T>>(data));
+        return Put(tag, to_underlying(data));
     }
 
     /**

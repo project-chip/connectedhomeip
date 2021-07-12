@@ -42,6 +42,7 @@
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
+#include <lib/support/TypeTraits.h>
 
 using namespace chip;
 
@@ -184,7 +185,7 @@ void emberAfPutInt16sInResp(int16_t value)
 
 void emberAfPutStatusInResp(EmberAfStatus value)
 {
-    emberAfPutInt8uInResp(static_cast<std::underlying_type_t<EmberAfStatus>>(value));
+    emberAfPutInt8uInResp(to_underlying(value));
 }
 
 // ------------------------------------
