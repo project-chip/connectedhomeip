@@ -348,7 +348,7 @@ CHIP_ERROR InetLayer::Shutdown()
         TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
             if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
-                lEndPoint->Abort();
+                lEndPoint->Free();
             }
             return true;
         });
@@ -359,7 +359,7 @@ CHIP_ERROR InetLayer::Shutdown()
         UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
             if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
-                lEndPoint->Close();
+                lEndPoint->Free();
             }
             return true;
         });
