@@ -25,16 +25,17 @@ __LOG_LEVELS__ = {
     help='Determines the verbosity of script output.')
 @click.option("--touch", type=click.Path(resolve_path=True, dir_okay=False), help="Timestamp file to touch.")
 @click.option("--repo", type=click.Path(resolve_path=True, dir_okay=True), help="Repository path used when generating.")
+@click.option("--output-root", type=click.Path(resolve_path=True, dir_okay=True), help="Build output directory")
 @click.option("--expected", type=click.File("rt"), help="Expected file content.")
 @click.option("--expected-out", type=click.File("wt"), help="Where to write expected content.")
 @click.option("--actual", type=click.Path(resolve_path=True, dir_okay=False), help="Actual file generated content.")
-def main(log_level, touch, repo, expected, expected_out, actual):
+def main(log_level, touch, repo, output_root, expected, expected_out, actual):
   coloredlogs.install(
     level=__LOG_LEVELS__[log_level],
     fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
 
   for l in expected.readlines():
-    expected_out.write(l.replace("{root}", repo))
+    expected_out.write(l.replace("{root}", repo).replace("{out}", output_root))
   expected_out.close()
 
 
