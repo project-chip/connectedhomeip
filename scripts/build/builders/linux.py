@@ -1,27 +1,16 @@
 import logging
 import os
 
-from .builder import Builder
+from .gn import GnBuilder
 
 
-class LinuxBuilder(Builder):
+class LinuxBuilder(GnBuilder):
 
   def __init__(self, root, runner, output_dir):
-    super(LinuxBuilder, self).__init__(root, runner, output_dir)
-
-  def generate(self):
-    if not os.path.exists(self.output_dir):
-      self._Execute(['gn', 'gen', self.output_dir],
-                    cwd=os.path.join(self.root,
-                                     'examples/all-clusters-app/linux/'),
-                    title='Generating ' + self.identifier)
-
-  def build(self):
-    logging.info('Compiling Linux at %s', self.output_dir)
-
-    self.generate()
-    self._Execute(['ninja', '-C', self.output_dir],
-                  title='Building ' + self.identifier)
+    super(LinuxBuilder, self).__init__(
+        root=os.path.join(root, 'examples/all-clusters-app/linux/'),
+        runner=runner,
+        output_dir=output_dir)
 
   def outputs(self):
     return {
