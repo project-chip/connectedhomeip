@@ -304,7 +304,7 @@ bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
     if (mCurrentPriority == PriorityLevel::Invalid)
     {
         // Upload is not in middle, previous mLastScheduledEventNumber is not valid, Check for new events, and set a checkpoint
-        for (size_t index = 0; index < ArraySize(mSelfProcessedEvents); index++)
+        for (int index = ArraySize(mSelfProcessedEvents) - 1; index >= 0; index--)
         {
             EventNumber lastEventNumber = aEventManager.GetLastEventNumber(static_cast<PriorityLevel>(index));
             if ((lastEventNumber != 0) && (lastEventNumber >= mSelfProcessedEvents[index]))
@@ -329,7 +329,7 @@ bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
 
 void ReadHandler::MoveToNextScheduledDirtyPriority()
 {
-    for (uint8_t i = 0; i < ArraySize(mSelfProcessedEvents); i++)
+    for (int i = ArraySize(mSelfProcessedEvents) - 1; i >= 0; i--)
     {
         if ((mLastScheduledEventNumber[i] != 0) && mSelfProcessedEvents[i] <= mLastScheduledEventNumber[i])
         {

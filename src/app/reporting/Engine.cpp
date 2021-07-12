@@ -83,12 +83,15 @@ exit:
     return err;
 }
 
-CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler)
+CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
 {
-    CHIP_ERROR err                               = CHIP_NO_ERROR;
-    ClusterInfo * clusterInfo                    = apReadHandler->GetAttributeClusterInfolist();
-    AttributeDataList::Builder attributeDataList = reportDataBuilder.CreateAttributeDataListBuilder();
-    SuccessOrExit(err = reportDataBuilder.GetError());
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    ClusterInfo * clusterInfo = apReadHandler->GetAttributeClusterInfolist();
+    bool attributeClean       = true;
+    TLV::TLVWriter backup;
+    aReportDataBuilder.Checkpoint(backup);
+    AttributeDataList::Builder attributeDataList = aReportDataBuilder.CreateAttributeDataListBuilder();
+    SuccessOrExit(err = aReportDataBuilder.GetError());
     // TODO: Need to handle multiple chunk of message
     while (clusterInfo != nullptr)
     {
@@ -101,6 +104,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
             err = RetrieveClusterData(attributeDataElementBuilder, *clusterInfo);
             VerifyOrExit(err == CHIP_NO_ERROR,
                          ChipLogError(DataManagement, "<RE:Run> Error retrieving data from cluster, aborting"));
+            attributeClean = false;
         }
 
         clusterInfo = clusterInfo->mpNext;
@@ -109,6 +113,10 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
     err = attributeDataList.GetError();
 
 exit:
+    if (attributeClean || err != CHIP_NO_ERROR)
+    {
+        aReportDataBuilder.Rollback(backup);
+    }
     ChipLogFunctError(err);
     return err;
 }
