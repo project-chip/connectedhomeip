@@ -39,7 +39,7 @@ PBKDF2_sha256HSM::~PBKDF2_sha256HSM() {}
 CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
                                            unsigned int iteration_count, uint32_t key_length, uint8_t * output)
 {
-    CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
+    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     VerifyOrReturnError(password != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(plen > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(key_length > 0, CHIP_ERROR_INVALID_ARGUMENT);

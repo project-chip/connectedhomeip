@@ -40,7 +40,7 @@ CHIP_ERROR HKDF_shaHSM::HKDF_SHA256(const uint8_t * secret, const size_t secret_
                                     const size_t salt_length, const uint8_t * info, const size_t info_length, uint8_t * out_buffer,
                                     size_t out_length)
 {
-    CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
+    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     if (salt_length > 64 || info_length > 80 || secret_length > 256 || out_length > 768)
     {
         /* Length not supported by se05x. Rollback to SW */
@@ -74,7 +74,6 @@ CHIP_ERROR HKDF_shaHSM::HKDF_SHA256(const uint8_t * secret, const size_t secret_
     status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, secret, secret_length, secret_length * 8, NULL, 0);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-
     const smStatus_t smstatus = Se05x_API_HKDF_Extended(
         &((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyObject.keyId, kSE05x_DigestMode_SHA256,
         kSE05x_HkdfMode_ExtractExpand, salt, salt_length, 0, info, info_length, 0, (uint16_t) out_length, out_buffer, &out_length);
@@ -85,7 +84,6 @@ exit:
     sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
 
     return error;
-
 }
 
 } // namespace Crypto

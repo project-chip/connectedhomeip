@@ -42,7 +42,7 @@ CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length, cons
                                     uint8_t * out_buffer, size_t out_length)
 
 {
-    CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
+    CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
     sss_mac_t ctx_mac      = { 0 };
     sss_object_t keyObject = { 0 };
 
