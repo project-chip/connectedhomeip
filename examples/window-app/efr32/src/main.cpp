@@ -33,9 +33,6 @@
 #include <support/CHIPMem.h>
 #include <support/CHIPPlatformMemory.h>
 
-#include <AppTask.h>
-
-#include "AppConfig.h"
 #include "init_efrPlatform.h"
 #include <app/server/Server.h>
 
@@ -61,9 +58,12 @@
 #include "Rpc.h"
 #endif
 
+#include <WindowAppImpl.h>
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
+using example::efr32::WindowApp;
 
 #define UNUSED_PARAMETER(a) (a = a)
 
@@ -95,7 +95,7 @@ extern "C" void vApplicationIdleHook(void)
 // ================================================================================
 int main(void)
 {
-    int ret = CHIP_CONFIG_CORE_ERROR_MAX;
+    int ret = CHIP_NO_ERROR;
 
     init_efrPlatform();
 
@@ -162,7 +162,7 @@ int main(void)
 #endif // CHIP_ENABLE_OPENTHREAD
 
     EFR32_LOG("Starting App Task");
-    ret = AppTask::Instance().Start();
+    ret = WindowApp::Instance().Init();
     if (ret != CHIP_NO_ERROR)
     {
         EFR32_LOG("GetAppTask().Init() failed");
