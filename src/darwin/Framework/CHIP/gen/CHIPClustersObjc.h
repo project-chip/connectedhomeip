@@ -926,6 +926,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateFabricLabel:(NSString *)label responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeFabricsListWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSupportedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCommissionedFabricsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

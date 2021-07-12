@@ -2376,6 +2376,8 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FabricsList                                                       | 0x0001 |
+| * SupportedFabrics                                                  | 0x0002 |
+| * CommissionedFabrics                                               | 0x0003 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -2392,6 +2394,21 @@ chip::System::PacketBufferHandle encodeOperationalCredentialsClusterDiscoverAttr
  */
 chip::System::PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsListAttribute(uint8_t seqNum,
                                                                                              chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server read command for the supported fabrics attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOperationalCredentialsClusterReadSupportedFabricsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server read command for the commissioned fabrics attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeOperationalCredentialsClusterReadCommissionedFabricsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
