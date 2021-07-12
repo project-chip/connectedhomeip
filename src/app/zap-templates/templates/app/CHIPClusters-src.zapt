@@ -6,6 +6,8 @@
 #include "chip-zcl-zpro-codec-api.h"
 #include <lib/support/Span.h>
 #include <gen/CHIPClientCallbacks.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace Controller {
@@ -92,9 +94,32 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCase
 {{#if (isWritableAttribute)}}
 CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
 {
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(seqNum, mEndpoint, value);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    chip::TLV::TLVWriter * writer = nullptr;
+    attributePath.mNodeId         = mDevice->GetDeviceId();
+    attributePath.mEndpointId     = mEndpoint;
+    attributePath.mClusterId      = mClusterId;
+    attributePath.mFieldId        = {{ asHex code 4 }};
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+{{#if (isString type)}}
+    VerifyOrReturnError(CanCastTo<uint16_t>(value.size()), CHIP_ERROR_INVALID_ARGUMENT);
+{{/if}}
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle->PrepareAttribute(attributePath));
+    VerifyOrReturnError((writer = handle->GetAttributeDataElementTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+{{#if (isString type)}}
+    ReturnErrorOnFailure(writer->PutBytes(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), value.data(), static_cast<uint16_t>(value.size())));
+{{else if (isBoolean type)}}
+    ReturnErrorOnFailure(writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), value));
+{{else}}
+    ReturnErrorOnFailure(writer->Put(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), value));
+{{/if}}
+    ReturnErrorOnFailure(handle->FinishAttribute());
+    ReturnErrorOnFailure(mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback));
+    return CHIP_NO_ERROR;
 }
 
 {{/if}}

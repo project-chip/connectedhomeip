@@ -27,7 +27,6 @@ namespace chip {
 namespace app {
 CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
 {
-    VerifyOrReturnError(apDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mpExchangeCtx = nullptr;
     mpDelegate    = apDelegate;

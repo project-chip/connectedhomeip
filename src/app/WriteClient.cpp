@@ -29,7 +29,8 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
+CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                             uint64_t aApplicationIdentifier)
 {
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpExchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -50,6 +51,7 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mpExchangeMgr         = apExchangeMgr;
     mpDelegate            = apDelegate;
     mAttributeStatusIndex = 0;
+    mAppIdentifier        = aApplicationIdentifier;
     MoveToState(State::Initialized);
 
     return CHIP_NO_ERROR;
@@ -294,9 +296,6 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     VerifyOrDie(apExchangeContext == mpExchangeCtx);
 
-    // We are done with this exchange, and it will be closing itself.
-    mpExchangeCtx = nullptr;
-
     // Verify that the message is an Write Response.
     // If not, close the exchange and free the payload.
     if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse))
@@ -307,6 +306,11 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
     err = ProcessWriteResponseMessage(std::move(aPayload));
 
 exit:
+    // We are done with this exchange, and it will be closing itself.
+    // The ExchangeCtx might still useful for client to determine the source of response, so we keep it until we finished the
+    // processing routine.
+    mpExchangeCtx = nullptr;
+
     if (mpDelegate != nullptr)
     {
         if (err != CHIP_NO_ERROR)
@@ -391,6 +395,17 @@ exit:
     {
         mpDelegate->WriteResponseProtocolError(this, mAttributeStatusIndex);
     }
+    return err;
+}
+
+CHIP_ERROR WriteClientHandle::SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession)
+{
+    CHIP_ERROR err = mpWriteClient->SendWriteRequest(aNodeId, aAdminId, apSecureSession);
+    if (err != CHIP_NO_ERROR)
+    {
+        mpWriteClient->Shutdown();
+    }
+    mpWriteClient = nullptr;
     return err;
 }
 

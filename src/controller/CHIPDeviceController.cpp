@@ -1562,6 +1562,34 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReportError(const app::Read
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseStatus(
+    const app::WriteClient * apWriteClient, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+    const uint32_t aProtocolId, const uint16_t aProtocolCode, app::AttributePathParams & aAttributePathParams,
+    uint8_t aCommandIndex)
+{
+    // TODO: (#7817) Need to map IM error codes to ember.
+    IMWriteResponseCallback(apWriteClient,
+                            (aProtocolCode == 0 && aGeneralCode == Protocols::SecureChannel::GeneralStatusCode::kSuccess)
+                                ? EMBER_ZCL_STATUS_SUCCESS
+                                : EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseProtocolError(const app::WriteClient * apWriteClient,
+                                                                                uint8_t aAttributeIndex)
+{
+    // TODO: (#7817) Need to map IM error codes to ember.
+    IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseError(const app::WriteClient * apWriteClient, CHIP_ERROR aError)
+{
+    // CHIP stack error cannot be mapped to ember error codes.
+    IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
+    return CHIP_NO_ERROR;
+}
+
 void BasicSuccess(void * context, uint16_t val)
 {
     ChipLogProgress(Controller, "Received success response 0x%x\n", val);

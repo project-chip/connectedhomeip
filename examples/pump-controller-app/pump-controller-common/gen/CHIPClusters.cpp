@@ -22,6 +22,8 @@
 
 #include "chip-zcl-zpro-codec-api.h"
 #include <gen/CHIPClientCallbacks.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -837,10 +839,22 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeOperationMode(Callba
 CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
                                                                            Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(seqNum, mEndpoint, value);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    app::WriteClientHandle handle;
+    chip::app::AttributePathParams attributePath;
+    chip::TLV::TLVWriter * writer = nullptr;
+    attributePath.mNodeId         = mDevice->GetDeviceId();
+    attributePath.mEndpointId     = mEndpoint;
+    attributePath.mClusterId      = mClusterId;
+    attributePath.mFieldId        = 0x0020;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+
+    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
+    ReturnErrorOnFailure(handle->PrepareAttribute(attributePath));
+    VerifyOrReturnError((writer = handle->GetAttributeDataElementTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(writer->Put(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), value));
+    ReturnErrorOnFailure(handle->FinishAttribute());
+    ReturnErrorOnFailure(mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
