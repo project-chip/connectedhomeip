@@ -17,20 +17,21 @@
  */
 
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/Ameba/AmebaConfig.h>
+#include "chip_porting.h"
 #include <core/CHIPEncoding.h>
+#include <platform/Ameba/AmebaConfig.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include "chip_porting.h"
 
-enum {
+enum
+{
     kPrefsTypeBoolean = 1,
     kPrefsTypeInteger = 2,
-    kPrefsTypeString = 3,
-    kPrefsTypeBuffer = 4
+    kPrefsTypeString  = 3,
+    kPrefsTypeBuffer  = 4
 };
 
 namespace chip {
@@ -76,10 +77,11 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, bool & val)
 {
     uint32_t intVal;
 
-    char* _namespace = (char*) malloc(strlen(key.Namespace) + 1);
-    char* _name = (char*) malloc(strlen(key.Name) + 1);
+    char * _namespace = (char *) malloc(strlen(key.Namespace) + 1);
+    char * _name      = (char *) malloc(strlen(key.Name) + 1);
 
-    if (_namespace == NULL || _name == NULL) {
+    if (_namespace == NULL || _name == NULL)
+    {
         free(_namespace);
         free(_name);
         return CHIP_ERROR_NO_MEMORY;
@@ -98,10 +100,11 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, bool & val)
 
 CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint32_t & val)
 {
-    char* _namespace = (char*) malloc(strlen(key.Namespace) + 1);
-    char* _name = (char*) malloc(strlen(key.Name) + 1);
+    char * _namespace = (char *) malloc(strlen(key.Namespace) + 1);
+    char * _name      = (char *) malloc(strlen(key.Name) + 1);
 
-    if (_namespace == NULL || _name == NULL) {
+    if (_namespace == NULL || _name == NULL)
+    {
         free(_namespace);
         free(_name);
         return CHIP_ERROR_NO_MEMORY;
@@ -124,11 +127,12 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint64_t & val)
 
 CHIP_ERROR AmebaConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    int32_t ret=0;
-    char* _namespace = (char*) malloc(strlen(key.Namespace) + 1);
-    char* _name = (char*) malloc(strlen(key.Name) + 1);
+    int32_t ret       = 0;
+    char * _namespace = (char *) malloc(strlen(key.Namespace) + 1);
+    char * _name      = (char *) malloc(strlen(key.Name) + 1);
 
-    if (_namespace == NULL || _name == NULL) {
+    if (_namespace == NULL || _name == NULL)
+    {
         free(_namespace);
         free(_name);
         return CHIP_ERROR_NO_MEMORY;
@@ -162,10 +166,11 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, bool val)
     int32_t success;
     uint8_t value;
 
-    char* _namespace = (char*) malloc(strlen(key.Namespace) + 1);
-    char* _name = (char*) malloc(strlen(key.Name) + 1);
+    char * _namespace = (char *) malloc(strlen(key.Namespace) + 1);
+    char * _name      = (char *) malloc(strlen(key.Name) + 1);
 
-    if (_namespace == NULL || _name == NULL) {
+    if (_namespace == NULL || _name == NULL)
+    {
         free(_namespace);
         free(_name);
         return CHIP_ERROR_NO_MEMORY;
@@ -190,10 +195,11 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint32_t val)
 {
     int32_t success;
 
-    char* _namespace = (char*) malloc(strlen(key.Namespace) + 1);
-    char* _name = (char*) malloc(strlen(key.Name) + 1);
+    char * _namespace = (char *) malloc(strlen(key.Namespace) + 1);
+    char * _name      = (char *) malloc(strlen(key.Name) + 1);
 
-    if (_namespace == NULL || _name == NULL) {
+    if (_namespace == NULL || _name == NULL)
+    {
         free(_namespace);
         free(_name);
         return CHIP_ERROR_NO_MEMORY;
@@ -201,7 +207,7 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint32_t val)
     strcpy(_namespace, key.Namespace);
     strcpy(_name, key.Name);
 
-    success = setPref(_namespace, _name, kPrefsTypeInteger, (uint8_t *)&val, sizeof(uint32_t));
+    success = setPref(_namespace, _name, kPrefsTypeInteger, (uint8_t *) &val, sizeof(uint32_t));
     if (!success)
         printf("setPref: %s/%s = %d(0x%x) failed\n", _namespace, _name, val, val);
 
@@ -214,10 +220,11 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint64_t val)
 {
     int32_t success;
 
-    char* _namespace = (char*) malloc(strlen(key.Namespace) + 1);
-    char* _name = (char*) malloc(strlen(key.Name) + 1);
+    char * _namespace = (char *) malloc(strlen(key.Namespace) + 1);
+    char * _name      = (char *) malloc(strlen(key.Name) + 1);
 
-    if (_namespace == NULL || _name == NULL) {
+    if (_namespace == NULL || _name == NULL)
+    {
         free(_namespace);
         free(_name);
         return CHIP_ERROR_NO_MEMORY;
@@ -225,7 +232,7 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint64_t val)
     strcpy(_namespace, key.Namespace);
     strcpy(_name, key.Name);
 
-    success = setPref(_namespace, _name, kPrefsTypeInteger, (uint8_t *)&val, sizeof(uint64_t));
+    success = setPref(_namespace, _name, kPrefsTypeInteger, (uint8_t *) &val, sizeof(uint64_t));
     if (!success)
         printf("setPref: %s/%s = %d(0x%x) failed\n", _namespace, _name, val, val);
 
@@ -238,11 +245,12 @@ CHIP_ERROR AmebaConfig::WriteConfigValueStr(Key key, const char * str)
 {
     int32_t success;
 
-    char* _namespace = (char*) malloc(strlen(key.Namespace) + 1);
-    char* _name = (char*) malloc(strlen(key.Name) + 1);
-    char* _str = (char*) malloc(strlen(str) + 1);
+    char * _namespace = (char *) malloc(strlen(key.Namespace) + 1);
+    char * _name      = (char *) malloc(strlen(key.Name) + 1);
+    char * _str       = (char *) malloc(strlen(str) + 1);
 
-    if (_namespace == NULL || _name == NULL || _str == NULL) {
+    if (_namespace == NULL || _name == NULL || _str == NULL)
+    {
         free(_namespace);
         free(_name);
         free(_str);
@@ -252,7 +260,7 @@ CHIP_ERROR AmebaConfig::WriteConfigValueStr(Key key, const char * str)
     strcpy(_name, key.Name);
     strcpy(_str, str);
 
-    success = setPref(_namespace, _name, kPrefsTypeString, (uint8_t *)_str, strlen(_str) + 1);
+    success = setPref(_namespace, _name, kPrefsTypeString, (uint8_t *) _str, strlen(_str) + 1);
     if (!success)
         printf("setPref: %s/%s = %s failed\n", _namespace, _name, _str);
 
@@ -300,8 +308,9 @@ CHIP_ERROR AmebaConfig::EnsureNamespace(const char * ns)
 {
     int32_t ret = -1;
 
-    char* temp = (char*) malloc(strlen(ns) + 1);
-    if (temp == NULL) {
+    char * temp = (char *) malloc(strlen(ns) + 1);
+    if (temp == NULL)
+    {
         free(temp);
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -319,8 +328,9 @@ CHIP_ERROR AmebaConfig::EnsureNamespace(const char * ns)
 CHIP_ERROR AmebaConfig::ClearNamespace(const char * ns)
 {
     int32_t ret = -1;
-    char* temp = (char*) malloc(strlen(ns) + 1);
-    if (temp == NULL) {
+    char * temp = (char *) malloc(strlen(ns) + 1);
+    if (temp == NULL)
+    {
         free(temp);
         return CHIP_ERROR_NO_MEMORY;
     }
