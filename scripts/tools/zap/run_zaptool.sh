@@ -16,16 +16,16 @@
 # limitations under the License.
 #
 
-CHIP_ROOT=$(readlink -f ${BASH_SOURCE%/scripts/tools/zap/run_zaptool.sh})
+CHIP_ROOT=$(readlink -f "${BASH_SOURCE%/scripts/tools/zap/run_zaptool.sh}")
 ZAP_ROOT="$CHIP_ROOT/third_party/zap/repo"
 [[ -n "$1" ]] && ZAP_ARGS=(-i "$(readlink -f "$1")") || ZAP_ARGS=()
 
 
-cd $CHIP_ROOT \
+cd "$CHIP_ROOT" \
 	&& git submodule update --init third_party/zap/repo \
 	|| exit 1
 
-cd $ZAP_ROOT
+cd "$ZAP_ROOT"
 if ! npm list installed-check &> /dev/null
 then
 	npm install installed-check \
