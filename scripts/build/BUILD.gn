@@ -60,16 +60,15 @@ if (chip_build_tests) {
 
   action_foreach("tests_run") {
     _stamp_file = "$target_gen_dir/$target_name.{{source_name_part}}.stamp"
-    _expected_file = "$target_gen_dir/{{source_name_part}}.expected"
-    _source_file = "$target_gen_dir/all_platform_build_commands.txt"
+    _expected_out = "$target_gen_dir/{{source_name_part}}.expected"
 
     script = "test.py"
     outputs = [
       _stamp_file,
-      _expected_file,
+      _expected_out,
     ]
 
-    sources = [ _source_file ]
+    sources = get_target_outputs(":all_platform_build_example")
 
     deps = [ ":all_platform_build_example" ]
 
@@ -81,7 +80,7 @@ if (chip_build_tests) {
       "--expected",
       rebase_path("expected_all_platform_commands.txt", root_build_dir),
       "--expected-out",
-      rebase_path(_expected_file, root_build_dir),
+      rebase_path(_expected_out, root_build_dir),
       "--actual",
       "{{source}}",
       "--touch",
