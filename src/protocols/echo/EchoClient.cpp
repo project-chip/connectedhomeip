@@ -95,21 +95,13 @@ CHIP_ERROR EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     // which clears the OnMessageReceived callback.
     VerifyOrDie(ec == mExchangeCtx);
 
+    mExchangeCtx = nullptr;
+
     // Verify that the message is an Echo Response.
-    // If not, close the exchange and free the payload.
     if (!payloadHeader.HasMessageType(MsgType::EchoResponse))
     {
-        ec->Close();
-        mExchangeCtx = nullptr;
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-    // Remove the EC from the app state now. OnEchoResponseReceived can call
-    // SendEchoRequest and install a new one. We abort rather than close
-    // because we no longer care whether the echo request message has been
-    // acknowledged at the transport layer.
-    mExchangeCtx->Abort();
-    mExchangeCtx = nullptr;
 
     // Call the registered OnEchoResponseReceived handler, if any.
     if (OnEchoResponseReceived != nullptr)

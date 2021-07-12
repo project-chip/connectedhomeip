@@ -24,6 +24,7 @@
 #include "gen/CHIPClusters.h"
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/Span.h>
 
@@ -140,6 +141,8 @@ private:
     CHIP_ERROR EnableNetwork();
     CHIP_ERROR UpdateNetworkAddress();
 
+    chip::ByteSpan GetThreadNetworkId();
+
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;
     Command::AddressWithInterface mRemoteAddr;
@@ -149,6 +152,7 @@ private:
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
     chip::ByteSpan mOperationalDataset;
+    uint8_t mExtendedPanId[chip::Thread::kSizeExtendedPanId];
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
     char * mOnboardingPayload;

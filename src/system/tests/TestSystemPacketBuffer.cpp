@@ -191,7 +191,7 @@ private:
     std::vector<PacketBufferHandle> handles;
 };
 
-const uint16_t sTestReservedSizes[] = { 0, 10, 128, 1536, PacketBufferTest::kBlockSize };
+const uint16_t sTestReservedSizes[] = { 0, 10, 128, 1536, PacketBuffer::kMaxSizeWithoutReserve, PacketBufferTest::kBlockSize };
 const uint16_t sTestLengths[]       = { 0, 1, 10, 128, PacketBufferTest::kBlockSize, UINT16_MAX };
 
 PacketBufferTest::TestContext sContext = {
