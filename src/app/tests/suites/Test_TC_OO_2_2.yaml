@@ -20,47 +20,47 @@ config:
 
 tests:
     - label: "Send Off Command"
-      command: "off"
+      command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
       command: "readAttribute"
-      attribute: "on/off"
+      attribute: "OnOff"
       response:
           value: 0
 
     - label: "Send On Command"
-      command: "on"
+      command: "On"
 
     - label: "Check on/off attribute value is true after on command"
       command: "readAttribute"
-      attribute: "on/off"
+      attribute: "OnOff"
       response:
           value: 1
 
     - label: "Send Off Command"
-      command: "off"
+      command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
       command: "readAttribute"
-      attribute: "on/off"
+      attribute: "OnOff"
       response:
           value: 0
 
     - label: "Send Toggle Command"
-      command: "toggle"
+      command: "Toggle"
 
     - label: "Check on/off attribute value is true after toggle command"
       command: "readAttribute"
-      attribute: "on/off"
+      attribute: "OnOff"
       response:
           value: 1
 
     - label: "Send Toggle Command"
-      command: "toggle"
+      command: "Toggle"
 
     - label: "Check on/off attribute value is false after toggle command"
       command: "readAttribute"
-      attribute: "on/off"
+      attribute: "OnOff"
       response:
           value: 0
 
@@ -69,15 +69,15 @@ tests:
 
     - label: "Check on/off attribute value is true after on command"
       command: "readAttribute"
-      attribute: "on/off"
+      attribute: "OnOff"
       response:
           value: 1
 
     - label: "Send Off Command"
-      command: "off"
+      command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
       command: "readAttribute"
-      attribute: "on/off"
+      attribute: "OnOff"
       response:
           value: 0
