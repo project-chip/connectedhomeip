@@ -564,7 +564,7 @@ struct LwIPEvent;
  *  @brief
  *      Use LwIP time function for System Layer monotonic clock functions.
  *
- *  Use the LwIP sys_now() function to implement the System Layer GetClock_Monotonic... functions.
+ *  Use the LwIP sys_now() function to implement the System Clock functions.
  *
  *  Defaults to enabled if the system is using LwIP and not sockets.
  *

@@ -51,7 +51,7 @@ void ReliableMessageMgr::Init(chip::System::Layer * systemLayer, SecureSessionMg
     mSystemLayer = systemLayer;
     mSessionMgr  = sessionMgr;
 
-    mTimeStampBase      = System::Timer::GetCurrentEpoch();
+    mTimeStampBase      = System::Clock::GetMonotonicMilliseconds();
     mCurrentTimerExpiry = 0;
 }
 
@@ -188,7 +188,7 @@ static void TickProceed(uint16_t & time, uint64_t ticks)
 
 void ReliableMessageMgr::ExpireTicks()
 {
-    uint64_t now = System::Timer::GetCurrentEpoch();
+    uint64_t now = System::Clock::GetMonotonicMilliseconds();
 
     // Number of full ticks elapsed since last timer processing.  We always round down
     // to the previous tick.  If we are between tick boundaries, the extra time since the
@@ -299,7 +299,7 @@ void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
                    ChipLogError(ExchangeManager, "StartRetransmission was called for invalid entry"));
 
     entry->nextRetransTimeTick = static_cast<uint16_t>(entry->rc->GetInitialRetransmitTimeoutTick() +
-                                                       GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
+                                                       GetTickCounterFromTimeDelta(System::Clock::GetMonotonicMilliseconds()));
 
     // Check if the timer needs to be started and start it.
     StartTimer();
@@ -468,18 +468,18 @@ void ReliableMessageMgr::StartTimer()
     if (foundWake)
     {
         // Set timer for next tick boundary - subtract the elapsed time from the current tick
-        System::Timer::Epoch timerExpiryEpoch = (nextWakeTimeTick << mTimerIntervalShift) + mTimeStampBase;
+        System::Clock::MonotonicMilliseconds timerExpiry = (nextWakeTimeTick << mTimerIntervalShift) + mTimeStampBase;
 
 #if defined(RMP_TICKLESS_DEBUG)
         ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer wake at %" PRIu64 " ms (%" PRIu64 " %" PRIu64 ")",
-                      timerExpiryEpoch, nextWakeTimeTick, mTimeStampBase);
+                      timerExpiry, nextWakeTimeTick, mTimeStampBase);
 #endif
-        if (timerExpiryEpoch != mCurrentTimerExpiry)
+        if (timerExpiry != mCurrentTimerExpiry)
         {
             // If the tick boundary has expired in the past (delayed processing of event due to other system activity),
             // expire the timer immediately
-            uint64_t now           = System::Timer::GetCurrentEpoch();
-            uint64_t timerArmValue = (timerExpiryEpoch > now) ? timerExpiryEpoch - now : 0;
+            uint64_t now           = System::Clock::GetMonotonicMilliseconds();
+            uint64_t timerArmValue = (timerExpiry > now) ? timerExpiry - now : 0;
 
 #if defined(RMP_TICKLESS_DEBUG)
             ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer set timer for %" PRIu64, timerArmValue);
@@ -488,19 +488,20 @@ void ReliableMessageMgr::StartTimer()
             res = mSystemLayer->StartTimer((uint32_t) timerArmValue, Timeout, this);
 
             VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager, "Cannot start ReliableMessageMgr::Timeout\n");
-            mCurrentTimerExpiry = timerExpiryEpoch;
+            mCurrentTimerExpiry = timerExpiry;
 #if defined(RMP_TICKLESS_DEBUG)
         }
         else
         {
-            ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer timer already set for %" PRIu64, timerExpiryEpoch);
+            ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer timer already set for %" PRIu64, timerExpiry);
 #endif
         }
     }
     else
     {
 #if defined(RMP_TICKLESS_DEBUG)
-        ChipLogDetail(ExchangeManager, "Not setting ReliableMessageProtocol timeout at %" PRIu64, System::Timer::GetCurrentEpoch());
+        ChipLogDetail(ExchangeManager, "Not setting ReliableMessageProtocol timeout at %" PRIu64,
+                      System::Clock::GetMonotonicMilliseconds());
 #endif
         StopTimer();
     }

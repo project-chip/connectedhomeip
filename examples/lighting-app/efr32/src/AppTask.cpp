@@ -238,7 +238,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         sStatusLED.Animate();
         sLightLED.Animate();
 
-        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
+        uint64_t nowUS            = chip::System::Clock::GetMonotonicMicroseconds();
         uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
 
         if (nowUS > nextChangeTimeUS)

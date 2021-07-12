@@ -407,7 +407,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(EndpointId endpoint, uint
     IasZoneStatusQueueEntry newBufferEntry;
     newBufferEntry.endpoint    = endpoint;
     newBufferEntry.status      = newStatus;
-    newBufferEntry.eventTimeMs = System::Layer::GetClock_MonotonicMS();
+    newBufferEntry.eventTimeMs = System::Clock::GetMonotonicMilliseconds();
 #endif
     EmberStatus sendStatus = EMBER_SUCCESS;
 
@@ -905,7 +905,7 @@ static int16_t popFromBuffer(IasZoneStatusQueue * ring, IasZoneStatusQueueEntry 
 
 uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry)
 {
-    uint32_t currentTimeMs = System::Layer::GetClock_MonotonicMS();
+    uint32_t currentTimeMs = System::Clock::GetMonotonicMilliseconds();
     int64_t deltaTimeMs    = currentTimeMs - entry->eventTimeMs;
 
     if (deltaTimeMs < 0)

@@ -94,7 +94,7 @@ namespace Controller {
 
 using namespace chip::Encoding;
 
-constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
+constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondsPerSecond;
 
 constexpr uint32_t kMaxCHIPCSRLength = 1024;
 
