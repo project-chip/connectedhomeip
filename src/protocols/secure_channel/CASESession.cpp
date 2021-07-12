@@ -935,8 +935,8 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
     mPairingComplete = true;
 
-    // Close the exchange, as no additional messages are expected from the peer
-    CloseExchange();
+    // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -1079,8 +1079,8 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
 
     mPairingComplete = true;
 
-    // Close the exchange, as no additional messages are expected from the peer
-    CloseExchange();
+    // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -1332,8 +1332,6 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
     {
         if (mExchangeCtxt != ec)
         {
-            // Close the incoming exchange explicitly, as the cleanup code only closes mExchangeCtxt
-            ec->Close();
             ReturnErrorOnFailure(CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
@@ -1401,6 +1399,9 @@ exit:
     // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)
     {
+        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // exchange will handle that.
+        mExchangeCtxt = nullptr;
         Clear();
         mDelegate->OnSessionEstablishmentError(err);
     }

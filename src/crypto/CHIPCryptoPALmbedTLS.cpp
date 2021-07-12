@@ -281,7 +281,7 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
     VerifyOrReturnError(key_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(message != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(message_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_length >= CHIP_CRYPTO_HASH_LEN_BYTES, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_length >= kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     const mbedtls_md_info_t * const md = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
@@ -581,8 +581,7 @@ exit:
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
-// TODO: Enable ECDH_derive_secret for Qorvo when their mbedTLS static libraries are updated
-#if defined(MBEDTLS_ECDH_C) && !defined(QORVO_CRYPTO_ENGINE)
+#if defined(MBEDTLS_ECDH_C)
     CHIP_ERROR error     = CHIP_NO_ERROR;
     int result           = 0;
     size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();

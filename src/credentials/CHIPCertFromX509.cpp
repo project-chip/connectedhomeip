@@ -717,8 +717,7 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, uint8_t
 
     writer.Init(chipCertBuf, chipCertBufSize);
 
-    ReturnErrorOnFailure(ConvertCertificate(
-        reader, writer, ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate), issuer, subject, fabric));
+    ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, issuer, subject, fabric));
 
     ReturnErrorOnFailure(writer.Finalize());
 
@@ -797,10 +796,7 @@ CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & no
             ReturnErrorOnFailure(reader.Next());
         }
         VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-        uint64_t tag = reader.GetTag();
-        VerifyOrReturnError(tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate) ||
-                                tag == AnonymousTag,
-                            CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+        VerifyOrReturnError(reader.GetTag() == AnonymousTag, CHIP_ERROR_INVALID_TLV_TAG);
 
         ReturnErrorOnFailure(reader.EnterContainer(nocContainerType));
         ReturnErrorOnFailure(reader.ExitContainer(nocContainerType));
@@ -822,10 +818,7 @@ CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & no
             ReturnErrorOnFailure(err);
         }
         VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-        uint64_t tag = reader.GetTag();
-        VerifyOrReturnError(tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate) ||
-                                tag == AnonymousTag,
-                            CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+        VerifyOrReturnError(reader.GetTag() == AnonymousTag, CHIP_ERROR_INVALID_TLV_TAG);
 
         ReturnErrorOnFailure(reader.EnterContainer(icacContainerType));
         ReturnErrorOnFailure(reader.ExitContainer(icacContainerType));

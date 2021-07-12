@@ -73,4 +73,32 @@ void StaticAllocatorBitmap::Deallocate(void * element)
     mAllocated--;
 }
 
+size_t StaticAllocatorBitmap::IndexOf(void * element)
+{
+    std::ptrdiff_t diff = static_cast<uint8_t *>(element) - static_cast<uint8_t *>(mElements);
+    assert(diff >= 0);
+    assert(static_cast<size_t>(diff) % mElementSize == 0);
+    auto index = static_cast<size_t>(diff) / mElementSize;
+    assert(index < Capacity());
+    return index;
+}
+
+bool StaticAllocatorBitmap::ForEachActiveObjectInner(void * context, Lambda lambda)
+{
+    for (size_t word = 0; word * kBitChunkSize < Capacity(); ++word)
+    {
+        auto & usage = mUsage[word];
+        auto value   = usage.load(std::memory_order_relaxed);
+        for (size_t offset = 0; offset < kBitChunkSize && offset + word * kBitChunkSize < Capacity(); ++offset)
+        {
+            if ((value & (kBit1 << offset)) != 0)
+            {
+                if (!lambda(context, At(word * kBitChunkSize + offset)))
+                    return false;
+            }
+        }
+    }
+    return true;
+}
+
 } // namespace chip

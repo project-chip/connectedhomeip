@@ -110,6 +110,12 @@ public:
     }
 
     /**
+     * A notification that we will have SendMessage called on us in the future
+     * (and should stay open until that happens).
+     */
+    void WillSendMessage() { mFlags.Set(Flags::kFlagWillSendMessage); }
+
+    /**
      *  Handle a received CHIP message on this exchange.
      *
      *  @param[in]    packetHeader  A reference to the PacketHeader object.

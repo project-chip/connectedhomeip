@@ -25,9 +25,8 @@
 
 using namespace ::chip;
 
-constexpr uint64_t kBreadcrumb                = 0;
-constexpr uint32_t kTimeoutMs                 = 6000;
-constexpr uint8_t kTemporaryThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
+constexpr uint64_t kBreadcrumb = 0;
+constexpr uint32_t kTimeoutMs  = 6000;
 
 CHIP_ERROR PairingCommand::Run()
 {
@@ -258,6 +257,26 @@ CHIP_ERROR PairingCommand::AddWiFiNetwork()
     return mCluster.AddWiFiNetwork(successCallback, failureCallback, mSSID, mPassword, kBreadcrumb, kTimeoutMs);
 }
 
+chip::ByteSpan PairingCommand::GetThreadNetworkId()
+{
+    // For Thread devices the networkId is the extendedPanId and it is
+    // part of the dataset defined by OpenThread
+
+    Thread::OperationalDataset dataset;
+
+    if (dataset.Init(mOperationalDataset) != CHIP_NO_ERROR)
+    {
+        return ByteSpan();
+    }
+
+    if (dataset.GetExtendedPanId(mExtendedPanId) != CHIP_NO_ERROR)
+    {
+        return ByteSpan();
+    }
+
+    return ByteSpan(mExtendedPanId);
+}
+
 CHIP_ERROR PairingCommand::EnableNetwork()
 {
     Callback::Cancelable * successCallback = mOnEnableNetworkCallback->Cancel();
@@ -270,7 +289,12 @@ CHIP_ERROR PairingCommand::EnableNetwork()
     }
     else
     {
-        networkId = ByteSpan(kTemporaryThreadNetworkId, sizeof(kTemporaryThreadNetworkId));
+        networkId = GetThreadNetworkId();
+    }
+
+    if (networkId.empty())
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     return mCluster.EnableNetwork(successCallback, failureCallback, networkId, kBreadcrumb, kTimeoutMs);

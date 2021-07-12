@@ -4691,7 +4691,7 @@
               "outgoing": 1
             },
             {
-              "name": "StopMotion",
+              "name": "Stop",
               "code": 2,
               "mfgCode": null,
               "source": "client",

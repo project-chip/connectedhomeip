@@ -42,16 +42,16 @@ if [ $? -ne 0 ]; then
 fi
 
 really_run_suite() {
-    idf scripts/tools/qemu_run_test.sh src/test_driver/esp32/build/chip "$1" "$2"
+    idf scripts/tools/qemu_run_test.sh src/test_driver/esp32/build/chip "$@"
 }
 
 run_suite() {
     if [[ -d "${log_dir}" ]]; then
         suite=${1%.a}
         suite=${suite#lib}
-        really_run_suite "$1" "$2" |& tee "$log_dir/$suite.log"
+        really_run_suite "$@" |& tee "$log_dir/$suite.log"
     else
-        really_run_suite "$1" "$2"
+        really_run_suite "$@"
     fi
 }
 
@@ -61,7 +61,15 @@ run_suite() {
 SUITES=(
 )
 
-run_suite libAppTests.a
+# TODO: libAppTests depends on MessagingTestHelpers, which depends on
+# NetworkTestHelpers.  That sort of depends on InetTestHelpers or
+# equivalent (to provide gSystemLayer, gInet, InitNetwork(),
+# ShutdownNetwork()) but there's only a POSIX implementation of that
+# last, which does not compile on ESP32.  Need to figure out how to
+# make that work.  See comments below for the transport layer tests,
+# which have the same issue.
+# run_suite libAppTests.a -lMessagingTestHelpers -lNetworkTestHelpers
+
 run_suite libASN1Tests.a
 run_suite libBleLayerTests.a
 run_suite libCoreTests.a

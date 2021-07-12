@@ -24,7 +24,7 @@ set(EXTRA_COMPONENT_DIRS
 )
 
 project(chip-ipv6only-app)
-idf_build_set_property(CXX_COMPILE_OPTIONS "-std=c++17;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
+idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++17;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 
 get_filename_component(CHIP_ROOT ./third_party/connectedhomeip REALPATH)
@@ -36,3 +36,8 @@ pw_set_backend(pw_sys_io pw_sys_io.esp32)
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
 add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sys_io)
+
+get_target_property(_target_cxx_flags pw_build.cpp17 INTERFACE_COMPILE_OPTIONS)
+list(REMOVE_ITEM _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
+list(APPEND _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>)
+set_target_properties(pw_build.cpp17 PROPERTIES INTERFACE_COMPILE_OPTIONS "${_target_cxx_flags}")
