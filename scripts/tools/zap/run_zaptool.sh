@@ -1,13 +1,13 @@
 #!/bin/bash
 
-CHIP_ROOT=$(readlink -f ${BASH_SOURCE%/scripts/tools/zap/run_zaptool.sh})
+CHIP_ROOT=$(readlink -f "${BASH_SOURCE%/scripts/tools/zap/run_zaptool.sh}")
 ZAP_ROOT="$CHIP_ROOT/third_party/zap/repo"
 
 (
-	cd $CHIP_ROOT
+	cd "$CHIP_ROOT"
 	git submodule update --init third_party/zap/repo
 
-	cd $ZAP_ROOT
+	cd "$ZAP_ROOT"
 	if ! npm list installed-check > /dev/null
 	then
 		npm install installed-check
