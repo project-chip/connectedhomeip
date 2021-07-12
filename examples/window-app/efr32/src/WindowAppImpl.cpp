@@ -41,7 +41,6 @@
 
 using namespace ::chip::DeviceLayer;
 
-
 namespace example {
 
 WindowApp & WindowApp::Instance()
@@ -49,8 +48,7 @@ WindowApp & WindowApp::Instance()
     return example::efr32::WindowApp::sInstance;
 }
 
-}
-
+} // namespace example
 
 namespace example::efr32 {
 
@@ -165,7 +163,6 @@ void WindowApp::Button::OnDownTimeout(example::Timer & timer)
 // Main Task
 //------------------------------------------------------------------------------
 
-
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(WindowEvent)];
 StaticQueue_t sAppEventQueueStruct;
 
@@ -266,7 +263,7 @@ example::Timer * WindowApp::CreateTimer(const char * name, uint32_t timeoutInMs,
 
 void WindowApp::DestroyTimer(example::Timer * timer)
 {
-    if(timer)
+    if (timer)
     {
         delete timer;
     }
