@@ -560,7 +560,7 @@ void Device::OnSessionEstablishmentError(CHIP_ERROR error)
 
 void Device::OnSessionEstablished()
 {
-    mCASESession.PeerConnection().SetPeerNodeId(mDeviceId);
+    mCASESession.GetPairingState().SetPeerNodeId(mDeviceId);
 
     CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mCASESession,
                                                  SecureSession::SessionRole::kInitiator, mAdminId);
