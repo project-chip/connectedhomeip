@@ -26,13 +26,13 @@ cd $CHIP_ROOT \
 	|| exit 1
 
 cd $ZAP_ROOT
-if ! npm list installed-check &> /dev/null 
+if ! npm list installed-check &> /dev/null
 then
 	npm install installed-check \
 		|| exit 1
 fi
 
-if ! ./node_modules/.bin/installed-check -c &> /dev/null 
+if ! ./node_modules/.bin/installed-check -c &> /dev/null
 then
 	npm install \
 		|| exit 1
