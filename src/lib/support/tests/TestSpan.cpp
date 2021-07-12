@@ -138,6 +138,11 @@ static void TestMutableByteSpan(nlTestSuite * inSuite, void * inContext)
     ByteSpan s9 = s8;
     NL_TEST_ASSERT(inSuite, s9.data_equal(s8));
     NL_TEST_ASSERT(inSuite, s8.data_equal(s9));
+
+    // Not mutable span on purpose.
+    ByteSpan s10(s8);
+    NL_TEST_ASSERT(inSuite, s10.data_equal(s8));
+    NL_TEST_ASSERT(inSuite, s8.data_equal(s10));
 }
 
 static void TestFixedByteSpan(nlTestSuite * inSuite, void * inContext)
@@ -171,7 +176,7 @@ static void TestFixedByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s3.data_equal(s2));
 
     uint8_t arr2[] = { 3, 2, 1 };
-    FixedByteSpan<3> s4(arr2);
+    FixedSpan<uint8_t, 3> s4(arr2);
     NL_TEST_ASSERT(inSuite, !s4.data_equal(s2));
 
     size_t idx = 0;
@@ -180,6 +185,58 @@ static void TestFixedByteSpan(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, entry == arr2[idx++]);
     }
     NL_TEST_ASSERT(inSuite, idx == 3);
+
+    FixedByteSpan<3> s5(arr2);
+    NL_TEST_ASSERT(inSuite, s5.data_equal(s4));
+    NL_TEST_ASSERT(inSuite, s4.data_equal(s5));
+
+    FixedByteSpan<2> s6(s4);
+    idx = 0;
+    for (auto & entry : s6)
+    {
+        NL_TEST_ASSERT(inSuite, entry == arr2[idx++]);
+    }
+    NL_TEST_ASSERT(inSuite, idx == 2);
+
+    // Not fixed, to test conversion.
+    ByteSpan s7(s4);
+    NL_TEST_ASSERT(inSuite, s7.data_equal(s4));
+    NL_TEST_ASSERT(inSuite, s4.data_equal(s7));
+
+    MutableByteSpan s8(s4);
+    NL_TEST_ASSERT(inSuite, s8.data_equal(s4));
+    NL_TEST_ASSERT(inSuite, s4.data_equal(s8));
+}
+
+static void TestSpanOfPointers(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t x        = 5;
+    uint8_t * ptrs[] = { &x, &x };
+    Span<uint8_t *> s1(ptrs);
+    Span<uint8_t * const> s2(s1);
+    NL_TEST_ASSERT(inSuite, s1.data_equal(s2));
+    NL_TEST_ASSERT(inSuite, s2.data_equal(s1));
+
+    FixedSpan<uint8_t *, 2> s3(ptrs);
+    FixedSpan<uint8_t * const, 2> s4(s3);
+    NL_TEST_ASSERT(inSuite, s1.data_equal(s3));
+    NL_TEST_ASSERT(inSuite, s3.data_equal(s1));
+
+    NL_TEST_ASSERT(inSuite, s2.data_equal(s3));
+    NL_TEST_ASSERT(inSuite, s3.data_equal(s2));
+
+    NL_TEST_ASSERT(inSuite, s1.data_equal(s4));
+    NL_TEST_ASSERT(inSuite, s4.data_equal(s1));
+
+    NL_TEST_ASSERT(inSuite, s2.data_equal(s4));
+    NL_TEST_ASSERT(inSuite, s4.data_equal(s2));
+
+    NL_TEST_ASSERT(inSuite, s3.data_equal(s4));
+    NL_TEST_ASSERT(inSuite, s4.data_equal(s3));
+
+    Span<uint8_t *> s5(s3);
+    NL_TEST_ASSERT(inSuite, s5.data_equal(s3));
+    NL_TEST_ASSERT(inSuite, s3.data_equal(s5));
 }
 
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
@@ -187,7 +244,7 @@ static void TestFixedByteSpan(nlTestSuite * inSuite, void * inContext)
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestByteSpan), NL_TEST_DEF_FN(TestMutableByteSpan),
-                                 NL_TEST_DEF_FN(TestFixedByteSpan), NL_TEST_SENTINEL() };
+                                 NL_TEST_DEF_FN(TestFixedByteSpan), NL_TEST_DEF_FN(TestSpanOfPointers), NL_TEST_SENTINEL() };
 
 int TestSpan(void)
 {
