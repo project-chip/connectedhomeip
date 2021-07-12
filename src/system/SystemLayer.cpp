@@ -68,6 +68,16 @@
 namespace chip {
 namespace System {
 
+namespace Platform {
+
+extern CHIP_ERROR WillInit(System::Layer & aLayer, void * aContext);
+extern CHIP_ERROR WillShutdown(System::Layer & aLayer, void * aContext);
+
+extern void DidInit(System::Layer & aLayer, void * aContext, CHIP_ERROR aStatus);
+extern void DidShutdown(System::Layer & aLayer, void * aContext, CHIP_ERROR aStatus);
+
+} // namespace Platform
+
 namespace {
 
 Clock::MonotonicMilliseconds GetTimestamp(const Callback::Cancelable * timer)
@@ -154,7 +164,7 @@ CHIP_ERROR Layer::Init(void * aContext)
     if (this->mLayerState != kLayerState_NotInitialized)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    lReturn = Platform::Layer::WillInit(*this, aContext);
+    lReturn = Platform::WillInit(*this, aContext);
     SuccessOrExit(lReturn);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -174,7 +184,7 @@ CHIP_ERROR Layer::Init(void * aContext)
     this->mContext    = aContext;
 
 exit:
-    Platform::Layer::DidInit(*this, aContext, lReturn);
+    Platform::DidInit(*this, aContext, lReturn);
     return lReturn;
 }
 
@@ -187,7 +197,7 @@ CHIP_ERROR Layer::Shutdown()
         return CHIP_ERROR_INCORRECT_STATE;
 
     lContext = this->mContext;
-    lReturn  = Platform::Layer::WillShutdown(*this, lContext);
+    lReturn  = Platform::WillShutdown(*this, lContext);
     SuccessOrExit(lReturn);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -213,7 +223,7 @@ CHIP_ERROR Layer::Shutdown()
     this->mLayerState = kLayerState_NotInitialized;
 
 exit:
-    Platform::Layer::DidShutdown(*this, lContext, lReturn);
+    Platform::DidShutdown(*this, lContext, lReturn);
     return lReturn;
 }
 
@@ -635,7 +645,7 @@ CHIP_ERROR Layer::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aA
     VerifyOrDieWithMsg(aTarget.IsRetained(*this), chipSystemLayer, "wrong poster! [target %p != this %p]", &(aTarget.SystemLayer()),
                        this);
 
-    lReturn = Platform::Layer::PostEvent(*this, this->mContext, aTarget, aEventType, aArgument);
+    lReturn = Platform::EventSupport::PostEvent(*this, this->mContext, aTarget, aEventType, aArgument);
     if (lReturn != CHIP_NO_ERROR)
     {
         ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer event (type %d): %s", aEventType, ErrorStr(lReturn));
@@ -657,7 +667,7 @@ CHIP_ERROR Layer::DispatchEvents()
     CHIP_ERROR lReturn = CHIP_NO_ERROR;
     VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_ERROR_INCORRECT_STATE);
 
-    lReturn = Platform::Layer::DispatchEvents(*this, this->mContext);
+    lReturn = Platform::EventSupport::DispatchEvents(*this, this->mContext);
     SuccessOrExit(lReturn);
 
 exit:
@@ -679,7 +689,7 @@ CHIP_ERROR Layer::DispatchEvent(Event aEvent)
     CHIP_ERROR lReturn = CHIP_NO_ERROR;
     VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_ERROR_INCORRECT_STATE);
 
-    lReturn = Platform::Layer::DispatchEvent(*this, this->mContext, aEvent);
+    lReturn = Platform::EventSupport::DispatchEvent(*this, this->mContext, aEvent);
     SuccessOrExit(lReturn);
 
 exit:
@@ -751,7 +761,7 @@ CHIP_ERROR Layer::StartPlatformTimer(uint32_t aDelayMilliseconds)
     CHIP_ERROR lReturn = CHIP_NO_ERROR;
     VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_ERROR_INCORRECT_STATE);
 
-    lReturn = Platform::Layer::StartTimer(*this, this->mContext, aDelayMilliseconds);
+    lReturn = Platform::EventSupport::StartTimer(*this, this->mContext, aDelayMilliseconds);
     SuccessOrExit(lReturn);
 
 exit:
@@ -799,7 +809,6 @@ struct LwIPEvent
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace Platform {
-namespace Layer {
 
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
 
@@ -882,6 +891,8 @@ DLL_EXPORT void DidShutdown(System::Layer & aLayer, void * aContext, CHIP_ERROR 
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
+
+namespace EventSupport {
 
 using chip::System::LwIPEvent;
 
@@ -1044,10 +1055,11 @@ DLL_EXPORT CHIP_ERROR StartTimer(Layer & aLayer, void * aContext, uint32_t aMill
     return lReturn;
 }
 
+} // namespace EventSupport
+
 #endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-} // namespace Layer
 } // namespace Platform
 } // namespace System
 } // namespace chip

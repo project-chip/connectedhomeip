@@ -56,34 +56,17 @@ namespace System {
 
 class Layer;
 class Timer;
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
 class Object;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace Platform {
-namespace Layer {
+namespace EventSupport {
 
-using ::chip::System::Layer;
+extern CHIP_ERROR PostEvent(System::Layer & aLayer, void * aContext, Object & aTarget, EventType aType, uintptr_t aArgument);
+extern CHIP_ERROR DispatchEvents(System::Layer & aLayer, void * aContext);
+extern CHIP_ERROR DispatchEvent(System::Layer & aLayer, void * aContext, Event aEvent);
+extern CHIP_ERROR StartTimer(System::Layer & aLayer, void * aContext, uint32_t aMilliseconds);
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-using ::chip::System::Object;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-extern CHIP_ERROR WillInit(Layer & aLayer, void * aContext);
-extern CHIP_ERROR WillShutdown(Layer & aLayer, void * aContext);
-
-extern void DidInit(Layer & aLayer, void * aContext, CHIP_ERROR aStatus);
-extern void DidShutdown(Layer & aLayer, void * aContext, CHIP_ERROR aStatus);
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-extern CHIP_ERROR PostEvent(Layer & aLayer, void * aContext, Object & aTarget, EventType aType, uintptr_t aArgument);
-extern CHIP_ERROR DispatchEvents(Layer & aLayer, void * aContext);
-extern CHIP_ERROR DispatchEvent(Layer & aLayer, void * aContext, Event aEvent);
-extern CHIP_ERROR StartTimer(Layer & aLayer, void * aContext, uint32_t aMilliseconds);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-} // namespace Layer
+} // namespace EventSupport
 } // namespace Platform
 
 /**
@@ -212,11 +195,11 @@ private:
 
     CHIP_ERROR StartPlatformTimer(uint32_t aDelayMilliseconds);
 
-    friend CHIP_ERROR Platform::Layer::PostEvent(Layer & aLayer, void * aContext, Object & aTarget, EventType aType,
-                                                 uintptr_t aArgument);
-    friend CHIP_ERROR Platform::Layer::DispatchEvents(Layer & aLayer, void * aContext);
-    friend CHIP_ERROR Platform::Layer::DispatchEvent(Layer & aLayer, void * aContext, Event aEvent);
-    friend CHIP_ERROR Platform::Layer::StartTimer(Layer & aLayer, void * aContext, uint32_t aMilliseconds);
+    friend CHIP_ERROR Platform::EventSupport::PostEvent(Layer & aLayer, void * aContext, Object & aTarget, EventType aType,
+                                                        uintptr_t aArgument);
+    friend CHIP_ERROR Platform::EventSupport::DispatchEvents(Layer & aLayer, void * aContext);
+    friend CHIP_ERROR Platform::EventSupport::DispatchEvent(Layer & aLayer, void * aContext, Event aEvent);
+    friend CHIP_ERROR Platform::EventSupport::StartTimer(Layer & aLayer, void * aContext, uint32_t aMilliseconds);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH

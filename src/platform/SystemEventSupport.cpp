@@ -30,7 +30,7 @@
 namespace chip {
 namespace System {
 namespace Platform {
-namespace Layer {
+namespace EventSupport {
 
 using namespace ::chip::DeviceLayer;
 
@@ -62,7 +62,7 @@ CHIP_ERROR DispatchEvent(System::Layer & aLayer, void * aContext, const ChipDevi
     return CHIP_NO_ERROR;
 }
 
-} // namespace Layer
+} // namespace EventSupport
 } // namespace Platform
 } // namespace System
 } // namespace chip
