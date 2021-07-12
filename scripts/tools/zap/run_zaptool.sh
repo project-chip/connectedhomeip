@@ -8,12 +8,12 @@ ZAP_ROOT="$CHIP_ROOT/third_party/zap/repo"
 	git submodule update --init third_party/zap/repo
 
 	cd $ZAP_ROOT
-	if ! npm list installed-check > /dev/null 
+	if ! npm list installed-check > /dev/null
 	then
 		npm install installed-check
 	fi
 
-	if ! ./node_modules/.bin/installed-check -c 2> /dev/null 
+	if ! ./node_modules/.bin/installed-check -c 2> /dev/null
        	then
 		npm install
 	fi
