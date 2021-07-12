@@ -77,7 +77,8 @@ chip_test_suite("tests") {
   # This fails on Raspberry Pi (Linux arm64), so only enable on Linux
   # x64.
   if (current_os != "mac" && current_os != "zephyr" &&
-      chip_device_platform != "esp32" && current_cpu == "x64" && chip_device_platform != "ameba" ) {
+      chip_device_platform != "esp32" && current_cpu == "x64" &&
+      chip_device_platform != "ameba") {
     test_sources += [ "TestInetLayerDNS.cpp" ]
 
     # TODO: This test does not seem executed

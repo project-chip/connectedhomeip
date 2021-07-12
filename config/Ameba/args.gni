@@ -32,7 +32,7 @@ chip_inet_config_enable_dns_resolver = false
 chip_inet_config_enable_tcp_endpoint = true
 chip_inet_config_enable_udp_endpoint = true
 
-chip_bypass_rendezvous=true
+chip_bypass_rendezvous = true
 chip_config_network_layer_ble = false
 
 custom_toolchain = "//third_party/connectedhomeip/config/Ameba/toolchain:ameba"
