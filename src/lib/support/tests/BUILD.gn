@@ -30,6 +30,7 @@ chip_test_suite("tests") {
     "TestCHIPCounter.cpp",
     "TestCHIPMem.cpp",
     "TestErrorStr.cpp",
+    "TestFixedBufferAllocator.cpp",
     "TestOwnerOf.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
