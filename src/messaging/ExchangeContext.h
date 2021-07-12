@@ -195,6 +195,13 @@ private:
     bool IsResponseExpected() const;
 
     /**
+     * Determine whether we are expecting our consumer to send a message on
+     * this exchange (i.e. WillSendMessage was called and the message has not
+     * yet been sent).
+     */
+    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
+
+    /**
      *  Track whether we are now expecting a response to a message sent via this exchange (because that
      *  message had the kExpectResponse flag set in its sendFlags).
      *
@@ -235,6 +242,12 @@ private:
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
 
     void DoClose(bool clearRetransTable);
+
+    /**
+     * We have handled an application-level message in some way and should
+     * re-evaluate out state to see whether we should still be open.
+     */
+    void MessageHandled();
 };
 
 } // namespace Messaging
