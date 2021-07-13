@@ -49,13 +49,6 @@
 #include <unistd.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
-#include <lwip/err.h>
-#include <lwip/sys.h>
-#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
 
@@ -784,20 +777,6 @@ exit:
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
-
-// MARK: CHIP System Layer platform- and system-specific functions for LwIP-native eventing.
-struct LwIPEvent
-{
-    EventType Type;
-    Object * Target;
-    uintptr_t Argument;
-};
-
-#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
 namespace Platform {
 namespace Layer {
 
@@ -879,173 +858,6 @@ DLL_EXPORT void DidShutdown(System::Layer & aLayer, void * aContext, CHIP_ERROR 
 }
 
 #endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
-
-using chip::System::LwIPEvent;
-
-/**
- *  This is a platform-specific event / message post hook. This may be overridden by assserting the preprocessor definition,
- *  #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
- *
- *  This posts an event / message of the specified type with the provided argument to this instance's platform-specific event /
- *  message queue.
- *
- *  @note
- *    This is an implementation for LwIP.
- *
- *  @param[in,out] aLayer    A pointer to the layer instance to which the event / message is being posted.
- *
- *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Init.
- *
- *  @param[in,out] aTarget   A pointer to the CHIP System Layer object making the post request.
- *
- *  @param[in]     aType     The type of event to post.
- *
- *  @param[in,out] aArgument The argument associated with the event to post.
- *
- *  @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
- */
-DLL_EXPORT CHIP_ERROR PostEvent(Layer & aLayer, void * aContext, Object & aTarget, EventType aType, uintptr_t aArgument)
-{
-    CHIP_ERROR lReturn = CHIP_NO_ERROR;
-    sys_mbox_t lSysMbox;
-    LwIPEvent * ev;
-    err_t lLwIPError;
-
-    VerifyOrExit(aContext != NULL, lReturn = CHIP_ERROR_INVALID_ARGUMENT);
-    lSysMbox = reinterpret_cast<sys_mbox_t>(aContext);
-
-    ev = chip::Platform::New<LwIPEvent>();
-    VerifyOrExit(ev != nullptr, lReturn = CHIP_ERROR_NO_MEMORY);
-
-    ev->Type     = aType;
-    ev->Target   = &aTarget;
-    ev->Argument = aArgument;
-
-    lLwIPError = sys_mbox_trypost(&lSysMbox, ev);
-    VerifyOrExit(lLwIPError == ERR_OK, chip::Platform::Delete(ev); lReturn = chip::System::MapErrorLwIP(lLwIPError));
-
-exit:
-    return lReturn;
-}
-
-/**
- *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor definition,
- *  #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
- *
- *  This effects an event loop, waiting on a queue that services this instance, pulling events off of that queue, and then
- *  dispatching them for handling.
- *
- *  @note
- *    This is an implementation for LwIP.
- *
- *  @param[in,out] aLayer    A reference to the layer instance for which events / messages are being dispatched.
- *
- *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Init.
- *
- *  @retval   #CHIP_ERROR_INVALID_ARGUMENT      If aLayer or aContext is NULL.
- *  @retval   #CHIP_ERROR_INCORRECT_STATE       If the state of the CHIP System Layer object is unexpected.
- *  @retval   #CHIP_ERROR_UNEXPECTED_EVENT      If an event type is unrecognized.
- *  @retval   #CHIP_NO_ERROR                    On success.
- */
-DLL_EXPORT CHIP_ERROR DispatchEvents(Layer & aLayer, void * aContext)
-{
-    CHIP_ERROR lReturn = CHIP_NO_ERROR;
-    err_t lLwIPError;
-    sys_mbox_t lSysMbox;
-    void * lVoidPointer;
-    const LwIPEvent * lEvent;
-
-    // Sanity check the context / queue.
-    VerifyOrExit(aContext != NULL, lReturn = CHIP_ERROR_INVALID_ARGUMENT);
-    lSysMbox = reinterpret_cast<sys_mbox_t>(aContext);
-
-    while (true)
-    {
-        lLwIPError = sys_arch_mbox_tryfetch(&lSysMbox, &lVoidPointer);
-        VerifyOrExit(lLwIPError == ERR_OK, lReturn = chip::System::MapErrorLwIP(lLwIPError));
-
-        lEvent = static_cast<const LwIPEvent *>(lVoidPointer);
-        VerifyOrExit(lEvent != NULL && lEvent->Target != NULL, lReturn = CHIP_ERROR_UNEXPECTED_EVENT);
-
-        lReturn = aLayer.HandleEvent(*lEvent->Target, lEvent->Type, lEvent->Argument);
-        chip::Platform::Delete(lEvent);
-
-        SuccessOrExit(lReturn);
-    }
-
-exit:
-    return lReturn;
-}
-
-/**
- *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor definition,
- *  #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
- *
- *  This dispatches the specified event for handling, unmarshalling the type and arguments from the event for hand off to CHIP
- *  System Layer::HandleEvent for the actual dispatch.
- *
- *  @note
- *    This is an implementation for LwIP.
- *
- *  @param[in,out] aLayer    A reference to the layer instance for which events / messages are being dispatched.
- *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Init.
- *  @param[in]     aEvent    The platform-specific event object to dispatch for handling.
- *
- *  @retval   #CHIP_ERROR_INVALID_ARGUMENT      If aLayer or the event target is NULL.
- *  @retval   #CHIP_ERROR_UNEXPECTED_EVENT      If the event type is unrecognized.
- *  @retval   #CHIP_ERROR_INCORRECT_STATE       If the state of the CHIP System Layer object is unexpected.
- *  @retval   #CHIP_NO_ERROR                    On success.
- */
-DLL_EXPORT CHIP_ERROR DispatchEvent(Layer & aLayer, void * aContext, Event aEvent)
-{
-    const EventType type = aEvent->Type;
-    Object * target      = aEvent->Target;
-    const uint32_t data  = aEvent->Argument;
-    CHIP_ERROR lReturn   = CHIP_NO_ERROR;
-
-    // Sanity check the target object.
-    VerifyOrExit(target != NULL, lReturn = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Handle the event.
-    lReturn = aLayer.HandleEvent(*target, type, data);
-    SuccessOrExit(lReturn);
-
-exit:
-    return lReturn;
-}
-
-/**
- *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor definition,
- *  #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
- *
- *  @note
- *    This is an implementation for LwIP.
- *
- *  @param[in,out] aLayer               A reference to the layer instance for which events / messages are being dispatched.
- *  @param[in,out] aContext             Platform-specific context data passed to the layer initialization method, \::Init.
- *  @param[in]     aMilliseconds        The number of milliseconds to set for the timer.
- *
- *  @retval   #CHIP_NO_ERROR    Always succeeds unless overridden.
- */
-DLL_EXPORT CHIP_ERROR StartTimer(Layer & aLayer, void * aContext, uint32_t aMilliseconds)
-{
-    CHIP_ERROR lReturn = CHIP_NO_ERROR;
-
-    // At the moment there is no need to do anything for standalone CHIP + LWIP.
-    // the Task will periodically call HandleTimer which will process any expired
-    // timers.
-    static_cast<void>(aLayer);
-    static_cast<void>(aContext);
-    static_cast<void>(aMilliseconds);
-
-    return lReturn;
-}
-
-#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 } // namespace Layer
 } // namespace Platform
