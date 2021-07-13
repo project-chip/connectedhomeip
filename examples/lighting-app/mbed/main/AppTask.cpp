@@ -51,8 +51,6 @@
 #define BUTTON_PUSH_EVENT 1
 #define BUTTON_RELEASE_EVENT 0
 
-constexpr uint32_t kPublishServicePeriodUs = 5000000;
-
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
 
 static mbed::InterruptIn sLightingButton(LIGHTING_BUTTON);
@@ -124,8 +122,7 @@ int AppTask::Init()
 
 int AppTask::StartApp()
 {
-    int ret                            = Init();
-    uint64_t mLastPublishServiceTimeUS = 0;
+    int ret = Init();
 
     if (ret)
     {
@@ -191,16 +188,6 @@ int AppTask::StartApp()
         }
 
         sStatusLED.Animate();
-
-        uint64_t nowUS            = chip::System::Clock::GetMonotonicMicroseconds();
-        uint64_t nextChangeTimeUS = mLastPublishServiceTimeUS + kPublishServicePeriodUs;
-
-        if (nowUS > nextChangeTimeUS)
-        {
-            // TODO:
-            // PublishService();
-            mLastPublishServiceTimeUS = nowUS;
-        }
     }
 }
 
