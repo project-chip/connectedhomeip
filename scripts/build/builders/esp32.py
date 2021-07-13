@@ -1,5 +1,7 @@
 import logging
 import os
+import shlex
+
 from enum import Enum, auto
 
 from .builder import Builder
@@ -72,8 +74,7 @@ class Esp32Builder(Builder):
     if defaults:
       cmd += " -D SDKCONFIG_DEFAULTS='%s'" % defaults
 
-    cmd += ' -C examples/%s/esp32 -B %s reconfigure' % (self.app.ExampleName,
-                                                        self.output_dir)
+    cmd += ' -C examples/%s/esp32 -B %s reconfigure' % (self.app.ExampleName, shlex.quote(self.output_dir))
 
     # This will do a 'cmake reconfigure' which will create ninja files without rebuilding
     self._IdfEnvExecute(cmd, cwd=self.root)

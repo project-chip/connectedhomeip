@@ -31,7 +31,7 @@ class Context:
        to generate make/ninja instructions and to compile.
     """
 
-  def __init__(self, repository_path, output_prefix):
+  def __init__(self, repository_path:str, output_prefix:str):
     self.builders = []
     self.repository_path = repository_path
     self.output_prefix = output_prefix
@@ -40,7 +40,7 @@ class Context:
   def SetupBuilders(self, platforms: Sequence[Platform],
                     boards: Sequence[Board],
                     applications: Sequence[Application]):
-    """Configures internal builders for the given platform/board/app combionation.
+    """Configures internal builders for the given platform/board/app combination.
 
         Handles smart default selection, so that users only need to specify
         part of platform/board/application information and the method tries
@@ -53,6 +53,8 @@ class Context:
         ])
       else:
         # when nothing is specified, start with a default host build
+        # TODO: this is only for linux. Should be moved to 'HOST' as a platform
+        # to also support building on MacOS
         platforms = [Platform.LINUX]
 
     # at this point, at least one of 'platforms' or 'boards' is non-empty
