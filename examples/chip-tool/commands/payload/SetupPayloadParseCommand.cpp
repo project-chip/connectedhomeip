@@ -17,6 +17,7 @@
  */
 
 #include "SetupPayloadParseCommand.h"
+#include <lib/support/TypeTraits.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
@@ -48,8 +49,7 @@ CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
     std::vector<OptionalQRCodeInfo> optionalVendorData;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(SetupPayload, "CommissioningFlow: %" PRIu8,
-                    static_cast<std::underlying_type_t<decltype(payload.commissioningFlow)>>(payload.commissioningFlow));
+    ChipLogProgress(SetupPayload, "CommissioningFlow: %" PRIu8, to_underlying(payload.commissioningFlow));
     ChipLogProgress(SetupPayload, "VendorID: %u", payload.vendorID);
     ChipLogProgress(SetupPayload, "Version: %u", payload.version);
     ChipLogProgress(SetupPayload, "ProductID: %u", payload.productID);
