@@ -18,11 +18,13 @@
 
 #include "WakeOnLanManager.h"
 
+#include "../cluster-helper.cpp"
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/basic-types.h>
 
 #include <inipp/inipp.h>
@@ -45,11 +47,13 @@ exit:
 
 void WakeOnLanManager::store(chip::EndpointId endpoint, char macAddress[18])
 {
-    char addressBuffer[19];
-    snprintf(addressBuffer, 19, "%c%s", 18, macAddress);
+    char cString[18];
+    strcpy(cString, macAddress);
+    uint8_t zclString[18];
+
     EmberAfStatus macAddressStatus =
         emberAfWriteServerAttribute(endpoint, ZCL_WAKE_ON_LAN_CLUSTER_ID, ZCL_WAKE_ON_LAN_MAC_ADDRESS_ATTRIBUTE_ID,
-                                    (uint8_t *) &addressBuffer, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+                                    MakeZclCharString(zclString, cString), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (macAddressStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store mac address attribute.");
