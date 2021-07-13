@@ -22,14 +22,14 @@ declare -i iterations=20
 declare -i background_pid=0
 
 usage() {
-  echo "test_suites.sh [-a APPLICATION] [-i ITERATIONS] [-h] [-s CASE_NAME] [-w COMMAND]"
-  echo "  -a APPLICATION: runs chip-tool against 'chip-<APPLICATION>-app' (default: all-clusters)"
-  echo "  -i ITERATIONS: number of iterations to run (default: $iterations)"
-  echo "  -h: this help message"
-  echo "  -s CASE_NAME: runs single test case name (by default, all are run)"
-  echo "  -w COMMAND: prefix all instantiations with a command (e.g. valgrind) (default: '')"
-  echo ""
-  exit 0
+    echo "test_suites.sh [-a APPLICATION] [-i ITERATIONS] [-h] [-s CASE_NAME] [-w COMMAND]"
+    echo "  -a APPLICATION: runs chip-tool against 'chip-<APPLICATION>-app' (default: all-clusters)"
+    echo "  -i ITERATIONS: number of iterations to run (default: $iterations)"
+    echo "  -h: this help message"
+    echo "  -s CASE_NAME: runs single test case name (by default, all are run)"
+    echo "  -w COMMAND: prefix all instantiations with a command (e.g. valgrind) (default: '')"
+    echo ""
+    exit 0
 }
 
 # read shell arguments
