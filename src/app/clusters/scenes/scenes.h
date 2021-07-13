@@ -39,7 +39,7 @@
 
 #pragma once
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/af-types.h>
 #include <stdint.h>
 
@@ -80,10 +80,10 @@ extern EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[];
 #define emberAfPluginScenesServerDecrNumSceneEntriesInUse() (--emberAfPluginScenesServerEntriesInUse)
 #endif // Use tokens
 
-bool emberAfPluginScenesServerParseAddScene(chip::app::Command * commandObj, const EmberAfClusterCommand * cmd,
+bool emberAfPluginScenesServerParseAddScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
                                             chip::GroupId groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
                                             uint8_t * extensionFieldSets);
-bool emberAfPluginScenesServerParseViewScene(chip::app::Command * commandObj, const EmberAfClusterCommand * cmd,
+bool emberAfPluginScenesServerParseViewScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
                                              chip::GroupId groupId, uint8_t sceneId);
 
 /** @brief Scenes Cluster Recall Saved Scene

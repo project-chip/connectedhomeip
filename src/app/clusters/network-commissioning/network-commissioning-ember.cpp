@@ -20,7 +20,7 @@
 
 #include <cstring>
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/att-storage.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
@@ -32,7 +32,7 @@
 
 using namespace chip;
 
-bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Command * commandObj, ByteSpan operationalDataset,
+bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::CommandHandler * commandObj, ByteSpan operationalDataset,
                                                                 uint64_t breadcrumb, uint32_t timeoutMs)
 {
     EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnAddThreadNetworkCommandCallbackInternal(
@@ -42,8 +42,8 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Comma
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command * commandObj, ByteSpan ssid, ByteSpan credentials,
-                                                              uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::CommandHandler * commandObj, ByteSpan ssid,
+                                                              ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnAddWiFiNetworkCommandCallbackInternal(
         nullptr, emberAfCurrentEndpoint(), ssid, credentials, breadcrumb, timeoutMs);
@@ -52,7 +52,7 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command * commandObj, ByteSpan networkID,
+bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::CommandHandler * commandObj, ByteSpan networkID,
                                                              uint64_t breadcrumb, uint32_t timeoutMs)
 {
     EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnEnableNetworkCommandCallbackInternal(
@@ -65,36 +65,37 @@ bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command 
 // TODO: The following commands needed to be implemented.
 // These commands are not implemented thus not handled yet, return false so ember will return a error.
 
-bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command * commandObj, ByteSpan networkID,
+bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::CommandHandler * commandObj, ByteSpan networkID,
                                                               uint64_t breadcrumb, uint32_t timeoutMs)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(chip::app::Command * commandObj,
+bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(chip::app::CommandHandler * commandObj,
                                                                                  uint32_t timeoutMs)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command * commandObj, ByteSpan NetworkID,
+bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::CommandHandler * commandObj, ByteSpan NetworkID,
                                                              uint64_t Breadcrumb, uint32_t TimeoutMs)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command * commandObj, ByteSpan ssid, uint64_t breadcrumb,
-                                                            uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::CommandHandler * commandObj, ByteSpan ssid,
+                                                            uint64_t breadcrumb, uint32_t timeoutMs)
 {
     return false;
 }
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Command * commandObj, ByteSpan operationalDataset,
-                                                                   uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::CommandHandler * commandObj,
+                                                                   ByteSpan operationalDataset, uint64_t breadcrumb,
+                                                                   uint32_t timeoutMs)
 {
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::Command * commandObj, ByteSpan ssid,
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::CommandHandler * commandObj, ByteSpan ssid,
                                                                  ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     return false;

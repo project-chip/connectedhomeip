@@ -167,7 +167,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         err = aCommandElement.GetData(&commandDataReader);
         SuccessOrExit(err);
         // TODO(#4503): Should call callbacks of cluster that sends the command.
-        DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);
+        DispatchSingleClusterResponseCommand(clusterId, commandId, endpointId, commandDataReader, this);
     }
 
 exit:
