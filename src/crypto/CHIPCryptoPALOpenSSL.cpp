@@ -528,9 +528,6 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     uint8_t digest[kSHA256_Hash_Length];
     memset(&digest[0], 0, sizeof(digest));
 
-    ChipLogDetail(SecureChannel, "ECDSA_sign_msg, msg_len=%u", (unsigned)msg_length);
-    chip::Logging::LogMemory(chip::Logging::LogModule::kLogModule_SecureChannel, "ECDSA_sign_msg data", msg, msg_length);
-
     ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, &digest[0]));
     return ECDSA_sign_hash(&digest[0], sizeof(digest), out_signature);
 }
@@ -556,27 +553,6 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
     ec_key = to_EC_KEY(&mKeypair);
     VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    // Log keys
-    {
-        BN_CTX * bn_ctx = nullptr;
-
-
-        const EC_POINT * public_key = EC_KEY_get0_public_key(ec_key);
-        const BIGNUM * private_key = EC_KEY_get0_private_key(ec_key);
-
-        char * private_key_hex = BN_bn2hex(private_key);
-
-        bn_ctx = BN_CTX_new();
-        char * public_key_hex = EC_POINT_point2hex(EC_KEY_get0_group(ec_key), public_key, POINT_CONVERSION_UNCOMPRESSED, bn_ctx);
-        BN_CTX_free(bn_ctx);
-
-        ChipLogDetail(SecureChannel, "ECDSA_sign_hash PK: %s, SK: %s", public_key_hex, private_key_hex);
-
-        OPENSSL_free(private_key_hex);
-        OPENSSL_free(public_key_hex);
-    }
-
-    chip::Logging::LogMemory(chip::Logging::LogModule::kLogModule_SecureChannel, "ECDSA_sign_hash hash", hash, (size_t)hash_length);
     sig = ECDSA_do_sign(Uint8::to_const_uchar(hash), static_cast<int>(hash_length), ec_key);
 
     VerifyOrExit(sig != nullptr, error = CHIP_ERROR_INTERNAL);
@@ -588,7 +564,6 @@ CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_
     VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
     BN_bn2binpad(r, out_signature.Bytes() + 0u, kP256_FE_Length);
     BN_bn2binpad(s, out_signature.Bytes() + kP256_FE_Length, kP256_FE_Length);
-    chip::Logging::LogMemory(chip::Logging::LogModule::kLogModule_SecureChannel, "ECDSA_sign_hash sig", out_signature, (size_t)out_signature.Length());
 
 exit:
     if (sig != nullptr)
@@ -610,8 +585,6 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
 {
     VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogDetail(SecureChannel, "ECDSA_validate_msg_signature, msg_len=%u", (unsigned)msg_length);
-    chip::Logging::LogMemory(chip::Logging::LogModule::kLogModule_SecureChannel, "ECDSA_validate_msg_signature data", msg, msg_length);
     uint8_t digest[kSHA256_Hash_Length];
     memset(&digest[0], 0, sizeof(digest));
 
@@ -647,7 +620,6 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     VerifyOrExit(key_point != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     result = EC_POINT_oct2point(ec_group, key_point, Uint8::to_const_uchar(*this), Length(), nullptr);
-    chip::Logging::LogMemory(chip::Logging::LogModule::kLogModule_SecureChannel, "ECDSA_validate_hash_signature pk", *this, Length());
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     ec_key = EC_KEY_new_by_curve_name(nid);
@@ -672,10 +644,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     result = ECDSA_SIG_set0(ec_sig, r, s);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
-    chip::Logging::LogMemory(chip::Logging::LogModule::kLogModule_SecureChannel, "ECDSA_validate_hash_signature hash", hash, (size_t)hash_length);
-    chip::Logging::LogMemory(chip::Logging::LogModule::kLogModule_SecureChannel, "ECDSA_validate_hash_signature sig", signature, (size_t)signature.Length());
     result = ECDSA_do_verify(Uint8::to_const_uchar(hash), static_cast<int>(hash_length), ec_sig, ec_key);
-    ChipLogDetail(SecureChannel, "ECDSA_do_verify, result=%d", (int)result);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INVALID_SIGNATURE);
     error = CHIP_NO_ERROR;
 
