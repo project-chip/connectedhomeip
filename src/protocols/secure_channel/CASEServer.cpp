@@ -117,11 +117,11 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 void CASEServer::OnSessionEstablished()
 {
     ChipLogProgress(Inet, "CASE Session established. Setting up the secure channel.");
-    mSessionMgr->ExpireAllPairings(mPairingSession.GetPairingState().GetPeerNodeId(), mAdminId);
+    mSessionMgr->ExpireAllPairings(mPairingSession.GetPeerNodeId(), mAdminId);
 
     CHIP_ERROR err = mSessionMgr->NewPairing(
-        Optional<Transport::PeerAddress>::Value(mPairingSession.GetPairingState().GetPeerAddress()),
-        mPairingSession.GetPairingState().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kResponder, mAdminId);
+        Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()),
+        mPairingSession.GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kResponder, mAdminId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed in setting up secure channel: err %s", ErrorStr(err));
