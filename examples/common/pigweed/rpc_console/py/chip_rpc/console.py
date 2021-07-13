@@ -18,11 +18,11 @@
 
 To start the console, provide a serial port as the --device argument
 
-  python -m lighting_app.rpc_console --device /dev/ttyUSB0
+  python -m chip_rpc.console --device /dev/ttyUSB0
 
 Alternatively to connect to a linux CHIP device provide the port.
 
-  python -m lighting_app.rpc_console -s localhost:33000
+  python -m chip_rpc.console -s localhost:33000
 
 This starts an IPython console for communicating with the connected device. A
 few variables are predefined in the interactive console. These include:
@@ -37,30 +37,38 @@ An example RPC command:
 """
 
 import argparse
-import glob
 import logging
-from pathlib import Path
 import sys
-from typing import Any, Collection, Iterable, Iterator
+from typing import Any, BinaryIO
 import socket
-
-import IPython  # type: ignore
+from inspect import cleandoc
 import serial  # type: ignore
 
-from pw_hdlc.rpc import HdlcRpcClient, default_channels, write_to_file
+import pw_cli.log
+from pw_console.console_app import embed
+from pw_console.__main__ import create_temp_log_file
+from pw_hdlc.rpc import HdlcRpcClient, default_channels
 
-# Protos for lighting app
+# Protos
 from button_service import button_service_pb2
-from lighting_service import lighting_service_pb2
 from device_service import device_service_pb2
+from lighting_service import lighting_service_pb2
+from locking_service import locking_service_pb2
+from wifi_service import wifi_service_pb2
 
-PW_LOG = logging.getLogger(__name__)
+_LOG = logging.getLogger(__name__)
+_DEVICE_LOG = logging.getLogger('rpc_device')
 
 PW_RPC_MAX_PACKET_SIZE = 256
 SOCKET_SERVER = 'localhost'
 SOCKET_PORT = 33000
 
-PROTOS = [button_service_pb2, lighting_service_pb2, device_service_pb2]
+PROTOS = [button_service_pb2,
+          lighting_service_pb2,
+          locking_service_pb2,
+          wifi_service_pb2,
+          device_service_pb2]
+
 
 def _parse_args():
     """Parses and returns the command line arguments."""
@@ -94,11 +102,26 @@ def _start_ipython_terminal(client: HdlcRpcClient) -> None:
         channel_client=client.client.channel(1),
         rpcs=client.client.channel(1).rpcs,
         protos=client.protos.packages,
+        # Include the active pane logger for creating logs in the repl.
+        LOG=_DEVICE_LOG,
     )
 
-    print(__doc__)  # Print the banner
-    IPython.terminal.embed.InteractiveShellEmbed().mainloop(
-        local_ns=local_variables, module=argparse.Namespace())
+    welcome_message = cleandoc("""
+        Welcome to the CHIP RPC Console!
+
+        Press F1 for help.
+        Example commands:
+
+          rpcs.chip.rpc.DeviceCommon.GetDeviceInfo()
+
+          LOG.warning('Message appears console log window.')
+    """)
+
+    embed(global_vars=local_variables,
+          local_vars=None,
+          loggers=[_DEVICE_LOG],
+          repl_startup_message=welcome_message,
+          help_text=__doc__)
 
 
 class SocketClientImpl:
@@ -122,6 +145,14 @@ class SocketClientImpl:
         return self.socket.recv(num_bytes)
 
 
+def write_to_output(data: bytes,
+                    unused_output: BinaryIO = sys.stdout.buffer,):
+    log_line = data
+
+    for line in log_line.decode(errors="surrogateescape").splitlines():
+        _DEVICE_LOG.info(line)
+
+
 def console(device: str, baudrate: int,
             socket_addr: str, output: Any) -> int:
     """Starts an interactive RPC console for HDLC."""
@@ -129,10 +160,12 @@ def console(device: str, baudrate: int,
     if output is sys.stdout:
         output = sys.stdout.buffer
 
+    logfile = create_temp_log_file()
+    pw_cli.log.install(logging.INFO, True, False, logfile)
 
     if socket_addr is None:
         serial_device = serial.Serial(device, baudrate, timeout=1)
-        read = lambda: serial_device.read(8192)
+        def read(): return serial_device.read(8192)
         write = serial_device.write
     else:
         try:
@@ -145,7 +178,7 @@ def console(device: str, baudrate: int,
 
     _start_ipython_terminal(
         HdlcRpcClient(read, PROTOS, default_channels(write),
-                      lambda data: write_to_file(data, output)))
+                      lambda data: write_to_output(data, output)))
     return 0
 
 

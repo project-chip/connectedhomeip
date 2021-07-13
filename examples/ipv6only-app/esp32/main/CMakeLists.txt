@@ -24,6 +24,7 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_bytes/public"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_checksum/public"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/public"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_function/public"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/public"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/public"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic/public"
@@ -72,17 +73,19 @@ include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
-pw_proto_library(gdm_service
+pw_proto_library(wifi_service
   SOURCES
-    ${IPV6_EXAMPLE_ROOT}/common/gdm_wifi_base_rpc.proto
+    ${IPV6_EXAMPLE_ROOT}/common/wifi_service/wifi_service.proto
   INPUTS
-    ${IPV6_EXAMPLE_ROOT}/common/gdm_wifi_base_rpc.options
+    ${IPV6_EXAMPLE_ROOT}/common/wifi_service/wifi_service.options
   PREFIX
-    gdm_service
+    wifi_service
+  DEPS
+    pw_protobuf.common_protos
   STRIP_PREFIX
-    ${IPV6_EXAMPLE_ROOT}/common
+    ${IPV6_EXAMPLE_ROOT}/common/wifi_service
 )
 
 target_link_libraries(${COMPONENT_LIB} PUBLIC
-  gdm_service.nanopb_rpc
+  wifi_service.nanopb_rpc
 )

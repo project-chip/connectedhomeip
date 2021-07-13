@@ -19,10 +19,7 @@ syntax = "proto3";
 
 package chip.rpc;
 
-// TODO: Use pw.protobuf.Empty; currently not using it so that this file has no
-//       dependencies and can be loaded into the hdlc console python tool.
-message Empty {
-}
+import 'pw_protobuf_protos/common.proto';
 
 message Channel {
   uint32 channel = 1;
@@ -150,22 +147,22 @@ message ConnectionResult {
   CONNECTION_ERROR error = 1;
 }
 
-// The GDMWifiBase service provides the common RPC interface for interacting
+// The Wifi service provides the common RPC interface for interacting
 // with a WIFI capable CHIP device.
 // The current state can be retrieved using the various 'Get' RPCs.
-// A device can be connected to an AP using the StartScan, and Connect RPCs. 
-service GDMWifiBase {
-  rpc GetChannel(Empty) returns (Channel) {}
-  rpc GetSsid(Empty) returns (Ssid) {}
-  rpc GetState(Empty) returns (State) {}
-  rpc GetMacAddress(Empty) returns (MacAddress) {}
+// A device can be connected to an AP using the StartScan, and Connect RPCs.
+service Wifi {
+  rpc GetChannel(pw.protobuf.Empty) returns (Channel) {}
+  rpc GetSsid(pw.protobuf.Empty) returns (Ssid) {}
+  rpc GetState(pw.protobuf.Empty) returns (State) {}
+  rpc GetMacAddress(pw.protobuf.Empty) returns (MacAddress) {}
 
-  rpc GetWiFiInterface(Empty) returns (WiFiInterface) {}
-  rpc GetIP4Address(Empty) returns (IP4Address) {}
-  rpc GetIP6Address(Empty) returns (IP6Address) {}
+  rpc GetWiFiInterface(pw.protobuf.Empty) returns (WiFiInterface) {}
+  rpc GetIP4Address(pw.protobuf.Empty) returns (IP4Address) {}
+  rpc GetIP6Address(pw.protobuf.Empty) returns (IP6Address) {}
 
   rpc StartScan(ScanConfig) returns (stream ScanResults) {}
-  rpc StopScan(Empty) returns (Empty) {}
+  rpc StopScan(pw.protobuf.Empty) returns (pw.protobuf.Empty) {}
   rpc Connect(ConnectionData) returns (ConnectionResult) {}
-  rpc Disconnect(Empty) returns (Empty) {}
+  rpc Disconnect(pw.protobuf.Empty) returns (pw.protobuf.Empty) {}
 }

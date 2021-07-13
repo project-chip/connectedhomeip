@@ -12,7 +12,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
-    -   [Running Pigweed RPC console](#running-pigweed-rpc-console)
+    -   [Running RPC console](#running-rpc-console)
 
 <hr>
 
@@ -278,16 +278,16 @@ via 2002::2
 
 <a name="running-pigweed-rpc-console"></a>
 
-## Running Pigweed RPC console
+## Running RPC console
 
--   As part of building the example with RPCs enabled the lighting_app python
+-   As part of building the example with RPCs enabled the chip_rpc python
     interactive console is installed into your venv. The python wheel files are
-    also created in the output folder: out/debug/lighting_app_wheels. To install
-    the wheel files without rebuilding:
-    `pip3 install out/debug/lighting_app_wheels/*.whl`
+    also created in the output folder: out/debug/chip_rpc_console_wheels. To
+    install the wheel files without rebuilding:
+    `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
 
--   To use the lighting-app console after it has been installed run:
-    `python3 -m lighting_app.rpc_console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
+-   To use the chip-rpc console after it has been installed run:
+    `python3 -m chip-rpc.console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
 -   Then you can simulate a button press or realease using the following command
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for

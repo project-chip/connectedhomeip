@@ -24,18 +24,18 @@
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
-#include "gdm_service/gdm_wifi_base_rpc.rpc.pb.h"
 #include "pw_status/status.h"
 #include "pw_status/try.h"
+#include "wifi_service/wifi_service.rpc.pb.h"
 
 namespace chip {
 namespace rpc {
 
-class GDMWifiBase final : public generated::GDMWifiBase<GDMWifiBase>
+class Wifi final : public generated::Wifi<Wifi>
 {
 public:
     // Singleton
-    static GDMWifiBase & Instance() { return instance_; }
+    static Wifi & Instance() { return instance_; }
 
     // Initalize the wifi station
     pw::Status Init();
@@ -46,7 +46,7 @@ public:
 
     // The following functions are the RPC handlers
 
-    pw::Status GetChannel(ServerContext &, const chip_rpc_Empty & request, chip_rpc_Channel & response)
+    pw::Status GetChannel(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_Channel & response)
     {
         uint8_t channel = 0;
         wifi_second_chan_t second;
@@ -55,7 +55,7 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status GetSsid(ServerContext &, const chip_rpc_Empty & request, chip_rpc_Ssid & response)
+    pw::Status GetSsid(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_Ssid & response)
     {
         wifi_config_t config;
         PW_TRY(EspToPwStatus(esp_wifi_get_config(WIFI_IF_STA, &config)));
@@ -65,7 +65,7 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status GetState(ServerContext &, const chip_rpc_Empty & request, chip_rpc_State & response)
+    pw::Status GetState(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_State & response)
     {
         wifi_ap_record_t ap_info;
         esp_err_t err = esp_wifi_sta_get_ap_info(&ap_info);
@@ -74,7 +74,7 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status GetMacAddress(ServerContext &, const chip_rpc_Empty & request, chip_rpc_MacAddress & response)
+    pw::Status GetMacAddress(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_MacAddress & response)
     {
         uint8_t mac[6];
         PW_TRY(EspToPwStatus(esp_wifi_get_mac(WIFI_IF_STA, mac)));
@@ -82,7 +82,7 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status GetWiFiInterface(ServerContext &, const chip_rpc_Empty & request, chip_rpc_WiFiInterface & response)
+    pw::Status GetWiFiInterface(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_WiFiInterface & response)
     {
         wifi_ap_record_t ap_info;
         PW_TRY(EspToPwStatus(esp_wifi_sta_get_ap_info(&ap_info)));
@@ -90,7 +90,7 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status GetIP4Address(ServerContext &, const chip_rpc_Empty & request, chip_rpc_IP4Address & response)
+    pw::Status GetIP4Address(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_IP4Address & response)
     {
         esp_netif_ip_info_t ip_info;
         PW_TRY(EspToPwStatus(esp_netif_get_ip_info(esp_netif_, &ip_info)));
@@ -98,7 +98,7 @@ public:
         return pw::OkStatus();
     }
 
-    pw::Status GetIP6Address(ServerContext &, const chip_rpc_Empty & request, chip_rpc_IP6Address & response)
+    pw::Status GetIP6Address(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_IP6Address & response)
     {
         esp_ip6_addr_t ip6{ 0 };
         PW_TRY(EspToPwStatus(esp_netif_get_ip6_linklocal(esp_netif_, &ip6)));
@@ -110,7 +110,7 @@ public:
     //       but would require another worker thread to handle the scanning.
     void StartScan(ServerContext &, const chip_rpc_ScanConfig & request, ServerWriter<chip_rpc_ScanResults> & writer);
 
-    pw::Status StopScan(ServerContext &, const chip_rpc_Empty & request, chip_rpc_Empty & response)
+    pw::Status StopScan(ServerContext &, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
         esp_wifi_scan_stop();
         return pw::OkStatus();
@@ -118,14 +118,14 @@ public:
 
     pw::Status Connect(ServerContext &, const chip_rpc_ConnectionData & request, chip_rpc_ConnectionResult & response);
 
-    pw::Status Disconnect(ServerContext &, const chip_rpc_Empty & request, chip_rpc_Empty & response)
+    pw::Status Disconnect(ServerContext &, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
         PW_TRY(EspToPwStatus(esp_wifi_disconnect()));
         return pw::OkStatus();
     }
 
 private:
-    static GDMWifiBase instance_;
+    static Wifi instance_;
     esp_netif_t * esp_netif_ = nullptr;
     SemaphoreHandle_t wifi_connected_semaphore_;
 
