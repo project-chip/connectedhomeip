@@ -31,7 +31,7 @@
 using namespace chip;
 using namespace chip::Encoding::LittleEndian;
 
-static const uint8_t test_buffer[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 };
+static const uint8_t test_buffer[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 };
 
 struct TestReader : public Reader
 {
@@ -45,13 +45,19 @@ static void TestBufferReader_Basic(nlTestSuite * inSuite, void * inContext)
     uint16_t second;
     uint32_t third;
     uint64_t fourth;
-    CHIP_ERROR err = reader.Read8(&first).Read16(&second).Read32(&third).Read64(&fourth).StatusCode();
+
+    uint8_t read_buf[3]                = { 0, 0, 0 };
+    const uint8_t read_buf_expected[3] = { 16, 17, 18 };
+
+    CHIP_ERROR err =
+        reader.Read8(&first).Read16(&second).Read32(&third).Read64(&fourth).ReadBytes(&read_buf[0], sizeof(read_buf)).StatusCode();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, first == 0x01);
     NL_TEST_ASSERT(inSuite, second == 0x0302);
     NL_TEST_ASSERT(inSuite, third == 0x07060504);
     NL_TEST_ASSERT(inSuite, fourth == 0x0f0e0d0c0b0a0908);
-    NL_TEST_ASSERT(inSuite, reader.OctetsRead() == 15);
+    NL_TEST_ASSERT(inSuite, memcmp(&read_buf[0], &read_buf_expected[0], sizeof(read_buf)) == 0);
+    NL_TEST_ASSERT(inSuite, reader.OctetsRead() == 18);
     NL_TEST_ASSERT(inSuite, reader.Remaining() == 3);
     NL_TEST_ASSERT(inSuite, reader.HasAtLeast(2));
     NL_TEST_ASSERT(inSuite, reader.HasAtLeast(3));
@@ -72,10 +78,10 @@ static void TestBufferReader_Saturation(nlTestSuite * inSuite, void * inContext)
     err = reader.Read64(&temp).StatusCode();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, reader.HasAtLeast(2));
-    NL_TEST_ASSERT(inSuite, !reader.HasAtLeast(3));
-    uint32_t tooBig;
-    err = reader.Read32(&tooBig).StatusCode();
+    NL_TEST_ASSERT(inSuite, reader.HasAtLeast(5));
+    NL_TEST_ASSERT(inSuite, !reader.HasAtLeast(6));
+    uint64_t tooBig;
+    err = reader.Read64(&tooBig).StatusCode();
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !reader.HasAtLeast(1));
 
