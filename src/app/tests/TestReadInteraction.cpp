@@ -133,12 +133,12 @@ public:
             if (numDataElementIndex == 0)
             {
                 VerifyOrReturnError(priorityLevel == static_cast<uint8_t>(chip::app::PriorityLevel::Critical),
-                                       CHIP_ERROR_INCORRECT_STATE);
+                                    CHIP_ERROR_INCORRECT_STATE);
             }
             else if (numDataElementIndex == 1)
             {
                 VerifyOrReturnError(priorityLevel == static_cast<uint8_t>(chip::app::PriorityLevel::Info),
-                                       CHIP_ERROR_INCORRECT_STATE);
+                                    CHIP_ERROR_INCORRECT_STATE);
             }
             ++numDataElementIndex;
         }
