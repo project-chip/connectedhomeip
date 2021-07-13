@@ -162,10 +162,11 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
 
 void InteractionModelEngine::FreeReleasedInvokeResponderObjects(intptr_t a)
 {
-    InteractionModelEngine *_this = reinterpret_cast<InteractionModelEngine *>(a);
+    InteractionModelEngine * _this = reinterpret_cast<InteractionModelEngine *>(a);
 
-    _this->mInvokeResponders.ForEachActiveObject([&](InvokeResponder *apInteraction) {
-        if (apInteraction->mState == InvokeResponder::kStateReleased) {
+    _this->mInvokeResponders.ForEachActiveObject([&](InvokeResponder * apInteraction) {
+        if (apInteraction->mState == InvokeResponder::kStateReleased)
+        {
             _this->mInvokeResponders.ReleaseObject(apInteraction);
         }
 
@@ -173,10 +174,11 @@ void InteractionModelEngine::FreeReleasedInvokeResponderObjects(intptr_t a)
     });
 }
 
-CHIP_ERROR InteractionModelEngine::RegisterServer(ClusterServer *apClusterServer)
+CHIP_ERROR InteractionModelEngine::RegisterServer(ClusterServer * apClusterServer)
 {
-    ClusterServer **server = mClusterServers.CreateObject();
-    if (server == nullptr) {
+    ClusterServer ** server = mClusterServers.CreateObject();
+    if (server == nullptr)
+    {
         return CHIP_ERROR_NO_MEMORY;
     }
 
@@ -232,9 +234,9 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
                                                           const PacketHeader & aPacketHeader, const PayloadHeader & aPayloadHeader,
                                                           System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    InvokeResponder *responder = nullptr;
-    bool isLegacy = false;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    InvokeResponder * responder = nullptr;
+    bool isLegacy               = false;
 
     responder = mInvokeResponders.CreateObject();
     assert(responder != nullptr);
@@ -246,7 +248,8 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
     //
     err = responder->Init(apExchangeContext, aPayload.Retain());
 
-    if (err == CHIP_ERROR_CLUSTER_NOT_FOUND) {
+    if (err == CHIP_ERROR_CLUSTER_NOT_FOUND)
+    {
         err = CHIP_NO_ERROR;
 
         isLegacy = true;

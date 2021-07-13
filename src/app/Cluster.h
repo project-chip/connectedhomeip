@@ -24,6 +24,10 @@
 
 #pragma once
 
+#include "InvokeInteraction.h"
+#include <app/MessageDef/CommandDataElement.h>
+#include <app/MessageDef/CommandList.h>
+#include <app/MessageDef/InvokeCommand.h>
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -35,10 +39,6 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include "InvokeInteraction.h"
-#include <app/MessageDef/CommandDataElement.h>
-#include <app/MessageDef/CommandList.h>
-#include <app/MessageDef/InvokeCommand.h>
 
 #include "app/util/basic-types.h"
 #include <functional>

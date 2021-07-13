@@ -177,8 +177,8 @@ public:
 
 #if CHIP_CONFIG_TEST
 public:
-    static ExchangeContextUnitTestDelegate *sUnitTestDelegate;
-    static void SetUnitTestDelegate(ExchangeContextUnitTestDelegate *delegate) { sUnitTestDelegate = delegate; }
+    static ExchangeContextUnitTestDelegate * sUnitTestDelegate;
+    static void SetUnitTestDelegate(ExchangeContextUnitTestDelegate * delegate) { sUnitTestDelegate = delegate; }
 #endif
 
 private:

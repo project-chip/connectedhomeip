@@ -24,13 +24,13 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
-#include <core/CHIPTLVDebug.hpp>
-#include <support/CodeUtils.h>
-#include <core/CHIPConfig.h>
-#include <support/BitFlags.h>
 #include <array>
 #include <basic-types.h>
+#include <core/CHIPConfig.h>
+#include <core/CHIPCore.h>
+#include <core/CHIPTLVDebug.hpp>
+#include <support/BitFlags.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 namespace app {
@@ -40,11 +40,11 @@ namespace app {
  *
  * Type of a field in a schema element (attributes, commands, events)
  */
-enum class Type: uint8_t
+enum class Type : uint8_t
 {
-    TYPE_UINT8 = (1 << 0),
+    TYPE_UINT8  = (1 << 0),
     TYPE_UINT32 = (1 << 1),
-    TYPE_ARRAY = (1 << 2),
+    TYPE_ARRAY  = (1 << 2),
     TYPE_STRUCT = (1 << 3),
     TYPE_UINT64 = (1 << 4),
     TYPE_OCTSTR = (1 << 5),
@@ -56,8 +56,9 @@ enum class Type: uint8_t
  *
  * Qualities of a field in a cluster definition.
  */
-enum QualityMasks {
-    kNone = 0,
+enum QualityMasks
+{
+    kNone     = 0,
     kOptional = (1 << 0),
     kNullable = (1 << 1),
 };
@@ -69,7 +70,8 @@ enum QualityMasks {
  *
  * This is emited in generated cluster definitions.
  */
-struct FullFieldDescriptor {
+struct FullFieldDescriptor
+{
     chip::FieldId FieldId;
     BitFlags<Type> FieldType;
     uint32_t Qualities;
@@ -85,7 +87,8 @@ struct FullFieldDescriptor {
  * This is generated using constexpr functions at compile time from generated descriptor tables of
  * type FullFieldDescriptor
  */
-struct CompactFieldDescriptor {
+struct CompactFieldDescriptor
+{
     chip::FieldId FieldId;
     BitFlags<Type> FieldType;
     uint32_t Qualities;
@@ -99,27 +102,31 @@ struct CompactFieldDescriptor {
  *
  * For every field in a generated type definition, this structure contains the offset of those fields
  */
-struct TypeOffsetInfo {
+struct TypeOffsetInfo
+{
     uint32_t Offset;
     uint32_t TypeSize;
 };
 
-
 template <size_t N>
-struct BaseType {
-    std::array<uint32_t,N> mOffsets;
+struct BaseType
+{
+    std::array<uint32_t, N> mOffsets;
 };
 
 template <size_t N>
-struct StructDescriptor {
+struct StructDescriptor
+{
     std::array<CompactFieldDescriptor, N> FieldList;
 };
 
 constexpr bool IsImplemented(uint64_t FieldId)
 {
 #ifdef ImplementedFields
-    for (size_t i = 0; i < ImplementedFields.size(); i++) {
-        if (ImplementedFields[i] == FieldId) {
+    for (size_t i = 0; i < ImplementedFields.size(); i++)
+    {
+        if (ImplementedFields[i] == FieldId)
+        {
             return true;
         }
     }
@@ -142,11 +149,14 @@ constexpr int GetNumImplementedFields(const FullFieldDescriptor (&structDescript
 {
     int count = 0;
 
-    for (size_t i = 0; i < N; i++) {
-        if (structDescriptor[i].Qualities & kOptional) {
+    for (size_t i = 0; i < N; i++)
+    {
+        if (structDescriptor[i].Qualities & kOptional)
+        {
             count += !!IsImplemented(structDescriptor[i].FieldGenTag);
         }
-        else {
+        else
+        {
             count++;
         }
     }
@@ -158,30 +168,34 @@ constexpr int GetNumImplementedFields(const FullFieldDescriptor (&structDescript
  * @brief
  *
  * The main function that generates the compact field descriptors from the full field descriptor using
- * product configuration information about implemented fields/features, as well as other product configuration defines (in the future)
+ * product configuration information about implemented fields/features, as well as other product configuration defines (in the
+ * future)
  */
-template <size_t N, size_t M, class ...Args>
-constexpr std::array<CompactFieldDescriptor, N> PopulateFieldDescriptors(const FullFieldDescriptor (&schema)[M],
-                                                                  std::array<TypeOffsetInfo,N> offsets, const Args& ...args) {
-    int index = 0;
+template <size_t N, size_t M, class... Args>
+constexpr std::array<CompactFieldDescriptor, N>
+PopulateFieldDescriptors(const FullFieldDescriptor (&schema)[M], std::array<TypeOffsetInfo, N> offsets, const Args &... args)
+{
+    int index       = 0;
     int structIndex = 0;
 
-    using result_t = ::std::array<CompactFieldDescriptor, N>;
-    result_t r = {};
-    std::array<chip::Span<const CompactFieldDescriptor>, sizeof...(args)> structArgs = {{ args... }};
-    const result_t& const_r = r;
+    using result_t                                                                   = ::std::array<CompactFieldDescriptor, N>;
+    result_t r                                                                       = {};
+    std::array<chip::Span<const CompactFieldDescriptor>, sizeof...(args)> structArgs = { { args... } };
+    const result_t & const_r                                                         = r;
 
-    for (size_t i = 0; i < M; i++) {
-        if (((schema[i].Qualities & kOptional) && IsImplemented(schema[i].FieldGenTag)) ||
-            !(schema[i].Qualities & kOptional)) {
-            const_cast<decltype(CompactFieldDescriptor::Offset)&>(const_r[index].Offset) = offsets[index].Offset;
-            const_cast<decltype(CompactFieldDescriptor::TypeSize)&>(const_r[index].TypeSize) = offsets[index].TypeSize;
-            const_cast<decltype(CompactFieldDescriptor::FieldId)&>(const_r[index].FieldId) = schema[i].FieldId;
-            const_cast<decltype(CompactFieldDescriptor::FieldType)&>(const_r[index].FieldType) = schema[i].FieldType;
-            const_cast<decltype(CompactFieldDescriptor::Qualities)&>(const_r[index].Qualities) = schema[i].Qualities;
+    for (size_t i = 0; i < M; i++)
+    {
+        if (((schema[i].Qualities & kOptional) && IsImplemented(schema[i].FieldGenTag)) || !(schema[i].Qualities & kOptional))
+        {
+            const_cast<decltype(CompactFieldDescriptor::Offset) &>(const_r[index].Offset)       = offsets[index].Offset;
+            const_cast<decltype(CompactFieldDescriptor::TypeSize) &>(const_r[index].TypeSize)   = offsets[index].TypeSize;
+            const_cast<decltype(CompactFieldDescriptor::FieldId) &>(const_r[index].FieldId)     = schema[i].FieldId;
+            const_cast<decltype(CompactFieldDescriptor::FieldType) &>(const_r[index].FieldType) = schema[i].FieldType;
+            const_cast<decltype(CompactFieldDescriptor::Qualities) &>(const_r[index].Qualities) = schema[i].Qualities;
 
-            if (schema[i].FieldType.Has(Type::TYPE_STRUCT)) {
-                const_cast<decltype(CompactFieldDescriptor::StructDef)&>(const_r[index].StructDef) = structArgs[structIndex++];
+            if (schema[i].FieldType.Has(Type::TYPE_STRUCT))
+            {
+                const_cast<decltype(CompactFieldDescriptor::StructDef) &>(const_r[index].StructDef) = structArgs[structIndex++];
             }
 
             index++;

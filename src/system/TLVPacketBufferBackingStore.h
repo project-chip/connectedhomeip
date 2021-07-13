@@ -75,7 +75,7 @@ public:
         return std::move(mHeadBuffer);
     }
 
-    chip::System::PacketBufferHandle& GetCurrentBuffer() { return mCurrentBuffer; }
+    chip::System::PacketBufferHandle & GetCurrentBuffer() { return mCurrentBuffer; }
 
     // TLVBackingStore overrides:
     CHIP_ERROR OnInit(chip::TLV::TLVReader & reader, const uint8_t *& bufStart, uint32_t & bufLen) override;
@@ -107,7 +107,7 @@ public:
         chip::TLV::TLVReader::Init(mBackingStore);
     }
 
-    TLVPacketBufferBackingStore& GetBackingStore() {return mBackingStore;}
+    TLVPacketBufferBackingStore & GetBackingStore() { return mBackingStore; }
 
 private:
     TLVPacketBufferBackingStore mBackingStore;

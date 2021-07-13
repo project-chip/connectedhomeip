@@ -57,7 +57,7 @@ static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & 
 }
 
 #if CHIP_CONFIG_TEST
-ExchangeContextUnitTestDelegate *ExchangeContext::sUnitTestDelegate = nullptr;
+ExchangeContextUnitTestDelegate * ExchangeContext::sUnitTestDelegate = nullptr;
 #endif
 
 bool ExchangeContext::IsInitiator() const
@@ -87,9 +87,10 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     Transport::PeerConnectionState * state = nullptr;
 
 #if CHIP_CONFIG_TEST
-    if (sUnitTestDelegate) {
-       sUnitTestDelegate->InterceptMessage(std::move(msgBuf));
-       return CHIP_NO_ERROR;
+    if (sUnitTestDelegate)
+    {
+        sUnitTestDelegate->InterceptMessage(std::move(msgBuf));
+        return CHIP_NO_ERROR;
     }
 #endif
 
