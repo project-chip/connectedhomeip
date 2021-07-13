@@ -30,7 +30,7 @@ jobs:
 
         strategy:
           matrix:
-            type: [debug, tsan]
+            type: [tsan]
             eventloop: [eventloop_same, eventloop_separate]
         env:
             USE_SEPARATE_EVENTLOOP: ${{ matrix.eventloop == 'eventloop_separate' }}
@@ -106,7 +106,7 @@ jobs:
 
         strategy:
           matrix:
-            type: [debug, tsan]
+            type: [tsan]
             eventloop: [eventloop_same, eventloop_separate]
         env:
             USE_SEPARATE_EVENTLOOP: ${{ matrix.eventloop == 'eventloop_separate' }}
