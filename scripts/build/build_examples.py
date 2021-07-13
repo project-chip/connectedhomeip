@@ -96,7 +96,7 @@ def main(context, log_level, platform, board, app, repo, out_prefix, clean,
     raise click.UsageError("""
 PW_PROJECT_ROOT not in current environment.
 
-Please make sure you `source scripts/bootstra.sh` or `source scripts/activate.sh`
+Please make sure you `source scripts/bootstrap.sh` or `source scripts/activate.sh`
 before running this script.
 """.strip())
 

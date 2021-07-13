@@ -43,7 +43,7 @@ Usage examples:
     ./scripts/build/chipbuild.py --app all_clusters_app --board devkitc build
     ```
 
-3. Generate all the makefiles (but do not compile) all native apps
+3. Generate all the build rules (but do not compile) all native apps
 
     ```
     ./scripts/build/chipbuild.py --platform native generate
