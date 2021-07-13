@@ -17,7 +17,7 @@
  */
 
 #include "ApplicationBasicManager.h"
-#include "../cluster-helper.cpp"
+#include "../zcl-strings.h"
 #include <app/Command.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
