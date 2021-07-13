@@ -47,22 +47,22 @@ public:
     using IntegerType = StorageType;
 
     constexpr BitFlags() : mValue(0) {}
-    BitFlags(const BitFlags & other) = default;
-    BitFlags & operator=(const BitFlags &) = default;
+    constexpr BitFlags(const BitFlags & other) = default;
+    constexpr BitFlags & operator=(const BitFlags &) = default;
 
-    explicit BitFlags(FlagsEnum value) : mValue(static_cast<IntegerType>(value)) {}
-    explicit BitFlags(IntegerType value) : mValue(value) {}
+    constexpr explicit BitFlags(FlagsEnum value) : mValue(static_cast<IntegerType>(value)) {}
+    constexpr explicit BitFlags(IntegerType value) : mValue(value) {}
 
     template <typename... Args>
-    BitFlags(FlagsEnum flag, Args &&... args) : mValue(Or(flag, std::forward<Args>(args)...))
+    constexpr BitFlags(FlagsEnum flag, Args &&... args) : mValue(Or(flag, std::forward<Args>(args)...))
     {}
 
     template <typename... Args>
-    BitFlags(const BitFlags<FlagsEnum> & flags, Args &&... args) : mValue(Or(flags, std::forward<Args>(args)...))
+    constexpr BitFlags(const BitFlags<FlagsEnum> & flags, Args &&... args) : mValue(Or(flags, std::forward<Args>(args)...))
     {}
 
     template <typename... Args>
-    BitFlags(IntegerType value, Args &&... args) : mValue(value | Or(std::forward<Args>(args)...))
+    constexpr BitFlags(IntegerType value, Args &&... args) : mValue(value | Or(std::forward<Args>(args)...))
     {}
 
     /**

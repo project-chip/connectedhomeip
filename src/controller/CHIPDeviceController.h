@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <OperationalCredentialCluster-Gen.h>
 #include <app/InteractionModelDelegate.h>
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
@@ -42,6 +43,7 @@
 #include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#include <stl/DemuxedInvokeInitiator.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/AdminPairingTable.h>
@@ -525,7 +527,11 @@ public:
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
+    void OnInvokeDone(app::DemuxedInvokeInitiator & demuxedInitiator);
+
 private:
+    std::vector<std::unique_ptr<app::DemuxedInvokeInitiator>> mDemuxedInvokeInitiatorList;
+
     DevicePairingDelegate * mPairingDelegate;
 
     /* This field is an index in mActiveDevices list. The object at this index in the list
@@ -547,6 +553,8 @@ private:
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
 
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
+
+    std::unique_ptr<app::DemuxedInvokeInitiator> CreateInitiator(Device * device);
 
     void PersistDeviceList();
 
@@ -578,7 +586,8 @@ private:
     CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(Device * device);
 
     /* Callback when the previously sent CSR request results in failure */
-    static void OnCSRFailureResponse(void * context, uint8_t status);
+    void OnCSRFailureResponse(app::DemuxedInvokeInitiator & invokeInitiator, CHIP_ERROR error,
+                              chip::app::StatusResponse * response);
 
     /**
      * @brief
@@ -593,13 +602,15 @@ private:
      * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
      * @param[in] Signature       Cryptographic signature generated for the fields in the response message.
      */
-    static void OnOperationalCertificateSigningRequest(void * context, ByteSpan CSR, ByteSpan CSRNonce, ByteSpan VendorReserved1,
-                                                       ByteSpan VendorReserved2, ByteSpan VendorReserved3, ByteSpan Signature);
+    void OnOperationalCertificateSigningRequest(app::DemuxedInvokeInitiator & invokeInitiator, app::CommandParams & params,
+                                                chip::app::Cluster::OperationalCredentialCluster::OpCsrResponse::Type * resp);
 
     /* Callback when adding operational certs to device results in failure */
-    static void OnAddOpCertFailureResponse(void * context, uint8_t status);
+    void OnAddOpCertFailureResponse(app::DemuxedInvokeInitiator & invokeInitiator, CHIP_ERROR error,
+                                    chip::app::StatusResponse * response);
+
     /* Callback when the device confirms that it has added the operational certificates */
-    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText);
+    void OnOperationalCertificateAddResponse(app::DemuxedInvokeInitiator & invokeInitiator, app::CommandParams & params);
 
     /* Callback when the device confirms that it has added the root certificate */
     static void OnRootCertSuccessResponse(void * context);
@@ -623,8 +634,7 @@ private:
      * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
      * @param[in] Signature       Cryptographic signature generated for all the above fields.
      */
-    CHIP_ERROR ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
-                            const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
+    CHIP_ERROR ProcessOpCSR(const chip::app::Cluster::OperationalCredentialCluster::OpCsrResponse::Type & resp);
 
     // Cluster callbacks for advancing commissioning flows
     Callback::Callback<BasicSuccessCallback> mSuccess;
@@ -632,11 +642,7 @@ private:
 
     CommissioningStage GetNextCommissioningStage();
 
-    Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
-    Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> mOpCertResponseCallback;
     Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
-    Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
-    Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;
 
     Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;

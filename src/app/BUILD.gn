@@ -31,16 +31,28 @@ buildconfig_header("app_buildconfig") {
   defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}" ]
 }
 
+config("app_config") {
+  include_dirs = [
+    "util",
+    ".",
+    "${target_gen_dir}/include",
+  ]
+}
+
 static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
+    "Cluster.cpp",
+    "Cluster.h",
     "Command.cpp",
     "Command.h",
     "CommandHandler.cpp",
     "CommandSender.cpp",
     "EventManagement.cpp",
     "InteractionModelEngine.cpp",
+    "InvokeInteraction.cpp",
+    "InvokeInteraction.h",
     "MessageDef/AttributeDataElement.cpp",
     "MessageDef/AttributeDataElement.h",
     "MessageDef/AttributeDataList.cpp",

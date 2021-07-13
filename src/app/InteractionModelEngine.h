@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include "Cluster.h"
 #include <app/MessageDef/ReportData.h>
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
@@ -34,6 +35,7 @@
 #include <protocols/interaction_model/Constants.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <support/Pool.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -58,6 +60,9 @@
 #define IM_SERVER_MAX_NUM_PATH_GROUPS 8
 #define CHIP_MAX_NUM_WRITE_CLIENT 4
 #define CHIP_MAX_NUM_WRITE_HANDLER 4
+
+#define CHIP_CONFIG_MAX_CLUSTER_SERVERS 10
+#define CHIP_MAX_NUM_INVOKE_INTERACTIONS 4
 
 namespace chip {
 namespace app {
@@ -148,6 +153,7 @@ public:
     uint16_t GetReadClientArrayIndex(const ReadClient * const apReadClient) const;
 
     uint16_t GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const;
+    CHIP_ERROR RegisterServer(ClusterServer * apServer);
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
@@ -156,6 +162,7 @@ public:
 
 private:
     friend class reporting::Engine;
+
     CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
@@ -198,6 +205,20 @@ private:
     WriteClient mWriteClients[CHIP_MAX_NUM_WRITE_CLIENT];
     WriteHandler mWriteHandlers[CHIP_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
+
+    static void FreeReleasedInvokeResponderObjects(intptr_t a);
+
+private:
+    friend class InvokeResponder;
+
+private:
+    BitMapObjectPool<ClusterServer *, CHIP_CONFIG_MAX_CLUSTER_SERVERS> mClusterServers;
+    BitMapObjectPool<InvokeResponder, CHIP_MAX_NUM_INVOKE_INTERACTIONS> mInvokeResponders;
+
+    friend class TestInvokeInteraction;
+
+    auto GetClusterServerSet() -> decltype(mClusterServers) & { return mClusterServers; }
+
     ClusterInfo mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS];
     ClusterInfo * mpNextAvailableClusterInfo = nullptr;
 };
