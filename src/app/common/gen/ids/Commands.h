@@ -655,6 +655,7 @@ static constexpr CommandId TestSpecificResponse = 0x00;
 static constexpr CommandId TestNotHandled       = 0x01;
 static constexpr CommandId TestSpecific         = 0x02;
 static constexpr CommandId TestUnknownCommand   = 0x03;
+static constexpr CommandId TestAsyncTransaction = 0x04;
 } // namespace Ids
 } // namespace Commands
 } // namespace TestCluster

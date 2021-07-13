@@ -20,7 +20,7 @@
  * @brief Implementation for the Test Server Cluster
  ***************************************************************************/
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
@@ -29,6 +29,7 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <core/CHIPSafeCasts.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -146,13 +147,13 @@ void emberAfPluginTestClusterServerInitCallback(void)
     }
 }
 
-bool emberAfTestClusterClusterTestCallback(chip::app::Command *)
+bool emberAfTestClusterClusterTestCallback(chip::app::CommandHandler *)
 {
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
-bool emberAfTestClusterClusterTestSpecificCallback(chip::app::Command * apCommandObj)
+bool emberAfTestClusterClusterTestSpecificCallback(chip::app::CommandHandler * apCommandObj)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t returnValue = 7;
@@ -176,7 +177,34 @@ exit:
     return true;
 }
 
-bool emberAfTestClusterClusterTestNotHandledCallback(chip::app::Command *)
+namespace {
+app::CommandHandler::CommandHandlerAsyncHandle sTestAsyncTransaction = nullptr;
+EndpointId responseEndPointId                                        = 0;
+
+void SendAsyncTransactionResponse(intptr_t notUsed)
+{
+    if (sTestAsyncTransaction == nullptr)
+    {
+        return;
+    }
+    app::CommandPathParams cmdParams = { responseEndPointId, /* group id */ 0, ZCL_TEST_CLUSTER_ID,
+                                         ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+    sTestAsyncTransaction->AddStatusCode(cmdParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                         Protocols::InteractionModel::Id, Protocols::InteractionModel::ProtocolCode::Success);
+    sTestAsyncTransaction = nullptr; // Release transaction.
+}
+} // namespace
+
+bool emberAfTestClusterClusterTestAsyncTransactionCallback(chip::app::CommandHandler * apCommandObj)
+{
+    responseEndPointId = emberAfCurrentEndpoint();
+    VerifyOrReturnError(apCommandObj != nullptr, false);
+    sTestAsyncTransaction = apCommandObj->PreparePendingWork();
+    DeviceLayer::PlatformMgr().ScheduleWork(SendAsyncTransactionResponse, 0);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestNotHandledCallback(chip::app::CommandHandler *)
 {
     return false;
 }

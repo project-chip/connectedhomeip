@@ -21,7 +21,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/common/gen/enums.h>
@@ -29,7 +29,7 @@
 
 EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode);
 
-static void sendResponse(chip::app::Command * command, EmberAfKeypadInputStatus keypadInputStatus)
+static void sendResponse(chip::app::CommandHandler * command, EmberAfKeypadInputStatus keypadInputStatus)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_KEYPAD_INPUT_CLUSTER_ID,
@@ -49,7 +49,7 @@ exit:
     }
 }
 
-bool emberAfKeypadInputClusterSendKeyCallback(chip::app::Command * command, uint8_t keyCode)
+bool emberAfKeypadInputClusterSendKeyCallback(chip::app::CommandHandler * command, uint8_t keyCode)
 {
     EmberAfKeypadInputStatus status = keypadInputClusterSendKey(static_cast<EmberAfKeypadInputCecKeyCode>(keyCode));
     sendResponse(command, status);

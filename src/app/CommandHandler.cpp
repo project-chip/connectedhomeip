@@ -34,6 +34,15 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 
 namespace chip {
 namespace app {
+
+CHIP_ERROR CommandHandler::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
+{
+    ReturnErrorOnFailure(Command::Init(apExchangeMgr, apDelegate));
+    // Not pending any work.
+    mPendingWorkCount = 0;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
@@ -48,7 +57,19 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
     err = ProcessCommandMessage(std::move(payload), CommandRoleId::HandlerId);
     SuccessOrExit(err);
 
-    err = SendCommandResponse();
+    if (mPendingWorkCount == 0)
+    {
+        // We do not have pending work.
+        err = SendCommandResponse();
+    }
+    else
+    {
+        // We have background work pending, notify the exchange context to wait for it.
+        if (mpExchangeCtx)
+        {
+            mpExchangeCtx->WillSendMessage();
+        }
+    }
 
 exit:
     ChipLogFunctError(err);
@@ -159,6 +180,46 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathP
 exit:
     ChipLogFunctError(err);
     return err;
+}
+
+void CommandHandler::FinishPendingWork(System::Layer *, void * commandHandlerPtr, CHIP_ERROR aError)
+{
+    CommandHandler * _this = reinterpret_cast<CommandHandler *>(commandHandlerPtr);
+    VerifyOrReturn(_this != nullptr);
+    VerifyOrDie(aError == CHIP_NO_ERROR);
+    VerifyOrDie(_this->mPendingWorkCount != 0);
+    _this->mPendingWorkCount--;
+    if (_this->mPendingWorkCount == 0)
+    {
+        ChipLogFunctError(_this->SendCommandResponse());
+    }
+}
+
+void CommandHandler::CommandHandlerHandleDeleter::operator()(CommandHandler * _this) const
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturn(_this != nullptr);
+    err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionMgr()->SystemLayer()->ScheduleWork(
+        CommandHandler::FinishPendingWork, _this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to schedule work for CommandHandler %p: %s", _this, chip::ErrorStr(err));
+        // We must experience something wrong here, and the CommandHandler will be unstable.
+        chipDie();
+    }
+}
+
+CommandHandler::CommandHandlerAsyncHandle CommandHandler::PreparePendingWork()
+{
+    if (mState == CommandState::Uninitialized)
+    {
+        return nullptr;
+    }
+    else
+    {
+        mPendingWorkCount++;
+        return CommandHandlerAsyncHandle(this);
+    }
 }
 
 } // namespace app
