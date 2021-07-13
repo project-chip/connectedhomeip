@@ -27,8 +27,10 @@ set -e
     exit 0
 }
 
-CHIP_ROOT=$(_get_fullpath "${BASH_SOURCE%/scripts/tools/zap/run_zaptool.sh}")
+SCRIPT_PATH="$(_get_fullpath "$0")"
+CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/run_zaptool.sh}"
 [[ -n "$1" ]] && ZAP_ARGS=(-i "$(_get_fullpath "$1")") || ZAP_ARGS=()
+
 
 (
 
