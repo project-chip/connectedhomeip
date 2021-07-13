@@ -85,9 +85,9 @@ exit:
 
 CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & aReportDataBuilder, ReadHandler * apReadHandler)
 {
-    CHIP_ERROR err                               = CHIP_NO_ERROR;
-    ClusterInfo * clusterInfo                    = apReadHandler->GetAttributeClusterInfolist();
-    bool attributeClean = true;
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    ClusterInfo * clusterInfo = apReadHandler->GetAttributeClusterInfolist();
+    bool attributeClean       = true;
     TLV::TLVWriter backup;
     aReportDataBuilder.Checkpoint(backup);
     AttributeDataList::Builder attributeDataList = aReportDataBuilder.CreateAttributeDataListBuilder();

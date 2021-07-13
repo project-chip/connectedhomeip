@@ -204,7 +204,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
         CHIP_ERROR __err = (expr);                                                                                                 \
         if (__err != CHIP_NO_ERROR)                                                                                                \
         {                                                                                                                          \
-            ChipLogError(NotSpecified, "%s at %s:%d", chip::ErrorStr(__err), __FILE__, __LINE__);                                        \
+            ChipLogError(NotSpecified, "%s at %s:%d", chip::ErrorStr(__err), __FILE__, __LINE__);                                  \
             return __err;                                                                                                          \
         }                                                                                                                          \
     } while (false)
@@ -301,7 +301,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
-            ChipLogError(NotSpecified, "%s at %s:%d", chip::ErrorStr(code), __FILE__, __LINE__);                                         \
+            ChipLogError(NotSpecified, "%s at %s:%d", chip::ErrorStr(code), __FILE__, __LINE__);                                   \
             return code;                                                                                                           \
         }                                                                                                                          \
     } while (false)

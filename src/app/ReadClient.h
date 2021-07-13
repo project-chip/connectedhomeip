@@ -52,11 +52,11 @@ class ReadClient : public Messaging::ExchangeDelegate
 {
 public:
     /**  Once SendReadRequest returns successfully, the ReadClient will
-    *  handle calling Shutdown on itself once it decides it's done with waiting
-    *  for a response (i.e. times out or gets a response).
-    *  If SendReadRequest is never called, or the call fails, the API
-    *  consumer is responsible for calling Shutdown on the ReadClient.
-    */
+     *  handle calling Shutdown on itself once it decides it's done with waiting
+     *  for a response (i.e. times out or gets a response).
+     *  If SendReadRequest is never called, or the call fails, the API
+     *  consumer is responsible for calling Shutdown on the ReadClient.
+     */
     void Shutdown();
 
     /**
