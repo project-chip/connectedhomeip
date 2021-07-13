@@ -27,10 +27,7 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/tft"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/spidriver"
     "${CMAKE_CURRENT_LIST_DIR}/../../common/QRCode"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/screen-framework"
 )
 
 project(chip-temperature-measurement-app)
