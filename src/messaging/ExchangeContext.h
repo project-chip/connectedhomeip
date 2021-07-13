@@ -31,8 +31,8 @@
 #include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
-#include <support/TypeTraits.h>
 #include <support/ReferenceCountedHandle.h>
+#include <support/TypeTraits.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
