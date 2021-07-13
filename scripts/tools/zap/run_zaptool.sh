@@ -16,27 +16,38 @@
 # limitations under the License.
 #
 
-CHIP_ROOT=$(readlink -f "${BASH_SOURCE%/scripts/tools/zap/run_zaptool.sh}")
-ZAP_ROOT="$CHIP_ROOT/third_party/zap/repo"
-[[ -n "$1" ]] && ZAP_ARGS=(-i "$(readlink -f "$1")") || ZAP_ARGS=()
+function _get_fullpath {
+	cd $(dirname $1) && echo "$(pwd)/$(basename $1)"
+}
+
+set -e
+
+[[ "$1" == "--help" ]] && {
+  echo "Usage: $0 [ZAP-file-path]" >&2
+  exit 0
+}
+
+
+CHIP_ROOT=$(_get_fullpath "${BASH_SOURCE%/scripts/tools/zap/run_zaptool.sh}")
+[[ -n "$1" ]] && ZAP_ARGS=(-i "$(_get_fullpath "$1")") || ZAP_ARGS=()
+
+(
 
 cd "$CHIP_ROOT" &&
-    git submodule update --init third_party/zap/repo ||
-    exit 1
+    git submodule update --init third_party/zap/repo
 
-cd "$ZAP_ROOT"
+cd "third_party/zap/repo"
 if ! npm list installed-check &>/dev/null; then
-    npm install installed-check ||
-        exit 1
+    npm install installed-check
 fi
 
 if ! ./node_modules/.bin/installed-check -c &>/dev/null; then
-    npm install ||
-        exit 1
+    npm install
 fi
 
-cd "$ZAP_ROOT"
 node src-script/zap-start.js --logToStdout \
     --gen "$CHIP_ROOT/src/app/zap-templates/app-templates.json" \
     --zcl "$CHIP_ROOT/src/app/zap-templates/zcl/zcl.json" \
     "${ZAP_ARGS[@]}"
+
+)
