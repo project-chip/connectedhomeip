@@ -65,9 +65,6 @@ enum class ECName
     P256v1 = 1,
 };
 
-nlSTATIC_ASSERT_PRINT(kMax_ECDH_Secret_Length >= 32, "ECDH shared secret is too short");
-// nlSTATIC_ASSERT_PRINT(kMax_ECDSA_Signature_Length >= 72, "ECDSA signature buffer length is too short");
-
 static int _nidForCurve(ECName name)
 {
     switch (name)

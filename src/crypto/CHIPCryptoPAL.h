@@ -88,6 +88,10 @@ constexpr size_t kMAX_P256Keypair_Context_Size = 512;
 constexpr size_t kMax_ECDSA_X9Dot62_Asn1_Overhead = 9;
 constexpr size_t kMax_ECDSA_Signature_Length_Der  = kMax_ECDSA_Signature_Length + kMax_ECDSA_X9Dot62_Asn1_Overhead;
 
+nlSTATIC_ASSERT_PRINT(kMax_ECDH_Secret_Length >= kP256_FE_Length, "ECDH shared secret is too short for crypto suite");
+nlSTATIC_ASSERT_PRINT(kMax_ECDSA_Signature_Length >= kP256_ECDSA_Signature_Length_Raw,
+                      "ECDSA signature buffer length is too short for crypto suite");
+
 /**
  * Spake2+ parameters for P256
  * Defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html#name-ciphersuites
