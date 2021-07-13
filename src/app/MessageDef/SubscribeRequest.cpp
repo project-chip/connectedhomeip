@@ -96,9 +96,9 @@ CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_MinIntervalMs:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MinIntervalMs)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_MinIntervalMs);
+        case kCsTag_MinInterval:
+            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MinInterval)), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_MinInterval);
             VerifyOrReturnLogError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -108,9 +108,9 @@ CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_MaxIntervalMs:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MaxIntervalMs)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_MaxIntervalMs);
+        case kCsTag_MaxInterval:
+            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MaxInterval)), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_MaxInterval);
             VerifyOrReturnLogError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -153,7 +153,7 @@ CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
     PRETTY_PRINT("");
     if (CHIP_END_OF_TLV == err)
     {
-        const uint16_t RequiredFields = (1 << kCsTag_MinIntervalMs) | (1 << kCsTag_MaxIntervalMs);
+        const uint16_t RequiredFields = (1 << kCsTag_MinInterval) | (1 << kCsTag_MaxInterval);
 
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {
@@ -195,14 +195,14 @@ CHIP_ERROR SubscribeRequest::Parser::GetEventNumber(uint64_t * const apEventNumb
     return GetUnsignedInteger(kCsTag_EventNumber, apEventNumber);
 }
 
-CHIP_ERROR SubscribeRequest::Parser::GetMinIntervalMs(uint16_t * const apMinIntervalMs) const
+CHIP_ERROR SubscribeRequest::Parser::GetMinIntervalSeconds(uint16_t * const apMinIntervalSeconds) const
 {
-    return GetUnsignedInteger(kCsTag_EventNumber, apMinIntervalMs);
+    return GetUnsignedInteger(kCsTag_EventNumber, apMinIntervalSeconds);
 }
 
-CHIP_ERROR SubscribeRequest::Parser::GetMaxIntervalMs(uint16_t * const apMaxIntervalMs) const
+CHIP_ERROR SubscribeRequest::Parser::GetMaxIntervalSeconds(uint16_t * const apMaxIntervalSeconds) const
 {
-    return GetUnsignedInteger(kCsTag_EventNumber, apMaxIntervalMs);
+    return GetUnsignedInteger(kCsTag_EventNumber, apMaxIntervalSeconds);
 }
 
 CHIP_ERROR SubscribeRequest::Parser::GetKeepExistingSubscriptions(bool * const apKeepExistingSubscription) const
@@ -263,21 +263,21 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::EventNumber(const uint64_
     return *this;
 }
 
-SubscribeRequest::Builder & SubscribeRequest::Builder::MinIntervalMs(const uint16_t aMinIntervalMs)
+SubscribeRequest::Builder & SubscribeRequest::Builder::MinIntervalSeconds(const uint16_t aMinIntervalSeconds)
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MinIntervalMs), aMinIntervalMs);
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MinInterval), aMinIntervalSeconds);
         ChipLogFunctError(mError);
     }
     return *this;
 }
 
-SubscribeRequest::Builder & SubscribeRequest::Builder::MaxIntervalMs(const uint16_t aMaxIntervalMs)
+SubscribeRequest::Builder & SubscribeRequest::Builder::MaxIntervalSeconds(const uint16_t aMaxIntervalSeconds)
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MaxIntervalMs), aMaxIntervalMs);
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MaxInterval), aMaxIntervalSeconds);
         ChipLogFunctError(mError);
     }
     return *this;
