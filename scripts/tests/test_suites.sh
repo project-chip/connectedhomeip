@@ -41,7 +41,7 @@ while getopts a:i:hs:w: flag; do
         i) iterations=$OPTARG ;;
         h) usage ;;
         s) single_case=$OPTARG ;;
-        w) test_case_wrapper=($OPTARG) ;;
+        w) test_case_wrapper=("$OPTARG") ;;
     esac
 done
 
