@@ -103,54 +103,56 @@ class TestPythonController(CHIPVirtualHome):
                             "Datamodel test failed: cannot find matching string from device {}".format(device_id))
 
         # Check if the device response proper Basic Cluster values to controller.
-        fmt = "CHIP:ZCL:   ClusterId: {cluster}\n" \
-              "CHIP:ZCL:   attributeId: {attr}\n" \
-              "CHIP:ZCL:   status: EMBER_ZCL_STATUS_SUCCESS (0x00)\n" \
-              "CHIP:ZCL:   attributeType: {attr_type}\n" \
-              "CHIP:ZCL:   value: {value}"
+        # Note: the TLV Type for string attributes is 0x0c, which is byte_string, this is fixed by #8167, modification for this case is required.
+        baseFmt = "CHIP:ZCL:   ClusterId: {cluster}\n" \
+            "CHIP:ZCL:   attributeId: {attr}\n" \
+            "CHIP:ZCL:   status: Success                (0x0000)\n" \
+            "CHIP:ZCL:   attribute TLV Type: {attr_tlv_type}\n"
+        fmtString = baseFmt + "CHIP:ZCL:   value: {attr_value}\n"
+        fmtNumeric = baseFmt + "CHIP:ZCL:   attributeValue: {attr_value}\n"
 
         for device_id in server_ids:
             matchContent = []
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0001',
-                                       attr_type='0x42',
-                                       value='TEST_VENDOR').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0002',
-                                       attr_type='0x21',
-                                       value='0x235a').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0003',
-                                       attr_type='0x42',
-                                       value='TEST_PRODUCT').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0004',
-                                       attr_type='0x21',
-                                       value='0xfeff').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0005',
-                                       attr_type='0x42',
-                                       value='').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0006',
-                                       attr_type='0x42',
-                                       value='').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0007',
-                                       attr_type='0x21',
-                                       value='0x0001').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0008',
-                                       attr_type='0x42',
-                                       value='TEST_VERSION').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0009',
-                                       attr_type='0x23',
-                                       value='0x00000001').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x000a',
-                                       attr_type='0x42',
-                                       value='prerelease').split("\n")
+            matchContent += fmtString.format(cluster='0x0028',
+                                             attr='0x0001',
+                                             attr_tlv_type='0x0c',
+                                             attr_value='TEST_VENDOR').split("\n")
+            matchContent += fmtNumeric.format(cluster='0x0028',
+                                              attr='0x0002',
+                                              attr_tlv_type='0x04',
+                                              attr_value='9050').split("\n")
+            matchContent += fmtString.format(cluster='0x0028',
+                                             attr='0x0003',
+                                             attr_tlv_type='0x0c',
+                                             attr_value='TEST_PRODUCT').split("\n")
+            matchContent += fmtNumeric.format(cluster='0x0028',
+                                              attr='0x0004',
+                                              attr_tlv_type='0x04',
+                                              attr_value='65279').split("\n")
+            matchContent += fmtString.format(cluster='0x0028',
+                                             attr='0x0005',
+                                             attr_tlv_type='0x0c',
+                                             attr_value='').split("\n")
+            matchContent += fmtString.format(cluster='0x0028',
+                                             attr='0x0006',
+                                             attr_tlv_type='0x0c',
+                                             attr_value='').split("\n")
+            matchContent += fmtNumeric.format(cluster='0x0028',
+                                              attr='0x0007',
+                                              attr_tlv_type='0x04',
+                                              attr_value='1').split("\n")
+            matchContent += fmtString.format(cluster='0x0028',
+                                             attr='0x0008',
+                                             attr_tlv_type='0x0c',
+                                             attr_value='TEST_VERSION').split("\n")
+            matchContent += fmtNumeric.format(cluster='0x0028',
+                                              attr='0x0009',
+                                              attr_tlv_type='0x04',
+                                              attr_value='1').split("\n")
+            matchContent += fmtString.format(cluster='0x0028',
+                                             attr='0x000a',
+                                             attr_tlv_type='0x0c',
+                                             attr_value='prerelease').split("\n")
 
             self.assertTrue(self.sequenceMatch(ret['output'],
                                                matchContent),
