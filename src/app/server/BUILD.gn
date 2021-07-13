@@ -39,13 +39,19 @@ static_library("server") {
     "Server.h",
     "StorablePeerConnection.cpp",
     "StorablePeerConnection.h",
+    "../clusters/network-commissioning/network-commissioning.cpp",
+    "../clusters/network-commissioning/network-commissioning.h"
   ]
 
-  public_configs = [ ":server_config" ]
+  public_configs = [ 
+    ":server_config",
+    "${chip_root}/gen-v2/device:includes"
+  ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/gen-v2/device",
     "${chip_root}/src/app",
     "${chip_root}/src/lib/mdns",
     "${chip_root}/src/messaging",

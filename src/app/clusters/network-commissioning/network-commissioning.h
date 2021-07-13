@@ -22,19 +22,81 @@
 #include <app/common/gen/enums.h>
 #include <lib/core/CHIPCore.h>
 #include <platform/internal/DeviceNetworkProvisioning.h>
+#include <Cluster.h>
+#include <NetworkCommissioningCluster-Gen.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <lib/support/ThreadOperationalDataset.h>
 
 namespace chip {
 namespace app {
-namespace clusters {
-namespace NetworkCommissioning {
-EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan operationalDataset,
-                                                                           uint64_t breadcrumb, uint32_t timeoutMs);
-EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan ssid,
-                                                                         ByteSpan credentials, uint64_t breadcrumb,
-                                                                         uint32_t timeoutMs);
-EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan networkID,
-                                                                        uint64_t breadcrumb, uint32_t timeoutMs);
-} // namespace NetworkCommissioning
+namespace Cluster {
+
+#ifndef CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS
+#define CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS 4
+#endif // CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS
+    
+class NetworkCommissioningServer : public ClusterServer {
+public:
+    NetworkCommissioningServer();
+
+private:
+    CHIP_ERROR OnInvokeRequest(CommandParams &commandParams, InvokeResponder &invokeInteraction, TLV::TLVReader *payload) override;
+    CHIP_ERROR AddThreadNetwork(chip::app::Cluster::NetworkCommissioningCluster::AddThreadNetworkCommand::Type &request);
+    CHIP_ERROR AddWifiNetwork(chip::app::Cluster::NetworkCommissioningCluster::AddWifiNetworkCommand::Type &request);
+    CHIP_ERROR EnableNetwork(chip::app::Cluster::NetworkCommissioningCluster::EnableNetworkCommand::Type &request);
+
+private:
+    constexpr static uint8_t kMaxNetworkIDLen       = 32;
+    constexpr static uint8_t kMaxThreadDatasetLen   = 254; // As defined in Thread spec.
+    constexpr static uint8_t kMaxWiFiSSIDLen        = 32;
+    constexpr static uint8_t kMaxWiFiCredentialsLen = 64;
+    constexpr static uint8_t kMaxNetworks           = CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS;
+
+    enum class NetworkType : uint8_t
+    {
+        kUndefined = 0,
+        kWiFi      = 1,
+        kThread    = 2,
+        kEthernet  = 3,
+    };
+
+    struct ThreadNetworkInfo
+    {
+        uint8_t mDataset[kMaxThreadDatasetLen];
+        uint8_t mDatasetLen;
+    };
+
+    struct WiFiNetworkInfo
+    {
+        uint8_t mSSID[kMaxWiFiSSIDLen + 1];
+        uint8_t mSSIDLen;
+        uint8_t mCredentials[kMaxWiFiCredentialsLen];
+        uint8_t mCredentialsLen;
+    };
+
+    struct NetworkInfo
+    {
+        uint8_t mNetworkID[kMaxNetworkIDLen];
+        uint8_t mNetworkIDLen;
+        uint8_t mEnabled;
+        NetworkType mNetworkType;
+        union NetworkData
+        {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+            Thread::OperationalDataset mThread;
+#endif
+#if defined(CHIP_DEVICE_LAYER_TARGET)
+            WiFiNetworkInfo mWiFi;
+#endif
+        } mData;
+    };
+
+    CHIP_ERROR DoEnableNetwork(NetworkInfo *network);
+
+private:    
+    NetworkInfo mNetworks[kMaxNetworks];
+
+};
 
 } // namespace clusters
 } // namespace app

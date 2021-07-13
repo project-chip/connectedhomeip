@@ -68,6 +68,8 @@ public:
      */
     CommandDataElement::Builder & CreateCommandDataElementBuilder();
 
+    CommandDataElement::Builder & GetCommandDataElementBuidler() { return mCommandDataElementBuilder; }
+
     /**
      *  @return A reference to CommandDataElement::Builder
      */
