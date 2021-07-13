@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
