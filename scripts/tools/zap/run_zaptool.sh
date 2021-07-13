@@ -17,7 +17,7 @@
 #
 
 function _get_fullpath {
-	cd $(dirname $1) && echo "$(pwd)/$(basename $1)"
+	cd "$(dirname "$1")" && echo "$PWD/$(basename "$1")"
 }
 
 set -e
