@@ -3127,7 +3127,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 2);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 3);
         [expectation fulfill];
     }];
 
@@ -3145,7 +3145,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 2);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 3);
         [expectation fulfill];
     }];
 
