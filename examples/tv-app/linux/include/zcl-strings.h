@@ -28,12 +28,4 @@ uint8_t * MakeZclCharString(uint8_t (&zclString)[BufferLength], char (&cString)[
     return zclString;
 }
 
-template <size_t BufferLength>
-char * MakeCharZclString(uint8_t (&zclString)[BufferLength], char (&cString)[BufferLength])
-{
-    static_assert(BufferLength <= 256, "Too long string to fit in ZCL_CHAR_STRING type");
-    memcpy(cString, &zclString[1], zclString[0]);
-    return cString;
-}
-
 } // namespace

@@ -31,7 +31,6 @@ executable("chip-tv-app") {
     "include/audio-output/AudioOutputManager.cpp",
     "include/audio-output/AudioOutputManager.h",
     "include/cluster-change-attribute.cpp",
-    "include/cluster-helper.cpp",
     "include/cluster-init.cpp",
     "include/content-launcher/ContentLauncherManager.cpp",
     "include/content-launcher/ContentLauncherManager.h",
@@ -51,6 +50,7 @@ executable("chip-tv-app") {
     "include/tv-channel/TvChannelManager.h",
     "include/wake-on-lan/WakeOnLanManager.cpp",
     "include/wake-on-lan/WakeOnLanManager.h",
+    "include/zcl-strings.h",
     "main.cpp",
   ]
 
