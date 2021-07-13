@@ -173,9 +173,8 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr)
                             ChipLogValueX64(session->GetPeerNodeId()));
             if (gSessionIDAllocator.Reserve(keyId) == CHIP_NO_ERROR)
             {
-                sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->GetPeerAddress()),
-                                      session->GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
-                                      connection.GetAdminId());
+                sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->GetPeerAddress()), session->GetPeerNodeId(),
+                                      session, SecureSession::SessionRole::kResponder, connection.GetAdminId());
             }
             else
             {

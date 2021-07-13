@@ -85,7 +85,7 @@ public:
     virtual const char * GetR2ISessionInfo() const = 0;
 
 private:
-    NodeId mPeerNodeId                      = kUndefinedNodeId;
+    NodeId mPeerNodeId = kUndefinedNodeId;
     // TODO(#8206): Remove address and use peer cache instead.
     Transport::PeerAddress mPeerAddress     = Transport::PeerAddress::Uninitialized();
     static constexpr uint16_t kInvalidKeyId = UINT16_MAX;
