@@ -17,7 +17,6 @@
 
 #pragma once
 #include "Builder.h"
-#include "EventPathList.h"
 #include "Parser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -28,11 +27,10 @@
 
 namespace chip {
 namespace app {
-namespace SubscribeResponse {
+namespace TimedRequest {
 enum
 {
-    kCsTag_SubscriptionId      = 0,
-    kCsTag_FinalSyncIntervalMs = 1,
+    kCsTag_TimeoutMs = 0,
 };
 
 class Parser : public chip::app::Parser
@@ -53,25 +51,19 @@ public:
      *    receiving during protocol development and debugging.
      *    The encoding rule has changed in IM encoding spec so this
      *    check is only "roughly" conformant now.
+     *
+     *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR CheckSchemaValidity() const;
 #endif
 
     /**
-     *  @brief Get Subscription ID. Next() must be called before accessing them.
+     *  @brief Get Timeout value. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetSubscriptionId(uint64_t * const apSubscriptionId) const;
-
-    /**
-     *  @brief Get FinalSyncInterval. Next() must be called before accessing them.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetFinalSyncIntervalMs(uint16_t * const apFinalSyncIntervalMs) const;
+    CHIP_ERROR GetTimeoutMs(uint16_t * const apTimeoutMs) const;
 };
 
 class Builder : public chip::app::Builder
@@ -80,20 +72,11 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     *  @brief final subscription Id for the subscription back to the client.s.
+     *  @brief Timeout value, sent by a client to a server, if there is a preceding successful Timed Request action,
+     *  the following action SHALL be received before the end of the Timeout interval.
      */
-    SubscribeResponse::Builder & SubscriptionId(const uint64_t SubscriptionId);
-
-    /**
-     *  @brief Final Sync Interval for the subscription back to the clients.
-     */
-    SubscribeResponse::Builder & FinalSyncIntervalMs(const uint16_t aFinalSyncIntervalMs);
-
-    /**
-     *  @brief Mark the end of this SubscribeResponse
-     */
-    SubscribeResponse::Builder & EndOfSubscribeResponse();
+    TimedRequest::Builder & TimeoutMs(const uint16_t aTimeoutMs);
 };
-} // namespace SubscribeResponse
+} // namespace TimedRequest
 } // namespace app
 } // namespace chip

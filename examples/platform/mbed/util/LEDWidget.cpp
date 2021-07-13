@@ -57,7 +57,7 @@ void LEDWidget::Animate()
 {
     if (mBlinkOnTimeMS != 0 && mBlinkOffTimeMS != 0)
     {
-        uint64_t nowMS      = chip::System::Platform::Layer::GetClock_MonotonicMS();
+        uint64_t nowMS      = chip::System::Clock::GetMonotonicMilliseconds();
         uint32_t stateDurMS = (mLED == LED_ACTIVE_STATE) ? mBlinkOnTimeMS : mBlinkOffTimeMS;
 
         if (nowMS > mLastChangeTimeMS + stateDurMS)

@@ -80,27 +80,21 @@ using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
-int AppTask::StartAppTask()
+CHIP_ERROR AppTask::StartAppTask()
 {
-    int err = CHIP_CONFIG_CORE_ERROR_MAX;
-
     sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
     if (sAppEventQueue == NULL)
     {
         EFR32_LOG("Failed to allocate app event queue");
-        appError(err);
+        appError(APP_ERROR_EVENT_QUEUE_FAILED);
     }
 
     // Start App task.
     sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
-    if (sAppTaskHandle != NULL)
-    {
-        err = CHIP_NO_ERROR;
-    }
-    return err;
+    return (sAppTaskHandle == nullptr) ? APP_ERROR_CREATE_TASK_FAILED : CHIP_NO_ERROR;
 }
 
-int AppTask::Init()
+CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -238,7 +232,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         sStatusLED.Animate();
         sLightLED.Animate();
 
-        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
+        uint64_t nowUS            = chip::System::Clock::GetMonotonicMicroseconds();
         uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
 
         if (nowUS > nextChangeTimeUS)
@@ -254,7 +248,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     bool initiated = false;
     LightingManager::Action_t action;
     int32_t actor;
-    int err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Light)
     {
@@ -275,7 +269,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        err = CHIP_CONFIG_CORE_ERROR_MAX;
+        err = APP_ERROR_UNHANDLED_EVENT;
     }
 
     if (err == CHIP_NO_ERROR)
@@ -419,7 +413,7 @@ void AppTask::CancelTimer()
     if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
     {
         EFR32_LOG("app timer stop() failed");
-        appError(CHIP_CONFIG_CORE_ERROR_MAX);
+        appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 
     mFunctionTimerActive = false;
@@ -439,7 +433,7 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     if (xTimerChangePeriod(sFunctionTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
     {
         EFR32_LOG("app timer start() failed");
-        appError(CHIP_CONFIG_CORE_ERROR_MAX);
+        appError(APP_ERROR_START_TIMER_FAILED);
     }
 
     mFunctionTimerActive = true;

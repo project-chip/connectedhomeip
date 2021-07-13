@@ -42,7 +42,8 @@ namespace Internal {
  */
 CHIP_ERROR MapOpenThreadError(otError otErr)
 {
-    return (otErr == OT_ERROR_NONE) ? CHIP_NO_ERROR : CHIP_CONFIG_OPENTHREAD_ERROR_MIN + static_cast<CHIP_ERROR>(otErr);
+    return (otErr == OT_ERROR_NONE) ? CHIP_NO_ERROR
+                                    : ChipError::Encapsulate(ChipError::Range::kOpenThread, static_cast<unsigned int>(otErr));
 }
 
 /**
@@ -59,7 +60,7 @@ CHIP_ERROR MapOpenThreadError(otError otErr)
  */
 bool FormatOpenThreadError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
-    if (err < CHIP_CONFIG_OPENTHREAD_ERROR_MIN || err > CHIP_CONFIG_OPENTHREAD_ERROR_MAX)
+    if (!ChipError::IsRange(ChipError::Range::kOpenThread, err))
     {
         return false;
     }
@@ -67,7 +68,7 @@ bool FormatOpenThreadError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 #if CHIP_CONFIG_SHORT_ERROR_STR
     const char * desc = NULL;
 #else  // CHIP_CONFIG_SHORT_ERROR_STR
-    otError otErr     = (otError)(err - CHIP_CONFIG_OPENTHREAD_ERROR_MIN);
+    otError otErr     = (otError) ChipError::GetValue(err);
     const char * desc = otThreadErrorToString(otErr);
 #endif // CHIP_CONFIG_SHORT_ERROR_STR
 
