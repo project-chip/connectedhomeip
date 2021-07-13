@@ -1143,9 +1143,11 @@ private:
             return;
         }
 
-        if (vendorId != 1U)
+        chip::ByteSpan vendorNameArgument =
+            chip::ByteSpan(chip::Uint8::from_const_char("exampleVendorName1"), strlen("exampleVendorName1"));
+        if (!vendorName.data_equal(vendorNameArgument))
         {
-            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "exampleVendorName1");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
@@ -1263,6 +1265,199 @@ private:
         TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
 
         if (runner->mIsFailureExpected_3 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        chip::ByteSpan applicationNameArgument =
+            chip::ByteSpan(chip::Uint8::from_const_char("exampleName1"), strlen("exampleName1"));
+        if (!applicationName.data_equal(applicationNameArgument))
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "exampleName1");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute product id
+    using SuccessCallback_4 = void (*)(void * context, uint16_t productId);
+    chip::Callback::Callback<SuccessCallback_4> mOnSuccessCallback_4{
+        OnTestSendClusterApplicationBasicCommandReadAttribute_4_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
+        OnTestSendClusterApplicationBasicCommandReadAttribute_4_FailureResponse, this
+    };
+    bool mIsFailureExpected_4 = 0;
+
+    CHIP_ERROR TestSendClusterApplicationBasicCommandReadAttribute_4()
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute product id: Sending command...");
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeProductId(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_4_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute product id: Failure Response");
+
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
+
+        if (runner->mIsFailureExpected_4 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_4_SuccessResponse(void * context, uint16_t productId)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute product id: Success Response");
+
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
+
+        if (runner->mIsFailureExpected_4 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (productId != 1U)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute id
+    using SuccessCallback_5 = void (*)(void * context, chip::ByteSpan applicationId);
+    chip::Callback::Callback<SuccessCallback_5> mOnSuccessCallback_5{
+        OnTestSendClusterApplicationBasicCommandReadAttribute_5_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
+        OnTestSendClusterApplicationBasicCommandReadAttribute_5_FailureResponse, this
+    };
+    bool mIsFailureExpected_5 = 0;
+
+    CHIP_ERROR TestSendClusterApplicationBasicCommandReadAttribute_5()
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute id: Sending command...");
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeApplicationId(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_5_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute id: Failure Response");
+
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
+
+        if (runner->mIsFailureExpected_5 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_5_SuccessResponse(void * context,
+                                                                                        chip::ByteSpan applicationId)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute id: Success Response");
+
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
+
+        if (runner->mIsFailureExpected_5 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        chip::ByteSpan applicationIdArgument = chip::ByteSpan(chip::Uint8::from_const_char("1"), strlen("1"));
+        if (!applicationId.data_equal(applicationIdArgument))
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read attribute catalog vendor id
+    using SuccessCallback_6 = void (*)(void * context, uint16_t catalogVendorId);
+    chip::Callback::Callback<SuccessCallback_6> mOnSuccessCallback_6{
+        OnTestSendClusterApplicationBasicCommandReadAttribute_6_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
+        OnTestSendClusterApplicationBasicCommandReadAttribute_6_FailureResponse, this
+    };
+    bool mIsFailureExpected_6 = 0;
+
+    CHIP_ERROR TestSendClusterApplicationBasicCommandReadAttribute_6()
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute catalog vendor id: Sending command...");
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(mDevice, 3);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeCatalogVendorId(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_6_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute catalog vendor id: Failure Response");
+
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
+
+        if (runner->mIsFailureExpected_6 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterApplicationBasicCommandReadAttribute_6_SuccessResponse(void * context, uint16_t catalogVendorId)
+    {
+        ChipLogProgress(chipTool, "Application Basic - Read attribute catalog vendor id: Success Response");
+
+        TV_ApplicationBasicCluster * runner = reinterpret_cast<TV_ApplicationBasicCluster *>(context);
+
+        if (runner->mIsFailureExpected_6 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -2782,6 +2977,127 @@ private:
         if (runner->mIsFailureExpected_5 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
+class TV_WakeOnLanCluster : public TestCommand
+{
+public:
+    TV_WakeOnLanCluster() : TestCommand("TV_WakeOnLanCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "TV_WakeOnLanCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterWakeOnLanCommandReadAttribute_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "TV_WakeOnLanCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    // Test Read mac address
+    typedef void (*SuccessCallback_0)(void * context, chip::ByteSpan wakeOnLanMacAddress);
+    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
+    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
+    bool mIsFailureExpected_0                                               = 0;
+
+    CHIP_ERROR TestSendClusterWakeOnLanCommandReadAttribute_0()
+    {
+        ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Sending command...");
+
+        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
+            OnTestSendClusterWakeOnLanCommandReadAttribute_0_FailureResponse, this);
+        mOnSuccessCallback_0 =
+            new chip::Callback::Callback<SuccessCallback_0>(OnTestSendClusterWakeOnLanCommandReadAttribute_0_SuccessResponse, this);
+
+        chip::Controller::WakeOnLanCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeWakeOnLanMacAddress(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel());
+
+        if (CHIP_NO_ERROR != err)
+        {
+            delete mOnFailureCallback_0;
+            delete mOnSuccessCallback_0;
+        }
+
+        return err;
+    }
+
+    static void OnTestSendClusterWakeOnLanCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Failure Response");
+
+        TV_WakeOnLanCluster * runner = reinterpret_cast<TV_WakeOnLanCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterWakeOnLanCommandReadAttribute_0_SuccessResponse(void * context, chip::ByteSpan wakeOnLanMacAddress)
+    {
+        ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Success Response");
+
+        TV_WakeOnLanCluster * runner = reinterpret_cast<TV_WakeOnLanCluster *>(context);
+
+        delete runner->mOnFailureCallback_0;
+        delete runner->mOnSuccessCallback_0;
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        chip::ByteSpan wakeOnLanMacAddressArgument =
+            chip::ByteSpan(chip::Uint8::from_const_char("00:00:00:00:00"), strlen("00:00:00:00:00"));
+        if (!wakeOnLanMacAddress.data_equal(wakeOnLanMacAddressArgument))
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "00:00:00:00:00");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
@@ -19317,6 +19633,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TV_TvChannelCluster>(),
         make_unique<TV_LowPowerCluster>(),
         make_unique<TV_MediaInputCluster>(),
+        make_unique<TV_WakeOnLanCluster>(),
         make_unique<TestCluster>(),
         make_unique<Test_TC_OO_1_1>(),
         make_unique<Test_TC_OO_2_1>(),
