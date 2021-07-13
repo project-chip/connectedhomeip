@@ -171,7 +171,7 @@ bool emberAfTestClusterClusterTestSpecificCallback(chip::app::Command * apComman
 exit:
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(Zcl, "Test Cluster: failed to send TestSpecific response: %x", err);
+        ChipLogError(Zcl, "Test Cluster: failed to send TestSpecific response: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
     }
     return true;
 }

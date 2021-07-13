@@ -732,7 +732,6 @@ CHIP_ERROR PASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
         "Assuming size of Spake2pErrorMsg message is 1 octet, so that endian-ness conversion and memory alignment is not needed");
 
     Spake2pErrorMsg * pMsg = reinterpret_cast<Spake2pErrorMsg *>(msg->Start());
-    ChipLogError(SecureChannel, "Received error during pairing process. %s", ErrorStr(pMsg->error));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     switch (pMsg->error)
@@ -749,6 +748,7 @@ CHIP_ERROR PASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
         err = CHIP_ERROR_INTERNAL;
         break;
     };
+    ChipLogError(SecureChannel, "Received error during pairing process. %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
 
     return err;
 }

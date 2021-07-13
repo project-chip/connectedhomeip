@@ -56,7 +56,7 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
         else
         {
             ChipLogError(Discovery, "Commissioning errored out with error %" CHIP_ERROR_FORMAT,
-                         event->CommissioningComplete.status);
+                         ChipError::FormatError(event->CommissioningComplete.status));
         }
         // TODO: Commissioning complete means we can finalize the admin in our storage
     }

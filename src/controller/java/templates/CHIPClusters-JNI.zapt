@@ -113,7 +113,7 @@ class CHIPDefaultSuccessCallback : public Callback::Callback<DefaultSuccessCallb
 
         exit:
             if (err != CHIP_NO_ERROR) {
-                ChipLogError(Zcl, "Error invoking Java callback: %d", err);
+                ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
             }
             if (cppCallback != nullptr) {
                 cppCallback->Cancel();
@@ -179,7 +179,7 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
             env->CallVoidMethod(javaCallbackRef, javaMethod, exception);
         exit:
             if (err != CHIP_NO_ERROR) {
-                ChipLogError(Zcl, "Error invoking Java callback: %d", err);
+                ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
             }
             if (cppCallback != nullptr) {
                 cppCallback->Cancel();
@@ -290,7 +290,7 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
 
         exit:
             if (err != CHIP_NO_ERROR) {
-                ChipLogError(Zcl, "Error invoking Java callback: %d", err);
+                ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
             }
             if (cppCallback != nullptr) {
                 cppCallback->Cancel();
@@ -373,13 +373,13 @@ exit:
 
         err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR) {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
             return;
         }
 
-        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        err = CreateIllegalStateException(env, "Error invoking cluster", ChipError::FormatError(err), exception);
         if (err != CHIP_NO_ERROR) {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
             return;
         }
         env->CallVoidMethod(callback, method, exception);

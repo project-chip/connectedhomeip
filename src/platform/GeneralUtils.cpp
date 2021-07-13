@@ -121,12 +121,12 @@ bool FormatDeviceLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     }
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    switch (err)
+    switch (ChipError::AsInteger(err))
     {
-    case CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND:
+    case ChipError::AsInteger(CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND):
         desc = "Config not found";
         break;
-    case CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED:
+    case ChipError::AsInteger(CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED):
         desc = "Not service provisioned";
         break;
     }

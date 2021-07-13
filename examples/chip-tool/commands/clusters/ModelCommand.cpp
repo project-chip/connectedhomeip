@@ -40,9 +40,9 @@ CHIP_ERROR ModelCommand::Run()
     auto * ctx = GetExecContext();
 
     err = ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-    VerifyOrExit(
-        err == CHIP_NO_ERROR,
-        ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %d", ctx->remoteId, err));
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %" CHIP_ERROR_FORMAT,
+                              ctx->remoteId, ChipError::FormatError(err)));
 
 exit:
     return err;
@@ -59,7 +59,8 @@ void ModelCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device 
 void ModelCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
 {
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %d", deviceId, error);
+    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %" CHIP_ERROR_FORMAT, deviceId,
+                 ChipError::FormatError(error));
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "ModelCommand context is null"));
     command->SetCommandExitStatus(error);
 }

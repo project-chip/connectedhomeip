@@ -50,10 +50,37 @@ namespace chip {
 class ChipError
 {
 public:
-    using BaseType = uint32_t;
+    // Internal representation of an error.
+    using StorageType = uint32_t;
 
-    /// `printf` format for error numbers. This is a C macro in order to allow for string literal concatenation.
-#define CHIP_ERROR_FORMAT PRIx32
+    /// Type for encapsulated error values.
+    using ValueType = StorageType;
+
+    // Type of CHIP_ERROR.
+#if CHIP_CONFIG_ERROR_CLASS
+    using ErrorType = ChipError;
+#else  // CHIP_CONFIG_ERROR_CLASS
+    using ErrorType = ChipError::StorageType;
+#endif // CHIP_CONFIG_ERROR_CLASS
+
+    /// Integer `printf` format for errors. This is a C macro in order to allow for string literal concatenation.
+#define CHIP_ERROR_INTEGER_FORMAT PRIx32
+
+#if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+
+    /// Type returned by `FormatError()`.
+    using FormatErrorType = const char *;
+    /// `printf` format for `FormatError()`. This is a C macro in order to allow for string literal concatenation.
+#define CHIP_ERROR_FORMAT "s"
+
+#else // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+
+    /// Type returned by `FormatError()`.
+    using FormatErrorType = StorageType;
+    /// `printf` format for `FormatError()`. This is a C macro in order to allow for string literal concatenation.
+#define CHIP_ERROR_FORMAT CHIP_ERROR_INTEGER_FORMAT
+
+#endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
 
     /// Top-level error classification.
     enum class Range : uint8_t
@@ -77,26 +104,62 @@ public:
         kApplication = 7, ///< Application-defined errors.
     };
 
-    /// Test whether @a error belongs to @a range.
-    static constexpr bool IsRange(Range range, BaseType error)
+    ChipError() = default;
+    explicit constexpr ChipError(StorageType error) : mError(error) {}
+
+    bool operator==(const ChipError & other) const { return mError == other.mError; }
+    bool operator!=(const ChipError & other) const { return mError != other.mError; }
+
+    constexpr explicit operator bool() const { return mError; }
+    static constexpr StorageType AsInteger(StorageType error) { return error; }
+    static constexpr StorageType AsInteger(ChipError error) { return error.mError; }
+
+    /// Format an @a error for printing.
+#if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+    static FormatErrorType FormatError(ErrorType error)
     {
-        return (error & MakeMask(kRangeStart, kRangeLength)) == MakeField(kRangeStart, static_cast<BaseType>(range));
+        extern const char * ErrorStr(ErrorType);
+        return ErrorStr(error);
+    }
+#else  // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+    static FormatErrorType FormatError(ErrorType error) { return AsInteger(error); }
+#endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+
+    /// Test whether @a error belongs to @a range.
+    static constexpr bool IsRange(Range range, ErrorType error)
+    {
+        return (AsInteger(error) & MakeMask(kRangeStart, kRangeLength)) == MakeField(kRangeStart, static_cast<StorageType>(range));
     }
 
-    static constexpr Range GetRange(BaseType error) { return static_cast<Range>(GetField(kRangeStart, kRangeLength, error)); }
-    static BaseType GetValue(BaseType error) { return GetField(kValueStart, kValueLength, error); }
+    /// Get the `Range` to which the @a error belongs.
+    static constexpr Range GetRange(ErrorType error)
+    {
+        return static_cast<Range>(GetField(kRangeStart, kRangeLength, AsInteger(error)));
+    }
+
+    /// Get the encapsulated value of an @a error.
+    static constexpr ValueType GetValue(ErrorType error) { return GetField(kValueStart, kValueLength, AsInteger(error)); }
 
     /// Test whether if @a value can be losslessly encapsulated in a `CHIP_ERROR`.
-    static constexpr bool CanEncapsulate(BaseType value) { return FitsInField(kValueLength, value); }
+    static constexpr bool CanEncapsulate(ValueType value) { return FitsInField(kValueLength, value); }
 
     /// Construct a `CHIP_ERROR` encapsulating @a value inside the @a range.
-    static BaseType Encapsulate(Range range, BaseType value) { return MakeInteger(range, (value & MakeMask(0, kValueLength))); }
+    static constexpr ErrorType Encapsulate(Range range, ValueType value)
+    {
+        StorageType e = MakeInteger(range, (value & MakeMask(0, kValueLength)));
+#if CHIP_CONFIG_ERROR_CLASS
+        return ChipError(e);
+#else  // CHIP_CONFIG_ERROR_CLASS
+        return e;
+#endif // CHIP_CONFIG_ERROR_CLASS
+    }
 
     /// Test whether @a error is an SDK error belonging to @a part.
-    static constexpr bool IsPart(SdkPart part, BaseType error)
+    static constexpr bool IsPart(SdkPart part, ErrorType error)
     {
-        return (error & (MakeMask(kRangeStart, kRangeLength) | MakeMask(kSdkPartStart, kSdkPartLength))) ==
-            (MakeField(kRangeStart, static_cast<BaseType>(Range::kSDK)) | MakeField(kSdkPartStart, static_cast<BaseType>(part)));
+        return (AsInteger(error) & (MakeMask(kRangeStart, kRangeLength) | MakeMask(kSdkPartStart, kSdkPartLength))) ==
+            (MakeField(kRangeStart, static_cast<StorageType>(Range::kSDK)) |
+             MakeField(kSdkPartStart, static_cast<StorageType>(part)));
     }
 
 private:
@@ -121,22 +184,24 @@ private:
     static constexpr int kSdkCodeStart  = 0;
     static constexpr int kSdkCodeLength = 8;
 
-    static constexpr BaseType GetField(unsigned int start, unsigned int length, BaseType value)
+    static constexpr StorageType GetField(unsigned int start, unsigned int length, StorageType value)
     {
         return (value >> start) & ((1u << length) - 1);
     }
-    static constexpr BaseType MakeMask(unsigned int start, unsigned int length) { return ((1u << length) - 1) << start; }
-    static constexpr BaseType MakeField(unsigned int start, BaseType value) { return value << start; }
-    static constexpr bool FitsInField(unsigned int length, BaseType value) { return value < (1u << length); }
+    static constexpr StorageType MakeMask(unsigned int start, unsigned int length) { return ((1u << length) - 1) << start; }
+    static constexpr StorageType MakeField(unsigned int start, StorageType value) { return value << start; }
+    static constexpr bool FitsInField(unsigned int length, StorageType value) { return value < (1u << length); }
 
-    static constexpr BaseType MakeInteger(Range range, BaseType value)
+    static constexpr StorageType MakeInteger(Range range, StorageType value)
     {
         return MakeField(kRangeStart, to_underlying(range)) | MakeField(kValueStart, value);
     }
-    static constexpr BaseType MakeInteger(SdkPart part, BaseType code)
+    static constexpr StorageType MakeInteger(SdkPart part, StorageType code)
     {
         return MakeInteger(Range::kSDK, MakeField(kSdkPartStart, to_underlying(part)) | MakeField(kSdkCodeStart, code));
     }
+
+    StorageType mError;
 
 public:
     /*
@@ -146,14 +211,14 @@ public:
      * The underlying template ensures that the numeric value is constant and well-formed.
      * (In C++20 this could be replaced by a consteval function.)
      */
-#define CHIP_SDK_ERROR(part, code) (::chip::ChipError::MakeSdkErrorConstant<(part), (code)>::value)
-    template <SdkPart part, BaseType code>
+#define CHIP_SDK_ERROR_CONSTANT(part, code) (::chip::ChipError::MakeSdkErrorConstant<(part), (code)>::value)
+    template <SdkPart part, StorageType code>
     struct MakeSdkErrorConstant
     {
         static_assert(FitsInField(kSdkPartLength, to_underlying(part)), "part is too large");
         static_assert(FitsInField(kSdkCodeLength, code), "code is too large");
         static_assert(MakeInteger(part, code) != 0, "value is zero");
-        static constexpr BaseType value = MakeInteger(part, code);
+        static constexpr StorageType value = MakeInteger(part, code);
     };
 };
 
@@ -162,7 +227,13 @@ public:
 /**
  *  The basic type for all CHIP errors.
  */
-using CHIP_ERROR = ::chip::ChipError::BaseType;
+using CHIP_ERROR = ::chip::ChipError::ErrorType;
+
+#if CHIP_CONFIG_ERROR_CLASS
+#define CHIP_SDK_ERROR(part, code) (::chip::ChipError(CHIP_SDK_ERROR_CONSTANT((part), (code))))
+#else // CHIP_CONFIG_ERROR_CLASS
+#define CHIP_SDK_ERROR(part, code) CHIP_SDK_ERROR_CONSTANT((part), (code))
+#endif // CHIP_CONFIG_ERROR_CLASS
 
 /**
  * Applications using the CHIP SDK can use this to define error codes in the `CHIP_ERROR` space for their own purposes.
@@ -186,7 +257,7 @@ using CHIP_ERROR = ::chip::ChipError::BaseType;
  *    This defines the CHIP error code for success or no error.
  *
  */
-#define CHIP_NO_ERROR                                          (0)
+#define CHIP_NO_ERROR                                          CHIP_ERROR(0)
 
 /**
  *  @def CHIP_ERROR_SENDING_BLOCKED

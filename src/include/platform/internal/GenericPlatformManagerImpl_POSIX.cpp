@@ -50,32 +50,22 @@ namespace Internal {
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int ret        = 0;
-
     mChipStackLock = PTHREAD_MUTEX_INITIALIZER;
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
-    err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 
     mShouldRunEventLoop.store(true, std::memory_order_relaxed);
 
-    ret = pthread_cond_init(&mEventQueueStoppedCond, nullptr);
-    SuccessOrExit(ret);
+    int ret = pthread_cond_init(&mEventQueueStoppedCond, nullptr);
+    VerifyOrReturnError(ret == 0, System::MapErrorPOSIX(ret));
 
     ret = pthread_mutex_init(&mStateLock, nullptr);
-    SuccessOrExit(ret);
+    VerifyOrReturnError(ret == 0, System::MapErrorPOSIX(ret));
 
     mHasValidChipTask = false;
 
-exit:
-    if (ret != 0)
-    {
-        err = System::MapErrorPOSIX(ret);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
@@ -219,11 +209,11 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
 {
     int err;
     err = pthread_attr_init(&mChipTaskAttr);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == 0, System::MapErrorPOSIX(err));
     err = pthread_attr_getschedparam(&mChipTaskAttr, &mChipTaskSchedParam);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == 0, System::MapErrorPOSIX(err));
     err = pthread_attr_setschedpolicy(&mChipTaskAttr, SCHED_RR);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == 0, System::MapErrorPOSIX(err));
 
     //
     // We need to grab the lock here since we have to protect setting
@@ -241,7 +231,6 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
 
     pthread_mutex_unlock(&mStateLock);
 
-exit:
     return System::MapErrorPOSIX(err);
 }
 
@@ -278,7 +267,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
         while (!mEventQueueHasStopped)
         {
             err = pthread_cond_wait(&mEventQueueStoppedCond, &mStateLock);
-            SuccessOrExit(err);
+            VerifyOrExit(err == 0, );
         }
 
         pthread_mutex_unlock(&mStateLock);
@@ -289,7 +278,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
         if (mTaskType == kInternallyManagedTask)
         {
             err = pthread_join(mChipTask, nullptr);
-            SuccessOrExit(err);
+            VerifyOrExit(err == 0, );
         }
     }
     else

@@ -130,19 +130,17 @@ static CHIP_ERROR ConfigGetFabricId(bool printHeader)
 
 static CHIP_ERROR PrintAllConfigs()
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    ReturnErrorOnFailure(ConfigGetVendorId(true));
+    ReturnErrorOnFailure(ConfigGetProductId(true));
+    ReturnErrorOnFailure(ConfigGetProductRevision(true));
 
-    error |= ConfigGetVendorId(true);
-    error |= ConfigGetProductId(true);
-    error |= ConfigGetProductRevision(true);
+    ReturnErrorOnFailure(ConfigGetFabricId(true));
+    ReturnErrorOnFailure(ConfigGetSetupPinCode(true));
+    ReturnErrorOnFailure(ConfigGetSetupDiscriminator(true));
 
-    error |= ConfigGetFabricId(true);
-    error |= ConfigGetSetupPinCode(true);
-    error |= ConfigGetSetupDiscriminator(true);
+    ReturnErrorOnFailure(ConfigGetDeviceId(true));
 
-    error |= ConfigGetDeviceId(true);
-
-    return (error) ? CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND : CHIP_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR ConfigHandler(int argc, char ** argv)
