@@ -259,6 +259,8 @@ public:
 
     CHIP_ERROR SetDevOpCredKeypair(const CertificateKeyId & trustedRootId, P256Keypair * newKeypair);
 
+    const ChipCertificateData * GetRootCertificate(const CertificateKeyId & trustedRootId) const;
+
 private:
     ChipCertificateSet * mOpCreds;     /**< Pointer to an array of certificate data. */
     uint8_t mOpCredCount;              /**< Number of certificates in mOpCreds

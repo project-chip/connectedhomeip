@@ -38,7 +38,6 @@
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/TLVPacketBufferBackingStore.h>
 #include <transport/PairingSession.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
@@ -105,6 +104,7 @@ public:
      * @param peerAddress                   Address of peer with which to establish a session.
      * @param operationalCredentialSet      CHIP Certificate Set used to store the chain root of trust an validate peer node
      *                                      certificates
+     * @param opCredSetIndex                Index value used to choose the chain root of trust for establisbing a session
      * @param peerNodeId                    Node id of the peer node
      * @param myKeyId                       Key ID to be assigned to the secure session on the peer node
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
@@ -113,8 +113,8 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress,
-                                Credentials::OperationalCredentialSet * operationalCredentialSet, NodeId peerNodeId,
-                                uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
+                                Credentials::OperationalCredentialSet * operationalCredentialSet, uint8_t opCredSetIndex,
+                                NodeId peerNodeId, uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
                                 SessionEstablishmentDelegate * delegate);
 
     /**
@@ -198,7 +198,6 @@ public:
 private:
     enum SigmaErrorType : uint8_t
     {
-        kNoSharedTrustRoots   = 0x01,
         kInvalidSignature     = 0x04,
         kInvalidResumptionTag = 0x05,
         kUnsupportedVersion   = 0x06,
@@ -220,17 +219,16 @@ private:
     CHIP_ERROR SendSigmaR1Resume();
     CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
-    CHIP_ERROR FindValidTrustedRoot(const System::PacketBufferTLVReader & tlvReader, uint32_t nTrustedRoots);
-    CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const uint8_t * ipk, size_t ipkLen,
+    CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::CertificateKeyId * trustedRootId, NodeId nodeId,
+                                     FabricId fabricId, MutableByteSpan & destinationId);
+    CHIP_ERROR FindDestinationIdCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
+    CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                     MutableByteSpan & salt);
-    CHIP_ERROR Validate_and_RetrieveResponderID(const uint8_t * responderOpCert, uint16_t responderOpCertLen,
-                                                Crypto::P256PublicKey & responderID);
-    CHIP_ERROR ConstructSaltSigmaR3(const uint8_t * ipk, size_t ipkLen, MutableByteSpan & salt);
-    CHIP_ERROR ConstructTBS2Data(const uint8_t * responderOpCert, uint32_t responderOpCertLen, uint8_t * tbsData,
-                                 uint16_t & tbsDataLen);
-    CHIP_ERROR ConstructTBS3Data(const uint8_t * responderOpCert, uint32_t responderOpCertLen, uint8_t * tbsData,
-                                 uint16_t & tbsDataLen);
-    CHIP_ERROR ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen);
+    CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID);
+    CHIP_ERROR ConstructSaltSigmaR3(const ByteSpan & ipk, MutableByteSpan & salt);
+    CHIP_ERROR ConstructTBS2Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
+    CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
+    CHIP_ERROR RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk);
 
     void SendErrorMsg(SigmaErrorType errorCode);
 
@@ -258,8 +256,6 @@ private:
 #else
     Crypto::P256Keypair mEphemeralKey;
 #endif
-    // TODO: Remove mFabricSecret later
-    Crypto::P256ECDHDerivedSecret mFabricSecret;
     Crypto::P256ECDHDerivedSecret mSharedSecret;
     Credentials::OperationalCredentialSet * mOpCredSet;
     Credentials::CertificateKeyId mTrustedRootId;
@@ -267,7 +263,6 @@ private:
 
     uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
     uint8_t mIPK[kIPKSize];
-    uint8_t mRemoteIPK[kIPKSize];
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
     SessionEstablishmentExchangeDispatch mMessageDispatch;

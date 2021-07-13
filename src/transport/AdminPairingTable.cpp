@@ -357,7 +357,7 @@ CHIP_ERROR AdminPairingInfo::SetOperationalCertsFromCertArray(const ByteSpan & c
 }
 
 CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentials, ChipCertificateSet & certificates,
-                                            CertificateKeyId & rootKeyId)
+                                            CertificateKeyId & rootKeyId, uint8_t & credentialsIndex)
 {
     constexpr uint8_t kMaxNumCertsInOpCreds = 3;
     ReturnErrorOnFailure(certificates.Init(kMaxNumCertsInOpCreds, kMaxCHIPCertLength * kMaxNumCertsInOpCreds));
@@ -374,6 +374,7 @@ CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentia
 
     credentials.Release();
     ReturnErrorOnFailure(credentials.Init(&certificates, 1));
+    credentialsIndex = static_cast<uint8_t>(credentials.GetCertCount() - 1U);
 
     rootKeyId = credentials.GetTrustedRootId(0);
 
