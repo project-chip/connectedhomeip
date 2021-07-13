@@ -21,10 +21,10 @@ if (chip_build_tests) {
   action("all_platform_build_example") {
     _output_file = "$target_gen_dir/all_platform_build_commands.txt"
 
-    script = "chipbuild.py"
+    script = "build_examples.py"
     outputs = [ _output_file ]
 
-    # chipbuild script
+    # build script source files
     inputs = [
       "./build/__init__.py",
       "./build/factory.py",
@@ -35,7 +35,6 @@ if (chip_build_tests) {
       "./builders/esp32.py",
       "./builders/linux.py",
       "./builders/qpg.py",
-      "./chipbuild.py",
       "expected_all_platform_commands.txt",
       "./runner/__init__.py",
       "./runner/printonly.py",
