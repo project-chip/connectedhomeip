@@ -33,13 +33,14 @@ namespace {
 
 constexpr uint8_t kIntegerTag = 0x02u;
 constexpr uint8_t kSeqTag     = 0x30u;
+constexpr size_t kMinSequenceOverhead = 1 /* tag */ + 1 /* length */ + 1 /* actual data or second length byte*/;
 
 CHIP_ERROR ReadDerLength(Reader & reader, uint8_t & length)
 {
     length = 0;
 
     uint8_t cur_byte = 0;
-    VerifyOrReturnError(reader.Read8(&cur_byte).StatusCode() == CHIP_NO_ERROR, reader.StatusCode());
+    ReturnErrorOnFailure(reader.Read8(&cur_byte).StatusCode());
 
     if ((cur_byte & (1u << 7)) == 0)
     {
@@ -47,21 +48,19 @@ CHIP_ERROR ReadDerLength(Reader & reader, uint8_t & length)
         length = cur_byte & 0x7Fu;
         return CHIP_NO_ERROR;
     }
+
+    // Did not early return: > 7 bit length, the number of bytes of the length is provided next.
+    uint8_t length_bytes = cur_byte & 0x7Fu;
+
+    if ((length_bytes > 1) || !reader.HasAtLeast(length_bytes))
+    {
+        // We only support lengths of 0..255 over 2 bytes
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     else
     {
-        // > 7 bit length, the number of bytes of the length is provided next.
-        uint8_t length_bytes = cur_byte & 0x7Fu;
-
-        if ((length_bytes > 1) || !reader.HasAtLeast(length_bytes))
-        {
-            // We only support lengths of 0..255 over 2 bytes
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        else
-        {
-            // Next byte has length 0..255.
-            return reader.Read8(&length).StatusCode();
-        }
+        // Next byte has length 0..255.
+        return reader.Read8(&length).StatusCode();
     }
 }
 
@@ -69,29 +68,26 @@ CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, uint8_t * raw_integer_
 {
     uint8_t cur_byte = 0;
 
-    VerifyOrReturnError(reader.Read8(&cur_byte).StatusCode() == CHIP_NO_ERROR, reader.StatusCode());
+    ReturnErrorOnFailure(reader.Read8(&cur_byte).StatusCode());
 
     // We expect first tag to be INTEGER
     VerifyOrReturnError(cur_byte == kIntegerTag, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Read the length
     uint8_t integer_len = 0;
-    CHIP_ERROR status   = ReadDerLength(reader, integer_len);
-    VerifyOrReturnError(status == CHIP_NO_ERROR, status);
+    ReturnErrorOnFailure(ReadDerLength(reader, integer_len));
 
     // Clear the destination buffer, so we can blit the unsigned value into place
     memset(raw_integer_out, 0, raw_integer_length);
 
     // Check for pseudo-zero to mark unsigned value
-    if (integer_len > (raw_integer_length + 1))
-    {
-        // This means we have too large an integer (should be at most 1 byte too large), it's invalid
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    else if (integer_len == (raw_integer_length + 1u))
+    // This means we have too large an integer (should be at most 1 byte too large), it's invalid
+    ReturnErrorCodeIf(integer_len > (raw_integer_length + 1), CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (integer_len == (raw_integer_length + 1u))
     {
         // Means we had a 0x00 byte stuffed due to MSB being high in original integer
-        VerifyOrReturnError(reader.Read8(&cur_byte).StatusCode() == CHIP_NO_ERROR, reader.StatusCode());
+        ReturnErrorOnFailure(reader.Read8(&cur_byte).StatusCode());
 
         // The extra byte must be a leading zero
         VerifyOrReturnError(cur_byte == 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -568,12 +564,9 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const uint8_t * raw_s
     VerifyOrReturnError(out_asn1_sig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_asn1_sig_length >= (raw_sig_length + kMax_ECDSA_X9Dot62_Asn1_Overhead), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    // Min overhead of SEQUENCE is 3 bytes
-    constexpr size_t kMinOverhead = 1u + 2u; // 1 byte tag, (1 byte length, 1 byte data) or 3 bytes length
-
     // Write both R an S integers past the overhead, we will shift them back later if we only needed 2 size bytes.
-    uint8_t * cursor = &out_asn1_sig[kMinOverhead];
-    size_t remaining = out_asn1_sig_length - kMinOverhead;
+    uint8_t * cursor = &out_asn1_sig[kMinSequenceOverhead];
+    size_t remaining = out_asn1_sig_length - kMinSequenceOverhead;
 
     size_t integers_length = 0;
 
@@ -602,9 +595,10 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const uint8_t * raw_s
     writer.Put(kSeqTag);
 
     // Put the length over 1 or two bytes depending on case
+    constexpr uint8_t kExtendedLengthMarker = 0x80u;
     if (integers_length > 127u)
     {
-        writer.Put(static_cast<uint8_t>(0x80u | 1u)); // Length is extended length, over 1 subsequent byte
+        writer.Put(static_cast<uint8_t>(kExtendedLengthMarker | 1)); // Length is extended length, over 1 subsequent byte
         writer.Put(static_cast<uint8_t>(integers_length));
     }
     else
@@ -616,16 +610,13 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const uint8_t * raw_s
     // Put the contents of the integers previously serialized in the buffer.
     // The writer.Put is memmove-safe, so the shifting will happen from the read
     // of the same buffer where the write is taking place.
-    writer.Put(&out_asn1_sig[kMinOverhead], integers_length);
+    writer.Put(&out_asn1_sig[kMinSequenceOverhead], integers_length);
 
     size_t actually_written = 0;
-    if (writer.Fit(actually_written))
-    {
-        out_asn1_sig_actual_length = actually_written;
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnError(writer.Fit(actually_written), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    return CHIP_ERROR_BUFFER_TOO_SMALL;
+    out_asn1_sig_actual_length = actually_written;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const uint8_t * asn1_sig, size_t asn1_sig_length, uint8_t * out_raw_sig,
@@ -634,8 +625,7 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const uint8_t * asn1_
     VerifyOrReturnError(fe_length_bytes > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(asn1_sig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    constexpr size_t kMinOverhead = 1u + 2u; // 1 byte tag, (1 byte length, 1 byte data) or 3 bytes length
-    VerifyOrReturnError(asn1_sig_length > kMinOverhead, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(asn1_sig_length > kMinSequenceOverhead, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Output raw signature is <r,s> both of which are of fe_length_bytes (see SEC1).
     VerifyOrReturnError(out_raw_sig_length >= (2u * fe_length_bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -645,13 +635,12 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const uint8_t * asn1_
 
     // Make sure we have a starting Sequence
     uint8_t tag = 0;
-    VerifyOrReturnError(reader.Read8(&tag).StatusCode() == CHIP_NO_ERROR, reader.StatusCode());
+    ReturnErrorOnFailure(reader.Read8(&tag).StatusCode());
     VerifyOrReturnError(tag == kSeqTag, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Read length of sequence
     uint8_t tag_len   = 0;
-    CHIP_ERROR status = ReadDerLength(reader, tag_len);
-    VerifyOrReturnError(status == CHIP_NO_ERROR, status);
+    ReturnErrorOnFailure(ReadDerLength(reader, tag_len));
 
     // Length of sequence must match what is left of signature
     VerifyOrReturnError(tag_len == reader.Remaining(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -660,14 +649,12 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const uint8_t * asn1_
     uint8_t * raw_cursor = out_raw_sig;
 
     // Read R
-    status = ReadDerUnsignedIntegerIntoRaw(reader, raw_cursor, fe_length_bytes);
-    VerifyOrReturnError(status == CHIP_NO_ERROR, status);
+    ReturnErrorOnFailure(ReadDerUnsignedIntegerIntoRaw(reader, raw_cursor, fe_length_bytes));
 
     raw_cursor += fe_length_bytes;
 
     // Read S
-    status = ReadDerUnsignedIntegerIntoRaw(reader, raw_cursor, fe_length_bytes);
-    VerifyOrReturnError(status == CHIP_NO_ERROR, status);
+    ReturnErrorOnFailure(ReadDerUnsignedIntegerIntoRaw(reader, raw_cursor, fe_length_bytes));
 
     return CHIP_NO_ERROR;
 }

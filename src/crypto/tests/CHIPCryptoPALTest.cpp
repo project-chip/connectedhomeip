@@ -610,39 +610,36 @@ static void TestAsn1Conversions(nlTestSuite * inSuite, void * inContext)
                   "kDerSigConvDerCase4 must have worst case overhead");
 
     int numOfTestVectors = ArraySize(kDerSigConvTestVectors);
-    int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
         const der_sig_conv_vector * vector = &kDerSigConvTestVectors[vectorIndex];
 
         chip::Platform::ScopedMemoryBuffer<uint8_t> out_raw_sig;
-        out_raw_sig.Calloc(vector->fe_length_bytes * 2);
+        size_t out_raw_sig_allocated_size = vector->fe_length_bytes * 2;
+        out_raw_sig.Calloc(out_raw_sig_allocated_size);
         NL_TEST_ASSERT(inSuite, out_raw_sig);
 
         chip::Platform::ScopedMemoryBuffer<uint8_t> out_asn1_sig;
-        out_asn1_sig.Calloc((vector->fe_length_bytes * 2) + kMax_ECDSA_X9Dot62_Asn1_Overhead);
+        size_t out_asn1_sig_allocated_size = (vector->fe_length_bytes * 2) + kMax_ECDSA_X9Dot62_Asn1_Overhead;
+        out_asn1_sig.Calloc(out_asn1_sig_allocated_size);
         NL_TEST_ASSERT(inSuite, out_asn1_sig);
 
         // Test converstion from ASN.1 ER to raw
         CHIP_ERROR status = EcdsaAsn1SignatureToRaw(vector->fe_length_bytes, vector->der_version, vector->der_version_length,
-                                                    out_raw_sig.Get(), out_raw_sig.AllocatedSize());
+                                                    out_raw_sig.Get(), out_raw_sig_allocated_size);
         NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, (memcmp(out_raw_sig.Get(), vector->raw_version, vector->raw_version_length) == 0));
 
         // Test conversion from raw to ASN.1 DER
         size_t der_size = 0;
         status          = EcdsaRawSignatureToAsn1(vector->fe_length_bytes, vector->raw_version, vector->raw_version_length,
-                                         out_asn1_sig.Get(), out_asn1_sig.AllocatedSize(), der_size);
+                                         out_asn1_sig.Get(), out_asn1_sig_allocated_size, der_size);
 
         NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, der_size <= out_asn1_sig.AllocatedSize());
+        NL_TEST_ASSERT(inSuite, der_size <= out_asn1_sig_allocated_size);
         NL_TEST_ASSERT(inSuite, der_size == vector->der_version_length);
         NL_TEST_ASSERT(inSuite, (memcmp(out_asn1_sig.Get(), vector->der_version, vector->der_version_length) == 0));
-
-        numOfTestsRan++;
     }
-
-    NL_TEST_ASSERT(inSuite, numOfTestsRan == numOfTestVectors);
 }
 
 static void TestHash_SHA256(nlTestSuite * inSuite, void * inContext)
