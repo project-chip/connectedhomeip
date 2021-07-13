@@ -42,23 +42,24 @@ tests:
       response:
           value: 2
 
-    - label: "read the optional global attribute: FeatureMap"
-      command: "readAttribute"
-      attribute: "Feature Map"
-      response:
-          value: 0
-
-    - label: "write the default values to optional global attribute: FeatureMap"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "Feature Map"
-      arguments:
-          value: 0
-      response:
-          error: 1
-
-    - label: "reads back optional global attribute: FeatureMap"
-      command: "readAttribute"
-      attribute: "Feature Map"
-      response:
-          value: 0
+#  WAIT FOR FEATURE MAP Proper implementation in ZAP
+#    - label: "read the optional global attribute: FeatureMap"
+#      command: "readAttribute"
+#      attribute: "Feature Map"
+#      response:
+#          value: 0
+#
+#    - label: "write the default values to optional global attribute: FeatureMap"
+#      disabled: true
+#      command: "writeAttribute"
+#      attribute: "Feature Map"
+#      arguments:
+#          value: 0
+#      response:
+#          error: 1
+#
+#    - label: "reads back optional global attribute: FeatureMap"
+#      command: "readAttribute"
+#      attribute: "Feature Map"
+#      response:
+#          value: 0
