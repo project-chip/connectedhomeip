@@ -111,6 +111,9 @@ void Engine::RegisterDefaultCommands()
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC
     RegisterNFCCommands();
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    RegisterDnsCommands();
+#endif
 }
 
 } // namespace Shell
