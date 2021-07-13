@@ -102,6 +102,8 @@ int main(void)
     vTaskStartScheduler();
 
     chip::Platform::MemoryShutdown();
+    PlatformMgr().StopEventLoopTask();
+    PlatformMgr().Shutdown();
 
     // Should never get here.
     P6_LOG("vTaskStartScheduler() failed");
