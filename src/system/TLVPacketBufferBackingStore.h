@@ -153,7 +153,7 @@ public:
     }
 
     bool HasBuffer() { return !mBackingStore.GetCurrentBuffer().IsNull(); }
-    
+
     /**
      * Free the underlying PacketBuffer.
      *

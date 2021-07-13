@@ -2,7 +2,7 @@
 
 namespace chip {
 namespace app {
-namespace Cluster { 
+namespace Cluster {
 namespace NetworkCommissioningCluster {
     namespace AddThreadNetworkCommand {
         constexpr std::array<TypeOffsetInfo,NumImplementedFields> InitializeOffsets() {
@@ -20,7 +20,7 @@ namespace NetworkCommissioningCluster {
         }
 
         constexpr std::array<TypeOffsetInfo, NumImplementedFields> Offsets = InitializeOffsets();
-        
+
         const StructDescriptor<NumImplementedFields> Descriptor = {
             .FieldList = PopulateFieldDescriptors<NumImplementedFields, ArraySize(_Schema)>(_Schema, Offsets)
         };
@@ -45,7 +45,7 @@ namespace NetworkCommissioningCluster {
         }
 
         constexpr std::array<TypeOffsetInfo, NumImplementedFields> Offsets = InitializeOffsets();
-        
+
         const StructDescriptor<NumImplementedFields> Descriptor = {
             .FieldList = PopulateFieldDescriptors<NumImplementedFields, ArraySize(_Schema)>(_Schema, Offsets)
         };
@@ -70,7 +70,7 @@ namespace NetworkCommissioningCluster {
         }
 
         constexpr std::array<TypeOffsetInfo, NumImplementedFields> Offsets = InitializeOffsets();
-        
+
         const StructDescriptor<NumImplementedFields> Descriptor = {
             .FieldList = PopulateFieldDescriptors<NumImplementedFields, ArraySize(_Schema)>(_Schema, Offsets)
         };

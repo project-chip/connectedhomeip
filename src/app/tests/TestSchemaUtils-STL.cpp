@@ -84,7 +84,7 @@ TestSchemaUtils gTestSchemaUtils;
 void TestSchemaUtils::SetupBuf()
 {
     chip::System::PacketBufferHandle buf;
-   
+
     buf = System::PacketBufferHandle::New(1024);
     mStore.Init(std::move(buf));
 
@@ -203,8 +203,8 @@ void TestSchemaUtils::TestSchemaUtilsEncAndDecList(nlTestSuite * apSuite, void *
 
         sc.e.insert(sc.e.begin() + (long)i, t);
     }
-   
-    err = sc.Encode(_this->mWriter, TLV::AnonymousTag); 
+
+    err = sc.Encode(_this->mWriter, TLV::AnonymousTag);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     _this->DumpBuf();

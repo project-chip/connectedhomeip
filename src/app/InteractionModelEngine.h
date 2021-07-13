@@ -218,7 +218,7 @@ private:
     friend class TestInvokeInteraction;
 
     auto GetClusterServerSet() -> decltype(mClusterServers) & { return mClusterServers; }
-	
+
 	ClusterInfo mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS];
 	ClusterInfo * mpNextAvailableClusterInfo = nullptr;
 };

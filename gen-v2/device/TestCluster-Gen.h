@@ -6,27 +6,27 @@
 
 namespace chip {
 namespace app {
-namespace Cluster { 
+namespace Cluster {
 namespace TestCluster {
     namespace StructA {
         constexpr int NumImplementedFields = GetNumImplementedFields(_Schema);
         extern const StructDescriptor<NumImplementedFields> Descriptor;
-        
+
         class Type {
             public:
                 uint8_t x;
                 uint8_t y;
                 chip::ByteSpan l;
                 chip::Span<char> m;
-                
+
                 static const StructDescriptor<NumImplementedFields> &mDescriptor;
         };
     }
-    
+
     namespace StructB {
         constexpr int NumImplementedFields = GetNumImplementedFields(_Schema);
         extern const StructDescriptor<NumImplementedFields> Descriptor;
-        
+
         class Type {
             public:
                 uint8_t x;
@@ -40,7 +40,7 @@ namespace TestCluster {
     namespace StructC {
         constexpr int NumImplementedFields = GetNumImplementedFields(_Schema);
         extern const StructDescriptor<NumImplementedFields> Descriptor;
-        
+
         class Type {
             public:
                 struct empty {};
@@ -59,7 +59,7 @@ namespace TestCluster {
     namespace CommandA {
         constexpr int NumImplementedFields = GetNumImplementedFields(_Schema);
         extern const StructDescriptor<NumImplementedFields> Descriptor;
-        
+
         class Type {
             public:
                 struct empty {};
@@ -76,16 +76,16 @@ namespace TestCluster {
                 static const StructDescriptor<NumImplementedFields> &mDescriptor;
         };
     }
-    
+
     namespace CommandB {
         constexpr int NumImplementedFields = GetNumImplementedFields(_Schema);
         extern const StructDescriptor<NumImplementedFields> Descriptor;
-        
+
         class Type {
             public:
                 static chip::ClusterId GetClusterId() { return kClusterId; }
                 static chip::CommandId GetCommandId() { return kCommandBId; }
-                
+
                 struct empty {};
 
             public:
@@ -102,7 +102,7 @@ namespace TestCluster {
     namespace Attributes {
         constexpr int NumImplementedFields = GetNumImplementedFields(_Schema);
         extern const StructDescriptor<NumImplementedFields> Descriptor;
-        
+
         class Type {
             public:
                 struct empty {};

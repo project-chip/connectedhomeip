@@ -84,7 +84,7 @@ TestSchemaUtils gTestSchemaUtils;
 void TestSchemaUtils::SetupBuf()
 {
     chip::System::PacketBufferHandle buf;
-   
+
     buf = System::PacketBufferHandle::New(1024);
     mStore.Init(std::move(buf));
 
@@ -126,7 +126,7 @@ void TestSchemaUtils::TestSchemaUtilsEncAndDecSimple(nlTestSuite * apSuite, void
 
     // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
     sa.m = chip::Span<char>(strbuf, strlen(strbuf));
-    
+
     err = chip::app::EncodeSchemaElement(sa, _this->mWriter, TLV::AnonymousTag);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -167,7 +167,7 @@ void TestSchemaUtils::TestSchemaUtilsEncAndDecNestedStruct(nlTestSuite * apSuite
     sb.y = 30;
     sb.z.x = 99;
     sb.z.y = 17;
-    
+
     err = chip::app::EncodeSchemaElement(sb, _this->mWriter, TLV::AnonymousTag);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -212,7 +212,7 @@ void TestSchemaUtils::TestSchemaUtilsEncAndDecList(nlTestSuite * apSuite, void *
         e[i].x = (uint8_t)i;
         e[i].y = (uint8_t)i;
     }
-    
+
     err = chip::app::EncodeSchemaElement(sc, _this->mWriter, TLV::AnonymousTag);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 

@@ -4,7 +4,7 @@
 
 namespace chip {
 namespace app {
-namespace Cluster { 
+namespace Cluster {
 namespace TestCluster {
     namespace StructA {
         CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) {
@@ -90,7 +90,7 @@ namespace TestCluster {
             return CHIP_NO_ERROR;
         }
     }
-  
+
     namespace StructC {
         CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) {
             TLV::TLVType outer;
@@ -99,7 +99,7 @@ namespace TestCluster {
             ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kFieldIdB), b));
             ReturnErrorOnFailure(c.Encode(writer, TLV::ContextTag(kFieldIdC)));
             ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(kFieldIdD), &d[0], d.size()));
-            
+
             {
                 TLV::TLVType outer1;
                 ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(kFieldIdE), TLV::kTLVType_Array, outer1));
@@ -161,7 +161,7 @@ namespace TestCluster {
             return CHIP_NO_ERROR;
         }
     }
-    
+
     namespace CommandA {
         CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) {
             TLV::TLVType outer;
@@ -204,7 +204,7 @@ namespace TestCluster {
             return CHIP_NO_ERROR;
         }
     }
-   
+
     namespace CommandB {
         CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) {
             TLV::TLVType outer;
@@ -213,7 +213,7 @@ namespace TestCluster {
             ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kFieldIdB), b));
             ReturnErrorOnFailure(c.Encode(writer, TLV::ContextTag(kFieldIdC)));
             ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(kFieldIdD), &d[0], d.size()));
-            
+
             {
                 TLV::TLVType outer1;
                 ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(kFieldIdE), TLV::kTLVType_Array, outer1));

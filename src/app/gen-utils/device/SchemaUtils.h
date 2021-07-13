@@ -41,10 +41,10 @@ CHIP_ERROR DecodeSchemaElement(chip::Span<const CompactFieldDescriptor> pDescrip
 template <typename GenType_t>
 CHIP_ERROR EncodeSchemaElement(GenType_t &v, TLV::TLVWriter &writer, uint64_t tag)
 {
-    CHIP_ERROR err = EncodeSchemaElement({v.mDescriptor.FieldList.data(), v.mDescriptor.FieldList.size()}, &v, tag, writer);    
+    CHIP_ERROR err = EncodeSchemaElement({v.mDescriptor.FieldList.data(), v.mDescriptor.FieldList.size()}, &v, tag, writer);
     SuccessOrExit(err);
 
-    err = writer.Finalize(); 
+    err = writer.Finalize();
 
 exit:
     return err;
@@ -53,7 +53,7 @@ exit:
 template <typename GenType_t>
 CHIP_ERROR DecodeSchemaElement(GenType_t &v, TLV::TLVReader &reader)
 {
-    CHIP_ERROR err = DecodeSchemaElement({v.mDescriptor.FieldList.data(), v.mDescriptor.FieldList.size()}, &v, reader);    
+    CHIP_ERROR err = DecodeSchemaElement({v.mDescriptor.FieldList.data(), v.mDescriptor.FieldList.size()}, &v, reader);
     SuccessOrExit(err);
 
 exit:

@@ -1839,7 +1839,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *
  * @brief
  *  A buffer that was passed in is unexpectedly null.
- */ 
+ */
 #define CHIP_ERROR_NULL_BUF_ARG                                CHIP_CORE_ERROR(197)
 
 
@@ -1848,7 +1848,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *
  * @brief
  *  Requested cluster with a specific Cluster ID was not found
- */ 
+ */
 #define CHIP_ERROR_CLUSTER_NOT_FOUND                            CHIP_CORE_ERROR(198)
 
 /**
@@ -1856,7 +1856,7 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *
  * @brief
  *  A status response containing an error was received.
- */ 
+ */
 #define CHIP_ERROR_STATUS_RESPONSE_RECEIVED                     CHIP_CORE_ERROR(199)
 /**
  *  @}

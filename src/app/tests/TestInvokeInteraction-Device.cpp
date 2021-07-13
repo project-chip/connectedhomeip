@@ -78,7 +78,7 @@ TestServerCluster::TestServerCluster()
 {
 }
 
-CHIP_ERROR 
+CHIP_ERROR
 TestServerCluster::OnInvokeRequest(CommandParams &commandParams, InvokeResponder &invokeInteraction, TLV::TLVReader *payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -92,7 +92,7 @@ TestServerCluster::OnInvokeRequest(CommandParams &commandParams, InvokeResponder
 
         gServerInvoke = &invokeInteraction;
 
-        NL_TEST_ASSERT(gpSuite, payload != nullptr); 
+        NL_TEST_ASSERT(gpSuite, payload != nullptr);
 
         err = DecodeSchemaElement(req, *payload);
         NL_TEST_ASSERT(gpSuite, err == CHIP_NO_ERROR);
@@ -109,7 +109,7 @@ TestServerCluster::OnInvokeRequest(CommandParams &commandParams, InvokeResponder
         //
         // Send response synchronously
         //
-        
+
         {
             chip::app::Cluster::TestCluster::CommandB::Type resp;
             chip::app::Cluster::TestCluster::StructA::Type e[5];
@@ -120,7 +120,7 @@ TestServerCluster::OnInvokeRequest(CommandParams &commandParams, InvokeResponder
             resp.c.y = 233;
             resp.d = chip::Span<uint8_t>{d};
             resp.e = chip::Span<chip::app::Cluster::TestCluster::StructA::Type>{e};
-    
+
             for (size_t i = 0; i < ArraySize(d); i++) {
                 d[i] = (uint8_t)(255 - i);
             }
@@ -181,12 +181,12 @@ TestInvokeInteraction::OnResponse(InvokeInitiator &invokeInteraction, CommandPar
     if (commandParams.CommandId == chip::app::Cluster::TestCluster::kCommandBId) {
         printf("Received CommandB\n");
 
-        // 
+        //
         // To prevent the stack from actually sending this message
         //
         //invokeInteraction.IncrementHoldoffRef();
 
-        NL_TEST_ASSERT(gpSuite, payload != nullptr); 
+        NL_TEST_ASSERT(gpSuite, payload != nullptr);
 
         err = DecodeSchemaElement(resp, *payload);
         NL_TEST_ASSERT(gpSuite, err == CHIP_NO_ERROR);
@@ -238,7 +238,7 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
 
     serverEp0.SetEndpoint(0);
     serverEp1.SetEndpoint(1);
-    
+
     err = chip::app::InteractionModelEngine::GetInstance()->RegisterServer(&serverEp0);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -260,11 +260,11 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
         for (size_t i = 0; i < ArraySize(d); i++) {
             d[i] = (uint8_t)i;
         }
-    
+
         err = invokeInitiator.AddRequest(CommandParams(req, 0, true), [&req](auto &writer, auto tag) {
             return EncodeSchemaElement(req, writer, tag);
         });
-        
+
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = invokeInitiator.AddRequest(CommandParams(req, 1, true), [&req](auto &writer, auto tag) {
@@ -288,14 +288,14 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
 
     pRxEc = chip::gExchangeManager.NewContext({0, 0, 0}, NULL);
     NL_TEST_ASSERT(apSuite, pRxEc != nullptr);
-    
+
     chip::app::InteractionModelEngine::GetInstance()->OnInvokeCommandRequest(pRxEc, packetHdr, payloadHdr, std::move(buf));
     NL_TEST_ASSERT(apSuite, gServerInvoke != nullptr);
     NL_TEST_ASSERT(apSuite, serverEp0.mGotCommandA);
     NL_TEST_ASSERT(apSuite, serverEp1.mGotCommandA);
 
     NL_TEST_ASSERT(apSuite, gTestInvoke.GetNumActiveInvokes() == 0);
-    
+
     {
         chip::System::PacketBufferTLVReader reader;
         reader.Init(std::move(gTestInvoke.mBuf));

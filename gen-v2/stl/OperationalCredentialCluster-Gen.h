@@ -12,7 +12,7 @@ namespace app {
 namespace Cluster {
 namespace OperationalCredentialCluster {
     const chip::ClusterId kClusterId = 0x003E;
-    
+
     namespace AddOpCert {
         enum FieldId {
             kFieldIdNoc = 0,
@@ -20,7 +20,7 @@ namespace OperationalCredentialCluster {
             kFieldIdCaseAdminNode = 2,
             kFieldIdAdminVendorId = 3
         };
-        
+
         class Type : public IEncodable {
             public:
                 std::vector<uint8_t> noc;
@@ -32,18 +32,18 @@ namespace OperationalCredentialCluster {
                 static uint16_t GetCommandId() { return 0x06; }
 
             public:
-                CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) final; 
+                CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) final;
                 CHIP_ERROR Decode(TLV::TLVReader &reader) final;
         };
     }
-    
+
     namespace OpCertResponse {
         enum FieldId {
             kFieldIdStatusCode = 0,
             kFieldIdFabricIndex = 1,
             kFieldIdDebugText = 2
         };
-        
+
         class Type : public IEncodable {
             public:
                 int8_t statusCode;
@@ -53,13 +53,13 @@ namespace OperationalCredentialCluster {
                 static chip::ClusterId GetClusterId() { return kClusterId; }
 
                 //
-                // TODO: This SHOULD be 0x08, but because the device side sends back a faulty status 
+                // TODO: This SHOULD be 0x08, but because the device side sends back a faulty status
                 // response, we need to switch this back to 0x06.
                 //
                 static chip::CommandId GetCommandId() { return 0x06; }
-                
+
             public:
-                CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) final; 
+                CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) final;
                 CHIP_ERROR Decode(TLV::TLVReader &reader) final;
         };
     }
@@ -68,7 +68,7 @@ namespace OperationalCredentialCluster {
         enum FieldID {
             kFieldIdCsrNonce = 0
         };
-        
+
         class Type : public IEncodable {
             public:
                 std::vector<uint8_t> csrNonce;
@@ -77,7 +77,7 @@ namespace OperationalCredentialCluster {
                 static chip::CommandId GetCommandId() { return 0x04; }
 
             public:
-                CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) final; 
+                CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) final;
                 CHIP_ERROR Decode(TLV::TLVReader &reader) final;
         };
     }
@@ -91,7 +91,7 @@ namespace OperationalCredentialCluster {
             kFieldIdVendorReserved3 = 4,
             kFieldIdSignature = 5
         };
-        
+
         class Type : public IEncodable {
             public:
                 std::vector<uint8_t> csr;
@@ -105,7 +105,7 @@ namespace OperationalCredentialCluster {
                 static chip::CommandId GetCommandId() { return 0x05; }
 
             public:
-                CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) final; 
+                CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) final;
                 CHIP_ERROR Decode(TLV::TLVReader &reader) final;
         };
     }

@@ -4,7 +4,7 @@
 
 namespace chip {
 namespace app {
-namespace Cluster { 
+namespace Cluster {
 namespace OperationalCredentialCluster {
     namespace AddOpCert {
         CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) {

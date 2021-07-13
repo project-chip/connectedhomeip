@@ -77,7 +77,7 @@ TestServerCluster::TestServerCluster()
 {
 }
 
-CHIP_ERROR 
+CHIP_ERROR
 TestServerCluster::OnInvokeRequest(CommandParams &commandParams, InvokeResponder &invokeInteraction, TLV::TLVReader *payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -88,7 +88,7 @@ TestServerCluster::OnInvokeRequest(CommandParams &commandParams, InvokeResponder
 
         gServerInvoke = &invokeInteraction;
 
-        NL_TEST_ASSERT(gpSuite, payload != nullptr); 
+        NL_TEST_ASSERT(gpSuite, payload != nullptr);
 
         err = req.Decode(*payload);
         NL_TEST_ASSERT(gpSuite, err == CHIP_NO_ERROR);
@@ -105,7 +105,7 @@ TestServerCluster::OnInvokeRequest(CommandParams &commandParams, InvokeResponder
         //
         // Send response synchronously
         //
-        
+
         {
             chip::app::Cluster::TestCluster::CommandB::Type resp;
 
@@ -113,7 +113,7 @@ TestServerCluster::OnInvokeRequest(CommandParams &commandParams, InvokeResponder
             resp.b = 49;
             resp.c.x = 19;
             resp.c.y = 233;
-    
+
             for (size_t i = 0; i < 5; i++) {
                 resp.d.insert(resp.d.begin() + (long)i, (uint8_t)(255 - i));
             }
@@ -144,7 +144,7 @@ public:
     int GetNumActiveInvokes();
 
     void OnCommandBResponse(DemuxedInvokeInitiator &invokeInteraction, CommandParams &commandParams, chip::app::Cluster::TestCluster::CommandB::Type *response);
-    
+
 protected:
     System::PacketBufferHandle mBuf;
     int mGotCommandB = 0;
@@ -207,7 +207,7 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
     TestServerCluster serverEp0;
     TestServerCluster serverEp1;
     std::unique_ptr<DemuxedInvokeInitiator> invokeInitiator;
-    
+
     auto onDoneFunc = [apSuite, &invokeInitiator] (DemuxedInvokeInitiator &initiator) {
         printf("OnDone!\n");
         NL_TEST_ASSERT(apSuite, &initiator == invokeInitiator.get());
@@ -259,14 +259,14 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
 
     pRxEc = chip::gExchangeManager.NewContext({0, 0, 0}, NULL);
     NL_TEST_ASSERT(apSuite, pRxEc != nullptr);
-    
+
     chip::app::InteractionModelEngine::GetInstance()->OnInvokeCommandRequest(pRxEc, packetHdr, payloadHdr, std::move(buf));
     NL_TEST_ASSERT(apSuite, gServerInvoke != nullptr);
     NL_TEST_ASSERT(apSuite, serverEp0.mGotCommandA);
     NL_TEST_ASSERT(apSuite, serverEp1.mGotCommandA);
 
     NL_TEST_ASSERT(apSuite, gTestInvoke.GetNumActiveInvokes() == 0);
-    
+
     {
         chip::System::PacketBufferTLVReader reader;
         reader.Init(std::move(gTestInvoke.mBuf));

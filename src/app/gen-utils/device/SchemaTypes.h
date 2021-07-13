@@ -82,7 +82,7 @@ struct FullFieldDescriptor {
  *
  * This descriptor contains schema information describing a particular field in a schema element.
  *
- * This is generated using constexpr functions at compile time from generated descriptor tables of 
+ * This is generated using constexpr functions at compile time from generated descriptor tables of
  * type FullFieldDescriptor
  */
 struct CompactFieldDescriptor {
@@ -161,7 +161,7 @@ constexpr int GetNumImplementedFields(const FullFieldDescriptor (&structDescript
  * product configuration information about implemented fields/features, as well as other product configuration defines (in the future)
  */
 template <size_t N, size_t M, class ...Args>
-constexpr std::array<CompactFieldDescriptor, N> PopulateFieldDescriptors(const FullFieldDescriptor (&schema)[M], 
+constexpr std::array<CompactFieldDescriptor, N> PopulateFieldDescriptors(const FullFieldDescriptor (&schema)[M],
                                                                   std::array<TypeOffsetInfo,N> offsets, const Args& ...args) {
     int index = 0;
     int structIndex = 0;

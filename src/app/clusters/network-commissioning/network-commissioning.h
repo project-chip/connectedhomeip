@@ -34,7 +34,7 @@ namespace Cluster {
 #ifndef CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS
 #define CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS 4
 #endif // CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS
-    
+
 class NetworkCommissioningServer : public ClusterServer {
 public:
     NetworkCommissioningServer();
@@ -93,7 +93,7 @@ private:
 
     CHIP_ERROR DoEnableNetwork(NetworkInfo *network);
 
-private:    
+private:
     NetworkInfo mNetworks[kMaxNetworks];
 
 };
