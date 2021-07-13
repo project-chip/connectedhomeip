@@ -25,9 +25,10 @@ ninja -C out/host
 The script `build_examples.py` provides a single entry point for generating and
 executing the build.
 
-Build environment _MUST_ be properly configured for build_examples to succeed. For
-example ESP32 builds requite IDF_PATH to be set. Building in the corresponding
-build image or the chip vscode image satisfy the build environment requirement.
+Build environment _MUST_ be properly configured for build_examples to succeed.
+For example ESP32 builds requite IDF_PATH to be set. Building in the
+corresponding build image or the chip vscode image satisfy the build environment
+requirement.
 
 Usage examples:
 
