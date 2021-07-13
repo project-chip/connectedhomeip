@@ -26,7 +26,8 @@ usage() {
     echo "  -a APPLICATION: runs chip-tool against 'chip-<APPLICATION>-app' (default: all-clusters)"
     echo "  -i ITERATIONS: number of iterations to run (default: $iterations)"
     echo "  -h: this help message"
-    echo "  -s CASE_NAME: runs single test case name (by default, all are run)"
+    echo "  -s CASE_NAME: runs single test case name (e.g. TC_OO_2_2"
+    echo "                for Test_TC_OO_2_2.yaml) (by default, all are run)"
     echo "  -w COMMAND: prefix all instantiations with a command (e.g. valgrind) (default: '')"
     echo ""
     exit 0
@@ -43,8 +44,6 @@ while getopts a:i:hs:w: flag; do
     esac
 done
 
-echo "Running tests for application: $application, with iterations set to: $iterations"
-
 if [[ $application == "tv" ]]; then
     declare test_filenames="TV_${single_case-*}.yaml"
     declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -exec basename {} .yaml \;))"
@@ -57,6 +56,13 @@ else
     declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -exec basename {} .yaml \;))"
 fi
 
+if [[ $iterations == 0 ]]; then
+    echo "Invalid iteration count: '$1'"
+    exit 1
+fi
+
+echo "Running tests for application: $application, with iterations set to: $iterations"
+
 cleanup() {
     if [[ $background_pid != 0 ]]; then
         # In case we died on a failure before we cleaned up our background task.
@@ -64,11 +70,6 @@ cleanup() {
     fi
 }
 trap cleanup EXIT
-
-if [[ $iterations == 0 ]]; then
-    echo "Invalid iteration count: '$1'"
-    exit 1
-fi
 
 echo "Found tests:"
 for i in "${test_array[@]}"; do
@@ -108,7 +109,7 @@ for j in "${iter_array[@]}"; do
         touch /tmp/"$application"-log
         rm -rf /tmp/pid
         (
-            stdbuf -o0 "${test_case_wrapper-}" out/debug/standalone/chip-"$application"-app &
+            stdbuf -o0 ${test_case_wrapper-} out/debug/standalone/chip-"$application"-app &
             echo $! >&3
         ) 3>/tmp/pid | tee /tmp/"$application"-log &
         while ! grep -q "Server Listening" /tmp/"$application"-log; do
@@ -120,9 +121,9 @@ for j in "${iter_array[@]}"; do
         # the data is there yet.
         background_pid="$(</tmp/pid)"
         echo "          * Pairing to device"
-        "${test_case_wrapper-}" out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 11097
+        ${test_case_wrapper-} out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 11097
         echo "          * Starting test run: $i"
-        "${test_case_wrapper-}" out/debug/standalone/chip-tool tests "$i"
+        ${test_case_wrapper-} out/debug/standalone/chip-tool tests "$i"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0

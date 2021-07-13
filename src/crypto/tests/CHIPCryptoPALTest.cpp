@@ -789,15 +789,24 @@ static void TestECDSA_Signing_SHA256_Hash(nlTestSuite * inSuite, void * inContex
     size_t hash_length   = sizeof(hash);
 
     Test_P256Keypair keypair;
-
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
-    P256ECDSASignature signature;
-    CHIP_ERROR signing_error = keypair.ECDSA_sign_hash(hash, hash_length, signature);
-    NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
+    constexpr int kNumSigningIterations = 10000;
+    for (int i = 0; i < kNumSigningIterations; ++i)
+    {
+        P256ECDSASignature signature;
+        CHIP_ERROR signing_error = keypair.ECDSA_sign_hash(hash, hash_length, signature);
+        NL_TEST_ASSERT(inSuite, signing_error == CHIP_NO_ERROR);
 
-    CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_hash_signature(hash, hash_length, signature);
-    NL_TEST_ASSERT(inSuite, validation_error == CHIP_NO_ERROR);
+        CHIP_ERROR validation_error = keypair.Pubkey().ECDSA_validate_hash_signature(hash, hash_length, signature);
+        NL_TEST_ASSERT(inSuite, validation_error == CHIP_NO_ERROR);
+
+        if ((signing_error != CHIP_NO_ERROR) || (validation_error != CHIP_NO_ERROR))
+        {
+            ChipLogError(Crypto, "TestECDSA_Signing_SHA256_Hash failed after %d/%d iterations", i + 1, kNumSigningIterations);
+            break;
+        }
+    }
 }
 
 static void TestECDSA_ValidationFailsDifferentMessage(nlTestSuite * inSuite, void * inContext)
