@@ -25,23 +25,14 @@ template <typename Target>
 class ReferenceCountedHandle
 {
 public:
-    explicit ReferenceCountedHandle(Target & target) : mTarget(target)
-    {
-        mTarget.Retain();
-    }
+    explicit ReferenceCountedHandle(Target & target) : mTarget(target) { mTarget.Retain(); }
 
-    ~ReferenceCountedHandle()
-    {
-        mTarget.Release();
-    }
+    ~ReferenceCountedHandle() { mTarget.Release(); }
 
-    ReferenceCountedHandle(const ReferenceCountedHandle & that) : mTarget(that.mTarget)
-    {
-        mTarget.Retain();
-    }
+    ReferenceCountedHandle(const ReferenceCountedHandle & that) : mTarget(that.mTarget) { mTarget.Retain(); }
 
     ReferenceCountedHandle & operator=(const ReferenceCountedHandle & that) = delete;
-    ReferenceCountedHandle(ReferenceCountedHandle && that) = delete;
+    ReferenceCountedHandle(ReferenceCountedHandle && that)                  = delete;
     ReferenceCountedHandle & operator=(ReferenceCountedHandle && that) = delete;
 
     Target & Get() const { return mTarget; }
