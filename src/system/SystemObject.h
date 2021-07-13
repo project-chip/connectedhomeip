@@ -34,7 +34,11 @@
 // Include dependent headers
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 #include <unistd.h>
+
+#include <memory>
+#include <vector>
 
 #include <support/DLLUtil.h>
 
@@ -75,6 +79,9 @@ class DLL_EXPORT Object
     friend class ObjectPool;
 
 public:
+    Object() : mSystemLayer(nullptr) {}
+    ~Object() {}
+
     /** Test whether this object is retained by \c aLayer. Concurrency safe. */
     bool IsRetained(const Layer & aLayer) const;
 
@@ -96,8 +103,6 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:
-    Object();
-    ~Object();
     Object(const Object &) = delete;
     Object & operator=(const Object &) = delete;
 
@@ -144,12 +149,6 @@ inline Layer & Object::SystemLayer() const
     return *this->mSystemLayer;
 }
 
-/** Deleted. */
-inline Object::Object() {}
-
-/** Deleted. */
-inline Object::~Object() {}
-
 /**
  *  @brief
  *      A union template used for representing a well-aligned block of memory.
@@ -175,6 +174,7 @@ template <class T, unsigned int N>
 class ObjectPool
 {
 public:
+    void Reset();
     static size_t Size();
 
     T * Get(const Layer & aLayer, size_t aIndex);
@@ -184,7 +184,11 @@ public:
 private:
     friend class TestObject;
 
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    std::vector<std::unique_ptr<T>> mObjects;
+#else
     ObjectArena<void *, N * sizeof(T)> mArena;
+#endif
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
     void GetNumObjectsInUse(unsigned int aStartIndex, unsigned int & aNumInUse);
@@ -192,6 +196,20 @@ private:
     volatile unsigned int mHighWatermark;
 #endif
 };
+
+template <class T, unsigned int N>
+inline void ObjectPool<T, N>::Reset()
+{
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    mObjects.clear();
+#else
+    memset(mArena.uMemory, 0, N * sizeof(T));
+#endif
+
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    mHighWatermark = 0;
+#endif
+}
 
 /**
  *  @brief
@@ -213,7 +231,13 @@ inline T * ObjectPool<T, N>::Get(const Layer & aLayer, size_t aIndex)
     T * lReturn = nullptr;
 
     if (aIndex < N)
+    {
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        lReturn = aIndex < mObjects.size() ? mObjects[aIndex].get() : nullptr;
+#else
         lReturn = &reinterpret_cast<T *>(mArena.uMemory)[aIndex];
+#endif
+    }
 
     (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
 
@@ -229,10 +253,27 @@ inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
 {
     T * lReturn = nullptr;
     unsigned int lIndex;
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    unsigned int lNumInUse = 0;
-#endif
 
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    for (lIndex = 0; lIndex < mObjects.size(); ++lIndex)
+    {
+        if (mObjects[lIndex]->TryCreate(aLayer, sizeof(T)))
+        {
+            lReturn = mObjects[lIndex].get();
+            break;
+        }
+    }
+
+    if (lReturn == nullptr && mObjects.size() < N)
+    {
+        mObjects.push_back(std::unique_ptr<T>(new T()));
+
+        if (mObjects.back()->TryCreate(aLayer, sizeof(T)))
+        {
+            lReturn = mObjects.back().get();
+        }
+    }
+#else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     for (lIndex = 0; lIndex < N; ++lIndex)
     {
         T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
@@ -243,8 +284,11 @@ inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
             break;
         }
     }
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    unsigned int lNumInUse = 0;
+
     if (lReturn != nullptr)
     {
         lIndex++;
@@ -288,6 +332,22 @@ inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsig
 {
     unsigned int count = 0;
 
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    for (unsigned int lIndex = aStartIndex; lIndex < mObjects.size(); ++lIndex)
+    {
+        if (mObjects[lIndex]->mSystemLayer != nullptr)
+        {
+            count++;
+        }
+    }
+
+    if (aStartIndex == 0)
+    {
+        aNumInUse = 0;
+    }
+
+    aNumInUse += count;
+#else
     for (unsigned int lIndex = aStartIndex; lIndex < N; ++lIndex)
     {
         T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
@@ -304,6 +364,7 @@ inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsig
     }
 
     aNumInUse += count;
+#endif
 }
 #endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
 

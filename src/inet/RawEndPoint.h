@@ -74,6 +74,7 @@ public:
      */
     IPProtocol IPProto; // This data member is read-only
 
+    RawEndPoint() = default;
     CHIP_ERROR Bind(IPAddressType addrType, const IPAddress & addr, InterfaceId intfId = INET_NULL_INTERFACEID);
     CHIP_ERROR BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & addr);
     CHIP_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
@@ -88,9 +89,7 @@ public:
     void Free();
 
 private:
-    RawEndPoint()                    = delete;
     RawEndPoint(const RawEndPoint &) = delete;
-    ~RawEndPoint()                   = delete;
 
     static chip::System::ObjectPool<RawEndPoint, INET_CONFIG_NUM_RAW_ENDPOINTS> sPool;
 
