@@ -3028,32 +3028,25 @@ private:
     //
 
     // Test Read mac address
-    typedef void (*SuccessCallback_0)(void * context, chip::ByteSpan wakeOnLanMacAddress);
-    chip::Callback::Callback<SuccessCallback_0> * mOnSuccessCallback_0      = nullptr;
-    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_0 = nullptr;
-    bool mIsFailureExpected_0                                               = 0;
+    using SuccessCallback_0 = void (*)(void * context, chip::ByteSpan wakeOnLanMacAddress);
+    chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{
+        OnTestSendClusterWakeOnLanCommandReadAttribute_0_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
+        OnTestSendClusterWakeOnLanCommandReadAttribute_0_FailureResponse, this
+    };
+    bool mIsFailureExpected_0 = 0;
 
     CHIP_ERROR TestSendClusterWakeOnLanCommandReadAttribute_0()
     {
         ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Sending command...");
-
-        mOnFailureCallback_0 = new chip::Callback::Callback<DefaultFailureCallback>(
-            OnTestSendClusterWakeOnLanCommandReadAttribute_0_FailureResponse, this);
-        mOnSuccessCallback_0 =
-            new chip::Callback::Callback<SuccessCallback_0>(OnTestSendClusterWakeOnLanCommandReadAttribute_0_SuccessResponse, this);
 
         chip::Controller::WakeOnLanCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeWakeOnLanMacAddress(mOnSuccessCallback_0->Cancel(), mOnFailureCallback_0->Cancel());
-
-        if (CHIP_NO_ERROR != err)
-        {
-            delete mOnFailureCallback_0;
-            delete mOnSuccessCallback_0;
-        }
+        err = cluster.ReadAttributeWakeOnLanMacAddress(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
 
         return err;
     }
@@ -3063,9 +3056,6 @@ private:
         ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Failure Response");
 
         TV_WakeOnLanCluster * runner = reinterpret_cast<TV_WakeOnLanCluster *>(context);
-
-        delete runner->mOnFailureCallback_0;
-        delete runner->mOnSuccessCallback_0;
 
         if (runner->mIsFailureExpected_0 == false)
         {
@@ -3082,9 +3072,6 @@ private:
         ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Success Response");
 
         TV_WakeOnLanCluster * runner = reinterpret_cast<TV_WakeOnLanCluster *>(context);
-
-        delete runner->mOnFailureCallback_0;
-        delete runner->mOnSuccessCallback_0;
 
         if (runner->mIsFailureExpected_0 == true)
         {
