@@ -31,8 +31,8 @@ using chip::Encoding::LittleEndian::Reader;
 
 namespace {
 
-constexpr uint8_t kIntegerTag = 0x02u;
-constexpr uint8_t kSeqTag     = 0x30u;
+constexpr uint8_t kIntegerTag         = 0x02u;
+constexpr uint8_t kSeqTag             = 0x30u;
 constexpr size_t kMinSequenceOverhead = 1 /* tag */ + 1 /* length */ + 1 /* actual data or second length byte*/;
 
 CHIP_ERROR ReadDerLength(Reader & reader, uint8_t & length)
@@ -639,7 +639,7 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const uint8_t * asn1_
     VerifyOrReturnError(tag == kSeqTag, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Read length of sequence
-    uint8_t tag_len   = 0;
+    uint8_t tag_len = 0;
     ReturnErrorOnFailure(ReadDerLength(reader, tag_len));
 
     // Length of sequence must match what is left of signature
