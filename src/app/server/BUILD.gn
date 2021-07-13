@@ -27,6 +27,8 @@ static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "../clusters/network-commissioning/network-commissioning.cpp",
+    "../clusters/network-commissioning/network-commissioning.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
     "Mdns.cpp",
@@ -39,13 +41,11 @@ static_library("server") {
     "Server.h",
     "StorablePeerConnection.cpp",
     "StorablePeerConnection.h",
-    "../clusters/network-commissioning/network-commissioning.cpp",
-    "../clusters/network-commissioning/network-commissioning.h"
   ]
 
-  public_configs = [ 
+  public_configs = [
     ":server_config",
-    "${chip_root}/gen-v2/device:includes"
+    "${chip_root}/gen-v2/device:includes",
   ]
 
   cflags = [ "-Wconversion" ]

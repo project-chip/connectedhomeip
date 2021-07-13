@@ -22,25 +22,24 @@ static_library("device") {
   output_name = "libDeviceSchema"
 
   sources = [
-    "TestCluster.cpp",
-    "TestCluster.h",
-    "TestCluster-Gen.h",
-
+    "NetworkCommissioningCluster-Gen.h",
     "NetworkCommissioningCluster.cpp",
     "NetworkCommissioningCluster.h",
-    "NetworkCommissioningCluster-Gen.h"
+    "TestCluster-Gen.h",
+    "TestCluster.cpp",
+    "TestCluster.h",
   ]
 
   public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/gen-utils:gen-utils-device",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/app",
-    "${chip_root}/src/app/gen-utils:gen-utils-device"
   ]
 
   public_configs = [
     "${chip_root}/src/app:app_config",
-    ":includes"
+    ":includes",
   ]
 
   defines = []

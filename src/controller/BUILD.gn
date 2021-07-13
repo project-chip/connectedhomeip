@@ -33,10 +33,8 @@ static_library("controller") {
     "data_model/gen/chip-zcl-zpro-codec-api.h",
   ]
 
-  public_configs = [
-    "${chip_root}/gen-v2/stl:includes"
-  ]
-  
+  public_configs = [ "${chip_root}/gen-v2/stl:includes" ]
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
