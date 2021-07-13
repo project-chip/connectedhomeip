@@ -435,8 +435,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     }
 
 exit:
-    // Don't close ourselves if we're already closed.
-    //
     // Don't close ourselves if this message is a standalone ack. We're still
     // not closed and getting an ack should not affect that.  In particular,
     // since the standalone ack was not passed to the delegate, the delegate
@@ -448,10 +446,9 @@ exit:
     //
     // Also don't close if there's an outer HandleMessage invocation.  It'll
     // deal with the closing.
-    if (!mFlags.Has(Flags::kFlagClosed) && !mFlags.Has(Flags::kFlagWillSendMessage) && !IsResponseExpected() &&
-        (!isStandaloneAck || (mDelegate == nullptr)) && (!isDuplicate || (mDelegate == nullptr)) && !alreadyHandlingMessage)
+    if ((!isStandaloneAck || (mDelegate == nullptr)) && (!isDuplicate || (mDelegate == nullptr)) && !alreadyHandlingMessage)
     {
-        Close();
+        MaybeAutoClose();
     }
 
     if (!alreadyHandlingMessage)
@@ -467,6 +464,17 @@ exit:
     Release();
 
     return err;
+}
+
+void ExchangeContext::MaybeAutoClose()
+{
+    // Don't close ourselves if we're already closed.
+    if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected())
+    {
+        return;
+    }
+
+    Close();
 }
 
 } // namespace Messaging
