@@ -82,19 +82,19 @@ void bind_PyChip_SetupPayload(std::function<pybind11::module &(std::string const
         cl.def_readwrite("discriminator", &chip::SetupPayload::discriminator);
         cl.def_readwrite("setUpPINCode", &chip::SetupPayload::setUpPINCode);
         cl.def("addOptionalVendorData",
-               (CHIP_ERROR (chip::SetupPayload::*)(unsigned char, int)) & chip::SetupPayload::addOptionalVendorData,
+               (CHIP_ERROR(chip::SetupPayload::*)(unsigned char, int)) & chip::SetupPayload::addOptionalVendorData,
                "A function to add an optional vendor data\n \n\n 7 bit [0-127] tag number\n \n\n String representation of data to "
                "add\n \n\n Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise\n\nC++: "
                "chip::SetupPayload::addOptionalVendorData(unsigned char, int) --> int",
                pybind11::arg("tag"), pybind11::arg("data"));
         cl.def("addOptionalVendorData",
-               (CHIP_ERROR (chip::SetupPayload::*)(unsigned char, int)) & chip::SetupPayload::addOptionalVendorData,
+               (CHIP_ERROR(chip::SetupPayload::*)(unsigned char, int)) & chip::SetupPayload::addOptionalVendorData,
                "A function to add an optional vendor data\n \n\n 7 bit [0-127] tag number\n \n\n Integer representation of data to "
                "add\n \n\n Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise\n\nC++: "
                "chip::SetupPayload::addOptionalVendorData(unsigned char, int) --> int",
                pybind11::arg("tag"), pybind11::arg("data"));
         cl.def("removeOptionalVendorData",
-               (CHIP_ERROR (chip::SetupPayload::*)(unsigned char)) & chip::SetupPayload::removeOptionalVendorData,
+               (CHIP_ERROR(chip::SetupPayload::*)(unsigned char)) & chip::SetupPayload::removeOptionalVendorData,
                "A function to remove an optional vendor data\n \n\n 7 bit [0-127] tag number\n \n\n Returns a "
                "CHIP_ERROR_KEY_NOT_FOUND on error, CHIP_NO_ERROR otherwise\n\nC++: "
                "chip::SetupPayload::removeOptionalVendorData(unsigned char) --> int",

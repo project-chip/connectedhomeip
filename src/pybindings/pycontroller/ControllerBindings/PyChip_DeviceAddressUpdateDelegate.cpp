@@ -23,9 +23,9 @@ struct PyCallBack_chip_Controller_OperationalCredentialsDelegate : public chip::
 {
     using chip::Controller::OperationalCredentialsDelegate::OperationalCredentialsDelegate;
 
-    CHIP_ERROR GenerateNodeOperationalCertificate(const chip::Optional<chip::NodeId> & a0, chip::FabricId a1, const chip::ByteSpan & a2,
-                                           const chip::ByteSpan & a3,
-                                           chip::Callback::Callback<chip::Controller::NOCGenerated> * a4) override
+    CHIP_ERROR GenerateNodeOperationalCertificate(const chip::Optional<chip::NodeId> & a0, chip::FabricId a1,
+                                                  const chip::ByteSpan & a2, const chip::ByteSpan & a3,
+                                                  chip::Callback::Callback<chip::Controller::NOCGenerated> * a4) override
     {
         pybind11::gil_scoped_acquire gil;
         pybind11::function overload = pybind11::get_overload(
@@ -115,8 +115,8 @@ struct PyCallBack_chip_Controller_ExampleOperationalCredentialsIssuer : public c
     // onst Optional<NodeId> & nodeId, FabricId fabricId, const ByteSpan & csr,
     //   const ByteSpan & DAC, Callback::Callback<NOCGenerated> * onNOCGenerated
     CHIP_ERROR GenerateNodeOperationalCertificate(const chip::Optional<chip::NodeId> & a0, const chip::FabricId a1,
-                                           const chip::ByteSpan & a2, const chip::ByteSpan & a3,
-                                           chip::Callback::Callback<chip::Controller::NOCGenerated> * a4) override
+                                                  const chip::ByteSpan & a2, const chip::ByteSpan & a3,
+                                                  chip::Callback::Callback<chip::Controller::NOCGenerated> * a4) override
     {
         pybind11::gil_scoped_acquire gil;
         pybind11::function overload = pybind11::get_overload(

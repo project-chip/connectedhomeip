@@ -92,7 +92,11 @@ void bind_PyChip_Inet_IPAddress(std::function<pybind11::module &(std::string con
                "chip::Inet::IPAddress::operator=(const class chip::Inet::IPAddress &) --> class chip::Inet::IPAddress &",
                pybind11::return_value_policy::automatic, pybind11::arg("other"));
         cl.def(
-            "ToString", [](chip::Inet::IPAddress * a0, char * a1) { char * err = a0->ToString(a1, 64); return std::make_tuple(err, a1); },
+            "ToString",
+            [](chip::Inet::IPAddress * a0, char * a1) {
+                char * err = a0->ToString(a1, 64);
+                return std::make_tuple(err, a1);
+            },
             "Emit the IP address in conventional text presentation format.\n\n \n         The address of the emitted text.\n \n\n  "
             "   The size of the buffer for the emitted text.\n\n \n\n  Use ToString(char *buf, uint32_t bufSize) const to write "
             "the\n  conventional text presentation form of the IP address to the memory\n  located at  and extending as much as  "

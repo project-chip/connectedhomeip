@@ -40,7 +40,7 @@ PYBIND11_MODULE(PyChip, root_module)
     std::vector<std::pair<std::string, std::string>> sub_modules{
         { "", "chip" },         { "", "ChipExceptions" }, { "chip", "Controller" },  { "chip", "Transport" },
         { "chip", "Platform" }, { "chip", "app" },        { "chip", "DeviceLayer" }, { "chip::DeviceLayer", "Internal" },
-        { "chip", "Mdns" },     { "chip", "Inet" },       { "chip", "Logging" },     {"chip", "Messaging"},
+        { "chip", "Mdns" },     { "chip", "Inet" },       { "chip", "Logging" },     { "chip", "Messaging" },
     };
     for (auto & p : sub_modules)
         modules[p.first.size() ? p.first + "::" + p.second : p.second] =

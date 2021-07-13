@@ -178,23 +178,34 @@ void bind_PyChip_MDNS(std::function<pybind11::module &(std::string const & names
 {
     {
         pybind11::enum_<chip::Inet::IPAddressType>(M("chip::Inet"), "IPAddressType", "")
-        .value("kIPAddressType_Unknown", chip::Inet::IPAddressType::kIPAddressType_Unknown)
-        .value("kIPAddressType_IPv4", chip::Inet::IPAddressType::kIPAddressType_IPv4)
-        .value("kIPAddressType_IPv6", chip::Inet::IPAddressType::kIPAddressType_IPv6)
-        .value("kIPAddressType_Any", chip::Inet::IPAddressType::kIPAddressType_Any);
+            .value("kIPAddressType_Unknown", chip::Inet::IPAddressType::kIPAddressType_Unknown)
+            .value("kIPAddressType_IPv4", chip::Inet::IPAddressType::kIPAddressType_IPv4)
+            .value("kIPAddressType_IPv6", chip::Inet::IPAddressType::kIPAddressType_IPv6)
+            .value("kIPAddressType_Any", chip::Inet::IPAddressType::kIPAddressType_Any);
     }
     { // chip::PeerId file:core/PeerId.h line:33
-		pybind11::class_<chip::PeerId, std::shared_ptr<chip::PeerId>> cl(M("chip"), "PeerId", "A peer is identified by a node id within a fabric");
-		cl.def( pybind11::init( [](){ return new chip::PeerId(); } ) );
-		cl.def( pybind11::init( [](chip::PeerId const &o){ return new chip::PeerId(o); } ) );
-		cl.def("GetNodeId", (unsigned long long (chip::PeerId::*)() const) &chip::PeerId::GetNodeId, "C++: chip::PeerId::GetNodeId() const --> unsigned long long");
-		cl.def("SetNodeId", (class chip::PeerId & (chip::PeerId::*)(unsigned long long)) &chip::PeerId::SetNodeId, "C++: chip::PeerId::SetNodeId(unsigned long long) --> class chip::PeerId &", pybind11::return_value_policy::reference, pybind11::arg("id"));
-		cl.def("GetFabricId", (unsigned long long (chip::PeerId::*)() const) &chip::PeerId::GetFabricId, "C++: chip::PeerId::GetFabricId() const --> unsigned long long");
-		cl.def("SetFabricId", (class chip::PeerId & (chip::PeerId::*)(unsigned long long)) &chip::PeerId::SetFabricId, "C++: chip::PeerId::SetFabricId(unsigned long long) --> class chip::PeerId &", pybind11::return_value_policy::reference, pybind11::arg("id"));
-		cl.def("__eq__", (bool (chip::PeerId::*)(const class chip::PeerId &) const) &chip::PeerId::operator==, "C++: chip::PeerId::operator==(const class chip::PeerId &) const --> bool", pybind11::arg("other"));
-		cl.def("__ne__", (bool (chip::PeerId::*)(const class chip::PeerId &) const) &chip::PeerId::operator!=, "C++: chip::PeerId::operator!=(const class chip::PeerId &) const --> bool", pybind11::arg("other"));
-		cl.def("assign", (class chip::PeerId & (chip::PeerId::*)(const class chip::PeerId &)) &chip::PeerId::operator=, "C++: chip::PeerId::operator=(const class chip::PeerId &) --> class chip::PeerId &", pybind11::return_value_policy::reference, pybind11::arg(""));
-	}
+        pybind11::class_<chip::PeerId, std::shared_ptr<chip::PeerId>> cl(M("chip"), "PeerId",
+                                                                         "A peer is identified by a node id within a fabric");
+        cl.def(pybind11::init([]() { return new chip::PeerId(); }));
+        cl.def(pybind11::init([](chip::PeerId const & o) { return new chip::PeerId(o); }));
+        cl.def("GetNodeId", (unsigned long long (chip::PeerId::*)() const) & chip::PeerId::GetNodeId,
+               "C++: chip::PeerId::GetNodeId() const --> unsigned long long");
+        cl.def("SetNodeId", (class chip::PeerId & (chip::PeerId::*) (unsigned long long) ) & chip::PeerId::SetNodeId,
+               "C++: chip::PeerId::SetNodeId(unsigned long long) --> class chip::PeerId &",
+               pybind11::return_value_policy::reference, pybind11::arg("id"));
+        cl.def("GetFabricId", (unsigned long long (chip::PeerId::*)() const) & chip::PeerId::GetFabricId,
+               "C++: chip::PeerId::GetFabricId() const --> unsigned long long");
+        cl.def("SetFabricId", (class chip::PeerId & (chip::PeerId::*) (unsigned long long) ) & chip::PeerId::SetFabricId,
+               "C++: chip::PeerId::SetFabricId(unsigned long long) --> class chip::PeerId &",
+               pybind11::return_value_policy::reference, pybind11::arg("id"));
+        cl.def("__eq__", (bool (chip::PeerId::*)(const class chip::PeerId &) const) & chip::PeerId::operator==,
+               "C++: chip::PeerId::operator==(const class chip::PeerId &) const --> bool", pybind11::arg("other"));
+        cl.def("__ne__", (bool (chip::PeerId::*)(const class chip::PeerId &) const) & chip::PeerId::operator!=,
+               "C++: chip::PeerId::operator!=(const class chip::PeerId &) const --> bool", pybind11::arg("other"));
+        cl.def("assign", (class chip::PeerId & (chip::PeerId::*) (const class chip::PeerId &) ) & chip::PeerId::operator=,
+               "C++: chip::PeerId::operator=(const class chip::PeerId &) --> class chip::PeerId &",
+               pybind11::return_value_policy::reference, pybind11::arg(""));
+    }
 
     { // chip::Mdns::ResolvedNodeData file:mdns/Resolver.h line:31
         pybind11::class_<chip::Mdns::ResolvedNodeData, std::shared_ptr<chip::Mdns::ResolvedNodeData>> cl(M("chip::Mdns"),
@@ -228,7 +239,7 @@ void bind_PyChip_MDNS(std::function<pybind11::module &(std::string const & names
                "C++: chip::Mdns::DiscoveredNodeData::IsValid() const --> bool");
     }
 
-   {
+    {
         // chip::Mdns::DiscoveryFilterType file:mdns/Resolver.h line:88
         pybind11::enum_<chip::Mdns::DiscoveryFilterType>(M("chip::Mdns"), "DiscoveryFilterType", "")
             .value("kNone", chip::Mdns::DiscoveryFilterType::kNone)
@@ -302,8 +313,7 @@ void bind_PyChip_MDNS(std::function<pybind11::module &(std::string const & names
                    chip::Mdns::Resolver::ResolveNodeId,
                "Requests resolution of a node ID to its address\n\nC++: chip::Mdns::Resolver::ResolveNodeId(const class "
                "chip::PeerId &, chip::Inet::IPAddressType) --> int",
-               pybind11::return_value_policy::reference,
-               pybind11::arg("peerId"), pybind11::arg("type"));
+               pybind11::return_value_policy::reference, pybind11::arg("peerId"), pybind11::arg("type"));
         cl.def(
             "FindCommissionableNodes", [](chip::Mdns::Resolver & o) -> int { return o.FindCommissionableNodes(); }, "");
         cl.def("FindCommissionableNodes",

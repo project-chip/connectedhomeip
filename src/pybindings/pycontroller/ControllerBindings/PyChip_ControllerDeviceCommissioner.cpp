@@ -130,9 +130,10 @@ struct PyCallBack_chip_app_InteractionModelDelegate : public chip::app::Interact
         }
         return InteractionModelDelegate::ReportError(a0, a1);
     }
-    CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * a0, const chip::Protocols::SecureChannel::GeneralStatusCode a1,
-                              const uint32_t a2, const uint16_t a3, chip::EndpointId a4, const chip::ClusterId a5,
-                              chip::CommandId a6, uint8_t a7) override
+    CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * a0,
+                                     const chip::Protocols::SecureChannel::GeneralStatusCode a1, const uint32_t a2,
+                                     const uint16_t a3, chip::EndpointId a4, const chip::ClusterId a5, chip::CommandId a6,
+                                     uint8_t a7) override
     {
         pybind11::gil_scoped_acquire gil;
         pybind11::function overload =
@@ -205,8 +206,8 @@ struct PyCallBack_chip_app_InteractionModelDelegate : public chip::app::Interact
         return InteractionModelDelegate::CommandResponseError(a0, a1);
     }
     CHIP_ERROR WriteResponseStatus(const class chip::app::WriteClient * a0,
-                            const enum chip::Protocols::SecureChannel::GeneralStatusCode a1, const unsigned int a2,
-                            const unsigned short a3, struct chip::app::AttributePathParams & a4, unsigned char a5) override
+                                   const enum chip::Protocols::SecureChannel::GeneralStatusCode a1, const unsigned int a2,
+                                   const unsigned short a3, struct chip::app::AttributePathParams & a4, unsigned char a5) override
     {
         pybind11::gil_scoped_acquire gil;
         pybind11::function overload =
@@ -351,8 +352,9 @@ struct PyCallBack_chip_Controller_DeviceControllerInteractionModelDelegate
     //                                      chip::ClusterId aClusterId, chip::CommandId aCommandId, uint8_t aCommandIndex
     // //
     CHIP_ERROR CommandResponseStatus(const class chip::app::CommandSender * a0,
-                              const enum chip::Protocols::SecureChannel::GeneralStatusCode a1, const uint32_t a2, const uint16_t a3,
-                              chip::EndpointId a4, const chip::ClusterId a5, chip::CommandId a6, unsigned char a7) override
+                                     const enum chip::Protocols::SecureChannel::GeneralStatusCode a1, const uint32_t a2,
+                                     const uint16_t a3, chip::EndpointId a4, const chip::ClusterId a5, chip::CommandId a6,
+                                     unsigned char a7) override
     {
         pybind11::gil_scoped_acquire gil;
         pybind11::function overload = pybind11::get_overload(
@@ -479,8 +481,8 @@ struct PyCallBack_chip_Controller_DeviceControllerInteractionModelDelegate
         return InteractionModelDelegate::ReportError(a0, a1);
     }
     CHIP_ERROR WriteResponseStatus(const class chip::app::WriteClient * a0,
-                            const enum chip::Protocols::SecureChannel::GeneralStatusCode a1, const unsigned int a2,
-                            const unsigned short a3, struct chip::app::AttributePathParams & a4, unsigned char a5) override
+                                   const enum chip::Protocols::SecureChannel::GeneralStatusCode a1, const unsigned int a2,
+                                   const unsigned short a3, struct chip::app::AttributePathParams & a4, unsigned char a5) override
     {
         pybind11::gil_scoped_acquire gil;
         pybind11::function overload = pybind11::get_overload(
@@ -1059,8 +1061,7 @@ void bind_PyChip_ControllerDeviceCommissioner(std::function<pybind11::module &(s
         cl.def("GetDevice",
                (int (chip::Controller::DeviceController::*)(chip::NodeId, chip::Controller::Device *)) &
                    chip::Controller::DeviceController::GetDevice,
-               "",
-               pybind11::arg("deviceId"), pybind11::arg("out_device"));
+               "", pybind11::arg("deviceId"), pybind11::arg("out_device"));
         cl.def("ReleaseDevice",
                (void (chip::Controller::DeviceController::*)(class chip::Controller::Device *)) &
                    chip::Controller::DeviceController::ReleaseDevice,
