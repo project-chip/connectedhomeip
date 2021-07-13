@@ -23,7 +23,7 @@ tests:
       command: "readAttribute"
       attribute: "Cluster Revision"
       response:
-          value: 2
+          value: 3
 
     - label:
           "write the default values to mandatory global attribute:
@@ -40,7 +40,7 @@ tests:
       command: "readAttribute"
       attribute: "Cluster Revision"
       response:
-          value: 2
+          value: 3
 
 #  WAIT FOR FEATURE MAP Proper implementation in ZAP
 #    - label: "read the optional global attribute: FeatureMap"
