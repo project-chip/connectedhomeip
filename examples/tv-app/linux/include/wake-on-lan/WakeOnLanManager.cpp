@@ -18,7 +18,7 @@
 
 #include "WakeOnLanManager.h"
 
-#include "../cluster-helper.cpp"
+#include "../zcl-strings.h"
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
