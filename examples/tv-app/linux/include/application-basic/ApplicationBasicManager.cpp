@@ -17,6 +17,7 @@
  */
 
 #include "ApplicationBasicManager.h"
+#include "../cluster-helper.cpp"
 #include <app/Command.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
@@ -43,9 +44,11 @@ exit:
 
 void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * application)
 {
+    uint8_t zclString[32];
+
     EmberAfStatus vendorNameStatus =
         emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_VENDOR_NAME_ATTRIBUTE_ID,
-                                    (uint8_t *) &application->vendorName, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+                                    MakeZclCharString(zclString, application->vendorName), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (vendorNameStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store vendor name attribute.");
@@ -61,7 +64,7 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
 
     EmberAfStatus nameStatus =
         emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_NAME_ATTRIBUTE_ID,
-                                    (uint8_t *) &application->name, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+                                    MakeZclCharString(zclString, application->name), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (nameStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store name attribute.");
@@ -77,7 +80,7 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
 
     EmberAfStatus idStatus =
         emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_ID_ATTRIBUTE_ID,
-                                    (uint8_t *) &application->id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+                                    MakeZclCharString(zclString, application->id), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (idStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store id attribute.");
