@@ -44,12 +44,16 @@ static constexpr size_t kKeyRotatingIdMaxLength         = 100;
 static constexpr size_t kKeyPairingInstructionMaxLength = 128;
 static constexpr size_t kKeyPairingHintMaxLength        = 10;
 
-static constexpr size_t kSubTypeShortDiscriminatorMaxLength = 3;
-static constexpr size_t kSubTypeLongDiscriminatorMaxLength  = 4;
-static constexpr size_t kSubTypeVendorMaxLength             = 5;
-static constexpr size_t kSubTypeDeviceTypeMaxLength         = 5;
-static constexpr size_t kSubTypeCommissioningModeMaxLength  = 1;
-static constexpr size_t kSubTypeAdditionalPairingMaxLength  = 1;
+static constexpr size_t kSubTypeShortDiscriminatorMaxLength = 4; // _S<dd>
+static constexpr size_t kSubTypeLongDiscriminatorMaxLength  = 6; // _L<dddd>
+static constexpr size_t kSubTypeVendorMaxLength             = 7; // _V<ddddd>
+static constexpr size_t kSubTypeDeviceTypeMaxLength         = 5; // _T<ddd>
+static constexpr size_t kSubTypeCommissioningModeMaxLength  = 3; // _C<d>
+static constexpr size_t kSubTypeAdditionalPairingMaxLength  = 3; // _A<d>
+static constexpr size_t kSubTypeMaxNumber                   = 6;
+static constexpr size_t kSubTypeMaxLength =
+    std::max({ kSubTypeShortDiscriminatorMaxLength, kSubTypeLongDiscriminatorMaxLength, kSubTypeVendorMaxLength,
+               kSubTypeDeviceTypeMaxLength, kSubTypeCommissioningModeMaxLength, kSubTypeAdditionalPairingMaxLength });
 
 enum class CommssionAdvertiseMode : uint8_t
 {
