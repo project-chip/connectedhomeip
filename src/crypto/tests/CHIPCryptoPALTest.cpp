@@ -791,7 +791,12 @@ static void TestECDSA_Signing_SHA256_Hash(nlTestSuite * inSuite, void * inContex
     Test_P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
-    constexpr int kNumSigningIterations = 10000;
+    // TODO: Need to make this large number (1k+) to catch some signature serialization corner cases
+    //       but this is too slow on QEMU/embedded, so we need to parametrize. Signing with ECDSA
+    //       is non-deterministic by design (since knowledge of the value `k` used allows recovery
+    //       of the private key).
+    constexpr int kNumSigningIterations = 3;
+
     for (int i = 0; i < kNumSigningIterations; ++i)
     {
         P256ECDSASignature signature;
