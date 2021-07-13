@@ -27,6 +27,7 @@
 #include "Command.h"
 #include "CommandHandler.h"
 #include "CommandSender.h"
+#include "InvokeInteraction.h"
 #include <cinttypes>
 
 namespace chip {
@@ -159,6 +160,30 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
     return err;
 }
 
+void InteractionModelEngine::FreeReleasedInvokeResponderObjects(intptr_t a)
+{
+    InteractionModelEngine *_this = reinterpret_cast<InteractionModelEngine *>(a);
+
+    _this->mInvokeResponders.ForEachActiveObject([&](InvokeResponder *apInteraction) {
+        if (apInteraction->mState == InvokeResponder::kStateReleased) {
+            _this->mInvokeResponders.ReleaseObject(apInteraction);
+        }
+
+        return true;
+    });
+}
+
+CHIP_ERROR InteractionModelEngine::RegisterServer(ClusterServer *apClusterServer)
+{
+    ClusterServer **server = mClusterServers.CreateObject();
+    if (server == nullptr) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    *server = apClusterServer;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClient ** const apWriteClient)
 {
     *apWriteClient = nullptr;
@@ -208,26 +233,45 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
                                                           System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    InvokeResponder *responder = nullptr;
+    bool isLegacy = false;
+    
+    responder = mInvokeResponders.CreateObject();
+    assert(responder != nullptr);
 
-    for (auto & commandHandler : mCommandHandlerObjs)
-    {
-        if (commandHandler.IsFree())
+    //
+    // Since we're in a transition phase here to the new InvokeResponder approach, not all clusters have been ported over.
+    // So, first attempt to process the invoke command using the new InvokeResponder class, and if it returns a specific
+    // CHIP_ERROR_CLUSTER_NOT_FOUND error, then revert to the legacy approach.
+    //
+    err = responder->Init(apExchangeContext, aPayload.Retain());
+
+    if (err == CHIP_ERROR_CLUSTER_NOT_FOUND) {
+        err = CHIP_NO_ERROR;
+
+        isLegacy = true;
+
+        for (auto & commandHandler : mCommandHandlerObjs)
         {
-            err = commandHandler.Init(mpExchangeMgr, mpDelegate);
-            SuccessOrExit(err);
-            err = commandHandler.OnInvokeCommandRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
-            apExchangeContext = nullptr;
-            break;
+            if (commandHandler.IsFree())
+            {
+                err = commandHandler.Init(mpExchangeMgr, mpDelegate);
+                SuccessOrExit(err);
+                err = commandHandler.OnInvokeCommandRequest(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+                apExchangeContext = nullptr;
+                break;
+            }
         }
     }
-
+    
 exit:
     ChipLogFunctError(err);
 
-    if (nullptr != apExchangeContext)
+    if (isLegacy && (nullptr != apExchangeContext))
     {
         apExchangeContext->Abort();
     }
+
     return err;
 }
 

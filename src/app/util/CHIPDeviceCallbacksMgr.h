@@ -87,7 +87,7 @@ private:
         chip::NodeId nodeId;
         uint8_t sequenceNumber;
 
-        bool operator==(ResponseCallbackInfo const & other)
+        bool operator==(ResponseCallbackInfo const & other) const
         {
             return nodeId == other.nodeId && sequenceNumber == other.sequenceNumber;
         }

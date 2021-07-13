@@ -140,7 +140,6 @@ template("chip_data_model") {
       } else if (cluster == "network-commissioning") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}-ember.cpp",
-          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
@@ -172,6 +171,7 @@ template("chip_data_model") {
     }
 
     public_deps += [
+      "${chip_root}/gen-v2/device",
       "${chip_root}/src/app",
       "${chip_root}/src/controller",
       "${chip_root}/src/lib/core",
@@ -190,7 +190,9 @@ template("chip_data_model") {
     cflags += [ "-Wconversion" ]
 
     if (!defined(public_configs)) {
-      public_configs = []
+      public_configs = [
+          "${chip_root}/gen-v2/device:includes"
+      ]
     }
 
     public_configs += [ ":${_data_model_name}_config" ]

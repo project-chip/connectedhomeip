@@ -48,6 +48,13 @@ public:
     static void Release(ExchangeContext * obj);
 };
 
+class ExchangeContextUnitTestDelegate
+{
+public:
+    virtual void InterceptMessage(System::PacketBufferHandle handle) = 0;
+    virtual ~ExchangeContextUnitTestDelegate() {}
+};
+
 /**
  *  @brief
  *    This class represents an ongoing conversation (ExchangeContext) between two or more nodes.
@@ -167,6 +174,12 @@ public:
     void Abort();
 
     void SetResponseTimeout(Timeout timeout);
+
+#if CHIP_CONFIG_TEST
+public:
+    static ExchangeContextUnitTestDelegate *sUnitTestDelegate;
+    static void SetUnitTestDelegate(ExchangeContextUnitTestDelegate *delegate) { sUnitTestDelegate = delegate; }
+#endif
 
 private:
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.

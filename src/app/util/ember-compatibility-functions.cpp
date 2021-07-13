@@ -55,7 +55,7 @@ EmberAfInterpanHeader imCompatibilityInterpanHeader;
 Command * currentCommandObject;
 
 // BasicType maps the type to basic int(8|16|32|64)(s|u) types.
-EmberAfAttributeType BaseType(EmberAfAttributeType type)
+EmberAfAttributeType BaseAttributeType(EmberAfAttributeType type)
 {
     switch (type)
     {
@@ -218,7 +218,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     }
 
     // TODO: ZCL_STRUCT_ATTRIBUTE_TYPE is not included in this switch case currently, should add support for structures.
-    switch (BaseType(attributeType))
+    switch (BaseAttributeType(attributeType))
     {
     case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data
         ReturnErrorOnFailure(apWriter->PutNull(TLV::ContextTag(AttributeDataElement::kCsTag_Data)));

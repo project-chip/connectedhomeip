@@ -31,6 +31,14 @@ buildconfig_header("app_buildconfig") {
   defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}" ]
 }
 
+config("app_config") {
+  include_dirs = [
+    "util",
+    ".",
+    "${target_gen_dir}/include",
+  ]
+}
+
 static_library("app") {
   output_name = "libCHIPDataModel"
 
@@ -97,6 +105,10 @@ static_library("app") {
     "encoder-common.cpp",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
+    "InvokeInteraction.cpp",
+    "InvokeInteraction.h",
+    "Cluster.cpp",
+    "Cluster.h"
   ]
 
   if (chip_ip_commissioning) {

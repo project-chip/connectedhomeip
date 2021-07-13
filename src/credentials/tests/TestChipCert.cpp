@@ -69,7 +69,6 @@ static const BitFlags<KeyPurposeFlags> sCA(KeyPurposeFlags::kClientAuth);
 static const BitFlags<KeyPurposeFlags> sCS(KeyPurposeFlags::kCodeSigning);
 static const BitFlags<KeyPurposeFlags> sEP(KeyPurposeFlags::kEmailProtection);
 static const BitFlags<KeyPurposeFlags> sTS(KeyPurposeFlags::kTimeStamping);
-static const BitFlags<KeyPurposeFlags> sOS(KeyPurposeFlags::kOCSPSigning);
 static const BitFlags<KeyPurposeFlags> sSAandCA(sSA, sCA);
 static const BitFlags<KeyPurposeFlags> sSAandCS(sSA, sCS);
 static const BitFlags<KeyPurposeFlags> sSAandEP(sSA, sEP);

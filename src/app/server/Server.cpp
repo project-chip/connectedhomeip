@@ -44,6 +44,8 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
 
+#include <../clusters/network-commissioning/network-commissioning.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <app/server/Mdns.h>
 #endif
@@ -452,6 +454,21 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
     return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
 }
 
+chip::app::Cluster::NetworkCommissioningServer gNetworkCommissioningServer;
+
+CHIP_ERROR AddCoreServerClusters()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    gNetworkCommissioningServer.SetEndpoint(0);
+
+    err = chip::app::InteractionModelEngine::GetInstance()->RegisterServer(&gNetworkCommissioningServer);
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
 // The function will initialize datamodel handler and then start the server
 // The server assumes the platform's networking has been setup already
 void InitServer(AppDelegate * delegate)
@@ -552,6 +569,9 @@ void InitServer(AppDelegate * delegate)
 
     err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalAdminPairingTable(),
                                                     &gSessionIDAllocator);
+    SuccessOrExit(err);
+
+    err = AddCoreServerClusters();
     SuccessOrExit(err);
 
 exit:

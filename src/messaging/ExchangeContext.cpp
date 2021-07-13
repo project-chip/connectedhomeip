@@ -56,6 +56,10 @@ static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & 
                  protocolId.ToFullyQualifiedSpecForm(), msgType, ec->GetExchangeId(), packetHeader.GetMessageId());
 }
 
+#if CHIP_CONFIG_TEST
+ExchangeContextUnitTestDelegate *ExchangeContext::sUnitTestDelegate = nullptr;
+#endif
+
 bool ExchangeContext::IsInitiator() const
 {
     return mFlags.Has(Flags::kFlagInitiator);
@@ -81,6 +85,13 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
+
+#if CHIP_CONFIG_TEST
+    if (sUnitTestDelegate) {
+       sUnitTestDelegate->InterceptMessage(std::move(msgBuf));
+       return CHIP_NO_ERROR;
+    }
+#endif
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
 

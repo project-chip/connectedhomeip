@@ -38,7 +38,7 @@ struct ReportCallbackInfo
     chip::ClusterId clusterId;
     chip::AttributeId attributeId;
 
-    bool operator==(ReportCallbackInfo const & other)
+    bool operator==(ReportCallbackInfo const & other) const
     {
         return nodeId == other.nodeId && endpointId == other.endpointId && clusterId == other.clusterId &&
             attributeId == other.attributeId;
