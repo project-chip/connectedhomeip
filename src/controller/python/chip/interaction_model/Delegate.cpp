@@ -20,6 +20,7 @@
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <controller/python/chip/interaction_model/Delegate.h>
+#include <support/TypeTraits.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip::app;
@@ -79,6 +80,43 @@ CHIP_ERROR PythonInteractionModelDelegate::CommandResponseProcessed(const app::C
     return CHIP_NO_ERROR;
 }
 
+void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
+                                                  TLV::TLVReader * apData, Protocols::InteractionModel::ProtocolCode status)
+{
+    if (onReportDataFunct != nullptr)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        TLV::TLVWriter writer;
+        uint8_t writerBuffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+        writer.Init(writerBuffer, sizeof(writerBuffer));
+        // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
+        // status.
+        if (apData != nullptr)
+        {
+            TLV::TLVReader tmpReader;
+            tmpReader.Init(*apData);
+            // The Copy operation should succeed since:
+            // - We used a buffer that is large enough
+            // - The writer is in a clean state.
+            err = writer.CopyElement(TLV::AnonymousTag, tmpReader);
+        }
+        if (CHIP_NO_ERROR == err)
+        {
+            AttributePath path{ .endpointId = aPath.mEndpointId, .clusterId = aPath.mClusterId, .fieldId = aPath.mFieldId };
+            onReportDataFunct(apReadClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId(),
+                              apReadClient->GetAppIdentifier(), &path, sizeof(path), writerBuffer, writer.GetLengthWritten(),
+                              to_underlying(status));
+        }
+        else
+        {
+            // We failed to dump the TLV data to buffer, so we cannot pass valid data to the Python side, this should be a internal
+            // error of the binding.
+            ChipLogError(Controller, "Cannot pass TLV data to python: failed to copy TLV: %s", ErrorStr(err));
+        }
+    }
+    DeviceControllerInteractionModelDelegate::OnReportData(apReadClient, aPath, apData, status);
+}
+
 void pychip_InteractionModelDelegate_SetCommandResponseStatusCallback(
     PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct f)
 {
@@ -94,6 +132,11 @@ void pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback(
 void pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(PythonInteractionModelDelegate_OnCommandResponseFunct f)
 {
     gPythonInteractionModelDelegate.SetOnCommandResponseCallback(f);
+}
+
+void pychip_InteractionModelDelegate_SetOnReportDataCallback(PythonInteractionModelDelegate_OnReportDataFunct f)
+{
+    gPythonInteractionModelDelegate.SetOnReportDataCallback(f);
 }
 
 PythonInteractionModelDelegate & PythonInteractionModelDelegate::Instance()
