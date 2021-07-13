@@ -280,7 +280,7 @@ public:
     const AdminPairingInfo & operator*() const { return mStart[mIndex]; }
     const AdminPairingInfo * operator->() const { return mStart + mIndex; }
 
-    bool operator==(const ConstAdminIterator & other)
+    bool operator==(const ConstAdminIterator & other) const
     {
         if (IsAtEnd())
         {

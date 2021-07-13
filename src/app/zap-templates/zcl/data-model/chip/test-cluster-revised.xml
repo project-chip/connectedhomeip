@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+   <struct name="StructA">
+     <item name="x" type="UINT8U", optional="false"/>
+     <item name="y" type="UINT8U", optional="false"/>
+     <item name="l" type="OCTET_STRING", optional="false"/>
+     <item name="m" type="CHAR_STRING", optional="false"/>
+   </struct>
+
+   <struct name="StructB">
+     <item name="x" type="UINT8U", optional="false"/>
+     <item name="y" type="UINT8U", optional="false"/>
+     <item name="z" type="StructA", optional="false"/>
+   </struct>
+
+   <struct name="StructC">
+     <item name="a" type="UINT8U", optional="false"/>
+     <item name="b" type="UINT8U", optional="false"/>
+     <item name="c" type="StructA", optional="false"/>
+     <item name="d" type="OCTET_STRING", optional="false"/>
+     <item name="e" type="StructA", array="true", optional="false"/>
+   </struct>
+   
+  <cluster>
+    <domain>CHIP</domain>
+    <name>Test Cluster</name>
+    <code>0x0510</code>
+    <define>TEST_CLUSTER_REVISED</define>
+    <description>The Test Cluster is meant to validate the updated code-generation strategy</description>
+
+    <!-- Test Commands -->
+    <command source="client" code="0x01" name="CommandA" optional="false">
+        <description>
+            A rich command with complex types in it.
+        </description>
+        
+        <arg name="a" type="UINT8U", optional="false"/>
+        <arg name="b" type="UINT8U", optional="false"/>
+        <arg name="c" type="StructA", optional="false"/>
+        <arg name="d" type="OCTET_STRING", optional="false"/>
+    </command>
+
+    <command source="server" code="0x02" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
+      <description>
+          Rich response back to CommandA
+      </description>
+
+        <arg name="a" type="UINT8U", optional="false"/>
+        <arg name="b" type="UINT8U", optional="false"/>
+        <arg name="c" type="StructA", optional="false"/>
+        <arg name="d" type="OCTET_STRING", optional="false"/>
+        <arg name="e" type="StructA", array="true", optional="false"/>
+    </command>
+
+  </cluster>
+</configurator>

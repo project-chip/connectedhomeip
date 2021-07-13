@@ -2586,7 +2586,7 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
 
 namespace NetworkCommissioning {
 
-void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+void __attribute__((weak)) DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
                            TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
