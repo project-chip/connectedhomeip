@@ -849,6 +849,13 @@ def qr_code_parse(qr_code):
     except Exception as e:
          return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
 
+def pin_code_code_parse(pin_code):
+    try:
+        result = SetupPayload().ParseManualPairingCode(pin_code).Dictionary()
+        return __get_response_dict(status = StatusCodeEnum.SUCCESS, result = result)
+    except Exception as e:
+         return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
+
 def get_fabric_id():
     try:
         fabricID = device_manager.devCtrl.GetFabricId()
@@ -881,6 +888,7 @@ def start_rpc_server():
         server.register_function(qr_code_parse)
         server.register_function(get_pase_data)
         server.register_function(get_fabric_id)
+        server.register_function(pin_code_code_parse)
         server.register_multicall_functions()
         server.register_introspection_functions()
         print('Serving XML-RPC on localhost port 5000')
