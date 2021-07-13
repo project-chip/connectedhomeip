@@ -24,7 +24,7 @@ declare -i background_pid=0
 usage() {
   echo "test_suites.sh [-a APPLICATION] [-i ITERATIONS] [-h] [-s CASE_NAME] [-w COMMAND]"
   echo "  -a APPLICATION: runs chip-tool against 'chip-<APPLICATION>-app' (default: all-clusters)"
-  echo "  -i ITERATIONS: number of iterations to run (default: ${iterations})"
+  echo "  -i ITERATIONS: number of iterations to run (default: $iterations)"
   echo "  -h: this help message"
   echo "  -s CASE_NAME: runs single test case name (by default, all are run)"
   echo "  -w COMMAND: prefix all instantiations with a command (e.g. valgrind) (default: '')"
@@ -47,14 +47,14 @@ echo "Running tests for application: $application, with iterations set to: $iter
 
 if [[ $application == "tv" ]]; then
     declare test_filenames="TV_${single_case-*}.yaml"
-    declare -a test_array="($(find src/app/tests/suites -type f -name "${test_filenames}" -exec basename {} .yaml \;))"
+    declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -exec basename {} .yaml \;))"
     cp examples/tv-app/linux/include/endpoint-configuration/chip_tv_config.ini /tmp/chip_tv_config.ini
 # in case there's no application argument
 # always default to all-cluters app
 else
     application="all-clusters"
     declare test_filenames="Test_${single_case-*}.yaml"
-    declare -a test_array="($(find src/app/tests/suites -type f -name "${test_filenames}" -exec basename {} .yaml \;))"
+    declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -exec basename {} .yaml \;))"
 fi
 
 cleanup() {
@@ -108,7 +108,7 @@ for j in "${iter_array[@]}"; do
         touch /tmp/"$application"-log
         rm -rf /tmp/pid
         (
-            stdbuf -o0 ${test_case_wrapper-} out/debug/standalone/chip-"$application"-app &
+            stdbuf -o0 "${test_case_wrapper-}" out/debug/standalone/chip-"$application"-app &
             echo $! >&3
         ) 3>/tmp/pid | tee /tmp/"$application"-log &
         while ! grep -q "Server Listening" /tmp/"$application"-log; do
@@ -120,9 +120,9 @@ for j in "${iter_array[@]}"; do
         # the data is there yet.
         background_pid="$(</tmp/pid)"
         echo "          * Pairing to device"
-        ${test_case_wrapper-} out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 11097
+        "${test_case_wrapper-}" out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 11097
         echo "          * Starting test run: $i"
-        ${test_case_wrapper-} out/debug/standalone/chip-tool tests "$i"
+        "${test_case_wrapper-}" out/debug/standalone/chip-tool tests "$i"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0
