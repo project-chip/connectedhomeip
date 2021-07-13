@@ -58,7 +58,7 @@ public:
     pw::Status GetSsid(ServerContext &, const chip_rpc_Empty & request, chip_rpc_Ssid & response)
     {
         wifi_config_t config;
-        PW_TRY(EspToPwStatus(esp_wifi_get_config(ESP_IF_WIFI_STA, &config)));
+        PW_TRY(EspToPwStatus(esp_wifi_get_config(WIFI_IF_STA, &config)));
         size_t size = std::min(sizeof(response.ssid.bytes), sizeof(config.sta.ssid));
         memcpy(response.ssid.bytes, config.sta.ssid, sizeof(response.ssid.bytes));
         response.ssid.size = size;
@@ -77,7 +77,7 @@ public:
     pw::Status GetMacAddress(ServerContext &, const chip_rpc_Empty & request, chip_rpc_MacAddress & response)
     {
         uint8_t mac[6];
-        PW_TRY(EspToPwStatus(esp_wifi_get_mac(ESP_IF_WIFI_STA, mac)));
+        PW_TRY(EspToPwStatus(esp_wifi_get_mac(WIFI_IF_STA, mac)));
         sprintf(response.mac_address, "%02x:%02x:%02x:%02x:%02x:%02x", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
         return pw::OkStatus();
     }

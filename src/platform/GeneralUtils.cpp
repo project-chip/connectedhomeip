@@ -115,7 +115,7 @@ bool FormatDeviceLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (err < CHIP_DEVICE_ERROR_MIN || err > CHIP_DEVICE_ERROR_MAX)
+    if (!ChipError::IsPart(ChipError::SdkPart::kDevice, err))
     {
         return false;
     }

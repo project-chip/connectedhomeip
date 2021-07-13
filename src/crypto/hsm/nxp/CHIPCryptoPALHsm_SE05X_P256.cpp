@@ -134,14 +134,15 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length
     sss_object_t keyObject = { 0 };
     size_t siglen          = out_signature.Capacity();
 
-    VerifyOrExit(msg != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(out_signature != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(keyid != kKeyId_NotInitialized, error = CHIP_ERROR_HSM);
+    VerifyOrReturnError(msg != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(msg_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_signature != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(keyid != kKeyId_NotInitialized, CHIP_ERROR_HSM);
 
     ChipLogDetail(Crypto, "ECDSA_sign_msg: Using SE05X for Ecc Sign!");
 
     se05x_sessionOpen();
+    VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
     status = sss_digest_context_init(&digest_ctx, &gex_sss_chip_ctx.session, kAlgorithm_SSS_SHA256, kMode_SSS_Digest);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
@@ -207,14 +208,15 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_hash(const uint8_t * hash, size_t hash_len
     sss_object_t keyObject     = { 0 };
     size_t siglen              = out_signature.Capacity();
 
-    VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(hash_length == kSHA256_Hash_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(out_signature != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(keyid != kKeyId_NotInitialized, error = CHIP_ERROR_HSM);
+    VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(hash_length == kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_signature != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(keyid != kKeyId_NotInitialized, CHIP_ERROR_HSM);
 
     ChipLogDetail(Crypto, "ECDSA_sign_hash: Using SE05X for Ecc Sign!");
 
     se05x_sessionOpen();
+    VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
     status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
@@ -302,6 +304,7 @@ CHIP_ERROR P256KeypairHSM::ECDH_derive_secret(const P256PublicKey & remote_publi
     ChipLogDetail(Crypto, "ECDH_derive_secret: Using SE05X for ECDH !");
 
     se05x_sessionOpen();
+    VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
     const uint8_t * const rem_pubKey = Uint8::to_const_uchar(remote_public_key);
     const size_t rem_pubKeyLen       = remote_public_key.Length();
@@ -328,6 +331,8 @@ CHIP_ERROR SE05X_Set_ECDSA_Public_Key(sss_object_t * keyObject, const uint8_t * 
     const uint8_t nist256_header[] = { 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01,
                                        0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00 };
 
+    se05x_sessionOpen();
+    VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
     /* Set public key */
     sss_status_t status = sss_key_object_init(keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
@@ -362,12 +367,13 @@ CHIP_ERROR P256PublicKeyHSM::ECDSA_validate_msg_signature(const uint8_t * msg, s
     size_t hash_length     = sizeof(hash);
     sss_object_t keyObject = { 0 };
 
-    VerifyOrExit(msg != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(msg != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(msg_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogDetail(Crypto, "ECDSA_validate_msg_signature: Using SE05X for ECDSA verify (msg) !");
 
     se05x_sessionOpen();
+    VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
     /* Create hash of input data */
     status = sss_digest_context_init(&ctx_digest, &gex_sss_chip_ctx.session, kAlgorithm_SSS_SHA256, kMode_SSS_Digest);
@@ -451,12 +457,13 @@ CHIP_ERROR P256PublicKeyHSM::ECDSA_validate_hash_signature(const uint8_t * hash,
     sss_asymmetric_t asymm_ctx = { 0 };
     sss_object_t keyObject     = { 0 };
 
-    VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(hash_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(hash_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogDetail(Crypto, "ECDSA_validate_hash_signature: Using SE05X for ECDSA verify (hash) !");
 
     se05x_sessionOpen();
+    VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
     if (PublicKeyid == kKeyId_NotInitialized)
     {

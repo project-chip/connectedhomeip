@@ -191,7 +191,7 @@ private:
     std::vector<PacketBufferHandle> handles;
 };
 
-const uint16_t sTestReservedSizes[] = { 0, 10, 128, 1536, PacketBufferTest::kBlockSize };
+const uint16_t sTestReservedSizes[] = { 0, 10, 128, 1536, PacketBuffer::kMaxSizeWithoutReserve, PacketBufferTest::kBlockSize };
 const uint16_t sTestLengths[]       = { 0, 1, 10, 128, PacketBufferTest::kBlockSize, UINT16_MAX };
 
 PacketBufferTest::TestContext sContext = {
@@ -1873,6 +1873,54 @@ void PacketBufferTest::CheckHandleCloneData(nlTestSuite * inSuite, void * inCont
             config_2.handle = nullptr;
         }
     }
+
+#if CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
+
+    // It is possible for a packet buffer allocation to return a larger block than requested (e.g. when using a shared pool)
+    // and in particular to return a larger block than it is possible to request from PackBufferHandle::New().
+    // In that case, (a) it is incorrect to actually use the extra space, and (b) if it is not used, the clone will
+    // be the maximum possible size.
+    //
+    // This is only testable on heap allocation configurations, where pbuf records the allocation size and we can manually
+    // construct an oversize buffer.
+
+    constexpr uint16_t kOversizeDataSize = PacketBuffer::kMaxSizeWithoutReserve + 99;
+    PacketBuffer * p =
+        reinterpret_cast<PacketBuffer *>(chip::Platform::MemoryAlloc(PacketBuffer::kStructureSize + kOversizeDataSize));
+    NL_TEST_ASSERT(inSuite, p != nullptr);
+
+    p->next       = nullptr;
+    p->payload    = reinterpret_cast<uint8_t *>(p) + PacketBuffer::kStructureSize;
+    p->tot_len    = 0;
+    p->len        = 0;
+    p->ref        = 1;
+    p->alloc_size = kOversizeDataSize;
+
+    PacketBufferHandle handle = PacketBufferHandle::Adopt(p);
+
+    // Fill the buffer to maximum and verify that it can be cloned.
+
+    memset(handle->Start(), 1, PacketBuffer::kMaxSizeWithoutReserve);
+    handle->SetDataLength(PacketBuffer::kMaxSizeWithoutReserve);
+    NL_TEST_ASSERT(inSuite, handle->DataLength() == PacketBuffer::kMaxSizeWithoutReserve);
+
+    PacketBufferHandle clone = handle.CloneData();
+    NL_TEST_ASSERT(inSuite, !clone.IsNull());
+    NL_TEST_ASSERT(inSuite, clone->DataLength() == PacketBuffer::kMaxSizeWithoutReserve);
+    NL_TEST_ASSERT(inSuite, memcmp(handle->Start(), clone->Start(), PacketBuffer::kMaxSizeWithoutReserve) == 0);
+
+    // Overfill the buffer and verify that it can not be cloned.
+    memset(handle->Start(), 2, kOversizeDataSize);
+    handle->SetDataLength(kOversizeDataSize);
+    NL_TEST_ASSERT(inSuite, handle->DataLength() == kOversizeDataSize);
+
+    clone = handle.CloneData();
+    NL_TEST_ASSERT(inSuite, clone.IsNull());
+
+    // Free the packet buffer memory ourselves, since we allocated it ourselves.
+    chip::Platform::MemoryFree(std::move(handle).UnsafeRelease());
+
+#endif // CHIP_SYSTEM_PACKETBUFFER_STORE == CHIP_SYSTEM_PACKETBUFFER_STORE_CHIP_HEAP
 }
 
 void PacketBufferTest::CheckPacketBufferWriter(nlTestSuite * inSuite, void * inContext)

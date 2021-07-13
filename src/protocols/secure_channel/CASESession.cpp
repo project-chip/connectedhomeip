@@ -35,6 +35,7 @@
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
+#include <support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
@@ -300,7 +301,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel,
                  "CASESession timed out while waiting for a response from the peer. Expected message type was %" PRIu8,
-                 static_cast<std::underlying_type_t<decltype(mNextExpectedMsg)>>(mNextExpectedMsg));
+                 to_underlying(mNextExpectedMsg));
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
     Clear();
 }
@@ -935,8 +936,8 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
     mPairingComplete = true;
 
-    // Close the exchange, as no additional messages are expected from the peer
-    CloseExchange();
+    // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -1079,8 +1080,8 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
 
     mPairingComplete = true;
 
-    // Close the exchange, as no additional messages are expected from the peer
-    CloseExchange();
+    // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -1332,8 +1333,6 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
     {
         if (mExchangeCtxt != ec)
         {
-            // Close the incoming exchange explicitly, as the cleanup code only closes mExchangeCtxt
-            ec->Close();
             ReturnErrorOnFailure(CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
@@ -1401,6 +1400,9 @@ exit:
     // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)
     {
+        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // exchange will handle that.
+        mExchangeCtxt = nullptr;
         Clear();
         mDelegate->OnSessionEstablishmentError(err);
     }

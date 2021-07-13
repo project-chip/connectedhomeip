@@ -671,3 +671,10 @@ tests:
       optional: true
       arguments:
           value: 0
+
+    - label: "Send Test Command to unsupported endpoint"
+      command: "test"
+      endpoint: 200
+      response:
+          # No cluster on that endpoint, so expect an error.
+          error: 1

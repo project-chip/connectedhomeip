@@ -42,6 +42,7 @@
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
+#include <support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
@@ -330,7 +331,7 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
                    ChipLogError(SecureChannel, "PASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel,
                  "PASESession timed out while waiting for a response from the peer. Expected message type was %" PRIu8,
-                 static_cast<std::underlying_type_t<decltype(mNextExpectedMsg)>>(mNextExpectedMsg));
+                 to_underlying(mNextExpectedMsg));
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
     Clear();
 }
@@ -646,8 +647,8 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
 
     mPairingComplete = true;
 
-    // Close the exchange, as no additional messages are expected from the peer
-    CloseExchange();
+    // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -688,8 +689,8 @@ CHIP_ERROR PASESession::HandleMsg3(const System::PacketBufferHandle & msg)
 
     mPairingComplete = true;
 
-    // Close the exchange, as no additional messages are expected from the peer
-    CloseExchange();
+    // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -764,8 +765,6 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     {
         if (mExchangeCtxt != exchange)
         {
-            // Close the incoming exchange explicitly, as the cleanup code only closes mExchangeCtxt
-            exchange->Close();
             ReturnErrorOnFailure(CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
@@ -827,6 +826,9 @@ exit:
     // Call delegate to indicate pairing failure
     if (err != CHIP_NO_ERROR)
     {
+        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // exchange will handle that.
+        mExchangeCtxt = nullptr;
         Clear();
         ChipLogError(SecureChannel, "Failed during PASE session setup. %s", ErrorStr(err));
         mDelegate->OnSessionEstablishmentError(err);

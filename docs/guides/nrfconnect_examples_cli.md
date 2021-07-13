@@ -307,3 +307,42 @@ Prints the information about the NFC tag emulation status.
 uart:~$ matter nfc state
 NFC tag emulation is disabled
 ```
+
+### dns
+
+Handles a group of commands that are used to trigger performing DNS queries. You
+must use this command together with one of the additional subcommands listed
+below.
+
+#### browse
+
+Browses for DNS services of `_matterc_udp` type and prints the received
+response. Takes no argument.
+
+```shell
+uart:~$ matter dns browse
+Browsing ...
+DNS browse succeeded:
+   Hostname: 0E824F0CA6DE309C
+   Vendor ID: 9050
+   Product ID: 20043
+   Long discriminator: 3840
+   Device type: 0
+   Device name:
+   Commissioning mode: 0
+   IP addresses:
+      fd08:b65e:db8e:f9c7:2cc2:2043:1366:3b31
+```
+
+#### resolve
+
+Resolves the specified Matter node service given by the <fabric-id> and
+<node-id>.
+
+```shell
+uart:~$ matter dns resolve <fabric-id> <node-id>
+Resolving ...
+DNS resolve for 000000014A77CBB3-0000000000BC5C01 succeeded:
+   IP address: fd08:b65e:db8e:f9c7:8052:1a8e:4dd4:e1f3
+   Port: 11097
+```

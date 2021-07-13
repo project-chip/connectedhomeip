@@ -45,4 +45,6 @@ executable("chip-cert") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
+
+  output_dir = root_out_dir
 }

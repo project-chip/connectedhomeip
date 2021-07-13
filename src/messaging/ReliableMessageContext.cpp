@@ -236,7 +236,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<M
         SetPendingPeerAckId(MessageId);
         mNextAckTimeTick =
             static_cast<uint16_t>(CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK +
-                                  GetReliableMessageMgr()->GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
+                                  GetReliableMessageMgr()->GetTickCounterFromTimeDelta(System::Clock::GetMonotonicMilliseconds()));
     }
 
 exit:

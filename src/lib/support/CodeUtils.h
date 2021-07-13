@@ -184,6 +184,32 @@ constexpr inline const _T & max(const _T & a, const _T & b)
     } while (false)
 
 /**
+ *  @def ReturnLogErrorOnFailure(expr)
+ *
+ *  @brief
+ *    Returns the error code if the expression returns something different
+ *    than CHIP_NO_ERROR.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnLogErrorOnFailure(channel->SendMsg(msg));
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ */
+#define ReturnLogErrorOnFailure(expr)                                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (__err != CHIP_NO_ERROR)                                                                                                \
+        {                                                                                                                          \
+            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                                        \
+            return __err;                                                                                                          \
+        }                                                                                                                          \
+    } while (false)
+
+/**
  *  @def ReturnOnFailure(expr)
  *
  *  @brief
@@ -251,6 +277,31 @@ constexpr inline const _T & max(const _T & a, const _T & b)
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
+            return code;                                                                                                           \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def VerifyOrReturnLogError(expr, code)
+ *
+ *  @brief
+ *    Returns and print a specified error code if expression evaluates to false
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    VerifyOrReturnLogError(param != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+ *  @endcode
+ *
+ *  @param[in]  expr        A Boolean expression to be evaluated.
+ *  @param[in]  code        A value to return if @a expr is false.
+ */
+#define VerifyOrReturnLogError(expr, code)                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expr))                                                                                                               \
+        {                                                                                                                          \
+            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(code), __FILE__, __LINE__);                                         \
             return code;                                                                                                           \
         }                                                                                                                          \
     } while (false)

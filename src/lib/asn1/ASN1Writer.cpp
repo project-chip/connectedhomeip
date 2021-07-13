@@ -295,6 +295,8 @@ CHIP_ERROR ASN1Writer::PutConstructedType(const uint8_t * val, uint16_t valLen)
     // Do nothing for a null writer.
     VerifyOrReturnError(mBuf != nullptr, CHIP_NO_ERROR);
 
+    VerifyOrReturnError((mWritePoint + valLen) <= mBufEnd, ASN1_ERROR_OVERFLOW);
+
     memcpy(mWritePoint, val, valLen);
     mWritePoint += valLen;
 

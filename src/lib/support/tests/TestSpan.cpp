@@ -173,6 +173,13 @@ static void TestFixedByteSpan(nlTestSuite * inSuite, void * inContext)
     uint8_t arr2[] = { 3, 2, 1 };
     FixedByteSpan<3> s4(arr2);
     NL_TEST_ASSERT(inSuite, !s4.data_equal(s2));
+
+    size_t idx = 0;
+    for (auto & entry : s4)
+    {
+        NL_TEST_ASSERT(inSuite, entry == arr2[idx++]);
+    }
+    NL_TEST_ASSERT(inSuite, idx == 3);
 }
 
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)

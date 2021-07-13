@@ -30,9 +30,6 @@
 
 // ==================== General Platform Adaptations ====================
 
-#define CHIP_CONFIG_ERROR_TYPE uint32_t
-#define CHIP_CONFIG_ERROR_FORMAT PRIu32
-
 #define ChipDie() assert()
 
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE uint16_t

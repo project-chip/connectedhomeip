@@ -48,6 +48,7 @@
 #include <support/ErrorStr.h>
 #include <support/PersistentStorageMacros.h>
 #include <support/SafeInt.h>
+#include <support/TypeTraits.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/MessageCounter.h>
@@ -184,9 +185,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 
     serializable.mDeviceOperationalCertProvisioned = (mDeviceOperationalCertProvisioned) ? 1 : 0;
 
-    static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
-                  "The underlying type of Transport::Type is not uint8_t.");
-    serializable.mDeviceTransport = static_cast<uint8_t>(mDeviceAddress.GetTransportType());
+    serializable.mDeviceTransport = to_underlying(mDeviceAddress.GetTransportType());
 
     ReturnErrorOnFailure(Inet::GetInterfaceName(mDeviceAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
                                                 sizeof(serializable.mInterfaceName)));
@@ -337,7 +336,6 @@ CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, cons
             HandleDataModelMessage(exchange, std::move(msgBuf));
         }
     }
-    exchange->Close();
     return CHIP_NO_ERROR;
 }
 

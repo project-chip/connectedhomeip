@@ -28,6 +28,9 @@
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/DLLUtil.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 
 #include <algorithm>
 #include <map>
@@ -66,7 +69,11 @@ struct NodeCredentialMap
 struct NodeKeypairMap
 {
     CertificateKeyId trustedRootId;
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+    P256KeypairHSM keypair;
+#else
     P256Keypair keypair;
+#endif
 };
 
 /**

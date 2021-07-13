@@ -31,6 +31,7 @@
 #include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
+#include <support/TypeTraits.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -104,10 +105,15 @@ public:
     CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload,
                            const SendFlags & sendFlags = SendFlags(SendMessageFlags::kNone))
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(msgType),
-                           std::move(msgPayload), sendFlags);
+        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(msgType), std::move(msgPayload),
+                           sendFlags);
     }
+
+    /**
+     * A notification that we will have SendMessage called on us in the future
+     * (and should stay open until that happens).
+     */
+    void WillSendMessage() { mFlags.Set(Flags::kFlagWillSendMessage); }
 
     /**
      *  Handle a received CHIP message on this exchange.
