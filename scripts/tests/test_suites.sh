@@ -20,6 +20,7 @@ set -e
 
 declare -i iterations=20
 declare -i background_pid=0
+declare test_case_wrapper=()
 
 usage() {
     echo "test_suites.sh [-a APPLICATION] [-i ITERATIONS] [-h] [-s CASE_NAME] [-w COMMAND]"
@@ -40,7 +41,7 @@ while getopts a:i:hs:w: flag; do
         i) iterations=$OPTARG ;;
         h) usage ;;
         s) single_case=$OPTARG ;;
-        w) test_case_wrapper=$OPTARG ;;
+        w) test_case_wrapper=($OPTARG) ;;
     esac
 done
 
@@ -109,7 +110,7 @@ for j in "${iter_array[@]}"; do
         touch /tmp/"$application"-log
         rm -rf /tmp/pid
         (
-            stdbuf -o0 ${test_case_wrapper-} out/debug/standalone/chip-"$application"-app &
+            stdbuf -o0 "${test_case_wrapper[@]}" out/debug/standalone/chip-"$application"-app &
             echo $! >&3
         ) 3>/tmp/pid | tee /tmp/"$application"-log &
         while ! grep -q "Server Listening" /tmp/"$application"-log; do
@@ -121,9 +122,9 @@ for j in "${iter_array[@]}"; do
         # the data is there yet.
         background_pid="$(</tmp/pid)"
         echo "          * Pairing to device"
-        ${test_case_wrapper-} out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 11097
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 11097
         echo "          * Starting test run: $i"
-        ${test_case_wrapper-} out/debug/standalone/chip-tool tests "$i"
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0
