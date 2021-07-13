@@ -100,7 +100,10 @@ class SetupPayload:
 
     def Dictionary(self):
         payload_dict = {}
-        attributes_array = self.attributes + self.vendor_attributes
-        for name, value in attributes_array:
+
+        for name, value in self.attributes.items():
             payload_dict[name] = value
+        for tag, value in self.vendor_attributes.items():
+            payload_dict[tag] = value
+
         return payload_dict
