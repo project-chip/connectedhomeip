@@ -16,18 +16,18 @@
 #    limitations under the License.
 #
 
-cd "$(dirname "$0")/../.."
+cd "$(dirname $0)/../../.."
 CHIP_ROOT="$PWD"
 cd "$CHIP_ROOT/src/test_driver/mbed/"
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
-SUPPORTED_TARGET_BOARD=(DISCO_L475VG_IOT01A NRF52840_DK CY8CPROTO_062_4343W)
+SUPPORTED_TARGET_BOARD=(CY8CPROTO_062_4343W)
 SUPPORTED_PROFILES=(release develop debug)
 SUPPORTED_COMMAND=(build flash build-flash)
 
-TARGET_BOARD=DISCO_L475VG_IOT01A
+TARGET_BOARD=CY8CPROTO_062_4343W
 TOOLCHAIN=GCC_ARM
-PROFILE=develop
+PROFILE=release
 COMMAND=build
 
 for i in "$@"; do
@@ -97,14 +97,6 @@ if [[ "$COMMAND" == *"build"* ]]; then
     # Create symlinks to mbed-os-posix-socket submodule
     MBED_OS_POSIX_SOCKET_PATH="$CHIP_ROOT"/third_party/mbed-os-posix-socket/repo
     ln -sfTr "$MBED_OS_POSIX_SOCKET_PATH" "mbed-os-posix-socket"
-
-    if [ "$TARGET_BOARD" == "DISCO_L475VG_IOT01A" ]; then
-        # Add the Mbed OS driver for the ISM43362 Wi-Fi module
-        WIFI_ISM43362_PATH="$CHIP_ROOT"/third_party/wifi-ism43362/repo
-
-        # Create symlinks to WIFI-ISM43362 submodule
-        ln -sfTr "$WIFI_ISM43362_PATH" "wifi-ism43362"
-    fi
 
     # Generate config file for selected target, toolchain and hardware
     mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD"

@@ -55,7 +55,7 @@ jobs:
             - name: Copy aside build products
               run: |
                   mkdir -p binaries/$BUILD_TYPE-build/
-                  cp src/test_driver/mbed/unit_tests/build-${{matrix.APP_TARGET}}/$APP_PROFILE/chip-mbed-unit-tests.hex \
+                  cp src/test_driver/mbed/build-${{matrix.APP_TARGET}}/$APP_PROFILE/chip-mbed-unit-tests.hex \
                      binaries/$BUILD_TYPE-build/unit-tests_${{matrix.APP_TARGET}}_$APP_PROFILE.hex
             - name: Binary artifact suffix
               id: outsuffix
