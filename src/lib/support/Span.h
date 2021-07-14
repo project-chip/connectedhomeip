@@ -37,7 +37,8 @@ template <class T>
 class Span
 {
 public:
-    using pointer = T *;
+    using pointer       = T *;
+    using const_pointer = const T *;
 
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
     constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
@@ -59,6 +60,10 @@ public:
     constexpr pointer data() const { return mDataBuf; }
     constexpr size_t size() const { return mDataLen; }
     constexpr bool empty() const { return size() == 0; }
+    constexpr const_pointer begin() const { return data(); }
+    constexpr const_pointer end() const { return data() + size(); }
+    constexpr pointer begin() { return data(); }
+    constexpr pointer end() { return data() + size(); }
 
     // Allow data_equal for spans that are over the same type up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
