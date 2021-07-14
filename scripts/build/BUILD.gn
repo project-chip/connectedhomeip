@@ -14,76 +14,30 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+   
+import("//build_overrides/pigweed.gni") 
+import("$dir_pw_build/python.gni")                                                                                                                                                                                           
+
 
 import("${chip_root}/build/chip/tests.gni")
 
-if (chip_build_tests) {
-  action("all_platform_build_example") {
-    _output_file = "$target_gen_dir/all_platform_build_commands.txt"
-
-    script = "build_examples.py"
-    outputs = [ _output_file ]
-
-    # build script source files
-    inputs = [
-      "./build/__init__.py",
-      "./build/factory.py",
-      "./build/targets.py",
-      "./builders/__init__.py",
-      "./builders/builder.py",
-      "./builders/efr32.py",
-      "./builders/esp32.py",
-      "./builders/linux.py",
-      "./builders/qpg.py",
-      "expected_all_platform_commands.txt",
-      "./runner/__init__.py",
-      "./runner/printonly.py",
-      "./runner/shell.py",
-    ]
-
-    args = [
-      "--repo",
-      rebase_path("${chip_root}"),
-      "--platform",
-      "all",
-      "--log-level",
-      "fatal",
-      "--out-prefix",
-      "/buildout",
-      "--dry-run",
-      "--dry-run-output",
-      rebase_path(_output_file, root_build_dir),
-      "build",
-    ]
-  }
-
-  action_foreach("tests_run") {
-    _stamp_file = "$target_gen_dir/$target_name.{{source_name_part}}.stamp"
-    _expected_out = "$target_gen_dir/{{source_name_part}}.expected"
-
-    script = "test.py"
-    outputs = [
-      _stamp_file,
-      _expected_out,
-    ]
-
-    sources = get_target_outputs(":all_platform_build_example")
-
-    deps = [ ":all_platform_build_example" ]
-
-    args = [
-      "--repo",
-      rebase_path("${chip_root}"),
-      "--output-root",
-      "/buildout",
-      "--expected",
-      rebase_path("expected_all_platform_commands.txt", root_build_dir),
-      "--expected-out",
-      rebase_path(_expected_out, root_build_dir),
-      "--actual",
-      "{{source}}",
-      "--touch",
-      rebase_path(_stamp_file, root_build_dir),
-    ]
-  }
-}
+pw_python_package("build_examples") {                                                                                                                                                                                                    
+  setup = [ "setup.py" ]                                                                                                                                                                                                     
+  sources = [                                                                                                                                                                                                                
+    "build_examples.py",
+    "build/__init__.py",
+    "build/factory.py",
+    "build/targets.py",
+    "builders/__init__.py",
+    "builders/builder.py",
+    "builders/efr32.py",
+    "builders/esp32.py",
+    "builders/linux.py",
+    "builders/qpg.py",
+    "runner/__init__.py",
+    "runner/printonly.py",
+    "runner/shell.py",
+    "expected_all_platform_commands.txt",
+  ]                                                                                                                                                                                                                          
+  tests = [ "test.py" ]                                                                                                                                                                                                                          
+}   

@@ -9,58 +9,40 @@ import subprocess
 import sys
 import time
 
-# Supported log levels, mapping string values required for argument
-# parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'fatal': logging.FATAL,
-}
+def buildExpected(root: str, out: str):
+  with open(os.path.join(os.path.dirname(__file__), 'expected_all_platform_commands.txt'), 'rt') as f:
+    for l in f.readlines():
+      yield l.replace("{root}", root).replace("{out}", out)
 
-def sameFile(a: str, b: str) -> bool:
-  with open(a, 'rt') as fa:
-    a_lines = fa.readlines()
 
-  with open(b, 'rt') as fb:
-    b_lines = fb.readlines()
+def buildActual(root: str, out: str):
+  return []
 
-  diffs = [line for line in difflib.unified_diff(a_lines, b_lines, fromfile=a, tofile=b)]
+
+def main():
+  coloredlogs.install(level=logging.INFO, fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
+
+  # @click.command()
+  # @click.option("--touch", type=click.Path(resolve_path=True, dir_okay=False), help="Timestamp file to touch.")
+  # @click.option("--repo", type=click.Path(resolve_path=True, dir_okay=True), help="Repository path used when generating.")
+  # @click.option("--output-root", type=click.Path(resolve_path=True, dir_okay=True), help="Build output directory")
+  # @click.option("--expected", type=click.File("rt"), help="Expected file content.")
+  # @click.option("--expected-out", type=click.File("wt"), help="Where to write expected content.")
+  # @click.option("--actual", type=click.Path(resolve_path=True, dir_okay=False), help="Actual file generated content.")
+
+  ROOT = '/BUILD/ROOT'
+  OUT = '/OUTPUT/DIR'
+
+  expected = [l for l in buildExpected(ROOT, OUT)]
+  actual = [l for l in buildActual(ROOT, OUT)]
+
+  diffs = [line for line in difflib.unified_diff(expected, actual)]
 
   if diffs:
-    logging.error("DIFFERENCE found between %s and %s" % (a, b))
+    logging.error("DIFFERENCE between expected and generated output")
     for l in diffs:
       logging.warning("  " + l.strip())
 
-    return False
-
-  return True
-
-
-@click.command()
-@click.option(
-    '--log-level',
-    default='INFO',
-    type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
-    help='Determines the verbosity of script output.')
-@click.option("--touch", type=click.Path(resolve_path=True, dir_okay=False), help="Timestamp file to touch.")
-@click.option("--repo", type=click.Path(resolve_path=True, dir_okay=True), help="Repository path used when generating.")
-@click.option("--output-root", type=click.Path(resolve_path=True, dir_okay=True), help="Build output directory")
-@click.option("--expected", type=click.File("rt"), help="Expected file content.")
-@click.option("--expected-out", type=click.File("wt"), help="Where to write expected content.")
-@click.option("--actual", type=click.Path(resolve_path=True, dir_okay=False), help="Actual file generated content.")
-def main(log_level, touch, repo, output_root, expected, expected_out, actual):
-  coloredlogs.install(
-    level=__LOG_LEVELS__[log_level],
-    fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
-
-  for l in expected.readlines():
-    expected_out.write(l.replace("{root}", repo).replace("{out}", output_root))
-  expected_out.close()
-
-
-  logging.info('Diffing %s and %s' % (expected_out.name, actual))
-  if not sameFile(expected_out.name, actual):
     sys.exit(1)
 
   logging.info('Touching %s' % touch)
