@@ -91,6 +91,16 @@ public:
     uint32_t mNumPairingComplete = 0;
 };
 
+class TestCASESessionDestinationId : public CASESession
+{
+public:
+    CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::CertificateKeyId * trustedRootId, NodeId nodeId,
+                                     FabricId fabricId, MutableByteSpan & destinationId)
+    {
+        return CASESession::GenerateDestinationID(random, trustedRootId, nodeId, fabricId, destinationId);
+    }
+};
+
 static CHIP_ERROR InitCredentialSets()
 {
     commissionerDevOpCred.Release();
@@ -447,6 +457,58 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     chip::Platform::Delete(testPairingSession2);
 }
 
+void CASE_DestinationIDGenerationTest(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    NL_TEST_ASSERT(inSuite, InitCredentialSets() == CHIP_NO_ERROR);
+
+    // Test all combinations of invalid parameters
+    TestCASESecurePairingDelegate delegate;
+    TestCASESecurePairingDelegate delegateAccessory;
+    TestCASESessionDestinationId pairingCommissioner;
+    CASESession pairingAccessory;
+
+    uint8_t random[kSigmaParamRandomNumberSize]        = { 0x7e, 0x17, 0x12, 0x31, 0x56, 0x8d, 0xfa, 0x17, 0x20, 0x6b, 0x3a,
+                                                    0xcc, 0xf8, 0xfa, 0xec, 0x2f, 0x4d, 0x21, 0xb5, 0x80, 0x11, 0x31,
+                                                    0x96, 0xf4, 0x7c, 0x7c, 0x4d, 0xeb, 0x81, 0x0a, 0x73, 0xdc };
+    uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
+    // NodeId = (0xDEDE_DEDE_0001_0001)
+    // FabricId = (0xFAB0_0000_0000_001D)
+    // Root PubKey = CHIPCert_test_vectors.cpp:sTestCert_Root01_PublicKey
+    // IPK = {0x1d <repeats 16 times>}
+    uint8_t destinationIdentifierTestVector[kSHA256_Hash_Length] = { 0x34, 0x10, 0x1f, 0xd9, 0x3f, 0x0f, 0x14, 0xc8,
+                                                                     0x16, 0x84, 0x4d, 0x55, 0x01, 0xa8, 0x05, 0x28,
+                                                                     0x0f, 0xf7, 0x72, 0x33, 0x29, 0x51, 0x52, 0xb9,
+                                                                     0x19, 0xae, 0xe4, 0x12, 0xe6, 0x34, 0x05, 0x1b };
+
+    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+
+    ExchangeContext * context = ctx.NewExchangeToLocal(&pairingCommissioner);
+
+    NL_TEST_ASSERT(inSuite,
+                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
+                       Protocols::SecureChannel::MsgType::CASE_SigmaR1, &pairingAccessory) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite,
+                   pairingAccessory.ListenForSessionEstablishment(&accessoryDevOpCred, 0, &delegateAccessory) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite,
+                   pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
+                                                        commissionerCredentialsIndex, Node01_01, Fabric_Node01_01, 0, context,
+                                                        &delegate) == CHIP_NO_ERROR);
+
+    {
+        MutableByteSpan destinationIdSpan(destinationIdentifier, sizeof(destinationIdentifier));
+        NL_TEST_ASSERT(inSuite,
+                       pairingCommissioner.GenerateDestinationID(ByteSpan(random, sizeof(random)), &trustedRootId, Node01_01,
+                                                                 Fabric_Node01_01, destinationIdSpan) == CHIP_NO_ERROR);
+    }
+
+    NL_TEST_ASSERT(inSuite, memcmp(destinationIdentifier, destinationIdentifierTestVector, sizeof(destinationIdentifier)) == 0);
+}
+
 // Test Suite
 
 /**
@@ -460,6 +522,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Handshake",   CASE_SecurePairingHandshakeTest),
     NL_TEST_DEF("ServerHandshake", CASE_SecurePairingHandshakeServerTest),
     NL_TEST_DEF("Serialize",   CASE_SecurePairingSerializeTest),
+    NL_TEST_DEF("DestinationID Generation", CASE_DestinationIDGenerationTest),
 
     NL_TEST_SENTINEL()
 };
