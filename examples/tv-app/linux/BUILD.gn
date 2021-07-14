@@ -50,7 +50,6 @@ executable("chip-tv-app") {
     "include/tv-channel/TvChannelManager.h",
     "include/wake-on-lan/WakeOnLanManager.cpp",
     "include/wake-on-lan/WakeOnLanManager.h",
-    "include/zcl-strings.h",
     "main.cpp",
   ]
 
