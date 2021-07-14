@@ -209,12 +209,13 @@ public:
      * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
      * @param[in] admin        Local administrator that's initializing this device object
      */
-    void Init(ControllerDeviceInitParams params, uint16_t listenPort, NodeId deviceId, const Transport::PeerAddress & peerAddress,
-              Transport::AdminId admin)
+    void Init(ControllerDeviceInitParams params, uint16_t listenPort, NodeId deviceId, FabricId fabricId,
+              const Transport::PeerAddress & peerAddress, Transport::AdminId admin)
     {
         Init(params, mListenPort, admin);
-        mDeviceId = deviceId;
-        mState    = ConnectionState::Connecting;
+        mDeviceId       = deviceId;
+        mDeviceFabricId = fabricId;
+        mState          = ConnectionState::Connecting;
 
         mDeviceAddress = peerAddress;
     }
@@ -410,6 +411,8 @@ private:
     };
     /* Node ID assigned to the CHIP device */
     NodeId mDeviceId;
+    /* Fabric ID assigned to the CHIP device */
+    FabricId mDeviceFabricId;
 
     /** Address used to communicate with the device.
      */

@@ -252,6 +252,15 @@ public:
      **/
     CHIP_ERROR GetCertChipId(uint64_t & certId) const;
 
+    /**
+     * @brief Retrieve the Fabric ID of a CHIP certificate.
+     *
+     * @param certId  A reference to the certificate Fabric ID value.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR GetCertFabricId(uint64_t & fabricId) const;
+
     bool IsEqual(const ChipDN & other) const;
 
     /**

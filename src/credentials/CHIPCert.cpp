@@ -746,6 +746,29 @@ CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ChipDN::GetCertFabricId(uint64_t & fabricId) const
+{
+    uint8_t rdnCount = RDNCount();
+
+    fabricId = 0;
+
+    for (uint8_t i = 0; i < rdnCount; i++)
+    {
+        switch (rdn[i].mAttrOID)
+        {
+        case kOID_AttributeType_ChipFabricId:
+            VerifyOrReturnError(fabricId == 0, CHIP_ERROR_WRONG_CERT_TYPE);
+
+            fabricId = rdn[i].mChipVal;
+            break;
+        default:
+            break;
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 bool ChipDN::IsEqual(const ChipDN & other) const
 {
     bool res         = true;

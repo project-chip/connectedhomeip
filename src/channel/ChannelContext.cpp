@@ -266,7 +266,7 @@ void ChannelContext::EnterCasePairingState()
     addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(prepare.mAddress);
     CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(
         addr, &prepare.mBuilder.GetOperationalCredentialSet(), prepare.mBuilder.GetOperationalCredentialSetIndex(),
-        prepare.mBuilder.GetPeerNodeId(), mExchangeManager->GetNextKeyId(), ctxt, this);
+        prepare.mBuilder.GetPeerNodeId(), prepare.mBuilder.GetPeerFabricId(), mExchangeManager->GetNextKeyId(), ctxt, this);
     if (err != CHIP_NO_ERROR)
     {
         ExitCasePairingState();

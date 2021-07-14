@@ -83,6 +83,13 @@ public:
     }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
 
+    ChannelBuilder & SetPeerFabricId(FabricId peerFabricId)
+    {
+        mPeerFabricId = peerFabricId;
+        return *this;
+    }
+    FabricId GetPeerFabricId() const { return mPeerFabricId; }
+
     ChannelBuilder & SetTransportPreference(TransportPreference preference)
     {
         mTransportPreference = preference;
@@ -123,6 +130,7 @@ public:
 
 private:
     NodeId mPeerNodeId                       = kUndefinedNodeId;
+    FabricId mPeerFabricId                   = kUndefinedFabricId;
     TransportPreference mTransportPreference = TransportPreference::kDefault;
     struct
     {

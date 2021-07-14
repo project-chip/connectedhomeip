@@ -71,7 +71,8 @@ P256Keypair accessoryOpKeys;
 CertificateKeyId trustedRootId = CertificateKeyId(sTestCert_Root01_SubjectKeyId);
 uint8_t commissionerCredentialsIndex;
 
-NodeId Node01_01 = 0xDEDEDEDE00010001;
+NodeId Node01_01          = 0xDEDEDEDE00010001;
+FabricId Fabric_Node01_01 = 0xFAB000000000001D;
 } // namespace
 
 enum
@@ -173,10 +174,12 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                            commissionerCredentialsIndex, Node01_01, 0, nullptr, nullptr) != CHIP_NO_ERROR);
+                                            commissionerCredentialsIndex, Node01_01, Fabric_Node01_01, 0, nullptr,
+                                            nullptr) != CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                            commissionerCredentialsIndex, Node01_01, 0, context, &delegate) == CHIP_NO_ERROR);
+                                            commissionerCredentialsIndex, Node01_01, Fabric_Node01_01, 0, context,
+                                            &delegate) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
 
@@ -191,7 +194,7 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite,
                    pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                             commissionerCredentialsIndex, Node01_01, 0, context1,
+                                             commissionerCredentialsIndex, Node01_01, Fabric_Node01_01, 0, context1,
                                              &delegate) == CHIP_ERROR_BAD_REQUEST);
     gLoopback.mMessageSendError = CHIP_NO_ERROR;
 }
@@ -223,8 +226,8 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
                    pairingAccessory.ListenForSessionEstablishment(&accessoryDevOpCred, 0, &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                                        commissionerCredentialsIndex, Node01_01, 0, contextCommissioner,
-                                                        &delegateCommissioner) == CHIP_NO_ERROR);
+                                                        commissionerCredentialsIndex, Node01_01, Fabric_Node01_01, 0,
+                                                        contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
@@ -370,7 +373,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &credentials,
-                                                         credentialsIndex, Node01_01, 0, contextCommissioner,
+                                                         credentialsIndex, Node01_01, Fabric_Node01_01, 0, contextCommissioner,
                                                          &delegateCommissioner) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
@@ -382,7 +385,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner1->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &credentials,
-                                                          credentialsIndex, Node01_01, 0, contextCommissioner1,
+                                                          credentialsIndex, Node01_01, Fabric_Node01_01, 0, contextCommissioner1,
                                                           &delegateCommissioner) == CHIP_NO_ERROR);
 
     chip::Platform::Delete(pairingCommissioner);

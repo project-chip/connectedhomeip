@@ -65,6 +65,9 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
 
+    FabricId GetPeerFabricId() const { return mPeerFabricId; }
+    void SetPeerFabricId(FabricId peerFabricId) { mPeerFabricId = peerFabricId; }
+
     uint16_t GetPeerKeyID() const { return mPeerKeyID; }
     void SetPeerKeyID(uint16_t id) { mPeerKeyID = id; }
 
@@ -92,6 +95,7 @@ public:
     {
         mPeerAddress        = PeerAddress::Uninitialized();
         mPeerNodeId         = kUndefinedNodeId;
+        mPeerFabricId       = kUndefinedFabricId;
         mLastActivityTimeMs = 0;
         mSecureSession.Reset();
         mSessionMessageCounter.Reset();
@@ -114,6 +118,7 @@ public:
 private:
     PeerAddress mPeerAddress;
     NodeId mPeerNodeId           = kUndefinedNodeId;
+    FabricId mPeerFabricId       = kUndefinedFabricId;
     uint16_t mPeerKeyID          = UINT16_MAX;
     uint16_t mLocalKeyID         = UINT16_MAX;
     uint64_t mLastActivityTimeMs = 0;
