@@ -433,20 +433,6 @@ struct LwIPEvent;
 #endif /* CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS */
 
 /**
- *  @def CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
- *
- *  @brief
- *      This defines whether (1) or not (0) your platform will provide the following platform-specific functions:
- *      - chip::System::Platform::Layer::PostEvent
- *      - chip::System::Platform::Layer::DispatchEvents
- *      - chip::System::Platform::Layer::DispatchEvent
- *      - chip::System::Platform::Layer::StartTimer
- */
-#ifndef CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 0
-#endif /* CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS */
-
-/**
  *  @def CHIP_SYSTEM_CONFIG_NUM_TIMERS
  *
  *  @brief
