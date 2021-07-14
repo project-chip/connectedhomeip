@@ -122,7 +122,7 @@ int AppTask::Init()
 
 int AppTask::StartApp()
 {
-    int ret                            = Init();
+    int ret = Init();
 
     if (ret)
     {

@@ -91,7 +91,7 @@ CHIP_ERROR AppTask::Start()
 
 void AppTask::Main(void * pvParameter)
 {
-    AppTask & app             = AppTask::sInstance;
+    AppTask & app = AppTask::sInstance;
     int err;
 
     err = app.Init();
