@@ -367,12 +367,10 @@ void TransferSession::Reset()
     mAwaitingResponse       = false;
 }
 
-CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg, uint64_t curTimeMs)
+CHIP_ERROR TransferSession::HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg,
+                                                  uint64_t curTimeMs)
 {
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    PayloadHeader payloadHeader;
-    ReturnErrorOnFailure(payloadHeader.DecodeAndConsume(msg));
 
     if (payloadHeader.HasProtocol(Protocols::BDX::Id))
     {
@@ -393,7 +391,7 @@ CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg
 }
 
 // Return CHIP_ERROR only if there was a problem decoding the message. Otherwise, call PrepareStatusReport().
-CHIP_ERROR TransferSession::HandleBdxMessage(PayloadHeader & header, System::PacketBufferHandle msg)
+CHIP_ERROR TransferSession::HandleBdxMessage(const PayloadHeader & header, System::PacketBufferHandle msg)
 {
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mPendingOutput == OutputEventType::kNone, CHIP_ERROR_INCORRECT_STATE);
@@ -441,7 +439,7 @@ CHIP_ERROR TransferSession::HandleBdxMessage(PayloadHeader & header, System::Pac
  *   NOTE: BDX does not currently expect to ever use a "Success" general code, so it will be treated as an error along with any
  *         other code.
  */
-CHIP_ERROR TransferSession::HandleStatusReportMessage(PayloadHeader & header, System::PacketBufferHandle msg)
+CHIP_ERROR TransferSession::HandleStatusReportMessage(const PayloadHeader & header, System::PacketBufferHandle msg)
 {
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 

@@ -86,8 +86,7 @@ CHIP_ERROR AttachHeaderAndSend(TransferSession::MessageTypeData typeData, chip::
     chip::PayloadHeader payloadHeader;
     payloadHeader.SetMessageType(typeData.ProtocolId, typeData.MessageType);
 
-    ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
-    ReturnErrorOnFailure(receiver.HandleMessageReceived(std::move(msgBuf), kNoAdvanceTime));
+    ReturnErrorOnFailure(receiver.HandleMessageReceived(payloadHeader, std::move(msgBuf), kNoAdvanceTime));
     return CHIP_NO_ERROR;
 }
 

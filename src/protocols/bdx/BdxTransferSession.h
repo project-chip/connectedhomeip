@@ -250,13 +250,15 @@ public:
      * @brief
      *   Process a message intended for this TransferSession object.
      *
-     * @param msg       A PacketBufferHandle pointing to the message buffer to process. May be BDX or StatusReport protocol.
-     * @param curTimeMs Current time indicated by the number of milliseconds since some epoch defined by the platform
+     * @param payloadHeader A PayloadHeader containing the Protocol type and Message Type
+     * @param msg           A PacketBufferHandle pointing to the message buffer to process. May be BDX or StatusReport protocol.
+     *                      Buffer is expected to start at data (not header).
+     * @param curTimeMs     Current time indicated by the number of milliseconds since some epoch defined by the platform
      *
      * @return CHIP_ERROR Indicates any problems in decoding the message, or if the message is not of the BDX or StatusReport
      *                    protocols.
      */
-    CHIP_ERROR HandleMessageReceived(System::PacketBufferHandle msg, uint64_t curTimeMs);
+    CHIP_ERROR HandleMessageReceived(const PayloadHeader & payloadHeader, System::PacketBufferHandle msg, uint64_t curTimeMs);
 
     TransferControlFlags GetControlMode() const { return mControlMode; }
     uint64_t GetStartOffset() const { return mStartOffset; }
@@ -280,8 +282,8 @@ private:
     };
 
     // Incoming message handlers
-    CHIP_ERROR HandleBdxMessage(PayloadHeader & header, System::PacketBufferHandle msg);
-    CHIP_ERROR HandleStatusReportMessage(PayloadHeader & header, System::PacketBufferHandle msg);
+    CHIP_ERROR HandleBdxMessage(const PayloadHeader & header, System::PacketBufferHandle msg);
+    CHIP_ERROR HandleStatusReportMessage(const PayloadHeader & header, System::PacketBufferHandle msg);
     void HandleTransferInit(MessageType msgType, System::PacketBufferHandle msgData);
     void HandleReceiveAccept(System::PacketBufferHandle msgData);
     void HandleSendAccept(System::PacketBufferHandle msgData);
