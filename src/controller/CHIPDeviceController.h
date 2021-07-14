@@ -348,7 +348,7 @@ protected:
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
-    Mdns::DiscoveredNodeData * GetDiscoveredNodes() override { return mCommissionableNodes; }
+    DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     // This function uses `OperationalCredentialsDelegate` to generate the operational certificates

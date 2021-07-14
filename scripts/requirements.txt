@@ -42,3 +42,6 @@ protobuf
 anytree
 cxxfilt
 pandas ; platform_machine != 'aarch64'
+
+# scripts/build
+click

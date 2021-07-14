@@ -430,32 +430,6 @@ struct LwIPEvent;
 
 
 /**
- *  @def CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
- *
- *  @brief
- *      This defines whether (1) or not (0) your platform will provide the following platform- and system-specific functions:
- *      - chip::System::MapErrorPOSIX
- *      - chip::System::DescribeErrorPOSIX
- *      - chip::System::IsErrorPOSIX
- */
-#ifndef CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS 0
-#endif /* CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS */
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
- *
- *  @brief
- *      This defines whether (1) or not (0) your platform will provide the following system-specific functions:
- *      - chip::System::MapErrorLwIP
- *      - chip::System::DescribeErrorLwIP
- *      - chip::System::IsErrorLwIP
- */
-#ifndef CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS 0
-#endif /* CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS */
-
-/**
  *  @def CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
  *
  *  @brief
@@ -468,20 +442,6 @@ struct LwIPEvent;
 #ifndef CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
 #define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS 0
 #endif /* CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS */
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
- *
- *  @brief
- *      This defines whether (1) or not (0) your platform will provide the following platform-specific functions:
- *      - chip::System::Platform::EventSupport::PostEvent
- *      - chip::System::Platform::EventSupport::DispatchEvents
- *      - chip::System::Platform::EventSupport::DispatchEvent
- *      - chip::System::Platform::EventSupport::StartTimer
- */
-#ifndef CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 0
-#endif /* CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS */
 
 /**
  *  @def CHIP_SYSTEM_CONFIG_NUM_TIMERS
@@ -575,7 +535,7 @@ struct LwIPEvent;
  *  @brief
  *      Use LwIP time function for System Layer monotonic clock functions.
  *
- *  Use the LwIP sys_now() function to implement the System Layer GetClock_Monotonic... functions.
+ *  Use the LwIP sys_now() function to implement the System Clock functions.
  *
  *  Defaults to enabled if the system is using LwIP and not sockets.
  *

@@ -31,21 +31,6 @@ limitations under the License.
   <bitmap name="ScenesCopyMode" type="BITMAP8">
     <field name="CopyAllScenes" mask="0x01"/>
   </bitmap>
-  <enum name="OnOffEffectIdentifier" type="ENUM8">
-    <item name="DelayedAllOff" value="0x00"/>
-    <item name="DyingLight" value="0x01"/>
-  </enum>
-  <enum name="OnOffDelayedAllOffEffectVariant" type="ENUM8">
-    <item name="FadeToOffIn_0p8Seconds" value="0x00"/>
-    <item name="NoFade" value="0x01"/>
-    <item name="50PercentDimDownIn_0p8SecondsThenFadeToOffIn_12Seconds" value="0x02"/>
-  </enum>
-  <enum name="OnOffDyingLightEffectVariant" type="ENUM8">
-    <item name="20PercenterDimUpIn_0p5SecondsThenFadeToOffIn_1Second" value="0x00"/>
-  </enum>
-  <bitmap name="OnOffControl" type="BITMAP8">
-    <field name="AcceptOnlyWhenOn" mask="0x01"/>
-  </bitmap>
   <enum name="EnhancedColorMode" type="ENUM8">
     <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
     <item name="CurrentXAndCurrentY" value="0x01"/>
@@ -140,31 +125,6 @@ limitations under the License.
       <arg name="status" type="Status"/>
       <arg name="groupIdFrom" type="INT16U"/>
       <arg name="sceneIdFrom" type="INT8U"/>
-    </command>
-  </clusterExtension>
-  <clusterExtension code="0x0006">
-    <attribute side="server" code="0x4000" define="GLOBAL_SCENE_CONTROL" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x01" optional="true" introducedIn="zll-1.0-11-0037-10">global scene control</attribute>
-    <attribute side="server" code="0x4001" define="ON_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true" introducedIn="zll-1.0-11-0037-10">on time</attribute>
-    <attribute side="server" code="0x4002" define="OFF_WAIT_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true" introducedIn="zll-1.0-11-0037-10">off wait time</attribute>
-    <command source="client" code="0x40" name="OffWithEffect" optional="true" introducedIn="zll-1.0-11-0037-10" cli="zcl on-off offeffect">
-      <description>
-        Command description for OffWithEffect
-      </description>
-      <arg name="effectId" type="OnOffEffectIdentifier"/>
-      <arg name="effectVariant" type="ENUM8"/>
-    </command>
-    <command source="client" code="0x41" name="OnWithRecallGlobalScene" optional="true" introducedIn="zll-1.0-11-0037-10" cli="zcl on-off onrecall">
-      <description>
-        Command description for OnWithRecallGlobalScene
-      </description>
-    </command>
-    <command source="client" code="0x42" name="OnWithTimedOff" optional="true" introducedIn="zll-1.0-11-0037-10" cli="zcl on-off ontimedoff">
-      <description>
-        Command description for OnWithTimedOff
-      </description>
-      <arg name="onOffControl" type="OnOffControl"/>
-      <arg name="onTime" type="INT16U"/>
-      <arg name="offWaitTime" type="INT16U"/>
     </command>
   </clusterExtension>
   <clusterExtension code="0x0300">

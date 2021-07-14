@@ -54,7 +54,7 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (err < CHIP_CONFIG_CORE_ERROR_MIN || err > CHIP_CONFIG_CORE_ERROR_MAX)
+    if (!ChipError::IsPart(ChipError::SdkPart::kCore, err))
     {
         return false;
     }

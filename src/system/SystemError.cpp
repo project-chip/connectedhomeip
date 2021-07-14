@@ -40,68 +40,13 @@
 #include <lwip/err.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
-#include <string.h>
-#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
-
-#include <stddef.h>
-
 #include <limits>
-
-#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
-
-/**
- *  @def CHIP_SYSTEM_POSIX_ERROR_MIN
- *
- *  @brief
- *      This defines the base or minimum CHIP System Layer error number range, when passing through errors from an underlying
- *      POSIX layer.
- */
-#define CHIP_SYSTEM_POSIX_ERROR_MIN 2000
-
-/**
- *  @def CHIP_SYSTEM_POSIX_ERROR_MAX
- *
- *  @brief
- *      This defines the base or maximum CHIP System Layer error number range, when passing through errors from an underlying
- *      POSIX layer.
- */
-#define CHIP_SYSTEM_POSIX_ERROR_MAX 2999
-
-#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
-
-/**
- *  @def CHIP_SYSTEM_LWIP_ERROR_MIN
- *
- *  @brief
- *      This defines the base or minimum CHIP System Layer error number range, when passing through errors from an underlying LWIP
- *      stack.
- */
-#ifndef CHIP_SYSTEM_LWIP_ERROR_MIN
-#define CHIP_SYSTEM_LWIP_ERROR_MIN 3000
-#endif // CHIP_SYSTEM_LWIP_ERROR_MIN
-
-/**
- *  @def CHIP_SYSTEM_LWIP_ERROR_MAX
- *
- *  @brief
- *      This defines the base or maximum CHIP System Layer error number range, when passing through errors from an underlying LWIP
- *      layer.
- */
-#ifndef CHIP_SYSTEM_LWIP_ERROR_MAX
-#define CHIP_SYSTEM_LWIP_ERROR_MAX 3128
-#endif // CHIP_SYSTEM_LWIP_ERROR_MAX
-
-#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <stddef.h>
+#include <string.h>
 
 namespace chip {
 namespace System {
 
-#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 /**
  * This implements a mapping function for CHIP System Layer errors that allows mapping integers in the number space of the
  * underlying POSIX network and OS stack errors into a platform- or system-specific range. Error codes beyond those currently
@@ -113,7 +58,8 @@ namespace System {
  */
 DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
 {
-    return (aError == 0 ? CHIP_NO_ERROR : static_cast<CHIP_ERROR>(CHIP_SYSTEM_POSIX_ERROR_MIN + aError));
+    return (aError == 0 ? CHIP_NO_ERROR
+                        : ChipError::Encapsulate(ChipError::Range::kPOSIX, static_cast<ChipError::BaseType>(aError)));
 }
 
 /**
@@ -126,24 +72,9 @@ DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
  */
 DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
 {
-    const int lError = (static_cast<int>(aError) - CHIP_SYSTEM_POSIX_ERROR_MIN);
+    const int lError = static_cast<int>(ChipError::GetValue(aError));
     return strerror(lError);
 }
-
-/**
- * This implements an introspection function for CHIP System Layer errors that allows the caller to determine whether the
- * specified error is an internal, underlying OS error.
- *
- *  @param[in] aError  The mapped error to determine whether it is an OS error.
- *
- *  @return True if the specified error is an OS error; otherwise, false.
- */
-DLL_EXPORT bool IsErrorPOSIX(CHIP_ERROR aError)
-{
-    return (aError >= CHIP_SYSTEM_POSIX_ERROR_MIN && aError <= CHIP_SYSTEM_POSIX_ERROR_MAX);
-}
-
-#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_POSIX_ERROR_FUNCTIONS
 
 /**
  * Register a text error formatter for POSIX errors.
@@ -169,15 +100,13 @@ void RegisterPOSIXErrorFormatter()
  */
 bool FormatPOSIXError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
-    const CHIP_ERROR sysErr = static_cast<CHIP_ERROR>(err);
-
-    if (IsErrorPOSIX(sysErr))
+    if (ChipError::IsRange(ChipError::Range::kPOSIX, err))
     {
         const char * desc =
 #if CHIP_CONFIG_SHORT_ERROR_STR
             NULL;
 #else
-            DescribeErrorPOSIX(sysErr);
+            DescribeErrorPOSIX(err);
 #endif
         FormatError(buf, bufSize, "OS", err, desc);
         return true;
@@ -200,7 +129,6 @@ DLL_EXPORT CHIP_ERROR MapErrorZephyr(int aError)
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
 
 /**
  * This implements a mapping function for CHIP System Layer errors that allows mapping underlying LwIP network stack errors into a
@@ -213,9 +141,8 @@ DLL_EXPORT CHIP_ERROR MapErrorZephyr(int aError)
  */
 DLL_EXPORT CHIP_ERROR MapErrorLwIP(err_t aError)
 {
-    static_assert(std::numeric_limits<err_t>::min() == CHIP_SYSTEM_LWIP_ERROR_MIN - CHIP_SYSTEM_LWIP_ERROR_MAX,
-                  "Can't represent all LWIP errors");
-    return (aError == ERR_OK ? CHIP_NO_ERROR : CHIP_SYSTEM_LWIP_ERROR_MIN - aError);
+    static_assert(ChipError::CanEncapsulate(-std::numeric_limits<err_t>::min()), "Can't represent all LWIP errors");
+    return (aError == ERR_OK ? CHIP_NO_ERROR : ChipError::Encapsulate(ChipError::Range::kLwIP, static_cast<unsigned int>(-aError)));
 }
 
 /**
@@ -229,20 +156,12 @@ DLL_EXPORT CHIP_ERROR MapErrorLwIP(err_t aError)
  */
 DLL_EXPORT const char * DescribeErrorLwIP(CHIP_ERROR aError)
 {
-    if (!IsErrorLwIP(aError))
+    if (!ChipError::IsRange(ChipError::Range::kLwIP, aError))
     {
         return nullptr;
     }
 
-    // Error might be a signed or unsigned type.  But we know the value is no
-    // larger than CHIP_SYSTEM_LWIP_ERROR_MAX and that this means it's safe to
-    // store in int.
-    static_assert(INT_MAX > CHIP_SYSTEM_LWIP_ERROR_MAX, "Our subtraction will fail");
-    const int lErrorWithoutOffset = aError - CHIP_SYSTEM_LWIP_ERROR_MIN;
-    // Cast is safe because the range from CHIP_SYSTEM_LWIP_ERROR_MIN to
-    // CHIP_SYSTEM_LWIP_ERROR_MAX all fits inside err_t.  See static_assert in
-    // MapErrorLwIP.
-    const err_t lError = static_cast<err_t>(-lErrorWithoutOffset);
+    const err_t lError = static_cast<err_t>(-static_cast<err_t>(ChipError::GetValue(aError)));
 
     // If we are not compiling with LWIP_DEBUG asserted, the unmapped
     // local value may go unused.
@@ -251,23 +170,6 @@ DLL_EXPORT const char * DescribeErrorLwIP(CHIP_ERROR aError)
 
     return lwip_strerr(lError);
 }
-
-/**
- * This implements an introspection function for CHIP System Layer errors that
- * allows the caller to determine whether the specified error is an
- * internal, underlying LwIP error.
- *
- *  @param[in] aError  The mapped error to determine whether it is a LwIP error.
- *
- *  @return True if the specified error is a LwIP error; otherwise, false.
- *
- */
-DLL_EXPORT bool IsErrorLwIP(CHIP_ERROR aError)
-{
-    return (aError >= CHIP_SYSTEM_LWIP_ERROR_MIN && aError <= CHIP_SYSTEM_LWIP_ERROR_MAX);
-}
-
-#endif // !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_LWIP_ERROR_FUNCTIONS
 
 /**
  * Register a text error formatter for LwIP errors.
@@ -293,15 +195,13 @@ void RegisterLwIPErrorFormatter(void)
  */
 bool FormatLwIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
-    const CHIP_ERROR sysErr = static_cast<CHIP_ERROR>(err);
-
-    if (IsErrorLwIP(sysErr))
+    if (ChipError::IsRange(ChipError::Range::kLwIP, err))
     {
         const char * desc =
 #if CHIP_CONFIG_SHORT_ERROR_STR
             NULL;
 #else
-            DescribeErrorLwIP(sysErr);
+            DescribeErrorLwIP(err);
 #endif
         chip::FormatError(buf, bufSize, "LwIP", err, desc);
         return true;

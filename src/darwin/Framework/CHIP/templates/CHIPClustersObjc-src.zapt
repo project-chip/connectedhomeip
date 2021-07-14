@@ -418,16 +418,16 @@ private:
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_responses}}
-class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge : public Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback>
+class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge : public Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback>
 {
 public:
-    CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+    CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
-    ~CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge() {};
+    ~CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge() {};
 
     static void CallbackFn(void * context{{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_server_cluster_response_arguments}})
     {
-        CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge * callback = reinterpret_cast<CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge *>(context);
+        CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge * callback = reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge *>(context);
         if (callback && callback->mQueue)
         {
             dispatch_async(callback->mQueue, ^{
@@ -464,16 +464,16 @@ private:
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-class CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge : public Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>
+class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge : public Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>
 {
 public:
-    CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+    CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
-    ~CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge() {};
+    ~CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t count, {{chipType}} * entries)
     {
-        CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge * callback = reinterpret_cast<CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge *>(context);
+        CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge * callback = reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge *>(context);
         if (callback && callback->mQueue)
         {
             id values[count];
@@ -571,11 +571,11 @@ private:
 
 {{#chip_client_clusters}}
 
-@interface CHIP{{asCamelCased name false}} ()
-@property (readonly) Controller::{{asCamelCased name false}}Cluster cppCluster;
+@interface CHIP{{asUpperCamelCase name}} ()
+@property (readonly) Controller::{{asUpperCamelCase name}}Cluster cppCluster;
 @end
 
-@implementation CHIP{{asCamelCased name false}}
+@implementation CHIP{{asUpperCamelCase name}}
 
 - (Controller::ClusterBase *)getCluster
 {
@@ -584,13 +584,13 @@ private:
 
 {{#chip_server_cluster_commands}}
 {{#if (zcl_command_arguments_count this.id)}}
-- (void){{asCamelCased name}}:{{#chip_server_cluster_command_arguments}}{{#if index includeZero=false}}{{asCamelCased label}}:{{/if}}({{asObjectiveCBasicType type}}){{asCamelCased label}} {{/chip_server_cluster_command_arguments}}responseHandler:(ResponseHandler)responseHandler
+- (void){{asLowerCamelCase name}}:{{#chip_server_cluster_command_arguments}}{{#if index includeZero=false}}{{asLowerCamelCase label}}:{{/if}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_server_cluster_command_arguments}}responseHandler:(ResponseHandler)responseHandler
 {{else}}
-- (void){{asCamelCased name}}:(ResponseHandler)responseHandler
+- (void){{asLowerCamelCase name}}:(ResponseHandler)responseHandler
 {{/if}}
 {
 {{#if hasSpecificResponse}}
-    CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}CallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}CallbackBridge(responseHandler, [self callbackQueue]);
+    CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}CallbackBridge * onSuccess = new CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase responseName}}CallbackBridge(responseHandler, [self callbackQueue]);
 {{else}}
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
 {{/if}}
@@ -608,7 +608,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*){{asCamelCased label}}.bytes, {{asCamelCased label}}.length){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*)[{{asCamelCased label}} dataUsingEncoding:NSUTF8StringEncoding].bytes, [{{asCamelCased label}} lengthOfBytesUsingEncoding:NSUTF8StringEncoding]){{else}}{{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}});
+        err = self.cppCluster.{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*){{asLowerCamelCase label}}.bytes, {{asLowerCamelCase label}}.length){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*)[{{asLowerCamelCase label}} dataUsingEncoding:NSUTF8StringEncoding].bytes, [{{asLowerCamelCase label}} lengthOfBytesUsingEncoding:NSUTF8StringEncoding]){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_server_cluster_command_arguments}});
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -620,12 +620,12 @@ private:
 {{/chip_server_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-- (void)readAttribute{{asCamelCased name false}}WithResponseHandler:(ResponseHandler)responseHandler
+- (void)readAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)responseHandler
 {
 {{#if isList}}
-    CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge * onSuccess = new CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge(responseHandler, [self callbackQueue]);
 {{else}}
-    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onSuccess = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(responseHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}});
+    CHIP{{chipCallback.name}}AttributeCallbackBridge * onSuccess = new CHIP{{chipCallback.name}}AttributeCallbackBridge(responseHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}});
 {{/if}}
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
@@ -641,7 +641,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ReadAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel());
+        err = self.cppCluster.ReadAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel());
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -651,8 +651,8 @@ private:
     }
 }
 
-{{#if (isWritableAttribute)}}
-- (void)writeAttribute{{asCamelCased name false}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler
+{{#if isWritableAttribute}}
+- (void)writeAttribute{{asUpperCamelCase name}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -670,12 +670,12 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         {{#if (isOctetString type)}}
-        err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)value.bytes, value.length));
+        err = self.cppCluster.WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)value.bytes, value.length));
         {{else if (isCharString type)}}
         NSData * data = [value dataUsingEncoding:NSUTF8StringEncoding];
-        err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)data.bytes, data.length));
+        err = self.cppCluster.WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)data.bytes, data.length));
         {{else}}
-        err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), value);
+        err = self.cppCluster.WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), value);
         {{/if}}
     });
 
@@ -687,8 +687,8 @@ private:
 }
 
 {{/if}}
-{{#if (isReportableAttribute)}}
-- (void) configureAttribute{{asCamelCased name false}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler
+{{#if isReportableAttribute}}
+- (void) configureAttribute{{asUpperCamelCase name}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -706,7 +706,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ConfigureAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval{{#if isAnalog}}, change{{/if}});
+        err = self.cppCluster.ConfigureAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval{{#if isAnalog}}, change{{/if}});
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -716,9 +716,9 @@ private:
     }
 }
 
-- (void) reportAttribute{{asCamelCased name false}}WithResponseHandler:(ResponseHandler)reportHandler
+- (void) reportAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)reportHandler
 {
-    CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onReport = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(reportHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}, true);
+    CHIP{{chipCallback.name}}AttributeCallbackBridge * onReport = new CHIP{{chipCallback.name}}AttributeCallbackBridge(reportHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}, true);
     if (!onReport) {
         reportHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -726,7 +726,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ReportAttribute{{asCamelCased name false}}(onReport->Cancel());
+        err = self.cppCluster.ReportAttribute{{asUpperCamelCase name}}(onReport->Cancel());
     });
 
     if (err != CHIP_NO_ERROR) {

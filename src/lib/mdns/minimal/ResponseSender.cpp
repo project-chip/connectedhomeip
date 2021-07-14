@@ -89,7 +89,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
 
     // send all 'Answer' replies
     {
-        const uint64_t kTimeNowMs = chip::System::Platform::Layer::GetClock_MonotonicMS();
+        const uint64_t kTimeNowMs = chip::System::Clock::GetMonotonicMilliseconds();
 
         QueryReplyFilter queryReplyFilter(query);
         QueryResponderRecordFilter responseFilter;

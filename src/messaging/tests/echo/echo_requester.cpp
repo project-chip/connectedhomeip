@@ -98,12 +98,12 @@ void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_E
         if (err != CHIP_NO_ERROR)
         {
             printf("Send request failed: %s\n", chip::ErrorStr(err));
-            Shutdown();
+            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
         }
     }
     else
     {
-        Shutdown();
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     }
 }
 
@@ -121,7 +121,7 @@ CHIP_ERROR SendEchoRequest()
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    gLastEchoTime = chip::System::Timer::GetCurrentEpoch();
+    gLastEchoTime = chip::System::Clock::GetMonotonicMilliseconds();
 
     err = chip::DeviceLayer::SystemLayer.StartTimer(gEchoInterval, EchoTimerHandler, NULL);
     if (err != CHIP_NO_ERROR)
@@ -173,7 +173,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         printf("Establish secure session failed, err: %s\n", chip::ErrorStr(err));
-        gLastEchoTime = chip::System::Timer::GetCurrentEpoch();
+        gLastEchoTime = chip::System::Clock::GetMonotonicMilliseconds();
     }
     else
     {
@@ -185,7 +185,7 @@ exit:
 
 void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
-    uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
+    uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
     uint32_t transitTime = respTime - gLastEchoTime;
 
     gEchoRespCount++;
@@ -276,12 +276,9 @@ int main(int argc, char * argv[])
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        Shutdown();
-    }
+    Shutdown();
 
+exit:
     if ((err != CHIP_NO_ERROR) || (gEchoRespCount != kMaxEchoCount))
     {
         printf("ChipEchoClient failed: %s\n", chip::ErrorStr(err));

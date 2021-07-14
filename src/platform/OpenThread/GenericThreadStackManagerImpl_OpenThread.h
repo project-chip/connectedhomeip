@@ -32,6 +32,10 @@
 #include <openthread/srp_client.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+#include <openthread/dns_client.h>
+#endif
+
 #include <lib/mdns/Advertiser.h>
 #include <lib/mdns/platform/Mdns.h>
 
@@ -93,11 +97,16 @@ protected:
     void _OnWoBLEAdvertisingStop(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    CHIP_ERROR _AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
-                              size_t aTxtEntiresSize, uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
+    CHIP_ERROR _AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
+                              const Span<const char * const> & aSubTypes, const Span<const Mdns::TextEntry> & aTxtEntries,
+                              uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR _RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR _RemoveAllSrpServices();
     CHIP_ERROR _SetupSrpHost(const char * aHostName);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+    CHIP_ERROR _DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback, void * aContext);
+    CHIP_ERROR _DnsResolve(const char * aServiceName, const char * aInstanceName, DnsResolveCallback aCallback, void * aContext);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     // ===== Members available to the implementation subclass.
@@ -119,20 +128,36 @@ private:
 
     struct SrpClient
     {
-        static constexpr uint8_t kMaxServicesNumber   = CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES;
-        static constexpr uint8_t kMaxInstanceNameSize = chip::Mdns::kMdnsInstanceNameMaxSize;
-        static constexpr uint8_t kMaxNameSize         = chip::Mdns::kMdnsTypeAndProtocolMaxSize;
-        static constexpr uint8_t kMaxHostNameSize     = 16;
-        // Thread only supports operational discovery
+        static constexpr uint8_t kMaxServicesNumber      = CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES;
+        static constexpr uint8_t kMaxInstanceNameSize    = chip::Mdns::kMdnsInstanceNameMaxSize;
+        static constexpr uint8_t kMaxNameSize            = chip::Mdns::kMdnsTypeAndProtocolMaxSize;
+        static constexpr uint8_t kMaxHostNameSize        = 16;
+        static constexpr const char * kDefaultDomainName = "default.service.arpa";
+        static constexpr uint8_t kDefaultDomainNameSize  = 20;
+        static constexpr uint8_t kMaxDomainNameSize      = 32;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+        // Thread supports both operational and commissionable discovery, so buffers sizes must be worst case.
+        static constexpr uint8_t kMaxTxtEntriesNumber = chip::Mdns::CommissionAdvertisingParameters::kNumAdvertisingTxtEntries;
+        static constexpr uint8_t kMaxTxtValueSize     = chip::Mdns::CommissionAdvertisingParameters::kTxtMaxValueSize;
+        static constexpr uint8_t kMaxTxtKeySize       = chip::Mdns::OperationalAdvertisingParameters::kTxtMaxKeySize;
+#else
+        // Thread only supports operational discovery.
         static constexpr uint8_t kMaxTxtEntriesNumber = chip::Mdns::OperationalAdvertisingParameters::kNumAdvertisingTxtEntries;
         static constexpr uint8_t kMaxTxtValueSize     = chip::Mdns::OperationalAdvertisingParameters::kTxtMaxValueSize;
         static constexpr uint8_t kMaxTxtKeySize       = chip::Mdns::OperationalAdvertisingParameters::kTxtMaxKeySize;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 
         struct Service
         {
             otSrpClientService mService;
             char mInstanceName[kMaxInstanceNameSize + 1];
             char mName[kMaxNameSize + 1];
+#if OPENTHREAD_API_VERSION >= 132
+            // TODO: use fixed buffer allocator to reduce the memory footprint from N*M to sum(M_i)
+            char mSubTypeBuffers[chip::Mdns::kSubTypeMaxNumber][chip::Mdns::kSubTypeMaxLength + 1];
+            const char * mSubTypes[chip::Mdns::kSubTypeMaxNumber + 1]; // extra entry for nullptr at the end
+#endif
             otDnsTxtEntry mTxtEntries[kMaxTxtEntriesNumber];
             uint8_t mTxtValueBuffers[kMaxTxtEntriesNumber][kMaxTxtValueSize];
             char mTxtKeyBuffers[kMaxTxtEntriesNumber][kMaxTxtKeySize];
@@ -149,6 +174,42 @@ private:
                                         const otSrpClientService * aRemovedServices, void * aContext);
     static void OnSrpClientStateChange(const otSockAddr * aServerSockAddr, void * aContext);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
+    // Thread supports both operational and commissionable discovery, so buffers sizes must be worst case.
+    static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber =
+        chip::Mdns::CommissionAdvertisingParameters::kNumAdvertisingTxtEntries;
+    static constexpr uint8_t kMaxDnsServiceTxtValueSize = chip::Mdns::CommissionAdvertisingParameters::kTxtMaxValueSize;
+    static constexpr uint8_t kMaxDnsServiceTxtKeySize   = chip::Mdns::OperationalAdvertisingParameters::kTxtMaxKeySize;
+#else
+    // Thread only supports operational discovery.
+    static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber =
+        chip::Mdns::OperationalAdvertisingParameters::kNumAdvertisingTxtEntries;
+    static constexpr uint8_t kMaxDnsServiceTxtValueSize = chip::Mdns::OperationalAdvertisingParameters::kTxtMaxValueSize;
+    static constexpr uint8_t kMaxDnsServiceTxtKeySize   = chip::Mdns::OperationalAdvertisingParameters::kTxtMaxKeySize;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
+
+    DnsBrowseCallback mDnsBrowseCallback;
+    DnsResolveCallback mDnsResolveCallback;
+
+    struct DnsServiceTxtEntries
+    {
+        chip::Mdns::TextEntry mTxtEntries[kMaxDnsServiceTxtEntriesNumber];
+        uint8_t mTxtValueBuffers[kMaxDnsServiceTxtEntriesNumber][kMaxDnsServiceTxtValueSize];
+        char mTxtKeyBuffers[kMaxDnsServiceTxtEntriesNumber][kMaxDnsServiceTxtKeySize];
+    };
+
+    struct DnsResult
+    {
+        chip::Mdns::MdnsService mMdnsService;
+        DnsServiceTxtEntries mServiceTxtEntry;
+    };
+
+    static void OnDnsBrowseResult(otError aError, const otDnsBrowseResponse * aResponse, void * aContext);
+    static void OnDnsResolveResult(otError aError, const otDnsServiceResponse * aResponse, void * aContext);
+    static CHIP_ERROR FromOtDnsResponseToMdnsData(otDnsServiceInfo & serviceInfo, const char * serviceType,
+                                                  chip::Mdns::MdnsService & mdnsService, DnsServiceTxtEntries & serviceTxtEntries);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     static void OnJoinerComplete(otError aError, void * aContext);

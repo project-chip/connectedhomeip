@@ -217,7 +217,7 @@ void emberAfPluginReportingTickEventHandler(void)
         // reportable change has occurred and the minimum interval has elapsed or
         // if the maximum interval is set and has elapsed.
         elapsedMs =
-            elapsedTimeInt32u(emAfPluginReportVolatileData[i].lastReportTimeMs, chip::System::Layer::GetClock_MonotonicMS());
+            elapsedTimeInt32u(emAfPluginReportVolatileData[i].lastReportTimeMs, chip::System::Clock::GetMonotonicMilliseconds());
         if (entry.endpoint == EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID ||
             entry.direction != EMBER_ZCL_REPORTING_DIRECTION_REPORTED ||
             (elapsedMs < entry.data.reported.minInterval * MILLISECOND_TICKS_PER_SECOND) ||
@@ -326,7 +326,7 @@ void emberAfPluginReportingTickEventHandler(void)
         // and changes.  We only track changes for data types that are small enough
         // for us to compare. For CHAR and OCTET strings, we substitute a 32-bit hash.
         emAfPluginReportVolatileData[i].reportableChange = false;
-        emAfPluginReportVolatileData[i].lastReportTimeMs = static_cast<uint32_t>(chip::System::Layer::GetClock_MonotonicMS());
+        emAfPluginReportVolatileData[i].lastReportTimeMs = static_cast<uint32_t>(chip::System::Clock::GetMonotonicMilliseconds());
         uint32_t stringHash                              = 0;
         uint8_t * copyData                               = readData;
         uint16_t copySize                                = dataSize;
@@ -808,9 +808,9 @@ static void scheduleTick(void)
         {
             uint32_t minIntervalMs = (entry.data.reported.minInterval * MILLISECOND_TICKS_PER_SECOND);
             uint32_t maxIntervalMs = (entry.data.reported.maxInterval * MILLISECOND_TICKS_PER_SECOND);
-            uint32_t elapsedMs =
-                elapsedTimeInt32u(emAfPluginReportVolatileData[i].lastReportTimeMs, chip::System::Layer::GetClock_MonotonicMS());
-            uint32_t remainingMs = MAX_INT32U_VALUE;
+            uint32_t elapsedMs     = elapsedTimeInt32u(emAfPluginReportVolatileData[i].lastReportTimeMs,
+                                                   chip::System::Clock::GetMonotonicMilliseconds());
+            uint32_t remainingMs   = MAX_INT32U_VALUE;
             if (emAfPluginReportVolatileData[i].reportableChange)
             {
                 remainingMs = (minIntervalMs < elapsedMs ? 0 : minIntervalMs - elapsedMs);
@@ -941,7 +941,7 @@ EmberAfStatus emberAfPluginReportingConfigureReportedAttribute(const EmberAfPlug
         if (index < REPORT_TABLE_SIZE)
         {
             emAfPluginReportVolatileData[index].lastReportTimeMs =
-                static_cast<uint32_t>(chip::System::Layer::GetClock_MonotonicMS());
+                static_cast<uint32_t>(chip::System::Clock::GetMonotonicMilliseconds());
             emAfPluginReportVolatileData[index].lastReportValue = 0;
         }
     }

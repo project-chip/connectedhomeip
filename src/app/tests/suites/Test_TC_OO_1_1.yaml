@@ -23,7 +23,7 @@ tests:
       command: "readAttribute"
       attribute: "Cluster Revision"
       response:
-          value: 2
+          value: 3
 
     - label:
           "write the default values to mandatory global attribute:
@@ -32,7 +32,7 @@ tests:
       command: "writeAttribute"
       attribute: "Cluster Revision"
       arguments:
-          value: 2
+          value: 3
       response:
           error: 1
 
@@ -40,7 +40,7 @@ tests:
       command: "readAttribute"
       attribute: "Cluster Revision"
       response:
-          value: 2
+          value: 3
 
     - label: "read the optional global attribute: FeatureMap"
       command: "readAttribute"

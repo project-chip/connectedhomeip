@@ -29,7 +29,8 @@ namespace chip {
 
 namespace Mdns {
 struct TextEntry;
-}
+struct MdnsService;
+} // namespace Mdns
 
 namespace DeviceLayer {
 
@@ -55,6 +56,12 @@ class GenericThreadStackManagerImpl_OpenThread_LwIP;
 template <class>
 class GenericThreadStackManagerImpl_FreeRTOS;
 } // namespace Internal
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+// Declaration of callback types corresponding to MdnsResolveCallback and MdnsBrowseCallback to avoid circular including.
+using DnsResolveCallback = void (*)(void * context, chip::Mdns::MdnsService * result, CHIP_ERROR error);
+using DnsBrowseCallback  = void (*)(void * context, chip::Mdns::MdnsService * services, size_t servicesSize, CHIP_ERROR error);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 
 /**
  * Provides features for initializing and interacting with the Thread stack on
@@ -86,11 +93,17 @@ public:
     CHIP_ERROR SetThreadEnabled(bool val);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
-                             size_t aTxtEntiresSize, uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
+    CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
+                             const Span<const char * const> & aSubTypes, const Span<const Mdns::TextEntry> & aTxtEntries,
+                             uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR RemoveAllSrpServices();
     CHIP_ERROR SetupSrpHost(const char * aHostName);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+    CHIP_ERROR DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback, void * aContext);
+    CHIP_ERROR DnsResolve(const char * aServiceName, const char * aInstanceName, DnsResolveCallback aCallback, void * aContext);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 private:
@@ -228,10 +241,11 @@ inline CHIP_ERROR ThreadStackManager::SetThreadEnabled(bool val)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 inline CHIP_ERROR ThreadStackManager::AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
-                                                    chip::Mdns::TextEntry * aTxtEntries, size_t aTxtEntiresSize,
-                                                    uint32_t aLeaseInterval = 0, uint32_t aKeyLeaseInterval = 0)
+                                                    const Span<const char * const> & aSubTypes,
+                                                    const Span<const Mdns::TextEntry> & aTxtEntries, uint32_t aLeaseInterval = 0,
+                                                    uint32_t aKeyLeaseInterval = 0)
 {
-    return static_cast<ImplClass *>(this)->_AddSrpService(aInstanceName, aName, aPort, aTxtEntries, aTxtEntiresSize, aLeaseInterval,
+    return static_cast<ImplClass *>(this)->_AddSrpService(aInstanceName, aName, aPort, aSubTypes, aTxtEntries, aLeaseInterval,
                                                           aKeyLeaseInterval);
 }
 
@@ -249,6 +263,20 @@ inline CHIP_ERROR ThreadStackManager::SetupSrpHost(const char * aHostName)
 {
     return static_cast<ImplClass *>(this)->_SetupSrpHost(aHostName);
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+inline CHIP_ERROR ThreadStackManager::DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback, void * aContext)
+{
+    return static_cast<ImplClass *>(this)->_DnsBrowse(aServiceName, aCallback, aContext);
+}
+
+inline CHIP_ERROR ThreadStackManager::DnsResolve(const char * aServiceName, const char * aInstanceName,
+                                                 DnsResolveCallback aCallback, void * aContext)
+{
+    return static_cast<ImplClass *>(this)->_DnsResolve(aServiceName, aInstanceName, aCallback, aContext);
+}
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 inline bool ThreadStackManager::IsThreadProvisioned()

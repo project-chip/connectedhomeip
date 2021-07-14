@@ -1998,8 +1998,21 @@ public class ChipClusters {
       off(chipClusterPtr, callback);
     }
 
+    public void offWithEffect(DefaultClusterCallback callback, int effectId, int effectVariant) {
+      offWithEffect(chipClusterPtr, callback, effectId, effectVariant);
+    }
+
     public void on(DefaultClusterCallback callback) {
       on(chipClusterPtr, callback);
+    }
+
+    public void onWithRecallGlobalScene(DefaultClusterCallback callback) {
+      onWithRecallGlobalScene(chipClusterPtr, callback);
+    }
+
+    public void onWithTimedOff(
+        DefaultClusterCallback callback, int onOffControl, int onTime, int offWaitTime) {
+      onWithTimedOff(chipClusterPtr, callback, onOffControl, onTime, offWaitTime);
     }
 
     public void toggle(DefaultClusterCallback callback) {
@@ -2008,7 +2021,20 @@ public class ChipClusters {
 
     private native void off(long chipClusterPtr, DefaultClusterCallback callback);
 
+    private native void offWithEffect(
+        long chipClusterPtr, DefaultClusterCallback callback, int effectId, int effectVariant);
+
     private native void on(long chipClusterPtr, DefaultClusterCallback callback);
+
+    private native void onWithRecallGlobalScene(
+        long chipClusterPtr, DefaultClusterCallback callback);
+
+    private native void onWithTimedOff(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int onOffControl,
+        int onTime,
+        int offWaitTime);
 
     private native void toggle(long chipClusterPtr, DefaultClusterCallback callback);
   }

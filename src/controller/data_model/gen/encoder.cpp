@@ -3596,7 +3596,10 @@ PacketBufferHandle encodeOccupancySensingClusterReadClusterRevisionAttribute(uin
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Off                                                               |   0x00 |
+| * OffWithEffect                                                     |   0x40 |
 | * On                                                                |   0x01 |
+| * OnWithRecallGlobalScene                                           |   0x41 |
+| * OnWithTimedOff                                                    |   0x42 |
 | * Toggle                                                            |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -4615,6 +4618,8 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 | * ListOctetString                                                   | 0x001B |
 | * ListStructOctetString                                             | 0x001C |
 | * LongOctetString                                                   | 0x001D |
+| * CharString                                                        | 0x001E |
+| * LongCharString                                                    | 0x001F |
 | * Unsupported                                                       | 0x00FF |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -5105,6 +5110,74 @@ PacketBufferHandle encodeTestClusterClusterWriteLongOctetStringAttribute(uint8_t
         .Put8(67)
         .Put16(static_cast<uint16_t>(longOctetStringStrLen))
         .Put(longOctetString.data(), longOctetStringStrLen);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CharString
+ */
+PacketBufferHandle encodeTestClusterClusterReadCharStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTestClusterCharString", TestCluster::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(TestCluster::Attributes::Ids::CharString);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeTestClusterClusterWriteCharStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                    chip::ByteSpan charString)
+{
+    COMMAND_HEADER("WriteTestClusterCharString", TestCluster::Id);
+    size_t charStringStrLen = charString.size();
+    if (!CanCastTo<uint8_t>(charStringStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, charStringStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::WriteAttributes)
+        .Put32(TestCluster::Attributes::Ids::CharString)
+        .Put8(66)
+        .Put(static_cast<uint8_t>(charStringStrLen))
+        .Put(charString.data(), charStringStrLen);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute LongCharString
+ */
+PacketBufferHandle encodeTestClusterClusterReadLongCharStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTestClusterLongCharString", TestCluster::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(TestCluster::Attributes::Ids::LongCharString);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeTestClusterClusterWriteLongCharStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                        chip::ByteSpan longCharString)
+{
+    COMMAND_HEADER("WriteTestClusterLongCharString", TestCluster::Id);
+    size_t longCharStringStrLen = longCharString.size();
+    if (!CanCastTo<uint16_t>(longCharStringStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, longCharStringStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::WriteAttributes)
+        .Put32(TestCluster::Attributes::Ids::LongCharString)
+        .Put8(68)
+        .Put16(static_cast<uint16_t>(longCharStringStrLen))
+        .Put(longCharString.data(), longCharStringStrLen);
     COMMAND_FOOTER();
 }
 

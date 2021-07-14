@@ -946,15 +946,15 @@
 /** @brief Command description for OffWithEffect
  *
  * Command: OffWithEffect
- * @param effectId OnOffEffectIdentifier
- * @param effectVariant ENUM8
+ * @param EffectId OnOffEffectIdentifier
+ * @param EffectVariant enum8
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterOffWithEffect(effectId, effectVariant)                                                                           \
+        offClusterOffWithEffect(EffectId, EffectVariant)                                                                           \
             emberAfFillExternalBuffer(mask,                                                                                        \
                                                                                                                                    \
-                                      ZCL_OFF_WITH_EFFECT_COMMAND_ID, "uu", effectId, effectVariant);
+                                      ZCL_OFF_WITH_EFFECT_COMMAND_ID, "uu", EffectId, EffectVariant);
 
 /** @brief Command description for OnWithRecallGlobalScene
  *
@@ -969,16 +969,16 @@
 /** @brief Command description for OnWithTimedOff
  *
  * Command: OnWithTimedOff
- * @param onOffControl OnOffControl
- * @param onTime INT16U
- * @param offWaitTime INT16U
+ * @param OnOffControl OnOffControl
+ * @param OnTime int16u
+ * @param OffWaitTime int16u
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterOnWithTimedOff(onOffControl, onTime, offWaitTime)                                                                \
+        offClusterOnWithTimedOff(OnOffControl, OnTime, OffWaitTime)                                                                \
             emberAfFillExternalBuffer(mask,                                                                                        \
                                                                                                                                    \
-                                      ZCL_ON_WITH_TIMED_OFF_COMMAND_ID, "uuu", onOffControl, onTime, offWaitTime);
+                                      ZCL_ON_WITH_TIMED_OFF_COMMAND_ID, "uuu", OnOffControl, OnTime, OffWaitTime);
 
 /** @brief Command description for MoveToLevel
  *

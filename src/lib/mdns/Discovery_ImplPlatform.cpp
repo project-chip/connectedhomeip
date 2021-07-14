@@ -135,15 +135,15 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     // size of textEntries array should be count of Bufs above
     TextEntry textEntries[9];
     size_t textEntrySize = 0;
-    // add underscore, character and newline to lengths for sub types (ex. _S<ddd>)
-    char shortDiscriminatorSubtype[kSubTypeShortDiscriminatorMaxLength + 3];
-    char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 4];
-    char vendorSubType[kSubTypeVendorMaxLength + 3];
-    char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 3];
-    char openWindowSubType[kSubTypeAdditionalPairingMaxLength + 3];
-    char deviceTypeSubType[kSubTypeDeviceTypeMaxLength + 3];
+    // add null-character to the subtypes
+    char shortDiscriminatorSubtype[kSubTypeShortDiscriminatorMaxLength + 1];
+    char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 1];
+    char vendorSubType[kSubTypeVendorMaxLength + 1];
+    char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 1];
+    char openWindowSubType[kSubTypeAdditionalPairingMaxLength + 1];
+    char deviceTypeSubType[kSubTypeDeviceTypeMaxLength + 1];
     // size of subTypes array should be count of SubTypes above
-    const char * subTypes[6];
+    const char * subTypes[kSubTypeMaxNumber];
     size_t subTypeSize = 0;
 
     if (!mMdnsInitialized)
@@ -450,7 +450,15 @@ void DiscoveryImplPlatform::HandleNodeBrowse(void * context, MdnsService * servi
 {
     for (size_t i = 0; i < servicesSize; ++i)
     {
-        ChipMdnsResolve(&services[i], INET_NULL_INTERFACEID, HandleNodeResolve, context);
+        // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
+        if (!services[i].mAddress.HasValue())
+        {
+            ChipMdnsResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
+        }
+        else
+        {
+            HandleNodeResolve(context, &services[i], error);
+        }
     }
 }
 

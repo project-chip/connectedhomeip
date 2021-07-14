@@ -65,9 +65,8 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
 
 - (BOOL)isDevicePaired:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (BOOL)getConnectedDevice:(uint64_t)deviceID
-         completionHandler:(CHIPDeviceConnectionCallback)completionHandler
                      queue:(dispatch_queue_t)queue
-                     error:(NSError * __autoreleasing *)error;
+         completionHandler:(CHIPDeviceConnectionCallback)completionHandler;
 - (nullable CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 
 - (instancetype)init NS_UNAVAILABLE;

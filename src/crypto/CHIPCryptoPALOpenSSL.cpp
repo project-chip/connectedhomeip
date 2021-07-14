@@ -1341,8 +1341,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::MacVerify(const uint8_t * key, size_t 
     VerifyOrReturnError(mac_len == kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t computed_mac[kSHA256_Hash_Length];
-    const CHIP_ERROR error = Mac(key, key_len, in, in_len, computed_mac);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(Mac(key, key_len, in, in_len, computed_mac));
 
     VerifyOrReturnError(CRYPTO_memcmp(mac, computed_mac, mac_len) == 0, CHIP_ERROR_INTERNAL);
 
@@ -1436,11 +1435,8 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1,
     scratch = EC_POINT_new(context->curve);
     VerifyOrExit(scratch != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    error = PointMul(scratch, P1, fe1);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = PointMul(R, P2, fe2);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    SuccessOrExit(error = PointMul(scratch, P1, fe1));
+    SuccessOrExit(error = PointMul(R, P2, fe2));
 
     error_openssl = EC_POINT_add(context->curve, static_cast<EC_POINT *>(R), static_cast<EC_POINT *>(R),
                                  static_cast<const EC_POINT *>(scratch), context->bn_ctx);

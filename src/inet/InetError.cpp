@@ -59,7 +59,7 @@ bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (err < INET_CONFIG_ERROR_MIN || err > INET_CONFIG_ERROR_MAX)
+    if (!ChipError::IsPart(ChipError::SdkPart::kInet, err))
     {
         return false;
     }

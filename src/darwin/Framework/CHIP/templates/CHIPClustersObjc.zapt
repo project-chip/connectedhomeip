@@ -31,24 +31,24 @@ NS_ASSUME_NONNULL_BEGIN
  * Cluster {{name}}
  *    {{description}}
  */
-@interface CHIP{{asCamelCased name false}} : CHIPCluster
+@interface CHIP{{asUpperCamelCase name}} : CHIPCluster
 
 {{#chip_server_cluster_commands}}
 {{#if (zcl_command_arguments_count this.id)}}
-- (void){{asCamelCased name}}:{{#chip_server_cluster_command_arguments}}{{#if index includeZero=false}}{{asCamelCased label}}:{{/if}}({{asObjectiveCBasicType type}}){{asCamelCased label}} {{/chip_server_cluster_command_arguments}}responseHandler:(ResponseHandler)responseHandler;
+- (void){{asLowerCamelCase name}}:{{#chip_server_cluster_command_arguments}}{{#if index includeZero=false}}{{asLowerCamelCase label}}:{{/if}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_server_cluster_command_arguments}}responseHandler:(ResponseHandler)responseHandler;
 {{else}}
-- (void){{asCamelCased name}}:(ResponseHandler)responseHandler;
+- (void){{asLowerCamelCase name}}:(ResponseHandler)responseHandler;
 {{/if}}
 {{/chip_server_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-- (void)readAttribute{{asCamelCased name false}}WithResponseHandler:(ResponseHandler)responseHandler;
-{{#if (isWritableAttribute)}}
-- (void)writeAttribute{{asCamelCased name false}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)responseHandler;
+{{#if isWritableAttribute}}
+- (void)writeAttribute{{asUpperCamelCase name}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler;
 {{/if}}
-{{#if (isReportableAttribute)}}
-- (void) configureAttribute{{asCamelCased name false}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler;
-- (void) reportAttribute{{asCamelCased name false}}WithResponseHandler:(ResponseHandler)responseHandler;
+{{#if isReportableAttribute}}
+- (void) configureAttribute{{asUpperCamelCase name}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler;
+- (void) reportAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)responseHandler;
 {{/if}}
 {{/chip_server_cluster_attributes}}
 

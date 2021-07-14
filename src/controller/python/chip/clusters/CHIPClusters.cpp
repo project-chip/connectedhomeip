@@ -3280,12 +3280,36 @@ CHIP_ERROR chip_ime_AppendCommand_OnOff_Off(chip::Controller::Device * device, c
     cluster.Associate(device, ZCLendpointId);
     return cluster.Off(nullptr, nullptr);
 }
+CHIP_ERROR chip_ime_AppendCommand_OnOff_OffWithEffect(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                      chip::GroupId, uint8_t effectId, uint8_t effectVariant)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OnOffCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.OffWithEffect(nullptr, nullptr, effectId, effectVariant);
+}
 CHIP_ERROR chip_ime_AppendCommand_OnOff_On(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OnOffCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.On(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_OnOff_OnWithRecallGlobalScene(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                chip::GroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OnOffCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.OnWithRecallGlobalScene(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_AppendCommand_OnOff_OnWithTimedOff(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                       chip::GroupId, uint8_t onOffControl, uint16_t onTime, uint16_t offWaitTime)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OnOffCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.OnWithTimedOff(nullptr, nullptr, onOffControl, onTime, offWaitTime);
 }
 CHIP_ERROR chip_ime_AppendCommand_OnOff_Toggle(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId)
 {
@@ -4398,6 +4422,42 @@ CHIP_ERROR chip_ime_WriteAttribute_TestCluster_LongOctetString(chip::Controller:
     cluster.Associate(device, ZCLendpointId);
     return cluster.WriteAttributeLongOctetString(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
                                                  chip::ByteSpan(value, len));
+}
+CHIP_ERROR chip_ime_ReadAttribute_TestCluster_CharString(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                         chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeCharString(gStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_WriteAttribute_TestCluster_CharString(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                          chip::GroupId, uint8_t * value, size_t len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.WriteAttributeCharString(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                            chip::ByteSpan(value, len));
+}
+CHIP_ERROR chip_ime_ReadAttribute_TestCluster_LongCharString(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeLongCharString(gStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_WriteAttribute_TestCluster_LongCharString(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                              chip::GroupId, uint8_t * value, size_t len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.WriteAttributeLongCharString(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                                chip::ByteSpan(value, len));
 }
 CHIP_ERROR chip_ime_ReadAttribute_TestCluster_Unsupported(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                           chip::GroupId /* ZCLgroupId */)

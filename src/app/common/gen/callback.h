@@ -15317,7 +15317,7 @@ bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransition2Callback(chip::app
 /**
  * @brief  Cluster OffWithEffect Command callback
  */
-bool emberAfOnOffClusterOffWithEffectCallback(chip::app::Command * commandObj, uint8_t effectId, uint8_t effectVariant);
+bool emberAfOnOffClusterOffWithEffectCallback(chip::app::Command * commandObj, uint8_t EffectId, uint8_t EffectVariant);
 
 /**
  * @brief  Cluster OnWithRecallGlobalScene Command callback
@@ -15327,8 +15327,8 @@ bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(chip::app::Command * com
 /**
  * @brief  Cluster OnWithTimedOff Command callback
  */
-bool emberAfOnOffClusterOnWithTimedOffCallback(chip::app::Command * commandObj, uint8_t onOffControl, uint16_t onTime,
-                                               uint16_t offWaitTime);
+bool emberAfOnOffClusterOnWithTimedOffCallback(chip::app::Command * commandObj, uint8_t OnOffControl, uint16_t OnTime,
+                                               uint16_t OffWaitTime);
 
 /**
  * @brief  Cluster MoveToLevel Command callback
