@@ -90,3 +90,4 @@ gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--
 # Build efr32-brd4161a-window_covering
 ninja -C {out}/efr32-brd4161a-window_covering
 
+
