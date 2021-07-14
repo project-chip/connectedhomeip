@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
-import coloredlogs
 import click
-import logging
-import time
-import os
+import coloredlogs
 import difflib
+import logging
+import os
 import subprocess
+import sys
+import time
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -24,11 +25,12 @@ def sameFile(a: str, b: str) -> bool:
   with open(b, 'rt') as fb:
     b_lines = fb.readlines()
 
-  diffs = difflib.unified_diff(a_lines, b_lines, fromfile=a, tofile=b)
+  diffs = [line for line in difflib.unified_diff(a_lines, b_lines, fromfile=a, tofile=b)]
+
   if diffs:
     logging.error("DIFFERENCE found between %s and %s" % (a, b))
     for l in diffs:
-      logging.warning("  " + l)
+      logging.warning("  " + l.strip())
 
     return False
 
