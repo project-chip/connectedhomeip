@@ -42,7 +42,7 @@ static_library("helpers") {
   ]
 
   if (current_os != "mbed") {
-    test_sources += [ "TestInetLayer.cpp" ]
+    sources += [ "TestInetLayer.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]
