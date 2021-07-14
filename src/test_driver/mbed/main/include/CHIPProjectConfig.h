@@ -39,3 +39,5 @@
 
 // Enable support functions for parsing command-line arguments
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
+
+#define CHIP_SYSTEM_CONFIG_NUM_TIMERS 32
