@@ -42,9 +42,9 @@ public:
 
     void Init(uint8_t * buffer, size_t capacity)
     {
-        mBegin       = buffer;
-        mEnd         = buffer + capacity;
-        mOutOfMemory = false;
+        mBegin          = buffer;
+        mEnd            = buffer + capacity;
+        mAnyAllocFailed = false;
     }
 
     template <size_t N>
@@ -80,17 +80,17 @@ public:
     char * Clone(const char * str);
 
     /**
-     * Returns if any allocation has failed so far.
+     * Returns whether any allocation has failed so far.
      */
-    bool IsOutOfMemory() const { return mOutOfMemory; }
+    bool AnyAllocFailed() const { return mAnyAllocFailed; }
 
 private:
     FixedBufferAllocator(const FixedBufferAllocator &) = delete;
     void operator=(const FixedBufferAllocator &) = delete;
 
-    uint8_t * mBegin  = nullptr;
-    uint8_t * mEnd    = nullptr;
-    bool mOutOfMemory = false;
+    uint8_t * mBegin     = nullptr;
+    uint8_t * mEnd       = nullptr;
+    bool mAnyAllocFailed = false;
 };
 
 } // namespace chip

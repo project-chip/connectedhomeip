@@ -55,11 +55,11 @@ void TestOutOfMemory(nlTestSuite * inSuite, void * inContext)
 
     // Allocating 16 bytes still works...
     NL_TEST_ASSERT(inSuite, alloc.Clone(kTestData, 16) != nullptr);
-    NL_TEST_ASSERT(inSuite, !alloc.IsOutOfMemory());
+    NL_TEST_ASSERT(inSuite, !alloc.AnyAllocFailed());
 
     // ...but cannot allocate even one more byte...
     NL_TEST_ASSERT(inSuite, alloc.Clone(kTestData, 1) == nullptr);
-    NL_TEST_ASSERT(inSuite, alloc.IsOutOfMemory());
+    NL_TEST_ASSERT(inSuite, alloc.AnyAllocFailed());
 }
 
 const nlTest sTests[] = { NL_TEST_DEF("Test successfull clone", TestClone), NL_TEST_DEF("Test out of memory", TestOutOfMemory),

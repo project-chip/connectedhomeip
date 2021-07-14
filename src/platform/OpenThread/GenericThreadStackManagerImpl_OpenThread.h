@@ -136,10 +136,12 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
         // Thread supports both operational and commissionable discovery, so buffers sizes must be worst case.
-        static constexpr size_t kSubTypeMaxNumber    = Mdns::kSubTypeMaxNumber;
-        static constexpr size_t kSubTypeTotalLength  = Mdns::kSubTypeTotalLength;
-        static constexpr size_t kTxtMaxNumber        = Mdns::CommissionAdvertisingParameters::kTxtMaxNumber;
-        static constexpr size_t kTxtTotalValueLength = Mdns::CommissionAdvertisingParameters::kTxtTotalValueSize;
+        static constexpr size_t kSubTypeMaxNumber   = Mdns::kSubTypeMaxNumber;
+        static constexpr size_t kSubTypeTotalLength = Mdns::kSubTypeTotalLength;
+        static constexpr size_t kTxtMaxNumber =
+            std::max(Mdns::CommissionAdvertisingParameters::kTxtMaxNumber, Mdns::OperationalAdvertisingParameters::kTxtMaxNumber);
+        static constexpr size_t kTxtTotalValueLength = std::max(Mdns::CommissionAdvertisingParameters::kTxtTotalValueSize,
+                                                                Mdns::OperationalAdvertisingParameters::kTxtTotalValueSize);
 #else
         // Thread only supports operational discovery.
         static constexpr size_t kSubTypeMaxNumber    = 0;

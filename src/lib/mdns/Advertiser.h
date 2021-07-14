@@ -26,6 +26,7 @@
 #include <inet/InetLayer.h>
 #include <lib/support/Span.h>
 #include <support/CHIPMemString.h>
+#include <support/SafeString.h>
 
 namespace chip {
 namespace Mdns {
@@ -104,7 +105,7 @@ class OperationalAdvertisingParameters : public BaseAdvertisingParams<Operationa
 {
 public:
     static constexpr uint8_t kTxtMaxNumber     = 2;
-    static constexpr uint8_t kTxtMaxKeySize    = 3; // "CRI"/"CRA" as possible keys
+    static constexpr uint8_t kTxtMaxKeySize    = MaxStringLength("CRI", "CRA"); // possible keys
     static constexpr uint8_t kTxtMaxValueSize  = std::max({ kTxtRetryIntervalIdleMaxLength, kTxtRetryIntervalActiveMaxLength });
     static constexpr size_t kTxtTotalValueSize = kTxtRetryIntervalIdleMaxLength + kTxtRetryIntervalActiveMaxLength;
 
@@ -137,7 +138,7 @@ class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionA
 {
 public:
     static constexpr uint8_t kTxtMaxNumber  = 9;
-    static constexpr uint8_t kTxtMaxKeySize = 2; // "D"/"VP"/"CM"/"DT"/"DN"/"RI"/"PI"/"PH" as possible keys
+    static constexpr uint8_t kTxtMaxKeySize = MaxStringLength("D", "VP", "CM", "DT", "DN", "RI", "PI", "PH"); // possible keys
     static constexpr uint8_t kTxtMaxValueSize =
         std::max({ kKeyDiscriminatorMaxLength, kKeyVendorProductMaxLength, kKeyAdditionalPairingMaxLength,
                    kKeyCommissioningModeMaxLength, kKeyDeviceTypeMaxLength, kKeyDeviceNameMaxLength, kKeyRotatingIdMaxLength,

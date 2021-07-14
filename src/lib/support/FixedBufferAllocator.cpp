@@ -24,7 +24,7 @@ uint8_t * FixedBufferAllocator::Alloc(size_t count)
 {
     if (mBegin + count > mEnd)
     {
-        mOutOfMemory = true;
+        mAnyAllocFailed = true;
         return nullptr;
     }
 

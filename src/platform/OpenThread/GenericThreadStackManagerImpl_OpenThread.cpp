@@ -1168,7 +1168,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     srpService->mService.mNumTxtEntries = static_cast<OtNumTxtEntries>(aTxtEntries.size());
     srpService->mService.mTxtEntries    = srpService->mTxtEntries;
 
-    VerifyOrExit(!alloc.IsOutOfMemory(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(!alloc.AnyAllocFailed(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     ChipLogProgress(DeviceLayer, "advertising srp service: %s.%s", srpService->mService.mInstanceName, srpService->mService.mName);
     error = MapOpenThreadError(otSrpClientAddService(mOTInst, &(srpService->mService)));
