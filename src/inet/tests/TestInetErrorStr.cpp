@@ -48,7 +48,7 @@ using namespace chip;
 // Test input data.
 
 // clang-format off
-static CHIP_ERROR sContext[] =
+static const CHIP_ERROR sContext[] =
 {
     INET_ERROR_WRONG_ADDRESS_TYPE,
     INET_ERROR_PEER_DISCONNECTED,
@@ -72,11 +72,10 @@ static CHIP_ERROR sContext[] =
 static void CheckInetErrorStr(nlTestSuite * inSuite, void * inContext)
 {
     // Register the layer error formatter
-
     Inet::RegisterLayerErrorFormatter();
 
     // For each defined error...
-    for (CHIP_ERROR err : sContext)
+    for (const auto & err : sContext)
     {
         const char * errStr = ErrorStr(err);
         char expectedText[9];
@@ -119,7 +118,7 @@ int TestInetErrorStr(void)
     // clang-format on
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, &sContext);
+    nlTestRunner(&theSuite, const_cast<void *>(reinterpret_cast<const void *>(&sContext)));
 
     return (nlTestRunnerStats(&theSuite));
 }
