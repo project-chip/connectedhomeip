@@ -25,7 +25,7 @@ class IDFExecutor:
     self.run_cmd = os.path.join(self.chip_root, "scripts", "run_in_build_env.sh")
     logging.info("Executing via: %s" % self.run_cmd)
 
-  
+
   def execute(self, command):
     os.chdir(self.chip_root)
     subprocess.call([self.run_cmd, 'source "%s/export.sh"; cd %s; idf.py %s' % (idf_path, ROOT, command)])
@@ -44,6 +44,13 @@ def main():
       default=None,
       choices=['m5stack', 'devkit', 'curr', 'default'],
   )
+  parser.add_argument(
+      '--generate-flash-script',
+      action='store_true',
+  )
+  parser.add_argument('--port', type=str, help='port to use for flashing. Ex. --port /dev/ttyUSB0')
+  parser.add_argument('--baud', type=int, help='baud rage to use for flasing')
+
   args = parser.parse_args()
 
   # Ensures somewhat pretty logging of what is going on
@@ -53,6 +60,27 @@ def main():
   coloredlogs.install()
 
   e = IDFExecutor()
+
+  port = os.getenv('ESPPORT')
+  baud = os.getenv('ESPBAUD')
+  if args.generate_flash_script:
+    if args.port is not None:
+      port = args.port
+    if args.baud is not None:
+      baud = args.baud
+
+    envs_ok = True
+    if port is None:
+      logging.error('Port must be set to use flashing.')
+      logging.error('This can be set using the ESPPORT environment var or the --port argument in this script')
+      envs_ok = False
+    if baud is None:
+      logging.error('Baud rate must be set to use flashing.')
+      logging.error('This can be set using the ESPBAUD environment var or the --baud argument in this script')
+      envs_ok = False
+      
+    if not envs_ok:
+      return
 
   if args.clear_config:
     old_default_sdkconfig = None
@@ -79,6 +107,7 @@ def main():
       shutil.move(old_default_sdkconfig, default_sdkconfig)
 
   logging.info('Compiling')
+
   e.execute('build')
 
 

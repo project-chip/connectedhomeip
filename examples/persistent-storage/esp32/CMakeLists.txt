@@ -17,6 +17,7 @@
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.5)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../../common/cmake/idf_flashing.cmake)
 
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
@@ -26,37 +27,4 @@ project(chip-persistent-storage)
 idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++14;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 
-idf_build_get_property(build_dir BUILD_DIR)
-idf_build_get_property(project_path PROJECT_DIR)
-idf_build_get_property(sdkconfig SDKCONFIG)
-idf_build_get_property(idf_path IDF_PATH)
-
-add_custom_command(OUTPUT "${build_dir}/firmware_utils.py"
-    COMMAND ${CMAKE_COMMAND} ARGS -E copy "${project_path}/third_party/connectedhomeip/scripts/flashing/firmware_utils.py" "${build_dir}/"
-    WORKING_DIRECTORY ${build_dir}
-    VERBATIM)
-
-add_custom_command(OUTPUT "${build_dir}/esp32_firmware_utils.py"
-    COMMAND ${CMAKE_COMMAND} ARGS -E copy "${project_path}/third_party/connectedhomeip/scripts/flashing/esp32_firmware_utils.py" "${build_dir}/"
-    WORKING_DIRECTORY ${build_dir}
-    VERBATIM)
-
-add_custom_command(OUTPUT "${build_dir}/${CMAKE_PROJECT_NAME}.flash.py"
-    COMMAND ${python}
-            "${project_path}/../../../scripts/flashing/gen_flashing_script.py" esp32
-            --output "${build_dir}/${CMAKE_PROJECT_NAME}.flash.py"
-            --port "$ENV{ESPPORT}"
-            --baud "$ENV{ESPBAUD}"
-            --before ${CONFIG_ESPTOOLPY_BEFORE}
-            --after ${CONFIG_ESPTOOLPY_AFTER}
-            --application "${CMAKE_PROJECT_NAME}.bin"
-            --bootloader "bootloader/bootloader.bin"
-            --partition "partition_table/partition-table.bin"
-            --use-partition-file "${build_dir}/partition_table/partition-table.bin"
-            --use-parttool ${idf_path}/components/partition_table/parttool.py
-            --use-sdkconfig ${project_path}/sdkconfig
-    WORKING_DIRECTORY ${build_dir}
-    COMMENT "To flash ${build_dir}/${CMAKE_PROJECT_NAME}.bin run ./build/${CMAKE_PROJECT_NAME}.flash.py"
-    VERBATIM)
-
-add_custom_target(flashing_script DEPENDS "${build_dir}/${CMAKE_PROJECT_NAME}.bin" "${build_dir}/${CMAKE_PROJECT_NAME}.flash.py" "${build_dir}/esp32_firmware_utils.py" "${build_dir}/firmware_utils.py")
+flashing_script()
