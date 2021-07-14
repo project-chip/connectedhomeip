@@ -28,14 +28,6 @@
 
 // ==================== General Platform Adaptations ====================
 
-#define CHIP_CONFIG_ERROR_TYPE int32_t
-#define CHIP_CONFIG_ERROR_FORMAT PRId32
-#define CHIP_CONFIG_CORE_ERROR_MIN 4000000
-#define CHIP_CONFIG_CORE_ERROR_MAX 4000999
-
-#define ASN1_CONFIG_ERROR_MIN 5000000
-#define ASN1_CONFIG_ERROR_MAX 5000999
-
 #define ChipDie() abort()
 
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE uint8_t

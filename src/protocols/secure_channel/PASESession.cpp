@@ -42,6 +42,7 @@
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
+#include <support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
@@ -330,7 +331,7 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
                    ChipLogError(SecureChannel, "PASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel,
                  "PASESession timed out while waiting for a response from the peer. Expected message type was %" PRIu8,
-                 static_cast<std::underlying_type_t<decltype(mNextExpectedMsg)>>(mNextExpectedMsg));
+                 to_underlying(mNextExpectedMsg));
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
     Clear();
 }

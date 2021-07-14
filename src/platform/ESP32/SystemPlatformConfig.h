@@ -42,9 +42,6 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_LWIP_EVENT_TYPE int
 #define CHIP_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
 
-#define CHIP_SYSTEM_LWIP_ERROR_MIN 3000000
-#define CHIP_SYSTEM_LWIP_ERROR_MAX 3000128
-
 // ==================== General Configuration Overrides ====================
 
 // NOTE: Values that are mapped to CONFIG_ #defines are settable via the ESP-IDF Kconfig mechanism.

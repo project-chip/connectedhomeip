@@ -70,18 +70,33 @@ namespace System {
 
 namespace {
 
-Timer::Epoch GetTimerEpoch(const Callback::Cancelable * timer)
+Clock::MonotonicMilliseconds GetTimestamp(const Callback::Cancelable * timer)
 {
-    Timer::Epoch timerEpoch;
-    static_assert(sizeof(timerEpoch) <= sizeof(timer->mInfo), "mInfo is too small for timer epoch");
-    memcpy(&timerEpoch, &timer->mInfo, sizeof(timerEpoch));
-    return timerEpoch;
+    Clock::MonotonicMilliseconds timestamp;
+    static_assert(sizeof(timestamp) <= sizeof(timer->mInfo), "mInfo is too small for timestamp");
+    memcpy(&timestamp, &timer->mInfo, sizeof(timestamp));
+    return timestamp;
 }
 
-void SetTimerEpoch(Callback::Cancelable * timer, Timer::Epoch timerEpoch)
+void SetTimestamp(Callback::Cancelable * timer, Clock::MonotonicMilliseconds timestamp)
 {
-    static_assert(sizeof(timerEpoch) <= sizeof(timer->mInfo), "mInfo is too small for timer epoch");
-    memcpy(&timer->mInfo, &timerEpoch, sizeof(timerEpoch));
+    static_assert(sizeof(timestamp) <= sizeof(timer->mInfo), "mInfo is too small for timestamp");
+    memcpy(&timer->mInfo, &timestamp, sizeof(timestamp));
+}
+
+bool TimerReady(const Clock::MonotonicMilliseconds timestamp, const Callback::Cancelable * timer)
+{
+    return !Timer::IsEarlier(timestamp, GetTimestamp(timer));
+}
+
+int TimerCompare(void * p, const Callback::Cancelable * a, const Callback::Cancelable * b)
+{
+    (void) p;
+
+    Clock::MonotonicMilliseconds timeA = GetTimestamp(a);
+    Clock::MonotonicMilliseconds timeB = GetTimestamp(b);
+
+    return (timeA > timeB) ? 1 : (timeA < timeB) ? -1 : 0;
 }
 
 } // namespace
@@ -243,21 +258,6 @@ CHIP_ERROR Layer::NewTimer(Timer *& aTimerPtr)
     return CHIP_NO_ERROR;
 }
 
-static bool TimerReady(const Timer::Epoch epoch, const Cancelable * timer)
-{
-    return !Timer::IsEarlierEpoch(epoch, GetTimerEpoch(timer));
-}
-
-static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
-{
-    (void) p;
-
-    Timer::Epoch epochA = GetTimerEpoch(a);
-    Timer::Epoch epochB = GetTimerEpoch(b);
-
-    return (epochA > epochB) ? 1 : (epochA < epochB) ? -1 : 0;
-}
-
 /**
  * @brief
  *   This method starts a one-shot timer.
@@ -288,7 +288,7 @@ void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCal
 
     Cancelable * ca = aCallback->Cancel();
 
-    SetTimerEpoch(ca, Timer::GetCurrentEpoch() + aMilliseconds);
+    SetTimestamp(ca, Clock::GetMonotonicMilliseconds() + aMilliseconds);
 
     mTimerCallbacks.InsertBy(ca, TimerCompare, nullptr);
 
@@ -381,7 +381,7 @@ void Layer::CancelTimer(Layer::TimerCompleteFunct aOnComplete, void * aAppState)
  *
  * @note
  *   This function could, in principle, be implemented as
- *   `StartTimer(0, aComplete, aAppState)`.  The specification for
+ *   `StartTimer`.  The specification for
  *   `SystemTimer` however permits certain optimizations that might
  *   make that implementation impossible. Specifically, `SystemTimer`
  *   API may only be called from the thread owning the particular
@@ -427,189 +427,14 @@ exit:
 
 /**
  * @brief
- *   Returns a monotonic system time in units of microseconds.
- *
- * This function returns an elapsed time in microseconds since an arbitrary, platform-defined
- * epoch.  The value returned is guaranteed to be ever-increasing (i.e. never wrapping) between
- * reboots of the system.  Additionally, the underlying time source is guaranteed to tick
- * continuously during any system sleep modes that do not entail a restart upon wake.
- *
- * Although some platforms may choose to return a value that measures the time since boot for the
- * system, applications must *not* rely on this.  Additionally, the epoch for GetClock_Monotonic()
- * is *not* required to be the same as that for any of the other GetClock... functions.  Therefore
- * relative time calculations can only be performed on values returned by the same function.
- *
- * This function is guaranteed to be thread-safe on any platform that employs threading.
- *
- * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
- */
-uint64_t Layer::GetClock_Monotonic()
-{
-    // Current implementation is a simple pass-through to the platform.
-    return Platform::Layer::GetClock_Monotonic();
-}
-
-/**
- * @brief
- *   Returns a monotonic system time in units of milliseconds.
- *
- * This function returns an elapsed time in milliseconds since an arbitrary, platform-defined
- * epoch.  The value returned is guaranteed to be ever-increasing (i.e. never wrapping) between
- * reboots of the system.  Additionally, the underlying time source is guaranteed to tick
- * continuously during any system sleep modes that do not entail a restart upon wake.
- *
- * Although some platforms may choose to return a value that measures the time since boot for the
- * system, applications must *not* rely on this.  Additionally, the epoch for GetClock_Monotonic()
- * is *not* required to be the same as that for any of the other GetClock... functions.  Therefore
- * relative time calculations can only be performed on values returned by the same function.
- *
- * This function is guaranteed to be thread-safe on any platform that employs threading.
- *
- * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
- */
-uint64_t Layer::GetClock_MonotonicMS()
-{
-    // Current implementation is a simple pass-through to the platform.
-    return Platform::Layer::GetClock_MonotonicMS();
-}
-
-/**
- * @brief
- *   Returns a (potentially) high-resolution monotonic system time in units of microseconds.
- *
- * This function returns an elapsed time in microseconds since an arbitrary, platform-defined
- * epoch.  The value returned is guaranteed to be ever-increasing (i.e. never wrapping) between
- * reboots of the system.  However, the underlying timer is *not* required to tick continuously
- * during system deep-sleep states.
- *
- * Some platforms may implement GetClock_MonotonicHiRes() using a high-resolution timer capable
- * of greater precision than GetClock_Monotonic(), and that is not subject to gradual clock
- * adjustments (slewing).  Systems without such a timer may simply return the same value as
- * GetClock_Monotonic().
- *
- * The epoch for time returned by GetClock_MonotonicHiRes() is not required to be the same that
- * for any of the other GetClock... functions, including GetClock_Monotonic().
- *
- * This function is guaranteed to be thread-safe on any platform that employs threading.
- *
- * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
- */
-uint64_t Layer::GetClock_MonotonicHiRes()
-{
-    // Current implementation is a simple pass-through to the platform.
-    return Platform::Layer::GetClock_MonotonicHiRes();
-}
-
-/**
- * @brief
- *   Returns the current real (civil) time in microsecond Unix time format.
- *
- * This method returns the local platform's notion of current real time, expressed as a Unix time
- * value scaled to microseconds.  The underlying clock is guaranteed to tick at a rate of least at
- * whole seconds (values of 1,000,000), but on some platforms may tick faster.
- *
- * If the underlying platform is capable of tracking real time, but the system is currently
- * unsynchronized, GetClock_RealTime() will return the error CHIP_ERROR_REAL_TIME_NOT_SYNCED.
- *
- * On platforms that are incapable of tracking real time, the GetClock_RealTime() method may be absent,
- * resulting a link error for any application that references it.  Alternatively, such platforms may
- * supply an implementation of GetClock_RealTime() that always returns the error CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE.
- *
- * This function is guaranteed to be thread-safe on any platform that employs threading.
- *
- * @param[out] curTime                  The current time, expressed as Unix time scaled to microseconds.
- *
- * @retval #CHIP_NO_ERROR       If the method succeeded.
- * @retval #CHIP_ERROR_REAL_TIME_NOT_SYNCED
- *                                      If the platform is capable of tracking real time, but is
- *                                      is currently unsynchronized.
- * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
- *                                      If the platform is incapable of tracking real time.
- */
-CHIP_ERROR Layer::GetClock_RealTime(uint64_t & curTime)
-{
-    // Current implementation is a simple pass-through to the platform.
-    return Platform::Layer::GetClock_RealTime(curTime);
-}
-
-/**
- * @brief
- *   Returns the current real (civil) time in millisecond Unix time format.
- *
- * This method returns the local platform's notion of current real time, expressed as a Unix time
- * value scaled to milliseconds.  The underlying clock is guaranteed to tick at a rate of least at
- * whole seconds (values of 1,000,000), but on some platforms may tick faster.
- *
- * If the underlying platform is capable of tracking real time, but the system is currently
- * unsynchronized, GetClock_RealTimeMS() will return the error CHIP_ERROR_REAL_TIME_NOT_SYNCED.
- *
- * On platforms that are incapable of tracking real time, the GetClock_RealTimeMS() method may be absent,
- * resulting a link error for any application that references it.  Alternatively, such platforms may
- * supply an implementation of GetClock_RealTimeMS() that always returns the error CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE.
- *
- * This function is guaranteed to be thread-safe on any platform that employs threading.
- *
- * @param[out] curTimeMS               The current time, expressed as Unix time scaled to milliseconds.
- *
- * @retval #CHIP_NO_ERROR       If the method succeeded.
- * @retval #CHIP_ERROR_REAL_TIME_NOT_SYNCED
- *                                      If the platform is capable of tracking real time, but is
- *                                      is currently unsynchronized.
- * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
- *                                      If the platform is incapable of tracking real time.
- */
-CHIP_ERROR Layer::GetClock_RealTimeMS(uint64_t & curTimeMS)
-{
-    // Current implementation is a simple pass-through to the platform.
-    return Platform::Layer::GetClock_RealTimeMS(curTimeMS);
-}
-
-/**
- * @brief
- *   Sets the platform's notion of current real (civil) time.
- *
- * Applications can call this function to set the local platform's notion of current real time.  The
- * new current time is expressed as a Unix time value scaled to microseconds.
- *
- * Once set, underlying platform clock is guaranteed to track real time with a granularity of at least
- * whole seconds.
- *
- * Some platforms may restrict which applications or processes can set real time.  If the caller is
- * not permitted to change real time, the SetClock_RealTime() function will return the error
- * CHIP_ERROR_ACCESS_DENIED.
- *
- * On platforms that are incapable of tracking real time, or do not offer the ability to set real time,
- * the SetClock_RealTime() function may be absent, resulting a link error for any application that
- * references it.  Alternatively, such platforms may supply an implementation of SetClock_RealTime()
- * that always returns the error CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE.
- *
- * This function is guaranteed to be thread-safe on any platform that employs threading.
- *
- * @param[in] newCurTime                The new current time, expressed as Unix time scaled to microseconds.
- *
- * @retval #CHIP_NO_ERROR               If the method succeeded.
- * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
- *                                      If the platform is incapable of tracking real time.
- * @retval #CHIP_ERROR_ACCESS_DENIED
- *                                      If the calling application does not have the privilege to set the
- *                                      current time.
- */
-CHIP_ERROR Layer::SetClock_RealTime(uint64_t newCurTime)
-{
-    // Current implementation is a simple pass-through to the platform.
-    return Platform::Layer::SetClock_RealTime(newCurTime);
-}
-
-/**
- * @brief
  *   Run any timers that are due based on input current time
  */
-void Layer::DispatchTimerCallbacks(const uint64_t kCurrentEpoch)
+void Layer::DispatchTimerCallbacks(const Clock::MonotonicMilliseconds aCurrentTime)
 {
     // dispatch TimerCallbacks
     Cancelable ready;
 
-    mTimerCallbacks.DequeueBy(TimerReady, kCurrentEpoch, ready);
+    mTimerCallbacks.DequeueBy(TimerReady, static_cast<uint64_t>(aCurrentTime), ready);
 
     while (ready.mNext != &ready)
     {
@@ -627,9 +452,9 @@ bool Layer::GetTimeout(struct timeval & aSleepTime)
     if (this->State() != kLayerState_Initialized)
         return false;
 
-    const Timer::Epoch kCurrentEpoch = Timer::GetCurrentEpoch();
-    Timer::Epoch lAwakenEpoch =
-        kCurrentEpoch + static_cast<Timer::Epoch>(aSleepTime.tv_sec) * 1000 + static_cast<uint32_t>(aSleepTime.tv_usec) / 1000;
+    const Clock::MonotonicMilliseconds kCurrentTime = Clock::GetMonotonicMilliseconds();
+    Clock::MonotonicMilliseconds lAwakenTime = kCurrentTime + static_cast<Clock::MonotonicMilliseconds>(aSleepTime.tv_sec) * 1000 +
+        static_cast<uint32_t>(aSleepTime.tv_usec) / 1000;
 
     bool anyTimer = false;
     for (size_t i = 0; i < Timer::sPool.Size(); i++)
@@ -640,31 +465,31 @@ bool Layer::GetTimeout(struct timeval & aSleepTime)
         {
             anyTimer = true;
 
-            if (!Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
+            if (!Timer::IsEarlier(kCurrentTime, lTimer->mAwakenTime))
             {
-                lAwakenEpoch = kCurrentEpoch;
+                lAwakenTime = kCurrentTime;
                 break;
             }
 
-            if (Timer::IsEarlierEpoch(lTimer->mAwakenEpoch, lAwakenEpoch))
-                lAwakenEpoch = lTimer->mAwakenEpoch;
+            if (Timer::IsEarlier(lTimer->mAwakenTime, lAwakenTime))
+                lAwakenTime = lTimer->mAwakenTime;
         }
     }
 
     // check for an earlier callback timer, too
-    if (lAwakenEpoch != kCurrentEpoch)
+    if (lAwakenTime != kCurrentTime)
     {
         Cancelable * ca = mTimerCallbacks.First();
-        if (ca != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, GetTimerEpoch(ca)))
+        if (ca != nullptr && !Timer::IsEarlier(kCurrentTime, GetTimestamp(ca)))
         {
-            anyTimer     = true;
-            lAwakenEpoch = GetTimerEpoch(ca);
+            anyTimer    = true;
+            lAwakenTime = GetTimestamp(ca);
         }
     }
 
-    const Timer::Epoch kSleepTime = lAwakenEpoch - kCurrentEpoch;
-    aSleepTime.tv_sec             = static_cast<time_t>(kSleepTime / 1000);
-    aSleepTime.tv_usec            = static_cast<suseconds_t>((kSleepTime % 1000) * 1000);
+    const Clock::MonotonicMilliseconds kSleepTime = lAwakenTime - kCurrentTime;
+    aSleepTime.tv_sec                             = static_cast<time_t>(kSleepTime / 1000);
+    aSleepTime.tv_usec                            = static_cast<suseconds_t>((kSleepTime % 1000) * 1000);
 
     return anyTimer;
 }
@@ -677,19 +502,19 @@ void Layer::HandleTimeout()
     this->mHandleSelectThread = pthread_self();
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-    const Timer::Epoch kCurrentEpoch = Timer::GetCurrentEpoch();
+    const Clock::MonotonicMilliseconds kCurrentTime = Clock::GetMonotonicMilliseconds();
 
     for (size_t i = 0; i < Timer::sPool.Size(); i++)
     {
         Timer * lTimer = Timer::sPool.Get(*this, i);
 
-        if (lTimer != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
+        if (lTimer != nullptr && !Timer::IsEarlier(kCurrentTime, lTimer->mAwakenTime))
         {
             lTimer->HandleComplete();
         }
     }
 
-    DispatchTimerCallbacks(kCurrentEpoch);
+    DispatchTimerCallbacks(kCurrentTime);
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     this->mHandleSelectThread = PTHREAD_NULL;
@@ -950,7 +775,7 @@ CHIP_ERROR Layer::HandlePlatformTimer()
 
     lReturn = Timer::HandleExpiredTimers(*this);
 
-    DispatchTimerCallbacks(Timer::GetCurrentEpoch());
+    DispatchTimerCallbacks(Clock::GetMonotonicMilliseconds());
 
     SuccessOrExit(lReturn);
 
@@ -989,7 +814,7 @@ namespace Layer {
  *  @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating the reason for initialization failure.
  *      Returning non-successful status will abort initialization.
  */
-DLL_EXPORT CHIP_ERROR WillInit(Layer & aLayer, void * aContext)
+DLL_EXPORT CHIP_ERROR WillInit(System::Layer & aLayer, void * aContext)
 {
     static_cast<void>(aLayer);
     static_cast<void>(aContext);
@@ -1008,7 +833,7 @@ DLL_EXPORT CHIP_ERROR WillInit(Layer & aLayer, void * aContext)
  *  @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
  *      non-successful status will abort shutdown.
  */
-DLL_EXPORT CHIP_ERROR WillShutdown(Layer & aLayer, void * aContext)
+DLL_EXPORT CHIP_ERROR WillShutdown(System::Layer & aLayer, void * aContext)
 {
     static_cast<void>(aLayer);
     static_cast<void>(aContext);
@@ -1026,7 +851,7 @@ DLL_EXPORT CHIP_ERROR WillShutdown(Layer & aLayer, void * aContext)
  *
  *  @param[in]     aStatus   The overall status being returned via the CHIP System Layer \::Init method.
  */
-DLL_EXPORT void DidInit(Layer & aLayer, void * aContext, CHIP_ERROR aStatus)
+DLL_EXPORT void DidInit(System::Layer & aLayer, void * aContext, CHIP_ERROR aStatus)
 {
     static_cast<void>(aLayer);
     static_cast<void>(aContext);
@@ -1046,7 +871,7 @@ DLL_EXPORT void DidInit(Layer & aLayer, void * aContext, CHIP_ERROR aStatus)
  *  @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
  *      non-successful status will abort shutdown.
  */
-DLL_EXPORT void DidShutdown(Layer & aLayer, void * aContext, CHIP_ERROR aStatus)
+DLL_EXPORT void DidShutdown(System::Layer & aLayer, void * aContext, CHIP_ERROR aStatus)
 {
     static_cast<void>(aLayer);
     static_cast<void>(aContext);

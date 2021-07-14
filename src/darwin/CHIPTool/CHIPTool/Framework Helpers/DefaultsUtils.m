@@ -85,10 +85,7 @@ BOOL CHIPGetConnectedDevice(CHIPDeviceConnectionCallback completionHandler)
         // Let's use the last device that was paired
         deviceId--;
         NSError * error;
-        return [controller getConnectedDevice:deviceId
-                            completionHandler:completionHandler
-                                        queue:dispatch_get_main_queue()
-                                        error:&error];
+        return [controller getConnectedDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
     }
 
     return NO;
@@ -99,10 +96,7 @@ BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, CHIPDeviceConnectionCallbac
     CHIPDeviceController * controller = InitializeCHIP();
 
     NSError * error;
-    return [controller getConnectedDevice:deviceId
-                        completionHandler:completionHandler
-                                    queue:dispatch_get_main_queue()
-                                    error:&error];
+    return [controller getConnectedDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
 }
 
 BOOL CHIPIsDevicePaired(uint64_t deviceId)

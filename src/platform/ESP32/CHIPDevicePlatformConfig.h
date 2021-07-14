@@ -29,7 +29,7 @@
 
 #define CHIP_DEVICE_CONFIG_LWIP_WIFI_STATION_IF_NAME "st"
 
-#define CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN 11000000
+#define CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN 0xB00000
 // ==================== Kconfig Overrides ====================
 
 // The following values are configured via the ESP-IDF Kconfig mechanism.

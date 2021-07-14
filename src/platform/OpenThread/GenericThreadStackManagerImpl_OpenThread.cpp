@@ -1000,7 +1000,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
             otSrpClientService * next      = nullptr;
             using Service                  = typename SrpClient::Service;
 
-            // Free memory for all removed services.
+            // Clear memory for all removed services.
             do
             {
                 next         = otService->mNext;
@@ -1059,6 +1059,13 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientStateChange
                         Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[5]),
                         Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[6]),
                         Encoding::BigEndian::HostSwap16(aServerSockAddr->mAddress.mFields.m16[7]));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+        // Set DNS server config to be set at the SRP server address
+        otDnsQueryConfig dnsConfig         = *otDnsClientGetDefaultConfig(ThreadStackMgrImpl().OTInstance());
+        dnsConfig.mServerSockAddr.mAddress = aServerSockAddr->mAddress;
+        otDnsClientSetDefaultConfig(ThreadStackMgrImpl().OTInstance(), &dnsConfig);
+#endif
     }
     else
     {
@@ -1237,6 +1244,250 @@ exit:
     return error;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsResponseToMdnsData(
+    otDnsServiceInfo & serviceInfo, const char * serviceType, chip::Mdns::MdnsService & mdnsService,
+    DnsServiceTxtEntries & serviceTxtEntries)
+{
+    char protocol[chip::Mdns::kMdnsProtocolTextMaxSize + 1];
+
+    if (strchr(serviceInfo.mHostNameBuffer, '.') == nullptr)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    // Extract from the <hostname>.<domain-name>. the <hostname> part.
+    size_t substringSize = strchr(serviceInfo.mHostNameBuffer, '.') - serviceInfo.mHostNameBuffer;
+    strncpy(mdnsService.mHostName, serviceInfo.mHostNameBuffer, substringSize);
+    // Append string terminating character.
+    mdnsService.mHostName[substringSize] = '\0';
+
+    if (strchr(serviceType, '.') == nullptr)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    // Extract from the <type>.<protocol>.<domain-name>. the <type> part.
+    substringSize = strchr(serviceType, '.') - serviceType;
+    strncpy(mdnsService.mType, serviceType, substringSize);
+    // Append string terminating character.
+    mdnsService.mType[substringSize] = '\0';
+
+    // Extract from the <type>.<protocol>.<domain-name>. the <protocol> part.
+    const char * protocolSubstringStart = serviceType + substringSize + 1;
+
+    if (strchr(protocolSubstringStart, '.') == nullptr)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    substringSize = strchr(protocolSubstringStart, '.') - protocolSubstringStart;
+    strncpy(protocol, protocolSubstringStart, substringSize);
+    // Append string terminating character.
+    protocol[substringSize] = '\0';
+
+    if (strncmp(protocol, "_udp", chip::Mdns::kMdnsProtocolTextMaxSize) == 0)
+    {
+        mdnsService.mProtocol = chip::Mdns::MdnsServiceProtocol::kMdnsProtocolUdp;
+    }
+    else if (strncmp(protocol, "_tcp", chip::Mdns::kMdnsProtocolTextMaxSize) == 0)
+    {
+        mdnsService.mProtocol = chip::Mdns::MdnsServiceProtocol::kMdnsProtocolTcp;
+    }
+    else
+    {
+        mdnsService.mProtocol = chip::Mdns::MdnsServiceProtocol::kMdnsProtocolUnknown;
+    }
+    mdnsService.mPort        = serviceInfo.mPort;
+    mdnsService.mInterface   = INET_NULL_INTERFACEID;
+    mdnsService.mAddressType = Inet::kIPAddressType_IPv6;
+    mdnsService.mAddress     = chip::Optional<chip::Inet::IPAddress>(ToIPAddress(serviceInfo.mHostAddress));
+
+    otDnsTxtEntryIterator iterator;
+    otDnsInitTxtEntryIterator(&iterator, serviceInfo.mTxtData, serviceInfo.mTxtDataSize);
+
+    otDnsTxtEntry txtEntry;
+
+    uint8_t entryIndex = 0;
+    while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < kMaxDnsServiceTxtEntriesNumber)
+    {
+        if (txtEntry.mKey && strlen(txtEntry.mKey) < kMaxDnsServiceTxtKeySize && txtEntry.mValue &&
+            txtEntry.mValueLength <= kMaxDnsServiceTxtValueSize)
+        {
+            strcpy(serviceTxtEntries.mTxtKeyBuffers[entryIndex], txtEntry.mKey);
+            serviceTxtEntries.mTxtEntries[entryIndex].mKey      = serviceTxtEntries.mTxtKeyBuffers[entryIndex];
+            serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
+            memcpy(serviceTxtEntries.mTxtValueBuffers[entryIndex], txtEntry.mValue, txtEntry.mValueLength);
+            serviceTxtEntries.mTxtEntries[entryIndex].mData = serviceTxtEntries.mTxtValueBuffers[entryIndex];
+            entryIndex++;
+        }
+    }
+
+    mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
+    mdnsService.mTextEntrySize = entryIndex;
+
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otError aError, const otDnsBrowseResponse * aResponse,
+                                                                            void * aContext)
+{
+    CHIP_ERROR error;
+    DnsResult browseResult;
+    // type buffer size is kMdnsTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
+    char type[chip::Mdns::kMdnsTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    // hostname buffer size is kMdnsHostNameMaxSize + . + kMaxDomainNameSize + . + termination character
+    char hostname[chip::Mdns::kMdnsHostNameMaxSize + SrpClient::kMaxDomainNameSize + 3];
+
+    uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber *
+                      (kMaxDnsServiceTxtKeySize + kMaxDnsServiceTxtValueSize + sizeof(chip::Mdns::TextEntry))];
+    otDnsServiceInfo serviceInfo;
+    uint16_t index = 0;
+    bool wasAnythingBrowsed;
+
+    if (ThreadStackMgrImpl().mDnsBrowseCallback == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Invalid dns browse callback");
+        return;
+    }
+
+    ThreadStackMgrImpl().LockThreadStack();
+
+    VerifyOrExit(aError == OT_ERROR_NONE, error = MapOpenThreadError(aError));
+
+    error = MapOpenThreadError(otDnsBrowseResponseGetServiceName(aResponse, type, sizeof(type)));
+
+    VerifyOrExit(error == CHIP_NO_ERROR, );
+
+    while (otDnsBrowseResponseGetServiceInstance(aResponse, index, browseResult.mMdnsService.mName,
+                                                 sizeof(browseResult.mMdnsService.mName)) == OT_ERROR_NONE)
+    {
+        serviceInfo.mHostNameBuffer     = hostname;
+        serviceInfo.mHostNameBufferSize = sizeof(hostname);
+        serviceInfo.mTxtData            = txtBuffer;
+        serviceInfo.mTxtDataSize        = sizeof(txtBuffer);
+
+        error = MapOpenThreadError(otDnsBrowseResponseGetServiceInfo(aResponse, browseResult.mMdnsService.mName, &serviceInfo));
+
+        VerifyOrExit(error == CHIP_NO_ERROR, );
+
+        if (FromOtDnsResponseToMdnsData(serviceInfo, type, browseResult.mMdnsService, browseResult.mServiceTxtEntry) ==
+            CHIP_NO_ERROR)
+        {
+            // Invoke callback for every service one by one instead of for the whole list due to large memory size needed to
+            // allocate on
+            // stack.
+            ThreadStackMgrImpl().mDnsBrowseCallback(aContext, &browseResult.mMdnsService, 1, MapOpenThreadError(aError));
+            wasAnythingBrowsed = true;
+        }
+        index++;
+    }
+
+exit:
+
+    ThreadStackMgrImpl().UnlockThreadStack();
+
+    // In case no service was found invoke callback to notify about failure. In other case it was already called before.
+    if (!wasAnythingBrowsed)
+        ThreadStackMgrImpl().mDnsBrowseCallback(aContext, nullptr, 0, error);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback,
+                                                                           void * aContext)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    Impl()->LockThreadStack();
+    const otDnsQueryConfig * defaultConfig = otDnsClientGetDefaultConfig(mOTInst);
+
+    VerifyOrExit(aServiceName, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    mDnsBrowseCallback = aCallback;
+
+    // Append default SRP domain name to the service name.
+    // fullServiceName buffer size is kMdnsTypeAndProtocolMaxSize + . separator + kDefaultDomainNameSize + termination character.
+    char fullServiceName[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
+    snprintf(fullServiceName, sizeof(fullServiceName), "%s.%s", aServiceName, SrpClient::kDefaultDomainName);
+
+    error = otDnsClientBrowse(mOTInst, fullServiceName, OnDnsBrowseResult, aContext, defaultConfig);
+
+exit:
+
+    Impl()->UnlockThreadStack();
+
+    return error;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otError aError, const otDnsServiceResponse * aResponse,
+                                                                             void * aContext)
+{
+    CHIP_ERROR error;
+    DnsResult resolveResult;
+    // type buffer size is kMdnsTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
+    char type[chip::Mdns::kMdnsTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    // hostname buffer size is kMdnsHostNameMaxSize + . + kMaxDomainNameSize + . + termination character
+    char hostname[chip::Mdns::kMdnsHostNameMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber *
+                      (kMaxDnsServiceTxtKeySize + kMaxDnsServiceTxtValueSize + sizeof(chip::Mdns::TextEntry))];
+    otDnsServiceInfo serviceInfo;
+
+    if (ThreadStackMgrImpl().mDnsResolveCallback == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Invalid dns browse callback");
+        return;
+    }
+
+    ThreadStackMgrImpl().LockThreadStack();
+
+    VerifyOrExit(aError == OT_ERROR_NONE, error = MapOpenThreadError(aError));
+
+    error = MapOpenThreadError(otDnsServiceResponseGetServiceName(aResponse, resolveResult.mMdnsService.mName,
+                                                                  sizeof(resolveResult.mMdnsService.mName), type, sizeof(type)));
+
+    VerifyOrExit(error == CHIP_NO_ERROR, );
+
+    serviceInfo.mHostNameBuffer     = hostname;
+    serviceInfo.mHostNameBufferSize = sizeof(hostname);
+    serviceInfo.mTxtData            = txtBuffer;
+    serviceInfo.mTxtDataSize        = sizeof(txtBuffer);
+
+    error = MapOpenThreadError(otDnsServiceResponseGetServiceInfo(aResponse, &serviceInfo));
+
+    VerifyOrExit(error == CHIP_NO_ERROR, );
+
+    error = FromOtDnsResponseToMdnsData(serviceInfo, type, resolveResult.mMdnsService, resolveResult.mServiceTxtEntry);
+
+exit:
+
+    ThreadStackMgrImpl().UnlockThreadStack();
+    ThreadStackMgrImpl().mDnsResolveCallback(aContext, &(resolveResult.mMdnsService), error);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsResolve(const char * aServiceName, const char * aInstanceName,
+                                                                            DnsResolveCallback aCallback, void * aContext)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    Impl()->LockThreadStack();
+    const otDnsQueryConfig * defaultConfig = otDnsClientGetDefaultConfig(mOTInst);
+
+    VerifyOrExit(aServiceName && aInstanceName, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    mDnsResolveCallback = aCallback;
+
+    // Append default SRP domain name to the service name.
+    // fullServiceName buffer size is kMdnsTypeAndProtocolMaxSize + . separator + kDefaultDomainNameSize + termination character.
+    char fullServiceName[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
+    snprintf(fullServiceName, sizeof(fullServiceName), "%s.%s", aServiceName, SrpClient::kDefaultDomainName);
+
+    error = otDnsClientResolveService(mOTInst, aInstanceName, fullServiceName, OnDnsResolveResult, aContext, defaultConfig);
+
+exit:
+
+    Impl()->UnlockThreadStack();
+
+    return error;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
 } // namespace Internal

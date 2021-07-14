@@ -48,7 +48,7 @@ CHIP_ERROR PostEvent(System::Layer & aLayer, void * aContext, System::Object & a
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DispatchEvents(Layer & aLayer, void * aContext)
+CHIP_ERROR DispatchEvents(System::Layer & aLayer, void * aContext)
 {
     PlatformMgr().RunEventLoop();
 
