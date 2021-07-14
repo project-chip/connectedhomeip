@@ -35,8 +35,10 @@ limitations under the License.
     <code>0x0030</code>
     <define>GENERAL_COMMISSIONING_CLUSTER</define>
     <description>This cluster is used to set, remove and update fabric information on a commissionee.</description>
-    <attribute side="server" code="0x00" define="FABRIC_ID" type="OCTET_STRING" length="8" writable="false" default="o" optional="false">FabricId</attribute>
-    <attribute side="server" code="0x01" define="BREADCRUMB" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="true" optional="false">Breadcrumb</attribute>
+    <attribute side="server" code="0x00" define="BREADCRUMB" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="true" default="0x0000000000000000" optional="false">Breadcrumb</attribute>
+    <attribute side="server" code="0x01" define="BASICCOMMISSIONINGINFO_LIST" type="ARRAY" entryType="BasicCommissioningInfoType" length="254" writable="false" optional="false">BasicCommissioningInfoList</attribute>
+    <attribute side="server" code="0x02" define="REGULATORYCONFIG_LIST" type="ARRAY" entryType="RegulatoryLocationType" length="254" writable="false" optional="true">RegulatoryConfigList</attribute>
+    <attribute side="server" code="0x03" define="LOCATIONCAPABILITY_LIST" type="ARRAY" entryType="RegulatoryLocationType" length="254" writable="false" optional="true">LocationCapabilityList</attribute>
     <command source="client" code="0x00" name="ArmFailSafe" optional="false" cli="chip fabric_commissioning armfailsafe">
       <description>Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock</description>
       <arg name="expiryLengthSeconds" type="INT16U"/>
