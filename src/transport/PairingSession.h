@@ -26,6 +26,7 @@
 #pragma once
 
 #include <core/CHIPError.h>
+#include <transport/MessageCounter.h>
 #include <transport/SecureSession.h>
 
 namespace chip {
@@ -73,10 +74,6 @@ public:
         // TODO(#6652): This is a stub implementation, should be replaced by the real one when CASE and PASE is completed
         return LocalSessionMessageCounter::kInitialValue;
     }
-
-    virtual const char * GetI2RSessionInfo() const = 0;
-
-    virtual const char * GetR2ISessionInfo() const = 0;
 };
 
 } // namespace chip

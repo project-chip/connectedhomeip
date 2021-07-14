@@ -74,12 +74,13 @@ public:
     uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
     void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
 
+    const SecureSession & GetSecureSession() const { return mSecureSession; }
     SecureSession & GetSecureSession() { return mSecureSession; }
 
     Transport::AdminId GetAdminId() const { return mAdmin; }
     void SetAdminId(Transport::AdminId admin) { mAdmin = admin; }
 
-    bool IsInitialized()
+    bool IsInitialized() const
     {
         return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerKeyID != UINT16_MAX ||
                 mLocalKeyID != UINT16_MAX);

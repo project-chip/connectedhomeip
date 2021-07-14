@@ -82,6 +82,18 @@ CHIP_ERROR SecureSession::InitFromSecret(const ByteSpan & secret, const ByteSpan
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR SecureSession::InitFromSerializable(const Serializable & serializable, SessionRole role)
+{
+    VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
+
+    static_assert(sizeof(serializable.mKeys) == sizeof(mKeys), "Key sizes do not match");
+    memcpy(mKeys, serializable.mKeys, sizeof(mKeys));
+    mKeyAvailable = true;
+    mSessionRole  = role;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR SecureSession::Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
                                const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
 {
@@ -198,6 +210,16 @@ CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, ui
 
     return AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKeys[usage], kAES_CCM128_Key_Length, IV, sizeof(IV),
                            output);
+}
+
+CHIP_ERROR SecureSession::ToSerializable(Serializable & serializable) const
+{
+    VerifyOrReturnError(mKeyAvailable, CHIP_ERROR_INCORRECT_STATE);
+
+    static_assert(sizeof(serializable.mKeys) == sizeof(mKeys), "Key sizes do not match");
+    memcpy(serializable.mKeys, mKeys, sizeof(mKeys));
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

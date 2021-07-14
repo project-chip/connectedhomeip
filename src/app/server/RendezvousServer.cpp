@@ -178,19 +178,5 @@ void RendezvousServer::OnSessionEstablished()
     }
 
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
-    StorablePeerConnection connection(mPairingSession, mAdmin->GetAdminId());
-
-    VerifyOrReturn(mStorage != nullptr,
-                   ChipLogError(AppServer, "Storage delegate is not available. Cannot store the connection state"));
-    VerifyOrReturn(connection.StoreIntoKVS(*mStorage) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to store the connection state"));
-
-    // The Peek() is used to find the smallest key ID that's not been assigned to any session.
-    // This value is persisted, and on reboot, it is used to revive any previously
-    // active secure sessions.
-    // We support one active PASE session at any time. So the key ID should not be updated
-    // in another thread, while we retrieve it here.
-    uint16_t keyID = mIDAllocator->Peek();
-    mStorage->SyncSetKeyValue(kStorablePeerConnectionCountKey, &keyID, sizeof(keyID));
 }
 } // namespace chip

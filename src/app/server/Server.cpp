@@ -20,6 +20,7 @@
 #include <app/server/Server.h>
 
 #include <app/InteractionModelEngine.h>
+#include <app/server/ConnectionMonitor.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
 #include <app/server/StorablePeerConnection.h>
@@ -80,19 +81,19 @@ class ServerStorageDelegate : public PersistentStorageDelegate
 {
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
-        ChipLogProgress(AppServer, "Retrieved value from server storage.");
+        ChipLogProgress(AppServer, "Getting from server storage: %s", key);
         return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
     {
-        ChipLogProgress(AppServer, "Stored value in server storage");
+        ChipLogProgress(AppServer, "Putting in server storage: %s", key);
         return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override
     {
-        ChipLogProgress(AppServer, "Delete value in server storage");
+        ChipLogProgress(AppServer, "Deleting from server storage: %s", key);
         return PersistedStorage::KeyValueStoreMgr().Delete(key);
     }
 };
@@ -154,45 +155,32 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr)
 {
     uint16_t nextSessionKeyId = 0;
     // It's not an error if the key doesn't exist. Just return right away.
-    VerifyOrReturnError(PersistedStorage::KeyValueStoreMgr().Get(kStorablePeerConnectionCountKey, &nextSessionKeyId) ==
-                            CHIP_NO_ERROR,
+    VerifyOrReturnError(StorablePeerConnection::FetchCountFromKVS(gServerStorage, nextSessionKeyId) == CHIP_NO_ERROR,
                         CHIP_NO_ERROR);
-    ChipLogProgress(AppServer, "Found %d stored connections", nextSessionKeyId);
-
-    PASESession * session = chip::Platform::New<PASESession>();
-    VerifyOrReturnError(session != nullptr, CHIP_ERROR_NO_MEMORY);
 
     for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
     {
         StorablePeerConnection connection;
-        if (CHIP_NO_ERROR == connection.FetchFromKVS(gServerStorage, keyId))
-        {
-            connection.GetPASESession(session);
 
-            ChipLogProgress(AppServer, "Fetched the session information: from 0x" ChipLogFormatX64,
-                            ChipLogValueX64(session->PeerConnection().GetPeerNodeId()));
-            if (gSessionIDAllocator.Reserve(keyId) == CHIP_NO_ERROR)
-            {
-                sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
-                                      session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
-                                      connection.GetAdminId());
-            }
-            else
-            {
-                ChipLogProgress(AppServer, "Session Key ID  %" PRIu16 " cannot be used. Skipping over this session", keyId);
-            }
-            session->Clear();
+        if (connection.FetchFromKVS(gServerStorage, keyId) != CHIP_NO_ERROR)
+            continue;
+
+        if (gSessionIDAllocator.Reserve(keyId) == CHIP_NO_ERROR)
+        {
+            connection.AddNewPairing(sessionMgr, SecureSession::SessionRole::kResponder);
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "Session key ID  %" PRIu16 " cannot be used. Skipping over this session", keyId);
         }
     }
-
-    chip::Platform::Delete(session);
 
     return CHIP_NO_ERROR;
 }
 
 void EraseAllSessionsUpTo(uint16_t nextSessionKeyId)
 {
-    PersistedStorage::KeyValueStoreMgr().Delete(kStorablePeerConnectionCountKey);
+    StorablePeerConnection::DeleteCountFromKVS(gServerStorage);
 
     for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
     {
@@ -295,6 +283,7 @@ SecureSessionMgr gSessions;
 RendezvousServer gRendezvousServer;
 CASEServer gCASEServer;
 Messaging::ExchangeManager gExchangeMgr;
+ConnectionMonitor gConnectionMonitor{ gServerStorage, gSessionIDAllocator };
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
 static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVerifier & verifier)
@@ -548,6 +537,8 @@ void InitServer(AppDelegate * delegate)
     // Register to receive unsolicited Service Provisioning messages from the exchange manager.
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
+
+    gExchangeMgr.SetDelegate(&gConnectionMonitor);
 
     err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalAdminPairingTable(),
                                                     &gSessionIDAllocator);

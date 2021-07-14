@@ -165,10 +165,6 @@ public:
      */
     uint16_t GetLocalKeyId() override { return mConnectionState.GetLocalKeyID(); }
 
-    const char * GetI2RSessionInfo() const override { return kSpake2pI2RSessionInfo; }
-
-    const char * GetR2ISessionInfo() const override { return kSpake2pR2ISessionInfo; }
-
     Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
     /** @brief Serialize the Pairing Session to a string.
@@ -355,10 +351,6 @@ public:
     uint16_t GetPeerKeyId() override { return mPeerKeyID; }
 
     uint16_t GetLocalKeyId() override { return mLocalKeyID; }
-
-    const char * GetI2RSessionInfo() const override { return "i2r"; }
-
-    const char * GetR2ISessionInfo() const override { return "r2i"; }
 
 private:
     const char * kTestSecret = "Test secret for key derivation";

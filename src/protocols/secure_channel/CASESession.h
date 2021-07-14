@@ -153,10 +153,6 @@ public:
      */
     uint16_t GetLocalKeyId() override { return mConnectionState.GetLocalKeyID(); }
 
-    const char * GetI2RSessionInfo() const override { return "Sigma I2R Key"; }
-
-    const char * GetR2ISessionInfo() const override { return "Sigma R2I Key"; }
-
     Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
     /**

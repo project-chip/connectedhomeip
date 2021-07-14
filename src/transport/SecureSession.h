@@ -30,6 +30,8 @@
 #include <support/Span.h>
 #include <transport/raw/MessageHeader.h>
 
+#include <type_traits>
+
 namespace chip {
 
 class DLL_EXPORT SecureSession
@@ -55,6 +57,8 @@ public:
         kSessionEstablishment, /**< A new secure session is established. */
         kSessionResumption,    /**< An old session is being resumed. */
     };
+
+    struct Serializable;
 
     /**
      * @brief
@@ -86,6 +90,16 @@ public:
 
     /**
      * @brief
+     *   Init the session using the serializable representation.
+     *
+     * @param serializable       A reference to the serializable object
+     * @param role               Role of the new session (initiator or responder)
+     * @return CHIP_ERROR        The result of initialization
+     */
+    CHIP_ERROR InitFromSerializable(const Serializable & serializable, SessionRole role);
+
+    /**
+     * @brief
      *   Encrypt the input data using keys established in the secure channel
      *
      * @param input Unencrypted input data
@@ -112,6 +126,15 @@ public:
      */
     CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
                        const MessageAuthenticationCode & mac) const;
+
+    /**
+     * @brief
+     *   Store the session into the serializable object.
+     *
+     * @param serializable       A reference to the serializable object
+     * @return CHIP_ERROR        The result of the store
+     */
+    CHIP_ERROR ToSerializable(Serializable & serializable) const;
 
     /**
      * @brief
@@ -151,6 +174,11 @@ private:
     // The encryption operations includes AAD when message authentication tag is generated. This tag
     // is used at the time of decryption to integrity check the received data.
     static CHIP_ERROR GetAdditionalAuthData(const PacketHeader & header, uint8_t * aad, uint16_t & len);
+};
+
+struct SecureSession::Serializable
+{
+    uint8_t mKeys[sizeof(std::declval<SecureSession>().mKeys)];
 };
 
 } // namespace chip

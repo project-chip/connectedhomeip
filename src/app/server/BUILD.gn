@@ -27,6 +27,7 @@ static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "ConnectionMonitor.h",
     "EchoHandler.cpp",
     "EchoHandler.h",
     "Mdns.cpp",

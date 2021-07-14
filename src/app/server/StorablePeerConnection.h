@@ -17,47 +17,48 @@
 
 #pragma once
 
-#include <core/CHIPPersistentStorageDelegate.h>
-#include <protocols/secure_channel/PASESession.h>
+#include <core/CHIPEncoding.h>
+#include <transport/AdminPairingTable.h>
+#include <transport/SecureSession.h>
 
 namespace chip {
 
-// KVS store is sensitive to length of key strings, based on the underlying
-// platform. Keeping them short.
-constexpr char kStorablePeerConnectionKeyPrefix[] = "CHIPCnxn";
-constexpr char kStorablePeerConnectionCountKey[]  = "CHIPNxtCnxn";
+class PersistentStorageDelegate;
+class SecureSessionMgr;
+
+namespace Transport {
+class PeerConnectionState;
+} // namespace Transport
 
 class DLL_EXPORT StorablePeerConnection
 {
 public:
-    StorablePeerConnection() {}
+    StorablePeerConnection() = default;
 
-    StorablePeerConnection(PASESession & session, Transport::AdminId admin);
-
-    virtual ~StorablePeerConnection() {}
+    CHIP_ERROR Init(const Transport::PeerConnectionState & connState);
 
     CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate & kvs);
-
     CHIP_ERROR FetchFromKVS(PersistentStorageDelegate & kvs, uint16_t keyId);
-
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, uint16_t keyId);
 
-    void GetPASESession(PASESession * session) { session->FromSerializable(mSession.mOpCreds); }
+    static CHIP_ERROR StoreCountIntoKVS(PersistentStorageDelegate & kvs, uint16_t count);
+    static CHIP_ERROR FetchCountFromKVS(PersistentStorageDelegate & kvs, uint16_t & count);
+    static CHIP_ERROR DeleteCountFromKVS(PersistentStorageDelegate & kvs);
 
-    Transport::AdminId GetAdminId() { return mSession.mAdmin; }
+    CHIP_ERROR AddNewPairing(SecureSessionMgr & mgr, SecureSession::SessionRole role);
 
 private:
     static constexpr size_t KeySize();
-
     static CHIP_ERROR GenerateKey(uint16_t id, char * key, size_t len);
 
-    struct StorableSession
+    struct Serializable
     {
-        PASESessionSerializable mOpCreds;
-        Transport::AdminId mAdmin; /* This field is serialized in LittleEndian byte order */
+        SecureSession::Serializable mSecureSession;
+        uint16_t mPeerKeyId;       // Serialized in LittleEndian byte order
+        Transport::AdminId mAdmin; // Serialized in LittleEndian byte order
     };
 
-    StorableSession mSession;
+    Serializable mSerializable;
     uint16_t mKeyId;
 };
 
