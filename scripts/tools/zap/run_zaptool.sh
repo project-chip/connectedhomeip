@@ -33,10 +33,9 @@ CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/run_zaptool.sh}"
 
 (
 
-    cd "$CHIP_ROOT" &&
-        git submodule update --init third_party/zap/repo
+    cd "$CHIP_ROOT/third_party/zap/repo" &&
+        git submodule update --init .
 
-    cd "third_party/zap/repo"
     if ! npm list installed-check &>/dev/null; then
         npm install installed-check
     fi
