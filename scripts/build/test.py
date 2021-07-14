@@ -5,6 +5,7 @@ import click
 import logging
 import time
 import os
+import difflib
 import subprocess
 
 # Supported log levels, mapping string values required for argument
@@ -15,6 +16,23 @@ __LOG_LEVELS__ = {
     'warn': logging.WARN,
     'fatal': logging.FATAL,
 }
+
+def sameFile(a: str, b: str) -> bool:
+  with open(a, 'rt') as fa:
+    a_lines = fa.readlines()
+
+  with open(b, 'rt') as fb:
+    b_lines = fb.readlines()
+
+  diffs = difflib.unified_diff(a_lines, b_lines, fromfile=a, tofile=b)
+  if diffs:
+    logging.error("DIFFERENCE found between %s and %s" % (a, b))
+    for l in diffs:
+      logging.warning("  " + l)
+
+    return False
+
+  return True
 
 
 @click.command()
@@ -40,10 +58,10 @@ def main(log_level, touch, repo, output_root, expected, expected_out, actual):
 
 
   logging.info('Diffing %s and %s' % (expected_out.name, actual))
-  subprocess.run(['diff', expected_out.name, actual], check=True)
+  if not sameFile(expected_out.name, actual):
+    sys.exit(1)
 
   logging.info('Touching %s' % touch)
-
   os.makedirs(os.path.dirname(touch), exist_ok=True)
   with open(touch, 'wt') as f:
     f.write("Executed at %s" % time.ctime())
