@@ -14,30 +14,29 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-   
-import("//build_overrides/pigweed.gni") 
-import("$dir_pw_build/python.gni")                                                                                                                                                                                           
 
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/tests.gni")
 
-pw_python_package("build_examples") {                                                                                                                                                                                                    
-  setup = [ "setup.py" ]                                                                                                                                                                                                     
-  sources = [                                                                                                                                                                                                                
-    "build_examples.py",
+pw_python_package("build_examples") {
+  setup = [ "setup.py" ]
+  sources = [
     "build/__init__.py",
     "build/factory.py",
     "build/targets.py",
+    "build_examples.py",
     "builders/__init__.py",
     "builders/builder.py",
     "builders/efr32.py",
     "builders/esp32.py",
     "builders/linux.py",
     "builders/qpg.py",
+    "expected_all_platform_commands.txt",
     "runner/__init__.py",
     "runner/printonly.py",
     "runner/shell.py",
-    "expected_all_platform_commands.txt",
-  ]                                                                                                                                                                                                                          
-  tests = [ "test.py" ]                                                                                                                                                                                                                          
-}   
+  ]
+  tests = [ "test.py" ]
+}
