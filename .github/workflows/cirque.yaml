@@ -14,7 +14,10 @@
 
 name: Cirque
 
-on: workflow_dispatch
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}

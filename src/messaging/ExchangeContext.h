@@ -31,6 +31,7 @@
 #include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
+#include <support/TypeTraits.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -104,9 +105,8 @@ public:
     CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload,
                            const SendFlags & sendFlags = SendFlags(SendMessageFlags::kNone))
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(msgType),
-                           std::move(msgPayload), sendFlags);
+        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(msgType), std::move(msgPayload),
+                           sendFlags);
     }
 
     /**
@@ -195,6 +195,13 @@ private:
     bool IsResponseExpected() const;
 
     /**
+     * Determine whether we are expecting our consumer to send a message on
+     * this exchange (i.e. WillSendMessage was called and the message has not
+     * yet been sent).
+     */
+    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
+
+    /**
      *  Track whether we are now expecting a response to a message sent via this exchange (because that
      *  message had the kExpectResponse flag set in its sendFlags).
      *
@@ -235,6 +242,12 @@ private:
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
 
     void DoClose(bool clearRetransTable);
+
+    /**
+     * We have handled an application-level message in some way and should
+     * re-evaluate out state to see whether we should still be open.
+     */
+    void MessageHandled();
 };
 
 } // namespace Messaging

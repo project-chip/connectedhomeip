@@ -18,7 +18,7 @@ public:
     {
 {{#chip_clusters}}
 {{#chip_server_cluster_attributes}}
-{{#if (isReportableAttribute)}}
+{{#if isReportableAttribute}}
     delete onReport{{asCamelCased parent.name false}}{{asCamelCased name false}}Callback;
 {{/if}}
 {{/chip_server_cluster_attributes}}
@@ -30,7 +30,7 @@ public:
         chip::app::CHIPDeviceCallbacksMgr & callbacksMgr = chip::app::CHIPDeviceCallbacksMgr::GetInstance();
 {{#chip_clusters}}
 {{#chip_server_cluster_attributes}}
-{{#if (isReportableAttribute)}}
+{{#if isReportableAttribute}}
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, {{asHex parent.code 4}}, {{asHex code 4}}, onReport{{asCamelCased parent.name false}}{{asCamelCased name false}}Callback->Cancel());
 {{/if}}
 {{/chip_server_cluster_attributes}}
@@ -75,8 +75,8 @@ public:
 private:
 {{#chip_clusters}}
 {{#chip_server_cluster_attributes}}
-{{#if (isReportableAttribute)}}
-    chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback> * onReport{{asCamelCased parent.name false}}{{asCamelCased name false}}Callback = new chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>(On{{asCallbackAttributeType atomicTypeId}}AttributeResponse, this);
+{{#if isReportableAttribute}}
+    chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onReport{{asCamelCased parent.name false}}{{asCamelCased name false}}Callback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_clusters}}

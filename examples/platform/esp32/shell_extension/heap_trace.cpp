@@ -46,31 +46,31 @@ heap_trace_record_t sTraceRecords[kNumHeapTraceRecords];
 
 Engine sShellHeapSubCommands;
 
-int HeapTraceHelpHandler(int argc, char ** argv)
+CHIP_ERROR HeapTraceHelpHandler(int argc, char ** argv)
 {
     sShellHeapSubCommands.ForEachCommand(PrintCommandHelp, nullptr);
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 #if CONFIG_HEAP_TRACING_STANDALONE
-int HeapTraceResetHandler(int argc, char ** argv)
+CHIP_ERROR HeapTraceResetHandler(int argc, char ** argv)
 {
     ESP_ERROR_CHECK(heap_trace_stop());
     ESP_ERROR_CHECK(heap_trace_start(HEAP_TRACE_LEAKS));
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
-int HeapTraceDumpHandler(int argc, char ** argv)
+CHIP_ERROR HeapTraceDumpHandler(int argc, char ** argv)
 {
     heap_trace_dump();
     streamer_printf(streamer_get(), "Free heap %d/%d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT),
                     heap_caps_get_total_size(MALLOC_CAP_8BIT));
-    return 0;
+    return CHIP_NO_ERROR;
 }
 #endif // CONFIG_HEAP_TRACING_STANDALONE
 
 #if CONFIG_HEAP_TASK_TRACKING
-int HeapTraceTaskHandler(int argc, char ** argv)
+CHIP_ERROR HeapTraceTaskHandler(int argc, char ** argv)
 {
     // static storage is required for task memory info;
     static size_t numTotals = 0;
@@ -103,11 +103,11 @@ int HeapTraceTaskHandler(int argc, char ** argv)
     streamer_printf(streamer_get(), "Free heap %d/%d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT),
                     heap_caps_get_total_size(MALLOC_CAP_8BIT));
 
-    return 0;
+    return CHIP_NO_ERROR;
 }
 #endif
 
-int HeapTraceDispatch(int argc, char ** argv)
+CHIP_ERROR HeapTraceDispatch(int argc, char ** argv)
 {
     if (argc == 0)
     {

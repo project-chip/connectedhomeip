@@ -83,7 +83,6 @@ public:
                                       const Protocols::InteractionModel::ProtocolCode aProtocolCode);
 
 private:
-    friend class TestWriteInteraction;
     enum class State
     {
         Uninitialized = 0,      // The handler has not been initialized

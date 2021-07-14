@@ -21,9 +21,17 @@ const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 const zclQuery     = require(zapPath + 'db/query-zcl.js')
 const cHelper      = require(zapPath + 'generator/helper-c.js')
+const string       = require(zapPath + 'util/string.js')
 
 const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
+
+// This list of attributes is taken from section '11.2. Global Attributes' of the
+// Data Model specification.
+const kGlobalAttributes = [
+  0xfffc, // ClusterRevision
+  0xfffd, // FeatureMap
+];
 
 // TODO Expose the readTypeLength as an additional member field of {{asUnderlyingZclType}} instead
 //      of having to call this method separately.
@@ -292,6 +300,23 @@ function asTypeLiteralSuffix(type)
   }
 }
 
+function hasSpecificAttributes(options)
+{
+  return this.count > kGlobalAttributes.length;
+}
+
+function asLowerCamelCase(label)
+{
+  let str = string.toCamelCase(label, true);
+  return str.replace(/[\.:]/g, '');
+}
+
+function asUpperCamelCase(label)
+{
+  let str = string.toCamelCase(label, false);
+  return str.replace(/[\.:]/g, '');
+}
+
 //
 // Module exports
 //
@@ -301,3 +326,6 @@ exports.asReadTypeLength                  = asReadTypeLength;
 exports.chip_endpoint_generated_functions = chip_endpoint_generated_functions
 exports.chip_endpoint_cluster_list        = chip_endpoint_cluster_list
 exports.asTypeLiteralSuffix               = asTypeLiteralSuffix;
+exports.asLowerCamelCase                  = asLowerCamelCase;
+exports.asUpperCamelCase                  = asUpperCamelCase;
+exports.hasSpecificAttributes             = hasSpecificAttributes;

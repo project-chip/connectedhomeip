@@ -319,7 +319,7 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
     LittleEndian::Write16(p, mExchangeID);
     if (HaveVendorId())
     {
-        LittleEndian::Write16(p, static_cast<std::underlying_type_t<VendorId>>(mProtocolID.GetVendorId()));
+        LittleEndian::Write16(p, to_underlying(mProtocolID.GetVendorId()));
     }
     LittleEndian::Write16(p, mProtocolID.GetProtocolId());
     if (mAckId.HasValue())

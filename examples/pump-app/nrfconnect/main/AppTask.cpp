@@ -197,7 +197,7 @@ int AppTask::StartApp()
         sUnusedLED.Animate();
         sUnusedLED_1.Animate();
 
-        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
+        uint64_t nowUS            = chip::System::Clock::GetMonotonicMicroseconds();
         uint64_t nextChangeTimeUS = mLastPublishServiceTimeUS + kPublishServicePeriodUs;
 
         if (nowUS > nextChangeTimeUS)

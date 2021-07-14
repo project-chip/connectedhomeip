@@ -42,6 +42,7 @@ CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length, cons
                                     uint8_t * out_buffer, size_t out_length)
 
 {
+    CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
     sss_mac_t ctx_mac      = { 0 };
     sss_object_t keyObject = { 0 };
 
@@ -73,12 +74,12 @@ CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length, cons
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     status = sss_mac_context_init(&ctx_mac, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_HMAC_SHA256, kMode_SSS_Mac);
-    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     if (message_length <= MAX_MAC_ONE_SHOT_DATA_LEN)
     {
         status = sss_mac_one_go(&ctx_mac, message, message_length, out_buffer, &out_length);
-        VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+        VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
     }
     else
     {
@@ -87,29 +88,31 @@ CHIP_ERROR HMAC_shaHSM::HMAC_SHA256(const uint8_t * key, size_t key_length, cons
         size_t rem_len     = message_length;
 
         status = sss_mac_init(&ctx_mac);
-        VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+        VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
         while (rem_len > 0)
         {
             datalenTemp = (rem_len > MAX_MAC_ONE_SHOT_DATA_LEN) ? MAX_MAC_ONE_SHOT_DATA_LEN : rem_len;
             status      = sss_mac_update(&ctx_mac, (message + (message_length - rem_len)), datalenTemp);
-            VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+            VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
             rem_len = rem_len - datalenTemp;
         }
 
         status = sss_mac_finish(&ctx_mac, out_buffer, &out_length);
-        VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+        VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
     }
 
-    status = sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
-    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    error = CHIP_NO_ERROR;
+exit:
 
     if (ctx_mac.session != NULL)
     {
         sss_mac_context_free(&ctx_mac);
     }
 
-    return CHIP_NO_ERROR;
+    sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
+
+    return error;
 }
 
 } // namespace Crypto

@@ -49,7 +49,7 @@ bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (err < BLE_CONFIG_ERROR_MIN || err > BLE_CONFIG_ERROR_MAX)
+    if (!ChipError::IsPart(ChipError::SdkPart::kBLE, err))
     {
         return false;
     }

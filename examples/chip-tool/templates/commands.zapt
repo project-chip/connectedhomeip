@@ -281,12 +281,12 @@ private:
 {{#if isList}}
     chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>(On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse, this);
 {{else}}
-    chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>(On{{asCallbackAttributeType atomicTypeId}}AttributeResponse, this);
+    chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
 {{/if}}
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
-{{#if (isWritableAttribute)}}
+{{#if isWritableAttribute}}
 class Write{{asCamelCased parent.name false}}{{asCamelCased name false}}: public ModelCommand
 {
 public:
@@ -327,7 +327,7 @@ private:
 };
 
 {{/if}}
-{{#if (isReportableAttribute)}}
+{{#if isReportableAttribute}}
 class Report{{asCamelCased parent.name false}}{{asCamelCased name false}}: public ModelCommand
 {
 public:
@@ -368,7 +368,7 @@ public:
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback> * onReportCallback = new chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>(On{{asCallbackAttributeType atomicTypeId}}AttributeResponse, this);
+    chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onReportCallback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     {{#if isAnalog}}
@@ -395,10 +395,10 @@ void registerCluster{{asCamelCased name false}}(Commands & commands)
         make_unique<Discover{{asCamelCased name false}}Attributes>(),
         {{#chip_server_cluster_attributes}}
         make_unique<Read{{asCamelCased parent.name false}}{{asCamelCased name false}}>(),
-        {{#if (isWritableAttribute)}}
+        {{#if isWritableAttribute}}
         make_unique<Write{{asCamelCased parent.name false}}{{asCamelCased name false}}>(),
         {{/if}}
-        {{#if (isReportableAttribute)}}
+        {{#if isReportableAttribute}}
         make_unique<Report{{asCamelCased parent.name false}}{{asCamelCased name false}}>(),
         {{/if}}
         {{/chip_server_cluster_attributes}}

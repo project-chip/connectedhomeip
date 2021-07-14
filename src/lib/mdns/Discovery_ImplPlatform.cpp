@@ -450,7 +450,15 @@ void DiscoveryImplPlatform::HandleNodeBrowse(void * context, MdnsService * servi
 {
     for (size_t i = 0; i < servicesSize; ++i)
     {
-        ChipMdnsResolve(&services[i], INET_NULL_INTERFACEID, HandleNodeResolve, context);
+        // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
+        if (!services[i].mAddress.HasValue())
+        {
+            ChipMdnsResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
+        }
+        else
+        {
+            HandleNodeResolve(context, &services[i], error);
+        }
     }
 }
 

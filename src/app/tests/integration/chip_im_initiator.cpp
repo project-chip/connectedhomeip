@@ -96,7 +96,7 @@ CHIP_ERROR SendCommandRequest(chip::app::CommandSender * commandSender)
 
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    gLastMessageTime = chip::System::Timer::GetCurrentEpoch();
+    gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -146,7 +146,7 @@ CHIP_ERROR SendBadCommandRequest(chip::app::CommandSender * commandSender)
 
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    gLastMessageTime = chip::System::Timer::GetCurrentEpoch();
+    gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -217,7 +217,7 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClient * apWriteClient)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVWriter * writer;
-    gLastMessageTime = chip::System::Timer::GetCurrentEpoch();
+    gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
     chip::app::AttributePathParams attributePathParams;
 
     printf("\nSend write request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
@@ -264,7 +264,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         printf("Establish secure session failed, err: %s\n", chip::ErrorStr(err));
-        gLastMessageTime = chip::System::Timer::GetCurrentEpoch();
+        gLastMessageTime = chip::System::Clock::GetMonotonicMilliseconds();
     }
     else
     {
@@ -276,7 +276,7 @@ exit:
 
 void HandleReadComplete()
 {
-    uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
+    uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
     uint32_t transitTime = respTime - gLastMessageTime;
 
     gReadRespCount++;
@@ -287,7 +287,7 @@ void HandleReadComplete()
 
 void HandleWriteComplete()
 {
-    uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
+    uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
     uint32_t transitTime = respTime - gLastMessageTime;
 
     gWriteRespCount++;
@@ -464,7 +464,7 @@ public:
     CHIP_ERROR CommandResponseProcessed(const chip::app::CommandSender * apCommandSender) override
     {
 
-        uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
+        uint32_t respTime    = chip::System::Clock::GetMonotonicMilliseconds();
         uint32_t transitTime = respTime - gLastMessageTime;
 
         gCommandRespCount++;
