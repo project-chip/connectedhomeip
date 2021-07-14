@@ -65,12 +65,13 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         new (&mChipStackMutex) rtos::Mutex();
 
         // Reinitialize the condition variable
-        mEvenLoopStopCond.~ConditionVariable();
-        new (&mEvenLoopStopCond) rtos::ConditionVariable(mThisStateMutex);
+        mEventLoopCond.~ConditionVariable();
+        new (&mEventLoopCond) rtos::ConditionVariable(mThisStateMutex);
 
         mShouldRunEventLoop.store(false);
 
         mEventLoopHasStopped = false;
+        mEventLoopHasRun     = false;
     }
     else
     {
@@ -152,13 +153,15 @@ void PlatformManagerImpl::_RunEventLoop()
         }
 
         mEventLoopHasStopped = false;
+        mEventLoopHasRun     = true;
+        mEventLoopCond.notify_all();
     }
 
     LockChipStack();
 
     ChipLogProgress(DeviceLayer, "CHIP Run event loop");
     SystemLayerSocketsLoop().EventLoopBegins();
-    while (true)
+    while (mShouldRunEventLoop.load())
     {
         SystemLayerSocketsLoop().PrepareEvents();
 
@@ -178,7 +181,7 @@ void PlatformManagerImpl::_RunEventLoop()
     {
         mbed::ScopedLock<rtos::Mutex> lock(mThisStateMutex);
         mEventLoopHasStopped = true;
-        mEvenLoopStopCond.notify_all();
+        mEventLoopCond.notify_all();
     }
 }
 
@@ -201,6 +204,9 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
     {
         ChipLogError(DeviceLayer, "Fail to start internal loop task thread");
     }
+
+    // Wait for event loop run
+    mEventLoopCond.wait([this] { return mEventLoopHasRun == true; });
 
     return TranslateOsStatus(error);
 }
@@ -230,7 +236,7 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
     if (mChipTaskId != rtos::ThisThread::get_id())
     {
         // First it waits for the condition variable to finish
-        mEvenLoopStopCond.wait([this] { return mEventLoopHasStopped == true; });
+        mEventLoopCond.wait([this] { return mEventLoopHasStopped == true; });
 
         // Then if it was running on the internal task, wait for it to finish
         if (mChipTaskId == mLoopTask.get_id())
