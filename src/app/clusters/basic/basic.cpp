@@ -27,24 +27,14 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/Constants.h>
+#include <support/ZclString.h>
 
 #include <cstring>
 
 using namespace chip;
 using namespace chip::DeviceLayer;
 
-namespace {
-template <size_t BufferLength>
-uint8_t * MakeZclCharString(uint8_t (&zclString)[BufferLength], char (&cString)[BufferLength])
-{
-    static_assert(BufferLength <= 256, "Too long string to fit in ZCL_CHAR_STRING type");
-    zclString[0] = static_cast<uint8_t>(strlen(cString));
-    memcpy(&zclString[1], cString, zclString[0]);
-    return zclString;
-}
-} // namespace
-
-void emberAfBasicClusterServerInitCallback(EndpointId endpoint)
+void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
 {
     uint16_t vendorId;
     uint16_t productId;
