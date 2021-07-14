@@ -27,7 +27,7 @@ class WakeOnLanManager
 {
 public:
     CHIP_ERROR Init();
-    void store(chip::EndpointId endpoint, char macAddress[17]);
+    void store(chip::EndpointId endpoint, char macAddress[32]);
     void setMacAddress(chip::EndpointId endpoint, char * macAddress);
 
     static WakeOnLanManager & GetInstance()
