@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,16 +15,22 @@
  *    limitations under the License.
  */
 
+#pragma once
+
 #include <app/util/af-types.h>
 
-namespace {
+namespace chip {
+
+/**
+ * @brief Create ZCL string from char
+ */
 template <size_t BufferLength>
-uint8_t * MakeZclCharString(uint8_t (&zclString)[BufferLength], char (&cString)[BufferLength])
+uint8_t * MakeZclCharString(uint8_t (&zclString)[BufferLength], char * cString)
 {
-    static_assert(BufferLength <= 256, "Too long string to fit in ZCL_CHAR_STRING type");
+    static_assert(BufferLength <= 254, "Too long string to fit in ZCL_CHAR_STRING type");
     zclString[0] = static_cast<uint8_t>(strlen(cString));
     memcpy(&zclString[1], cString, zclString[0]);
     return zclString;
 }
 
-} // namespace
+} // namespace chip

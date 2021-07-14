@@ -17,7 +17,6 @@
  */
 
 #include "ApplicationBasicManager.h"
-#include "../zcl-strings.h"
 #include <app/Command.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
@@ -26,10 +25,11 @@
 #include <app/common/gen/enums.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
+#include <support/ZclString.h>
 
 #include <inipp/inipp.h>
 
-using namespace std;
+using namespace chip;
 
 CHIP_ERROR ApplicationBasicManager::Init()
 {
@@ -108,7 +108,7 @@ Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId 
     Application app = {};
     uint16_t size   = static_cast<uint16_t>(sizeof(app.name));
 
-    string section = "endpoint" + std::to_string(endpoint);
+    std::string section = "endpoint" + std::to_string(endpoint);
 
     CHIP_ERROR err = es->get(section, "name", app.name, size);
     if (err != CHIP_NO_ERROR)
