@@ -13627,7 +13627,10 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Off                                                               |   0x00 |
+| * OffWithEffect                                                     |   0x40 |
 | * On                                                                |   0x01 |
+| * OnWithRecallGlobalScene                                           |   0x41 |
+| * OnWithTimedOff                                                    |   0x42 |
 | * Toggle                                                            |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -13670,6 +13673,42 @@ private:
 };
 
 /*
+ * Command OffWithEffect
+ */
+class OnOffOffWithEffect : public ModelCommand
+{
+public:
+    OnOffOffWithEffect() : ModelCommand("off-with-effect")
+    {
+        AddArgument("EffectId", 0, UINT8_MAX, &mEffectId);
+        AddArgument("EffectVariant", 0, UINT8_MAX, &mEffectVariant);
+        ModelCommand::AddArguments();
+    }
+    ~OnOffOffWithEffect()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0006) command (0x40) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OnOffCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.OffWithEffect(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mEffectId, mEffectVariant);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mEffectId;
+    uint8_t mEffectVariant;
+};
+
+/*
  * Command On
  */
 class OnOffOn : public ModelCommand
@@ -13696,6 +13735,74 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command OnWithRecallGlobalScene
+ */
+class OnOffOnWithRecallGlobalScene : public ModelCommand
+{
+public:
+    OnOffOnWithRecallGlobalScene() : ModelCommand("on-with-recall-global-scene") { ModelCommand::AddArguments(); }
+    ~OnOffOnWithRecallGlobalScene()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0006) command (0x41) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OnOffCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.OnWithRecallGlobalScene(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command OnWithTimedOff
+ */
+class OnOffOnWithTimedOff : public ModelCommand
+{
+public:
+    OnOffOnWithTimedOff() : ModelCommand("on-with-timed-off")
+    {
+        AddArgument("OnOffControl", 0, UINT8_MAX, &mOnOffControl);
+        AddArgument("OnTime", 0, UINT16_MAX, &mOnTime);
+        AddArgument("OffWaitTime", 0, UINT16_MAX, &mOffWaitTime);
+        ModelCommand::AddArguments();
+    }
+    ~OnOffOnWithTimedOff()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0006) command (0x42) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OnOffCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.OnWithTimedOff(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mOnOffControl, mOnTime,
+                                      mOffWaitTime);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mOnOffControl;
+    uint16_t mOnTime;
+    uint16_t mOffWaitTime;
 };
 
 /*
@@ -23655,7 +23762,10 @@ void registerClusterOnOff(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<OnOffOff>(),
+        make_unique<OnOffOffWithEffect>(),
         make_unique<OnOffOn>(),
+        make_unique<OnOffOnWithRecallGlobalScene>(),
+        make_unique<OnOffOnWithTimedOff>(),
         make_unique<OnOffToggle>(),
         make_unique<DiscoverOnOffAttributes>(),
         make_unique<ReadOnOffOnOff>(),

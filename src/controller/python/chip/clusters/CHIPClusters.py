@@ -560,7 +560,18 @@ class ChipClusters:
             "OnOff": {
                 "Off": {
                 },
+                "OffWithEffect": {
+                    "effectId": "int",
+                    "effectVariant": "int",
+                },
                 "On": {
+                },
+                "OnWithRecallGlobalScene": {
+                },
+                "OnWithTimedOff": {
+                    "onOffControl": "int",
+                    "onTime": "int",
+                    "offWaitTime": "int",
                 },
                 "Toggle": {
                 },
@@ -2725,9 +2736,21 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OnOff_Off(
                 device, ZCLendpoint, ZCLgroupid
         )
+    def ClusterOnOff_CommandOffWithEffect(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, effectId: int, effectVariant: int):
+        return self._chipLib.chip_ime_AppendCommand_OnOff_OffWithEffect(
+                device, ZCLendpoint, ZCLgroupid, effectId, effectVariant
+        )
     def ClusterOnOff_CommandOn(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_On(
                 device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterOnOff_CommandOnWithRecallGlobalScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_OnOff_OnWithRecallGlobalScene(
+                device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterOnOff_CommandOnWithTimedOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, onOffControl: int, onTime: int, offWaitTime: int):
+        return self._chipLib.chip_ime_AppendCommand_OnOff_OnWithTimedOff(
+                device, ZCLendpoint, ZCLgroupid, onOffControl, onTime, offWaitTime
         )
     def ClusterOnOff_CommandToggle(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_Toggle(
@@ -4694,9 +4717,18 @@ class ChipClusters:
         # Cluster OnOff Command Off
         self._chipLib.chip_ime_AppendCommand_OnOff_Off.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OnOff_Off.restype = ctypes.c_uint32
+        # Cluster OnOff Command OffWithEffect
+        self._chipLib.chip_ime_AppendCommand_OnOff_OffWithEffect.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_OnOff_OffWithEffect.restype = ctypes.c_uint32
         # Cluster OnOff Command On
         self._chipLib.chip_ime_AppendCommand_OnOff_On.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OnOff_On.restype = ctypes.c_uint32
+        # Cluster OnOff Command OnWithRecallGlobalScene
+        self._chipLib.chip_ime_AppendCommand_OnOff_OnWithRecallGlobalScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OnOff_OnWithRecallGlobalScene.restype = ctypes.c_uint32
+        # Cluster OnOff Command OnWithTimedOff
+        self._chipLib.chip_ime_AppendCommand_OnOff_OnWithTimedOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OnOff_OnWithTimedOff.restype = ctypes.c_uint32
         # Cluster OnOff Command Toggle
         self._chipLib.chip_ime_AppendCommand_OnOff_Toggle.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OnOff_Toggle.restype = ctypes.c_uint32
