@@ -421,7 +421,7 @@ extern "C" void app_main()
     {
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(err));
         return;
-    } 
+    }
 
     InitServer();
 
