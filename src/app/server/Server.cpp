@@ -604,3 +604,8 @@ AdminPairingTable & GetGlobalAdminPairingTable()
 {
     return gAdminPairings;
 }
+
+SecureSessionMgr & GetGlobalSecureSessionMgr()
+{
+    return gSessions;
+}

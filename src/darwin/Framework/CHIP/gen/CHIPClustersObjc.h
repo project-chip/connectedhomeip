@@ -915,6 +915,8 @@ NS_ASSUME_NONNULL_BEGIN
       adminVendorId:(uint16_t)adminVendorId
     responseHandler:(ResponseHandler)responseHandler;
 - (void)addTrustedRootCertificate:(NSData *)rootCertificate responseHandler:(ResponseHandler)responseHandler;
+- (void)attestationRequest:(NSData *)attestationNonce responseHandler:(ResponseHandler)responseHandler;
+- (void)certChainRequest:(uint16_t)certChainType responseHandler:(ResponseHandler)responseHandler;
 - (void)opCSRRequest:(NSData *)cSRNonce responseHandler:(ResponseHandler)responseHandler;
 - (void)removeAllFabrics:(ResponseHandler)responseHandler;
 - (void)removeFabric:(uint64_t)fabricId

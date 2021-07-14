@@ -113,6 +113,8 @@ public:
     CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
                        const MessageAuthenticationCode & mac) const;
 
+    ByteSpan GetAttestationChallenge() const { return ByteSpan(mKeys[kAttestationChallengeKey], kAES_CCM128_Key_Length); }
+
     /**
      * @brief
      *   Memory overhead of encrypting data. The overhead is independent of size of

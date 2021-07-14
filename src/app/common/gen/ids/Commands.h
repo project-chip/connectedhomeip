@@ -337,6 +337,8 @@ namespace Commands {
 namespace Ids {
 static constexpr CommandId SetFabric                    = 0x00;
 static constexpr CommandId SetFabricResponse            = 0x01;
+static constexpr CommandId CertChainRequest             = 0x02;
+static constexpr CommandId CertChainResponse            = 0x03;
 static constexpr CommandId OpCSRRequest                 = 0x04;
 static constexpr CommandId OpCSRResponse                = 0x05;
 static constexpr CommandId AddOpCert                    = 0x06;
@@ -344,6 +346,8 @@ static constexpr CommandId OpCertResponse               = 0x08;
 static constexpr CommandId UpdateFabricLabel            = 0x09;
 static constexpr CommandId RemoveFabric                 = 0x0A;
 static constexpr CommandId RemoveAllFabrics             = 0x0B;
+static constexpr CommandId AttestationRequest           = 0x0C;
+static constexpr CommandId AttestationResponse          = 0x0D;
 static constexpr CommandId AddTrustedRootCertificate    = 0xA1;
 static constexpr CommandId RemoveTrustedRootCertificate = 0xA2;
 } // namespace Ids
