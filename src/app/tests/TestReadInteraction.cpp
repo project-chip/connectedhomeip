@@ -60,7 +60,7 @@ chip::ClusterId kTestClusterId     = 6;
 chip::EndpointId kTestEndpointId   = 1;
 chip::EventId kTestEventIdDebug    = 1;
 chip::EventId kTestEventIdCritical = 2;
-uint64_t kTestEventTag = 1;
+uint64_t kTestEventTag             = 1;
 using TestContext                  = chip::Test::MessagingContext;
 TestContext sContext;
 
@@ -72,8 +72,8 @@ void InitializeEventLogging(chip::Messaging::ExchangeManager & aExchangeManager)
         { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
     };
 
-    chip::app::EventManagement::CreateEventManagement(
-        &aExchangeManager, ArraySize(logStorageResources), gCircularEventBuffer, logStorageResources);
+    chip::app::EventManagement::CreateEventManagement(&aExchangeManager, ArraySize(logStorageResources), gCircularEventBuffer,
+                                                      logStorageResources);
 }
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
@@ -252,7 +252,7 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
 
 void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadClient readClient;
     EventNumber eventNumber = 0;
@@ -277,7 +277,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
 
 void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadHandler readHandler;
     System::PacketBufferTLVWriter writer;
@@ -404,7 +404,7 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
 
 void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadHandler readHandler;
     System::PacketBufferTLVWriter writer;

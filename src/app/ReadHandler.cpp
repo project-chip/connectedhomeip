@@ -303,8 +303,8 @@ bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
 {
     if (mCurrentPriority == PriorityLevel::Invalid)
     {
-        // Upload is not in middle, previous mLastScheduledEventNumber is not valid, Check for new events from Critical high priority
-        // to Debug low priority, and set a checkpoint when there is dirty events
+        // Upload is not in middle, previous mLastScheduledEventNumber is not valid, Check for new events from Critical high
+        // priority to Debug low priority, and set a checkpoint when there is dirty events
         for (int index = ArraySize(mSelfProcessedEvents) - 1; index >= 0; index--)
         {
             EventNumber lastEventNumber = aEventManager.GetLastEventNumber(static_cast<PriorityLevel>(index));
