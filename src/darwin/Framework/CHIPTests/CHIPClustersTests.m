@@ -3115,6 +3115,251 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_ColorControl_000000_On
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Turn on Light Color Control tests"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster on:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Turn on Light Color Control tests Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is true after on command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000002_EnhancedMoveToHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move To Hue command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster EnhancedMoveToHue:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Enhanced Move To Hue command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000003_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Check Remaining time attribute value matched the value sent by the last command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeRemainingTimeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Check Remaining time attribute value matched the value sent by the last command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 1);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000004_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Check EnhancedCurrentHue attribute value matched the value sent by the last command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000005_EnhancedMoveHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Down command "];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster EnhancedMoveHue:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Enhanced Move Hue Down command  Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000006_EnhancedMoveHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Stop command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster EnhancedMoveHue:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000007_EnhancedMoveHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Up command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster EnhancedMoveHue:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Enhanced Move Hue Up command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000008_EnhancedMoveHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Stop command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster EnhancedMoveHue:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Enhanced Move Hue Stop command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000009_EnhancedStepHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Step Hue Up command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster EnhancedStepHue:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Enhanced Step Hue Up command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000010_EnhancedStepHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Step Hue Down command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster EnhancedStepHue:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Enhanced Step Hue Down command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000011_EnhancedMoveToHueAndSaturation
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced move to hue and saturation command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster EnhancedMoveToHueAndSaturation:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Enhanced move to hue and saturation command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000012_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Check EnhancedCurrentHue attribute value matched the value sent by the last command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeEnhancedCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ColorControl_000013_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Check Saturation attribute value matched the value sent by the last command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeCurrentSaturationWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Check Saturation attribute value matched the value sent by the last command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterAccountLoginReadAttributeClusterRevisionWithResponseHandler
 {
     XCTestExpectation * expectation =
