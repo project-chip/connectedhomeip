@@ -318,7 +318,10 @@ CHIP_ERROR EncodeChipECDSASignature(Crypto::P256ECDSASignature & signature, ASN1
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ASN1_START_BIT_STRING_ENCAPSULATED { writer.PutConstructedType(signature, (uint16_t) signature.Length()); }
+    ASN1_START_BIT_STRING_ENCAPSULATED
+    {
+        ReturnErrorOnFailure(writer.PutConstructedType(signature, (uint16_t) signature.Length()));
+    }
     ASN1_END_ENCAPSULATED;
 
 exit:

@@ -63,31 +63,22 @@ using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
-int AppTask::StartAppTask()
+CHIP_ERROR AppTask::StartAppTask()
 {
-    int err = CHIP_CONFIG_CORE_ERROR_MAX;
-
     sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
     {
         ESP_LOGE(TAG, "Failed to allocate app event queue");
-        return 0;
+        return APP_ERROR_EVENT_QUEUE_FAILED;
     }
 
     // Start App task.
     sAppTaskHandle = xTaskCreate(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, NULL);
-    if (sAppTaskHandle)
-    {
-        err = CHIP_NO_ERROR;
-    }
-
-    return err;
+    return sAppTaskHandle ? CHIP_NO_ERROR : APP_ERROR_CREATE_TASK_FAILED;
 }
 
-int AppTask::Init()
+CHIP_ERROR AppTask::Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
                                   1,                // == default timer period (mS)
@@ -95,7 +86,7 @@ int AppTask::Init()
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
-    err            = BoltLockMgr().Init();
+    CHIP_ERROR err = BoltLockMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGI(TAG, "BoltLockMgr().Init() failed");
@@ -187,7 +178,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         sStatusLED.Animate();
         sLockLED.Animate();
 
-        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
+        uint64_t nowUS            = chip::System::Clock::GetMonotonicMicroseconds();
         uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
 
         if (nowUS > nextChangeTimeUS)
@@ -216,7 +207,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     bool initiated = false;
     BoltLockManager::Action_t action;
     int32_t actor;
-    int err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Lock)
     {
@@ -237,7 +228,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        err = CHIP_CONFIG_CORE_ERROR_MAX;
+        err = APP_ERROR_UNHANDLED_EVENT;
     }
 
     if (err == CHIP_NO_ERROR)

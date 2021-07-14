@@ -51,7 +51,7 @@ class Builder(ABC):
       target_dir_full_name = os.path.dirname(target_full_name)
 
       if not os.path.exists(target_dir_full_name):
-        logging.info('   Creating subdirectory %s first', target_dir_full_name)
+        logging.info('Creating subdirectory %s first', target_dir_full_name)
         os.makedirs(target_dir_full_name)
 
       shutil.copyfile(source_name, target_full_name)

@@ -99,8 +99,6 @@ extern "C" void vApplicationIdleHook(void)
 // ================================================================================
 int main(void)
 {
-    int ret = CHIP_CONFIG_CORE_ERROR_MAX;
-
     init_efrPlatform();
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
@@ -125,7 +123,7 @@ int main(void)
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
-    ret = PlatformMgr().InitChipStack();
+    CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
         EFR32_LOG("PlatformMgr().InitChipStack() failed");

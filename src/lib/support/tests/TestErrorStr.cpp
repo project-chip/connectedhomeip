@@ -152,10 +152,6 @@ static bool testFormatErr()
     // skip both
     FormatError(buf, kBufSize, nullptr, 1, nullptr);
     ret &= CHECK_EQ_STR(buf, "Error 1 (0x00000001)");
-
-    // negative
-    FormatError(buf, kBufSize, nullptr, static_cast<CHIP_ERROR>(-1), nullptr);
-    ret &= CHECK_EQ_STR(buf, "Error -1 (0xFFFFFFFF)");
 #endif
 
     return ret;

@@ -374,22 +374,25 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 }
 
 - (BOOL)getConnectedDevice:(uint64_t)deviceID
-         completionHandler:(CHIPDeviceConnectionCallback)completionHandler
                      queue:(dispatch_queue_t)queue
-                     error:(NSError * __autoreleasing *)error
+         completionHandler:(CHIPDeviceConnectionCallback)completionHandler
 {
-    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     if (![self isRunning]) {
-        [self checkForError:errorCode logMsg:kErrorNotRunning error:error];
+        NSError * error;
+        [self checkForError:CHIP_ERROR_INCORRECT_STATE logMsg:kErrorNotRunning error:&error];
+        dispatch_async(queue, ^{
+            completionHandler(nil, error);
+        });
         return NO;
     }
 
     dispatch_async(_chipWorkQueue, ^{
         CHIPDeviceConnectionBridge * connectionBridge = new CHIPDeviceConnectionBridge(completionHandler, queue);
-        errorCode = connectionBridge->connect(self->_cppCommissioner, deviceID);
+        CHIP_ERROR errorCode = connectionBridge->connect(self->_cppCommissioner, deviceID);
 
-        if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:error]) {
-            // Errors are propagated to the caller thru completionHandler.
+        NSError * error;
+        if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:&error]) {
+            // Errors are propagated to the caller through completionHandler.
             // No extra error handling is needed here.
             return;
         }

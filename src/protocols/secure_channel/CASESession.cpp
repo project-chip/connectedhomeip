@@ -35,6 +35,7 @@
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
+#include <support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
@@ -300,7 +301,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel,
                  "CASESession timed out while waiting for a response from the peer. Expected message type was %" PRIu8,
-                 static_cast<std::underlying_type_t<decltype(mNextExpectedMsg)>>(mNextExpectedMsg));
+                 to_underlying(mNextExpectedMsg));
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
     Clear();
 }

@@ -79,9 +79,14 @@ def ValidateRepoPath(context, parameter, value):
     default=False,
     is_flag=True,
     help='Only print out shell commands that would be executed')
+@click.option(
+    '--dry-run-output',
+    default="-",
+    type=click.File("wt"),
+    help='Where to write the dry run output')
 @click.pass_context
 def main(context, log_level, platform, board, app, repo, out_prefix, clean,
-         dry_run):
+         dry_run, dry_run_output):
   # Ensures somewhat pretty logging of what is going on
   coloredlogs.install(
       level=__LOG_LEVELS__[log_level],
@@ -91,7 +96,7 @@ def main(context, log_level, platform, board, app, repo, out_prefix, clean,
     raise click.UsageError("""
 PW_PROJECT_ROOT not in current environment.
 
-Please make sure you `source scripts/bootstra.sh` or `source scripts/activate.sh`
+Please make sure you `source scripts/bootstrap.sh` or `source scripts/activate.sh`
 before running this script.
 """.strip())
 
@@ -100,7 +105,7 @@ before running this script.
     platform = build.PLATFORMS
 
   if dry_run:
-    runner = PrintOnlyRunner()
+    runner = PrintOnlyRunner(dry_run_output)
   else:
     runner = ShellRunner()
 

@@ -44,21 +44,19 @@
 namespace chip {
 namespace System {
 
-extern void RegisterLayerErrorFormatter();
-extern bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err);
-
 extern CHIP_ERROR MapErrorPOSIX(int code);
 extern const char * DescribeErrorPOSIX(CHIP_ERROR code);
-extern bool IsErrorPOSIX(CHIP_ERROR code);
 extern void RegisterPOSIXErrorFormatter();
 extern bool FormatPOSIXError(char * buf, uint16_t bufSize, CHIP_ERROR err);
+
+#if __ZEPHYR__
 extern CHIP_ERROR MapErrorZephyr(int code);
+#endif // __ZEPHYR__
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 extern CHIP_ERROR MapErrorLwIP(err_t code);
 extern const char * DescribeErrorLwIP(CHIP_ERROR code);
-extern bool IsErrorLwIP(CHIP_ERROR code);
 extern void RegisterLwIPErrorFormatter(void);
 extern bool FormatLwIPError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 

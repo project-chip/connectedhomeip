@@ -83,14 +83,40 @@ template <class T, size_t N>
 class FixedSpan
 {
 public:
-    using pointer = T *;
+    using pointer       = T *;
+    using const_pointer = const T *;
 
     constexpr FixedSpan() : mDataBuf(nullptr) {}
-    constexpr explicit FixedSpan(pointer databuf) : mDataBuf(databuf) {}
+
+    // We want to allow construction from things that look like T*, but we want
+    // to make construction from an array use the constructor that asserts the
+    // array is big enough.  This requires that both constructors be templates
+    // (because otherwise the non-template would be favored by overload
+    // resolution, since due to decay to pointer it matches just as well as the
+    // template).
+    //
+    // To do that we have a template constructor enabled only when the type
+    // passed to it is a pointer type, and rely on our assignment of that
+    // pointer type to mDataBuf to verify that the pointer is to a type
+    // compatible enough with T (T itself, a subclass, a non-const version if T
+    // is const, etc).
+    template <class U, typename = std::enable_if_t<std::is_pointer<U>::value>>
+    constexpr explicit FixedSpan(U databuf) : mDataBuf(databuf)
+    {}
+    template <class U, size_t M>
+    constexpr explicit FixedSpan(U (&databuf)[M]) : mDataBuf(databuf)
+    {
+        static_assert(M >= N, "Passed-in buffer too small for FixedSpan");
+    }
 
     constexpr pointer data() const { return mDataBuf; }
     constexpr size_t size() const { return N; }
     constexpr bool empty() const { return data() == nullptr; }
+
+    constexpr pointer begin() { return mDataBuf; }
+    constexpr pointer end() { return mDataBuf + N; }
+    constexpr const_pointer begin() const { return mDataBuf; }
+    constexpr const_pointer end() const { return mDataBuf + N; }
 
     // Allow data_equal for spans that are over the same type up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>

@@ -79,7 +79,6 @@ int AppTask::StartAppTask()
 
 int AppTask::Init()
 {
-    int ret = CHIP_CONFIG_CORE_ERROR_MAX;
     LED_Params ledParams;
     Button_Params buttionParams;
     ConnectivityManager::ThreadPollingConfig pollingConfig;
@@ -89,7 +88,7 @@ int AppTask::Init()
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
-    ret = PlatformMgr().InitChipStack();
+    CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("PlatformMgr().InitChipStack() failed");
