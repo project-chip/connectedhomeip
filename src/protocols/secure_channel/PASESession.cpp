@@ -748,7 +748,7 @@ CHIP_ERROR PASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
         err = CHIP_ERROR_INTERNAL;
         break;
     };
-    ChipLogError(SecureChannel, "Received error during pairing process. %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+    ChipLogError(SecureChannel, "Received error during pairing process. %s", ErrorStr(err));
 
     return err;
 }

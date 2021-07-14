@@ -47,7 +47,7 @@ using namespace chip;
 // Test input data.
 
 // clang-format off
-static CHIP_ERROR sContext[] =
+static const CHIP_ERROR kTestElements[] =
 {
     BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK,
     BLE_ERROR_CENTRAL_UNSUBSCRIBED,
@@ -76,8 +76,6 @@ static CHIP_ERROR sContext[] =
 };
 // clang-format on
 
-static const size_t kTestElements = sizeof(sContext) / sizeof(sContext[0]);
-
 static void CheckBleErrorStr(nlTestSuite * inSuite, void * inContext)
 {
     // Register the layer error formatter
@@ -85,9 +83,8 @@ static void CheckBleErrorStr(nlTestSuite * inSuite, void * inContext)
     Ble::RegisterLayerErrorFormatter();
 
     // For each defined error...
-    for (size_t i = 0; i < kTestElements; i++)
+    for (const auto & err : kTestElements)
     {
-        CHIP_ERROR err      = sContext[i];
         const char * errStr = ErrorStr(err);
         char expectedText[9];
 
@@ -129,7 +126,7 @@ int TestBleErrorStr(void)
     // clang-format on
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, &sContext);
+    nlTestRunner(&theSuite, nullptr);
 
     return nlTestRunnerStats(&theSuite);
 }

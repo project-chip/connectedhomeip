@@ -565,7 +565,7 @@ void Device::OnSessionEstablished()
                                                  SecureSession::SessionRole::kInitiator, mAdminId);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed in setting up CASE secure channel: err %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+        ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));
         OnSessionEstablishmentError(err);
         return;
     }
