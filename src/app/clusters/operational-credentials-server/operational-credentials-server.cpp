@@ -324,7 +324,8 @@ void DoRemoveAllFabrics(intptr_t)
     OpenDefaultPairingWindow(ResetFabrics::kYes);
 }
 
-CHIP_ERROR SendNOCResponse(chip::app::Command * commandObj, EmberAfNOCResponseStatus status, uint8_t index, ByteSpan debug_text)
+CHIP_ERROR SendNOCResponse(chip::app::Command * commandObj, EmberAfNodeOperationalCertStatus status, uint8_t index,
+                           ByteSpan debug_text)
 {
     app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
                                          ZCL_NOC_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -335,26 +336,28 @@ CHIP_ERROR SendNOCResponse(chip::app::Command * commandObj, EmberAfNOCResponseSt
     ReturnErrorOnFailure(commandObj->PrepareCommand(cmdParams));
     writer = commandObj->GetCommandDataElementTLVWriter();
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(0), status));
-    if (status == EMBER_ZCL_NOC_RESPONSE_STATUS_SUCCESS)
+    if (status == EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS)
     {
         ReturnErrorOnFailure(writer->Put(TLV::ContextTag(1), index));
     }
+    // TODO: Change DebugText to CHAR_STRING once strings are supported in command/response fields
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(2), debug_text));
     ReturnErrorOnFailure(commandObj->FinishCommand());
 
     return CHIP_NO_ERROR;
 }
 
-EmberAfNOCResponseStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
+EmberAfNodeOperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
 {
     switch (err)
     {
     case CHIP_NO_ERROR:
-        return EMBER_ZCL_NOC_RESPONSE_STATUS_SUCCESS;
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;
     case CHIP_ERROR_INVALID_PUBLIC_KEY:
-        return EMBER_ZCL_NOC_RESPONSE_STATUS_INVALID_PUBLIC_KEY;
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_PUBLIC_KEY;
+    case CHIP_ERROR_INVALID_FABRIC_ID:
     case CHIP_ERROR_WRONG_NODE_ID:
-        return EMBER_ZCL_NOC_RESPONSE_STATUS_INVALID_NODE_OP_ID;
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NODE_OP_ID;
     case CHIP_ERROR_CA_CERT_NOT_FOUND:
     case CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED:
     case CHIP_ERROR_CERT_PATH_TOO_LONG:
@@ -366,14 +369,12 @@ EmberAfNOCResponseStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     case CHIP_ERROR_CERT_LOAD_FAILED:
     case CHIP_ERROR_CERT_NOT_TRUSTED:
     case CHIP_ERROR_WRONG_CERT_SUBJECT:
-        return EMBER_ZCL_NOC_RESPONSE_STATUS_INVALID_NOC;
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NOC;
     case CHIP_ERROR_NO_MEMORY:
-        return EMBER_ZCL_NOC_RESPONSE_STATUS_TABLE_FULL;
-    case CHIP_ERROR_INVALID_FABRIC_ID:
-        return EMBER_ZCL_NOC_RESPONSE_STATUS_INVALID_FABRIC_INDEX;
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_TABLE_FULL;
     };
 
-    return EMBER_ZCL_NOC_RESPONSE_STATUS_INVALID_NOC;
+    return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NOC;
 }
 
 } // namespace
@@ -391,14 +392,15 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(chip::EndpointId endpoin
                                                         chip::ByteSpan NOCArray, chip::ByteSpan IPKValue,
                                                         chip::NodeId CaseAdminNode, uint16_t AdminVendorId)
 {
-    CHIP_ERROR err                       = CHIP_NO_ERROR;
-    EmberAfNOCResponseStatus nocResponse = EMBER_ZCL_NOC_RESPONSE_STATUS_SUCCESS;
-    uint8_t fabricIndex                  = 0;
+    EmberAfNodeOperationalCertStatus nocResponse = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;
+
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    uint8_t fabricIndex = 0;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added an Op Cert");
 
     FabricInfo * fabric = retrieveCurrentFabric();
-    VerifyOrExit(fabric != nullptr, nocResponse = EMBER_ZCL_NOC_RESPONSE_STATUS_MISSING_CSR);
+    VerifyOrExit(fabric != nullptr, nocResponse = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_MISSING_CSR);
 
     err = fabric->SetOperationalCertsFromCertArray(NOCArray);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
@@ -418,7 +420,7 @@ exit:
 
     SendNOCResponse(commandObj, nocResponse, fabricIndex, ByteSpan());
 
-    if (nocResponse != EMBER_ZCL_NOC_RESPONSE_STATUS_SUCCESS)
+    if (nocResponse != EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddNOC request. Status %d", nocResponse);
     }
