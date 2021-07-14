@@ -139,6 +139,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     }
 
     {
+        // Create a new scope for `err`, to avoid shadowing warning previous `err`.
         CHIP_ERROR err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
                                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
         if (err != CHIP_NO_ERROR && IsResponseExpected())
@@ -400,27 +401,26 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     bool isStandaloneAck = payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck);
     bool isDuplicate     = msgFlags.Has(MessageFlagValues::kDuplicateMessage);
 
-    auto deffered = MakeDefer([&]() {
-        // Also don't close if there's an outer HandleMessage invocation.  It'll deal with the closing.
+    auto deferred = MakeDefer([&]() {
+        // The alreadyHandlingMessage check is effectively a workaround for the fact that SendMessage() is not calling
+        // MessageHandled() yet and will go away when we fix that.
         if (alreadyHandlingMessage)
+        {
+            // Don't close if there's an outer HandleMessage invocation.  It'll deal with the closing.
             return;
-        mFlags.Clear(Flags::kFlagHandlingMessage);
+        }
         // We are the outermost HandleMessage invocation.  We're not handling a message anymore.
+        mFlags.Clear(Flags::kFlagHandlingMessage);
 
-        // Duplicates and standalone acks are not application-level messages, so
-        // they should generally not lead to any state changes.  The one exception
-        // to that is that if we have a null mDelegate then our lifetime is not
-        // application-defined, since we don't interact with the application at that
-        // point.  That can happen when we are already closed (in which case
-        // MessageHandled is a no-op) or if we were just created to send a
-        // standalone ack for this incoming message, in which case we should treat
-        // it as an app-level message for purposes of our state.
-        //
-        // The alreadyHandlingMessage check is effectively a workaround for the fact that
-        // SendMessage() is not calling MessageHandled() yet and will go away when
-        // we fix that.
+        // Duplicates and standalone acks are not application-level messages, so they should generally not lead to any state
+        // changes.  The one exception to that is that if we have a null mDelegate then our lifetime is not application-defined,
+        // since we don't interact with the application at that point.  That can happen when we are already closed (in which case
+        // MessageHandled is a no-op) or if we were just created to send a standalone ack for this incoming message, in which case
+        // we should treat it as an app-level message for purposes of our state.
         if ((isStandaloneAck || isDuplicate) && mDelegate != nullptr)
+        {
             return;
+        }
 
         MessageHandled();
     });
