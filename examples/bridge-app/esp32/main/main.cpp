@@ -27,7 +27,6 @@
 #include <app/util/attribute-storage.h>
 #include <core/CHIPError.h>
 #include <support/ErrorStr.h>
-#include <app/server/Server.h>
 
 const char * TAG = "bridge-app";
 
