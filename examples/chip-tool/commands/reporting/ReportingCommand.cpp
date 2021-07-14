@@ -50,7 +50,11 @@ void ReportingCommand::OnDeviceConnectedFn(void * context, chip::Controller::Dev
     command->AddReportCallbacks(command->mEndPointId);
 
     CHIP_ERROR err = cluster.MfgSpecificPing(nullptr, nullptr);
-    VerifyOrReturn(CHIP_NO_ERROR == err, ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err)));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err));
+        command->SetCommandExitStatus(err);
+    }
 }
 
 void ReportingCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR err)
