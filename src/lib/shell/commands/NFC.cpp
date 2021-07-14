@@ -32,7 +32,7 @@ using chip::DeviceLayer::ConnectivityMgr;
 namespace chip {
 namespace Shell {
 
-static int NFCHandler(int argc, char ** argv)
+static CHIP_ERROR NFCHandler(int argc, char ** argv)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
