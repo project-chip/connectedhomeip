@@ -363,14 +363,13 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     if (ec == nullptr)
         return;
 
-    // NOTE: we don't set mResponseExpected to false here because the response could still arrive. If the user
-    // wants to never receive the response, they must close the exchange context.
-
     ec->NotifyResponseTimeout();
 }
 
 void ExchangeContext::NotifyResponseTimeout()
 {
+    SetResponseExpected(false);
+
     ExchangeDelegate * delegate = GetDelegate();
 
     // Call the user's timeout handler.
@@ -378,6 +377,8 @@ void ExchangeContext::NotifyResponseTimeout()
     {
         delegate->OnResponseTimeout(this);
     }
+
+    MessageHandled();
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,

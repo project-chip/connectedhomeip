@@ -56,7 +56,10 @@ public:
      *  all held resources.  The object must not be used after Shutdown() is called.
      *
      *  SDK consumer can choose when to shut down the ReadClient.
-     *  The ReadClient will never shut itself down, unless the overall InteractionModelEngine is shut down.
+     *  The ReadClient will automatically shut itself down when it receives a
+     *  response or the response times out.  So manual shutdown is only needed
+     *  to shut down a ReadClient before one of those two things has happened,
+     *  (e.g. if SendReadRequest returned failure).
      */
     void Shutdown();
 
@@ -126,6 +129,12 @@ private:
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
     CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;
+
+    /**
+     * Internal shutdown method that we use when we know what's going on with
+     * our exchange and don't need to manually close it.
+     */
+    void ShutdownInternal();
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;

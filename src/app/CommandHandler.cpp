@@ -72,9 +72,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     MoveToState(CommandState::Sending);
 
 exit:
-    // Keep Shutdown() from double-closing our exchange.
-    mpExchangeCtx = nullptr;
-    Shutdown();
+    ShutdownInternal();
     ChipLogFunctError(err);
     return err;
 }
