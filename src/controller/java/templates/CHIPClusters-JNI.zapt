@@ -214,7 +214,7 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
 };
 
 {{#chip_server_global_responses}}
-
+{{#if chipCallback.type}}
 class CHIP{{chipCallback.name}}AttributeCallback : public Callback::Callback<{{chipCallback.name}}AttributeCallback> {
     public:
         CHIP{{chipCallback.name}}AttributeCallback(jobject javaCallback, bool keepAlive = false): Callback::Callback<{{chipCallback.name}}AttributeCallback>(CallbackFn, this)
@@ -285,6 +285,9 @@ class CHIP{{chipCallback.name}}AttributeCallback : public Callback::Callback<{{c
         jobject javaCallbackRef;
         bool keepAlive;
 };
+{{else}}
+// TODO: Type {{ type }} is not supported yet.
+{{/if}}
 {{/chip_server_global_responses}}
 
 {{#chip_client_clusters}}
@@ -583,7 +586,7 @@ exit:
 }
 {{/chip_cluster_commands}}
 {{#chip_server_cluster_attributes}}
-
+{{#if (attributeTypeSupported this)}}
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, read{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -662,6 +665,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
+{{/if}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}

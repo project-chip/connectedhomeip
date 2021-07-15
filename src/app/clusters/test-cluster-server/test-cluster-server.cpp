@@ -123,6 +123,17 @@ EmberAfStatus writeTestListStructOctetAttribute(EndpointId endpoint)
     VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
     return status;
 }
+
+EmberAfStatus writeTestStructAttribute(EndpointId endpoint)
+{
+    _simplestruct structValue;
+    structValue.fieldA = 0xfedcba9876543210;
+    structValue.fieldB = 0x76543210;
+    uint8_t buf[16];
+    size_t len;
+    _simplestruct::ToEmberBuffer(&structValue, buf, sizeof(buf), len);
+    return writeAttribute(endpoint, ZCL_SIMPLE_STRUCT_ATTRIBUTE_ID, buf);
+}
 } // namespace
 
 void emberAfPluginTestClusterServerInitCallback(void)
@@ -145,6 +156,9 @@ void emberAfPluginTestClusterServerInitCallback(void)
 
         status = writeTestListStructOctetAttribute(endpoint);
         VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list strut octet", status));
+
+        status = writeTestStructAttribute(endpoint);
+        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test struct", status));
     }
 }
 

@@ -122,9 +122,8 @@ function asJniBasicTypeForZclType(type)
   function fn(pkgId)
   {
     const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      return convertBasicCTypeToJniType(ChipTypesHelper.asBasicType(zclType));
-    })
+    return zclHelper.asUnderlyingZclType.call(this, type, options)
+        .then(zclType => { return convertBasicCTypeToJniType(ChipTypesHelper.asBasicType(zclType)); })
   }
 
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
@@ -139,9 +138,8 @@ function asJniSignature(type)
   function fn(pkgId)
   {
     const options = { 'hash' : {} };
-    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      return convertCTypeToJniSignature(ChipTypesHelper.asBasicType(zclType));
-    })
+    return zclHelper.asUnderlyingZclType.call(this, type, options)
+        .then(zclType => { return convertCTypeToJniSignature(ChipTypesHelper.asBasicType(zclType)); })
   }
 
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
@@ -203,6 +201,11 @@ function omitCommaForFirstNonStatusCommand(id, index)
   return templateUtil.templatePromise(this.global, promise);
 }
 
+function attributeTypeSupported(attribute)
+{
+  return attribute.isList || attribute.chipCallback.type
+}
+
 //
 // Module exports
 //
@@ -216,3 +219,4 @@ exports.convertCTypeToJniSignature             = convertCTypeToJniSignature;
 exports.convertBasicCTypeToJavaBoxedType       = convertBasicCTypeToJavaBoxedType;
 exports.convertAttributeCallbackTypeToJavaName = convertAttributeCallbackTypeToJavaName;
 exports.omitCommaForFirstNonStatusCommand      = omitCommaForFirstNonStatusCommand;
+exports.attributeTypeSupported                 = attributeTypeSupported;

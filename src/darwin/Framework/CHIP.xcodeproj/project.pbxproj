@@ -48,6 +48,7 @@
 		2CB7163C252E8A7C0026E2BB /* CHIPDevicePairingDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2CB71639252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.mm */; };
 		2CB7163F252F731E0026E2BB /* CHIPDevicePairingDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CB7163E252F731E0026E2BB /* CHIPDevicePairingDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2F79A67726CE6672006377B0 /* im-client-callbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2F79A67626CE6672006377B0 /* im-client-callbacks.cpp */; };
+		2F778AED26A15C43002A4437 /* af-structs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2F778AEC26A15C43002A4437 /* af-structs.cpp */; };
 		2FD775552695557E00FF4B12 /* error-mapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FD775542695557E00FF4B12 /* error-mapping.cpp */; };
 		5129BCFD26A9EE3300122DDF /* CHIPError.h in Headers */ = {isa = PBXBuildFile; fileRef = 5129BCFC26A9EE3300122DDF /* CHIPError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		85D4C41026DFF4950070835D /* prepare-list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85D4C40F26DFF4950070835D /* prepare-list.cpp */; };
@@ -130,6 +131,7 @@
 		2CB71639252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDevicePairingDelegateBridge.mm; sourceTree = "<group>"; };
 		2CB7163E252F731E0026E2BB /* CHIPDevicePairingDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDevicePairingDelegate.h; sourceTree = "<group>"; };
 		2F79A67626CE6672006377B0 /* im-client-callbacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "im-client-callbacks.cpp"; path = "../../../app/util/im-client-callbacks.cpp"; sourceTree = "<group>"; };
+		2F778AEC26A15C43002A4437 /* af-structs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "af-structs.cpp"; path = "../../../../zzz_generated/app-common/app-common/zap-generated/af-structs.cpp"; sourceTree = "<group>"; };
 		2FD775542695557E00FF4B12 /* error-mapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "error-mapping.cpp"; path = "../../../app/util/error-mapping.cpp"; sourceTree = "<group>"; };
 		5129BCFC26A9EE3300122DDF /* CHIPError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CHIPError.h; path = CHIP/CHIPError.h; sourceTree = "<group>"; };
 		85D4C40F26DFF4950070835D /* prepare-list.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "prepare-list.cpp"; path = "../../app/util/prepare-list.cpp"; sourceTree = "<group>"; };
@@ -189,6 +191,7 @@
 			isa = PBXGroup;
 			children = (
 				2F79A67626CE6672006377B0 /* im-client-callbacks.cpp */,
+				2F778AEC26A15C43002A4437 /* af-structs.cpp */,
 				2FD775542695557E00FF4B12 /* error-mapping.cpp */,
 				1E85733326551A700050A4D9 /* reporting-default-configuration.cpp */,
 				1E85733226551A700050A4D9 /* reporting.cpp */,
@@ -503,6 +506,7 @@
 				1E85732626551A490050A4D9 /* attribute-storage.cpp in Sources */,
 				1E85732C26551A490050A4D9 /* DataModelHandler.cpp in Sources */,
 				1E85733126551A490050A4D9 /* chip-message-send.cpp in Sources */,
+				2F778AED26A15C43002A4437 /* af-structs.cpp in Sources */,
 				1E85730F265519AE0050A4D9 /* attribute-size.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
