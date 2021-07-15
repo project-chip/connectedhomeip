@@ -31,10 +31,14 @@ pw_python_package("build_examples") {
     "builders/esp32.py",
     "builders/linux.py",
     "builders/qpg.py",
-    "expected_all_platform_commands.txt",
     "runner/__init__.py",
     "runner/printonly.py",
     "runner/shell.py",
+
+    # This is a test dependency and is awkward.
+    # Finding a different way to express 'rerun test if this changes' would
+    # be ideal.
+    "expected_all_platform_commands.txt",
   ]
   tests = [ "test.py" ]
 }
