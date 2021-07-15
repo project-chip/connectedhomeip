@@ -130,5 +130,3 @@ tests:
       attribute: "Mode"
       response:
           value: 7
-
-
