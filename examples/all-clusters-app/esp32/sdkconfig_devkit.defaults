@@ -18,7 +18,8 @@
 #    Description:
 #      CI uses this to select the ESP32-DevKitC.
 #
-
+CONFIG_IDF_TARGET="esp32"
+CONFIG_IDF_TARGET_ESP32=y
 CONFIG_DEVICE_TYPE_ESP32_DEVKITC=y
 
 # Default to 921600 baud when flashing and monitoring device

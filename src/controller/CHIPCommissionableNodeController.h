@@ -40,9 +40,7 @@ public:
     CommissionableNodeController(){};
     virtual ~CommissionableNodeController() {}
 
-    CHIP_ERROR DiscoverCommissionersLongDiscriminator(uint16_t long_discriminator);
-
-    CHIP_ERROR DiscoverCommissioners();
+    CHIP_ERROR DiscoverCommissioners(Mdns::DiscoveryFilter discoveryFilter = Mdns::DiscoveryFilter());
 
     const Mdns::DiscoveredNodeData * GetDiscoveredCommissioner(int idx);
 
@@ -57,7 +55,7 @@ public:
     }
 
 protected:
-    Mdns::DiscoveredNodeData * GetDiscoveredNodes() override { return mDiscoveredCommissioners; }
+    DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mDiscoveredCommissioners); }
 
 private:
     Mdns::DiscoveredNodeData mDiscoveredCommissioners[CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES];

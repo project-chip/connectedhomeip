@@ -26,10 +26,11 @@ cffi==1.14.5
     # via cryptography
 chardet==4.0.0
     # via requests
-click==8.0.1
+click==7.1.2
     # via
     #   -r requirements.esp32.txt
     #   flask
+    #   mbed-tools
     #   pip-tools
 colorama==0.4.4
     # via west
@@ -68,6 +69,10 @@ gdbgui==0.13.2.0 ; platform_machine != "aarch64"
     # via -r requirements.esp32.txt
 gevent==1.5.0
     # via gdbgui
+gitdb==4.0.7
+    # via gitpython
+gitpython==3.1.14
+    # via mbed-tools
 greenlet==1.1.0
     # via gevent
 humanfriendly==9.2
@@ -85,13 +90,23 @@ itsdangerous==2.0.1
 jedi==0.18.0
     # via ipython
 jinja2==3.0.1
-    # via flask
+    # via
+    #   flask
+    #   mbed-tools
 lockfile==0.12.2
     # via -r requirements.txt
+mako==1.1.4
+    # via pdoc3
+markdown==3.3.4
+    # via pdoc3
 markupsafe==2.0.1
-    # via jinja2
+    # via
+    #   jinja2
+    #   mako
 matplotlib-inline==0.1.2
     # via ipython
+mbed-tools==7.22.0
+    # via -r requirements.mbed.txt
 mobly==1.10.1
     # via -r requirements.txt
 numpy==1.20.3
@@ -102,6 +117,8 @@ pandas==1.2.4 ; platform_machine != "aarch64"
     # via -r requirements.txt
 parso==0.8.2
     # via jedi
+pdoc3==0.9.2
+    # via mbed-tools
 pep517==0.10.0
     # via pip-tools
 pexpect==4.8.0
@@ -116,6 +133,8 @@ portpicker==1.4.0
     # via
     #   -r requirements.txt
     #   mobly
+prettytable==0.7.2
+    # via -r requirements.mbed.txt
 prompt-toolkit==3.0.18
     # via ipython
 protobuf==3.17.3
@@ -123,6 +142,7 @@ protobuf==3.17.3
 psutil==5.8.0
     # via
     #   -r requirements.txt
+    #   mbed-tools
     #   mobly
 ptyprocess==0.7.0
     # via pexpect
@@ -147,17 +167,22 @@ pyparsing==2.3.1
 pyserial==3.5
     # via
     #   -r requirements.esp32.txt
+    #   mbed-tools
     #   mobly
 python-dateutil==2.8.1
     # via
     #   pandas
     #   pykwalify
+python-dotenv==0.17.1
+    # via mbed-tools
 python-engineio==4.2.0
     # via python-socketio
-python-socketio==5.3.0
+python-socketio<5
     # via flask-socketio
 pytz==2021.1
     # via pandas
+pyudev==0.22.0
+    # via mbed-tools
 pyyaml==5.4.1
     # via
     #   mobly
@@ -165,7 +190,9 @@ pyyaml==5.4.1
 reedsolo==1.5.4
     # via -r requirements.esp32.txt
 requests==2.25.1
-    # via -r requirements.txt
+    # via
+    #   -r requirements.txt
+    #   mbed-tools
 ruamel.yaml.clib==0.2.2
     # via ruamel.yaml
 ruamel.yaml==0.17.9
@@ -176,15 +203,24 @@ six==1.16.0
     #   ecdsa
     #   protobuf
     #   python-dateutil
+    #   pyudev
     #   virtualenv
+smmap==4.0.0
+    # via gitdb
+tabulate==0.8.9
+    # via mbed-tools
 timeout-decorator==0.5.0
     # via mobly
 toml==0.10.2
     # via pep517
+tqdm==4.61.1
+    # via mbed-tools
 traitlets==5.0.5
     # via
     #   ipython
     #   matplotlib-inline
+typing-extensions==3.10.0.0
+    # via mbed-tools
 urllib3==1.26.5
     # via requests
 virtualenv==20.4.7

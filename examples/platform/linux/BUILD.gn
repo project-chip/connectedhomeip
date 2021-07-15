@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/lib/lib.gni")
 
 config("app-main-config") {
   include_dirs = [ "." ]
@@ -38,6 +39,9 @@ source_set("app-main") {
     # BLE and on-network. Code defaults to BLE if this is not set.
     defines += [ "CONFIG_RENDEZVOUS_MODE=6" ]
   }
+  if (chip_build_libshell) {
+    defines += [ "ENABLE_CHIP_SHELL" ]
+  }
 
   public_deps = [
     "${chip_root}/src/app/server",
@@ -45,9 +49,6 @@ source_set("app-main") {
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/lib/shell:shell_core",
   ]
-
-    public_deps += [ 
-    ]
 
   public_configs = [ ":app-main-config" ]
 }

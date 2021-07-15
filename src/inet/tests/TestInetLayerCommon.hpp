@@ -145,14 +145,14 @@ extern bool HandleICMPv6DataReceived(chip::System::PacketBufferHandle && aBuffer
 
 // Timer Callback Handler
 
-extern void HandleSendTimerComplete(chip::System::Layer * aSystemLayer, void * aAppState, chip::System::Error aError);
+extern void HandleSendTimerComplete(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
 
 // Raw Endpoint Callback Handlers
 
 extern void HandleRawMessageReceived(const chip::Inet::IPEndPointBasis * aEndPoint,
                                      const chip::System::PacketBufferHandle & aBuffer,
                                      const chip::Inet::IPPacketInfo * aPacketInfo);
-extern void HandleRawReceiveError(const chip::Inet::IPEndPointBasis * aEndPoint, const INET_ERROR & aError,
+extern void HandleRawReceiveError(const chip::Inet::IPEndPointBasis * aEndPoint, const CHIP_ERROR & aError,
                                   const chip::Inet::IPPacketInfo * aPacketInfo);
 
 // UDP Endpoint Callback Handlers
@@ -160,7 +160,7 @@ extern void HandleRawReceiveError(const chip::Inet::IPEndPointBasis * aEndPoint,
 extern void HandleUDPMessageReceived(const chip::Inet::IPEndPointBasis * aEndPoint,
                                      const chip::System::PacketBufferHandle & aBuffer,
                                      const chip::Inet::IPPacketInfo * aPacketInfo);
-extern void HandleUDPReceiveError(const chip::Inet::IPEndPointBasis * aEndPoint, const INET_ERROR & aError,
+extern void HandleUDPReceiveError(const chip::Inet::IPEndPointBasis * aEndPoint, const CHIP_ERROR & aError,
                                   const chip::Inet::IPPacketInfo * aPacketInfo);
 
 } // namespace Common

@@ -31,6 +31,7 @@
 #include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
+#include <support/TypeTraits.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -104,10 +105,15 @@ public:
     CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload,
                            const SendFlags & sendFlags = SendFlags(SendMessageFlags::kNone))
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(msgType),
-                           std::move(msgPayload), sendFlags);
+        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(msgType), std::move(msgPayload),
+                           sendFlags);
     }
+
+    /**
+     * A notification that we will have SendMessage called on us in the future
+     * (and should stay open until that happens).
+     */
+    void WillSendMessage() { mFlags.Set(Flags::kFlagWillSendMessage); }
 
     /**
      *  Handle a received CHIP message on this exchange.
@@ -118,6 +124,8 @@ public:
      *
      *  @param[in]    peerAddress   The address of the sender
      *
+     *  @param[in]    msgFlags      The message flags corresponding to the received message
+     *
      *  @param[in]    msgBuf        A handle to the packet buffer holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
@@ -126,7 +134,8 @@ public:
      *                                                       protocol layer.
      */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msgBuf);
+                             const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+                             System::PacketBufferHandle && msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
@@ -186,6 +195,13 @@ private:
     bool IsResponseExpected() const;
 
     /**
+     * Determine whether we are expecting our consumer to send a message on
+     * this exchange (i.e. WillSendMessage was called and the message has not
+     * yet been sent).
+     */
+    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
+
+    /**
      *  Track whether we are now expecting a response to a message sent via this exchange (because that
      *  message had the kExpectResponse flag set in its sendFlags).
      *
@@ -223,9 +239,15 @@ private:
     CHIP_ERROR StartResponseTimer();
 
     void CancelResponseTimer();
-    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
+    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
 
     void DoClose(bool clearRetransTable);
+
+    /**
+     * We have handled an application-level message in some way and should
+     * re-evaluate out state to see whether we should still be open.
+     */
+    void MessageHandled();
 };
 
 } // namespace Messaging

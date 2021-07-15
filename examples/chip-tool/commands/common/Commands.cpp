@@ -42,6 +42,7 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Controller::CommissionerInitParams initParams;
+    Command * command = nullptr;
 
     err = chip::Platform::MemoryInit();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err)));
@@ -69,16 +70,39 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
     err = mController.Init(localId, initParams);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
 
+#if CONFIG_USE_SEPARATE_EVENTLOOP
+    // ServiceEvents() calls StartEventLoopTask(), which is paired with the
+    // StopEventLoopTask() below.
     err = mController.ServiceEvents();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
-    err = RunCommand(localId, remoteId, argc, argv);
+    err = RunCommand(localId, remoteId, argc, argv, &command);
     SuccessOrExit(err);
 
+#if !CONFIG_USE_SEPARATE_EVENTLOOP
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
+#endif // !CONFIG_USE_SEPARATE_EVENTLOOP
+
+    if (command)
+    {
+        err = command->GetCommandExitStatus();
+    }
+
 exit:
-#if CONFIG_DEVICE_LAYER
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
+    }
+
+#if CONFIG_USE_SEPARATE_EVENTLOOP
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-#endif
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
+
+    if (command)
+    {
+        command->Shutdown();
+    }
 
     //
     // We can call DeviceController::Shutdown() safely without grabbing the stack lock
@@ -90,7 +114,7 @@ exit:
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char ** argv)
+CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char ** argv, Command ** ranCommand)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::map<std::string, CommandsVector>::iterator cluster;
@@ -158,19 +182,40 @@ CHIP_ERROR Commands::RunCommand(NodeId localId, NodeId remoteId, int argc, char 
         execContext.commissioner  = &mController;
         execContext.opCredsIssuer = &mOpCredsIssuer;
         execContext.storage       = &mStorage;
+        execContext.localId       = localId;
+        execContext.remoteId      = remoteId;
 
         command->SetExecutionContext(execContext);
+        *ranCommand = command;
 
-        err = command->Run(localId, remoteId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
-            ExitNow();
-        }
+        //
+        // Set this to true first BEFORE we send commands to ensure we don't end
+        // up in a situation where the response comes back faster than we can
+        // set the variable to true, which will cause it to block indefinitely.
+        //
+        command->UpdateWaitForResponse(true);
+#if CONFIG_USE_SEPARATE_EVENTLOOP
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(command));
+        command->WaitForResponse(command->GetWaitDurationInSeconds());
+#else  // CONFIG_USE_SEPARATE_EVENTLOOP
+        err = command->Run();
+        SuccessOrExit(err);
+        command->ScheduleWaitForResponse(command->GetWaitDurationInSeconds());
+#endif // CONFIG_USE_SEPARATE_EVENTLOOP
     }
 
 exit:
     return err;
+}
+
+void Commands::RunQueuedCommand(intptr_t commandArg)
+{
+    auto * command = reinterpret_cast<Command *>(commandArg);
+    CHIP_ERROR err = command->Run();
+    if (err != CHIP_NO_ERROR)
+    {
+        command->SetCommandExitStatus(err);
+    }
 }
 
 std::map<std::string, Commands::CommandsVector>::iterator Commands::GetCluster(std::string clusterName)

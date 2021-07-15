@@ -31,25 +31,25 @@ namespace Controller {
 
 void AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData)
 {
-    Mdns::DiscoveredNodeData * mDiscoveredNodes = GetDiscoveredNodes();
-    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; ++i)
+    auto discoveredNodes = GetDiscoveredNodes();
+    for (auto & discoveredNode : discoveredNodes)
     {
-        if (!mDiscoveredNodes[i].IsValid())
+        if (!discoveredNode.IsValid())
         {
             continue;
         }
-        if (strcmp(mDiscoveredNodes[i].hostName, nodeData.hostName) == 0)
+        if (strcmp(discoveredNode.hostName, nodeData.hostName) == 0)
         {
-            mDiscoveredNodes[i] = nodeData;
+            discoveredNode = nodeData;
             return;
         }
     }
     // Node not yet in the list
-    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; ++i)
+    for (auto & discoveredNode : discoveredNodes)
     {
-        if (!mDiscoveredNodes[i].IsValid())
+        if (!discoveredNode.IsValid())
         {
-            mDiscoveredNodes[i] = nodeData;
+            discoveredNode = nodeData;
             return;
         }
     }
@@ -63,27 +63,21 @@ CHIP_ERROR AbstractMdnsDiscoveryController::SetUpNodeDiscovery()
     ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().StartResolver(&DeviceLayer::InetLayer, kMdnsPort));
 #endif
 
-    Mdns::DiscoveredNodeData * mDiscoveredNodes = GetDiscoveredNodes();
-    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; ++i)
+    auto discoveredNodes = GetDiscoveredNodes();
+    for (auto & discoveredNode : discoveredNodes)
     {
-        mDiscoveredNodes[i].Reset();
+        discoveredNode.Reset();
     }
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AbstractMdnsDiscoveryController::SetUpNodeDiscoveryLongDiscriminator(uint16_t long_discriminator)
-{
-    filter = Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kLong, long_discriminator);
-    return SetUpNodeDiscovery();
 }
 
 const Mdns::DiscoveredNodeData * AbstractMdnsDiscoveryController::GetDiscoveredNode(int idx)
 {
     // TODO(cecille): Add assertion about main loop.
-    Mdns::DiscoveredNodeData * mDiscoveredNodes = GetDiscoveredNodes();
-    if (mDiscoveredNodes[idx].IsValid())
+    auto discoveredNodes = GetDiscoveredNodes();
+    if (0 <= idx && idx < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES && discoveredNodes.data()[idx].IsValid())
     {
-        return &mDiscoveredNodes[idx];
+        return discoveredNodes.data() + idx;
     }
     return nullptr;
 }

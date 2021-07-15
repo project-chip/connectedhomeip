@@ -53,7 +53,7 @@
  *
  * An application or module that incorporates chip can define a project configuration
  * file to override standard chip configuration with application-specific values.
- * The chipProjectConfig.h file is typically located outside the Openchip source tree,
+ * The chipProjectConfig.h file is typically located outside the CHIP source tree,
  * alongside the source code for the application.
  */
 #ifdef CHIP_PROJECT_CONFIG_INCLUDE
@@ -64,8 +64,8 @@
  *
  * A platform configuration file contains overrides to standard chip configuration
  * that are specific to the platform or OS on which chip is running.  It is typically
- * provided as apart of an adaptation layer that adapts Openchip to the target
- * environment.  This adaptation layer may be included in the Openchip source tree
+ * provided as apart of an adaptation layer that adapts CHIP to the target
+ * environment.  This adaptation layer may be included in the CHIP source tree
  * itself or implemented externally.
  */
 #ifdef CHIP_PLATFORM_CONFIG_INCLUDE
@@ -73,63 +73,6 @@
 #endif
 
 // Profile-specific Configuration Headers
-/**
- *  @def CHIP_CONFIG_ERROR_TYPE
- *
- *  @brief
- *    This defines the data type used to represent errors for chip.
- *
- */
-#ifndef CHIP_CONFIG_ERROR_TYPE
-#include <stdint.h>
-
-#define CHIP_CONFIG_ERROR_TYPE int32_t
-#endif // CHIP_CONFIG_ERROR_TYPE
-
-/**
- *  @def CHIP_CONFIG_NO_ERROR
- *
- *  @brief
- *    This defines the chip error code for no error or success.
- *
- */
-#ifndef CHIP_CONFIG_NO_ERROR
-#define CHIP_CONFIG_NO_ERROR 0
-#endif // CHIP_CONFIG_NO_ERROR
-
-/**
- *  @def CHIP_CONFIG_ERROR_MIN
- *
- *  @brief
- *    This defines the base or minimum chip error number range.
- *
- */
-#ifndef CHIP_CONFIG_ERROR_MIN
-#define CHIP_CONFIG_ERROR_MIN 4000
-#endif // CHIP_CONFIG_ERROR_MIN
-
-/**
- *  @def CHIP_CONFIG_ERROR_MAX
- *
- *  @brief
- *    This defines the top or maximum chip error number range.
- *
- */
-#ifndef CHIP_CONFIG_ERROR_MAX
-#define CHIP_CONFIG_ERROR_MAX 4999
-#endif // CHIP_CONFIG_ERROR_MAX
-
-/**
- *  @def _CHIP_CONFIG_ERROR
- *
- *  @brief
- *    This defines a mapping function for chip errors that allows
- *    mapping such errors into a platform- or system-specific manner.
- *
- */
-#ifndef _CHIP_CONFIG_ERROR
-#define _CHIP_CONFIG_ERROR(e) (CHIP_ERROR_MIN + (e))
-#endif // _CHIP_CONFIG_ERROR
 
 /**
  *  @def CHIP_CONFIG_USE_OPENSSL_ECC

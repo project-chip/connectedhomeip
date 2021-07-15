@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,9 @@ declare_args() {
   # Use BSD/POSIX socket API.
   chip_system_config_use_sockets = current_os != "freertos"
 
+  # Socket event loop type.
+  chip_system_config_sockets_event_loop = "Select"
+
   # Mutex implementation: posix, freertos, none.
   chip_system_config_locking = ""
 
@@ -42,6 +45,8 @@ declare_args() {
 if (chip_system_config_locking == "") {
   if (current_os == "freertos") {
     chip_system_config_locking = "freertos"
+  } else if (current_os == "mbed") {
+    chip_system_config_locking = "mbed"
   } else if (chip_system_config_use_dispatch == false) {
     chip_system_config_locking = "posix"
   } else {
@@ -49,10 +54,12 @@ if (chip_system_config_locking == "") {
   }
 }
 
-assert(chip_system_config_locking == "posix" ||
-           chip_system_config_locking == "freertos" ||
-           chip_system_config_locking == "none",
-       "Please select a valid mutex implementation: posix, freertos, none")
+assert(
+    chip_system_config_locking == "posix" ||
+        chip_system_config_locking == "freertos" ||
+        chip_system_config_locking == "none" ||
+        chip_system_config_locking == "mbed",
+    "Please select a valid mutex implementation: posix, freertos, mbed, none")
 
 assert(
     chip_system_config_clock == "clock_gettime" ||

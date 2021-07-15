@@ -143,6 +143,11 @@ public:
      * @param error Error cause, if any
      */
     virtual void OnPairingDeleted(CHIP_ERROR error) {}
+
+    /**
+     *   Called when the commissioning process is complete (with success or error)
+     */
+    virtual void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) {}
 };
 
 struct CommissionerInitParams : public ControllerInitParams
@@ -168,6 +173,10 @@ public:
     CHIP_ERROR CommandResponseError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
 
     CHIP_ERROR CommandResponseProcessed(const app::CommandSender * apCommandSender) override;
+
+    void OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath, TLV::TLVReader * apData,
+                      Protocols::InteractionModel::ProtocolCode status) override;
+    CHIP_ERROR ReportError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override;
 };
 
 /**
@@ -204,21 +213,6 @@ public:
 
     /**
      * @brief
-     *   This function deserializes the provided deviceInfo object, and initializes and outputs the
-     *   corresponding Device object. The lifetime of the output object is tied to that of the DeviceController
-     *   object. The caller must not use the Device object If they free the DeviceController object, or
-     *   after they call ReleaseDevice() on the returned device object.
-     *
-     * @param[in] deviceId   Node ID for the CHIP device
-     * @param[in] deviceInfo Serialized device info for the device
-     * @param[out] device    The output device object
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    CHIP_ERROR GetDevice(NodeId deviceId, const SerializedDevice & deviceInfo, Device ** device);
-
-    /**
-     * @brief
      *   This function is similar to the other GetDevice object, except it reads the serialized object from
      *   the persistent storage.
      *
@@ -230,16 +224,30 @@ public:
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
 
     /**
+     *   This function returns true if the device corresponding to `deviceId` has previously been commissioned
+     *   on the fabric.
+     */
+    bool DoesDevicePairingExist(const PeerId & deviceId);
+
+    /**
+     *   This function finds the device corresponding to deviceId, and establishes a secure connection with it.
+     *   Once the connection is successfully establishes (or if it's already connected), it calls `onConnectedDevice`
+     *   callback. If it fails to establish the connection, it calls `onError` callback.
+     */
+    CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                  Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+
+    /**
      * @brief
      *   This function update the device informations asynchronously using mdns.
      *   If new device informations has been found, it will be persisted.
      *
-     * @param[in] device    The input device object to update
+     * @param[in] deviceId  Node ID for the CHIP devicex
      * @param[in] fabricId  The fabricId used for mdns resolution
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR UpdateDevice(Device * device, uint64_t fabricId);
+    CHIP_ERROR UpdateDevice(NodeId deviceId, uint64_t fabricId);
 
     void PersistDevice(Device * device);
 
@@ -334,19 +342,26 @@ protected:
     Credentials::OperationalCredentialSet mCredentials;
     Credentials::CertificateKeyId mRootKeyId;
 
-    uint16_t mNextKeyId = 0;
+    SessionIDAllocator mIDAllocator;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
-    Mdns::DiscoveredNodeData * GetDiscoveredNodes() override { return mCommissionableNodes; }
+    DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
+
+    // This function uses `OperationalCredentialsDelegate` to generate the operational certificates
+    // for the given device. The output is a TLV encoded array of compressed CHIP certificates. The
+    // array can contain up to two certificates (node operational certificate, and ICA certificate).
+    // If the certificate issuer doesn't require an ICA (i.e. NOC is signed by the root CA), the array
+    // will have only one certificate (node operational certificate).
+    CHIP_ERROR GenerateOperationalCertificates(const ByteSpan & noc, MutableByteSpan & cert);
 
 private:
     //////////// ExchangeDelegate Implementation ///////////////
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle && msgBuf) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
@@ -356,6 +371,9 @@ private:
     void ReleaseAllDevices();
 
     CHIP_ERROR LoadLocalCredentials(Transport::AdminPairingInfo * admin);
+
+    static void OnLocalNOCGenerated(void * context, const ByteSpan & noc);
+    Callback::Callback<NOCGenerated> mLocalNOCCallback;
 };
 
 /**
@@ -445,6 +463,16 @@ public:
      */
     CHIP_ERROR UnpairDevice(NodeId remoteDeviceId);
 
+    /**
+     *   This function call indicates that the device has been provisioned with operational
+     *   credentials, and is reachable on operational network. At this point, the device is
+     *   available for CASE session establishment.
+     *
+     *   The function updates the state of device proxy object such that all subsequent messages
+     *   will use secure session established via CASE handshake.
+     */
+    CHIP_ERROR OperationalDiscoveryComplete(NodeId remoteDeviceId);
+
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
@@ -468,18 +496,12 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     /**
      * @brief
-     *   Discover devices advertising as commissionable that match the long discriminator.
-     * @return CHIP_ERROR   The return status
-     */
-    CHIP_ERROR DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator);
-
-    /**
-     * @brief
      *   Discover all devices advertising as commissionable.
      *   Should be called on main loop thread.
+     * * @param[in] filter  Browse filter - controller will look for only the specified subtype.
      * @return CHIP_ERROR   The return status
      */
-    CHIP_ERROR DiscoverAllCommissioning();
+    CHIP_ERROR DiscoverCommissionableNodes(Mdns::DiscoveryFilter filter);
 
     /**
      * @brief
@@ -534,7 +556,7 @@ private:
 
     void OnSessionEstablishmentTimeout();
 
-    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError);
+    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, CHIP_ERROR aError);
 
     /* This function sends an OpCSR request to the device.
        The function does not hold a refernce to the device object.
@@ -584,6 +606,11 @@ private:
     /* Callback called when adding root cert to device results in failure */
     static void OnRootCertFailureResponse(void * context, uint8_t status);
 
+    static void OnDeviceConnectedFn(void * context, Device * device);
+    static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+
+    static void OnDeviceNOCGenerated(void * context, const ByteSpan & noc);
+
     /**
      * @brief
      *   This function processes the CSR sent by the device.
@@ -611,6 +638,11 @@ private:
     Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;
+
+    Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
+    Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+
+    Callback::Callback<NOCGenerated> mDeviceNOCCallback;
 
     PASESession mPairingSession;
 };

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <lib/support/Span.h>
 #include <mdns/Resolver.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -45,12 +46,10 @@ public:
     void OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData) override;
 
 protected:
+    using DiscoveredNodeList = FixedSpan<Mdns::DiscoveredNodeData, CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES>;
     CHIP_ERROR SetUpNodeDiscovery();
-    CHIP_ERROR SetUpNodeDiscoveryLongDiscriminator(uint16_t long_discriminator);
     const Mdns::DiscoveredNodeData * GetDiscoveredNode(int idx);
-    virtual Mdns::DiscoveredNodeData * GetDiscoveredNodes() = 0;
-
-    Mdns::DiscoveryFilter filter;
+    virtual DiscoveredNodeList GetDiscoveredNodes() = 0;
 };
 
 } // namespace Controller

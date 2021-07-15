@@ -18,24 +18,31 @@
 
 #pragma once
 
+#include "JniReferences.h"
+
 #include <jni.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
+using namespace chip::Controller;
+
 class KeyValueStoreManagerImpl : public KeyValueStoreManager
 {
 public:
+    ~KeyValueStoreManagerImpl()
+    {
+        JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mKeyValueStoreManagerObject);
+    }
     CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0);
     CHIP_ERROR _Delete(const char * key);
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
-    void InitializeMethodForward(JavaVM * vm, JNIEnv * env);
+    void InitializeWithObject(jobject managerObject);
 
 private:
-    JavaVM * mJvm                     = nullptr;
-    jclass mKeyValueStoreManagerClass = nullptr;
+    jobject mKeyValueStoreManagerObject = nullptr;
 
     jmethodID mSetMethod    = nullptr;
     jmethodID mGetMethod    = nullptr;

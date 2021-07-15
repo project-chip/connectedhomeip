@@ -17,38 +17,15 @@
  */
 package chip.devicecontroller;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Log;
-
 /**
- * Java implementation of a key/value store.
+ * Java interface for a key/value store.
  *
  * <p>Exposes get/set/delete methods to be used by the native C++ JNI Layer.
  */
-public class KeyValueStoreManager {
-  private static final String TAG = KeyValueStoreManager.class.getSimpleName();
-  private static SharedPreferences preferences;
-  private static final String PREFERENCE_FILE_KEY = "com.google.chip.KeyValueStore";
+public interface KeyValueStoreManager {
+  public String get(String key);
 
-  public static String get(String key) {
-    String value = preferences.getString(key, null);
-    if (value == null) {
-      Log.d(TAG, "Key '" + key + "' not found in shared preferences");
-    }
-    return value;
-  }
+  public void set(String key, String value);
 
-  public static void set(String key, String value) {
-    preferences.edit().putString(key, value).apply();
-  }
-
-  public static void delete(String key) {
-    preferences.edit().remove(key).apply();
-  }
-
-  /** Initialization MUST be done before any of get/set/delete work. */
-  public static void initialize(Context context) {
-    preferences = context.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
-  }
+  public void delete(String key);
 }

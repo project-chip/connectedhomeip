@@ -21,27 +21,49 @@
 
 #include <support/CodeUtils.h>
 
-void SetJavaVm(JavaVM * jvm)
+namespace chip {
+namespace Controller {
+
+pthread_mutex_t * JniReferences::GetStackLock()
 {
-    sJvm = jvm;
+    return &mStackLock;
 }
 
-JNIEnv * GetEnvForCurrentThread()
+void JniReferences::SetJavaVm(JavaVM * jvm)
+{
+    VerifyOrReturn(mJvm == nullptr, ChipLogError(Controller, "JavaVM is already set"));
+    mJvm = jvm;
+
+    // Cache the classloader for CHIP Java classes. env->FindClass() can start in the system class loader if called from a different
+    // thread, meaning it won't find our Chip classes.
+    // https://developer.android.com/training/articles/perf-jni#faq_FindClass
+    JNIEnv * env = GetEnvForCurrentThread();
+    // Any chip.devicecontroller.* class will work here - just need something to call getClassLoader() on.
+    jclass chipClass               = env->FindClass("chip/devicecontroller/ChipDeviceController");
+    jclass classClass              = env->FindClass("java/lang/Class");
+    jclass classLoaderClass        = env->FindClass("java/lang/ClassLoader");
+    jmethodID getClassLoaderMethod = env->GetMethodID(classClass, "getClassLoader", "()Ljava/lang/ClassLoader;");
+
+    mClassLoader     = env->NewGlobalRef(env->CallObjectMethod(chipClass, getClassLoaderMethod));
+    mFindClassMethod = env->GetMethodID(classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+}
+
+JNIEnv * JniReferences::GetEnvForCurrentThread()
 {
     JNIEnv * env;
-    if (sJvm == NULL)
+    if (mJvm == nullptr)
     {
         ChipLogError(Controller, "Missing Java VM");
         return nullptr;
     }
-    sJvm->GetEnv((void **) &env, JNI_VERSION_1_6);
-    if (env == NULL)
+    mJvm->GetEnv((void **) &env, JNI_VERSION_1_6);
+    if (env == nullptr)
     {
         jint error;
 #ifdef __ANDROID__
-        error = sJvm->AttachCurrentThreadAsDaemon(&env, NULL);
+        error = mJvm->AttachCurrentThreadAsDaemon(&env, nullptr);
 #else
-        error = sJvm->AttachCurrentThreadAsDaemon((void **) &env, NULL);
+        error = mJvm->AttachCurrentThreadAsDaemon((void **) &env, nullptr);
 #endif
         if (error != JNI_OK)
         {
@@ -52,54 +74,72 @@ JNIEnv * GetEnvForCurrentThread()
     return env;
 }
 
-CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls)
+CHIP_ERROR JniReferences::GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    jclass cls     = NULL;
+    jclass cls     = nullptr;
 
     cls = env->FindClass(clsType);
-    VerifyOrExit(cls != NULL, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    env->ExceptionClear();
+
+    if (cls == nullptr)
+    {
+        // Try the cached classloader if FindClass() didn't work.
+        cls = static_cast<jclass>(env->CallObjectMethod(mClassLoader, mFindClassMethod, env->NewStringUTF(clsType)));
+        VerifyOrReturnError(cls != nullptr && env->ExceptionCheck() != JNI_TRUE, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    }
 
     outCls = (jclass) env->NewGlobalRef((jobject) cls);
-    VerifyOrExit(outCls != NULL, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    VerifyOrReturnError(outCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
-exit:
-    env->DeleteLocalRef(cls);
     return err;
 }
 
-CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId)
+CHIP_ERROR JniReferences::N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    outArray = env->NewByteArray((int) inArrayLen);
+    VerifyOrReturnError(outArray != NULL, CHIP_ERROR_NO_MEMORY);
+
+    env->ExceptionClear();
+    env->SetByteArrayRegion(outArray, 0, inArrayLen, (jbyte *) inArray);
+    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR JniReferences::FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature,
+                                     jmethodID * methodId)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
-    jclass javaClass = NULL;
-    VerifyOrExit(env != nullptr && object != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+    jclass javaClass = nullptr;
+    VerifyOrReturnError(env != nullptr && object != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     javaClass = env->GetObjectClass(object);
-    ChipLogProgress(Controller, "FindMethod:: javaClass exists? %d", javaClass != NULL);
-    VerifyOrExit(javaClass != NULL, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    VerifyOrReturnError(javaClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
     *methodId = env->GetMethodID(javaClass, methodName, methodSignature);
-    VerifyOrExit(*methodId != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    VerifyOrReturnError(*methodId != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-exit:
-    ChipLogProgress(Controller, "FindMethod Returning %d", err);
     return err;
 }
 
-void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument)
+void JniReferences::CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID method;
 
-    err = FindMethod(env, object, methodName, "(I)V", &method);
-    SuccessOrExit(err);
+    err = JniReferences::FindMethod(env, object, methodName, "(I)V", &method);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Error finding Java method: %d", err);
+    }
 
     env->ExceptionClear();
     env->CallVoidMethod(object, method, argument);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Error calling Java method: %d", err);
-    }
 }
+
+} // namespace Controller
+} // namespace chip

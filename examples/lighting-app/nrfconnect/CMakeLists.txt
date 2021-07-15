@@ -30,7 +30,7 @@ if (EXISTS boards/${BOARD}.conf)
 endif()
 
 # TODO: temporary fix to remove after solving static addressing problem on nrf5340
-if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
+if(BOARD STREQUAL "nrf5340dk_nrf5340_cpuapp")
     list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-bt_private_addresses.conf)
 endif()
 
@@ -60,7 +60,6 @@ target_sources(app PRIVATE
                ${LIGHTING_COMMON}/gen/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
-               ${NRFCONNECT_COMMON}/app/Service.cpp
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
@@ -75,6 +74,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/client-api.cpp
                ${CHIP_ROOT}/src/app/util/ember-compatibility-functions.cpp
                ${CHIP_ROOT}/src/app/util/ember-print.cpp
+               ${CHIP_ROOT}/src/app/util/error-mapping.cpp
                ${CHIP_ROOT}/src/app/util/message.cpp
                ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
@@ -87,13 +87,21 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/server/StorablePeerConnection.cpp
                ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
+               ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/ethernet_network_diagnostics_server/ethernet_network_diagnostics_server.cpp
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp               
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
                ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
+               ${CHIP_ROOT}/src/app/clusters/color-control-server/color-control-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
                )
+
+if (BOARD STREQUAL "nrf52840dongle_nrf52840")
+  target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUTrigger.cpp)
+endif()
 
 if (CONFIG_CHIP_PW_RPC)
 
@@ -151,7 +159,6 @@ target_sources(app PRIVATE
 )
 
 target_include_directories(app PRIVATE
-  ${ZEPHYR_BASE}/subsys // required to get access to `log_output_std.h`
   ${PIGWEED_ROOT}/pw_sys_io/public
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
@@ -168,4 +175,8 @@ target_link_libraries(app PRIVATE
   pw_rpc.server
 )
 
+target_link_libraries(pw_build INTERFACE zephyr_interface)
+
 endif(CONFIG_CHIP_PW_RPC)
+
+include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -78,33 +78,22 @@ namespace System {
 ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
 
 /**
- *  This method returns the current epoch, corrected by system sleep with the system timescale, in milliseconds.
- *
- *  DEPRECATED -- Please use System::Layer::GetClock_MonotonicMS() instead.
- *
- *  @return A timestamp in milliseconds.
- */
-Timer::Epoch Timer::GetCurrentEpoch()
-{
-    return Platform::Layer::GetClock_MonotonicMS();
-}
-
-/**
- *  Compares two Timer::Epoch values and returns true if the first value is earlier than the second value.
+ *  Compares two Clock::MonotonicMilliseconds values and returns true if the first value is earlier than the second value.
  *
  *  @brief
  *      A static API that gets called to compare 2 time values.  This API attempts to account for timer wrap by assuming that the
- *      difference between the 2 input values will only be more than half the Epoch scalar range if a timer wrap has occurred
+ *      difference between the 2 input values will only be more than half the timestamp scalar range if a timer wrap has occurred
  *      between the 2 samples.
  *
  *  @note
- *      This implementation assumes that Timer::Epoch is an unsigned scalar type.
+ *      This implementation assumes that Clock::MonotonicMilliseconds is an unsigned scalar type.
  *
  *  @return true if the first param is earlier than the second, false otherwise.
  */
-bool Timer::IsEarlierEpoch(const Timer::Epoch & inFirst, const Timer::Epoch & inSecond)
+bool Timer::IsEarlier(const Clock::MonotonicMilliseconds & inFirst, const Clock::MonotonicMilliseconds & inSecond)
 {
-    static const Epoch kMaxTime_2 = static_cast<Epoch>((static_cast<Epoch>(0) - static_cast<Epoch>(1)) / 2);
+    static const Clock::MonotonicMilliseconds kMaxTime_2 = static_cast<Clock::MonotonicMilliseconds>(
+        (static_cast<Clock::MonotonicMilliseconds>(0) - static_cast<Clock::MonotonicMilliseconds>(1)) / 2);
 
     // account for timer wrap with the assumption that no two input times will "naturally"
     // be more than half the timer range apart.
@@ -119,17 +108,17 @@ bool Timer::IsEarlierEpoch(const Timer::Epoch & inFirst, const Timer::Epoch & in
  *  @param[in]  aOnComplete          A pointer to the callback function when this timer fires
  *  @param[in]  aAppState            An arbitrary pointer to be passed into onComplete when this timer fires
  *
- *  @retval #CHIP_SYSTEM_NO_ERROR Unconditionally.
+ *  @retval #CHIP_NO_ERROR Unconditionally.
  *
  */
-Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState)
+CHIP_ERROR Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState)
 {
     Layer & lLayer = this->SystemLayer();
 
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, aDelayMilliseconds = 0);
 
-    this->AppState     = aAppState;
-    this->mAwakenEpoch = Timer::GetCurrentEpoch() + static_cast<Epoch>(aDelayMilliseconds);
+    this->AppState    = aAppState;
+    this->mAwakenTime = Clock::GetMonotonicMilliseconds() + static_cast<Clock::MonotonicMilliseconds>(aDelayMilliseconds);
     if (!__sync_bool_compare_and_swap(&this->OnComplete, nullptr, aOnComplete))
     {
         chipDie();
@@ -137,7 +126,7 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // add to the sorted list of timers. Earliest timer appears first.
-    if (lLayer.mTimerList == NULL || this->IsEarlierEpoch(this->mAwakenEpoch, lLayer.mTimerList->mAwakenEpoch))
+    if (lLayer.mTimerList == NULL || this->IsEarlier(this->mAwakenTime, lLayer.mTimerList->mAwakenTime))
     {
         this->mNextTimer  = lLayer.mTimerList;
         lLayer.mTimerList = this;
@@ -156,7 +145,7 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
 
         while (lTimer->mNextTimer)
         {
-            if (this->IsEarlierEpoch(this->mAwakenEpoch, lTimer->mNextTimer->mAwakenEpoch))
+            if (this->IsEarlier(this->mAwakenTime, lTimer->mNextTimer->mAwakenTime))
             {
                 // found the insert location.
                 break;
@@ -168,6 +157,7 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
         this->mNextTimer   = lTimer->mNextTimer;
         lTimer->mNextTimer = this;
     }
+    return CHIP_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
@@ -190,26 +180,25 @@ Error Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, voi
             this->HandleComplete();
         });
         dispatch_resume(timerSource);
-    }
-    else
-    {
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-        lLayer.WakeSelect();
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+        return CHIP_NO_ERROR;
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
+#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+    lLayer.WakeIOThread();
+#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
-Error Timer::ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState)
+CHIP_ERROR Timer::ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState)
 {
-    Error err      = CHIP_SYSTEM_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     Layer & lLayer = this->SystemLayer();
 
-    this->AppState     = aAppState;
-    this->mAwakenEpoch = Timer::GetCurrentEpoch();
+    this->AppState    = aAppState;
+    this->mAwakenTime = Clock::GetMonotonicMilliseconds();
     if (!__sync_bool_compare_and_swap(&this->OnComplete, nullptr, aOnComplete))
     {
         chipDie();
@@ -218,6 +207,7 @@ Error Timer::ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     err = lLayer.PostEvent(*this, chip::System::kEvent_ScheduleWork, 0);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_queue_t dispatchQueue = lLayer.GetDispatchQueue();
@@ -230,7 +220,7 @@ Error Timer::ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState)
     else
     {
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-        lLayer.WakeSelect();
+        lLayer.WakeIOThread();
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -242,9 +232,9 @@ Error Timer::ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState)
 /**
  *  This method de-initializes the timer object, and prevents this timer from firing if it hasn't done so.
  *
- *  @retval #CHIP_SYSTEM_NO_ERROR Unconditionally.
+ *  @retval #CHIP_NO_ERROR Unconditionally.
  */
-Error Timer::Cancel()
+CHIP_ERROR Timer::Cancel()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     Layer & lLayer = this->SystemLayer();
@@ -296,7 +286,7 @@ Error Timer::Cancel()
 
     this->Release();
 exit:
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -320,7 +310,7 @@ void Timer::HandleComplete()
 
     // Invoke the app's callback, if it's still valid.
     if (lOnComplete != nullptr)
-        lOnComplete(&lLayer, lAppState, CHIP_SYSTEM_NO_ERROR);
+        lOnComplete(&lLayer, lAppState, CHIP_NO_ERROR);
 
 exit:
     return;
@@ -338,17 +328,17 @@ exit:
  *  @note
  *      It's harmless if this API gets called and there are no expired timers.
  *
- *  @return CHIP_SYSTEM_NO_ERROR on success, error code otherwise.
+ *  @return CHIP_NO_ERROR on success, error code otherwise.
  *
  */
-Error Timer::HandleExpiredTimers(Layer & aLayer)
+CHIP_ERROR Timer::HandleExpiredTimers(Layer & aLayer)
 {
     size_t timersHandled = 0;
 
     // Expire each timer in turn until an unexpired timer is reached or the timerlist is emptied.  We set the current expiration
     // time outside the loop; that way timers set after the current tick will not be executed within this expiration window
     // regardless how long the processing of the currently expired timers took
-    Epoch currentEpoch = Timer::GetCurrentEpoch();
+    Clock::MonotonicMilliseconds currentTime = Clock::GetMonotonicMilliseconds();
 
     while (aLayer.mTimerList)
     {
@@ -356,7 +346,7 @@ Error Timer::HandleExpiredTimers(Layer & aLayer)
         // (though not exactly same) as that on the sockets-based systems.
 
         // The platform timer API has MSEC resolution so expire any timer with less than 1 msec remaining.
-        if ((timersHandled < Timer::sPool.Size()) && Timer::IsEarlierEpoch(aLayer.mTimerList->mAwakenEpoch, currentEpoch + 1))
+        if ((timersHandled < Timer::sPool.Size()) && Timer::IsEarlier(aLayer.mTimerList->mAwakenTime, currentTime + 1))
         {
             Timer & lTimer    = *aLayer.mTimerList;
             aLayer.mTimerList = lTimer.mNextTimer;
@@ -373,15 +363,15 @@ Error Timer::HandleExpiredTimers(Layer & aLayer)
             // timers still exist so restart the platform timer.
             uint64_t delayMilliseconds = 0ULL;
 
-            currentEpoch = Timer::GetCurrentEpoch();
+            currentTime = Clock::GetMonotonicMilliseconds();
 
             // the next timer expires in the future, so set the delayMilliseconds to a non-zero value
-            if (currentEpoch < aLayer.mTimerList->mAwakenEpoch)
+            if (currentTime < aLayer.mTimerList->mAwakenTime)
             {
-                delayMilliseconds = aLayer.mTimerList->mAwakenEpoch - currentEpoch;
+                delayMilliseconds = aLayer.mTimerList->mAwakenTime - currentTime;
             }
             /*
-             * StartPlatformTimer() accepts a 32bit value in milliseconds.  Epochs are 64bit numbers.  The only way in which this
+             * StartPlatformTimer() accepts a 32bit value in milliseconds. Timestamps are 64bit numbers. The only way in which this
              * could overflow is if time went backwards (e.g. as a result of a time adjustment from time synchronization).  Verify
              * that the timer can still be executed (even if it is very late) and exit if that is the case.  Note: if the time sync
              * ever ends up adjusting the clock, we should implement a method that deals with all the timers in the system.
@@ -393,7 +383,7 @@ Error Timer::HandleExpiredTimers(Layer & aLayer)
         }
     }
 
-    return CHIP_SYSTEM_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 

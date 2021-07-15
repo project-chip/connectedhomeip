@@ -22,6 +22,7 @@ chip_test_suite("tests") {
   output_name = "libAppTests"
 
   test_sources = [
+    "TestCHIPDeviceCallbacksMgr.cpp",
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
@@ -31,14 +32,18 @@ chip_test_suite("tests") {
     "TestMessageDef.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
+    "TestWriteInteraction.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/protocols",
+    "${chip_root}/src/transport/raw/tests:helpers",
     "${nlunit_test_root}:nlunit-test",
   ]
 }

@@ -77,8 +77,8 @@ exit:
     return err;
 }
 
-void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                            const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -92,9 +92,8 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeCon
 exit:
     ChipLogFunctError(err);
 
-    // Close the exchange cleanly so that the ExchangeManager will send an ack for the message we just received.
-    // This needs to be done before the Reset() call, because Reset() aborts mpExchangeCtx if its not null.
-    mpExchangeCtx->Close();
+    // Null out mpExchangeCtx, so our Shutdown() call below won't try to abort
+    // it and fail to send an ack for the message we just received.
     mpExchangeCtx = nullptr;
 
     if (mpDelegate != nullptr)
@@ -110,6 +109,7 @@ exit:
     }
 
     Shutdown();
+    return err;
 }
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)

@@ -74,8 +74,8 @@ static EmAfIdentifyState * getIdentifyState(EndpointId endpoint);
 
 static EmAfIdentifyState * getIdentifyState(EndpointId endpoint)
 {
-    uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_IDENTIFY_CLUSTER_ID);
-    return (ep == 0xFF ? NULL : &stateTable[ep]);
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_IDENTIFY_CLUSTER_ID);
+    return (ep == 0xFFFF ? NULL : &stateTable[ep]);
 }
 
 void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
@@ -155,13 +155,6 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::Command * commandObj
     }
 
     emberAfIdentifyClusterPrintln("Identifying for %d more seconds", identifyTime);
-    if (commandObj == nullptr)
-    {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_IDENTIFY_CLUSTER_ID,
-                                  ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID, "v", identifyTime);
-        sendStatus = emberAfSendResponse();
-    }
-    else
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_IDENTIFY_CLUSTER_ID,
                                              ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID,
@@ -180,10 +173,6 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to encode response command.");
-    }
-    if (EMBER_SUCCESS != sendStatus)
-    {
-        emberAfIdentifyClusterPrintln("Identify: failed to send %s response: 0x%x", "query", sendStatus);
     }
     return true;
 }

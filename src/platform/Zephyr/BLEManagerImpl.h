@@ -122,8 +122,8 @@ private:
     static void HandleTXCompleted(bt_conn * conn, void * param);
     static void HandleConnect(bt_conn * conn, uint8_t err);
     static void HandleDisconnect(bt_conn * conn, uint8_t reason);
-    static void HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, System::Error error);
-    static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param, System::Error error);
+    static void HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, CHIP_ERROR error);
+    static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param, CHIP_ERROR error);
 
     // ===== Members for internal use by the following friends.
 

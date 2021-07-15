@@ -206,8 +206,7 @@ CHIP_ERROR EncodeNOCSpecificExtensions(ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    uint16_t keyUsageBits =
-        static_cast<uint16_t>(KeyUsageFlags::kDigitalSignature) | static_cast<uint16_t>(KeyUsageFlags::kKeyEncipherment);
+    uint16_t keyUsageBits = static_cast<uint16_t>(KeyUsageFlags::kDigitalSignature);
 
     ReturnErrorOnFailure(EncodeIsCAExtension(kNotCACert, writer));
     ReturnErrorOnFailure(EncodeKeyUsageExtension(keyUsageBits, writer));
@@ -319,7 +318,16 @@ CHIP_ERROR EncodeChipECDSASignature(Crypto::P256ECDSASignature & signature, ASN1
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ASN1_START_BIT_STRING_ENCAPSULATED { writer.PutConstructedType(signature, (uint16_t) signature.Length()); }
+    ASN1_START_BIT_STRING_ENCAPSULATED
+    {
+        // Convert RAW signature to DER when generating X509 certs.
+        uint8_t sig_der[Crypto::kMax_ECDSA_Signature_Length_Der];
+        uint16_t sig_der_size = 0;
+        P256ECDSASignatureSpan raw_sig(signature.Bytes());
+
+        ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(raw_sig, &sig_der[0], sizeof(sig_der), sig_der_size));
+        ReturnErrorOnFailure(writer.PutConstructedType(&sig_der[0], static_cast<uint16_t>(sig_der_size)));
+    }
     ASN1_END_ENCAPSULATED;
 
 exit:
@@ -411,7 +419,6 @@ CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, Certific
     writer.Init(x509CertBuf, x509CertBufSize);
 
     ReturnErrorOnFailure(EncodeTBSCert(requestParams, issuerLevel, subject, subjectPubkey, issuerKeypair.Pubkey(), writer));
-    writer.Finalize();
 
     Crypto::P256ECDSASignature signature;
     ReturnErrorOnFailure(issuerKeypair.ECDSA_sign_msg(x509CertBuf, writer.GetLengthWritten(), signature));
@@ -429,7 +436,6 @@ CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, Certific
     }
     ASN1_END_SEQUENCE;
 
-    writer.Finalize();
     x509CertLen = writer.GetLengthWritten();
 
 exit:

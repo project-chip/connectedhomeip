@@ -55,7 +55,8 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
         }
         else
         {
-            ChipLogError(Discovery, "Commissioning errored out with error %" PRId32, event->CommissioningComplete.status);
+            ChipLogError(Discovery, "Commissioning errored out with error %" CHIP_ERROR_FORMAT,
+                         event->CommissioningComplete.status);
         }
         // TODO: Commissioning complete means we can finalize the admin in our storage
     }
@@ -100,15 +101,18 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
     ReturnErrorOnFailure(mExchangeManager->RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
 
+    uint16_t keyID = 0;
+    ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
+
     if (params.HasPASEVerifier())
     {
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(params.GetPASEVerifier(), mNextKeyId++, this));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(params.GetPASEVerifier(), keyID, this));
     }
     else
     {
         ReturnErrorOnFailure(mPairingSession.WaitForPairing(params.GetSetupPINCode(), kSpake2p_Iteration_Count,
                                                             reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
-                                                            strlen(kSpake2pKeyExchangeSalt), mNextKeyId++, this));
+                                                            strlen(kSpake2pKeyExchangeSalt), keyID, this));
     }
 
     ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transportMgr));
@@ -145,7 +149,7 @@ void RendezvousServer::OnSessionEstablished()
     CHIP_ERROR err =
         mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
                                 mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession,
-                                SecureSession::SessionRole::kResponder, mAdmin->GetAdminId(), nullptr);
+                                SecureSession::SessionRole::kResponder, mAdmin->GetAdminId());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -181,6 +185,12 @@ void RendezvousServer::OnSessionEstablished()
     VerifyOrReturn(connection.StoreIntoKVS(*mStorage) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to store the connection state"));
 
-    mStorage->SyncSetKeyValue(kStorablePeerConnectionCountKey, &mNextKeyId, sizeof(mNextKeyId));
+    // The Peek() is used to find the smallest key ID that's not been assigned to any session.
+    // This value is persisted, and on reboot, it is used to revive any previously
+    // active secure sessions.
+    // We support one active PASE session at any time. So the key ID should not be updated
+    // in another thread, while we retrieve it here.
+    uint16_t keyID = mIDAllocator->Peek();
+    mStorage->SyncSetKeyValue(kStorablePeerConnectionCountKey, &keyID, sizeof(keyID));
 }
 } // namespace chip

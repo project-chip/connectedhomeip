@@ -55,14 +55,13 @@
 #include <app/common/gen/att-storage.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
+#include <app/common/gen/callback.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 #include <system/SystemLayer.h>
-
-#include "gen/callback.h"
 
 using namespace chip;
 
@@ -408,7 +407,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(EndpointId endpoint, uint
     IasZoneStatusQueueEntry newBufferEntry;
     newBufferEntry.endpoint    = endpoint;
     newBufferEntry.status      = newStatus;
-    newBufferEntry.eventTimeMs = System::Layer::GetClock_MonotonicMS();
+    newBufferEntry.eventTimeMs = System::Clock::GetMonotonicMilliseconds();
 #endif
     EmberStatus sendStatus = EMBER_SUCCESS;
 
@@ -630,7 +629,7 @@ static void unenrollSecurityDevice(EndpointId endpoint)
     uint16_t zoneType     = EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE;
 
     emberAfWriteServerAttribute(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID, (uint8_t *) ieeeAddress,
-                                ZCL_IEEE_ADDRESS_ATTRIBUTE_TYPE);
+                                ZCL_NODE_ID_ATTRIBUTE_TYPE);
 
     emberAfWriteServerAttribute(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_TYPE_ATTRIBUTE_ID, (uint8_t *) &zoneType,
                                 ZCL_INT16U_ATTRIBUTE_TYPE);
@@ -906,7 +905,7 @@ static int16_t popFromBuffer(IasZoneStatusQueue * ring, IasZoneStatusQueueEntry 
 
 uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry)
 {
-    uint32_t currentTimeMs = System::Layer::GetClock_MonotonicMS();
+    uint32_t currentTimeMs = System::Clock::GetMonotonicMilliseconds();
     int64_t deltaTimeMs    = currentTimeMs - entry->eventTimeMs;
 
     if (deltaTimeMs < 0)

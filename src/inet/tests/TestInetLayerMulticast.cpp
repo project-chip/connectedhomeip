@@ -263,7 +263,7 @@ namespace TestInetLayerMulticast {
 int main(int argc, char * argv[])
 {
     bool lSuccessful = true;
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
     InitTestInetCommon();
 
@@ -296,7 +296,7 @@ int main(int argc, char * argv[])
     if (gInterfaceName != nullptr)
     {
         lStatus = InterfaceNameToId(gInterfaceName, gInterfaceId);
-        if (lStatus != INET_NO_ERROR)
+        if (lStatus != CHIP_NO_ERROR)
         {
             PrintArgError("%s: unknown network interface %s\n", kToolName, gInterfaceName);
             lSuccessful = false;
@@ -470,14 +470,11 @@ static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdent
 
 bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
 {
-    bool retval = true;
-
     if ((gOptFlags & (kOptFlagListen | kOptFlagNoLoopback)) == (kOptFlagListen | kOptFlagNoLoopback))
     {
         PrintArgError("%s: the listen option is exclusive with the loopback suppression option. Please select one or the other.\n",
                       aProgram);
-        retval = false;
-        goto exit;
+        return false;
     }
 
     // If there were any additional, non-parsed arguments, it's an error.
@@ -485,8 +482,7 @@ bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
     if (argc > 0)
     {
         PrintArgError("%s: unexpected argument: %s\n", aProgram, argv[0]);
-        retval = false;
-        goto exit;
+        return false;
     }
 
     // If no IP version or transport flags were specified, use the defaults.
@@ -496,8 +492,7 @@ bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
         gOptFlags |= kOptFlagsDefault;
     }
 
-exit:
-    return (retval);
+    return true;
 }
 
 // Create an IPv4 administratively-scoped multicast address
@@ -535,47 +530,40 @@ static void SetGroup(GroupAddress & aGroupAddress, uint32_t aGroupIdentifier, ui
 static bool ParseGroupOpt(const char * aProgram, const char * aValue, bool aIPv6, uint32_t & aOutLastGroupIndex)
 {
     uint32_t lGroupIdentifier;
-    bool lRetval = true;
 
     if (sGroupAddresses.mSize == sGroupAddresses.mCapacity)
     {
         PrintArgError("%s: the maximum number of allowed groups (%zu) have been specified\n", aProgram, sGroupAddresses.mCapacity);
-        lRetval = false;
-        goto exit;
+        return false;
     }
 
     if (!ParseInt(aValue, lGroupIdentifier))
     {
         PrintArgError("%s: unrecognized group %s\n", aProgram, aValue);
-        lRetval = false;
-        goto exit;
+        return false;
     }
 
     aOutLastGroupIndex = sGroupAddresses.mSize++;
 
     SetGroup(sGroupAddresses.mAddresses[aOutLastGroupIndex], lGroupIdentifier, lGroupIdentifier, lGroupIdentifier);
 
-exit:
-    return (lRetval);
+    return true;
 }
 
 static bool ParseAndUpdateExpectedGroupPackets(const char * aProgram, const char * aValue, uint32_t aGroup,
                                                const char * aDescription, uint32_t & aOutExpected)
 {
     uint32_t lExpectedGroupPackets;
-    bool lRetval = true;
 
     if (!ParseInt(aValue, lExpectedGroupPackets))
     {
         PrintArgError("%s: invalid value specified for expected group %u %s packets: %s\n", aProgram, aGroup, aDescription, aValue);
-        lRetval = false;
-        goto exit;
+        return false;
     }
 
     aOutExpected = lExpectedGroupPackets;
 
-exit:
-    return (lRetval);
+    return true;
 }
 
 static GroupAddress * FindGroupAddress(const IPAddress & aSourceAddress)
@@ -604,33 +592,25 @@ static void PrintReceivedStats(const GroupAddress & aGroupAddress)
 
 static bool HandleDataReceived(const PacketBufferHandle & aBuffer, GroupAddress & aGroupAddress, bool aCheckBuffer)
 {
-    const bool lStatsByPacket = true;
-    bool lStatus              = true;
-
-    lStatus = Common::HandleDataReceived(aBuffer, aGroupAddress.mStats, lStatsByPacket, aCheckBuffer);
-    VerifyOrExit(lStatus == true, );
+    constexpr bool lStatsByPacket = true;
+    if (!Common::HandleDataReceived(aBuffer, aGroupAddress.mStats, lStatsByPacket, aCheckBuffer))
+    {
+        return false;
+    }
 
     PrintReceivedStats(aGroupAddress);
 
-exit:
-    return (lStatus);
+    return true;
 }
 
 static bool HandleDataReceived(const PacketBufferHandle & aBuffer, const IPPacketInfo & aPacketInfo, bool aCheckBuffer)
 {
-    bool lStatus = true;
-    GroupAddress * lGroupAddress;
-
-    lGroupAddress = FindGroupAddress(aPacketInfo.DestAddress);
-
+    GroupAddress * const lGroupAddress = FindGroupAddress(aPacketInfo.DestAddress);
     if (lGroupAddress != nullptr)
     {
-        lStatus = HandleDataReceived(aBuffer, *lGroupAddress, aCheckBuffer);
-        VerifyOrExit(lStatus == true, );
+        return HandleDataReceived(aBuffer, *lGroupAddress, aCheckBuffer);
     }
-
-exit:
-    return (lStatus);
+    return true;
 }
 
 // Raw Endpoint Callbacks
@@ -685,7 +665,7 @@ exit:
     }
 }
 
-static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError, const IPPacketInfo * aPacketInfo)
+static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleRawReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -714,7 +694,7 @@ exit:
     }
 }
 
-static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError, const IPPacketInfo * aPacketInfo)
+static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, CHIP_ERROR aError, const IPPacketInfo * aPacketInfo)
 {
     Common::HandleUDPReceiveError(aEndPoint, aError, aPacketInfo);
 
@@ -737,17 +717,16 @@ static bool IsTransportReadyForSend()
     return (lStatus);
 }
 
-static INET_ERROR PrepareTransportForSend()
+static CHIP_ERROR PrepareTransportForSend()
 {
-    INET_ERROR lStatus = INET_NO_ERROR;
+    CHIP_ERROR lStatus = CHIP_NO_ERROR;
 
     return (lStatus);
 }
 
-static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
+static CHIP_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
 {
     PacketBufferHandle lBuffer;
-    INET_ERROR lStatus = INET_NO_ERROR;
 
     if ((gOptFlags & (kOptFlagUseRawIP)) == (kOptFlagUseRawIP))
     {
@@ -759,48 +738,40 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
         if ((gOptFlags & kOptFlagUseIPv6) == (kOptFlagUseIPv6))
         {
             lBuffer = Common::MakeICMPv6DataBuffer(aSize);
-            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if ((gOptFlags & kOptFlagUseIPv4) == (kOptFlagUseIPv4))
         {
             lBuffer = Common::MakeICMPv4DataBuffer(aSize);
-            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        lStatus = sRawIPEndPoint->SendTo(aAddress, std::move(lBuffer));
-        SuccessOrExit(lStatus);
+        return sRawIPEndPoint->SendTo(aAddress, std::move(lBuffer));
     }
-    else
+
+    if ((gOptFlags & kOptFlagUseUDPIP) == kOptFlagUseUDPIP)
     {
-        if ((gOptFlags & kOptFlagUseUDPIP) == kOptFlagUseUDPIP)
-        {
-            const uint8_t lFirstValue = 0;
+        const uint8_t lFirstValue = 0;
 
-            // For UDP, we'll send n aSize or smaller datagrams, each
-            // patterned from zero to aSize - 1.
+        // For UDP, we'll send n aSize or smaller datagrams, each
+        // patterned from zero to aSize - 1.
 
-            lBuffer = Common::MakeDataBuffer(aSize, lFirstValue);
-            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
+        lBuffer = Common::MakeDataBuffer(aSize, lFirstValue);
+        VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
-            lStatus = sUDPIPEndPoint->SendTo(aAddress, kUDPPort, std::move(lBuffer));
-            SuccessOrExit(lStatus);
-        }
+        return sUDPIPEndPoint->SendTo(aAddress, kUDPPort, std::move(lBuffer));
     }
 
-exit:
-    return (lStatus);
+    return CHIP_NO_ERROR;
 }
 
-static INET_ERROR DriveSendForGroup(GroupAddress & aGroupAddress)
+static CHIP_ERROR DriveSendForGroup(GroupAddress & aGroupAddress)
 {
-    INET_ERROR lStatus = INET_NO_ERROR;
-
     if (aGroupAddress.mStats.mTransmit.mActual < aGroupAddress.mStats.mTransmit.mExpected)
     {
-        lStatus = DriveSendForDestination(aGroupAddress.mMulticastAddress, gSendSize);
-        SuccessOrExit(lStatus);
+        ReturnErrorOnFailure(DriveSendForDestination(aGroupAddress.mMulticastAddress, gSendSize));
 
         aGroupAddress.mStats.mTransmit.mActual++;
 
@@ -808,33 +779,25 @@ static INET_ERROR DriveSendForGroup(GroupAddress & aGroupAddress)
                aGroupAddress.mStats.mTransmit.mExpected, aGroupAddress.mGroup);
     }
 
-exit:
-    return (lStatus);
+    return CHIP_NO_ERROR;
 }
 
 template <size_t tCapacity>
-static INET_ERROR DriveSendForGroups(GroupAddresses<tCapacity> & aGroupAddresses)
+static CHIP_ERROR DriveSendForGroups(GroupAddresses<tCapacity> & aGroupAddresses)
 {
-    INET_ERROR lStatus = INET_NO_ERROR;
-
     // Iterate over each multicast group for which this node is a
     // member and send a packet.
-
     for (size_t i = 0; i < aGroupAddresses.mSize; i++)
     {
-        GroupAddress & lGroupAddress = aGroupAddresses.mAddresses[i];
-
-        lStatus = DriveSendForGroup(lGroupAddress);
-        SuccessOrExit(lStatus);
+        ReturnErrorOnFailure(DriveSendForGroup(aGroupAddresses.mAddresses[i]));
     }
 
-exit:
-    return (lStatus);
+    return CHIP_NO_ERROR;
 }
 
 void DriveSend()
 {
-    INET_ERROR lStatus = INET_NO_ERROR;
+    CHIP_ERROR lStatus = CHIP_NO_ERROR;
 
     if (!Common::IsSender())
         goto exit;
@@ -857,7 +820,7 @@ void DriveSend()
     }
 
 exit:
-    if (lStatus != INET_NO_ERROR)
+    if (lStatus != CHIP_NO_ERROR)
     {
         SetStatusFailed(sTestState.mStatus);
     }
@@ -871,7 +834,7 @@ static void StartTest()
     IPAddress lAddress           = IPAddress::Any;
     IPEndPointBasis * lEndPoint  = nullptr;
     const bool lUseLoopback      = ((gOptFlags & kOptFlagNoLoopback) == 0);
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
 #if INET_CONFIG_ENABLE_IPV4
     if (gOptFlags & kOptFlagUseIPv4)
@@ -980,7 +943,7 @@ static void StartTest()
 static void CleanupTest()
 {
     IPEndPointBasis * lEndPoint = nullptr;
-    INET_ERROR lStatus;
+    CHIP_ERROR lStatus;
 
     gSendIntervalExpired = false;
     gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);

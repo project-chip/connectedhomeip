@@ -25,7 +25,8 @@ class SetupPayloadParseCommand : public Command
 {
 public:
     SetupPayloadParseCommand() : Command("parse-setup-payload") { AddArgument("payload", &mCode); }
-    CHIP_ERROR Run(NodeId localId, NodeId remoteId) override;
+    CHIP_ERROR Run() override;
+    uint16_t GetWaitDurationInSeconds() const override { return 5; }
 
 private:
     char * mCode;

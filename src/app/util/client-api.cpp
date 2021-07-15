@@ -89,7 +89,10 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
         buffer[bytes++] = EMBER_HIGH_BYTE(manufacturerCode);
     }
     buffer[bytes++] = emberAfNextSequence();
-    buffer[bytes++] = commandId;
+    buffer[bytes++] = EMBER_BYTE_0(commandId);
+    buffer[bytes++] = EMBER_BYTE_1(commandId);
+    buffer[bytes++] = EMBER_BYTE_2(commandId);
+    buffer[bytes++] = EMBER_BYTE_3(commandId);
 
     // Each argument comes in as an integer value, a pointer to a buffer, or a
     // pointer to a buffer followed by an integer length.

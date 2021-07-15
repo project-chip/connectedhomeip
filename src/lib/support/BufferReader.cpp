@@ -17,6 +17,8 @@
 
 #include "BufferReader.h"
 
+#include <string.h>
+
 namespace chip {
 namespace Encoding {
 namespace LittleEndian {
@@ -60,6 +62,25 @@ void Reader::RawRead(T * retval)
 
     ReadHelper(mReadPtr, retval);
     mAvailable = static_cast<uint16_t>(mAvailable - data_size);
+}
+
+Reader & Reader::ReadBytes(uint8_t * dest, size_t size)
+{
+    static_assert(CHAR_BIT == 8, "Our various sizeof checks rely on bytes and octets being the same thing");
+
+    if ((size > UINT16_MAX) || (mAvailable < size))
+    {
+        mStatus = CHIP_ERROR_BUFFER_TOO_SMALL;
+        // Ensure that future reads all fail.
+        mAvailable = 0;
+        return *this;
+    }
+
+    memcpy(dest, mReadPtr, size);
+
+    mReadPtr += size;
+    mAvailable = static_cast<uint16_t>(mAvailable - size);
+    return *this;
 }
 
 // Explicit Read instantiations for the data types we want to support.

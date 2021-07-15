@@ -227,10 +227,11 @@ ESP32_OPTIONS = {
         },
         'bootloader_offset': {
             'help': 'Bootloader offset',
-            'default': '0x1000',
+            'default': None,
             'argparse': {
                 'metavar': 'OFFSET'
             },
+            'sdkconfig': 'CONFIG_BOOTLOADER_OFFSET_IN_FLASH',
         },
         'partition': {
             'help': 'Partition table image',

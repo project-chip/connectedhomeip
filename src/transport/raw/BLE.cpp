@@ -61,11 +61,10 @@ void BLEBase::ClearState()
 
 CHIP_ERROR BLEBase::Init(const BleListenParameters & param)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
     BleLayer * bleLayer = param.GetBleLayer();
 
-    VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(bleLayer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(bleLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mBleLayer                           = bleLayer;
     mBleLayer->mBleTransport            = this;
@@ -73,25 +72,19 @@ CHIP_ERROR BLEBase::Init(const BleListenParameters & param)
 
     mState = State::kInitialized;
 
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEBase::SetEndPoint(Ble::BLEEndPoint * endPoint)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(endPoint->mState == BLEEndPoint::kState_Connected, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(endPoint->mState == BLEEndPoint::kState_Connected, CHIP_ERROR_INVALID_ARGUMENT);
 
     mBleEndPoint = endPoint;
 
     // Manually trigger the OnConnectComplete callback.
-    OnEndPointConnectComplete(endPoint, err);
+    OnEndPointConnectComplete(endPoint, CHIP_NO_ERROR);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
@@ -152,7 +145,7 @@ exit:
     }
 }
 
-void BLEBase::OnBleConnectionError(BLE_ERROR err)
+void BLEBase::OnBleConnectionError(CHIP_ERROR err)
 {
     ClearPendingPackets();
     ChipLogDetail(Inet, "BleConnection Error: %s", ErrorStr(err));
@@ -163,11 +156,11 @@ void BLEBase::OnEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHand
     HandleMessageReceived(Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
 }
 
-void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
+void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err)
 {
     mState = State::kConnected;
 
-    if (err != BLE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed to establish BLE connection: %s", ErrorStr(err));
         ClearPendingPackets();
@@ -184,7 +177,7 @@ void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
     ChipLogDetail(Inet, "BLE EndPoint %p Connection Complete", endPoint);
 }
 
-void BLEBase::OnEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
+void BLEBase::OnEndPointConnectionClosed(BLEEndPoint * endPoint, CHIP_ERROR err)
 {
     mState       = State::kInitialized;
     mBleEndPoint = nullptr;

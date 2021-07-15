@@ -20,7 +20,7 @@ on:
     workflow_dispatch:
 
 concurrency:
-    group: ${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
   
 jobs:
@@ -30,9 +30,11 @@ jobs:
 
         strategy:
             matrix:
-                type: [gcc_debug, gcc_release, clang, mbedtls, clang_experimental]
+                type: [gcc_debug, gcc_release, clang, mbedtls, clang_experimental, no_detail_logging, no_progress_logging]
         env:
             BUILD_TYPE: ${{ matrix.type }}
+            DETAIL_LOGGING: ${{ matrix.type != 'no_detail_logging' && matrix.type != 'no_progress_logging' }}
+            PROGRESS_LOGGING: ${{ matrix.type != 'no_progress_logging' }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -46,6 +48,14 @@ jobs:
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
+            - name: Dump GitHub context
+              env:
+                GITHUB_CONTEXT: ${{ toJSON(github) }}
+              run: echo "$GITHUB_CONTEXT"
+            - name: Dump Concurrency context
+              env:
+                CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+              run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
               uses: actions/checkout@v2
               with:
@@ -77,7 +87,7 @@ jobs:
                      *) ;;
                   esac
 
-                  scripts/build/gn_gen.sh --args="$GN_ARGS"
+                  scripts/build/gn_gen.sh --args="$GN_ARGS chip_detail_logging=${DETAIL_LOGGING} chip_progress_logging=${PROGRESS_LOGGING}"
             - name: Run Build
               timeout-minutes: 10
               run: scripts/build/gn_build.sh
@@ -145,10 +155,10 @@ jobs:
               run: |
                   scripts/build/gn_gen.sh --args='is_clang=true target_os="all"'
             - name: Run Build
-              timeout-minutes: 10
+              timeout-minutes: 30
               run: scripts/build/gn_build.sh
             - name: Run Tests
-              timeout-minutes: 2
+              timeout-minutes: 10
               run: scripts/tests/gn_tests.sh
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512

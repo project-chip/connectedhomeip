@@ -67,7 +67,7 @@ CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHa
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed in sending cluster command. Err %" PRId32, err);
+        ChipLogError(Controller, "Failed in sending cluster command. Err %" CHIP_ERROR_FORMAT, err);
         mDevice->CancelResponseHandler(seqNum);
     }
 
@@ -76,13 +76,10 @@ exit:
 
 CHIP_ERROR ClusterBase::RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * onReportCallback)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(onReportCallback != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(onReportCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mDevice->AddReportHandler(mEndpoint, mClusterId, attributeId, onReportCallback);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Controller

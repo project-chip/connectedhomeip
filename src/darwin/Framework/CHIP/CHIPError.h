@@ -20,7 +20,7 @@
 NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSErrorDomain const CHIPErrorDomain;
 
-typedef int32_t CHIP_ERROR;
+typedef uint32_t CHIP_ERROR;
 
 typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode) {
     CHIPSuccess = 0,
@@ -33,6 +33,7 @@ typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode) {
     CHIPErrorCodeWrongAddressType = 7,
     CHIPErrorCodeIntegrityCheckFailed = 8,
     CHIPErrorCodeDuplicateExists = 9,
+    CHIPErrorCodeUnsupportedAttribute = 10,
 };
 
 @interface CHIPError : NSObject

@@ -49,8 +49,9 @@
 #define EMBER_MAX_EVENT_CONTROL_DELAY_QS (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 8)
 #define EMBER_MAX_EVENT_CONTROL_DELAY_MINUTES (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 16)
 
+#include <app/common/gen/callback.h>
+
 #include "gen/af-gen-event.h"
-#include "gen/callback.h"
 
 using namespace chip;
 
@@ -96,7 +97,7 @@ EmberEventData emAfEvents[] = {
     { NULL, NULL }
 };
 
-void EventControlHandler(chip::System::Layer * systemLayer, void * appState, chip::System::Error error)
+void EventControlHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
 {
     EmberEventControl * control = reinterpret_cast<EmberEventControl *>(appState);
     if (control->status != EMBER_EVENT_INACTIVE)

@@ -40,8 +40,15 @@ import enum
 __all__ = ["ChipDeviceController"]
 
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, c_uint32)
+_DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(None, c_uint64, c_uint32)
 _DeviceAddressUpdateDelegate_OnUpdateComplete = CFUNCTYPE(
     None, c_uint64, c_uint32)
+# void (*)(Device *, CHIP_ERROR).
+#
+# CHIP_ERROR is actually signed, so using c_uint32 is weird, but everything
+# else seems to do it.
+_DeviceAvailableFunct = CFUNCTYPE(None, c_void_p, c_uint32)
+
 
 # This is a fix for WEAV-429. Jay Logue recommends revisiting this at a later
 # date to allow for truely multiple instances so this is temporary.
@@ -103,8 +110,20 @@ class ChipDeviceController(object):
         def HandleAddressUpdateComplete(nodeid, err):
             if err != 0:
                 print("Failed to update node address: {}".format(err))
+                # Failed update address, don't wait for HandleCommissioningComplete
+                self.state = DCState.IDLEHandleCommissioningComplete
+                self._ChipStack.callbackRes = err
+                self._ChipStack.completeEvent.set()
             else:
                 print("Node address has been updated")
+                # Wait for HandleCommissioningComplete before setting
+                # self._ChipStack.callbackRes; we're not done until that happens.
+
+        def HandleCommissioningComplete(nodeid, err):
+            if err != 0:
+                print("Failed to commission: {}".format(err))
+            else:
+                print("Commissioning complete")
             self.state = DCState.IDLE
             self._ChipStack.callbackRes = err
             self._ChipStack.completeEvent.set()
@@ -115,6 +134,11 @@ class ChipDeviceController(object):
             HandleKeyExchangeComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(
             self.devCtrl, self.cbHandleKeyExchangeCompleteFunct)
+
+        self.cbHandleCommissioningCompleteFunct = _DevicePairingDelegate_OnCommissioningCompleteFunct(
+            HandleCommissioningComplete)
+        self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
+            self.devCtrl, self.cbHandleCommissioningCompleteFunct)
 
         self.cbOnAddressUpdateComplete = _DeviceAddressUpdateDelegate_OnUpdateComplete(
             HandleAddressUpdateComplete)
@@ -179,9 +203,34 @@ class ChipDeviceController(object):
         )
 
         return (address.value.decode(), port.value) if error == 0 else None
-    def DiscoverCommissioningLongDiscriminator(self, long_discriminator):
+    def DiscoverCommissionableNodesLongDiscriminator(self, long_discriminator):
         return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator(self.devCtrl, long_discriminator)
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(self.devCtrl, long_discriminator)
+        )
+
+    def DiscoverCommissionableNodesShortDiscriminator(self, short_discriminator):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator(self.devCtrl, short_discriminator)
+        )
+        
+    def DiscoverCommissionableNodesVendor(self, vendor):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesVendor(self.devCtrl, vendor)
+        )
+
+    def DiscoverCommissionableNodesDeviceType(self, device_type):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesDeviceType(self.devCtrl, device_type)
+        )
+
+    def DiscoverCommissionableNodesCommissioningEnabled(self, enabled):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(self.devCtrl, enabled)
+        )
+
+    def DiscoverCommissionableNodesCommissioningEnabledFromCommand(self):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand(self.devCtrl)
         )
 
     def PrintDiscoveredDevices(self):
@@ -202,24 +251,26 @@ class ChipDeviceController(object):
 
     def DiscoverAllCommissioning(self):
         return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_DiscoverAllCommissioning(self.devCtrl)
+            lambda: self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes(self.devCtrl)
         )
 
     def GetFabricId(self):
         fabricid = c_uint64(0)
 
-        error = self._ChipStack.Call(
+        res = self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_GetFabricId(
                 self.devCtrl, pointer(fabricid))
         )
 
-        if error == 0:
+        if res == 0:
             return fabricid.value
         else:
-            return 0
+            raise self._ChipStack.ErrorToException(res)
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         device = c_void_p(None)
+        # We should really use pychip_GetConnectedDeviceByNodeId and do the
+        # command off its callback....
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(
             self.devCtrl, nodeid, pointer(device)))
         if res != 0:
@@ -234,6 +285,8 @@ class ChipDeviceController(object):
 
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
         device = c_void_p(None)
+        # We should really use pychip_GetConnectedDeviceByNodeId and do the
+        # read off its callback....
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(
             self.devCtrl, nodeid, pointer(device)))
         if res != 0:
@@ -245,6 +298,8 @@ class ChipDeviceController(object):
 
     def ZCLWriteAttribute(self, cluster, attribute, nodeid, endpoint, groupid, value, blocking=True):
         device = c_void_p(None)
+        # We should really use pychip_GetConnectedDeviceByNodeId and do the
+        # write off its callback....
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(
             self.devCtrl, nodeid, pointer(device)))
         if res != 0:
@@ -256,6 +311,8 @@ class ChipDeviceController(object):
 
     def ZCLConfigureAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, change, blocking=True):
         device = c_void_p(None)
+        # We should really use pychip_GetConnectedDeviceByNodeId and do the
+        # ConfigureAttribute off its callback....
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(
             self.devCtrl, nodeid, pointer(device)))
         if res != 0:
@@ -310,11 +367,26 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, c_uint64]
-            self._dmLib.pychip_DeviceController_DiscoverAllCommissioning.argtypes = [c_void_p]
-            self._dmLib.pychip_DeviceController_DiscoverAllCommissioning.restype = c_uint32
+            self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.restype = c_uint32
 
-            self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator.argtypes = [c_void_p, c_uint16]
-            self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator.restype = c_uint32
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesVendor.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesVendor.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesDeviceType.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesDeviceType.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled.argtypes = [c_void_p, c_uint16]
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [c_void_p]
 
@@ -332,6 +404,10 @@ class ChipDeviceController(object):
                 c_void_p, _DevicePairingDelegate_OnPairingCompleteFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.restype = c_uint32
 
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.argtypes = [
+                c_void_p, _DevicePairingDelegate_OnCommissioningCompleteFunct]
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback.restype = c_uint32
+
             self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.argtypes = [
                 _DeviceAddressUpdateDelegate_OnUpdateComplete]
             self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.restype = None
@@ -342,6 +418,10 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_GetDeviceByNodeId.argtypes = [
                 c_void_p, c_uint64, POINTER(c_void_p)]
+            self._dmLib.pychip_GetDeviceByNodeId.restype = c_uint32
+
+            self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
+                c_void_p, c_uint64, _DeviceAvailableFunct]
             self._dmLib.pychip_GetDeviceByNodeId.restype = c_uint32
 
             self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.argtypes = [c_void_p]

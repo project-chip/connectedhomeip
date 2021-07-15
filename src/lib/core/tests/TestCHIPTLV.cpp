@@ -1468,7 +1468,7 @@ static CHIP_ERROR FindContainerWithElement(const TLVReader & aReader, size_t aDe
         // Map a successful find (CHIP_NO_ERROR) onto a signal that the element has been found.
         if (err == CHIP_NO_ERROR)
         {
-            err = CHIP_ERROR_MAX;
+            err = CHIP_ERROR_SENTINEL;
         }
         // Map a failed find attempt to NO_ERROR
         else if (err == CHIP_ERROR_TLV_TAG_NOT_FOUND)
@@ -3725,12 +3725,12 @@ static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
             {
                 printf("Unexpected success of fuzz test: offset %u, original value 0x%02X, mutated value 0x%02X\n",
                        static_cast<unsigned>(i), static_cast<unsigned>(origVal), static_cast<unsigned>(fuzzedData[i]));
-                ExitNow();
+                return;
             }
 
             time(&now);
             if (now >= endTime)
-                ExitNow();
+                return;
 
             fuzzedData[i] = origVal;
         }
@@ -3738,9 +3738,6 @@ static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
         if (m < sizeof(sFixedFuzzVals))
             m++;
     }
-
-exit:
-    return;
 }
 
 // Test Suite

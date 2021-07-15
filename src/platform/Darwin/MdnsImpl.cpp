@@ -33,7 +33,7 @@ using namespace chip::Mdns;
 
 namespace {
 
-constexpr const char * kLocalDomain = "local.";
+constexpr const char * kLocalDot    = "local.";
 constexpr const char * kProtocolTcp = "._tcp";
 constexpr const char * kProtocolUdp = "._udp";
 constexpr uint8_t kMdnsKeyMaxSize   = 32;
@@ -292,7 +292,7 @@ CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, 
     }
 
     sdCtx = chip::Platform::New<RegisterContext>(type, nullptr);
-    err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDomain, NULL, ntohs(port), recordLen,
+    err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, NULL, ntohs(port), recordLen,
                              recordBytesPtr, OnRegister, sdCtx);
     TXTRecordDeallocate(recordRef);
 
@@ -309,7 +309,7 @@ void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, 
     ChipLogDetail(DeviceLayer, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %d", __func__, name, type, domain,
                   interfaceId);
 
-    VerifyOrReturn(strcmp(kLocalDomain, domain) == 0);
+    VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
 
     char * tokens  = strdup(type);
     char * regtype = strtok(tokens, ".");
@@ -333,7 +333,7 @@ void OnBrowseRemove(BrowseContext * context, const char * name, const char * typ
     ChipLogDetail(DeviceLayer, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %d", __func__, name, type, domain,
                   interfaceId);
 
-    VerifyOrReturn(strcmp(kLocalDomain, domain) == 0);
+    VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
 
     std::remove_if(context->services.begin(), context->services.end(), [name, type, interfaceId](const MdnsService & service) {
         return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol) &&
@@ -365,7 +365,7 @@ CHIP_ERROR Browse(void * context, MdnsBrowseCallback callback, uint32_t interfac
     BrowseContext * sdCtx;
 
     sdCtx = chip::Platform::New<BrowseContext>(context, callback, protocol);
-    err   = DNSServiceBrowse(&sdRef, 0 /* flags */, interfaceId, type, kLocalDomain, OnBrowse, sdCtx);
+    err   = DNSServiceBrowse(&sdRef, 0 /* flags */, interfaceId, type, kLocalDot, OnBrowse, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
 
     err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
@@ -467,7 +467,7 @@ static CHIP_ERROR Resolve(void * context, MdnsResolveCallback callback, uint32_t
     ResolveContext * sdCtx;
 
     sdCtx = chip::Platform::New<ResolveContext>(context, callback, name, addressType);
-    err   = DNSServiceResolve(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDomain, OnResolve, sdCtx);
+    err   = DNSServiceResolve(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDot, OnResolve, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
 
     err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
@@ -544,9 +544,9 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, chip::Inet::InterfaceId interf
     return Resolve(context, callback, interfaceId, service->mAddressType, regtype.c_str(), service->mName);
 }
 
-void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout) {}
+void GetMdnsTimeout(timeval & timeout) {}
 
-void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet) {}
+void HandleMdnsTimeout() {}
 
 } // namespace Mdns
 } // namespace chip

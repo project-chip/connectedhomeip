@@ -5,14 +5,14 @@ class {{filename}}: public TestCommand
     {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
-    CHIP_ERROR NextTest() override
+    void NextTest() override
     {
       CHIP_ERROR err = CHIP_NO_ERROR;
 
       if (mTestCount == mTestIndex)
       {
           ChipLogProgress(chipTool, "{{filename}}: Test complete");
-          SetCommandExitStatus(true);
+          SetCommandExitStatus(CHIP_NO_ERROR);
       }
 
       // Ensure we increment mTestIndex before we start running the relevant
@@ -31,10 +31,8 @@ class {{filename}}: public TestCommand
       if (CHIP_NO_ERROR != err)
       {
           ChipLogProgress(chipTool, "{{filename}}: %s", chip::ErrorStr(err));
-          SetCommandExitStatus(false);
+          SetCommandExitStatus(err);
       }
-
-      return err;
     }
 
 
@@ -48,17 +46,14 @@ class {{filename}}: public TestCommand
 
     {{#chip_tests_items}}
     // Test {{label}}
-    typedef void (*SuccessCallback_{{index}})(void * context{{#chip_tests_item_response_parameters}}, {{chipType}} {{asCamelCased name true}}{{/chip_tests_item_response_parameters}});
-    chip::Callback::Callback<SuccessCallback_{{index}}> * mOnSuccessCallback_{{index}} = nullptr;
-    chip::Callback::Callback<DefaultFailureCallback> * mOnFailureCallback_{{index}} = nullptr;
+    using SuccessCallback_{{index}} = void (*)(void * context{{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asCamelCased name true}}{{/chip_tests_item_response_parameters}});
+    chip::Callback::Callback<SuccessCallback_{{index}}> mOnSuccessCallback_{{index}} { OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse, this };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_{{index}} { OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_FailureResponse, this };
     bool mIsFailureExpected_{{index}} = {{response.error}};
 
     CHIP_ERROR TestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}()
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Sending command...");
-
-        mOnFailureCallback_{{index}} = new chip::Callback::Callback<DefaultFailureCallback>(OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_FailureResponse, this);
-        mOnSuccessCallback_{{index}} = new chip::Callback::Callback<SuccessCallback_{{index}}>(OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse, this);
 
         chip::Controller::{{asCamelCased cluster false}}Cluster cluster;
         cluster.Associate(mDevice, {{endpoint}});
@@ -70,30 +65,24 @@ class {{filename}}: public TestCommand
         {{#if (isString type)}}
         {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"));
         {{else}}
-        {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{#if (isStrEqual chipType "int64_t")}}LL{{else if (isStrEqual chipType "uint64_t")}}ULL{{/if}};
+        {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
         {{/if}}
         {{/chip_tests_item_parameters}}
-        err = cluster.{{asCamelCased command false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(){{#chip_tests_item_parameters}}, {{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
+        err = cluster.{{asCamelCased command false}}(mOnSuccessCallback_{{index}}.Cancel(), mOnFailureCallback_{{index}}.Cancel(){{#chip_tests_item_parameters}}, {{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
         {{else if isReadAttribute}}
-        err = cluster.ReadAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel());
+        err = cluster.ReadAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}.Cancel(), mOnFailureCallback_{{index}}.Cancel());
         {{else if isWriteAttribute}}
         {{#chip_tests_item_parameters}}
         {{#if (isString type)}}
         {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"));
         {{else}}
-        {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{#if (isStrEqual chipType "int64_t")}}LL{{else if (isStrEqual chipType "uint64_t")}}ULL{{/if}};
+        {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
         {{/if}}
         {{/chip_tests_item_parameters}}
-        err = cluster.WriteAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}->Cancel(), mOnFailureCallback_{{index}}->Cancel(), {{#chip_tests_item_parameters}}{{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
+        err = cluster.WriteAttribute{{asCamelCased attribute false}}(mOnSuccessCallback_{{index}}.Cancel(), mOnFailureCallback_{{index}}.Cancel(), {{#chip_tests_item_parameters}}{{asCamelCased name true}}Argument{{/chip_tests_item_parameters}});
         {{else}}
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         {{/if}}
-
-        if (CHIP_NO_ERROR != err)
-        {
-            delete mOnFailureCallback_{{index}};
-            delete mOnSuccessCallback_{{index}};
-        }
 
         return err;
     }
@@ -104,47 +93,84 @@ class {{filename}}: public TestCommand
 
         {{parent.filename}} * runner = reinterpret_cast<{{parent.filename}} *>(context);
 
-        delete runner->mOnFailureCallback_{{index}};
-        delete runner->mOnSuccessCallback_{{index}};
+        {{#if optional}}
+        if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) {
+            runner->NextTest();
+            return;
+        }
+        {{/if}}
 
         if (runner->mIsFailureExpected_{{index}} == false) {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         runner->NextTest();
     }
 
-    static void OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse(void * context {{#chip_tests_item_response_parameters}}, {{chipType}} {{asCamelCased name true}}{{/chip_tests_item_response_parameters}})
+    static void OnTestSendCluster{{asCamelCased cluster false}}Command{{asCamelCased command false}}_{{index}}_SuccessResponse(void * context {{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asCamelCased name true}}{{/chip_tests_item_response_parameters}})
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Success Response");
 
         {{parent.filename}} * runner = reinterpret_cast<{{parent.filename}} *>(context);
 
-        delete runner->mOnFailureCallback_{{index}};
-        delete runner->mOnSuccessCallback_{{index}};
-
         if (runner->mIsFailureExpected_{{index}} == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         {{#chip_tests_item_response_parameters}}
         {{#if hasExpectedValue}}
+        {{#if isList}}
+        if (count != {{expectedValue.length}})
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+        {{else}}
         {{#if (isString type)}}
         {{chipType}} {{asCamelCased name true}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{expectedValue}}"), strlen("{{expectedValue}}"));
         if (!{{asCamelCased name true}}.data_equal({{asCamelCased name true}}Argument))
         {{else}}
-        if ({{asCamelCased name true}} != {{expectedValue}}{{#if (isStrEqual chipType "int64_t")}}LL{{else if (isStrEqual chipType "uint64_t")}}ULL{{/if}})
+        if ({{asCamelCased name true}} != {{expectedValue}}{{asTypeLiteralSuffix chipType}})
         {{/if}}
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "{{expectedValue}}");
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
+        {{/if}}
+        {{/if}}
+        {{#if hasExpectedConstraints}}
+        {{#if expectedConstraints.type}}
+        ChipLogError(chipTool, "Warning: {{asCamelCased name true}} type checking is not implemented yet. Expected type: '%s'", "{{expectedConstraints.type}}");
+        {{/if}}
+
+        {{#if expectedConstraints.format}}
+        ChipLogError(chipTool, "Warning: {{asCamelCased name true}} format checking is not implemented yet. Expected format: '%s'", "{{expectedConstraints.format}}");
+        {{/if}}
+
+        {{#if expectedConstraints.minLength}}
+          if ({{asCamelCased name true}}.size() < {{expectedConstraints.minLength}})
+          {
+            ChipLogError(chipTool, "Error: {{asCamelCased name true}} is too short. Min size is {{expectedConstraints.minLength}} but got '%zu'", {{asCamelCased name true}}.size());
+            runner->SetCommandExitStatus(false);
+            return;
+          }
+        {{/if}}
+
+        {{#if expectedConstraints.maxLength}}
+          if ({{asCamelCased name true}}.size() > {{expectedConstraints.maxLength}})
+          {
+            ChipLogError(chipTool, "Error: {{asCamelCased name true}} is too long. Max size is {{expectedConstraints.maxLength}} but got '%zu'", {{asCamelCased name true}}.size());
+            runner->SetCommandExitStatus(false);
+            return;
+          }
+        {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}
 

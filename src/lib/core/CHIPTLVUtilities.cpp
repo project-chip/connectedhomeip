@@ -54,7 +54,7 @@ struct FindContext
  *                              any encountered arrays or structures should be
  *                              descended into.
  *
- *  @retval  #CHIP_END_OF_TLV  On a successful iteration to the end of a TLV encoding,
+ *  @retval  #CHIP_END_OF_TLV   On a successful iteration to the end of a TLV encoding,
  *                              or to the end of a TLV container.
  *
  *  @retval  The last value returned by @a aHandler, if different than #CHIP_NO_ERROR
@@ -65,34 +65,31 @@ static CHIP_ERROR Iterate(TLVReader & aReader, size_t aDepth, IterateHandler aHa
 
     if (aReader.GetType() == kTLVType_NotSpecified)
     {
-        retval = aReader.Next();
-        SuccessOrExit(retval);
+        ReturnErrorOnFailure(aReader.Next());
     }
 
     do
     {
         const TLVType theType = aReader.GetType();
 
-        retval = (aHandler)(aReader, aDepth, aContext);
-        SuccessOrExit(retval);
+        ReturnErrorOnFailure((aHandler)(aReader, aDepth, aContext));
 
         if (aRecurse && TLVTypeIsContainer(theType))
         {
             TLVType containerType;
 
-            retval = aReader.EnterContainer(containerType);
-            SuccessOrExit(retval);
+            ReturnErrorOnFailure(aReader.EnterContainer(containerType));
 
             retval = Iterate(aReader, aDepth + 1, aHandler, aContext, aRecurse);
-            if (retval != CHIP_END_OF_TLV)
-                SuccessOrExit(retval);
+            if ((retval != CHIP_END_OF_TLV) && (retval != CHIP_NO_ERROR))
+            {
+                return retval;
+            }
 
-            retval = aReader.ExitContainer(containerType);
-            SuccessOrExit(retval);
+            ReturnErrorOnFailure(aReader.ExitContainer(containerType));
         }
     } while ((retval = aReader.Next()) == CHIP_NO_ERROR);
 
-exit:
     return retval;
 }
 
@@ -149,18 +146,13 @@ CHIP_ERROR Iterate(const TLVReader & aReader, IterateHandler aHandler, void * aC
  */
 CHIP_ERROR Iterate(const TLVReader & aReader, IterateHandler aHandler, void * aContext, const bool aRecurse)
 {
-    const size_t depth = 0;
+    VerifyOrReturnError(aHandler != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     TLVReader temp;
-    CHIP_ERROR retval = CHIP_ERROR_NOT_IMPLEMENTED;
-
-    VerifyOrExit(aHandler != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
-
     temp.Init(aReader);
 
-    retval = Iterate(temp, depth, aHandler, aContext, aRecurse);
-
-exit:
-    return retval;
+    constexpr size_t depth = 0;
+    return Iterate(temp, depth, aHandler, aContext, aRecurse);
 }
 
 /**
@@ -179,14 +171,11 @@ exit:
  */
 static CHIP_ERROR CountHandler(const TLVReader & aReader, size_t aDepth, void * aContext)
 {
-    CHIP_ERROR retval = CHIP_NO_ERROR;
-
-    VerifyOrExit(aContext != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     *static_cast<size_t *>(aContext) += 1;
 
-exit:
-    return retval;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -205,12 +194,8 @@ exit:
  */
 CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount)
 {
-    const bool recurse = true;
-    CHIP_ERROR retval;
-
-    retval = Count(aReader, aCount, recurse);
-
-    return retval;
+    constexpr bool recurse = true;
+    return Count(aReader, aCount, recurse);
 }
 
 /**
@@ -232,11 +217,9 @@ CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount)
  */
 CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount, const bool aRecurse)
 {
-    CHIP_ERROR retval;
-
     aCount = 0;
 
-    retval = Iterate(aReader, CountHandler, &aCount, aRecurse);
+    CHIP_ERROR retval = Iterate(aReader, CountHandler, &aCount, aRecurse);
 
     if (retval == CHIP_END_OF_TLV)
         retval = CHIP_NO_ERROR;
@@ -256,25 +239,22 @@ CHIP_ERROR Count(const TLVReader & aReader, size_t & aCount, const bool aRecurse
  *
  *  @retval  #CHIP_ERROR_INVALID_ARGUMENT  If @a aContext is NULL.
  *
- *  @retval  #CHIP_ERROR_MAX               If the specified tag is found.
+ *  @retval  #CHIP_ERROR_SENTINEL          If the specified tag is found.
  *
  */
 static CHIP_ERROR FindHandler(const TLVReader & aReader, size_t aDepth, void * aContext)
 {
-    const FindContext * theContext = static_cast<const FindContext *>(aContext);
-    CHIP_ERROR retval              = CHIP_NO_ERROR;
-
-    VerifyOrExit(aContext != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    const FindContext * const theContext = static_cast<const FindContext *>(aContext);
 
     if (theContext->mTag == aReader.GetTag())
     {
         theContext->mReader.Init(aReader);
         // terminate the iteration when the specified tag is found
-        retval = CHIP_ERROR_MAX;
+        return CHIP_ERROR_SENTINEL;
     }
 
-exit:
-    return retval;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -294,12 +274,8 @@ exit:
  */
 CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aResult)
 {
-    const bool recurse = true;
-    CHIP_ERROR retval;
-
-    retval = Find(aReader, aTag, aResult, recurse);
-
-    return retval;
+    constexpr bool recurse = true;
+    return Find(aReader, aTag, aResult, recurse);
 }
 
 /**
@@ -324,11 +300,9 @@ CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aR
 CHIP_ERROR Find(const TLVReader & aReader, const uint64_t & aTag, TLVReader & aResult, const bool aRecurse)
 {
     FindContext theContext = { aTag, aResult };
-    CHIP_ERROR retval;
+    CHIP_ERROR retval      = Iterate(aReader, FindHandler, &theContext, aRecurse);
 
-    retval = Iterate(aReader, FindHandler, &theContext, aRecurse);
-
-    if (retval == CHIP_ERROR_MAX)
+    if (retval == CHIP_ERROR_SENTINEL)
         retval = CHIP_NO_ERROR;
     else
         retval = CHIP_ERROR_TLV_TAG_NOT_FOUND;
@@ -355,7 +329,7 @@ static CHIP_ERROR FindPredicateHandler(const TLVReader & aReader, size_t aDepth,
 
     err = theContext->mHandler(aReader, aDepth, theContext->mContext);
 
-    if (err == CHIP_ERROR_MAX)
+    if (err == CHIP_ERROR_SENTINEL)
         theContext->mResult.Init(aReader);
 
     return err;
@@ -364,7 +338,7 @@ static CHIP_ERROR FindPredicateHandler(const TLVReader & aReader, size_t aDepth,
 /**
  *  Search for the first element matching the predicate within the TLV reader
  *  descending into arrays or structures. The @a aPredicate is applied
- *  to each visited TLV element; the @a aPredicate shall return #CHIP_ERROR_MAX
+ *  to each visited TLV element; the @a aPredicate shall return #CHIP_ERROR_SENTINEL
  *  for the matching elements, #CHIP_NO_ERROR for non-matching elements, and any
  *  other value to terminate the search.
  *
@@ -373,10 +347,10 @@ static CHIP_ERROR FindPredicateHandler(const TLVReader & aReader, size_t aDepth,
  *  @param[in] aPredicate  A predicate to be applied to each TLV element.  To
  *                         support the code reuse, aPredicate has the
  *                         IterateHandler type.  The return value of aPredicate
- *                         controls the search: a #CHIP_ERROR_MAX signals that
+ *                         controls the search: a #CHIP_ERROR_SENTINEL signals that
  *                         desired element has been found, #CHIP_NO_ERROR
  *                         signals that the desired element has not been found,
- *                         and all other values signal that the saerch should be
+ *                         and all other values signal that the search should be
  *                         terminated.
  *  @param[in] aContext    An optional pointer to caller-provided context data.
  *
@@ -397,7 +371,7 @@ CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aPredicate, void * aCo
 /**
  *  Search for the first element matching the predicate within the TLV reader
  *  optionally descending into arrays or structures. The @a aPredicate is applied
- *  to each visited TLV element; the @a aPredicate shall return #CHIP_ERROR_MAX
+ *  to each visited TLV element; the @a aPredicate shall return #CHIP_ERROR_SENTINEL
  *  for the matching elements, #CHIP_NO_ERROR for non-matching elements, and any
  *  other value to terminate the search.
  *
@@ -406,7 +380,7 @@ CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aPredicate, void * aCo
  *  @param[in] aPredicate  A predicate to be applied to each TLV element.  To
  *                         support the code reuse, aPredicate has the
  *                         @a IterateHandler type.  The return value of aPredicate
- *                         controls the search: a #CHIP_ERROR_MAX signals that
+ *                         controls the search: a #CHIP_ERROR_SENTINEL signals that
  *                         desired element has been found, #CHIP_NO_ERROR
  *                         signals that the desired element has not been found,
  *                         and all other values signal that the saerch should be
@@ -431,7 +405,7 @@ CHIP_ERROR Find(const TLVReader & aReader, IterateHandler aPredicate, void * aCo
 
     retval = Iterate(aReader, FindPredicateHandler, &theContext, aRecurse);
 
-    if (retval == CHIP_ERROR_MAX)
+    if (retval == CHIP_ERROR_SENTINEL)
         retval = CHIP_NO_ERROR;
     else
         retval = CHIP_ERROR_TLV_TAG_NOT_FOUND;

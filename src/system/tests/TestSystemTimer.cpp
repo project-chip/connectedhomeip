@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,10 +43,6 @@
 #include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-#include <sys/select.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
 #include <errno.h>
 #include <stdint.h>
 #include <string.h>
@@ -57,39 +53,19 @@ using namespace chip::System;
 static void ServiceEvents(Layer & aLayer, ::timeval & aSleepTime)
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    fd_set readFDs, writeFDs, exceptFDs;
-    int numFDs = 0;
-
-    FD_ZERO(&readFDs);
-    FD_ZERO(&writeFDs);
-    FD_ZERO(&exceptFDs);
-
-    if (aLayer.State() == kLayerState_Initialized)
-        aLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
-
-    int selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &aSleepTime);
-    if (selectRes < 0)
-    {
-        printf("select failed: %s\n", ErrorStr(MapErrorPOSIX(errno)));
-        return;
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-    if (aLayer.State() == kLayerState_Initialized)
-    {
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-        aLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
+    aLayer.WatchableEvents().PrepareEventsWithTimeout(aSleepTime);
+    aLayer.WatchableEvents().WaitForEvents();
+    aLayer.WatchableEvents().HandleEvents();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-        if (aLayer.State() == kLayerState_Initialized)
-        {
-            // TODO: Currently timers are delayed by aSleepTime above. A improved solution would have a mechanism to reduce
-            // aSleepTime according to the next timer.
-            aLayer.HandlePlatformTimer();
-        }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+    if (aLayer.State() == kLayerState_Initialized)
+    {
+        // TODO: Currently timers are delayed by aSleepTime above. A improved solution would have a mechanism to reduce
+        // aSleepTime according to the next timer.
+        aLayer.HandlePlatformTimer();
     }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 // Test input vector format.
@@ -135,13 +111,13 @@ void TimerFailed(void * aState)
     sOverflowTestDone = true;
 }
 
-void HandleTimerFailed(Layer * inetLayer, void * aState, Error aError)
+void HandleTimerFailed(Layer * inetLayer, void * aState, CHIP_ERROR aError)
 {
     (void) inetLayer, (void) aError;
     TimerFailed(aState);
 }
 
-void HandleTimer10Success(Layer * inetLayer, void * aState, Error aError)
+void HandleTimer10Success(Layer * inetLayer, void * aState, CHIP_ERROR aError)
 {
     TestContext & lContext = *static_cast<TestContext *>(aState);
     NL_TEST_ASSERT(lContext.mTestSuite, true);
@@ -177,7 +153,7 @@ static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
     lSys.CancelTimer(HandleTimer10Success, aContext);
 }
 
-void HandleGreedyTimer(Layer * aLayer, void * aState, Error aError)
+void HandleGreedyTimer(Layer * aLayer, void * aState, CHIP_ERROR aError)
 {
     static uint32_t sNumTimersHandled = 0;
     TestContext & lContext            = *static_cast<TestContext *>(aState);

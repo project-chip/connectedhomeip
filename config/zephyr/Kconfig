@@ -47,17 +47,10 @@ config CHIP_OPENTHREAD_CONFIG
 	  This option can be used to replace Zephyr-supplied OpenThread
 	  configuration file with a custom one.
 
-config CHIP_ZEPHYR_SHELL
-	bool "Enable Zephyr-based CHIP shell"
-	default n
-	imply SHELL
-	help
-	  Add CHIP commands to the Zephyr shell.
-
-config CHIP_STANDALONE_SHELL
+config CHIP_LIB_SHELL
 	bool "Enable CHIP shell library"
 	default n
-	depends on !CHIP_ZEPHYR_SHELL
+	imply SHELL
 	help
 	  Link the application with the library containing CHIP shell commands.
 
@@ -92,6 +85,13 @@ config CHIP_ENABLE_DNSSD_SRP
 	imply OPENTHREAD_SRP_CLIENT
 	help
 	  Enables DNS-SD SRP client support
+
+config CHIP_ENABLE_DNS_CLIENT
+	bool "Enable support for DNS client"
+	default y
+	imply OPENTHREAD_DNS_CLIENT
+	help
+	  Enables DNS client support used for resolving and browsing services.
 
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"

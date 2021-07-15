@@ -36,7 +36,8 @@ using namespace chip::DeviceLayer::PersistedStorage;
         {                                                                                                                          \
             char error_str[255];                                                                                                   \
             chip::FormatCHIPError(error_str, sizeof(error_str), temp_test_result);                                                 \
-            ChipLogError(NotSpecified, "%s: FAILED %d [%s]", #test_result, temp_test_result, chip::ErrorStr(temp_test_result));    \
+            ChipLogError(NotSpecified, "%s: FAILED %" PRId32 " [%s]", #test_result, temp_test_result,                              \
+                         chip::ErrorStr(temp_test_result));                                                                        \
         }                                                                                                                          \
         else                                                                                                                       \
         {                                                                                                                          \

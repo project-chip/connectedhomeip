@@ -138,8 +138,8 @@ static void deactivate(EndpointId endpoint)
 
 static EmberAfLevelControlState * getState(EndpointId endpoint)
 {
-    uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID);
-    return (ep == 0xFF ? NULL : &stateTable[ep]);
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID);
+    return (ep == 0xFFFF ? NULL : &stateTable[ep]);
 }
 
 #if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
@@ -706,6 +706,9 @@ static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uin
     // OnLevel is not used for Move commands.
     state->useOnLevel = false;
 
+    // storedLevel is not used for Move commands.
+    state->storedLevel = INVALID_STORED_LEVEL;
+
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, state->eventDurationMs);
     status = EMBER_ZCL_STATUS_SUCCESS;
@@ -825,6 +828,9 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
 
     // OnLevel is not used for Step commands.
     state->useOnLevel = false;
+
+    // storedLevel is not used for Step commands
+    state->storedLevel = INVALID_STORED_LEVEL;
 
     // The setup was successful, so mark the new state as active and return.
     schedule(endpoint, state->eventDurationMs);

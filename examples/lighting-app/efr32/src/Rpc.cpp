@@ -118,15 +118,13 @@ void RunRpcService(void *)
     Start(RegisterServices, &logger_mutex);
 }
 
-int Init()
+void Init()
 {
-    int err = CHIP_ERROR_MAX;
     pw_sys_io_Init();
 
     // Start App task.
     sRpcTaskHandle = xTaskCreateStatic(RunRpcService, "RPC_TASK", ArraySize(sRpcTaskStack), nullptr, RPC_TASK_PRIORITY,
                                        sRpcTaskStack, &sRpcTaskBuffer);
-    return err;
 }
 
 } // namespace rpc

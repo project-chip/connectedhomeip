@@ -95,7 +95,11 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
     case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         OnLevelControlAttributeChangeCallback(endpointId, attributeId, value);
         break;
-
+#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+    case ZCL_COLOR_CONTROL_CLUSTER_ID:
+        OnColorControlAttributeChangeCallback(endpointId, attributeId, value);
+        break;
+#endif
     default:
         ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
         break;
@@ -164,7 +168,37 @@ exit:
     return;
 }
 
-void IdentifyTimerHandler(Layer * systemLayer, void * appState, Error error)
+// Currently we only support ColorControl cluster for ESP32C3_DEVKITM which has an on-board RGB-LED
+#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+void DeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+{
+    VerifyOrExit(attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID ||
+                     attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                 ESP_LOGI(TAG, "Unhandled AttributeId ID: '0x%04x", attributeId));
+    VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+    if (endpointId == 1)
+    {
+        uint8_t hue, saturation;
+        if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
+        {
+            hue = *value;
+            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                                       &saturation, sizeof(uint8_t));
+        }
+        else
+        {
+            saturation = *value;
+            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue,
+                                       sizeof(uint8_t));
+        }
+        statusLED1.SetColor(hue, saturation);
+    }
+exit:
+    return;
+}
+#endif
+
+void IdentifyTimerHandler(Layer * systemLayer, void * appState, CHIP_ERROR error)
 {
     statusLED1.Animate();
 

@@ -102,7 +102,7 @@ public:
      * Handle physical wakeup of system due to ReliableMessageProtocol wakeup.
      *
      */
-    static void Timeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
+    static void Timeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
 
     /**
      *  Add a CHIP message into the retransmission table to be subsequently resent if a corresponding acknowledgment
@@ -229,9 +229,9 @@ private:
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
     SecureSessionMgr * mSessionMgr;
-    uint64_t mTimeStampBase;                  // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
-    System::Timer::Epoch mCurrentTimerExpiry; // Tracks when the ReliableMessageProtocol timer will next expire
-    uint16_t mTimerIntervalShift;             // ReliableMessageProtocol Timer tick period shift
+    uint64_t mTimeStampBase; // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
+    System::Clock::MonotonicMilliseconds mCurrentTimerExpiry; // Tracks when the ReliableMessageProtocol timer will next expire
+    uint16_t mTimerIntervalShift;                             // ReliableMessageProtocol Timer tick period shift
 
     /* Placeholder function to run a function for all exchanges */
     template <typename Function>

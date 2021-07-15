@@ -25,6 +25,8 @@
 
 #include "Builder.h"
 #include "Parser.h"
+
+#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
@@ -113,7 +115,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetFieldId(chip::FieldId * const apFieldId) const;
+    CHIP_ERROR GetFieldId(chip::AttributeId * const apFieldId) const;
 
     /**
      *  @brief Get a TLVReader for the ListIndex. Next() must be called before accessing them.
@@ -184,7 +186,7 @@ public:
      *
      *  @return A reference to *this
      */
-    AttributePath::Builder & FieldId(const chip::FieldId aFieldId);
+    AttributePath::Builder & FieldId(const chip::AttributeId aFieldId);
 
     /**
      *  @brief Inject NodeId into the TLV stream.

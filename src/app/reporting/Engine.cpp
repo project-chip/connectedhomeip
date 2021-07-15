@@ -23,6 +23,7 @@
  *
  */
 
+#include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
 
@@ -55,7 +56,6 @@ CHIP_ERROR
 Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElementBuilder, ClusterInfo & aClusterInfo)
 {
     CHIP_ERROR err                              = CHIP_NO_ERROR;
-    TLV::TLVType type                           = TLV::kTLVType_NotSpecified;
     AttributePath::Builder attributePathBuilder = aAttributeDataElementBuilder.CreateAttributePathBuilder();
     attributePathBuilder.NodeId(aClusterInfo.mNodeId)
         .EndpointId(aClusterInfo.mEndpointId)
@@ -65,21 +65,19 @@ Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElemen
     err = attributePathBuilder.GetError();
     SuccessOrExit(err);
 
-    aAttributeDataElementBuilder.GetWriter()->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data),
-                                                             TLV::kTLVType_Structure, type);
-    err = ReadSingleClusterData(aClusterInfo, *(aAttributeDataElementBuilder.GetWriter()));
+    err = ReadSingleClusterData(aClusterInfo, aAttributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
     SuccessOrExit(err);
-    aAttributeDataElementBuilder.GetWriter()->EndContainer(type);
-    aAttributeDataElementBuilder.DataVersion(0).MoreClusterData(false).EndOfAttributeDataElement();
+    aAttributeDataElementBuilder.MoreClusterData(false);
+    aAttributeDataElementBuilder.EndOfAttributeDataElement();
     err = aAttributeDataElementBuilder.GetError();
-    // TODO: Add DataVersion support
 
 exit:
     aClusterInfo.ClearDirty();
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Error retrieving data from clusterId: %08x, err = %" PRId32, aClusterInfo.mClusterId, err);
+        ChipLogError(DataManagement, "Error retrieving data from clusterId: %" PRIx32 ", err = %" CHIP_ERROR_FORMAT,
+                     aClusterInfo.mClusterId, err);
     }
 
     return err;
@@ -97,7 +95,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
         if (clusterInfo->IsDirty())
         {
             AttributeDataElement::Builder attributeDataElementBuilder = attributeDataList.CreateAttributeDataElementBuilder();
-            ChipLogDetail(DataManagement, "<RE:Run> Cluster %u, Field %u is dirty", clusterInfo->mClusterId, clusterInfo->mFieldId);
+            ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", clusterInfo->mClusterId,
+                          clusterInfo->mFieldId);
             // Retrieve data for this cluster instance and clear its dirty flag.
             err = RetrieveClusterData(attributeDataElementBuilder, *clusterInfo);
             VerifyOrExit(err == CHIP_NO_ERROR,
@@ -217,7 +216,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportData::Builder & aReportD
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Error retrieving events, err = %" PRId32, err);
+        ChipLogError(DataManagement, "Error retrieving events, err = %" CHIP_ERROR_FORMAT, err);
     }
 
     return err;
@@ -276,7 +275,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     ChipLogDetail(DataManagement, "<RE> Sending report...");
     err = SendReport(apReadHandler, std::move(bufHandle));
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DataManagement, "<RE> Error sending out report data with %" PRId32 "!", err));
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(DataManagement, "<RE> Error sending out report data with %" CHIP_ERROR_FORMAT "!", err));
 
     ChipLogDetail(DataManagement, "<RE> ReportsInFlight = %" PRIu32 " with readHandler %" PRIu32 ", RE has %s", mNumReportsInFlight,
                   mCurReadHandlerIdx, mMoreChunkedMessages ? "more messages" : "no more messages");
@@ -295,7 +295,7 @@ exit:
     return err;
 }
 
-void Engine::Run(System::Layer * aSystemLayer, void * apAppState, System::Error)
+void Engine::Run(System::Layer * aSystemLayer, void * apAppState, CHIP_ERROR)
 {
     Engine * const pEngine = reinterpret_cast<Engine *>(apAppState);
     pEngine->Run();

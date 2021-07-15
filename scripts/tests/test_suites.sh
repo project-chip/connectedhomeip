@@ -18,9 +18,51 @@
 
 set -e
 
-declare -a test_array="($(find src/app/tests/suites -type f -name "*.yaml" -exec basename {} .yaml \;))"
 declare -i iterations=20
 declare -i background_pid=0
+declare test_case_wrapper=()
+
+usage() {
+    echo "test_suites.sh [-a APPLICATION] [-i ITERATIONS] [-h] [-s CASE_NAME] [-w COMMAND]"
+    echo "  -a APPLICATION: runs chip-tool against 'chip-<APPLICATION>-app' (default: all-clusters)"
+    echo "  -i ITERATIONS: number of iterations to run (default: $iterations)"
+    echo "  -h: this help message"
+    echo "  -s CASE_NAME: runs single test case name (e.g. TC_OO_2_2"
+    echo "                for Test_TC_OO_2_2.yaml) (by default, all are run)"
+    echo "  -w COMMAND: prefix all instantiations with a command (e.g. valgrind) (default: '')"
+    echo ""
+    exit 0
+}
+
+# read shell arguments
+while getopts a:i:hs:w: flag; do
+    case "$flag" in
+        a) application=$OPTARG ;;
+        i) iterations=$OPTARG ;;
+        h) usage ;;
+        s) single_case=$OPTARG ;;
+        w) test_case_wrapper=("$OPTARG") ;;
+    esac
+done
+
+if [[ $application == "tv" ]]; then
+    declare test_filenames="TV_${single_case-*}.yaml"
+    declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -exec basename {} .yaml \;))"
+    cp examples/tv-app/linux/include/endpoint-configuration/chip_tv_config.ini /tmp/chip_tv_config.ini
+# in case there's no application argument
+# always default to all-cluters app
+else
+    application="all-clusters"
+    declare test_filenames="Test_${single_case-*}.yaml"
+    declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -exec basename {} .yaml \;))"
+fi
+
+if [[ $iterations == 0 ]]; then
+    echo "Invalid iteration count: '$1'"
+    exit 1
+fi
+
+echo "Running tests for application: $application, with iterations set to: $iterations"
 
 cleanup() {
     if [[ $background_pid != 0 ]]; then
@@ -29,14 +71,6 @@ cleanup() {
     fi
 }
 trap cleanup EXIT
-
-if [[ -n $1 ]]; then
-    iterations=$1
-    if [[ $iterations == 0 ]]; then
-        echo "Invalid iteration count: '$1'"
-        exit 1
-    fi
-fi
 
 echo "Found tests:"
 for i in "${test_array[@]}"; do
@@ -55,7 +89,7 @@ for j in "${iter_array[@]}"; do
         echo "          * Starting cluster server"
         rm -rf /tmp/chip_tool_config.ini
         # This part is a little complicated.  We want to
-        # 1) Start chip-all-clusters-app in the background
+        # 1) Start chip-app in the background
         # 2) Pipe its output through tee so we can wait until it's ready for a
         #    PASE handshake.
         # 3) Save its pid off so we can kill it.
@@ -72,13 +106,14 @@ for j in "${iter_array[@]}"; do
 
         # Clear out our temp files so we don't accidentally do a stale
         # read from them before we write to them.
-        rm -rf /tmp/all-clusters-log
+        rm -rf /tmp/"$application"-log
+        touch /tmp/"$application"-log
         rm -rf /tmp/pid
         (
-            stdbuf -o0 out/debug/standalone/chip-all-clusters-app &
+            stdbuf -o0 "${test_case_wrapper[@]}" out/debug/standalone/chip-"$application"-app &
             echo $! >&3
-        ) 3>/tmp/pid | tee /tmp/all-clusters-log &
-        while ! grep -q "Server Listening" /tmp/all-clusters-log; do
+        ) 3>/tmp/pid | tee /tmp/"$application"-log &
+        while ! grep -q "Server Listening" /tmp/"$application"-log; do
             :
         done
         # Now read $background_pid from /tmp/pid; presumably it's
@@ -87,13 +122,13 @@ for j in "${iter_array[@]}"; do
         # the data is there yet.
         background_pid="$(</tmp/pid)"
         echo "          * Pairing to device"
-        out/debug/standalone/chip-tool pairing onnetwork 1 20202021 3840 ::1 11097
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 11097
         echo "          * Starting test run: $i"
-        out/debug/standalone/chip-tool tests "$i"
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0
-        kill -9 "$temp_background_pid" || true
+        kill -9 "$temp_background_pid"
         echo "  ===== Test complete: $i"
     done
     echo " ===== Iteration $j completed"

@@ -140,7 +140,7 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
 
-void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)
+void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source)
 {
 #if CHIP_ERROR_LOGGING
     char srcAddressStr[Transport::PeerAddress::kMaxToStringSize];
@@ -197,15 +197,20 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                         SecureSessionHandle session, const Transport::PeerAddress & source,
-                                        System::PacketBufferHandle && msgBuf, SecureSessionMgr * msgLayer)
+                                        DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
-    bool sendAckAndCloseExchange            = false;
 
     ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %" PRIu32 " on exchange %d",
                     payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(),
                     payloadHeader.GetExchangeID());
+
+    MessageFlags msgFlags;
+    if (isDuplicate == DuplicateMessage::Yes)
+    {
+        msgFlags.Set(MessageFlagValues::kDuplicateMessage);
+    }
 
     // Search for an existing exchange that the message applies to. If a match is found...
     bool found = false;
@@ -220,7 +225,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             }
 
             // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
+            ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
             found = true;
             return false;
         }
@@ -232,10 +237,10 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ExitNow(err = CHIP_NO_ERROR);
     }
 
-    // Search for an unsolicited message handler if it marked as being sent by an initiator. Since we didn't
-    // find an existing exchange that matches the message, it must be an unsolicited message. However all
+    // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.
+    // Since we didn't find an existing exchange that matches the message, it must be an unsolicited message. However all
     // unsolicited messages must be marked as being from an initiator.
-    if (payloadHeader.IsInitiator())
+    if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsInitiator())
     {
         // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
         // handle the message type over handlers that handle all messages for a profile.
@@ -263,36 +268,23 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
     }
 
-    // If we didn't find an existing exchange that matches the message, and no unsolicited message handler registered
-    // to hand this message, we need to create a temporary exchange to send an ack for this message and then close this exchange.
-    sendAckAndCloseExchange = payloadHeader.NeedsAck() && (matchingUMH == nullptr);
-
-    // If we found a handler or we need to create a new exchange context (EC).
-    if (matchingUMH != nullptr || sendAckAndCloseExchange)
+    // If we found a handler or we need to send an ack, create an exchange to
+    // handle the message.
+    if (matchingUMH != nullptr || payloadHeader.NeedsAck())
     {
-        ExchangeContext * ec = nullptr;
-
-        if (sendAckAndCloseExchange)
-        {
-            // If rcvd msg is from initiator then this exchange is created as not Initiator.
-            // If rcvd msg is not from initiator then this exchange is created as Initiator.
-            // TODO: Figure out which channel to use for the received message
-            ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), nullptr);
-        }
-        else
-        {
-            ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, false, matchingUMH->Delegate);
-        }
+        ExchangeDelegate * delegate = matchingUMH ? matchingUMH->Delegate : nullptr;
+        // If rcvd msg is from initiator then this exchange is created as not Initiator.
+        // If rcvd msg is not from initiator then this exchange is created as Initiator.
+        // Note that if matchingUMH is not null then rcvd msg if from initiator.
+        // TODO: Figure out which channel to use for the received message
+        ExchangeContext * ec =
+            mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), delegate);
 
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%p", ec->GetExchangeId(), ec->GetDelegate());
 
-        ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
-
-        // Close exchange if it was created only to send ack for a duplicate message.
-        if (sendAckAndCloseExchange)
-            ec->Close();
+        ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
     }
 
 exit:
@@ -302,7 +294,7 @@ exit:
     }
 }
 
-void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+void ExchangeManager::OnNewConnection(SecureSessionHandle session)
 {
     if (mDelegate != nullptr)
     {
@@ -310,7 +302,7 @@ void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSession
     }
 }
 
-void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
+void ExchangeManager::OnConnectionExpired(SecureSessionHandle session)
 {
     if (mDelegate != nullptr)
     {
@@ -326,23 +318,6 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
         }
         return true;
     });
-}
-
-void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf)
-{
-    PacketHeader header;
-
-    ReturnOnFailure(header.DecodeAndConsume(msgBuf));
-
-    Optional<NodeId> peer = header.GetSourceNodeId();
-    if (!peer.HasValue())
-    {
-        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
-        source.ToString(addrBuffer, sizeof(addrBuffer));
-        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no source node id in packet header.",
-                     addrBuffer);
-        return;
-    }
 }
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)

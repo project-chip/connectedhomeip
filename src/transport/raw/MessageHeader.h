@@ -33,6 +33,7 @@
 #include <core/PeerId.h>
 #include <protocols/Protocols.h>
 #include <support/BitFlags.h>
+#include <support/TypeTraits.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -47,9 +48,8 @@ namespace Header {
 
 enum class EncryptionType
 {
-    kAESCCMTagLen8  = 0,
-    kAESCCMTagLen12 = 1,
-    kAESCCMTagLen16 = 2,
+    kEncryptionTypeNone = 0,
+    kAESCCMTagLen16     = 1,
 };
 
 /**
@@ -74,16 +74,19 @@ enum class ExFlagValues : uint8_t
 enum class FlagValues : uint16_t
 {
     /// Header flag specifying that a destination node id is included in the header.
-    kDestinationNodeIdPresent = 0x0100,
+    kDestinationNodeIdPresent = 0x0001,
+
+    /// Header flag specifying that a destination group id is included in the header.
+    kDestinationGroupIdPresent = 0x0002,
 
     /// Header flag specifying that a source node id is included in the header.
-    kSourceNodeIdPresent = 0x0200,
+    kSourceNodeIdPresent = 0x0004,
 
     /// Header flag specifying that it is a control message for secure session.
-    kSecureSessionControlMessage = 0x0800,
+    kSecureSessionControlMessage = 0x4000,
 
     /// Header flag specifying that it is a encrypted message.
-    kSecure = 0x0001,
+    kEncryptedMessage = 0x0100,
 
 };
 
@@ -97,7 +100,6 @@ using ExFlags = BitFlags<ExFlagValues>;
 //                      |   |            +---Encrypted
 //                      |   +----------------Control message (TODO: Implement this)
 //                      +--------------------Privacy enhancements (TODO: Implement this)
-static constexpr uint16_t kFlagsMask = 0x0F01;
 
 } // namespace Header
 
@@ -340,8 +342,7 @@ public:
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
     bool HasMessageType(MessageType type) const
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        return HasProtocol(Protocols::MessageTypeTraits<MessageType>::ProtocolId()) && HasMessageType(static_cast<uint8_t>(type));
+        return HasProtocol(Protocols::MessageTypeTraits<MessageType>::ProtocolId()) && HasMessageType(to_underlying(type));
     }
 
     /**
@@ -372,8 +373,7 @@ public:
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
     PayloadHeader & SetMessageType(MessageType type)
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        SetMessageType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(type));
+        SetMessageType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(type));
         return *this;
     }
 

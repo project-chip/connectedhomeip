@@ -72,7 +72,7 @@ int AppTask::StartAppTask()
     sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
     {
-        err = CHIP_ERROR_MAX;
+        err = APP_ERROR_EVENT_QUEUE_FAILED;
         K32W_LOG("Failed to allocate app event queue");
         assert(err == CHIP_NO_ERROR);
     }
@@ -113,6 +113,7 @@ int AppTask::Init()
     );
     if (sFunctionTimer == NULL)
     {
+        err = APP_ERROR_CREATE_TIMER_FAILED;
         K32W_LOG("app_timer_create() failed");
         assert(err == CHIP_NO_ERROR);
     }
@@ -408,7 +409,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        err = CHIP_ERROR_MAX;
+        err = APP_ERROR_UNHANDLED_EVENT;
     }
 
     if (err == CHIP_NO_ERROR)
@@ -627,6 +628,6 @@ void AppTask::UpdateClusterState(void)
                                                  (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx32, status);
+        ChipLogError(NotSpecified, "ERR: updating on/off %" PRIx8, status);
     }
 }

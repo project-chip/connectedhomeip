@@ -4,6 +4,7 @@
     "helpers": [
         "../../zap-templates/partials/helper.js",
         "../../zap-templates/common/StringHelper.js",
+        "../../zap-templates/common/attributes/Accessors.js",
         "../../zap-templates/templates/app/helper.js",
         "../../zap-templates/templates/chip/helper.js"
     ],
@@ -41,6 +42,11 @@
             "output": "src/app/common/gen/attribute-type.h"
         },
         {
+            "path": "../../zap-templates/templates/app/callback.zapt",
+            "name": "ZCL callback header",
+            "output": "src/app/common/gen/callback.h"
+        },
+        {
             "path": "../../zap-templates/templates/app/cluster-id.zapt",
             "name": "ZCL cluster-id header",
             "output": "src/app/common/gen/cluster-id.h"
@@ -64,6 +70,31 @@
             "path": "../../zap-templates/templates/app/print-cluster.zapt",
             "name": "ZCL print-cluster header",
             "output": "src/app/common/gen/print-cluster.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/attributes/Accessors.zapt",
+            "name": "Attributes Accessors header",
+            "output": "src/app/common/gen/attributes/Accessors.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/attributes/Accessors-src.zapt",
+            "name": "Attributes Accessors",
+            "output": "src/app/common/gen/attributes/Accessors.cpp"
+        },
+        {
+            "path": "../../zap-templates/templates/app/ids/Attributes.zapt",
+            "name": "Attributes Ids header",
+            "output": "src/app/common/gen/ids/Attributes.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/ids/Clusters.zapt",
+            "name": "Clusters Ids header",
+            "output": "src/app/common/gen/ids/Clusters.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/ids/Commands.zapt",
+            "name": "Commands Ids header",
+            "output": "src/app/common/gen/ids/Commands.h"
         }
     ]
 }

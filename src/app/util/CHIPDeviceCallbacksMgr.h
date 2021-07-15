@@ -26,13 +26,34 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
+#include <core/CHIPConfig.h>
 #include <core/CHIPError.h>
+#include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
 
 namespace chip {
 namespace app {
+
+#ifndef CHIP_DEVICE_CALLBACK_MANAGER_TLV_FILTER_POOL_SIZE
+constexpr size_t kTLVFilterPoolSize = 32;
+#else
+constexpr size_t kTLVFilterPoolSize = CHIP_DEVICE_CALLBACK_MANAGER_TLV_FILTER_POOL_SIZE;
+#endif
+
+/**
+ * The filter interface for processing data from TLV.
+ * The caller of the function will pass the original TLV data, the original success and failure callback to this function.
+ * Since success callback and failure callback contains necessary context, this function itself is stateless.
+ * The possible implementation of this function might be:
+ *  - Unpack the data with some schema from TLV
+ *  - Call success callback and failure callback according to the result of unpack routine.
+ */
+using TLVDataFilter = void (*)(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
+                               chip::Callback::Cancelable * onFailure);
 
 class DLL_EXPORT CHIPDeviceCallbacksMgr
 {
@@ -48,10 +69,10 @@ public:
     }
 
     CHIP_ERROR AddResponseCallback(NodeId nodeId, uint8_t sequenceNumber, Callback::Cancelable * onSuccessCallback,
-                                   Callback::Cancelable * onFailureCallback);
+                                   Callback::Cancelable * onFailureCallback, TLVDataFilter callbackFilter = nullptr);
     CHIP_ERROR CancelResponseCallback(NodeId nodeId, uint8_t sequenceNumber);
     CHIP_ERROR GetResponseCallback(NodeId nodeId, uint8_t sequenceNumber, Callback::Cancelable ** onSuccessCallback,
-                                   Callback::Cancelable ** onFailureCallback);
+                                   Callback::Cancelable ** onFailureCallback, TLVDataFilter * callbackFilter = nullptr);
 
     CHIP_ERROR AddReportCallback(NodeId nodeId, EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
                                  Callback::Cancelable * onReportCallback);
@@ -60,6 +81,23 @@ public:
 
 private:
     CHIPDeviceCallbacksMgr() {}
+
+    struct ResponseCallbackInfo
+    {
+        chip::NodeId nodeId;
+        uint8_t sequenceNumber;
+
+        bool operator==(ResponseCallbackInfo const & other)
+        {
+            return nodeId == other.nodeId && sequenceNumber == other.sequenceNumber;
+        }
+    };
+
+    struct TLVFilterItem
+    {
+        ResponseCallbackInfo info = { kAnyNodeId, 0 };
+        TLVDataFilter filter      = nullptr;
+    };
 
     template <typename T>
     CHIP_ERROR CancelCallback(T & info, Callback::CallbackDeque & queue)
@@ -81,7 +119,11 @@ private:
         Callback::Cancelable * ca = &queue;
         while (ca != nullptr && ca->mNext != &queue)
         {
-            if (*reinterpret_cast<T *>(&ca->mNext->mInfoPtr) == info)
+            T callbackInfo;
+            static_assert(std::is_pod<T>::value, "Callback info must be POD");
+            static_assert(sizeof(ca->mNext->mInfo) >= sizeof(callbackInfo), "Callback info too large");
+            memcpy(&callbackInfo, ca->mNext->mInfo, sizeof(callbackInfo));
+            if (callbackInfo == info)
             {
                 *callback = ca->mNext;
                 return CHIP_NO_ERROR;
@@ -93,8 +135,12 @@ private:
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
+    CHIP_ERROR AddResponseFilter(const ResponseCallbackInfo & info, TLVDataFilter callbackFilter);
+    CHIP_ERROR PopResponseFilter(const ResponseCallbackInfo & info, TLVDataFilter * callbackFilter);
+
     Callback::CallbackDeque mResponsesSuccess;
     Callback::CallbackDeque mResponsesFailure;
+    TLVFilterItem mTLVFilterPool[kTLVFilterPoolSize];
     Callback::CallbackDeque mReports;
 };
 

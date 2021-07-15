@@ -26,6 +26,8 @@
 #include "AttributePath.h"
 #include "Builder.h"
 #include "Parser.h"
+
+#include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
@@ -40,7 +42,8 @@ enum
     kCsTag_AttributePath       = 0,
     kCsTag_DataVersion         = 1,
     kCsTag_Data                = 2,
-    kCsTag_MoreClusterDataFlag = 3,
+    kCsTag_Status              = 3,
+    kCsTag_MoreClusterDataFlag = 4,
 };
 
 class Parser : public chip::app::Parser
@@ -103,6 +106,16 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetData(chip::TLV::TLVReader * const apReader) const;
+
+    /**
+     *  @brief Get the IM status code.
+     *
+     *  @param [out] apStatus A pointer to result
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is not such element
+     */
+    CHIP_ERROR GetStatus(uint16_t * const apStatus) const;
 
     /**
      *  @brief Check whether it need more cluster data Next() must be called before accessing them.

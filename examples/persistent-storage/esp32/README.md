@@ -10,6 +10,7 @@ An example testing and demonstrating the key value storage API.
         -   [Building](#building)
         -   [Flashing the Application](#flashing-the-application)
         -   [Viewing Logging Output](#viewing-logging-output)
+        -   [Flashing app using script](#flashing-app-using-script)
 
 <hr>
 
@@ -41,13 +42,14 @@ Development Framework and the xtensa-esp32-elf toolchain.
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout release/v4.2 branch
+-   Clone the Espressif ESP-IDF and checkout
+    [v4.3 tag](https://github.com/espressif/esp-idf/releases/v4.3)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout release/v4.2
+          $ git checkout v4.3
           $ git submodule update --init
           $ ./install.sh
 
@@ -104,6 +106,25 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     before the device shows up on `/dev/tty`.
 
 <a name="view-logging"></a>
+
+### Flashing app using script
+
+-   Follow these steps to use `${app_name}.flash.py`.
+
+    -   First set IDF target, run set-target with one of the commands.
+
+            $ idf.py set-target esp32
+            $ idf.py set-target esp32c3
+
+    -   Execute below sequence of commands
+
+```
+        $ export ESPPORT=/dev/tty.SLAB_USBtoUART
+        $ export ESPBAUD=${baud_value}
+        $ idf.py build
+        $ idf.py flashing_script
+        $ python ${app_name}.flash.py
+```
 
 ### Viewing Logging Output
 

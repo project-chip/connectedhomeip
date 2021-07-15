@@ -22,6 +22,7 @@
  *
  */
 
+#include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPath.h>
 #include <app/ReadHandler.h>
@@ -33,7 +34,6 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
-    VerifyOrExit(apDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     mpExchangeCtx              = nullptr;
     mpDelegate                 = apDelegate;
@@ -78,12 +78,12 @@ CHIP_ERROR ReadHandler::OnReadRequest(Messaging::ExchangeContext * apExchangeCon
 
     mpExchangeCtx = apExchangeContext;
     err           = ProcessReadRequest(std::move(aPayload));
-    SuccessOrExit(err);
 
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogFunctError(err);
+        // Keep Shutdown() from double-closing our exchange.
+        mpExchangeCtx = nullptr;
         Shutdown();
     }
 
@@ -155,6 +155,17 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     MoveToState(HandlerState::Reportable);
 
     err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    SuccessOrExit(err);
+
+    // mpExchangeCtx can be null here due to
+    // https://github.com/project-chip/connectedhomeip/issues/8031
+    if (mpExchangeCtx)
+    {
+        mpExchangeCtx->WillSendMessage();
+    }
+
+    // There must be no code after the WillSendMessage() call that can cause
+    // this method to return a failure.
 
 exit:
     ChipLogFunctError(err);

@@ -30,7 +30,10 @@ static_library("helpers") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ "${chip_root}/src/inet/tests:helpers" ]
+  public_deps = [
+    "${chip_root}/src/inet/tests:helpers",
+    "${chip_root}/src/transport/raw",
+  ]
 }
 
 chip_test_suite("tests") {

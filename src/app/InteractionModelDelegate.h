@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <app/AttributePathParams.h>
+#include <app/ClusterInfo.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
@@ -33,6 +35,7 @@
 namespace chip {
 namespace app {
 class ReadClient;
+class WriteClient;
 class CommandSender;
 
 /**
@@ -59,6 +62,21 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    /**
+     * Notification that the interaction model has received a list of attribute data in response to a Read request. apData might be
+     * nullptr if status is not ProtocolCode::Success.
+     *
+     * @param[in]  apReadClient   The read client object, the application can use GetAppIdentifier() for the read client to
+     *                            distinguish different read requests.
+     * @param[in]  aPath          The path of the attribute, contains node id, endpoint id, cluster id, field id etc.
+     * @param[in]  apData         The attribute data TLV
+     * @param[in]  status         Interaction model status code
+     *
+     */
+    virtual void OnReportData(const ReadClient * apReadClient, const ClusterInfo & aPath, TLV::TLVReader * apData,
+                              Protocols::InteractionModel::ProtocolCode status)
+    {}
 
     /**
      * Notification that the last message for a Report Data action for the given ReadClient has been received and processed.
@@ -130,6 +148,46 @@ public:
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
     virtual CHIP_ERROR CommandResponseError(const CommandSender * apCommandSender, CHIP_ERROR aError)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * Notification that a WriteClient has received a Write Response containing a status code.
+     * aAttributeIndex is processing attribute index which can identify attribute if there exists multiple attribute changes with
+     * same attribute path
+     */
+    virtual CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient,
+                                           const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+                                           const uint32_t aProtocolId, const uint16_t aProtocolCode,
+                                           AttributePathParams & aAttributePathParams, uint8_t aAttributeIndex)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * Notification that a Write Response has been processed and application can do further work .
+     */
+    virtual CHIP_ERROR WriteResponseProcessed(const WriteClient * apWriteClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Notification that a Write Client has received a Write Response and fails to process a attribute data element in that
+     * write response
+     */
+    virtual CHIP_ERROR WriteResponseProtocolError(const WriteClient * apWriteClient, uint8_t aAttributeIndex)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * Notification that a write client encountered an asynchronous failure.
+     * @param[in]  apWriteClient  A current write client which can identify the write client to the consumer, particularly
+     * during multiple write interactions
+     * @param[in]  aError         A error that could be CHIP_ERROR_TIMEOUT when write client fails to receive, or other error when
+     *                            fail to process write response.
+     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
+     */
+    virtual CHIP_ERROR WriteResponseError(const WriteClient * apWriteClient, CHIP_ERROR aError)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }

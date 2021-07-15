@@ -14,7 +14,7 @@ static void OnDefaultSuccessResponse(void * context)
     ChipLogProgress(chipTool, "Default Success Response");
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnDefaultFailureResponse(void * context, uint8_t status)
@@ -22,7 +22,7 @@ static void OnDefaultFailureResponse(void * context, uint8_t status)
     ChipLogProgress(chipTool, "Default Failure Response: 0x%02x", status);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(false);
+    command->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
 }
 
 static void OnBooleanAttributeResponse(void * context, bool value)
@@ -30,7 +30,7 @@ static void OnBooleanAttributeResponse(void * context, bool value)
     ChipLogProgress(chipTool, "Boolean attribute Response: %d", value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt8uAttributeResponse(void * context, uint8_t value)
@@ -38,7 +38,7 @@ static void OnInt8uAttributeResponse(void * context, uint8_t value)
     ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt16uAttributeResponse(void * context, uint16_t value)
@@ -46,7 +46,7 @@ static void OnInt16uAttributeResponse(void * context, uint16_t value)
     ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt32uAttributeResponse(void * context, uint32_t value)
@@ -54,7 +54,7 @@ static void OnInt32uAttributeResponse(void * context, uint32_t value)
     ChipLogProgress(chipTool, "Int32u attribute Response: %" PRIu32, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt64uAttributeResponse(void * context, uint64_t value)
@@ -62,7 +62,7 @@ static void OnInt64uAttributeResponse(void * context, uint64_t value)
     ChipLogProgress(chipTool, "Int64u attribute Response: %" PRIu64, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt8sAttributeResponse(void * context, int8_t value)
@@ -70,7 +70,7 @@ static void OnInt8sAttributeResponse(void * context, int8_t value)
     ChipLogProgress(chipTool, "Int8s attribute Response: %" PRId8, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt16sAttributeResponse(void * context, int16_t value)
@@ -78,7 +78,7 @@ static void OnInt16sAttributeResponse(void * context, int16_t value)
     ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt32sAttributeResponse(void * context, int32_t value)
@@ -86,7 +86,7 @@ static void OnInt32sAttributeResponse(void * context, int32_t value)
     ChipLogProgress(chipTool, "Int32s attribute Response: %" PRId32, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt64sAttributeResponse(void * context, int64_t value)
@@ -94,7 +94,7 @@ static void OnInt64sAttributeResponse(void * context, int64_t value)
     ChipLogProgress(chipTool, "Int64s attribute Response: %" PRId64, value);
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnStringAttributeResponse(void * context, const chip::ByteSpan value)
@@ -102,28 +102,20 @@ static void OnStringAttributeResponse(void * context, const chip::ByteSpan value
     ChipLogProgress(chipTool, "String attribute Response: %zu", value.size());
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 {{#chip_client_clusters}}
-{{#if (user_cluster_has_enabled_command name side)}}
-{{#all_user_cluster_commands}}
-{{#if (isStrEqual clusterName parent.name)}}
-{{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
-{{#if (isStrEndsWith name "Response")}}
-static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
+{{#chip_server_cluster_responses}}
+static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}(void * context{{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_server_cluster_response_arguments}})
 {
     ChipLogProgress(chipTool, "{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}");
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-{{/if}}
-{{/if}}
-{{/if}}
-{{/all_user_cluster_commands}}
-{{/if}}
+{{/chip_server_cluster_responses}}
 {{/chip_client_clusters}}
 
 {{#chip_client_clusters}}
@@ -159,7 +151,7 @@ static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListA
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(true);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 {{/if}}
@@ -186,9 +178,9 @@ public:
     {
         {{#chip_server_cluster_command_arguments}}
         {{#if (isString type)}}
-        AddArgument("{{asCamelCased label}}", &m{{asCamelCased label false}});
+        AddArgument("{{asCamelCased label false}}", &m{{asCamelCased label false}});
         {{else}}
-        AddArgument("{{asCamelCased label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asCamelCased label false}});
+        AddArgument("{{asCamelCased label false}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asCamelCased label false}});
         {{/if}}
         {{/chip_server_cluster_command_arguments}}
         ModelCommand::AddArguments();
@@ -201,7 +193,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command ({{asHex code 2}}) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command ({{asHex code 2}}) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
@@ -245,7 +237,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x0C) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x0C) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::{{asCamelCased name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
@@ -266,7 +258,7 @@ class Read{{asCamelCased parent.name false}}{{asCamelCased name false}}: public 
 public:
     Read{{asCamelCased parent.name false}}{{asCamelCased name false}}(): ModelCommand("read")
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name)}}");
+        AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name false)}}");
         ModelCommand::AddArguments();
     }
 
@@ -278,7 +270,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
@@ -289,18 +281,18 @@ private:
 {{#if isList}}
     chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>(On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse, this);
 {{else}}
-    chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>(On{{asCallbackAttributeType atomicTypeId}}AttributeResponse, this);
+    chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
 {{/if}}
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
-{{#if (isWritableAttribute)}}
+{{#if isWritableAttribute}}
 class Write{{asCamelCased parent.name false}}{{asCamelCased name false}}: public ModelCommand
 {
 public:
     Write{{asCamelCased parent.name false}}{{asCamelCased name false}}(): ModelCommand("write")
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name)}}");
+        AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name false)}}");
         {{#if (isString type)}}
         AddArgument("attr-value", &mValue);
         {{else}}
@@ -317,7 +309,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x01) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x01) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
@@ -335,20 +327,18 @@ private:
 };
 
 {{/if}}
-{{#if (isReportableAttribute)}}
+{{#if isReportableAttribute}}
 class Report{{asCamelCased parent.name false}}{{asCamelCased name false}}: public ModelCommand
 {
 public:
     Report{{asCamelCased parent.name false}}{{asCamelCased name false}}(): ModelCommand("report")
     {
-        AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name)}}");
+        AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name false)}}");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        {{#unless (isDiscreteType)}}
-        {{#unless (isString type)}}
+        {{#if isAnalog}}
         AddArgument("change", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mChange);
-        {{/unless}}
-        {{/unless}}
+        {{/if}}
         ModelCommand::AddArguments();
     }
 
@@ -361,7 +351,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x06) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x06) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
@@ -372,20 +362,18 @@ public:
             return err;
         }
 
-        return cluster.ConfigureAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval, mMaxInterval{{#unless (isDiscreteType)}}, mChange{{/unless}});
+        return cluster.ConfigureAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval, mMaxInterval{{#if isAnalog}}, mChange{{/if}});
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback> * onReportCallback = new chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>(On{{asCallbackAttributeType atomicTypeId}}AttributeResponse, this);
+    chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onReportCallback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    {{#unless (isDiscreteType)}}
-    {{#unless (isString type)}}
+    {{#if isAnalog}}
     {{chipType}} mChange;
-    {{/unless}}
-    {{/unless}}
+    {{/if}}
 };
 
 {{/if}}
@@ -407,10 +395,10 @@ void registerCluster{{asCamelCased name false}}(Commands & commands)
         make_unique<Discover{{asCamelCased name false}}Attributes>(),
         {{#chip_server_cluster_attributes}}
         make_unique<Read{{asCamelCased parent.name false}}{{asCamelCased name false}}>(),
-        {{#if (isWritableAttribute)}}
+        {{#if isWritableAttribute}}
         make_unique<Write{{asCamelCased parent.name false}}{{asCamelCased name false}}>(),
         {{/if}}
-        {{#if (isReportableAttribute)}}
+        {{#if isReportableAttribute}}
         make_unique<Report{{asCamelCased parent.name false}}{{asCamelCased name false}}>(),
         {{/if}}
         {{/chip_server_cluster_attributes}}

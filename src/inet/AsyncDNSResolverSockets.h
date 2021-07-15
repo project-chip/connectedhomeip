@@ -55,15 +55,15 @@ class AsyncDNSResolverSockets
     friend class DNSResolver;
 
 public:
-    INET_ERROR EnqueueRequest(DNSResolver & resolver);
+    CHIP_ERROR EnqueueRequest(DNSResolver & resolver);
 
-    INET_ERROR Init(InetLayer * inet);
+    CHIP_ERROR Init(InetLayer * inet);
 
-    INET_ERROR Cancel(DNSResolver & resolver);
+    CHIP_ERROR Cancel(DNSResolver & resolver);
 
-    INET_ERROR Shutdown();
+    CHIP_ERROR Shutdown();
 
-    INET_ERROR PrepareDNSResolver(DNSResolver & resolver, const char * hostName, uint16_t hostNameLen, uint8_t options,
+    CHIP_ERROR PrepareDNSResolver(DNSResolver & resolver, const char * hostName, uint16_t hostNameLen, uint8_t options,
                                   uint8_t maxAddrs, IPAddress * addrArray, DNSResolver::OnResolveCompleteFunct onComplete,
                                   void * appState);
 
@@ -74,11 +74,10 @@ private:
     volatile DNSResolver * mAsyncDNSQueueHead; /* The head of the asynchronous DNSResolver object queue. */
     volatile DNSResolver * mAsyncDNSQueueTail; /* The tail of the asynchronous DNSResolver object queue. */
     InetLayer * mInet;                         /* The pointer to the InetLayer. */
-    static void
-    DNSResultEventHandler(chip::System::Layer * aLayer, void * aAppState,
-                          chip::System::Error aError); /* Timer event handler function for asynchronous DNS notification */
+    static void DNSResultEventHandler(chip::System::Layer * aLayer, void * aAppState,
+                                      CHIP_ERROR aError); /* Timer event handler function for asynchronous DNS notification */
 
-    INET_ERROR DequeueRequest(DNSResolver ** outResolver);
+    CHIP_ERROR DequeueRequest(DNSResolver ** outResolver);
 
     bool ShouldThreadShutdown();
 

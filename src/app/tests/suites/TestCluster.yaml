@@ -599,3 +599,148 @@ tests:
       attribute: "octet_string"
       arguments:
           value: ""
+
+    # Tests for Long Octet String attribute
+
+    - label: "Read attribute LONG_OCTET_STRING Default Value"
+      command: "readAttribute"
+      attribute: "long_octet_string"
+      response:
+          value: ""
+
+    - label: "Write attribute LONG_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "long_octet_string"
+      arguments:
+          value: "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+
+    - label: "Read attribute LONG_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "long_octet_string"
+      response:
+          value: "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+
+    - label: "Write attribute LONG_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "long_octet_string"
+      arguments:
+          value: ""
+
+    # Tests for Char String attribute
+
+    - label: "Read attribute CHAR_STRING Default Value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: ""
+
+    - label: "Write attribute CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "☉Test☉"
+
+    - label: "Read attribute CHAR_STRING"
+      command: "readAttribute"
+      attribute: "char_string"
+      disabled: true
+      response:
+          value: "☉Test☉"
+
+    - label: "Write attribute CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "☉TestValueLongerThan10☉"
+
+    - label: "Read attribute CHAR_STRING"
+      command: "readAttribute"
+      attribute: "char_string"
+      disabled: true
+      response:
+          value: "☉TestVal"
+
+    - label: "Write attribute CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: ""
+
+    # Tests for Long Char String attribute
+
+    - label: "Read attribute LONG_CHAR_STRING Default Value"
+      command: "readAttribute"
+      attribute: "long_char_string"
+      response:
+          value: ""
+
+    - label: "Write attribute LONG_CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "long_char_string"
+      arguments:
+          value: "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+
+    - label: "Read attribute LONG_CHAR_STRING"
+      command: "readAttribute"
+      attribute: "long_char_string"
+      response:
+          value: "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+
+    - label: "Write attribute LONG_CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "long_char_string"
+      arguments:
+          value: ""
+
+    # Tests for List attribute
+
+    - label: "Read attribute LIST"
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          value: [1, 2, 3, 4]
+
+    # Tests for List Octet String attribute
+
+    - label: "Read attribute LIST_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "list_octet_string"
+      response:
+          value: ["Test0", "Test1", "Test2", "Test3"]
+
+    # Tests for List Struct Octet String attribute
+
+    - label: "Read attribute LIST_STRUCT_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "list_struct_octet_string"
+      response:
+          value:
+              [
+                  { fabricIndex: 0, operationalCert: "Test0" },
+                  { fabricIndex: 1, operationalCert: "Test1" },
+                  { fabricIndex: 2, operationalCert: "Test2" },
+                  { fabricIndex: 3, operationalCert: "Test3" },
+              ]
+
+    # Tests for Unsupported attribute
+
+    - label: "Read attribute UNSUPPORTED"
+      command: "readAttribute"
+      attribute: "unsupported"
+      optional: true
+      response:
+          value: 0
+
+    - label: "Writeattribute UNSUPPORTED"
+      command: "writeAttribute"
+      attribute: "unsupported"
+      optional: true
+      arguments:
+          value: 0
+
+    - label: "Send Test Command to unsupported endpoint"
+      command: "test"
+      endpoint: 200
+      response:
+          # No cluster on that endpoint, so expect an error.
+          error: 1

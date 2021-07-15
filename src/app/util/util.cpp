@@ -43,6 +43,7 @@
 #include "app/util/common.h"
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
+#include <app/common/gen/callback.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/common/gen/print-cluster.h>
@@ -50,8 +51,6 @@
 #include <app/util/af-event.h>
 #include <app/util/af-main.h>
 #include <app/util/af.h>
-
-#include "gen/callback.h"
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -158,7 +157,7 @@ EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 // Device enabled/disabled functions
 bool emberAfIsDeviceEnabled(EndpointId endpoint)
 {
-    uint8_t index;
+    uint16_t index;
 #ifdef ZCL_USING_BASIC_CLUSTER_DEVICE_ENABLED_ATTRIBUTE
     bool deviceEnabled;
     if (emberAfReadServerAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_DEVICE_ENABLED_ATTRIBUTE_ID, (uint8_t *) &deviceEnabled,
@@ -168,7 +167,7 @@ bool emberAfIsDeviceEnabled(EndpointId endpoint)
     }
 #endif
     index = emberAfIndexFromEndpoint(endpoint);
-    if (index != 0xFF && index < sizeof(afDeviceEnabled))
+    if (index != 0xFFFF && index < sizeof(afDeviceEnabled))
     {
         return afDeviceEnabled[index];
     }
@@ -177,8 +176,8 @@ bool emberAfIsDeviceEnabled(EndpointId endpoint)
 
 void emberAfSetDeviceEnabled(EndpointId endpoint, bool enabled)
 {
-    uint8_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index != 0xFF && index < sizeof(afDeviceEnabled))
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index != 0xFFFF && index < sizeof(afDeviceEnabled))
     {
         afDeviceEnabled[index] = enabled;
     }
@@ -362,7 +361,7 @@ void emberAfStackDown(void)
 
 uint16_t emberAfFindClusterNameIndexWithMfgCode(ClusterId cluster, uint16_t mfgCode)
 {
-    static_assert(sizeof(ClusterId) == 2, "May need to adjust our index type or somehow define it in terms of cluster id type");
+    static_assert(sizeof(ClusterId) == 4, "May need to adjust our index type or somehow define it in terms of cluster id type");
     uint16_t index = 0;
     while (zclClusterNames[index].id != ZCL_NULL_CLUSTER_ID)
     {
@@ -394,8 +393,8 @@ void emberAfDecodeAndPrintClusterWithMfgCode(ClusterId cluster, uint16_t mfgCode
     uint16_t index = emberAfFindClusterNameIndexWithMfgCode(cluster, mfgCode);
     if (index == 0xFFFF)
     {
-        static_assert(sizeof(ClusterId) == 2, "Adjust the print formatting");
-        emberAfPrint(emberAfPrintActiveArea, "(Unknown clus. [0x%2x])", cluster);
+        static_assert(sizeof(ClusterId) == 4, "Adjust the print formatting");
+        emberAfPrint(emberAfPrintActiveArea, "(Unknown clus. [0x%4x])", cluster);
     }
     else
     {
@@ -454,9 +453,9 @@ static void printIncomingZclMessage(const EmberAfClusterCommand * cmd)
 
 static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
 {
-    uint8_t index = emberAfIndexFromEndpoint(cmd->apsFrame->destinationEndpoint);
+    uint16_t index = emberAfIndexFromEndpoint(cmd->apsFrame->destinationEndpoint);
 
-    if (index == 0xFF)
+    if (index == 0xFFFF)
     {
         emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
         emberAfDebugPrint(" due to invalid endpoint: ");
@@ -519,8 +518,9 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMess
     {
         returnCmd->mfgCode = EMBER_AF_NULL_MANUFACTURER_CODE;
     }
-    returnCmd->seqNum    = message[returnCmd->payloadStartIndex++];
-    returnCmd->commandId = message[returnCmd->payloadStartIndex++];
+    returnCmd->seqNum            = message[returnCmd->payloadStartIndex++];
+    returnCmd->commandId         = emberAfGetInt32u(message, returnCmd->payloadStartIndex, returnCmd->bufLen);
+    returnCmd->payloadStartIndex = static_cast<uint8_t>(returnCmd->payloadStartIndex + 4);
     if (returnCmd->payloadStartIndex > returnCmd->bufLen)
     {
         emberAfAppPrintln("%pRX pkt malformed: %d < %d", "ERROR: ", returnCmd->bufLen, returnCmd->payloadStartIndex);
@@ -844,9 +844,9 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
         emberAfPutInt16uInResp(cmd->mfgCode);
     }
     emberAfPutInt8uInResp(cmd->seqNum);
-    emberAfPutInt8uInResp(ZCL_DEFAULT_RESPONSE_COMMAND_ID);
-    emberAfPutInt8uInResp(cmd->commandId);
-    emberAfPutInt8uInResp(status);
+    emberAfPutInt32uInResp(ZCL_DEFAULT_RESPONSE_COMMAND_ID);
+    emberAfPutInt32uInResp(cmd->commandId);
+    emberAfPutStatusInResp(status);
 
     prepareForResponse(cmd);
     return emberAfSendResponseWithCallback(callback);
@@ -878,7 +878,7 @@ void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x)
     data[index + 3] = (uint8_t)(((x) >> 24) & 0xFF);
 }
 
-void emberAfCopyString(uint8_t * dest, const uint8_t * src, uint8_t size)
+void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
 {
     if (src == NULL)
     {
@@ -893,14 +893,15 @@ void emberAfCopyString(uint8_t * dest, const uint8_t * src, uint8_t size)
         uint8_t length = emberAfStringLength(src);
         if (size < length)
         {
-            length = size;
+            // Since we have checked that size < length, size must be able to fit into the type of length.
+            length = static_cast<decltype(length)>(size);
         }
         memmove(dest + 1, src + 1, length);
         dest[0] = length;
     }
 }
 
-void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size)
+void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
 {
     if (src == NULL)
     {
@@ -916,7 +917,8 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size)
         uint16_t length = emberAfLongStringLength(src);
         if (size < length)
         {
-            length = size;
+            // Since we have checked that size < length, size must be able to fit into the type of length.
+            length = static_cast<decltype(length)>(size);
         }
         memmove(dest + 2, src + 2, length);
         dest[0] = EMBER_LOW_BYTE(length);
@@ -1040,8 +1042,8 @@ bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
 
 EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls, EndpointId endpoint)
 {
-    uint8_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == 0xFF)
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index == 0xFFFF)
     {
         return EMBER_INVALID_ENDPOINT;
     }
@@ -1051,14 +1053,14 @@ EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls,
 
 bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, EndpointId endpoint)
 {
-    uint8_t index = emberAfIndexFromEndpoint(endpoint);
-    return (index != 0xFF && emberEventControlGetActive(&controls[index]));
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    return (index != 0xFFFF && emberEventControlGetActive(&controls[index]));
 }
 
 EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, EndpointId endpoint)
 {
-    uint8_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == 0xFF)
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index == 0xFFFF)
     {
         return EMBER_INVALID_ENDPOINT;
     }

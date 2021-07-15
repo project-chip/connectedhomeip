@@ -59,37 +59,29 @@ class DLL_EXPORT Timer : public Object
     friend class Layer;
 
 public:
-    /**
-     *  Represents an epoch in the local system timescale, usually the POSIX timescale.
-     *
-     *  The units are dependent on the context. If used with values returned by GetCurrentEpoch, the units are milliseconds.
-     */
-    typedef uint64_t Epoch;
+    static bool IsEarlier(const Clock::MonotonicMilliseconds & first, const Clock::MonotonicMilliseconds & second);
 
-    static Epoch GetCurrentEpoch();
-    static bool IsEarlierEpoch(const Epoch & first, const Epoch & second);
-
-    typedef void (*OnCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
+    typedef void (*OnCompleteFunct)(Layer * aLayer, void * aAppState, CHIP_ERROR aError);
     OnCompleteFunct OnComplete;
 
-    Error Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState);
-    Error Cancel();
+    CHIP_ERROR Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState);
+    CHIP_ERROR Cancel();
 
     static void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
 
 private:
     static ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
 
-    Epoch mAwakenEpoch;
+    Clock::MonotonicMilliseconds mAwakenTime;
 
     void HandleComplete();
 
-    Error ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState);
+    CHIP_ERROR ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     Timer * mNextTimer;
 
-    static Error HandleExpiredTimers(Layer & aLayer);
+    static CHIP_ERROR HandleExpiredTimers(Layer & aLayer);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH

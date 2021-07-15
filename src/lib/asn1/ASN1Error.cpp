@@ -46,7 +46,7 @@ bool FormatASN1Error(char * buf, uint16_t bufSize, int32_t err)
 {
     const char * desc = nullptr;
 
-    if (err < ASN1_ERROR_MIN || err > ASN1_ERROR_MAX)
+    if (!ChipError::IsPart(ChipError::SdkPart::kASN1, err))
     {
         return false;
     }

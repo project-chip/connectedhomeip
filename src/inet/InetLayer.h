@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,9 +74,11 @@
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
 #if INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 #include <inet/AsyncDNSResolverSockets.h>
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #include <system/SystemLayer.h>
@@ -114,11 +116,11 @@ class InetLayer;
 namespace Platform {
 namespace InetLayer {
 
-extern INET_ERROR WillInit(Inet::InetLayer * aLayer, void * aContext);
-extern void DidInit(Inet::InetLayer * aLayer, void * aContext, INET_ERROR anError);
+extern CHIP_ERROR WillInit(Inet::InetLayer * aLayer, void * aContext);
+extern void DidInit(Inet::InetLayer * aLayer, void * aContext, CHIP_ERROR anError);
 
-extern INET_ERROR WillShutdown(Inet::InetLayer * aLayer, void * aContext);
-extern void DidShutdown(Inet::InetLayer * aLayer, void * aContext, INET_ERROR anError);
+extern CHIP_ERROR WillShutdown(Inet::InetLayer * aLayer, void * aContext);
+extern void DidShutdown(Inet::InetLayer * aLayer, void * aContext, CHIP_ERROR anError);
 
 } // namespace InetLayer
 } // namespace Platform
@@ -178,23 +180,25 @@ public:
 
     InetLayer();
 
-    INET_ERROR Init(chip::System::Layer & aSystemLayer, void * aContext);
-    INET_ERROR Shutdown();
+    CHIP_ERROR Init(chip::System::Layer & aSystemLayer, void * aContext);
+
+    // Must be called before System::Layer::Shutdown(), since this holds a pointer to that.
+    CHIP_ERROR Shutdown();
 
     chip::System::Layer * SystemLayer() const;
 
     // End Points
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    INET_ERROR NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEndPoint ** retEndPoint);
+    CHIP_ERROR NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEndPoint ** retEndPoint);
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    INET_ERROR NewTCPEndPoint(TCPEndPoint ** retEndPoint);
+    CHIP_ERROR NewTCPEndPoint(TCPEndPoint ** retEndPoint);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    INET_ERROR NewUDPEndPoint(UDPEndPoint ** retEndPoint);
+    CHIP_ERROR NewUDPEndPoint(UDPEndPoint ** retEndPoint);
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
     // DNS Resolution
@@ -203,25 +207,20 @@ public:
 
     typedef DNSResolver::OnResolveCompleteFunct DNSResolveCompleteFunct;
 
-    INET_ERROR ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs,
+    CHIP_ERROR ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs,
                                   IPAddress * addrArray, DNSResolveCompleteFunct onComplete, void * appState);
-    INET_ERROR ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t maxAddrs, IPAddress * addrArray,
+    CHIP_ERROR ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t maxAddrs, IPAddress * addrArray,
                                   DNSResolveCompleteFunct onComplete, void * appState);
-    INET_ERROR ResolveHostAddress(const char * hostName, uint8_t maxAddrs, IPAddress * addrArray,
+    CHIP_ERROR ResolveHostAddress(const char * hostName, uint8_t maxAddrs, IPAddress * addrArray,
                                   DNSResolveCompleteFunct onComplete, void * appState);
     void CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, void * appState);
 
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
-    INET_ERROR GetInterfaceFromAddr(const IPAddress & addr, InterfaceId & intfId);
+    CHIP_ERROR GetInterfaceFromAddr(const IPAddress & addr, InterfaceId & intfId);
 
-    INET_ERROR GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr);
+    CHIP_ERROR GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr);
     bool MatchLocalIPv6Subnet(const IPAddress & addr);
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    void PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval & sleepTime);
-    void HandleSelectResult(int selectRes, fd_set * readfds, fd_set * writefds, fd_set * exceptfds);
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     static void UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot);
 
@@ -229,8 +228,7 @@ public:
     void SetPlatformData(void * aPlatformData);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static chip::System::Error HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType,
-                                                    uintptr_t aArgument);
+    static CHIP_ERROR HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType, uintptr_t aArgument);
 
     static chip::System::LwIPEventHandlerDelegate sInetEventHandlerDelegate;
 
@@ -261,7 +259,7 @@ public:
             false;
     }
 
-    INET_ERROR InitQueueLimiter(void);
+    CHIP_ERROR InitQueueLimiter(void);
     bool CanEnqueueDroppableEvent(void);
     void DroppableEventDequeued(void);
 
@@ -280,14 +278,14 @@ public:
 
     inline static bool IsDroppableEvent(chip::System::EventType aType) { return false; }
 
-    inline INET_ERROR InitQueueLimiter(void) { return INET_NO_ERROR; }
+    inline CHIP_ERROR InitQueueLimiter(void) { return CHIP_NO_ERROR; }
     inline bool CanEnqueueDroppableEvent(void) { return true; }
     inline void DroppableEventDequeued(void) { return; }
 #endif // !INET_CONFIG_MAX_DROPPABLE_EVENTS
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-    static void HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState, chip::System::Error aError);
+    static void HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
 
 private:
@@ -302,11 +300,11 @@ private:
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-    friend INET_ERROR Platform::InetLayer::WillInit(Inet::InetLayer * aLayer, void * aContext);
-    friend void Platform::InetLayer::DidInit(Inet::InetLayer * aLayer, void * aContext, INET_ERROR anError);
+    friend CHIP_ERROR Platform::InetLayer::WillInit(Inet::InetLayer * aLayer, void * aContext);
+    friend void Platform::InetLayer::DidInit(Inet::InetLayer * aLayer, void * aContext, CHIP_ERROR anError);
 
-    friend INET_ERROR Platform::InetLayer::WillShutdown(Inet::InetLayer * aLayer, void * aContext);
-    friend void Platform::InetLayer::DidShutdown(Inet::InetLayer * aLayer, void * aContext, INET_ERROR anError);
+    friend CHIP_ERROR Platform::InetLayer::WillShutdown(Inet::InetLayer * aLayer, void * aContext);
+    friend void Platform::InetLayer::DidShutdown(Inet::InetLayer * aLayer, void * aContext, CHIP_ERROR anError);
 
     bool IsIdleTimerRunning();
 };
@@ -338,10 +336,10 @@ public:
     void Clear();
 };
 
-extern INET_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,
+extern CHIP_ERROR ParseHostAndPort(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,
                                    uint16_t & aPort);
 
-extern INET_ERROR ParseHostPortAndInterface(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,
+extern CHIP_ERROR ParseHostPortAndInterface(const char * aString, uint16_t aStringLen, const char *& aHost, uint16_t & aHostLen,
                                             uint16_t & aPort, const char *& aInterface, uint16_t & aInterfaceLen);
 
 } // namespace Inet

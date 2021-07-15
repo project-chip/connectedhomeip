@@ -37,7 +37,7 @@ using namespace chip;
 constexpr const char * kErrorStr = "Test Cluster: List Octet cluster (0x%02x) Error setting '%s' attribute: 0x%02x";
 
 namespace {
-EmberAfStatus writeAttribute(uint8_t endpoint, AttributeId attributeId, uint8_t * buffer, int32_t index = -1)
+EmberAfStatus writeAttribute(EndpointId endpoint, AttributeId attributeId, uint8_t * buffer, int32_t index = -1)
 {
     EmberAfAttributeSearchRecord record;
     record.endpoint         = endpoint;
@@ -57,7 +57,24 @@ EmberAfStatus writeAttribute(uint8_t endpoint, AttributeId attributeId, uint8_t 
     return emAfReadOrWriteAttribute(&record, NULL, buffer, 0, true, index + 1);
 }
 
-EmberAfStatus writeTestListOctetAttribute(uint8_t endpoint)
+EmberAfStatus writeTestListInt8uAttribute(EndpointId endpoint)
+{
+    EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
+    AttributeId attributeId = ZCL_LIST_ATTRIBUTE_ID;
+
+    uint16_t attributeCount = 4;
+    for (uint8_t index = 0; index < attributeCount; index++)
+    {
+        status = writeAttribute(endpoint, attributeId, (uint8_t *) &index, index);
+        VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
+    }
+
+    status = writeAttribute(endpoint, attributeId, (uint8_t *) &attributeCount);
+    VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
+    return status;
+}
+
+EmberAfStatus writeTestListOctetAttribute(EndpointId endpoint)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
     AttributeId attributeId = ZCL_LIST_OCTET_STRING_ATTRIBUTE_ID;
@@ -79,7 +96,7 @@ EmberAfStatus writeTestListOctetAttribute(uint8_t endpoint)
     return status;
 }
 
-EmberAfStatus writeTestListStructOctetAttribute(uint8_t endpoint)
+EmberAfStatus writeTestListStructOctetAttribute(EndpointId endpoint)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
     AttributeId attributeId = ZCL_LIST_STRUCT_OCTET_STRING_ATTRIBUTE_ID;
@@ -117,6 +134,9 @@ void emberAfPluginTestClusterServerInitCallback(void)
         {
             continue;
         }
+
+        status = writeTestListInt8uAttribute(endpoint);
+        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list int8u", status));
 
         status = writeTestListOctetAttribute(endpoint);
         VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list octet", status));

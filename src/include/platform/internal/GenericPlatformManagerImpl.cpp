@@ -25,6 +25,7 @@
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_CPP
 #define GENERIC_PLATFORM_MANAGER_IMPL_CPP
 
+#include <inttypes.h>
 #include <new>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>
@@ -67,7 +68,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     // Initialize the CHIP system layer.
     new (&SystemLayer) System::Layer();
     err = SystemLayer.Init(nullptr);
-    if (err != CHIP_SYSTEM_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
     }
@@ -76,7 +77,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     // Initialize the CHIP Inet layer.
     new (&InetLayer) Inet::InetLayer();
     err = InetLayer.Init(SystemLayer, nullptr);
-    if (err != INET_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "InetLayer initialization failed: %s", ErrorStr(err));
     }
@@ -87,7 +88,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     // Initialize the CHIP BLE manager.
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     err = BLEMgr().Init();
-    if (err != BLE_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "BLEManager initialization failed: %s", ErrorStr(err));
     }
@@ -202,7 +203,7 @@ template <class ImplClass>
 void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent * event)
 {
 #if CHIP_PROGRESS_LOGGING
-    uint64_t startUS = System::Layer::GetClock_MonotonicHiRes();
+    uint64_t startUS = System::Clock::GetMonotonicMicroseconds();
 #endif // CHIP_PROGRESS_LOGGING
 
     switch (event->Type)
@@ -237,7 +238,7 @@ void GenericPlatformManagerImpl<ImplClass>::_DispatchEvent(const ChipDeviceEvent
 
     // TODO: make this configurable
 #if CHIP_PROGRESS_LOGGING
-    uint32_t delta = (static_cast<uint32_t>(System::Layer::GetClock_MonotonicHiRes() - startUS)) / 1000;
+    uint32_t delta = (static_cast<uint32_t>(System::Clock::GetMonotonicMicroseconds() - startUS)) / 1000;
     if (delta > 100)
     {
         ChipLogError(DeviceLayer, "Long dispatch time: %" PRId32 " ms", delta);
@@ -255,7 +256,7 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const Chi
     // Invoke the System Layer's event handler function.
     err = SystemLayer.HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
                                   event->ChipSystemLayerEvent.Argument);
-    if (err != CHIP_SYSTEM_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Error handling CHIP System Layer event (type %d): %s", event->Type, ErrorStr(err));
     }

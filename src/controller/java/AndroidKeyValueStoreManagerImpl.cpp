@@ -20,6 +20,7 @@
 #include <memory>
 #include <string.h>
 
+#include "AndroidKeyValueStoreManagerImpl.h"
 #include "CHIPJNIError.h"
 #include "JniReferences.h"
 #include "JniTypeWrappers.h"
@@ -31,6 +32,8 @@
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
+
+using namespace chip::Controller;
 namespace {
 
 constexpr size_t kMaxKvsValueBytes        = 4096;
@@ -43,16 +46,16 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset)
 {
-    ReturnErrorCodeIf(mKeyValueStoreManagerClass == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorCodeIf(mKeyValueStoreManagerObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mGetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(offset != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    JNIEnv * env = GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
     UtfString javaKey(env, key);
 
-    jobject javaValue = env->CallStaticObjectMethod(mKeyValueStoreManagerClass, mGetMethod, javaKey.jniValue());
+    jobject javaValue = env->CallObjectMethod(mKeyValueStoreManagerObject, mGetMethod, javaKey.jniValue());
     if (env->ExceptionCheck())
     {
         ChipLogError(DeviceLayer, "Java exception in KVS::Get");
@@ -97,15 +100,15 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    ReturnErrorCodeIf(mKeyValueStoreManagerClass == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorCodeIf(mKeyValueStoreManagerObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mDeleteMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    JNIEnv * env = GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
     UtfString javaKey(env, key);
 
-    env->CallStaticVoidMethod(mKeyValueStoreManagerClass, mDeleteMethod, javaKey.jniValue());
+    env->CallVoidMethod(mKeyValueStoreManagerObject, mDeleteMethod, javaKey.jniValue());
 
     if (env->ExceptionCheck())
     {
@@ -120,11 +123,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    ReturnErrorCodeIf(mKeyValueStoreManagerClass == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorCodeIf(mKeyValueStoreManagerObject == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(mSetMethod == nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(value_size > kMaxKvsValueBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
-    JNIEnv * env = GetEnvForCurrentThread();
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
     std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value_size) + 1]);
@@ -135,7 +138,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     UtfString utfKey(env, key);
     UtfString utfBase64Value(env, buffer.get());
 
-    env->CallStaticVoidMethod(mKeyValueStoreManagerClass, mSetMethod, utfKey.jniValue(), utfBase64Value.jniValue());
+    env->CallVoidMethod(mKeyValueStoreManagerObject, mSetMethod, utfKey.jniValue(), utfBase64Value.jniValue());
 
     if (env->ExceptionCheck())
     {
@@ -148,32 +151,29 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     return CHIP_NO_ERROR;
 }
 
-void KeyValueStoreManagerImpl::InitializeMethodForward(JavaVM * vm, JNIEnv * env)
+void KeyValueStoreManagerImpl::InitializeWithObject(jobject managerObject)
 {
-    mJvm = vm;
+    JNIEnv * env                     = JniReferences::GetInstance().GetEnvForCurrentThread();
+    mKeyValueStoreManagerObject      = env->NewGlobalRef(managerObject);
+    jclass keyValueStoreManagerClass = env->GetObjectClass(mKeyValueStoreManagerObject);
 
-    CHIP_ERROR err = GetClassRef(env, "chip/devicecontroller/KeyValueStoreManager", mKeyValueStoreManagerClass);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to get reference to KeyValueStoreManager");
-        return;
-    }
+    VerifyOrReturn(keyValueStoreManagerClass != nullptr, ChipLogError(DeviceLayer, "Failed to get KVS Java class"));
 
-    mGetMethod = env->GetStaticMethodID(mKeyValueStoreManagerClass, "get", "(Ljava/lang/String;)Ljava/lang/String;");
+    mGetMethod = env->GetMethodID(keyValueStoreManagerClass, "get", "(Ljava/lang/String;)Ljava/lang/String;");
     if (mGetMethod == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to access KVS 'get' method");
         env->ExceptionClear();
     }
 
-    mSetMethod = env->GetStaticMethodID(mKeyValueStoreManagerClass, "set", "(Ljava/lang/String;Ljava/lang/String;)V");
+    mSetMethod = env->GetMethodID(keyValueStoreManagerClass, "set", "(Ljava/lang/String;Ljava/lang/String;)V");
     if (mSetMethod == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to access KVS 'set' method");
         env->ExceptionClear();
     }
 
-    mDeleteMethod = env->GetStaticMethodID(mKeyValueStoreManagerClass, "delete", "(Ljava/lang/String;)V");
+    mDeleteMethod = env->GetMethodID(keyValueStoreManagerClass, "delete", "(Ljava/lang/String;)V");
     if (mDeleteMethod == nullptr)
     {
         ChipLogError(DeviceLayer, "Failed to access KVS 'delete' method");

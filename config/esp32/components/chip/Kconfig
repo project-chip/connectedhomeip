@@ -554,7 +554,7 @@ menu "CHIP Device Layer"
 
         config CHIPOBLE_SINGLE_CONNECTION
             bool "Single Connection Mode"
-            default n
+            default y
             depends on ENABLE_CHIPOBLE
             help
                 Limit support for CHIP-over-BLE (WoBLE) to a single inbound connection.
