@@ -40,6 +40,7 @@
 #include <protocols/Protocols.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/ScopedBuffer.h>
 #include <support/TimeUtils.h>
 
 namespace chip {
@@ -58,8 +59,6 @@ ChipCertificateSet::ChipCertificateSet()
     mCerts               = nullptr;
     mCertCount           = 0;
     mMaxCerts            = 0;
-    mDecodeBuf           = nullptr;
-    mDecodeBufSize       = 0;
     mMemoryAllocInternal = false;
 }
 
@@ -68,7 +67,7 @@ ChipCertificateSet::~ChipCertificateSet()
     Release();
 }
 
-CHIP_ERROR ChipCertificateSet::Init(uint8_t maxCertsArraySize, uint16_t decodeBufSize)
+CHIP_ERROR ChipCertificateSet::Init(uint8_t maxCertsArraySize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -76,12 +75,7 @@ CHIP_ERROR ChipCertificateSet::Init(uint8_t maxCertsArraySize, uint16_t decodeBu
     mCerts = reinterpret_cast<ChipCertificateData *>(chip::Platform::MemoryAlloc(sizeof(ChipCertificateData) * maxCertsArraySize));
     VerifyOrExit(mCerts != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    VerifyOrExit(decodeBufSize > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
-    mDecodeBuf = reinterpret_cast<uint8_t *>(chip::Platform::MemoryAlloc(decodeBufSize));
-    VerifyOrExit(mDecodeBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
     mMaxCerts            = maxCertsArraySize;
-    mDecodeBufSize       = decodeBufSize;
     mMemoryAllocInternal = true;
 
     Clear();
@@ -95,20 +89,15 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipCertificateSet::Init(ChipCertificateData * certsArray, uint8_t certsArraySize, uint8_t * decodeBuf,
-                                    uint16_t decodeBufSize)
+CHIP_ERROR ChipCertificateSet::Init(ChipCertificateData * certsArray, uint8_t certsArraySize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(certsArray != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(certsArraySize > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(decodeBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(decodeBufSize > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     mCerts               = certsArray;
     mMaxCerts            = certsArraySize;
-    mDecodeBuf           = decodeBuf;
-    mDecodeBufSize       = decodeBufSize;
     mMemoryAllocInternal = false;
 
     Clear();
@@ -126,11 +115,6 @@ void ChipCertificateSet::Release()
             Clear();
             chip::Platform::MemoryFree(mCerts);
             mCerts = nullptr;
-        }
-        if (mDecodeBuf != nullptr)
-        {
-            chip::Platform::MemoryFree(mDecodeBuf);
-            mDecodeBuf = nullptr;
         }
     }
 }
@@ -187,11 +171,29 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
         // Enter the certificate structure...
         ReturnErrorOnFailure(reader.EnterContainer(containerType));
 
-        // Initialize an ASN1Writer and convert the TBS (to-be-signed) portion of the certificate to ASN.1 DER
-        // encoding.  At the same time, parse various components within the certificate and set the corresponding
-        // fields in the CertificateData object.
-        writer.Init(mDecodeBuf, mDecodeBufSize);
-        ReturnErrorOnFailure(DecodeConvertTBSCert(reader, writer, cert));
+        // If requested to generate the TBSHash.
+        if (decodeFlags.Has(CertDecodeFlags::kGenerateTBSHash))
+        {
+            chip::Platform::ScopedMemoryBuffer<uint8_t> asn1TBSBuf;
+            ReturnErrorCodeIf(!asn1TBSBuf.Alloc(kMaxCHIPCertDecodeBufLength), CHIP_ERROR_NO_MEMORY);
+
+            // Initialize an ASN1Writer and convert the TBS (to-be-signed) portion of the certificate to ASN.1 DER
+            // encoding. At the same time, parse various components within the certificate and set the corresponding
+            // fields in the CertificateData object.
+            writer.Init(asn1TBSBuf.Get(), kMaxCHIPCertDecodeBufLength);
+            ReturnErrorOnFailure(DecodeConvertTBSCert(reader, writer, cert));
+
+            // Generate a SHA hash of the encoded TBS certificate.
+            chip::Crypto::Hash_SHA256(asn1TBSBuf.Get(), writer.GetLengthWritten(), cert.mTBSHash);
+
+            cert.mCertFlags.Set(CertFlags::kTBSHashPresent);
+        }
+        else
+        {
+            // Initialize an ASN1Writer as a NullWriter.
+            writer.InitNullWriter();
+            ReturnErrorOnFailure(DecodeConvertTBSCert(reader, writer, cert));
+        }
 
         // Verify the cert has both the Subject Key Id and Authority Key Id extensions present.
         // Only certs with both these extensions are supported for the purposes of certificate validation.
@@ -200,15 +202,6 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
 
         // Verify the cert was signed with ECDSA-SHA256. This is the only signature algorithm currently supported.
         VerifyOrReturnError(cert.mSigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
-
-        // If requested, generate the hash of the TBS portion of the certificate...
-        if (decodeFlags.Has(CertDecodeFlags::kGenerateTBSHash))
-        {
-            // Generate a SHA hash of the encoded TBS certificate.
-            chip::Crypto::Hash_SHA256(mDecodeBuf, writer.GetLengthWritten(), cert.mTBSHash);
-
-            cert.mCertFlags.Set(CertFlags::kTBSHashPresent);
-        }
 
         // Decode the certificate's signature...
         ReturnErrorOnFailure(DecodeECDSASignature(reader, cert));
@@ -957,7 +950,7 @@ CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId)
 {
     ChipCertificateSet certSet;
 
-    ReturnErrorOnFailure(certSet.Init(1, kMaxCHIPCertDecodeBufLength));
+    ReturnErrorOnFailure(certSet.Init(1));
 
     ReturnErrorOnFailure(certSet.LoadCert(opcert.data(), static_cast<uint32_t>(opcert.size()), BitFlags<CertDecodeFlags>()));
 

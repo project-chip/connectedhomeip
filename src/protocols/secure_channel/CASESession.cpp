@@ -1197,7 +1197,7 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t * respond
 
     ChipCertificateSet certSet;
     // Certificate set can contain up to 3 certs (NOC, ICA cert, and Root CA cert)
-    ReturnErrorOnFailure(certSet.Init(3, kMaxCHIPCertDecodeBufLength));
+    ReturnErrorOnFailure(certSet.Init(3));
 
     Encoding::LittleEndian::BufferWriter bbuf(responderID, responderID.Length());
     ReturnErrorOnFailure(
