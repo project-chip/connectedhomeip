@@ -1937,6 +1937,16 @@
 #endif // CHIP_CONFIG_ERROR_CLASS
 
 /**
+ *  @def CHIP_CONFIG_ERROR_SOURCE
+ *
+ *  If asserted (1), and CHIP_CONFIG_ERROR_CLASS is also 1, then CHIP_ERROR constants
+ *  will include the source location of their expansion.
+ */
+#ifndef CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_CONFIG_ERROR_SOURCE 0
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
+/**
  *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
  *
  *  If 0, then ChipError::FormatError() returns an integer (ChipError::BaseType).
