@@ -29,4 +29,5 @@ project(chip-pigweed-app)
 idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++17;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 
+idf_build_get_property(project_path PROJECT_DIR)
 flashing_script(DEPENDS "${project_path}/echo_test_config.yml" "${project_path}/../mobly_tests/echo_test.py")

@@ -52,7 +52,7 @@ macro(flashing_script)
   get_additional_flashing_depends(${ARGN})
   foreach(dep IN LISTS additional_flashing_depends)
     get_filename_component(filename ${dep} NAME)
-    configure_file(${dep}, "${build_dir}/${filename}")
+    configure_file("${dep}" "${build_dir}/${filename}")
     list(APPEND build_dir_depends "${build_dir}/${filename}")
   endforeach(dep)
 
