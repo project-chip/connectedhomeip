@@ -306,8 +306,8 @@ bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHea
         // The exchange identifier of the message matches the exchange identifier of the context.
         (mExchangeId == payloadHeader.GetExchangeID())
 
-        // AND The message was received from the peer node associated with the exchange
-        && (mSecureSession == session)
+        // AND The Session ID associated with the incoming message matches the Session ID associated with the exchange.
+        && (mSecureSession.GetPeerKeyId() == session.GetPeerKeyId())
 
         // AND The message was sent by an initiator and the exchange context is a responder (IsInitiator==false)
         //    OR The message was sent by a responder and the exchange context is an initiator (IsInitiator==true) (for the broadcast
