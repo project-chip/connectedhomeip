@@ -25,9 +25,7 @@ PYBIND11_MODULE(PyChip, root_module)
 
     modules[""] = root_module;
 
-    std::vector<std::pair<std::string, std::string>> sub_modules{
-        { "", "ChipExceptions" }
-    };
+    std::vector<std::pair<std::string, std::string>> sub_modules{ { "", "ChipExceptions" } };
     for (auto & p : sub_modules)
         modules[p.first.size() ? p.first + "::" + p.second : p.second] =
             modules[p.first].def_submodule(p.second.c_str(), ("Bindings for " + p.first + "::" + p.second + " namespace").c_str());
