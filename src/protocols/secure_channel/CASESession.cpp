@@ -1078,9 +1078,11 @@ CHIP_ERROR CASESession::ConstructSignedCredentials(const uint8_t ** msgIterator,
 
 CHIP_ERROR CASESession::ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen)
 {
+    uint8_t sid[2] = { (uint8_t) sessionID, (uint8_t) (sessionID >> 8) };
+
     HKDF_sha_crypto mHKDF;
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(fabricSecret, fabricSecret.Length(), reinterpret_cast<const uint8_t *>(&sessionID),
-                                           sizeof(sessionID), kIPKInfo, sizeof(kIPKInfo), ipk, ipkLen));
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mFabricSecret, mFabricSecret.Length(), sid,
+                                           sizeof(sid), kIPKInfo, sizeof(kIPKInfo), ipk, ipkLen));
 
     return CHIP_NO_ERROR;
 }
