@@ -57,7 +57,7 @@ CHIP_ERROR ReadByteSpan(const uint8_t * buffer, uint16_t bufferLen, chip::ByteSp
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WriteByteSpan(uint8_t * buffer, uint16_t bufferLen, chip::ByteSpan * span)
+CHIP_ERROR WriteByteSpan(uint8_t * buffer, uint16_t bufferLen, const chip::ByteSpan * span)
 {
     uint16_t size = static_cast<uint16_t>(span->size());
     ReturnErrorOnFailure(WriteByteSpanSize(buffer, bufferLen, size));

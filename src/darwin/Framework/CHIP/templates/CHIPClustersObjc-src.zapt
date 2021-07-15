@@ -36,6 +36,7 @@ using chip::Callback::Cancelable;
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{#if (attributeTypeSupported this)}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 {{#*inline "callbackName"}}{{#if isList}}{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}List{{else}}{{chipCallback.name}}{{/if}}Attribute{{/inline}}
 - (void)read{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler
@@ -73,6 +74,7 @@ using chip::Callback::Cancelable;
     }, true);
 }
 
+{{/if}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 

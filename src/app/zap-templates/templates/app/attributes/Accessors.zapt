@@ -23,8 +23,11 @@ namespace Attributes {
 {{/first}}
 {{#if clusterRef}}
 {{#if (canHaveSimpleAccessors type)}}
-EmberAfStatus Get{{asUpperCamelCase label}}(chip::EndpointId endpoint, {{asUnderlyingZclType type}} * {{asLowerCamelCase label}}); // {{type}} {{isArray}}
-EmberAfStatus Set{{asUpperCamelCase label}}(chip::EndpointId endpoint, {{asUnderlyingZclType type}} {{asLowerCamelCase label}});
+{{#if_is_struct type}}
+{{else}}
+EmberAfStatus Get{{asUpperCamelCase label}}(chip::EndpointId endpoint, {{asUnderlyingZclType type struct='uint8_t'}} * {{asLowerCamelCase label}}); // {{type}} {{isArray}}
+EmberAfStatus Set{{asUpperCamelCase label}}(chip::EndpointId endpoint, {{asUnderlyingZclType type struct='uint8_t*'}} {{asLowerCamelCase label}});
+{{/if_is_struct}}
 {{/if}}
 {{/if}}
 {{#last}}

@@ -52,15 +52,15 @@ function asReadTypeLength(type)
     const defaultResolver = zclQuery.selectAtomicType(db, pkgId, type);
 
     const enumResolver = zclHelper.isEnum(db, type, pkgId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectEnumByName(db, type, pkgId).then(rec => {
-        return zclQuery.selectAtomicType(db, pkgId, rec.type);
-      });
+      return result == 'unknown'
+          ? null
+          : zclQuery.selectEnumByName(db, type, pkgId).then(rec => { return zclQuery.selectAtomicType(db, pkgId, rec.type); });
     });
 
     const bitmapResolver = zclHelper.isBitmap(db, type, pkgId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectBitmapByName(db, pkgId, type).then(rec => {
-        return zclQuery.selectAtomicType(db, pkgId, rec.type);
-      });
+      return result == 'unknown'
+          ? null
+          : zclQuery.selectBitmapByName(db, pkgId, type).then(rec => { return zclQuery.selectAtomicType(db, pkgId, rec.type); });
     });
 
     const typeResolver = Promise.all([ defaultResolver, enumResolver, bitmapResolver ]);
@@ -162,25 +162,25 @@ function chip_endpoint_generated_functions()
       {
         hasFunctionArray = true
         functionList     = functionList.concat(
-            `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
+                `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
       }
 
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
             cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
-        hasFunctionArray = true
+            hasFunctionArray = true
       }
 
       if (endpointClusterWithMessageSent.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
             cHelper.asCamelCased(clusterName, false)}ClusterServerMessageSentCallback,\\\n`)
-        hasFunctionArray = true
+            hasFunctionArray = true
       }
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
             cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
-        hasFunctionArray = true
+            hasFunctionArray = true
       }
 
       if (hasFunctionArray) {
@@ -333,6 +333,39 @@ function asUpperCamelCase(label)
 function asMEI(prefix, suffix)
 {
   return cHelper.asHex((prefix << 16) + suffix, 8);
+}
+
+/**
+ * Iterator over the server attributes. If it is used at toplevel, if iterates over all the server attributes
+ * in the database. If used within zcl_cluster context, it iterates over all the server attributes
+ * that belong to that cluster.
+ *
+ * @param {*} options
+ * @returns Promise of attribute iteration.
+ */
+function zcl_attributes_server_enhanced(options)
+{
+  const loadTypes = [
+    loadAtomics.call(context, packageId),
+    loadEnums.call(context, packageId),
+    loadBitmaps.call(context, packageId),
+    loadStructs.call(context, packageId),
+  ];
+
+  // If used at the toplevel, 'this' is the toplevel context object.
+  // when used at the cluster level, 'this' is a cluster
+  let promise = templateUtil.ensureZclPackageId(this)
+                    .then((packageId) => {
+                      if ('id' in this) {
+                        // We're functioning inside a nested context with an id, so we will only query for this cluster.
+                        return queryZcl.selectAttributesByClusterIdAndSideIncludingGlobal(
+                            this.global.db, this.id, packageId, dbEnum.side.server)
+                      } else {
+                        return queryZcl.selectAllAttributesBySide(this.global.db, dbEnum.side.server, packageId)
+                      }
+                    })
+                    .then((atts) => templateUtil.collectBlocks(atts, options, this))
+  return templateUtil.templatePromise(this.global, promise)
 }
 
 //
