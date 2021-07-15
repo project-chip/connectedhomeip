@@ -29,7 +29,7 @@
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 
 #include <app/server/Server.h>
 
@@ -48,10 +48,10 @@ NodeId GetCurrentNodeId()
     // mdns advertises a single node id as parameter.
 
     // Search for one admin pairing and use its node id.
-    auto pairing = GetGlobalAdminPairingTable().cbegin();
-    if (pairing != GetGlobalAdminPairingTable().cend())
+    auto pairing = GetGlobalFabricTable().cbegin();
+    if (pairing != GetGlobalFabricTable().cend())
     {
-        ChipLogProgress(Discovery, "Found admin pairing for admin %" PRIX16 ", node 0x" ChipLogFormatX64, pairing->GetAdminId(),
+        ChipLogProgress(Discovery, "Found admin pairing for admin %" PRIX8 ", node 0x" ChipLogFormatX64, pairing->GetFabricIndex(),
                         ChipLogValueX64(pairing->GetNodeId()));
         return pairing->GetNodeId();
     }

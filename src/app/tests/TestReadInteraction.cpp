@@ -262,7 +262,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     err                            = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     SecureSessionHandle session = ctx.GetSessionLocalToPeer();
-    err = readClient.SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetAdminId(), &session, nullptr /*apEventPathParamsList*/,
+    err = readClient.SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session, nullptr /*apEventPathParamsList*/,
                                      0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
                                      0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -389,7 +389,7 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     SecureSessionHandle session = ctx.GetSessionLocalToPeer();
-    err = readClient.SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetAdminId(), &session, nullptr /*apEventPathParamsList*/,
+    err = readClient.SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session, nullptr /*apEventPathParamsList*/,
                                      0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
                                      0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -578,8 +578,8 @@ void TestReadInteraction::TestReadEventRoundtrip(nlTestSuite * apSuite, void * a
     eventPathParams[1].mEventId    = kTestEventIdCritical;
 
     SecureSessionHandle session = ctx.GetSessionLocalToPeer();
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetAdminId(), &session,
-                                                                            eventPathParams, 2, nullptr, 1, 0);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(),
+                                                                            &session, eventPathParams, 2, nullptr, 1, 0);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();

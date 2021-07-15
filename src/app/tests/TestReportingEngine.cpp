@@ -49,13 +49,13 @@ static SecureSessionMgr gSessionManager;
 static Messaging::ExchangeManager gExchangeManager;
 static TransportMgr<Transport::UDP> gTransportManager;
 static secure_channel::MessageCounterManager gMessageCounterManager;
-static const Transport::AdminId gAdminId = 0;
-constexpr ClusterId kTestClusterId       = 6;
-constexpr EndpointId kTestEndpointId     = 1;
-constexpr chip::FieldId kTestFieldId1    = 1;
-constexpr chip::FieldId kTestFieldId2    = 2;
-constexpr uint8_t kTestFieldValue1       = 1;
-constexpr uint8_t kTestFieldValue2       = 2;
+static const FabricIndex gFabricIndex = 0;
+constexpr ClusterId kTestClusterId    = 6;
+constexpr EndpointId kTestEndpointId  = 1;
+constexpr chip::FieldId kTestFieldId1 = 1;
+constexpr chip::FieldId kTestFieldId2 = 2;
+constexpr uint8_t kTestFieldValue1    = 1;
+constexpr uint8_t kTestFieldValue2    = 2;
 
 namespace app {
 CHIP_ERROR ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter * apWriter, bool * apDataExists)
@@ -148,17 +148,17 @@ void InitializeChip(nlTestSuite * apSuite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(chip::gAdminId, chip::kTestDeviceNodeId);
+    chip::Transport::FabricTable fabrics;
+    chip::Transport::FabricInfo * fabricInfo = fabrics.AssignFabricIndex(chip::gFabricIndex, chip::kTestDeviceNodeId);
 
-    NL_TEST_ASSERT(apSuite, adminInfo != nullptr);
+    NL_TEST_ASSERT(apSuite, fabricInfo != nullptr);
 
     err = chip::Platform::MemoryInit();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     chip::gSystemLayer.Init();
 
-    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins,
+    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &fabrics,
                                      &chip::gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 

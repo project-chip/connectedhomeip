@@ -339,7 +339,7 @@ public:
         if (i == 0)
         {
             ConnectivityMgr().ClearWiFiStationProvision();
-            OpenDefaultPairingWindow(ResetAdmins::kYes);
+            OpenDefaultPairingWindow(ResetFabrics::kYes);
         }
         else if (i == 1)
         {
@@ -348,7 +348,7 @@ public:
         else if (i == 2)
         {
             app::Mdns::AdvertiseCommissionableNode();
-            OpenDefaultPairingWindow(ResetAdmins::kYes, PairingWindowAdvertisement::kMdns);
+            OpenDefaultPairingWindow(ResetFabrics::kYes, PairingWindowAdvertisement::kMdns);
         }
     }
 

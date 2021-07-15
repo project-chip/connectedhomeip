@@ -44,7 +44,7 @@
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
@@ -333,8 +333,8 @@ protected:
 
     void PersistNextKeyId();
 
-    Transport::AdminId mAdminId = 0;
-    Transport::AdminPairingTable mAdmins;
+    FabricIndex mFabricIndex = 0;
+    Transport::FabricTable mFabrics;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
@@ -370,7 +370,7 @@ private:
 
     void ReleaseAllDevices();
 
-    CHIP_ERROR LoadLocalCredentials(Transport::AdminPairingInfo * admin);
+    CHIP_ERROR LoadLocalCredentials(Transport::FabricInfo * fabric);
 
     static void OnLocalNOCGenerated(void * context, const ByteSpan & noc);
     Callback::Callback<NOCGenerated> mLocalNOCCallback;

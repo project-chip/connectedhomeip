@@ -59,7 +59,7 @@ public:
      *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
-    CHIP_ERROR SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession);
+    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession);
 
     CHIP_ERROR PrepareAttribute(const AttributePathParams & attributePathParams);
     CHIP_ERROR FinishAttribute();

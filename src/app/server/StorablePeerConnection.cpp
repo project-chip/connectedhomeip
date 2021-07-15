@@ -21,11 +21,11 @@
 
 namespace chip {
 
-StorablePeerConnection::StorablePeerConnection(PASESession & session, Transport::AdminId admin)
+StorablePeerConnection::StorablePeerConnection(PASESession & session, FabricIndex fabric)
 {
     session.ToSerializable(mSession.mOpCreds);
-    mSession.mAdmin = Encoding::LittleEndian::HostSwap16(admin);
-    mKeyId          = session.GetLocalKeyId();
+    mSession.mFabric = fabric;
+    mKeyId           = session.GetLocalKeyId();
 }
 
 CHIP_ERROR StorablePeerConnection::StoreIntoKVS(PersistentStorageDelegate & kvs)

@@ -52,7 +52,7 @@ public:
     //
     // If SendCommandRequest is never called, or the call fails, the API
     // consumer is responsible for calling Shutdown on the CommandSender.
-    CHIP_ERROR SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * secureSession = nullptr);
+    CHIP_ERROR SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * secureSession = nullptr);
 
 private:
     // ExchangeDelegate interface implementation.  Private so people won't
