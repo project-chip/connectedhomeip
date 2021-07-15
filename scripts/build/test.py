@@ -9,15 +9,17 @@ import subprocess
 import sys
 import time
 
+from typing import List
+
 SCRIPT_ROOT = os.path.dirname(__file__)
 
-def buildExpected(root: str, out: str):
+def build_expected_output(root: str, out: str) -> List[str]:
   with open(os.path.join(SCRIPT_ROOT, 'expected_all_platform_commands.txt'), 'rt') as f:
     for l in f.readlines():
       yield l.replace("{root}", root).replace("{out}", out)
 
 
-def buildActual(root: str, out: str):
+def build_actual_output(root: str, out: str) -> List[str]:
   # Fake out that we have a project root
   os.environ['PW_PROJECT_ROOT'] = root
 
@@ -43,8 +45,8 @@ def main():
   ROOT = '/TEST/BUILD/ROOT'
   OUT = '/OUTPUT/DIR'
 
-  expected = [l for l in buildExpected(ROOT, OUT)]
-  actual = [l for l in buildActual(ROOT, OUT)]
+  expected = [l for l in build_expected_output(ROOT, OUT)]
+  actual = [l for l in build_actual_output(ROOT, OUT)]
 
   diffs = [line for line in difflib.unified_diff(expected, actual)]
 
