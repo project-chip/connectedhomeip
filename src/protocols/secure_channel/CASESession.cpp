@@ -1216,6 +1216,12 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t * respond
         const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[0].mSubjectKeyId;
 
         ReturnErrorOnFailure(mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, resultCert));
+
+        // Now that we have verified that this is a valid cert, try to get the
+        // peer's operational identity from it.
+        PeerId peerId;
+        ReturnErrorOnFailure(ExtractPeerIdFromOpCert(certSet.GetCertSet()[0], &peerId));
+        mConnectionState.SetPeerNodeId(peerId.GetNodeId());
     }
 
     return CHIP_NO_ERROR;
