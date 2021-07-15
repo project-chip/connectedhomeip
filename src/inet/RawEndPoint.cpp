@@ -48,7 +48,7 @@
 #endif                             // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <system/SystemSockets.h>
+#include <system/WatchableSocket.h>
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif // HAVE_SYS_SOCKET_H
