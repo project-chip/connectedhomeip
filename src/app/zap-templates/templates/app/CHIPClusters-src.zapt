@@ -83,6 +83,8 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCase
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
 {{#if isList}}
         {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAttributeFilter
+{{else if isStruct}}
+         BasicAttributeFilter<{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback>
 {{else}}
          BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>
 {{/if}}

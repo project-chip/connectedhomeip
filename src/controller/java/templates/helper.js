@@ -191,6 +191,11 @@ function omitCommaForFirstNonStatusCommand(id, index)
   return templateUtil.templatePromise(this.global, promise);
 }
 
+function attributeTypeSupported(attribute)
+{
+  return attribute.isArray || attribute.chipCallback.type
+}
+
 //
 // Module exports
 //
@@ -204,3 +209,4 @@ exports.convertCTypeToJniSignature             = convertCTypeToJniSignature;
 exports.convertBasicCTypeToJavaBoxedType       = convertBasicCTypeToJavaBoxedType;
 exports.convertAttributeCallbackTypeToJavaName = convertAttributeCallbackTypeToJavaName;
 exports.omitCommaForFirstNonStatusCommand      = omitCommaForFirstNonStatusCommand;
+exports.attributeTypeSupported                 = attributeTypeSupported;

@@ -3,7 +3,9 @@
     "version": "chip-v1",
     "helpers": [
         "../../zap-templates/partials/helper.js",
+        "../../zap-templates/common/ChipTypesHelper.js",
         "../../zap-templates/common/StringHelper.js",
+        "../../zap-templates/common/ListHelper.js",
         "../../zap-templates/common/attributes/Accessors.js",
         "../../zap-templates/templates/app/helper.js",
         "../../zap-templates/templates/chip/helper.js"
@@ -20,6 +22,11 @@
             "path": "../../zap-templates/templates/app/af-structs.zapt",
             "name": "ZCL af-structs header",
             "output": "src/app/common/gen/af-structs.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/af-structs-src.zapt",
+            "name": "ZCL af-structs encoder",
+            "output": "src/app/common/gen/af-structs.cpp"
         },
         {
             "path": "../../zap-templates/templates/app/att-storage.zapt",

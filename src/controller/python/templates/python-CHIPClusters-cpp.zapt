@@ -79,6 +79,13 @@ static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListA
         gSuccessResponseDelegate();
 }
 chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback> g{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback{On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse, nullptr};
+{{else if isStruct}}
+static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}StructAttributeResponse(void * context, {{chipType}} value) {
+    ChipLogProgress(chipTool, "On{{asCamelCased parent.name false}}{{asCamelCased name false}}StructAttributeResponse: TODO: Print struct content.");
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback> g{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback{On{{asCamelCased parent.name false}}{{asCamelCased name false}}StructAttributeResponse, nullptr};
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
@@ -132,6 +139,8 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_{{asCamelCased parent.name f
     cluster.Associate(device, ZCLendpointId);
 {{#if isList}}
     return chip::ChipError::AsInteger(cluster.ReadAttribute{{asCamelCased name false}}(g{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+{{else if isStruct}}
+    return chip::ChipError::AsInteger(cluster.ReadAttribute{{asCamelCased name false}}(g{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
 {{else}}
     return chip::ChipError::AsInteger(cluster.ReadAttribute{{asCamelCased name false}}(g{{chipCallback.name}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
 {{/if}}

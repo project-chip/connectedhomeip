@@ -25,6 +25,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CMAKE_CURRENT_LIST_DIR}/gen"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/common/gen/attributes"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/common/gen"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"

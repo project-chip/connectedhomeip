@@ -153,7 +153,13 @@ static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListA
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
-
+{{else if isStruct}}
+static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}StructAttributeResponse(void * context, {{chipType}} value) {
+    ChipLogProgress(chipTool, "On{{asCamelCased parent.name false}}{{asCamelCased name false}}StructAttributeResponse: TODO: Print struct content.");
+    IgnoreUnusedVariable(value);
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
@@ -280,6 +286,8 @@ public:
 private:
 {{#if isList}}
     chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>(On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse, this);
+{{else if isStruct}}
+    chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback>(On{{asCamelCased parent.name false}}{{asCamelCased name false}}StructAttributeResponse, this);
 {{else}}
     chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
 {{/if}}

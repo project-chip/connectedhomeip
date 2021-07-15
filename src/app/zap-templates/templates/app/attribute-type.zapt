@@ -8,4 +8,8 @@ enum {
 {{#zcl_atomics}}
 {{ident}}ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPE = {{asHex atomicId 2}}, // {{description}}
 {{/zcl_atomics}}
+// TODO: workaround for structs, should emit ZCL_STRUCT_ATTRIBUTE_TYPE for structs, this is a issue of zap.
+{{#zcl_structs}}
+{{ident}}ZCL_{{asDelimitedMacro label}}_ATTRIBUTE_TYPE = ZCL_STRUCT_ATTRIBUTE_TYPE,
+{{/zcl_structs}}
 };

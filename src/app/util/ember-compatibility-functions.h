@@ -29,6 +29,22 @@
 
 namespace chip {
 namespace app {
+
+using TLVEncoderFunct        = CHIP_ERROR (*)(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+using TLVDecoderFunct        = CHIP_ERROR (*)(void * val, const chip::TLV::TLVReader & aReader);
+using EmberBufferEncodeFunct = CHIP_ERROR (*)(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+using EmberBufferDecodeFunct = CHIP_ERROR (*)(void * valPtr, const uint8_t * buf, size_t bufLength);
+
+struct AttributeStructEncoderInfo
+{
+    TLVEncoderFunct TLVEncoder          = nullptr;
+    TLVDecoderFunct TLVDecoder          = nullptr;
+    EmberBufferEncodeFunct EmberEncoder = nullptr;
+    EmberBufferDecodeFunct EmberDecoder = nullptr;
+};
+
+const AttributeStructEncoderInfo * GetAttributeStructEncoderInfo(ClusterId clusterId, AttributeId attributeId);
+
 namespace Compatibility {
 
 void SetupEmberAfObjects(Command * command, ClusterId clusterId, CommandId commandId, EndpointId endpointId);

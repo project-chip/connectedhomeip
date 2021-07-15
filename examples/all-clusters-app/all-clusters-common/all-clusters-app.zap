@@ -1,5 +1,5 @@
 {
-  "featureLevel": 39,
+  "featureLevel": 45,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -3356,7 +3356,7 @@
               "reportableChange": 0
             },
             {
-              "name": "supported fabrics",
+              "name": "SupportedFabrics",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -3371,7 +3371,7 @@
               "reportableChange": 0
             },
             {
-              "name": "commissioned fabrics",
+              "name": "CommissionedFabrics",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -13383,6 +13383,21 @@
             {
               "name": "long_char_string",
               "code": 31,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "simple_struct",
+              "code": 32,
               "mfgCode": null,
               "side": "server",
               "included": 1,
