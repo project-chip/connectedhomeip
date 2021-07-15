@@ -3170,26 +3170,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000001_WriteAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"write a value into the RO mandatory attribute: Type"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    uint8_t typeArgument = 7;
-    [cluster writeAttributeTypeWithValue:typeArgument
-                         responseHandler:^(NSError * err, NSDictionary * values) {
-                             NSLog(@"write a value into the RO mandatory attribute: Type Error: %@", err);
-
-                             XCTAssertEqual(err.code, 1);
-                             [expectation fulfill];
-                         }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_WNCV_2_1_000002_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000001_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back the RO mandatory attribute: Type"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3207,7 +3188,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000003_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000002_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"read the RO mandatory attribute default: ConfigStatus"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3225,7 +3206,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000004_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000003_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back the RO mandatory attribute: ConfigStatus"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3243,7 +3224,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000005_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000004_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"read the RO mandatory attribute default: OperationalStatus"];
@@ -3262,7 +3243,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000006_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000005_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back the RO mandatory attribute: OperationalStatus"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3280,7 +3261,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000007_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000006_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"read the RO mandatory attribute default: EndProductType"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3298,7 +3279,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000008_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000007_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back the RO mandatory attribute: EndProductType"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3316,7 +3297,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_WNCV_2_1_000009_ReadAttribute
+- (void)testSendClusterTest_TC_WNCV_2_1_000008_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"read the RW mandatory attribute default: Mode"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3331,6 +3312,25 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
         [expectation fulfill];
     }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_WNCV_2_1_000009_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"write a value into the RW mandatory attribute:: Mode"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPWindowCovering * cluster = [[CHIPWindowCovering alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t modeArgument = 7;
+    [cluster writeAttributeModeWithValue:modeArgument
+                         responseHandler:^(NSError * err, NSDictionary * values) {
+                             NSLog(@"write a value into the RW mandatory attribute:: Mode Error: %@", err);
+
+                             XCTAssertEqual(err.code, 0);
+                             [expectation fulfill];
+                         }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }

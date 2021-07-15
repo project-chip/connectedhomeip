@@ -28,7 +28,7 @@ tests:
           value: 0
 
     - label: "write a value into the RO mandatory attribute: Type"
-      disabled: false
+      disabled: true
       command: "writeAttribute"
       attribute: "Type"
       arguments:
@@ -117,7 +117,7 @@ tests:
           value: 0
 
     - label: "write a value into the RW mandatory attribute:: Mode"
-      disabled: true
+      disabled: false
       command: "writeAttribute"
       attribute: "Mode"
       arguments:

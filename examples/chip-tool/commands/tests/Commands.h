@@ -13563,7 +13563,7 @@ public:
             err = TestSendClusterWindowCoveringCommandReadAttribute_0();
             break;
         case 1:
-            err = TestSendClusterWindowCoveringCommandWriteAttribute_1();
+            err = TestSendClusterWindowCoveringCommandReadAttribute_1();
             break;
         case 2:
             err = TestSendClusterWindowCoveringCommandReadAttribute_2();
@@ -13587,7 +13587,7 @@ public:
             err = TestSendClusterWindowCoveringCommandReadAttribute_8();
             break;
         case 9:
-            err = TestSendClusterWindowCoveringCommandReadAttribute_9();
+            err = TestSendClusterWindowCoveringCommandWriteAttribute_9();
             break;
         case 10:
             err = TestSendClusterWindowCoveringCommandReadAttribute_10();
@@ -13672,34 +13672,33 @@ private:
         runner->NextTest();
     }
 
-    // Test write a value into the RO mandatory attribute: Type
+    // Test reads back the RO mandatory attribute: Type
     using SuccessCallback_1 = void (*)(void * context, uint8_t type);
     chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{
-        OnTestSendClusterWindowCoveringCommandWriteAttribute_1_SuccessResponse, this
+        OnTestSendClusterWindowCoveringCommandReadAttribute_1_SuccessResponse, this
     };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
-        OnTestSendClusterWindowCoveringCommandWriteAttribute_1_FailureResponse, this
+        OnTestSendClusterWindowCoveringCommandReadAttribute_1_FailureResponse, this
     };
-    bool mIsFailureExpected_1 = 1;
+    bool mIsFailureExpected_1 = 0;
 
-    CHIP_ERROR TestSendClusterWindowCoveringCommandWriteAttribute_1()
+    CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_1()
     {
-        ChipLogProgress(chipTool, "Window Covering - write a value into the RO mandatory attribute: Type: Sending command...");
+        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: Type: Sending command...");
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint8_t typeArgument = 7;
-        err = cluster.WriteAttributeType(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel(), typeArgument);
+        err = cluster.ReadAttributeType(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
 
         return err;
     }
 
-    static void OnTestSendClusterWindowCoveringCommandWriteAttribute_1_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterWindowCoveringCommandReadAttribute_1_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Window Covering - write a value into the RO mandatory attribute: Type: Failure Response");
+        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: Type: Failure Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -13713,69 +13712,13 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterWindowCoveringCommandWriteAttribute_1_SuccessResponse(void * context, uint8_t type)
-    {
-        ChipLogProgress(chipTool, "Window Covering - write a value into the RO mandatory attribute: Type: Success Response");
-
-        Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
-
-        if (runner->mIsFailureExpected_1 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test reads back the RO mandatory attribute: Type
-    using SuccessCallback_2 = void (*)(void * context, uint8_t type);
-    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
-        OnTestSendClusterWindowCoveringCommandReadAttribute_2_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
-        OnTestSendClusterWindowCoveringCommandReadAttribute_2_FailureResponse, this
-    };
-    bool mIsFailureExpected_2 = 0;
-
-    CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_2()
-    {
-        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: Type: Sending command...");
-
-        chip::Controller::WindowCoveringCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReadAttributeType(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
-
-        return err;
-    }
-
-    static void OnTestSendClusterWindowCoveringCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: Type: Failure Response");
-
-        Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
-
-        if (runner->mIsFailureExpected_2 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterWindowCoveringCommandReadAttribute_2_SuccessResponse(void * context, uint8_t type)
+    static void OnTestSendClusterWindowCoveringCommandReadAttribute_1_SuccessResponse(void * context, uint8_t type)
     {
         ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: Type: Success Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
-        if (runner->mIsFailureExpected_2 == true)
+        if (runner->mIsFailureExpected_1 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -13793,6 +13736,69 @@ private:
     }
 
     // Test read the RO mandatory attribute default: ConfigStatus
+    using SuccessCallback_2 = void (*)(void * context, uint8_t configStatus);
+    chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
+        OnTestSendClusterWindowCoveringCommandReadAttribute_2_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
+        OnTestSendClusterWindowCoveringCommandReadAttribute_2_FailureResponse, this
+    };
+    bool mIsFailureExpected_2 = 0;
+
+    CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_2()
+    {
+        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: ConfigStatus: Sending command...");
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeConfigStatus(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterWindowCoveringCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: ConfigStatus: Failure Response");
+
+        Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_2 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterWindowCoveringCommandReadAttribute_2_SuccessResponse(void * context, uint8_t configStatus)
+    {
+        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: ConfigStatus: Success Response");
+
+        Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
+
+        if (runner->mIsFailureExpected_2 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (configStatus != 3)
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "3");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test reads back the RO mandatory attribute: ConfigStatus
     using SuccessCallback_3 = void (*)(void * context, uint8_t configStatus);
     chip::Callback::Callback<SuccessCallback_3> mOnSuccessCallback_3{
         OnTestSendClusterWindowCoveringCommandReadAttribute_3_SuccessResponse, this
@@ -13804,7 +13810,7 @@ private:
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_3()
     {
-        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: ConfigStatus: Sending command...");
+        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: ConfigStatus: Sending command...");
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -13818,7 +13824,7 @@ private:
 
     static void OnTestSendClusterWindowCoveringCommandReadAttribute_3_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: ConfigStatus: Failure Response");
+        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: ConfigStatus: Failure Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -13834,7 +13840,7 @@ private:
 
     static void OnTestSendClusterWindowCoveringCommandReadAttribute_3_SuccessResponse(void * context, uint8_t configStatus)
     {
-        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: ConfigStatus: Success Response");
+        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: ConfigStatus: Success Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -13855,8 +13861,8 @@ private:
         runner->NextTest();
     }
 
-    // Test reads back the RO mandatory attribute: ConfigStatus
-    using SuccessCallback_4 = void (*)(void * context, uint8_t configStatus);
+    // Test read the RO mandatory attribute default: OperationalStatus
+    using SuccessCallback_4 = void (*)(void * context, uint8_t operationalStatus);
     chip::Callback::Callback<SuccessCallback_4> mOnSuccessCallback_4{
         OnTestSendClusterWindowCoveringCommandReadAttribute_4_SuccessResponse, this
     };
@@ -13867,21 +13873,22 @@ private:
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_4()
     {
-        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: ConfigStatus: Sending command...");
+        ChipLogProgress(chipTool,
+                        "Window Covering - read the RO mandatory attribute default: OperationalStatus: Sending command...");
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeConfigStatus(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
+        err = cluster.ReadAttributeOperationalStatus(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
 
         return err;
     }
 
     static void OnTestSendClusterWindowCoveringCommandReadAttribute_4_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: ConfigStatus: Failure Response");
+        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: OperationalStatus: Failure Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -13895,9 +13902,9 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterWindowCoveringCommandReadAttribute_4_SuccessResponse(void * context, uint8_t configStatus)
+    static void OnTestSendClusterWindowCoveringCommandReadAttribute_4_SuccessResponse(void * context, uint8_t operationalStatus)
     {
-        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: ConfigStatus: Success Response");
+        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: OperationalStatus: Success Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -13908,9 +13915,9 @@ private:
             return;
         }
 
-        if (configStatus != 3)
+        if (operationalStatus != 0)
         {
-            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "3");
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
@@ -13918,7 +13925,7 @@ private:
         runner->NextTest();
     }
 
-    // Test read the RO mandatory attribute default: OperationalStatus
+    // Test reads back the RO mandatory attribute: OperationalStatus
     using SuccessCallback_5 = void (*)(void * context, uint8_t operationalStatus);
     chip::Callback::Callback<SuccessCallback_5> mOnSuccessCallback_5{
         OnTestSendClusterWindowCoveringCommandReadAttribute_5_SuccessResponse, this
@@ -13930,8 +13937,7 @@ private:
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_5()
     {
-        ChipLogProgress(chipTool,
-                        "Window Covering - read the RO mandatory attribute default: OperationalStatus: Sending command...");
+        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: OperationalStatus: Sending command...");
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -13945,7 +13951,7 @@ private:
 
     static void OnTestSendClusterWindowCoveringCommandReadAttribute_5_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: OperationalStatus: Failure Response");
+        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: OperationalStatus: Failure Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -13961,7 +13967,7 @@ private:
 
     static void OnTestSendClusterWindowCoveringCommandReadAttribute_5_SuccessResponse(void * context, uint8_t operationalStatus)
     {
-        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: OperationalStatus: Success Response");
+        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: OperationalStatus: Success Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -13982,8 +13988,8 @@ private:
         runner->NextTest();
     }
 
-    // Test reads back the RO mandatory attribute: OperationalStatus
-    using SuccessCallback_6 = void (*)(void * context, uint8_t operationalStatus);
+    // Test read the RO mandatory attribute default: EndProductType
+    using SuccessCallback_6 = void (*)(void * context, uint8_t endProductType);
     chip::Callback::Callback<SuccessCallback_6> mOnSuccessCallback_6{
         OnTestSendClusterWindowCoveringCommandReadAttribute_6_SuccessResponse, this
     };
@@ -13994,21 +14000,21 @@ private:
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_6()
     {
-        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: OperationalStatus: Sending command...");
+        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: EndProductType: Sending command...");
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeOperationalStatus(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
+        err = cluster.ReadAttributeEndProductType(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
 
         return err;
     }
 
     static void OnTestSendClusterWindowCoveringCommandReadAttribute_6_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: OperationalStatus: Failure Response");
+        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: EndProductType: Failure Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -14022,9 +14028,9 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterWindowCoveringCommandReadAttribute_6_SuccessResponse(void * context, uint8_t operationalStatus)
+    static void OnTestSendClusterWindowCoveringCommandReadAttribute_6_SuccessResponse(void * context, uint8_t endProductType)
     {
-        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: OperationalStatus: Success Response");
+        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: EndProductType: Success Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -14035,7 +14041,7 @@ private:
             return;
         }
 
-        if (operationalStatus != 0)
+        if (endProductType != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -14045,7 +14051,7 @@ private:
         runner->NextTest();
     }
 
-    // Test read the RO mandatory attribute default: EndProductType
+    // Test reads back the RO mandatory attribute: EndProductType
     using SuccessCallback_7 = void (*)(void * context, uint8_t endProductType);
     chip::Callback::Callback<SuccessCallback_7> mOnSuccessCallback_7{
         OnTestSendClusterWindowCoveringCommandReadAttribute_7_SuccessResponse, this
@@ -14057,7 +14063,7 @@ private:
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_7()
     {
-        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: EndProductType: Sending command...");
+        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: EndProductType: Sending command...");
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -14071,7 +14077,7 @@ private:
 
     static void OnTestSendClusterWindowCoveringCommandReadAttribute_7_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: EndProductType: Failure Response");
+        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: EndProductType: Failure Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -14087,7 +14093,7 @@ private:
 
     static void OnTestSendClusterWindowCoveringCommandReadAttribute_7_SuccessResponse(void * context, uint8_t endProductType)
     {
-        ChipLogProgress(chipTool, "Window Covering - read the RO mandatory attribute default: EndProductType: Success Response");
+        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: EndProductType: Success Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -14108,8 +14114,8 @@ private:
         runner->NextTest();
     }
 
-    // Test reads back the RO mandatory attribute: EndProductType
-    using SuccessCallback_8 = void (*)(void * context, uint8_t endProductType);
+    // Test read the RW mandatory attribute default: Mode
+    using SuccessCallback_8 = void (*)(void * context, uint8_t mode);
     chip::Callback::Callback<SuccessCallback_8> mOnSuccessCallback_8{
         OnTestSendClusterWindowCoveringCommandReadAttribute_8_SuccessResponse, this
     };
@@ -14120,21 +14126,21 @@ private:
 
     CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_8()
     {
-        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: EndProductType: Sending command...");
+        ChipLogProgress(chipTool, "Window Covering - read the RW mandatory attribute default: Mode: Sending command...");
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeEndProductType(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
+        err = cluster.ReadAttributeMode(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
 
         return err;
     }
 
     static void OnTestSendClusterWindowCoveringCommandReadAttribute_8_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: EndProductType: Failure Response");
+        ChipLogProgress(chipTool, "Window Covering - read the RW mandatory attribute default: Mode: Failure Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -14148,9 +14154,9 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterWindowCoveringCommandReadAttribute_8_SuccessResponse(void * context, uint8_t endProductType)
+    static void OnTestSendClusterWindowCoveringCommandReadAttribute_8_SuccessResponse(void * context, uint8_t mode)
     {
-        ChipLogProgress(chipTool, "Window Covering - reads back the RO mandatory attribute: EndProductType: Success Response");
+        ChipLogProgress(chipTool, "Window Covering - read the RW mandatory attribute default: Mode: Success Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -14161,7 +14167,7 @@ private:
             return;
         }
 
-        if (endProductType != 0)
+        if (mode != 0)
         {
             ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -14171,33 +14177,34 @@ private:
         runner->NextTest();
     }
 
-    // Test read the RW mandatory attribute default: Mode
+    // Test write a value into the RW mandatory attribute:: Mode
     using SuccessCallback_9 = void (*)(void * context, uint8_t mode);
     chip::Callback::Callback<SuccessCallback_9> mOnSuccessCallback_9{
-        OnTestSendClusterWindowCoveringCommandReadAttribute_9_SuccessResponse, this
+        OnTestSendClusterWindowCoveringCommandWriteAttribute_9_SuccessResponse, this
     };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
-        OnTestSendClusterWindowCoveringCommandReadAttribute_9_FailureResponse, this
+        OnTestSendClusterWindowCoveringCommandWriteAttribute_9_FailureResponse, this
     };
     bool mIsFailureExpected_9 = 0;
 
-    CHIP_ERROR TestSendClusterWindowCoveringCommandReadAttribute_9()
+    CHIP_ERROR TestSendClusterWindowCoveringCommandWriteAttribute_9()
     {
-        ChipLogProgress(chipTool, "Window Covering - read the RW mandatory attribute default: Mode: Sending command...");
+        ChipLogProgress(chipTool, "Window Covering - write a value into the RW mandatory attribute:: Mode: Sending command...");
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeMode(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
+        uint8_t modeArgument = 7;
+        err = cluster.WriteAttributeMode(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel(), modeArgument);
 
         return err;
     }
 
-    static void OnTestSendClusterWindowCoveringCommandReadAttribute_9_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterWindowCoveringCommandWriteAttribute_9_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Window Covering - read the RW mandatory attribute default: Mode: Failure Response");
+        ChipLogProgress(chipTool, "Window Covering - write a value into the RW mandatory attribute:: Mode: Failure Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
@@ -14211,22 +14218,15 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterWindowCoveringCommandReadAttribute_9_SuccessResponse(void * context, uint8_t mode)
+    static void OnTestSendClusterWindowCoveringCommandWriteAttribute_9_SuccessResponse(void * context, uint8_t mode)
     {
-        ChipLogProgress(chipTool, "Window Covering - read the RW mandatory attribute default: Mode: Success Response");
+        ChipLogProgress(chipTool, "Window Covering - write a value into the RW mandatory attribute:: Mode: Success Response");
 
         Test_TC_WNCV_2_1 * runner = reinterpret_cast<Test_TC_WNCV_2_1 *>(context);
 
         if (runner->mIsFailureExpected_9 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        if (mode != 0)
-        {
-            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "0");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
