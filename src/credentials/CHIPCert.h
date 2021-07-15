@@ -471,6 +471,11 @@ public:
     CHIP_ERROR LoadCerts(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags);
 
     /**
+     * @brief Release last certificate data in the set.
+     **/
+    CHIP_ERROR ReleaseLastCert();
+
+    /**
      * @brief Find certificate in the set.
      *
      * @param subjectKeyId  Subject key identifier of the certificate to be found in the set.

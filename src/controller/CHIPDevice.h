@@ -206,6 +206,7 @@ public:
      * @param[in] params       Wrapper object for transport manager etc.
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
+     * @param[in] fabricId     Fabric ID of the device
      * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
      * @param[in] admin        Local administrator that's initializing this device object
      */

@@ -77,7 +77,7 @@ FabricId Fabric_Node01_01 = 0xFAB000000000001D;
 
 enum
 {
-    kStandardCertsCount = 4,
+    kStandardCertsCount = 3,
 };
 
 class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
@@ -94,10 +94,10 @@ public:
 class TestCASESessionDestinationId : public CASESession
 {
 public:
-    CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::CertificateKeyId * trustedRootId, NodeId nodeId,
+    CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::CertificateKeyId * rootKeyId, NodeId nodeId,
                                      FabricId fabricId, MutableByteSpan & destinationId)
     {
-        return CASESession::GenerateDestinationID(random, trustedRootId, nodeId, fabricId, destinationId);
+        return CASESession::GenerateDestinationID(random, rootKeyId, nodeId, fabricId, destinationId);
     }
 };
 
@@ -219,8 +219,6 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     CASESession pairingAccessory;
     CASESessionSerializable serializableCommissioner;
     CASESessionSerializable serializableAccessory;
-
-    NL_TEST_ASSERT(inSuite, InitCredentialSets() == CHIP_NO_ERROR);
 
     gLoopback.mSentMessageCount = 0;
     NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
@@ -460,8 +458,6 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
 void CASE_DestinationIDGenerationTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    NL_TEST_ASSERT(inSuite, InitCredentialSets() == CHIP_NO_ERROR);
 
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;

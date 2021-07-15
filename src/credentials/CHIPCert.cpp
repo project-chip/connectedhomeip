@@ -311,6 +311,17 @@ exit:
     return err;
 }
 
+CHIP_ERROR ChipCertificateSet::ReleaseLastCert()
+{
+    const ChipCertificateData * lastCert = GetLastCert();
+    VerifyOrReturnError(lastCert != nullptr, CHIP_ERROR_INTERNAL);
+
+    lastCert->~ChipCertificateData();
+    --mCertCount;
+
+    return CHIP_NO_ERROR;
+}
+
 const ChipCertificateData * ChipCertificateSet::FindCert(const CertificateKeyId & subjectKeyId) const
 {
     for (uint8_t i = 0; i < mCertCount; i++)
