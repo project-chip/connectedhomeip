@@ -627,15 +627,16 @@ static void TestAsn1Conversions(nlTestSuite * inSuite, void * inContext)
         // Test converstion from ASN.1 ER to raw
         MutableByteSpan out_raw_sig_span(out_raw_sig.Get(), out_raw_sig_allocated_size);
 
-        CHIP_ERROR status =
-            EcdsaAsn1SignatureToRaw(vector->fe_length_bytes, ByteSpan{ vector->der_version, vector->der_version_length }, out_raw_sig_span);
+        CHIP_ERROR status = EcdsaAsn1SignatureToRaw(vector->fe_length_bytes,
+                                                    ByteSpan{ vector->der_version, vector->der_version_length }, out_raw_sig_span);
         NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, out_raw_sig_span.size() == vector->raw_version_length);
         NL_TEST_ASSERT(inSuite, (memcmp(out_raw_sig_span.data(), vector->raw_version, vector->raw_version_length) == 0));
 
         // Test conversion from raw to ASN.1 DER
         MutableByteSpan out_der_sig_span(out_der_sig.Get(), out_der_sig_allocated_size);
-        status = EcdsaRawSignatureToAsn1(vector->fe_length_bytes, ByteSpan{ vector->raw_version, vector->raw_version_length }, out_der_sig_span);
+        status = EcdsaRawSignatureToAsn1(vector->fe_length_bytes, ByteSpan{ vector->raw_version, vector->raw_version_length },
+                                         out_der_sig_span);
 
         NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, out_der_sig_span.size() <= out_der_sig_allocated_size);
