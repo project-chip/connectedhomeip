@@ -19,14 +19,14 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Turn on Light Color Control tests"
+    - label: "Turn on light for color control tests"
       cluster: "On/Off"
       command: "on"
 
     - label: "Check on/off attribute value is true after on command"
       cluster: "On/Off"
       command: "readAttribute"
-      attribute: "on/off"
+      attribute: "OnOff"
       response:
           value: 1
 
