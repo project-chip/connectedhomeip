@@ -10398,14 +10398,14 @@ exit:
         err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
             return;
         }
 
-        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        err = CreateIllegalStateException(env, "Error invoking cluster", ChipError::FormatError(err), exception);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
             return;
         }
         env->CallVoidMethod(callback, method, exception);
@@ -10488,14 +10488,14 @@ exit:
         err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
             return;
         }
 
-        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        err = CreateIllegalStateException(env, "Error invoking cluster", ChipError::FormatError(err), exception);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
             return;
         }
         env->CallVoidMethod(callback, method, exception);
@@ -10534,14 +10534,14 @@ exit:
         err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
             return;
         }
 
-        err = CreateIllegalStateException(env, "Error invoking cluster", err, exception);
+        err = CreateIllegalStateException(env, "Error invoking cluster", ChipError::FormatError(err), exception);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %d", err);
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
             return;
         }
         env->CallVoidMethod(callback, method, exception);
