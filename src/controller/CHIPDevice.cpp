@@ -377,6 +377,14 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR Device::CloseSession()
+{
+    ReturnErrorCodeIf(mState != ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    mSessionManager->ExpirePairing(mSecureSession);
+    mState = ConnectionState::NotConnected;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
 {
     bool didLoad;
@@ -505,12 +513,7 @@ void Device::OperationalCertProvisioned()
     mDeviceOperationalCertProvisioned = true;
 
     Persist();
-
-    if (mState == ConnectionState::SecureConnected)
-    {
-        mSessionManager->ExpirePairing(mSecureSession);
-        mState = ConnectionState::NotConnected;
-    }
+    CloseSession();
 }
 
 CHIP_ERROR Device::WarmupCASESession()

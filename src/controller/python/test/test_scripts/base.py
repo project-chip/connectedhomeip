@@ -66,6 +66,15 @@ class BaseTestHelper:
         self.logger.info("Device finished key exchange.")
         return True
 
+    def TestCloseSession(self, nodeid: int):
+        self.logger.info(f"Closing sessions with device {nodeid}")
+        try:
+            self.devCtrl.CloseSession(nodeid)
+            return True
+        except Exception as ex:
+            self.logger.exception(f"Failed to close sessions with device {nodeid}: {ex}")
+            return False
+
     def TestNetworkCommissioning(self, nodeid: int, endpoint: int, group: int, dataset: str, network_id: str):
         self.logger.info("Commissioning network to device {}".format(nodeid))
         try:

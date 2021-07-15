@@ -181,6 +181,11 @@ class ChipDeviceController(object):
             lambda: self._dmLib.pychip_DeviceCommissioner_CloseBleConnection(self.devCtrl)
         )
 
+    def CloseSession(self, nodeid):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_CloseSession(self.devCtrl, nodeid)
+        )
+
     def ConnectIP(self, ipaddr, setupPinCode, nodeid):
         self.state = DCState.RENDEZVOUS_ONGOING
         return self._ChipStack.CallAsync(
@@ -395,6 +400,9 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [c_void_p, c_char_p, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectIP.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_CloseSession.argtypes = [c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_CloseSession.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
                 c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]

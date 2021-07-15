@@ -298,6 +298,11 @@ public:
     CHIP_ERROR OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload);
 
     /**
+     *  In case there exists an open session to the device, mark it as expired.
+     */
+    CHIP_ERROR CloseSession();
+
+    /**
      * @brief
      *   Update address of the device.
      *
