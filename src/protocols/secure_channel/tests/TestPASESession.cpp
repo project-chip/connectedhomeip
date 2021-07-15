@@ -44,14 +44,7 @@ using TestContext = chip::Test::MessagingContext;
 
 static void test_os_sleep_ms(uint64_t millisecs)
 {
-    struct timespec sleep_time;
-    uint64_t s = millisecs / 1000;
-
-    millisecs -= s * 1000;
-    sleep_time.tv_sec  = static_cast<time_t>(s);
-    sleep_time.tv_nsec = static_cast<long>(millisecs * 1000000);
-
-    nanosleep(&sleep_time, nullptr);
+    usleep((useconds_t) millisecs * 1000);
 }
 
 class PASETestLoopbackTransport : public Test::LoopbackTransport

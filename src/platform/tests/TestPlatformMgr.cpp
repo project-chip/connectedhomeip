@@ -98,7 +98,7 @@ static bool sleepRan;
 
 static void SleepSome(intptr_t)
 {
-    sleep(1);
+    usleep((useconds_t)(1 * 1000 * 1000));
     sleepRan = true;
 }
 
