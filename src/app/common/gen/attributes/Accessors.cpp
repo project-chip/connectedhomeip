@@ -6773,6 +6773,16 @@ EmberAfStatus SetEnum16(chip::EndpointId endpoint, uint16_t enum16)
 {
     return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Ids::Enum16, (uint8_t *) &enum16, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
+EmberAfStatus GetSimpleStruct(chip::EndpointId endpoint, /* TYPE WARNING: simplestruct defaults to */ uint8_t * simpleStruct)
+{
+    return emberAfReadServerAttribute(endpoint, TestCluster::Id, Ids::SimpleStruct, (uint8_t *) simpleStruct,
+                                      sizeof(*simpleStruct));
+}
+EmberAfStatus SetSimpleStruct(chip::EndpointId endpoint, /* TYPE WARNING: simplestruct defaults to */ uint8_t * simpleStruct)
+{
+    return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Ids::SimpleStruct, (uint8_t *) &simpleStruct,
+                                       ZCL_SIMPLESTRUCT_ATTRIBUTE_TYPE);
+}
 EmberAfStatus GetUnsupported(chip::EndpointId endpoint, uint8_t * unsupported)
 {
     return emberAfReadServerAttribute(endpoint, TestCluster::Id, Ids::Unsupported, (uint8_t *) unsupported, sizeof(*unsupported));

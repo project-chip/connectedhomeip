@@ -255,6 +255,15 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(void * conte
 }
 chip::Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>
     gTestClusterListStructOctetStringListAttributeCallback{ OnTestClusterListStructOctetStringListAttributeResponse, nullptr };
+static void OnTestClusterSimpleStructStructAttributeResponse(void * context, _simplestruct value)
+{
+    ChipLogProgress(chipTool, "OnTestClusterSimpleStructStructAttributeResponse: TODO: Print struct content.");
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<TestClusterSimpleStructAttributeCallback> gTestClusterSimpleStructAttributeCallback{
+    OnTestClusterSimpleStructStructAttributeResponse, nullptr
+};
 static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(void * context, uint16_t count,
                                                                              _NeighborTable * entries)
 {
@@ -5076,6 +5085,17 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_LongCharString(
     return ChipError::AsInteger(cluster.WriteAttributeLongCharString(gDefaultSuccessCallback.Cancel(),
                                                                      gDefaultFailureCallback.Cancel(), chip::ByteSpan(value, len)));
 }
+chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_SimpleStruct(chip::Controller::Device * device,
+                                                                             chip::EndpointId ZCLendpointId,
+                                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::TestClusterCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(
+        cluster.ReadAttributeSimpleStruct(gTestClusterSimpleStructAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_Unsupported(chip::Controller::Device * device,
                                                                             chip::EndpointId ZCLendpointId,
                                                                             chip::GroupId /* ZCLgroupId */)

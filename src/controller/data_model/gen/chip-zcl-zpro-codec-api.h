@@ -2949,6 +2949,7 @@ encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, 
 | * LongOctetString                                                   | 0x001D |
 | * CharString                                                        | 0x001E |
 | * LongCharString                                                    | 0x001F |
+| * SimpleStruct                                                      | 0x0020 |
 | * Unsupported                                                       | 0x00FF |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -3235,6 +3236,13 @@ chip::System::PacketBufferHandle encodeTestClusterClusterReadLongCharStringAttri
 chip::System::PacketBufferHandle encodeTestClusterClusterWriteLongCharStringAttribute(uint8_t seqNum,
                                                                                       chip::EndpointId destinationEndpoint,
                                                                                       chip::ByteSpan longCharString);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the simple_struct attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadSimpleStructAttribute(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
 
 /**
  * @brief

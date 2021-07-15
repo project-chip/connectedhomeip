@@ -21,10 +21,13 @@
 #include <app/util/af.h>
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
+#include <app/util/ember-compatibility-functions.h>
+#include <core/CHIPTLV.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::app::List;
 
 // The first 2 bytes specify the number of entries. A value of 0xFFFF means the list in invalid
@@ -43,6 +46,86 @@ void copyListMember(uint8_t * dest, uint8_t * src, bool write, uint16_t * offset
     }
 
     *offset = static_cast<uint16_t>(*offset + length);
+}
+
+CHIP_ERROR CopyStructAttributeToCHIPTLV(ClusterId clusterId, AttributeId attributeId, uint8_t * src, uint16_t len,
+                                        TLV::TLVWriter & writer, uint64_t tag)
+{
+    switch (clusterId)
+    {
+    }
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+CHIP_ERROR EmberListToCHIPTLV(ClusterId clusterId, AttributeId attributeId, uint8_t * src, uint16_t len, TLV::TLVWriter & writer,
+                              uint64_t tag)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::TLV::TLVType tmpType;
+    size_t count         = *reinterpret_cast<uint16_t *>(src);
+    uint16_t entryLength = 0;
+    // Suppress error of unused variable.
+    (void) entryLength;
+    (void) count;
+    SuccessOrExit(err = writer.StartContainer(tag, TLV::TLVType::kTLVType_Array, tmpType));
+    switch (clusterId)
+    {
+    case 0x0033: // General Diagnostics Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (attributeId)
+        {
+        case 0x0000: // NetworkInterfaces
+        {
+            for (size_t index = 0; index < count; index++)
+            {
+                entryLength = 48;
+                if ((index * entryLength) > static_cast<size_t>(len - entryLength))
+                {
+                    ChipLogError(Zcl, "Index %zu is invalid.", index);
+                    ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+                }
+                entryOffset = static_cast<uint16_t>(kSizeLengthInBytes + (index * entryLength));
+                // Struct _NetworkInterfaceType
+                _NetworkInterfaceType entry;
+                SuccessOrExit(err = _NetworkInterfaceType::FromEmberBuffer(&entry, src + entryOffset, 48));
+                SuccessOrExit(err = writer.Put(TLV::AnonymousTag, entry));
+            }
+            break;
+        }
+        }
+        break;
+    }
+    case 0x003E: // Operational Credentials Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (attributeId)
+        {
+        case 0x0001: // fabrics list
+        {
+            for (size_t index = 0; index < count; index++)
+            {
+                entryLength = 52;
+                if ((index * entryLength) > static_cast<size_t>(len - entryLength))
+                {
+                    ChipLogError(Zcl, "Index %zu is invalid.", index);
+                    ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+                }
+                entryOffset = static_cast<uint16_t>(kSizeLengthInBytes + (index * entryLength));
+                // Struct _FabricDescriptor
+                _FabricDescriptor entry;
+                SuccessOrExit(err = _FabricDescriptor::FromEmberBuffer(&entry, src + entryOffset, 52));
+                SuccessOrExit(err = writer.Put(TLV::AnonymousTag, entry));
+            }
+            break;
+        }
+        }
+        break;
+    }
+    }
+exit:
+    err = writer.EndContainer(tmpType);
+    return err;
 }
 
 uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src,
@@ -80,8 +163,9 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     {
     case 0x0033: // General Diagnostics Cluster
     {
-        uint16_t entryOffset = kSizeLengthInBytes;
-        switch (am->attributeId)
+        uint16_t entryOffset    = kSizeLengthInBytes;
+        AttributeId attributeId = am->attributeId;
+        switch (attributeId)
         {
         case 0x0000: // NetworkInterfaces
         {
@@ -94,33 +178,15 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
             // Struct _NetworkInterfaceType
             _NetworkInterfaceType * entry = reinterpret_cast<_NetworkInterfaceType *>(write ? src : dest);
-            chip::ByteSpan * NameSpan     = &entry->Name; // OCTET_STRING
-            if (CHIP_NO_ERROR !=
-                (write ? WriteByteSpan(dest + entryOffset, 34, NameSpan) : ReadByteSpan(src + entryOffset, 34, NameSpan)))
+            if (write)
             {
-                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
-                return 0;
+                size_t unusedLen;
+                _NetworkInterfaceType::ToEmberBuffer(entry, dest + entryOffset, 48, unusedLen);
             }
-            entryOffset = static_cast<uint16_t>(entryOffset + 34);
-            copyListMember(write ? dest : (uint8_t *) &entry->FabricConnected, write ? (uint8_t *) &entry->FabricConnected : src,
-                           write, &entryOffset, sizeof(entry->FabricConnected)); // BOOLEAN
-            copyListMember(write ? dest : (uint8_t *) &entry->OffPremiseServicesReachableIPv4,
-                           write ? (uint8_t *) &entry->OffPremiseServicesReachableIPv4 : src, write, &entryOffset,
-                           sizeof(entry->OffPremiseServicesReachableIPv4)); // BOOLEAN
-            copyListMember(write ? dest : (uint8_t *) &entry->OffPremiseServicesReachableIPv6,
-                           write ? (uint8_t *) &entry->OffPremiseServicesReachableIPv6 : src, write, &entryOffset,
-                           sizeof(entry->OffPremiseServicesReachableIPv6)); // BOOLEAN
-            chip::ByteSpan * HardwareAddressSpan = &entry->HardwareAddress; // OCTET_STRING
-            if (CHIP_NO_ERROR !=
-                (write ? WriteByteSpan(dest + entryOffset, 10, HardwareAddressSpan)
-                       : ReadByteSpan(src + entryOffset, 10, HardwareAddressSpan)))
+            else
             {
-                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
-                return 0;
+                _NetworkInterfaceType::FromEmberBuffer(entry, src + entryOffset, 48);
             }
-            entryOffset = static_cast<uint16_t>(entryOffset + 10);
-            copyListMember(write ? dest : (uint8_t *) &entry->Type, write ? (uint8_t *) &entry->Type : src, write, &entryOffset,
-                           sizeof(entry->Type)); // ENUM8
             break;
         }
         }
@@ -128,8 +194,9 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     }
     case 0x003E: // Operational Credentials Cluster
     {
-        uint16_t entryOffset = kSizeLengthInBytes;
-        switch (am->attributeId)
+        uint16_t entryOffset    = kSizeLengthInBytes;
+        AttributeId attributeId = am->attributeId;
+        switch (attributeId)
         {
         case 0x0001: // fabrics list
         {
@@ -142,20 +209,15 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
             // Struct _FabricDescriptor
             _FabricDescriptor * entry = reinterpret_cast<_FabricDescriptor *>(write ? src : dest);
-            copyListMember(write ? dest : (uint8_t *) &entry->FabricId, write ? (uint8_t *) &entry->FabricId : src, write,
-                           &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
-            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
-                           &entryOffset, sizeof(entry->VendorId)); // INT16U
-            copyListMember(write ? dest : (uint8_t *) &entry->NodeId, write ? (uint8_t *) &entry->NodeId : src, write, &entryOffset,
-                           sizeof(entry->NodeId));      // NODE_ID
-            chip::ByteSpan * LabelSpan = &entry->Label; // OCTET_STRING
-            if (CHIP_NO_ERROR !=
-                (write ? WriteByteSpan(dest + entryOffset, 34, LabelSpan) : ReadByteSpan(src + entryOffset, 34, LabelSpan)))
+            if (write)
             {
-                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
-                return 0;
+                size_t unusedLen;
+                _FabricDescriptor::ToEmberBuffer(entry, dest + entryOffset, 52, unusedLen);
             }
-            entryOffset = static_cast<uint16_t>(entryOffset + 34);
+            else
+            {
+                _FabricDescriptor::FromEmberBuffer(entry, src + entryOffset, 52);
+            }
             break;
         }
         }

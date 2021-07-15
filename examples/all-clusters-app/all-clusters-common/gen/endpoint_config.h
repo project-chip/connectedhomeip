@@ -955,17 +955,20 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
                                                                                                                                    \
+            /* 10414 - simple_struct, */                                                                                           \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                        \
+                                                                                                                                   \
             /* Endpoint: 1, Cluster: Electrical Measurement (server), big-endian */                                                \
                                                                                                                                    \
-            /* 10414 - measurement type, */                                                                                        \
+            /* 10430 - measurement type, */                                                                                        \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 10418 - total active power, */                                                                                      \
+            /* 10434 - total active power, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: On/off (server), big-endian */                                                                \
                                                                                                                                    \
-            /* 10422 - feature map, */                                                                                             \
+            /* 10438 - feature map, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
     }
 
@@ -1901,23 +1904,26 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
                                                                                                                                    \
+            /* 10414 - simple_struct, */                                                                                           \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                        \
+                                                                                                                                   \
             /* Endpoint: 1, Cluster: Electrical Measurement (server), little-endian */                                             \
                                                                                                                                    \
-            /* 10414 - measurement type, */                                                                                        \
+            /* 10430 - measurement type, */                                                                                        \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 10418 - total active power, */                                                                                      \
+            /* 10434 - total active power, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: On/off (server), little-endian */                                                             \
                                                                                                                                    \
-            /* 10422 - feature map, */                                                                                             \
+            /* 10438 - feature map, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
     }
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (128)
+#define GENERATED_DEFAULTS_COUNT (129)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -1945,7 +1951,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 380
+#define GENERATED_ATTRIBUTE_COUNT 381
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -2421,12 +2427,13 @@
               ZAP_LONG_DEFAULTS_INDEX(8404) }, /* long_octet_string */                                                             \
             { 0x001E, ZAP_TYPE(CHAR_STRING), 10, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(9404) }, /* char_string */  \
             { 0x001F, ZAP_TYPE(LONG_CHAR_STRING), 1000, ZAP_ATTRIBUTE_MASK(WRITABLE),                                              \
-              ZAP_LONG_DEFAULTS_INDEX(9414) },                              /* long_char_string */                                 \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
+              ZAP_LONG_DEFAULTS_INDEX(9414) },                                         /* long_char_string */                      \
+            { 0x0020, ZAP_TYPE(SIMPLESTRUCT), 16, 0, ZAP_LONG_DEFAULTS_INDEX(10414) }, /* simple_struct */                         \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },            /* cluster revision */                      \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Electrical Measurement (server) */                                                            \
-            { 0x0000, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(10414) }, /* measurement type */                           \
-            { 0x0304, ZAP_TYPE(INT32S), 4, 0, ZAP_LONG_DEFAULTS_INDEX(10418) },   /* total active power */                         \
+            { 0x0000, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(10430) }, /* measurement type */                           \
+            { 0x0304, ZAP_TYPE(INT32S), 4, 0, ZAP_LONG_DEFAULTS_INDEX(10434) },   /* total active power */                         \
             { 0x0505, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xffff) },       /* rms voltage */                                \
             { 0x0506, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x8000) },       /* rms voltage min */                            \
             { 0x0507, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x8000) },       /* rms voltage max */                            \
@@ -2447,7 +2454,7 @@
             { 0x4001, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) }, /* OnTime */                     \
             { 0x4002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) }, /* OffWaitTime */                \
             { 0x4003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },    /* StartUpOnOff */               \
-            { 0xFFFC, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(10422) },                   /* feature map */                \
+            { 0xFFFC, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(10438) },                   /* feature map */                \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },                            /* cluster revision */           \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Occupancy Sensing (server) */                                                                 \
@@ -2688,22 +2695,22 @@
                 0x050E, ZAP_ATTRIBUTE_INDEX(332), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Account Login (server) */                                                                  \
             {                                                                                                                      \
-                0x050F, ZAP_ATTRIBUTE_INDEX(333), 23, 2589, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+                0x050F, ZAP_ATTRIBUTE_INDEX(333), 24, 2605, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
             }, /* Endpoint: 1, Cluster: Test Cluster (server) */                                                                   \
             {                                                                                                                      \
-                0x0B04, ZAP_ATTRIBUTE_INDEX(356), 12, 28, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+                0x0B04, ZAP_ATTRIBUTE_INDEX(357), 12, 28, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 1, Cluster: Electrical Measurement (server) */                                                         \
             {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(368), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0xF000, ZAP_ATTRIBUTE_INDEX(369), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Binding (server) */                                                                        \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(369),                                                                                            \
+              ZAP_ATTRIBUTE_INDEX(370),                                                                                            \
               7,                                                                                                                   \
               13,                                                                                                                  \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayOnOffServer }, /* Endpoint: 2, Cluster: On/off (server) */                                              \
             { 0x0406,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(376),                                                                                            \
+              ZAP_ATTRIBUTE_INDEX(377),                                                                                            \
               4,                                                                                                                   \
               5,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
@@ -2715,7 +2722,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 15, 3562 }, { ZAP_CLUSTER_INDEX(15), 37, 7259 }, { ZAP_CLUSTER_INDEX(52), 2, 18 },                 \
+        { ZAP_CLUSTER_INDEX(0), 15, 3562 }, { ZAP_CLUSTER_INDEX(15), 37, 7275 }, { ZAP_CLUSTER_INDEX(52), 2, 18 },                 \
     }
 
 // Largest attribute size is needed for various buffers
@@ -2725,7 +2732,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (1497)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (10839)
+#define ATTRIBUTE_MAX_SIZE (10855)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (3)

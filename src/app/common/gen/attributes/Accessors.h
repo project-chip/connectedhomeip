@@ -1860,6 +1860,9 @@ EmberAfStatus GetEnum8(chip::EndpointId endpoint, uint8_t * enum8); // enum8
 EmberAfStatus SetEnum8(chip::EndpointId endpoint, uint8_t enum8);
 EmberAfStatus GetEnum16(chip::EndpointId endpoint, uint16_t * enum16); // enum16
 EmberAfStatus SetEnum16(chip::EndpointId endpoint, uint16_t enum16);
+EmberAfStatus GetSimpleStruct(chip::EndpointId endpoint,
+                              /* TYPE WARNING: simplestruct defaults to */ uint8_t * simpleStruct); // simplestruct
+EmberAfStatus SetSimpleStruct(chip::EndpointId endpoint, /* TYPE WARNING: simplestruct defaults to */ uint8_t * simpleStruct);
 EmberAfStatus GetUnsupported(chip::EndpointId endpoint, uint8_t * unsupported); // boolean
 EmberAfStatus SetUnsupported(chip::EndpointId endpoint, uint8_t unsupported);
 } // namespace Attributes

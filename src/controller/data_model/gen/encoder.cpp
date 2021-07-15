@@ -4651,6 +4651,7 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 | * LongOctetString                                                   | 0x001D |
 | * CharString                                                        | 0x001E |
 | * LongCharString                                                    | 0x001F |
+| * SimpleStruct                                                      | 0x0020 |
 | * Unsupported                                                       | 0x00FF |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -5209,6 +5210,19 @@ PacketBufferHandle encodeTestClusterClusterWriteLongCharStringAttribute(uint8_t 
         .Put8(68)
         .Put16(static_cast<uint16_t>(longCharStringStrLen))
         .Put(longCharString.data(), longCharStringStrLen);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute SimpleStruct
+ */
+PacketBufferHandle encodeTestClusterClusterReadSimpleStructAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTestClusterSimpleStruct", TestCluster::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(TestCluster::Attributes::Ids::SimpleStruct);
     COMMAND_FOOTER();
 }
 

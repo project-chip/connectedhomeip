@@ -253,6 +253,7 @@ void TestClusterClusterListStructOctetStringListAttributeFilter(chip::TLV::TLVRe
                                                                 chip::Callback::Cancelable * onFailureCallback);
 typedef void (*TestClusterListStructOctetStringListAttributeCallback)(void * context, uint16_t count,
                                                                       _TestListStructOctet * entries);
+typedef void (*TestClusterSimpleStructAttributeCallback)(void * context, _simplestruct entries);
 void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                          chip::Callback::Cancelable * onSuccessCallback,
                                                                          chip::Callback::Cancelable * onFailureCallback);

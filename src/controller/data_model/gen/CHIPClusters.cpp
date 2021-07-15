@@ -9832,6 +9832,18 @@ CHIP_ERROR TestClusterCluster::WriteAttributeLongCharString(Callback::Cancelable
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+CHIP_ERROR TestClusterCluster::ReadAttributeSimpleStruct(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0020;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<TestClusterSimpleStructAttributeCallback>);
+}
+
 CHIP_ERROR TestClusterCluster::ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {

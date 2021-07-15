@@ -305,7 +305,6 @@ private:
 
     bool keepAlive;
 };
-
 class CHIPInt8sAttributeCallback : public Callback::Callback<Int8sAttributeCallback>
 {
 public:
@@ -365,7 +364,6 @@ private:
 
     bool keepAlive;
 };
-
 class CHIPInt8uAttributeCallback : public Callback::Callback<Int8uAttributeCallback>
 {
 public:
@@ -425,7 +423,6 @@ private:
 
     bool keepAlive;
 };
-
 class CHIPInt16sAttributeCallback : public Callback::Callback<Int16sAttributeCallback>
 {
 public:
@@ -485,7 +482,6 @@ private:
 
     bool keepAlive;
 };
-
 class CHIPInt16uAttributeCallback : public Callback::Callback<Int16uAttributeCallback>
 {
 public:
@@ -545,7 +541,6 @@ private:
 
     bool keepAlive;
 };
-
 class CHIPInt32sAttributeCallback : public Callback::Callback<Int32sAttributeCallback>
 {
 public:
@@ -605,7 +600,6 @@ private:
 
     bool keepAlive;
 };
-
 class CHIPInt32uAttributeCallback : public Callback::Callback<Int32uAttributeCallback>
 {
 public:
@@ -665,7 +659,6 @@ private:
 
     bool keepAlive;
 };
-
 class CHIPInt64sAttributeCallback : public Callback::Callback<Int64sAttributeCallback>
 {
 public:
@@ -725,7 +718,6 @@ private:
 
     bool keepAlive;
 };
-
 class CHIPInt64uAttributeCallback : public Callback::Callback<Int64uAttributeCallback>
 {
 public:
@@ -785,7 +777,6 @@ private:
 
     bool keepAlive;
 };
-
 class CHIPStringAttributeCallback : public Callback::Callback<StringAttributeCallback>
 {
 public:
@@ -858,6 +849,7 @@ private:
     bool octetString;
     bool keepAlive;
 };
+// TODO: Type  is not supported yet.
 
 class CHIPAccountLoginClusterGetSetupPINResponseCallback : public Callback::Callback<AccountLoginClusterGetSetupPINResponseCallback>
 {
@@ -25288,6 +25280,43 @@ JNI_METHOD(void, TestClusterCluster, writeLongCharStringAttribute)
         delete onSuccess;
         delete onFailure;
         ReturnIllegalStateException(env, callback, "Error writing attribute", err);
+    }
+}
+
+JNI_METHOD(void, TestClusterCluster, readSimpleStructAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIPUnsupportedAttributeCallback * onSuccess = new CHIPUnsupportedAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY);
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY);
+        return;
+    }
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    err = cppCluster->ReadAttributeSimpleStruct(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err);
     }
 }
 
