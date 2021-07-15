@@ -106,7 +106,7 @@ gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_deta
 
 # Compiles python files
 # Check pybindings was requested
-if [ $enable_pybindinds == true ]
+if [ "$enable_pybindinds" == true ]
 then
 ninja -v -C "$OUTPUT_ROOT" pycontroller
 else
@@ -120,7 +120,7 @@ virtualenv --clear "$ENVIRONMENT_ROOT"
 
 # Activate the new enviroment to register the python WHL
 
-if [ $enable_pybindinds == true ]
+if [ "$enable_pybindinds" == true ]
 then
 WHEEL="$OUTPUT_ROOT"/pybindings/pycontroller/pybindings-*.whl
 else
@@ -129,7 +129,7 @@ fi
 
 source "$ENVIRONMENT_ROOT"/bin/activate
 "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir $WHEEL
+"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "$WHEEL"
 
 
 echo ""
