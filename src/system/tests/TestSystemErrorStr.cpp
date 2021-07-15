@@ -48,7 +48,7 @@ using namespace chip;
 // Test input data.
 
 // clang-format off
-static CHIP_ERROR sContext[] =
+static const CHIP_ERROR kTestElements[] =
 {
     CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
     CHIP_ERROR_INVALID_ARGUMENT,
@@ -67,13 +67,13 @@ static void CheckSystemErrorStr(nlTestSuite * inSuite, void * inContext)
     RegisterCHIPLayerErrorFormatter();
 
     // For each defined error...
-    for (CHIP_ERROR err : sContext)
+    for (const auto & err : kTestElements)
     {
         const char * errStr = ErrorStr(err);
         char expectedText[9];
 
         // Assert that the error string contains the error number in hex.
-        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err);
+        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, ChipError::AsInteger(err));
         NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != nullptr));
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
@@ -110,7 +110,7 @@ int TestSystemErrorStr(void)
     // clang-format on
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, &sContext);
+    nlTestRunner(&theSuite, nullptr);
 
     return (nlTestRunnerStats(&theSuite));
 }

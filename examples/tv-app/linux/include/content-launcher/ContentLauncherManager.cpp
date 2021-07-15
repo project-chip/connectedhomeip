@@ -98,7 +98,7 @@ static void sendResponse(const char * responseName, ContentLaunchResponse launch
     EmberStatus status = emberAfSendResponse();
     if (status != EMBER_SUCCESS)
     {
-        ChipLogError(Zcl, "Failed to send %s. Error:%s", responseName, chip::ErrorStr(status));
+        ChipLogError(Zcl, "Failed to send %s. Error:%d", responseName, static_cast<int>(status));
     }
 }
 

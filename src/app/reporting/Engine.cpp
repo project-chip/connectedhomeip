@@ -77,7 +77,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DataManagement, "Error retrieving data from clusterId: %" PRIx32 ", err = %" CHIP_ERROR_FORMAT,
-                     aClusterInfo.mClusterId, err);
+                     aClusterInfo.mClusterId, ChipError::FormatError(err));
     }
 
     return err;
@@ -216,7 +216,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventList(ReportData::Builder & aReportD
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Error retrieving events, err = %" CHIP_ERROR_FORMAT, err);
+        ChipLogError(DataManagement, "Error retrieving events, err = %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
     }
 
     return err;
@@ -276,7 +276,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     ChipLogDetail(DataManagement, "<RE> Sending report...");
     err = SendReport(apReadHandler, std::move(bufHandle));
     VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogError(DataManagement, "<RE> Error sending out report data with %" CHIP_ERROR_FORMAT "!", err));
+                 ChipLogError(DataManagement, "<RE> Error sending out report data with %" CHIP_ERROR_FORMAT "!",
+                              ChipError::FormatError(err)));
 
     ChipLogDetail(DataManagement, "<RE> ReportsInFlight = %" PRIu32 " with readHandler %" PRIu32 ", RE has %s", mNumReportsInFlight,
                   mCurReadHandlerIdx, mMoreChunkedMessages ? "more messages" : "no more messages");

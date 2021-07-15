@@ -63,7 +63,7 @@ CHIP_ERROR PythonInteractionModelDelegate::CommandResponseError(const CommandSen
 {
     if (commandResponseErrorFunct != nullptr)
     {
-        commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), aError);
+        commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), ChipError::AsInteger(aError));
     }
     if (aError != CHIP_NO_ERROR)
     {

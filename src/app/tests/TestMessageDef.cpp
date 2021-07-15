@@ -33,6 +33,7 @@
 #include <app/MessageDef/TimedRequest.h>
 #include <app/MessageDef/WriteRequest.h>
 #include <app/MessageDef/WriteResponse.h>
+#include <core/CHIPError.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <support/CHIPMem.h>
 #include <support/UnitTestRegistration.h>
@@ -65,7 +66,7 @@ CHIP_ERROR DebugPrettyPrint(const chip::System::PacketBufferHandle & aMsgBuf)
 
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogProgress(DataManagement, "DebugPrettyPrint fails with err %" CHIP_ERROR_FORMAT, err);
+        ChipLogProgress(DataManagement, "DebugPrettyPrint fails with err %" CHIP_ERROR_FORMAT, chip::ChipError::FormatError(err));
     }
 
     return err;
