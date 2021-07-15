@@ -151,7 +151,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     ChipLogProgress(Controller, "Java class references loaded.");
 
     // Initialize the CHIP System Layer.
-    err = sSystemLayer.Init(NULL);
+    err = sSystemLayer.Init();
     SuccessOrExit(err);
 
     // Initialize the CHIP Inet layer.

@@ -428,21 +428,6 @@ struct LwIPEvent;
 
 #endif /* CHIP_SYSTEM_CONFIG_USE_LWIP */
 
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
- *
- *  @brief
- *      This defines whether (1) or not (0) your platform will provide the following platform-specific functions:
- *      - chip::System::Platform::WillInit
- *      - chip::System::Platform::WillShutdown
- *      - chip::System::Platform::DidInit
- *      - chip::System::Platform::DidShutdown
- */
-#ifndef CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS 0
-#endif /* CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS */
-
 /**
  *  @def CHIP_SYSTEM_CONFIG_NUM_TIMERS
  *

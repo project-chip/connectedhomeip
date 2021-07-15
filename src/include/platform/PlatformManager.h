@@ -170,14 +170,13 @@ private:
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
     // Parentheses used to fix clang parsing issue with these declarations
-    friend ::CHIP_ERROR(::chip::System::Platform::EventSupport::PostEvent)(::chip::System::Layer & aLayer, void * aContext,
-                                                                           ::chip::System::Object & aTarget,
-                                                                           ::chip::System::EventType aType, uintptr_t aArgument);
-    friend ::CHIP_ERROR(::chip::System::Platform::EventSupport::DispatchEvents)(::chip::System::Layer & aLayer, void * aContext);
-    friend ::CHIP_ERROR(::chip::System::Platform::EventSupport::DispatchEvent)(::chip::System::Layer & aLayer, void * aContext,
-                                                                               ::chip::System::Event aEvent);
-    friend ::CHIP_ERROR(::chip::System::Platform::EventSupport::StartTimer)(::chip::System::Layer & aLayer, void * aContext,
-                                                                            uint32_t aMilliseconds);
+    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::PostEvent)(::chip::System::Layer & aLayer,
+                                                                       ::chip::System::Object & aTarget,
+                                                                       ::chip::System::EventType aType, uintptr_t aArgument);
+    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::DispatchEvents)(::chip::System::Layer & aLayer);
+    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::DispatchEvent)(::chip::System::Layer & aLayer,
+                                                                           ::chip::System::Event aEvent);
+    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::StartTimer)(::chip::System::Layer & aLayer, uint32_t aMilliseconds);
 
     void PostEvent(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);

@@ -66,7 +66,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 
     // Initialize the CHIP system layer.
     new (&SystemLayer) System::Layer();
-    err = SystemLayer.Init(nullptr);
+    err = SystemLayer.Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "SystemLayer initialization failed: %s", ErrorStr(err));
