@@ -41,7 +41,7 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App):
     return None
 
   if board == Esp32Board.DevKitC:
-    return 'sdkconfig_devkit.defaults'
+    return 'sdkconfig.defaults'
   elif board == Esp32Board.M5Stack:
     return 'sdkconfig_m5stack.defaults'
   else:
