@@ -9,12 +9,12 @@
 
 #include <cstring>
 
-#define K32W_LOG_MODULE_NAME       chip
-#define EOL_CHARS                  "\r\n" /* End of Line Characters */
-#define EOL_CHARS_LEN 2            /* Length of EOL */
+#define K32W_LOG_MODULE_NAME chip
+#define EOL_CHARS "\r\n" /* End of Line Characters */
+#define EOL_CHARS_LEN 2  /* Length of EOL */
 
-#define TIMESTAMP_MAX_LEN_BYTES    10
-#define CATEGORY_MAX_LEN_BYTES     1
+#define TIMESTAMP_MAX_LEN_BYTES 10
+#define CATEGORY_MAX_LEN_BYTES 1
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
