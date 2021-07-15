@@ -107,8 +107,7 @@ pw_python_action("pycontroller") {
   _py_manifest_files = [
     {
       src_dir = "."
-      sources = [
-      ]
+      sources = []
     },
     {
       src_dir = target_out_dir
