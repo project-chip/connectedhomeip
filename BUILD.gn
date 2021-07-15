@@ -171,6 +171,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Set this to true to enable k32w builds by default.
     enable_k32w_builds = false
+
+    # Static code analyzer using clang-tidy
+    enable_clang_tidy_check = false
   }
 
   declare_args() {
@@ -254,6 +257,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   if (enable_host_gcc_mbedtls_build) {
     chip_build("host_gcc_mbedtls") {
       toolchain = "${chip_root}/config/mbedtls/toolchain:${host_os}_${host_cpu}_gcc_mbedtls"
+    }
+  }
+
+  if (enable_clang_tidy_check) {
+    chip_build("clang_tidy") {
+      toolchain = "${build_root}/toolchain/clang_tidy:clang_tidy"
     }
   }
 
@@ -447,6 +456,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
     if (enable_cc13x2x7_26x2x7_lock_app_build) {
       deps += [ ":cc13x2x7_26x2x7_lock_app" ]
+    }
+    if (enable_clang_tidy_check) {
+      deps += [ ":clang_tidy" ]
     }
   }
 

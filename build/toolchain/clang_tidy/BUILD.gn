@@ -1,0 +1,124 @@
+# Copyright 2020 The Pigweed Authors
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_toolchain/generate_toolchain.gni")
+
+toolchain("clang_tidy") {
+    tool("asm") {
+        command = "touch {{output}}"
+        description = "as {{output}}"
+        outputs = [
+          "{{source_out_dir}}/{{target_output_name}}.{{source_file_part}}.stamp",
+        ]
+    }
+
+    tool("cc") {
+        command = string_join(" ",
+          [
+            "clang-tidy",
+            "{{source}}",
+            "--",
+            "{{cflags}}",
+            "{{cflags_c}}",  # Must come after {{cflags}}.
+            "{{defines}}",
+            "{{include_dirs}}",
+          ])
+        description = "cc {{output}}"
+        outputs = [
+          "{{source_out_dir}}/{{target_output_name}}.{{source_file_part}}.stamp",
+        ]
+    }
+
+    tool("cxx") {
+        command = string_join(" ",
+          [
+            "clang-tidy",
+            "{{source}}",
+            "--",
+            "{{cflags}}",
+            "{{cflags_c}}",  # Must come after {{cflags}}.
+            "{{defines}}",
+            "{{include_dirs}}",
+          ])
+        description = "c++ {{output}}"
+        outputs = [
+          "{{source_out_dir}}/{{target_output_name}}.{{source_file_part}}.stamp",
+        ]
+    }
+
+    tool("objc") {
+        command = "touch {{output}}"
+        description = "objc {{output}}"
+        outputs = [
+          "{{source_out_dir}}/{{target_output_name}}.{{source_file_part}}.stamp",
+        ]
+    }
+
+    tool("objcxx") {
+        command = "touch {{output}}"
+        description = "objc++ {{output}}"
+        outputs = [
+          "{{source_out_dir}}/{{target_output_name}}.{{source_file_part}}.stamp",
+        ]
+    }
+
+    tool("alink") {
+        command = "touch {{output}}"
+        description = "ar {{target_output_name}}{{output_extension}}"
+        outputs = [ "{{output_dir}}/{{target_output_name}}{{output_extension}}" ]
+        default_output_extension = ".a"
+        default_output_dir = "{{target_out_dir}}/lib"
+    }
+
+    _link_outfile = "{{output_dir}}/{{target_output_name}}{{output_extension}}"
+
+    tool("link") {
+        command = "touch {{output}}"
+        description = "ld $_link_outfile"
+        outputs = [ _link_outfile ]
+        default_output_extension = ""
+        default_output_dir = "{{target_out_dir}}/bin"
+    }
+
+    tool("solink") {
+        command = "touch {{output}}"
+        description = "ld -shared $_link_outfile"
+        outputs = [ _link_outfile ]
+        default_output_extension = ".so"
+        default_output_dir = "{{target_out_dir}}/lib"
+    }
+
+    tool("stamp") {
+# GN-ism: GN gets mad if you directly forward the contents of
+# pw_universal_stamp.
+        _stamp = pw_universal_stamp
+        forward_variables_from(_stamp, "*")
+    }
+
+    tool("copy") {
+# GN-ism: GN gets mad if you directly forward the contents of
+# pw_universal_copy.
+        _copy = pw_universal_copy
+        forward_variables_from(_copy, "*")
+    }
+
+    toolchain_args = {
+        skip_tests = true
+        current_os = "linux"
+    }
+}
