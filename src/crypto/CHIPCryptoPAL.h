@@ -88,9 +88,9 @@ constexpr size_t kMAX_P256Keypair_Context_Size = 512;
 constexpr size_t kMax_ECDSA_X9Dot62_Asn1_Overhead = 9;
 constexpr size_t kMax_ECDSA_Signature_Length_Der  = kMax_ECDSA_Signature_Length + kMax_ECDSA_X9Dot62_Asn1_Overhead;
 
-nlSTATIC_ASSERT_PRINT(kMax_ECDH_Secret_Length >= kP256_FE_Length, "ECDH shared secret is too short for crypto suite");
-nlSTATIC_ASSERT_PRINT(kMax_ECDSA_Signature_Length >= kP256_ECDSA_Signature_Length_Raw,
-                      "ECDSA signature buffer length is too short for crypto suite");
+static_assert(kMax_ECDH_Secret_Length >= kP256_FE_Length, "ECDH shared secret is too short for crypto suite");
+static_assert(kMax_ECDSA_Signature_Length >= kP256_ECDSA_Signature_Length_Raw,
+              "ECDSA signature buffer length is too short for crypto suite");
 
 /**
  * Spake2+ parameters for P256
@@ -362,15 +362,13 @@ private:
  *
  * @param[in] fe_length_bytes Field Element length in bytes (e.g. 32 for P256 curve)
  * @param[in] raw_sig Raw signature of <r,s> concatenated
- * @param[in] raw_sig_length Raw signature length (MUST be 2*`fe_length_bytes` long)
- * @param[out] out_asn1_sig ASN.1 DER signature format output buffer
- * @param[in] out_asn1_sig_length ASN.1 DER signature format output buffer length. Must have space for at least
+ * @param[out] out_asn1_sig ASN.1 DER signature format output buffer. Size must have space for at least
  * kMax_ECDSA_X9Dot62_Asn1_Overhead.
  * @param[out] out_asn1_sig_actual_length Final computed size of signature.
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  */
-CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const uint8_t * raw_sig, size_t raw_sig_length, uint8_t * out_asn1_sig,
-                                   size_t out_asn1_sig_length, size_t & out_asn1_sig_actual_length);
+CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_sig, MutableByteSpan out_asn1_sig,
+                                   size_t & out_asn1_sig_actual_length);
 
 /**
  * @brief Convert an ASN.1 DER signature (per X9.62) as used by TLS libraries to SEC1 raw format
@@ -383,14 +381,10 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const uint8_t * raw_s
  *
  * @param[in] fe_length_bytes Field Element length in bytes (e.g. 32 for P256 curve)
  * @param[in] asn1_sig ASN.1 DER signature input
- * @param[in] asn1_sig_length ASN.1 DER signature length
- * @param[out] out_raw_sig Raw signature of <r,s> concatenated format output buffer
- * @param[in] out_raw_sig_length Raw signature output buffer length. Must be at least >= `2 * fe_length_bytes`
+ * @param[out] out_raw_sig Raw signature of <r,s> concatenated format output buffer. Size must be at least >= `2 * fe_length_bytes`
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  */
-
-CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const uint8_t * asn1_sig, size_t asn1_sig_length, uint8_t * out_raw_sig,
-                                   size_t out_raw_sig_length);
+CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1_sig, MutableByteSpan out_raw_sig);
 
 /**
  * @brief A function that implements AES-CCM encryption

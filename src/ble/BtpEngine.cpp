@@ -292,7 +292,7 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
     data->SetDataLength(chip::min(data->DataLength(), mRxFragmentSize));
 
     // Now mark the bytes we consumed as consumed.
-    data->ConsumeHead(reader.OctetsRead());
+    data->ConsumeHead(static_cast<uint16_t>(reader.OctetsRead()));
 
     ChipLogDebugBtpEngine(Ble, ">>> BTP reassembler received data:");
     PrintBufDebug(data);
@@ -312,7 +312,7 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
 
         mRxState = kState_InProgress;
 
-        data->ConsumeHead(startReader.OctetsRead());
+        data->ConsumeHead(static_cast<uint16_t>(startReader.OctetsRead()));
 
         // Create a new buffer for use as the Rx re-assembly area.
         mRxBuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
