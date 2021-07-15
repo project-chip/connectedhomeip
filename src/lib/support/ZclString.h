@@ -16,19 +16,19 @@
  */
 
 #pragma once
-
-#include <app/util/af-types.h>
-
 namespace chip {
 
 /**
  * @brief Create ZCL string from char
  */
-template <size_t BufferLength>
-uint8_t * MakeZclCharString(uint8_t (&zclString)[BufferLength], char * cString)
+static uint8_t * MakeZclCharString(uint8_t * zclString, const char * cString)
 {
-    static_assert(BufferLength <= 254, "Too long string to fit in ZCL_CHAR_STRING type");
-    zclString[0] = static_cast<uint8_t>(strlen(cString));
+    size_t len = strlen(cString);
+    if (len > 254)
+    {
+        len = 0;
+    }
+    zclString[0] = static_cast<uint8_t>(len);
     memcpy(&zclString[1], cString, zclString[0]);
     return zclString;
 }
