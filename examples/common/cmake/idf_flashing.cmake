@@ -36,8 +36,16 @@ macro(flashing_script)
   idf_build_get_property(sdkconfig SDKCONFIG)
   idf_build_get_property(idf_path IDF_PATH)
 
+  if (${IDF_TARGET} MATCHES "esp32*")
+    set(board_type "esp32")
+  elseif (${IDF_TARGET} MATCHES "efr32*")
+    set(board_type "efr32")
+  else()
+    message(FATAL_ERROR "Unknown board type ${IDF_TARGET}")
+  endif()
+
   set(flashing_utils_dir "${project_path}/third_party/connectedhomeip/scripts/flashing/")
-  set(board_firmware_utils "${IDF_TARGET}_firmware_utils.py")
+  set(board_firmware_utils "${board_type}_firmware_utils.py")
   configure_file("${flashing_utils_dir}/${board_firmware_utils}" "${build_dir}/${board_firmware_utils}")
   configure_file("${flashing_utils_dir}/firmware_utils.py" "${build_dir}/firmware_utils.py")
 
@@ -50,7 +58,7 @@ macro(flashing_script)
 
   add_custom_target(flashing_script
     COMMAND ${python}
-            "${project_path}/../../../scripts/flashing/gen_flashing_script.py" ${IDF_TARGET}
+            "${project_path}/../../../scripts/flashing/gen_flashing_script.py" ${board_type}
             --output "${build_dir}/${CMAKE_PROJECT_NAME}.flash.py"
             --port "$ENV{ESPPORT}"
             --baud "$ENV{ESPBAUD}"
