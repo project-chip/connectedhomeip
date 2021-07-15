@@ -2744,6 +2744,34 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::app
     return true;
 }
 
+bool emberAfOperationalCredentialsClusterAttestationResponseCallback(chip::app::Command * commandObj,
+                                                                     chip::ByteSpan AttestationElements, chip::ByteSpan Signature)
+{
+    ChipLogProgress(Zcl, "AttestationResponse:");
+    ChipLogProgress(Zcl, "  AttestationElements: %zu", AttestationElements.size());
+    ChipLogProgress(Zcl, "  Signature: %zu", Signature.size());
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterAttestationResponseCallback");
+
+    Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, AttestationElements, Signature);
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterCertChainResponseCallback(chip::app::Command * commandObj, chip::ByteSpan Certificate)
+{
+    ChipLogProgress(Zcl, "CertChainResponse:");
+    ChipLogProgress(Zcl, "  Certificate: %zu", Certificate.size());
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterCertChainResponseCallback");
+
+    Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, Certificate);
+    return true;
+}
+
 bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, chip::ByteSpan CSR,
                                                                chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
                                                                chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3,

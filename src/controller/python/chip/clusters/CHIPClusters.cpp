@@ -3441,6 +3441,25 @@ CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertifica
     cluster.Associate(device, ZCLendpointId);
     return cluster.AddTrustedRootCertificate(nullptr, nullptr, chip::ByteSpan(rootCertificate, rootCertificate_Len));
 }
+CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_AttestationRequest(chip::Controller::Device * device,
+                                                                            chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                            const uint8_t * attestationNonce,
+                                                                            uint32_t attestationNonce_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.AttestationRequest(nullptr, nullptr, chip::ByteSpan(attestationNonce, attestationNonce_Len));
+}
+CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_CertChainRequest(chip::Controller::Device * device,
+                                                                          chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                          uint16_t certChainType)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.CertChainRequest(nullptr, nullptr, certChainType);
+}
 CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest(chip::Controller::Device * device,
                                                                       chip::EndpointId ZCLendpointId, chip::GroupId,
                                                                       const uint8_t * cSRNonce, uint32_t cSRNonce_Len)

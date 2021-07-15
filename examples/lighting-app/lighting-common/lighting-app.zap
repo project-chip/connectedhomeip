@@ -2895,6 +2895,22 @@
               "outgoing": 1
             },
             {
+              "name": "CertChainRequest",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "AttestationRequest",
+              "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
               "name": "OpCSRRequest",
               "code": 4,
               "mfgCode": null,
@@ -2980,6 +2996,22 @@
             {
               "name": "SetFabricResponse",
               "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "CertChainResponse",
+              "code": 3,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "AttestationResponse",
+              "code": 13,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,

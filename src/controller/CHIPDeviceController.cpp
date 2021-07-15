@@ -62,6 +62,7 @@
 #include <support/ScopedBuffer.h>
 #include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <transport/PeerConnectionState.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
@@ -77,8 +78,11 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "dac_chain.h"
+
 using namespace chip::Inet;
 using namespace chip::System;
+using namespace chip::Transport;
 using namespace chip::Credentials;
 
 // For some applications those does not implement IMDelegate, the DeviceControllerInteractionModelDelegate will dispatch the
@@ -803,12 +807,14 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 }
 
 DeviceCommissioner::DeviceCommissioner() :
-    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this),
-    mOpCSRResponseCallback(OnOperationalCertificateSigningRequest, this),
+    mSuccess(BasicSuccess, this), mFailure(BasicFailure, this), mCertChainResponseCallback(OnCertificateChainResponse, this),
+    mAttestationResponseCallback(OnAttestationResponse, this), mOpCSRResponseCallback(OnOperationalCertificateSigningRequest, this),
     mOpCertResponseCallback(OnOperationalCertificateAddResponse, this), mRootCertResponseCallback(OnRootCertSuccessResponse, this),
-    mOnCSRFailureCallback(OnCSRFailureResponse, this), mOnCertFailureCallback(OnAddOpCertFailureResponse, this),
-    mOnRootCertFailureCallback(OnRootCertFailureResponse, this), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
-    mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this), mDeviceNOCCallback(OnDeviceNOCGenerated, this)
+    mOnCertChainFailureCallback(OnCertChainFailureResponse, this),
+    mOnAttestationFailureCallback(OnAttestationFailureResponse, this), mOnCSRFailureCallback(OnCSRFailureResponse, this),
+    mOnCertFailureCallback(OnAddOpCertFailureResponse, this), mOnRootCertFailureCallback(OnRootCertFailureResponse, this),
+    mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
+    mDeviceNOCCallback(OnDeviceNOCGenerated, this)
 {
     mPairingDelegate      = nullptr;
     mDeviceBeingPaired    = kNumMaxActiveDevices;
@@ -1164,10 +1170,10 @@ void DeviceCommissioner::OnSessionEstablished()
 
     if (sendOperationalCertsImmediately)
     {
-        err = SendTrustedRootCertificate(device);
+        err = SendCertificateChainRequestCommand(device, CertificateChainType::kDAC);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Ble, "Failed in sending 'add trusted root' command to the device: err %s", ErrorStr(err));
+            ChipLogError(Ble, "Failed in sending Certificate Chain request command to the device: err %s", ErrorStr(err));
             OnSessionEstablishmentError(err);
             return;
         }
@@ -1176,6 +1182,298 @@ void DeviceCommissioner::OnSessionEstablished()
     {
         AdvanceCommissioningStage(CHIP_NO_ERROR);
     }
+}
+
+CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(Device * device, CertificateChainType certificateChainType)
+{
+    ChipLogDetail(Controller, "Sending Certificate Chain request to %p device", device);
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, 0);
+
+    mCertificateChainBeingRequested = certificateChainType;
+
+    Callback::Cancelable * successCallback = mCertChainResponseCallback.Cancel();
+    Callback::Cancelable * failureCallback = mOnCertChainFailureCallback.Cancel();
+
+    ReturnErrorOnFailure(cluster.CertChainRequest(successCallback, failureCallback, certificateChainType));
+    ChipLogDetail(Controller, "Sent Certificate Chain request, waiting for the DAC Certificate");
+    return CHIP_NO_ERROR;
+}
+
+void DeviceCommissioner::OnCertChainFailureResponse(void * context, uint8_t status)
+{
+    ChipLogProgress(Controller, "Device failed to receive the Certificate Chain request Response: 0x%02x", status);
+    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    commissioner->mCertChainResponseCallback.Cancel();
+    commissioner->mOnCertChainFailureCallback.Cancel();
+    // TODO: Map error status to correct error code
+    commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
+}
+
+void DeviceCommissioner::OnCertificateChainResponse(void * context, ByteSpan certificate)
+{
+    ChipLogProgress(Controller, "Received certificate chain from the device");
+    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+
+    commissioner->mCertChainResponseCallback.Cancel();
+    commissioner->mOnCertChainFailureCallback.Cancel();
+
+    if (commissioner->ProcessCertificateChain(certificate) != CHIP_NO_ERROR)
+    {
+        // Handle error, and notify session failure to the commissioner application.
+        ChipLogError(Controller, "Failed to process the certificate chain request");
+        // TODO: Map error status to correct error code
+        commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
+    }
+}
+
+CHIP_ERROR DeviceCommissioner::ProcessCertificateChain(const ByteSpan & certificate)
+{
+    Transport::AdminPairingInfo * admin = mAdmins.FindAdminWithId(mAdminId);
+    VerifyOrReturnError(admin != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    switch (mCertificateChainBeingRequested)
+    {
+    case CertificateChainType::kDAC: {
+        admin->SetDeviceDAC(certificate);
+        break;
+    }
+    case CertificateChainType::kPAI: {
+        admin->SetDevicePAI(certificate);
+        break;
+    }
+    case CertificateChainType::kUnknown:
+    default: {
+        return CHIP_ERROR_INTERNAL;
+    }
+    }
+
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDeviceBeingPaired < kNumMaxActiveDevices, CHIP_ERROR_INCORRECT_STATE);
+
+    Device * device = &mActiveDevices[mDeviceBeingPaired];
+
+    if (admin->AreDeviceCredentialsAvailable())
+    {
+        // Step c
+        // TODO: see if vid matches
+
+        // Step b/d
+        uint16_t paiLen;
+        const uint8_t * pai = admin->GetDevicePAI(paiLen);
+        uint16_t dacLen;
+        const uint8_t * dac = admin->GetDeviceDAC(dacLen);
+
+        ReturnErrorOnFailure(ValidateCertificateChain(paa_certificate, sizeof(paa_certificate), pai, paiLen, dac, dacLen));
+
+        // Extract Manufacturer Certificate Public Key
+        ReturnErrorOnFailure(ExtractPubkeyFromX509Cert(ByteSpan(dac, dacLen), mRemoteManufacturerPubkey));
+
+        ChipLogProgress(Controller, "Sending Attestation Request to the device.");
+        ReturnErrorOnFailure(SendAttestationRequestCommand(device));
+    }
+    else
+    {
+        CHIP_ERROR err = SendCertificateChainRequestCommand(device, CertificateChainType::kPAI);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed in sending Certificate Chain request command to the device: err %s", ErrorStr(err));
+            OnSessionEstablishmentError(err);
+            return err;
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(Device * device)
+{
+    ChipLogDetail(Controller, "Sending Attestation request to %p device", device);
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, 0);
+
+    Callback::Cancelable * successCallback = mAttestationResponseCallback.Cancel();
+    Callback::Cancelable * failureCallback = mOnAttestationFailureCallback.Cancel();
+
+    ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce)));
+
+    ReturnErrorOnFailure(
+        cluster.AttestationRequest(successCallback, failureCallback, ByteSpan(mAttestationNonce, sizeof(mAttestationNonce))));
+    ChipLogDetail(Controller, "Sent Attestation request, waiting for the Attestation Information");
+    return CHIP_NO_ERROR;
+}
+
+void DeviceCommissioner::OnAttestationFailureResponse(void * context, uint8_t status)
+{
+    ChipLogProgress(Controller, "Device failed to receive the Attestation Information Response: 0x%02x", status);
+    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    commissioner->mAttestationResponseCallback.Cancel();
+    commissioner->mOnAttestationFailureCallback.Cancel();
+    // TODO: Map error status to correct error code
+    commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
+}
+
+void DeviceCommissioner::OnAttestationResponse(void * context, chip::ByteSpan attestationElements, chip::ByteSpan signature)
+{
+    ChipLogProgress(Controller, "Received Attestation Information from the device");
+    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+
+    commissioner->mAttestationResponseCallback.Cancel();
+    commissioner->mOnAttestationFailureCallback.Cancel();
+
+    if (commissioner->ValidateAttestationInfo(attestationElements, signature) != CHIP_NO_ERROR)
+    {
+        // Handle error, and notify session failure to the commissioner application.
+        ChipLogError(Controller, "Failed to validate the Attestation Information");
+        // TODO: Map error status to correct error code
+        commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
+    }
+}
+
+CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(chip::ByteSpan attestationElements, chip::ByteSpan signature)
+{
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDeviceBeingPaired < kNumMaxActiveDevices, CHIP_ERROR_INCORRECT_STATE);
+
+    Device * device = &mActiveDevices[mDeviceBeingPaired];
+
+    ByteSpan certDeclaration;
+    ByteSpan attestationNonce;
+    ByteSpan timestamp;
+    ByteSpan firmwareInfo;
+    ByteSpan vendorReserved1;
+    ByteSpan vendorReserved2;
+    ByteSpan vendorReserved3;
+    ByteSpan vendorReserved4;
+
+    ByteSpan * element_array[] = { &certDeclaration, &attestationNonce, &timestamp,       &firmwareInfo,
+                                   &vendorReserved1, &vendorReserved2,  &vendorReserved3, &vendorReserved4 };
+
+    System::PacketBufferTLVWriter tlvWriter;
+    TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
+    System::PacketBufferHandle attestationElementsTbs;
+
+    TLV::TLVReader tlvReader;
+    TLV::TLVType containerType = TLV::kTLVType_Structure;
+    int i                      = 0;
+
+    tlvReader.Init(attestationElements.data(), static_cast<uint32_t>(attestationElements.size()));
+    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
+    do
+    {
+        if (!TLV::IsContextTag(tlvReader.GetTag()))
+        {
+            continue;
+        }
+        const uint8_t * data = nullptr;
+        ReturnErrorOnFailure(tlvReader.GetDataPtr(data));
+        *element_array[i++] = ByteSpan(data, tlvReader.GetLength());
+    } while (tlvReader.Next() == CHIP_NO_ERROR);
+
+    // Step f
+    // Retrieve attestation challenge
+    PeerConnectionState * state = mSessionMgr->GetPeerConnectionState(
+        { mPairingSession.PeerConnection().GetPeerNodeId(), mPairingSession.GetPeerKeyId(), mAdminId });
+    VerifyOrReturnError(state != nullptr, CHIP_ERROR_NOT_CONNECTED);
+    ByteSpan attestationChallenge = state->GetSecureSession().GetAttestationChallenge();
+
+    // Create attestation-elements-tbs
+    attestationElementsTbs = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    VerifyOrReturnError(!attestationElementsTbs.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    tlvWriter.Init(std::move(attestationElementsTbs));
+    outerContainerType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(0), attestationElements));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), attestationChallenge));
+    ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.Finalize(&attestationElementsTbs));
+
+    // Step e
+    P256ECDSASignature deviceSignature;
+    ReturnErrorOnFailure(deviceSignature.SetLength(signature.size()));
+    memcpy(deviceSignature, signature.data(), signature.size());
+    ReturnErrorOnFailure(mRemoteManufacturerPubkey.ECDSA_validate_msg_signature(
+        attestationElementsTbs->Start(), attestationElementsTbs->DataLength(), deviceSignature));
+
+    // Step g
+    VerifyOrReturnError(sizeof(mAttestationNonce) == attestationNonce.size(), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(memcmp(mAttestationNonce, attestationNonce.data(), sizeof(mAttestationNonce)) == 0, CHIP_ERROR_INTERNAL);
+
+    // Step h/i
+    ReturnErrorOnFailure(ValidateCertificateDeclaration(certDeclaration, mRemoteManufacturerPubkey, firmwareInfo));
+
+    ChipLogProgress(Controller, "Sending Trusted Root Certificate to the device.");
+    ReturnErrorOnFailure(SendTrustedRootCertificate(device));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceCommissioner::ValidateCertificateDeclaration(chip::ByteSpan certDeclaration, Crypto::P256PublicKey pubkey,
+                                                              chip::ByteSpan firmwareInfo)
+{
+    P256ECDSASignature signature;
+    ByteSpan certDeclarationTbs;
+    ByteSpan certDeclarationSignature;
+
+    const uint8_t * data = nullptr;
+    TLV::TLVReader tlvReader;
+    TLV::TLVType containerType = TLV::kTLVType_Structure;
+    tlvReader.Init(certDeclaration.data(), static_cast<uint32_t>(certDeclaration.size()));
+    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
+    ReturnErrorOnFailure(tlvReader.Next());
+    ReturnErrorOnFailure(tlvReader.GetDataPtr(data));
+    certDeclarationTbs = ByteSpan(data, tlvReader.GetLength());
+    ReturnErrorOnFailure(tlvReader.Next());
+    VerifyOrReturnError(TLV::IsContextTag(tlvReader.GetTag()) == true, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(tlvReader.GetDataPtr(data));
+    certDeclarationSignature = ByteSpan(data, tlvReader.GetLength());
+    ReturnErrorOnFailure(signature.SetLength(certDeclarationSignature.size()));
+    memcpy(signature, certDeclarationSignature.data(), certDeclarationSignature.size());
+
+    ReturnErrorOnFailure(pubkey.ECDSA_validate_msg_signature(certDeclarationTbs.data(), certDeclarationTbs.size(), signature));
+
+    uint16_t vendor_id;
+    uint16_t product_id;
+    uint16_t server_category_id;
+    uint16_t client_category_id;
+    uint16_t security_level;
+    uint16_t security_information;
+    uint16_t version_number;
+
+    uint16_t * element_array[] = { &vendor_id,      &product_id,           &server_category_id, &client_category_id,
+                                   &security_level, &security_information, &version_number };
+
+    int i         = 0;
+    containerType = TLV::kTLVType_Structure;
+    tlvReader.Init(certDeclarationTbs.data(), static_cast<uint32_t>(certDeclarationTbs.size()));
+    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
+    do
+    {
+        if (!TLV::IsContextTag(tlvReader.GetTag()))
+        {
+            continue;
+        }
+        ReturnErrorOnFailure(tlvReader.Get(*element_array[i++]));
+    } while (tlvReader.Next() == CHIP_NO_ERROR);
+
+    uint16_t cd_version_number;
+
+    containerType = TLV::kTLVType_Structure;
+    tlvReader.Init(firmwareInfo.data(), static_cast<uint32_t>(firmwareInfo.size()));
+    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
+    ReturnErrorOnFailure(tlvReader.Next());
+    ReturnErrorOnFailure(tlvReader.Get(cd_version_number));
+
+    VerifyOrReturnError(version_number == cd_version_number, CHIP_ERROR_VERSION_MISMATCH);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(Device * device)

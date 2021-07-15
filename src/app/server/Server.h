@@ -50,6 +50,7 @@ void InitServer(AppDelegate * delegate = nullptr);
 CHIP_ERROR AddTestPairing();
 
 chip::Transport::AdminPairingTable & GetGlobalAdminPairingTable();
+chip::SecureSessionMgr & GetGlobalSecureSessionMgr();
 
 namespace chip {
 

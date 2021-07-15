@@ -586,6 +586,12 @@ class ChipClusters:
                 "AddTrustedRootCertificate": {
                     "rootCertificate": "bytes",
                 },
+                "AttestationRequest": {
+                    "attestationNonce": "bytes",
+                },
+                "CertChainRequest": {
+                    "certChainType": "int",
+                },
                 "OpCSRRequest": {
                     "cSRNonce": "bytes",
                 },
@@ -2764,6 +2770,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate(
                 device, ZCLendpoint, ZCLgroupid, rootCertificate, len(rootCertificate)
         )
+    def ClusterOperationalCredentials_CommandAttestationRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, attestationNonce: bytes):
+        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AttestationRequest(
+                device, ZCLendpoint, ZCLgroupid, attestationNonce, len(attestationNonce)
+        )
+    def ClusterOperationalCredentials_CommandCertChainRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, certChainType: int):
+        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_CertChainRequest(
+                device, ZCLendpoint, ZCLgroupid, certChainType
+        )
     def ClusterOperationalCredentials_CommandOpCSRRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, cSRNonce: bytes):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest(
                 device, ZCLendpoint, ZCLgroupid, cSRNonce, len(cSRNonce)
@@ -4772,6 +4786,12 @@ class ChipClusters:
         # Cluster OperationalCredentials Command AddTrustedRootCertificate
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials Command AttestationRequest
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AttestationRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AttestationRequest.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials Command CertChainRequest
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_CertChainRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_CertChainRequest.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command OpCSRRequest
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest.restype = ctypes.c_uint32

@@ -3768,6 +3768,8 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 | Commands:                                                           |        |
 | * AddOpCert                                                         |   0x06 |
 | * AddTrustedRootCertificate                                         |   0xA1 |
+| * AttestationRequest                                                |   0x0C |
+| * CertChainRequest                                                  |   0x02 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
 | * RemoveFabric                                                      |   0x0A |

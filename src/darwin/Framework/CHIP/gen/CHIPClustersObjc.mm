@@ -2254,6 +2254,71 @@ private:
     dispatch_queue_t mQueue;
 };
 
+class CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge
+    : public Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback> {
+public:
+    CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge() {};
+
+    static void CallbackFn(void * context, chip::ByteSpan AttestationElements, chip::ByteSpan Signature)
+    {
+        CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"AttestationElements" : [NSData dataWithBytes:AttestationElements.data() length:AttestationElements.size()],
+                    @"Signature" : [NSData dataWithBytes:Signature.data() length:Signature.size()],
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPOperationalCredentialsClusterCertChainResponseCallbackBridge
+    : public Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback> {
+public:
+    CHIPOperationalCredentialsClusterCertChainResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPOperationalCredentialsClusterCertChainResponseCallbackBridge() {};
+
+    static void CallbackFn(void * context, chip::ByteSpan Certificate)
+    {
+        CHIPOperationalCredentialsClusterCertChainResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPOperationalCredentialsClusterCertChainResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"Certificate" : [NSData dataWithBytes:Certificate.data() length:Certificate.size()],
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
 class CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge
     : public Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> {
 public:
@@ -13464,6 +13529,61 @@ private:
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.AddTrustedRootCertificate(onSuccess->Cancel(), onFailure->Cancel(),
             chip::ByteSpan((const uint8_t *) rootCertificate.bytes, rootCertificate.length));
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)attestationRequest:(NSData *)attestationNonce responseHandler:(ResponseHandler)responseHandler
+{
+    CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge * onSuccess
+        = new CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.AttestationRequest(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) attestationNonce.bytes, attestationNonce.length));
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)certChainRequest:(uint16_t)certChainType responseHandler:(ResponseHandler)responseHandler
+{
+    CHIPOperationalCredentialsClusterCertChainResponseCallbackBridge * onSuccess
+        = new CHIPOperationalCredentialsClusterCertChainResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.CertChainRequest(onSuccess->Cancel(), onFailure->Cancel(), certChainType);
     });
 
     if (err != CHIP_NO_ERROR) {

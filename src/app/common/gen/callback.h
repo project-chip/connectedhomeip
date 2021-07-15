@@ -15878,6 +15878,16 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId);
 
 /**
+ * @brief  Cluster CertChainRequest Command callback
+ */
+bool emberAfOperationalCredentialsClusterCertChainRequestCallback(chip::app::Command * commandObj, uint16_t CertChainType);
+
+/**
+ * @brief  Cluster CertChainResponse Command callback
+ */
+bool emberAfOperationalCredentialsClusterCertChainResponseCallback(chip::app::Command * commandObj, chip::ByteSpan Certificate);
+
+/**
  * @brief  Cluster OpCSRRequest Command callback
  */
 bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::Command * commandObj, chip::ByteSpan CSRNonce);
@@ -15918,6 +15928,18 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command
  * @brief  Cluster RemoveAllFabrics Command callback
  */
 bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::Command * commandObj);
+
+/**
+ * @brief  Cluster AttestationRequest Command callback
+ */
+bool emberAfOperationalCredentialsClusterAttestationRequestCallback(chip::app::Command * commandObj,
+                                                                    chip::ByteSpan AttestationNonce);
+
+/**
+ * @brief  Cluster AttestationResponse Command callback
+ */
+bool emberAfOperationalCredentialsClusterAttestationResponseCallback(chip::app::Command * commandObj,
+                                                                     chip::ByteSpan AttestationElements, chip::ByteSpan Signature);
 
 /**
  * @brief  Cluster AddTrustedRootCertificate Command callback

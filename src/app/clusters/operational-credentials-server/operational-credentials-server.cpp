@@ -39,6 +39,8 @@
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
 
+#include "dac_chain.h"
+
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
@@ -355,6 +357,182 @@ exit:
     if (status == EMBER_ZCL_STATUS_FAILURE)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddOpCert request.");
+    }
+
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterCertChainRequestCallback(chip::app::Command * commandObj, uint16_t certChainType)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Device Attestation Credentials");
+
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
+                                         ZCL_CERT_CHAIN_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    TLV::TLVWriter * writer = nullptr;
+
+    VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+    writer = commandObj->GetCommandDataElementTLVWriter();
+    if (certChainType == 1)
+    {
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(dac_certificate, sizeof(dac_certificate))));
+    }
+    else if (certChainType == 2)
+    {
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(pai_certificate, sizeof(pai_certificate))));
+    }
+    else
+    {
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
+    }
+    SuccessOrExit(err = commandObj->FinishCommand());
+
+exit:
+    if (status == EMBER_ZCL_STATUS_FAILURE)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed CertChainRequest.");
+        emberAfSendImmediateDefaultResponse(status);
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command: %s", ErrorStr(err));
+    }
+
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterAttestationRequestCallback(chip::app::Command * commandObj,
+                                                                    chip::ByteSpan attestationNonce)
+{
+    EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    System::PacketBufferTLVWriter tlvWriter;
+    TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
+    System::PacketBufferHandle certDeclaration;
+    System::PacketBufferHandle certDeclarationTbs;
+    System::PacketBufferHandle firmwareInfo;
+    System::PacketBufferHandle attestationElements;
+    System::PacketBufferHandle attestationElementsTbs;
+    Crypto::P256ECDSASignature signature;
+    Crypto::P256Keypair keypair;
+    Crypto::P256SerializedKeypair serializedKeypair;
+    PeerConnectionState * state;
+    ByteSpan attestationChallenge;
+    uint16_t certificationElement = 0;
+
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Attestation");
+
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
+                                         ZCL_ATTESTATION_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    // Fetch current admin
+    AdminPairingInfo * admin = retrieveCurrentAdmin();
+    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+
+    SuccessOrExit(err = serializedKeypair.SetLength(sizeof(dac_private_key) + sizeof(dac_public_key)));
+    memcpy(serializedKeypair, dac_public_key, sizeof(dac_public_key));
+    memcpy(serializedKeypair + sizeof(dac_public_key), dac_private_key, sizeof(dac_private_key));
+    SuccessOrExit(err = keypair.Deserialize(serializedKeypair));
+
+    certDeclarationTbs = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    VerifyOrExit(!certDeclarationTbs.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+
+    tlvWriter.Init(std::move(certDeclarationTbs));
+    SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(0), certificationElement)); // TODO: add vendor_id
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(1), certificationElement)); // TODO: add product_id
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(2), certificationElement)); // TODO: add server_category_id
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(3), certificationElement)); // TODO: add client_category_id
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(4), certificationElement)); // TODO: add security_level
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(5), certificationElement)); // TODO: add security_information
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(6), certificationElement)); // TODO: add version_number
+    SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
+    SuccessOrExit(err = tlvWriter.Finalize(&certDeclarationTbs));
+
+    SuccessOrExit(err = keypair.ECDSA_sign_msg(certDeclarationTbs->Start(), certDeclarationTbs->DataLength(), signature));
+
+    certDeclaration = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    VerifyOrExit(!certDeclaration.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+
+    tlvWriter.Init(std::move(certDeclaration));
+    outerContainerType = TLV::kTLVType_NotSpecified;
+    SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(0), ByteSpan(certDeclarationTbs->Start(), certDeclarationTbs->DataLength())));
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(1), ByteSpan(signature, signature.Length())));
+    SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
+    SuccessOrExit(err = tlvWriter.Finalize(&certDeclaration));
+
+    firmwareInfo = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    VerifyOrExit(!firmwareInfo.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+
+    tlvWriter.Init(std::move(firmwareInfo));
+    outerContainerType = TLV::kTLVType_NotSpecified;
+    SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(0), certificationElement));
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(1), ByteSpan(nullptr, 0))); // TODO: add firmware digest(s)
+    SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
+    SuccessOrExit(err = tlvWriter.Finalize(&firmwareInfo));
+
+    attestationElements = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    VerifyOrExit(!attestationElements.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+
+    attestationElementsTbs = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    VerifyOrExit(!attestationElementsTbs.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+
+    tlvWriter.Init(std::move(attestationElements));
+    outerContainerType = TLV::kTLVType_NotSpecified;
+    SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(0), ByteSpan(certDeclaration->Start(), certDeclaration->DataLength())));
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(1), attestationNonce));
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(2), ByteSpan(nullptr, 0))); // TODO: add timestamp
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(3), ByteSpan(firmwareInfo->Start(), firmwareInfo->DataLength())));
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(4), ByteSpan(nullptr, 0))); // Vendor Reserved 5
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(5), ByteSpan(nullptr, 0))); // Vendor Reserved 6
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(6), ByteSpan(nullptr, 0))); // Vendor Reserved 7
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(7), ByteSpan(nullptr, 0))); // Vendor Reserved 8
+    SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
+    SuccessOrExit(err = tlvWriter.Finalize(&attestationElements));
+
+    // Retrieve attestation challenge
+    // TODO: Retrieve Peer Node Id / Remove hard-coded NodeId value
+    state = GetGlobalSecureSessionMgr().GetPeerConnectionState({ 112233, kAnyKeyId, kUndefinedAdminId });
+    VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
+    attestationChallenge = state->GetSecureSession().GetAttestationChallenge();
+
+    tlvWriter.Init(std::move(attestationElementsTbs));
+    outerContainerType = TLV::kTLVType_NotSpecified;
+    SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    SuccessOrExit(err =
+                      tlvWriter.Put(TLV::ContextTag(0), ByteSpan(attestationElements->Start(), attestationElements->DataLength())));
+    SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(1), attestationChallenge));
+    SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
+    SuccessOrExit(err = tlvWriter.Finalize(&attestationElementsTbs));
+
+    SuccessOrExit(err = keypair.ECDSA_sign_msg(attestationElementsTbs->Start(), attestationElementsTbs->DataLength(), signature));
+
+    VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+    writer = commandObj->GetCommandDataElementTLVWriter();
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(attestationElements->Start(), attestationElements->DataLength())));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), ByteSpan(signature, signature.Length())));
+    SuccessOrExit(err = commandObj->FinishCommand());
+
+exit:
+    if (status == EMBER_ZCL_STATUS_FAILURE)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed OpCSRRequest.");
+        emberAfSendImmediateDefaultResponse(status);
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command: %s", ErrorStr(err));
     }
 
     return true;

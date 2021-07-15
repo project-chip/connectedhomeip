@@ -1082,6 +1082,10 @@ public:
                          chip::ByteSpan nOCArray, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId);
     CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          chip::ByteSpan rootCertificate);
+    CHIP_ERROR AttestationRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  chip::ByteSpan attestationNonce);
+    CHIP_ERROR CertChainRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                uint16_t certChainType);
     CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             chip::ByteSpan cSRNonce);
     CHIP_ERROR RemoveAllFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -1101,6 +1105,8 @@ public:
 private:
     static constexpr CommandId kAddOpCertCommandId                    = 0x06;
     static constexpr CommandId kAddTrustedRootCertificateCommandId    = 0xA1;
+    static constexpr CommandId kAttestationRequestCommandId           = 0x0C;
+    static constexpr CommandId kCertChainRequestCommandId             = 0x02;
     static constexpr CommandId kOpCSRRequestCommandId                 = 0x04;
     static constexpr CommandId kRemoveAllFabricsCommandId             = 0x0B;
     static constexpr CommandId kRemoveFabricCommandId                 = 0x0A;

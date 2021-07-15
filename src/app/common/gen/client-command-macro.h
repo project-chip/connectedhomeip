@@ -2231,6 +2231,28 @@
                                                                                                                                    \
                                                                             ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "u", FabricId);
 
+/** @brief Command description for CertChainRequest
+ *
+ * Command: CertChainRequest
+ * @param CertChainType INT16U
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterCertChainRequest(CertChainType)                                                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_CERT_CHAIN_REQUEST_COMMAND_ID, "u", CertChainType);
+
+/** @brief Command description for CertChainResponse
+ *
+ * Command: CertChainResponse
+ * @param Certificate OCTET_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterCertChainResponse(Certificate)                                                                               \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_CERT_CHAIN_RESPONSE_COMMAND_ID, "u", Certificate);
+
 /** @brief Command description for OpCSRRequest
  *
  * Command: OpCSRRequest
@@ -2316,6 +2338,29 @@
     CredentialsClusterRemoveAllFabrics() emberAfFillExternalBuffer(mask,                                                           \
                                                                                                                                    \
                                                                    ZCL_REMOVE_ALL_FABRICS_COMMAND_ID, "", );
+
+/** @brief Command description for AttestationRequest
+ *
+ * Command: AttestationRequest
+ * @param AttestationNonce OCTET_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterAttestationRequest(AttestationNonce)                                                                         \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ATTESTATION_REQUEST_COMMAND_ID, "u", AttestationNonce);
+
+/** @brief Command description for AttestationResponse
+ *
+ * Command: AttestationResponse
+ * @param AttestationElements OCTET_STRING
+ * @param Signature OCTET_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterAttestationResponse(AttestationElements, Signature)                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ATTESTATION_RESPONSE_COMMAND_ID, "uu", AttestationElements, Signature);
 
 /** @brief Command description for AddTrustedRootCertificate
  *
