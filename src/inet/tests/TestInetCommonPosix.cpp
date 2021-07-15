@@ -450,7 +450,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
         if (NetworkIsReady())
 #endif
         {
-            printf("CHIP node ready to service events; PID: %d; PPID: %d\n", getpid(), getppid());
+            printf("CHIP node ready to service events\n");
             fflush(stdout);
             printed = true;
         }
@@ -530,14 +530,14 @@ void ShutdownNetwork()
 
 void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix, uint32_t rowWidth)
 {
-    int indexWidth = snprintf(nullptr, 0, "%X", len);
+    int indexWidth = snprintf(nullptr, 0, "%" PRIX32, len);
 
     if (indexWidth < 4)
         indexWidth = 4;
 
     for (uint32_t i = 0; i < len; i += rowWidth)
     {
-        printf("%s%0*X: ", prefix, indexWidth, i);
+        printf("%s%0*" PRIX32 ": ", prefix, indexWidth, i);
 
         uint32_t rowEnd = i + rowWidth;
 

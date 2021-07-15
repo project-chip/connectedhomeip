@@ -76,7 +76,7 @@ static void CheckInetErrorStr(nlTestSuite * inSuite, void * inContext)
     Inet::RegisterLayerErrorFormatter();
 
     // For each defined error...
-    for (int err : sContext)
+    for (int32_t err : sContext)
     {
         const char * errStr = ErrorStr(err);
         char expectedText[9];

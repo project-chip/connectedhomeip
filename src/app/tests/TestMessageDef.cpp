@@ -65,7 +65,7 @@ CHIP_ERROR DebugPrettyPrint(const chip::System::PacketBufferHandle & aMsgBuf)
 
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogProgress(DataManagement, "DebugPrettyPrint fails with err %d", err);
+        ChipLogProgress(DataManagement, "DebugPrettyPrint fails with err %" CHIP_ERROR_FORMAT, err);
     }
 
     return err;
