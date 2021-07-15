@@ -26,8 +26,8 @@
 #include <app/common/gen/cluster-id.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/ZclString.h>
 #include <protocols/interaction_model/Constants.h>
-#include <support/ZclString.h>
 
 #include <cstring>
 

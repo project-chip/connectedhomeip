@@ -25,7 +25,7 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/basic-types.h>
-#include <support/ZclString.h>
+#include <lib/support/ZclString.h>
 
 #include <inipp/inipp.h>
 
