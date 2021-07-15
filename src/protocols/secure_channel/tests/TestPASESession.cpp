@@ -360,7 +360,7 @@ int TestSecurePairing_Teardown(void * inContext);
 // clang-format off
 static nlTestSuite sSuite =
 {
-    "Test-CHIP-SecurePairing",
+    "Test-CHIP-SecurePairing-PASE",
     &sTests[0],
     TestSecurePairing_Setup,
     TestSecurePairing_Teardown,
