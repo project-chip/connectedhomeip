@@ -18,12 +18,12 @@
 
 #pragma once
 
+#include "AppConfig.h"
+#include "board_features.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "AppConfig.h"
-#include "board_features.h"
 
 #define MAX_STR_LEN 48
 
