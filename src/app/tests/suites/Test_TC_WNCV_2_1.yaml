@@ -86,7 +86,6 @@ tests:
       response:
           value: 0
 
-
     ### Attribute[ 13]: EndProductType
     - label: "read the RO mandatory attribute default: EndProductType"
       command: "readAttribute"
