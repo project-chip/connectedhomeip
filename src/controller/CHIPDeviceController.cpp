@@ -823,7 +823,7 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     uint16_t nextKeyID = 0;
     uint16_t size      = sizeof(nextKeyID);
     CHIP_ERROR error   = mStorageDelegate->SyncGetKeyValue(kNextAvailableKeyID, &nextKeyID, size);
-    if (error || (size != sizeof(nextKeyID)))
+    if ((error != CHIP_NO_ERROR) || (size != sizeof(nextKeyID)))
     {
         nextKeyID = 0;
     }

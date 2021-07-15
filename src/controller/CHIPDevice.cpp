@@ -306,7 +306,7 @@ void Device::OnNewConnection(SecureSessionHandle session)
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
     VerifyOrReturn(connectionState != nullptr);
     MessageCounter & localCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter();
-    if (localCounter.SetCounter(mLocalMessageCounter))
+    if (localCounter.SetCounter(mLocalMessageCounter) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Unable to restore local counter to %" PRIu32, mLocalMessageCounter);
     }

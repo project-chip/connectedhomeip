@@ -643,7 +643,7 @@ void WriteEncoding3(nlTestSuite * inSuite, TLVWriter & writer)
         TLVWriter writer1;
 
         err = writer.OpenContainer(ProfileTag(TestProfile_1, 1), kTLVType_Structure, writer1);
-        if (err)
+        if (err != CHIP_NO_ERROR)
             NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = writer1.PutBoolean(ProfileTag(TestProfile_2, 2), false);
