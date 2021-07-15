@@ -33,6 +33,8 @@ typedef void (*{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}C
 {{#if isList}}
 void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
 typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback)(void * context, uint16_t count, {{chipType}} * entries);
+{{else if isStruct}}
+typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback)(void * context, {{chipType}} entries);
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}

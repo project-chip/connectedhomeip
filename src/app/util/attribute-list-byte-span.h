@@ -42,7 +42,7 @@ CHIP_ERROR ReadByteSpan(const uint8_t * buffer, uint16_t bufferLen, chip::ByteSp
  * @param [in] span       The bytespan to serialize
  *
  */
-CHIP_ERROR WriteByteSpan(uint8_t * buffer, uint16_t bufferLen, chip::ByteSpan * span);
+CHIP_ERROR WriteByteSpan(uint8_t * buffer, uint16_t bufferLen, const chip::ByteSpan * span);
 
 /**
  * @brief Returns the byte offset of a serialized bytespan into a buffer of serialized bytespans.

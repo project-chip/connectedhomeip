@@ -7,7 +7,7 @@
 
 #include <app/util/basic-types.h>
 #include <lib/support/Span.h>
-
+#include <lib/core/CHIPTLV.h>
 #include "enums.h"
 
 {{#zcl_structs}}
@@ -16,8 +16,18 @@
 // Struct for {{label}}
 typedef struct _{{asType label}} {
 {{#zcl_struct_items}}
+{{#if (isCharString type)}}
+{{ident}}const {{asUnderlyingZclType type}} {{asSymbol label}};
+{{else if (isList type) }}
+{{ident}}const {{asUnderlyingZclType type}} {{asSymbol label}};
+{{else}}
 {{ident}}{{asUnderlyingZclType type}} {{asSymbol label}};
+{{/if}}
 {{/zcl_struct_items}}
+static CHIP_ERROR Encode(const void * val, chip::TLV::TLVWriter & writer, uint64_t tag);
+static CHIP_ERROR Decode(void * val, const chip::TLV::TLVReader & aReader);
+static CHIP_ERROR ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len);
+static CHIP_ERROR FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength);
 } {{asUnderlyingType label}};
 {{else}}
 // Void typedef for {{asUnderlyingType label}} which is empty.

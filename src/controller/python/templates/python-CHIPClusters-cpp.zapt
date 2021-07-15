@@ -78,6 +78,13 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
         gSuccessResponseDelegate();
 }
 chip::Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback> g{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback{On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse, nullptr};
+{{else if isStruct}}
+static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}StructAttributeResponse(void * context, {{chipType}} value) {
+    ChipLogProgress(chipTool, "%s: TODO: Print struct content.", __FUNCTION__);
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+chip::Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback> g{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback{On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}StructAttributeResponse, nullptr};
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
@@ -129,11 +136,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_{{asUpperCamelCase parent.na
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
     cluster.Associate(device, ZCLendpointId);
+
+    return
 {{#if isList}}
-    return cluster.ReadAttribute{{asUpperCamelCase name}}(g{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+    cluster.ReadAttribute{{asUpperCamelCase name}}(g{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+{{else if isStruct}}
+    cluster.ReadAttribute{{asUpperCamelCase name}}(g{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
 {{else}}
-    return cluster.ReadAttribute{{asUpperCamelCase name}}(g{{chipCallback.name}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+    cluster.ReadAttribute{{asUpperCamelCase name}}(g{{chipCallback.name}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
 {{/if}}
+    .AsInteger();
 }
 
 {{#if isReportableAttribute}}

@@ -46,7 +46,13 @@ function asBasicType(type)
   }
 }
 
+function isNoData(type)
+{
+  return type == 'NO_DATA';
+}
+
 //
 // Module exports
 //
 exports.asBasicType = asBasicType;
+exports.isNoData    = isNoData;
