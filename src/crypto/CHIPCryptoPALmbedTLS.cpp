@@ -818,7 +818,8 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
     VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
 
     // Convert DER signature to raw signature
-    error = EcdsaAsn1SignatureToRaw(kP256_FE_Length, csr.sig.p, csr.sig.len, signature.Bytes(), signature.Capacity());
+    error = EcdsaAsn1SignatureToRaw(kP256_FE_Length, ByteSpan{ csr.sig.p, csr.sig.len },
+                                    MutableByteSpan{ signature.Bytes(), signature.Capacity() });
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
     signature.SetLength(kP256_FE_Length * 2);
 
