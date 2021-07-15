@@ -619,27 +619,28 @@ static void TestAsn1Conversions(nlTestSuite * inSuite, void * inContext)
         out_raw_sig.Calloc(out_raw_sig_allocated_size);
         NL_TEST_ASSERT(inSuite, out_raw_sig);
 
-        chip::Platform::ScopedMemoryBuffer<uint8_t> out_asn1_sig;
-        size_t out_asn1_sig_allocated_size = (vector->fe_length_bytes * 2) + kMax_ECDSA_X9Dot62_Asn1_Overhead;
-        out_asn1_sig.Calloc(out_asn1_sig_allocated_size);
-        NL_TEST_ASSERT(inSuite, out_asn1_sig);
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_der_sig;
+        size_t out_der_sig_allocated_size = (vector->fe_length_bytes * 2) + kMax_ECDSA_X9Dot62_Asn1_Overhead;
+        out_der_sig.Calloc(out_der_sig_allocated_size);
+        NL_TEST_ASSERT(inSuite, out_der_sig);
 
         // Test converstion from ASN.1 ER to raw
+        MutableByteSpan out_raw_sig_span(out_raw_sig.Get(), out_raw_sig_allocated_size);
+
         CHIP_ERROR status =
-            EcdsaAsn1SignatureToRaw(vector->fe_length_bytes, ByteSpan{ vector->der_version, vector->der_version_length },
-                                    MutableByteSpan{ out_raw_sig.Get(), out_raw_sig_allocated_size });
+            EcdsaAsn1SignatureToRaw(vector->fe_length_bytes, ByteSpan{ vector->der_version, vector->der_version_length }, out_raw_sig_span);
         NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, (memcmp(out_raw_sig.Get(), vector->raw_version, vector->raw_version_length) == 0));
+        NL_TEST_ASSERT(inSuite, out_raw_sig_span.size() == vector->raw_version_length);
+        NL_TEST_ASSERT(inSuite, (memcmp(out_raw_sig_span.data(), vector->raw_version, vector->raw_version_length) == 0));
 
         // Test conversion from raw to ASN.1 DER
-        size_t der_size = 0;
-        status = EcdsaRawSignatureToAsn1(vector->fe_length_bytes, ByteSpan{ vector->raw_version, vector->raw_version_length },
-                                         MutableByteSpan{ out_asn1_sig.Get(), out_asn1_sig_allocated_size }, der_size);
+        MutableByteSpan out_der_sig_span(out_der_sig.Get(), out_der_sig_allocated_size);
+        status = EcdsaRawSignatureToAsn1(vector->fe_length_bytes, ByteSpan{ vector->raw_version, vector->raw_version_length }, out_der_sig_span);
 
         NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, der_size <= out_asn1_sig_allocated_size);
-        NL_TEST_ASSERT(inSuite, der_size == vector->der_version_length);
-        NL_TEST_ASSERT(inSuite, (memcmp(out_asn1_sig.Get(), vector->der_version, vector->der_version_length) == 0));
+        NL_TEST_ASSERT(inSuite, out_der_sig_span.size() <= out_der_sig_allocated_size);
+        NL_TEST_ASSERT(inSuite, out_der_sig_span.size() == vector->der_version_length);
+        NL_TEST_ASSERT(inSuite, (memcmp(out_der_sig_span.data(), vector->der_version, vector->der_version_length) == 0));
     }
 }
 

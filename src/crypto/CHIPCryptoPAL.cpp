@@ -495,8 +495,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::KDF(const uint8_t * ikm, const size_t 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_sig, MutableByteSpan out_asn1_sig,
-                                   size_t & out_asn1_sig_actual_length)
+CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_sig, MutableByteSpan & out_asn1_sig)
 {
     VerifyOrReturnError(fe_length_bytes > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(raw_sig.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -555,11 +554,11 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_
     size_t actually_written = 0;
     VerifyOrReturnError(writer.Fit(actually_written), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    out_asn1_sig_actual_length = actually_written;
+    out_asn1_sig = out_asn1_sig.SubSpan(0, actually_written);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1_sig, MutableByteSpan out_raw_sig)
+CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1_sig, MutableByteSpan & out_raw_sig)
 {
     VerifyOrReturnError(fe_length_bytes > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(asn1_sig.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -594,6 +593,8 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1
 
     // Read S
     ReturnErrorOnFailure(ReadDerUnsignedIntegerIntoRaw(reader, MutableByteSpan{ raw_cursor, fe_length_bytes }));
+
+    out_raw_sig = out_raw_sig.SubSpan(0, (2u * fe_length_bytes));
 
     return CHIP_NO_ERROR;
 }
