@@ -28,6 +28,26 @@
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 
+typedef struct RgbColor_
+{
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+} RgbColor_t;
+
+typedef struct HsvColor_
+{
+    unsigned char h;
+    unsigned char s;
+    unsigned char v;
+} HsvColor_t;
+
+typedef struct XyColor_
+{
+    uint16_t x;
+    uint16_t y;
+} XyColor_t;
+
 class LightingManager
 {
 public:
@@ -36,6 +56,7 @@ public:
         ON_ACTION = 0,
         OFF_ACTION,
         LEVEL_ACTION,
+        COLOR_ACTION,
         INVALID_ACTION
     } Action;
 
@@ -58,12 +79,18 @@ private:
     friend LightingManager & LightingMgr(void);
     State_t mState;
     uint8_t mLevel;
+    uint16_t mX, mY;
+    RgbColor_t mRGB;
 
     LightingCallback_fn mActionInitiated_CB;
     LightingCallback_fn mActionCompleted_CB;
 
+    RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY);
+    RgbColor_t HsvToRgb(HsvColor_t hsv);
+
     void Set(bool aOn);
     void SetLevel(uint8_t aLevel);
+    void SetColor(uint16_t x, uint16_t y);
     void UpdateLight();
 
     static LightingManager sLight;

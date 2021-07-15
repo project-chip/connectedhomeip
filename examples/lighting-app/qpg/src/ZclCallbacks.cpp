@@ -62,6 +62,42 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             ChipLogError(Zcl, "wrong length for level: %d", size);
         }
     }
+    else if (clusterId == ZCL_COLOR_CONTROL_CLUSTER_ID)
+    {
+        if ((attributeId != ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID) && 
+            (attributeId != ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID))
+        {
+            ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
+            return;
+        }
+
+        if (size == sizeof(uint16_t))
+        {
+            XyColor_t xy;
+            if (attributeId == ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID)
+            {
+                xy.x = *(uint16_t *)(value);
+                //get Y from cluster value storage
+                EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, 
+                                                        ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID, (uint8_t *)&xy.y, sizeof(xy.y));
+                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+            }
+            if (attributeId == ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID)
+            {
+                xy.y = *(uint16_t *)(value);
+                //get X from cluster value storage
+                EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, 
+                                                        ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID, (uint8_t *)&xy.x, sizeof(xy.x));
+                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+            }
+            ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
+            LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, 0, sizeof(xy), (uint8_t *)&xy);
+        }
+        else
+        {
+            ChipLogError(Zcl, "Wrong length for ColorControl X/Y value: %d", size);
+        }
+    }
     else
     {
         ChipLogProgress(Zcl, "Unknown cluster ID: %" PRIx32, clusterId);
