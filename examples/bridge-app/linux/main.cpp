@@ -30,6 +30,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <core/CHIPError.h>
+#include <lib/support/ZclString.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CHIPMem.h>
@@ -183,18 +184,6 @@ int RemoveDeviceEndpoint(Device * dev)
     return -1;
 }
 
-uint8_t * ToZclCharString(uint8_t * zclString, const char * cString, uint8_t maxLength)
-{
-    size_t len = strlen(cString);
-    if (len > maxLength)
-    {
-        len = maxLength;
-    }
-    zclString[0] = static_cast<uint8_t>(len);
-    memcpy(&zclString[1], cString, zclString[0]);
-    return zclString;
-}
-
 void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, uint16_t length, EmberAfAttributeMetadata * am)
 {
     char zclOctetStrBuf[kFixedLabelElementsOctetStringSize];
@@ -230,7 +219,7 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     if (itemChangedMask & Device::kChanged_Name)
     {
         uint8_t zclName[kUserLabelSize];
-        ToZclCharString(zclName, dev->GetName(), kUserLabelSize - 1);
+        MakeZclCharString(zclName, dev->GetName());
         emberAfReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
                                                 ZCL_USER_LABEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, 0, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
                                                 zclName);
@@ -261,7 +250,7 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     }
     else if ((attributeId == ZCL_USER_LABEL_ATTRIBUTE_ID) && (maxReadLength == 32))
     {
-        ToZclCharString(buffer, dev->GetName(), static_cast<uint8_t>(maxReadLength - 1));
+        MakeZclCharString(buffer, dev->GetName());
     }
     else
     {
