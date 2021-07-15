@@ -450,11 +450,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
         if (NetworkIsReady())
 #endif
         {
-#ifdef __MBED__
             printf("CHIP node ready to service events\n");
-#else
-            printf("CHIP node ready to service events; PID: %d; PPID: %d\n", getpid(), getppid());
-#endif // __MBED__
             fflush(stdout);
             printed = true;
         }
