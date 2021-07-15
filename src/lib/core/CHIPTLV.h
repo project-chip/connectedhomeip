@@ -558,6 +558,15 @@ public:
     CHIP_ERROR GetDataPtr(const uint8_t *& data);
 
     /**
+     * Retrieves a struct from TLV.
+     */
+    template <typename T>
+    CHIP_ERROR Get(T & data)
+    {
+        return T::Decode(&data, *this);
+    }
+
+    /**
      * Prepares a TLVReader object for reading the members of TLV container element.
      *
      * The EnterContainer() method prepares the current TLVReader object to begin reading the member
@@ -1240,6 +1249,15 @@ public:
     CHIP_ERROR Put(uint64_t tag, T data)
     {
         return Put(tag, to_underlying(data));
+    }
+
+    /**
+     * template for encode a encodable structs. This function won't enabled if Encode is not declared for T.
+     */
+    template <typename T, typename = decltype(T::Encode)>
+    CHIP_ERROR Put(uint64_t tag, const T & data)
+    {
+        return T::Encode(&data, *this, tag);
     }
 
     /**

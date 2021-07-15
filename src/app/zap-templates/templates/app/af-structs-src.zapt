@@ -1,0 +1,180 @@
+{{> header}}
+
+#include "af-structs.h"
+#include "enums.h"
+#include <app/util/af.h>
+#include <app/util/attribute-list-byte-span.h>
+#include <app/util/basic-types.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/CHIPTLV.h>
+#include <stdint.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+// TODO: Lists inside structs are not currently supported.
+// NOTE: Lists of structs ARE supported
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::List;
+
+{{#zcl_structs}}
+{{#if itemCnt}}
+// Struct for {{label}}
+CHIP_ERROR _{{asType label}}::Encode(const void * valPtr, TLV::TLVWriter & writer, uint64_t tag)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::TLV::TLVType tmpType;
+    uint8_t seq = 0;
+    VerifyOrReturnError(valPtr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    const _{{asType label}} & val = *reinterpret_cast<const _{{asType label}} *>(valPtr);
+    SuccessOrExit(err = writer.StartContainer(tag, TLV::TLVType::kTLVType_Structure, tmpType));
+{{#zcl_struct_items}}
+SuccessOrExit(err =
+    {{#if (isOctetString type) }}
+    writer.Put(TLV::ContextTag(seq++), val.{{asSymbol label}})
+    {{else if (isCharString type) }}
+    writer.PutString(TLV::ContextTag(seq++), chip::Uint8::to_const_char(val.{{asSymbol label}}))
+    {{else if (isList type) }}
+    writer.PutNull(TLV::ContextTag(seq++)) /* TODO: List inside struct is not implemented. */
+    {{else if (isNoData type) }}
+    writer.PutNull(TLV::ContextTag(seq++))
+    {{else}}
+    writer.Put(TLV::ContextTag(seq++), val.{{asSymbol label}})
+    {{/if}}
+);
+{{/zcl_struct_items}}
+exit:
+    err = writer.EndContainer(tmpType);
+    return err;
+}
+
+CHIP_ERROR _{{asType label}}::Decode(void * valPtr, const TLV::TLVReader & aReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::TLV::TLVReader reader;
+    chip::TLV::TLVType tmpType;
+    VerifyOrReturnError(valPtr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    _{{asType label}} & val = *reinterpret_cast<_{{asType label}} *>(valPtr);
+    reader.Init(aReader);
+    VerifyOrReturnError(reader.GetType() == TLV::TLVType::kTLVType_Structure, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(reader.EnterContainer(tmpType));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
+        uint32_t currentDecodeTagId = TLV::TagNumFromTag(reader.GetTag());
+        switch (currentDecodeTagId)
+        {
+{{#zcl_struct_items}}
+        case {{index}}:
+        {
+{{#if (isOctetString type)}}
+        {
+            const uint8_t * data = nullptr;
+            ReturnErrorOnFailure(reader.GetDataPtr(data));
+            val.{{asSymbol label}} = {{asUnderlyingZclType type}}(data, reader.GetLength());
+        }
+{{else if (isString type)}}
+            ReturnErrorOnFailure(reader.GetDataPtr(val.{{asSymbol label}}));
+{{else if (isNoData type) }}
+            // Nothing;
+{{else if (isList type) }}
+            ReturnErrorOnFailure(reader.GetDataPtr(val.{{asSymbol label}}));
+{{else}}
+            ReturnErrorOnFailure(reader.Get(val.{{asSymbol label}}));
+{{/if}}
+            break;
+        }
+{{/zcl_struct_items}}
+        default:
+            // Unsupported tag, ignore it.
+            ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+        }
+    }
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
+CHIP_ERROR _{{asType label}}::FromEmberBuffer(void * valPtr, const uint8_t * buf, size_t bufLength)
+{
+    VerifyOrReturnError(valPtr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    uint16_t offset = 0;
+    _{{asType label}} & val = *reinterpret_cast<_{{asType label}} *>(valPtr);
+    {{#zcl_struct_items}}
+    {{#if (isCharString type)}}
+    {
+    {{#if (isLongString type)}}
+    uint16_t len;
+    {{else}}
+    uint8_t len;
+    {{/if}}
+    memcpy(&len, buf + offset, sizeof(len));
+    val.{{asSymbol label}} = buf + offset;
+    offset = static_cast<uint16_t>(offset + len + sizeof(len));
+    }
+    {{else if (isOctetString type)}}
+    {
+    constexpr uint16_t kLengthSize = 2;
+    chip::ByteSpan & {{asSymbol label}}Span = val.{{asSymbol label}}; // {{type}}
+    ReturnErrorOnFailure(ReadByteSpan(buf + offset, static_cast<uint16_t>(bufLength - offset), &{{asSymbol label}}Span));
+    offset = static_cast<uint16_t>(offset + kLengthSize + {{asSymbol label}}Span.size());
+    }
+    {{else}}
+    {
+    VerifyOrReturnError(offset + sizeof(val.{{asSymbol label}}) <= bufLength, CHIP_ERROR_INVALID_ARGUMENT);
+    memmove((uint8_t *)&(val.{{asSymbol label}}), buf + offset, sizeof(val.{{asSymbol label}})); // {{type}}
+    offset = static_cast<uint16_t>(offset + sizeof(val.{{asSymbol label}}));
+    }
+    {{/if}}
+    {{/zcl_struct_items}}
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR _{{asType label}}::ToEmberBuffer(const void * valPtr, uint8_t * buf, size_t bufLength, size_t & len)
+{
+    VerifyOrReturnError(valPtr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    uint16_t offset = 0;
+    const _{{asType label}} & val = *reinterpret_cast<const _{{asType label}} *>(valPtr);
+    {{#zcl_struct_items}}
+    {{#if (isCharString type)}}
+    {
+    {{#if (isLongString type)}}
+    uint16_t stringLen = emberAfLongStringLength(val.{{asSymbol label}});
+    {{else}}
+    uint8_t stringLen = emberAfStringLength(val.{{asSymbol label}});
+    {{/if}}
+    VerifyOrReturnError(offset + stringLen + sizeof(stringLen) <= bufLength, CHIP_ERROR_NO_MEMORY);
+    {{#if (isLongString type)}}
+    emberAfCopyLongString
+    {{else}}
+    emberAfCopyString
+    {{/if}}
+      (buf + offset, val.{{asSymbol label}}, bufLength - offset);
+    }
+    {{else if (isOctetString type)}}
+    {
+    constexpr uint16_t kLengthSize = 2;
+    const chip::ByteSpan & {{asSymbol label}}Span = val.{{asSymbol label}}; // {{type}}
+    ReturnErrorOnFailure(WriteByteSpan(buf + offset, static_cast<uint16_t>(bufLength - offset), &{{asSymbol label}}Span));
+    offset = static_cast<uint16_t>(offset + kLengthSize + {{asSymbol label}}Span.size());
+    }
+    {{else}}
+    {
+    VerifyOrReturnError(offset + sizeof(val.{{asSymbol label}}) <= bufLength, CHIP_ERROR_INVALID_ARGUMENT);
+    memmove(buf + offset, (uint8_t *)&(val.{{asSymbol label}}), sizeof(val.{{asSymbol label}})); // {{type}}
+    offset = static_cast<uint16_t>(offset + sizeof(val.{{asSymbol label}}));
+    }
+    {{/if}}
+    {{/zcl_struct_items}}
+    return CHIP_NO_ERROR;
+}
+
+{{/if}}
+{{/zcl_structs}}

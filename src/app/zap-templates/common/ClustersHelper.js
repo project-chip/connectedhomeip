@@ -234,7 +234,7 @@ function getEnum(enums, type)
 
 function getStruct(structs, type)
 {
-  return structs.find(struct => struct.label == type);
+  return structs.find(struct => struct.label.toLowerCase() == type.toLowerCase());
 }
 
 function handleString(item, [ atomics, enums, bitmaps, structs ])
@@ -278,14 +278,15 @@ function handleList(item, [ atomics, enums, bitmaps, structs ])
 
 function handleStruct(item, [ atomics, enums, bitmaps, structs ])
 {
-  const struct = getStruct(structs, item.type);
+  const struct = StructHelper.isStruct(item.type) ? getStruct(structs, item.entryType) : getStruct(structs, item.type);
   if (!struct) {
     return false;
   }
 
   // Add a leading `_` before the name of struct to match what is done in the af-structs.zapt template.
   // For instance structs are declared as "typedef struct _{{asType label}}".
-  item.chipType = '_' + item.type;
+  item.chipType = '_' + struct.label;
+  item.type     = 'STRUCT';
   item.isStruct = true;
 
   struct.items.map(structItem => enhancedItem(structItem, [ atomics, enums, bitmaps, structs ]));

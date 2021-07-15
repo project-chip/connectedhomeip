@@ -135,7 +135,15 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReadAttribute{{asUpperCamelC
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = {{asHex code 8}};
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,{{#if isList}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter{{else}}BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>{{/if}});
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+{{#if isList}}
+        {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAttributeFilter
+{{else if isStruct}}
+         BasicAttributeFilter<{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback>
+{{else}}
+         BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>
+{{/if}}
+        );
 }
 
 {{#if isWritableAttribute}}

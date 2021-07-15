@@ -114,6 +114,11 @@ function asTestIndex(index)
   return index.toString().padStart(6, 0);
 }
 
+function attributeTypeSupported(attribute)
+{
+  return attribute.isList || !attribute.isStruct
+}
+
 //
 // Module exports
 //
@@ -122,3 +127,4 @@ exports.asObjectiveCNumberType       = asObjectiveCNumberType;
 exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
 exports.asTestIndex                  = asTestIndex;
 exports.asTestValue                  = asTestValue;
+exports.attributeTypeSupported       = attributeTypeSupported;
