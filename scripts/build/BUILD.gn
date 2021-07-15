@@ -20,6 +20,11 @@ import("$dir_pw_build/python.gni")
 
 pw_python_package("build_examples") {
   setup = [ "setup.py" ]
+  inputs = [
+    # Dependency for the unit test
+    "expected_all_platform_commands.txt",
+  ]
+
   sources = [
     "build/__init__.py",
     "build/factory.py",
@@ -34,11 +39,6 @@ pw_python_package("build_examples") {
     "runner/__init__.py",
     "runner/printonly.py",
     "runner/shell.py",
-
-    # This is a test dependency and is awkward.
-    # Finding a different way to express 'rerun test if this changes' would
-    # be ideal.
-    "expected_all_platform_commands.txt",
   ]
   tests = [ "test.py" ]
 }
