@@ -115,6 +115,7 @@ template("chip_data_model") {
       "${_app_root}/util/process-cluster-message.cpp",
       "${_app_root}/util/process-global-message.cpp",
       "${_app_root}/util/util.cpp",
+      "${chip_root}/zzz_generated/app-common/app-common/zap-generated/af-structs.cpp",
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
 

@@ -91,6 +91,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
+               ${CHIP_ROOT}/src/app/common/gen/af-structs.cpp
 )
 
 add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)

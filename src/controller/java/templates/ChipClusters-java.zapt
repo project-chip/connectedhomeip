@@ -165,7 +165,7 @@ public class ChipClusters {
   {{/if}}
   {{/chip_server_cluster_attributes}}
   {{#chip_server_cluster_attributes}}
-
+{{#if (attributeTypeSupported this)}}
     public void read{{asUpperCamelCase name}}Attribute(
 {{#if isList}}
       {{asUpperCamelCase name}}AttributeCallback callback
@@ -181,9 +181,12 @@ public class ChipClusters {
       write{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, value);
     }
   {{/if}}
+{{else}}
+  // TODO: Unsupported type {{ type }}
+{{/if}}
   {{/chip_server_cluster_attributes}}
   {{#chip_server_cluster_attributes}}
-  
+{{#if (attributeTypeSupported this)}}
     private native void read{{asUpperCamelCase name}}Attribute(long chipClusterPtr,
 {{#if isList}}
       {{asUpperCamelCase name}}AttributeCallback callback
@@ -195,6 +198,9 @@ public class ChipClusters {
 
     private native void write{{asUpperCamelCase name}}Attribute(long chipClusterPtr, DefaultClusterCallback callback, {{asJavaBasicType type}} value);
   {{/if}}
+{{else}}
+  // TODO: Unsupported type {{ type }}
+{{/if}}
   {{/chip_server_cluster_attributes}}
   }
   {{#not_last}}

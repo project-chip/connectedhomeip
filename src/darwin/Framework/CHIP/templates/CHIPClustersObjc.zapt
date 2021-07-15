@@ -42,6 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{#if (attributeTypeSupported this)}}
 - (void)readAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)responseHandler;
 {{#if isWritableAttribute}}
 - (void)writeAttribute{{asUpperCamelCase name}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler;
@@ -49,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if isReportableAttribute}}
 - (void) configureAttribute{{asUpperCamelCase name}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval{{#if isAnalog}} change:({{chipType}})change{{/if}} responseHandler:(ResponseHandler)responseHandler;
 - (void) reportAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)responseHandler;
+{{/if}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 

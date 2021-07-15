@@ -214,7 +214,7 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
 };
 
 {{#chip_server_global_responses}}
-
+{{#if chipCallback.type}}
 class CHIP{{chipCallback.name}}AttributeCallback : public Callback::Callback<{{chipCallback.name}}AttributeCallback> {
     public:
         CHIP{{chipCallback.name}}AttributeCallback(jobject javaCallback, bool keepAlive = false): Callback::Callback<{{chipCallback.name}}AttributeCallback>(CallbackFn, this)
@@ -285,6 +285,9 @@ class CHIP{{chipCallback.name}}AttributeCallback : public Callback::Callback<{{c
         jobject javaCallbackRef;
         bool keepAlive;
 };
+{{else}}
+// TODO: Type {{ type }} is not supported yet.
+{{/if}}
 {{/chip_server_global_responses}}
 
 {{#chip_client_clusters}}

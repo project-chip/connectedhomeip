@@ -48,6 +48,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${GEN_DIR}/lock-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/lock-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
+               ${CHIP_ROOT}/src/app/common/gen/af-structs.cpp
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
                ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp

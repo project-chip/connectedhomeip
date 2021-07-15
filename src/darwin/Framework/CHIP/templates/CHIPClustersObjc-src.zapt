@@ -232,6 +232,7 @@ private:
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{#if (attributeTypeSupported this)}}
 - (void)readAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)responseHandler
 {
 {{#if isList}}
@@ -347,6 +348,7 @@ private:
     }
 }
 
+{{/if}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 
