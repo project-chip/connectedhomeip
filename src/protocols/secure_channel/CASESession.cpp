@@ -1274,8 +1274,8 @@ CHIP_ERROR CASESession::ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size
     bbuf.Put16(sessionID);
 
     HKDF_sha_crypto mHKDF;
-    ReturnErrorOnFailure(
-        mHKDF.HKDF_SHA256(mFabricSecret, mFabricSecret.Length(), bbuf.Buffer(), bbuf.Size(), kIPKInfo, sizeof(kIPKInfo), ipk, ipkLen));
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mFabricSecret, mFabricSecret.Length(), bbuf.Buffer(), bbuf.Size(), kIPKInfo,
+                                           sizeof(kIPKInfo), ipk, ipkLen));
 
     return CHIP_NO_ERROR;
 }
