@@ -85,7 +85,7 @@ void TestSpanVersusRegular(nlTestSuite * inSuite, void * inContext)
     uint8_t final_expected[5] = { 1, 2, 3, 4, 0 };
 
     BufferWriter regular_writer(buf_regular, sizeof(buf_regular));
-    BufferWriter span_writer(chip::MutableByteSpan{ buf_span, sizeof(buf_span) });
+    BufferWriter span_writer(chip::MutableByteSpan{ buf_span });
 
     NL_TEST_ASSERT(inSuite, regular_writer.Available() == sizeof(buf_regular));
     NL_TEST_ASSERT(inSuite, span_writer.Available() == sizeof(buf_span));

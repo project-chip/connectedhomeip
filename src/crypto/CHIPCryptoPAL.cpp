@@ -126,7 +126,7 @@ CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, MutableByteSpan raw_in
  */
 size_t EmitDerIntegerFromRaw(const ByteSpan & raw_integer, MutableByteSpan out_der_integer)
 {
-    if ((raw_integer.empty()) || (raw_integer.size() == 0))
+    if (raw_integer.data() == nullptr)
     {
         return 0;
     }
@@ -137,7 +137,7 @@ size_t EmitDerIntegerFromRaw(const ByteSpan & raw_integer, MutableByteSpan out_d
     bool needs_leading_zero_byte = false;
 
     uint8_t cur_byte = 0;
-    while ((reader.Read8(&cur_byte).StatusCode() == CHIP_NO_ERROR) && (cur_byte == 0))
+    while ((reader.Remaining() > 0) && (reader.Read8(&cur_byte).StatusCode() == CHIP_NO_ERROR) && (cur_byte == 0))
     {
         // Omit all leading zeros
     }
