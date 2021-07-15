@@ -364,7 +364,7 @@ private:
  * @param[in] raw_sig Raw signature of <r,s> concatenated
  * @param[out] out_asn1_sig ASN.1 DER signature format output buffer. Size must have space for at least
  * kMax_ECDSA_X9Dot62_Asn1_Overhead. On CHIP_NO_ERROR, the out_asn1_sig buffer will be re-assigned
- * to have the correct sized based on variable-length output.
+ * to have the correct size based on variable-length output.
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  */
 CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_sig, MutableByteSpan & out_asn1_sig);
@@ -382,7 +382,7 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_
  * @param[in] asn1_sig ASN.1 DER signature input
  * @param[out] out_raw_sig Raw signature of <r,s> concatenated format output buffer. Size must be at
  * least >= `2 * fe_length_bytes`. On CHIP_NO_ERROR, the out_asn1_sig buffer will be re-assigned
- * to have the correct sized based on variable-length output.
+ * to have the correct size based on variable-length output.
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  */
 CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1_sig, MutableByteSpan & out_raw_sig);

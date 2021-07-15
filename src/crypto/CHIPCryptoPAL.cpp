@@ -126,7 +126,7 @@ CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, MutableByteSpan raw_in
  */
 size_t EmitDerIntegerFromRaw(const ByteSpan & raw_integer, MutableByteSpan out_der_integer)
 {
-    if (raw_integer.data() == nullptr)
+    if (raw_integer.empty())
     {
         return 0;
     }
@@ -498,9 +498,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::KDF(const uint8_t * ikm, const size_t 
 CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_sig, MutableByteSpan & out_asn1_sig)
 {
     VerifyOrReturnError(fe_length_bytes > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(raw_sig.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(raw_sig.size() == (2u * fe_length_bytes), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_asn1_sig.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_asn1_sig.size() >= (raw_sig.size() + kMax_ECDSA_X9Dot62_Asn1_Overhead), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Write both R an S integers past the overhead, we will shift them back later if we only needed 2 size bytes.
@@ -561,12 +559,9 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_
 CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1_sig, MutableByteSpan & out_raw_sig)
 {
     VerifyOrReturnError(fe_length_bytes > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(asn1_sig.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
     VerifyOrReturnError(asn1_sig.size() > kMinSequenceOverhead, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Output raw signature is <r,s> both of which are of fe_length_bytes (see SEC1).
-    VerifyOrReturnError(out_raw_sig.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_raw_sig.size() >= (2u * fe_length_bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     Reader reader(asn1_sig);
