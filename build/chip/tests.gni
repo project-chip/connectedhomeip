@@ -22,7 +22,8 @@ declare_args() {
 
 declare_args() {
   # Enable building tests.
-  chip_build_tests = (current_os != "freertos") && !(defined(skip_tests) && skip_tests)
+  chip_build_tests =
+      current_os != "freertos" && !(defined(skip_tests) && skip_tests)
 
   # Enable happy tests.
   chip_enable_happy_tests = false
