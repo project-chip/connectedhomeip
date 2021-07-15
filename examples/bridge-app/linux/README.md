@@ -110,7 +110,7 @@ value/label pair `"room"`/`[light name]`.
 
 -   Install tool chain
 
-          $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
+          $ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev 
 
 -   Build the example application:
 
@@ -131,7 +131,7 @@ value/label pair `"room"`/`[light name]`.
 
 > If you want to test ZCL, please disable Rendezvous
 >
->     gn gen out/debug --args='bypass_rendezvous=true'
+>     gn gen out/debug --args='chip_bypass_rendezvous=true'
 >     ninja -C out/debug
 >
 > Note that GN will set bypass_rendezvous for future builds, to enable

@@ -102,6 +102,19 @@
             }
         },
         {
+            "label": "Build Bridge App (Linux)",
+            "type": "shell",
+            "command": "scripts/examples/gn_build_example.sh examples/bridge-app/linux out/bridge-app 'chip_bypass_rendezvous=true'",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/out/bridge-app/"
+                ]
+            }
+        },
+        {
             "label": "Build Lighting App (Linux)",
             "type": "shell",
             "command": "scripts/examples/gn_build_example.sh examples/lighting-app/linux out/lighting-app",
