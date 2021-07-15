@@ -191,9 +191,6 @@ EmberAfStatus GetSceneValid(chip::EndpointId endpoint, uint8_t * sceneValid); //
 EmberAfStatus SetSceneValid(chip::EndpointId endpoint, uint8_t sceneValid);
 EmberAfStatus GetNameSupport(chip::EndpointId endpoint, uint8_t * nameSupport); // bitmap8
 EmberAfStatus SetNameSupport(chip::EndpointId endpoint, uint8_t nameSupport);
-EmberAfStatus GetLastConfiguredBy(chip::EndpointId endpoint,
-                                  /* TYPE WARNING: unknown defaults to */ uint8_t ** lastConfiguredBy); // eui64
-EmberAfStatus SetLastConfiguredBy(chip::EndpointId endpoint, /* TYPE WARNING: unknown defaults to */ uint8_t * lastConfiguredBy);
 } // namespace Attributes
 } // namespace Scenes
 

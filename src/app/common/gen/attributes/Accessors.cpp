@@ -22,12 +22,12 @@
  *    This file contains definitions for accessors around clusters attributes.
  */
 
-#pragma once
-
 #include <app/common/gen/attributes/Accessors.h>
 
+#include <app/common/gen/attribute-type.h>
 #include <app/common/gen/ids/Attributes.h>
 #include <app/common/gen/ids/Clusters.h>
+#include <app/util/af.h>
 
 namespace chip {
 namespace app {
@@ -735,16 +735,6 @@ EmberAfStatus SetNameSupport(chip::EndpointId endpoint, uint8_t nameSupport)
 {
     return emberAfWriteServerAttribute(endpoint, Scenes::Id, Ids::NameSupport, (uint8_t *) &nameSupport,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
-}
-EmberAfStatus GetLastConfiguredBy(chip::EndpointId endpoint, /* TYPE WARNING: unknown defaults to */ uint8_t ** lastConfiguredBy)
-{
-    return emberAfReadServerAttribute(endpoint, Scenes::Id, Ids::LastConfiguredBy, (uint8_t *) lastConfiguredBy,
-                                      sizeof(*lastConfiguredBy));
-}
-EmberAfStatus SetLastConfiguredBy(chip::EndpointId endpoint, /* TYPE WARNING: unknown defaults to */ uint8_t * lastConfiguredBy)
-{
-    return emberAfWriteServerAttribute(endpoint, Scenes::Id, Ids::LastConfiguredBy, (uint8_t *) &lastConfiguredBy,
-                                       ZCL_EUI64_ATTRIBUTE_TYPE);
 }
 } // namespace Attributes
 } // namespace Scenes
