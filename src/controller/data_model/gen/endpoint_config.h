@@ -414,7 +414,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (225)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (228)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -454,6 +454,9 @@
             { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Off */                                                         \
             { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On */                                                          \
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Toggle */                                                      \
+            { 0x0006, 0x40, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* OffWithEffect */                                               \
+            { 0x0006, 0x41, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* OnWithRecallGlobalScene */                                     \
+            { 0x0006, 0x42, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* OnWithTimedOff */                                              \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Level Control (client) */                                                                     \
             { 0x0008, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* MoveToLevel */                                                 \
@@ -725,7 +728,7 @@
 #define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (1)
 #define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
     {                                                                                                                              \
-        { 40, 4098 },                                                                                                              \
+        { 43, 4098 },                                                                                                              \
     }
 
 // This is an array of EmberAfManufacturerCodeEntry structures for clusters.

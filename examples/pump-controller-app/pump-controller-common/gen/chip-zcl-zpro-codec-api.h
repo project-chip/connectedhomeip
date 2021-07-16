@@ -170,7 +170,7 @@ chip::System::PacketBufferHandle encodeOnOffClusterDiscoverAttributes(uint8_t se
 
 /**
  * @brief
- *    Encode a On/off server read command for the on/off attribute into buffer including the APS frame
+ *    Encode a On/off server read command for the OnOff attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeOnOffClusterReadOnOffAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 

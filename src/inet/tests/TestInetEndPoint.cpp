@@ -315,10 +315,12 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     InterfaceId intId;
 
     // EndPoint
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
     RawEndPoint * testRaw6EP = nullptr;
 #if INET_CONFIG_ENABLE_IPV4
     RawEndPoint * testRaw4EP = nullptr;
 #endif // INET_CONFIG_ENABLE_IPV4
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
     UDPEndPoint * testUDPEP  = nullptr;
     TCPEndPoint * testTCPEP1 = nullptr;
     PacketBufferHandle buf   = PacketBufferHandle::New(PacketBuffer::kMaxSize);
@@ -326,6 +328,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     bool didListen           = false;
 
     // init all the EndPoints
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
     err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRaw6EP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -333,6 +336,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = gInet.NewRawEndPoint(kIPVersion_4, kIPProtocol_ICMPv4, &testRaw4EP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 #endif // INET_CONFIG_ENABLE_IPV4
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
     err = gInet.NewUDPEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -352,6 +356,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 #endif // INET_CONFIG_ENABLE_IPV4
 
     // error bind cases
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
     err = testRaw6EP->Bind(kIPAddressType_Unknown, addr_any);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
 #if INET_CONFIG_ENABLE_IPV4
@@ -410,6 +415,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
     testRaw4EP->Free();
 #endif // INET_CONFIG_ENABLE_IPV4
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
     // UdpEndPoint special cases to cover the error branch
     err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
@@ -488,15 +494,19 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 // Test the InetLayer resource limitation
 static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
     RawEndPoint * testRawEP = nullptr;
+#endif //
     UDPEndPoint * testUDPEP = nullptr;
     TCPEndPoint * testTCPEP = nullptr;
     CHIP_ERROR err;
     char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
 
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
     for (int i = 0; i < INET_CONFIG_NUM_RAW_ENDPOINTS + 1; i++)
         err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRawEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
     for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS + 1; i++)
         err = gInet.NewUDPEndPoint(&testUDPEP);

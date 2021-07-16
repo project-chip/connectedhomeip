@@ -303,6 +303,9 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
                  "CASESession timed out while waiting for a response from the peer. Expected message type was %" PRIu8,
                  to_underlying(mNextExpectedMsg));
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+    // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    mExchangeCtxt = nullptr;
     Clear();
 }
 
@@ -1216,6 +1219,12 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t * respond
         const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[0].mSubjectKeyId;
 
         ReturnErrorOnFailure(mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, resultCert));
+
+        // Now that we have verified that this is a valid cert, try to get the
+        // peer's operational identity from it.
+        PeerId peerId;
+        ReturnErrorOnFailure(ExtractPeerIdFromOpCert(certSet.GetCertSet()[0], &peerId));
+        mConnectionState.SetPeerNodeId(peerId.GetNodeId());
     }
 
     return CHIP_NO_ERROR;
@@ -1263,9 +1272,14 @@ CHIP_ERROR CASESession::ConstructTBS3Data(const uint8_t * responderOpCert, uint3
 
 CHIP_ERROR CASESession::ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen)
 {
+    uint8_t sid[2];
+    Encoding::LittleEndian::BufferWriter bbuf(sid, sizeof(sid));
+    bbuf.Put16(sessionID);
+    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
+
     HKDF_sha_crypto mHKDF;
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mFabricSecret, mFabricSecret.Length(), reinterpret_cast<const uint8_t *>(&sessionID),
-                                           sizeof(sessionID), kIPKInfo, sizeof(kIPKInfo), ipk, ipkLen));
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mFabricSecret, mFabricSecret.Length(), bbuf.Buffer(), bbuf.Size(), kIPKInfo,
+                                           sizeof(kIPKInfo), ipk, ipkLen));
 
     return CHIP_NO_ERROR;
 }

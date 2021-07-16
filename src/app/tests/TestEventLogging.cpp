@@ -79,7 +79,7 @@ void InitializeChip(nlTestSuite * apSuite)
     err = chip::Platform::MemoryInit();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    gSystemLayer.Init(nullptr);
+    gSystemLayer.Init();
 
     err = gSessionManager.Init(kTestDeviceNodeId1, &gSystemLayer, &gTransportManager, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

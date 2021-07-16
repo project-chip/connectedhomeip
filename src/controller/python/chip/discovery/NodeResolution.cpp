@@ -27,7 +27,7 @@ namespace {
 
 // callback types shared with python code (see ptyhon code in chip.discovery.types)
 using DiscoverSuccessCallback = void (*)(uint64_t fabricId, uint64_t nodeId, uint32_t interfaceId, const char * ip, uint16_t port);
-using DiscoverFailureCallback = void (*)(uint64_t fabricId, uint64_t nodeId, uint32_t error_code);
+using DiscoverFailureCallback = void (*)(uint64_t fabricId, uint64_t nodeId, CHIP_ERROR error_code);
 
 constexpr uint16_t kMdnsPort = 5353;
 
@@ -88,7 +88,7 @@ extern "C" void pychip_discovery_set_callbacks(DiscoverSuccessCallback success, 
 
 extern "C" int32_t pychip_discovery_resolve(uint64_t fabricId, uint64_t nodeId)
 {
-    int32_t result = CHIP_NO_ERROR;
+    CHIP_ERROR result = CHIP_NO_ERROR;
 
     chip::python::ChipMainThreadScheduleAndWait([&] {
         result = Resolver::Instance().StartResolver(&chip::DeviceLayer::InetLayer, kMdnsPort);
@@ -101,5 +101,5 @@ extern "C" int32_t pychip_discovery_resolve(uint64_t fabricId, uint64_t nodeId)
                                                     chip::Inet::IPAddressType::kIPAddressType_Any);
     });
 
-    return result;
+    return ChipError::AsInteger(result);
 }

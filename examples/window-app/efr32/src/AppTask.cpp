@@ -20,7 +20,6 @@
 #include <AppConfig.h>
 #include <AppTask.h>
 #include <LcdPainter.h>
-#include <Service.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
@@ -92,8 +91,7 @@ CHIP_ERROR AppTask::Start()
 
 void AppTask::Main(void * pvParameter)
 {
-    AppTask & app             = AppTask::sInstance;
-    uint64_t lastChangeTimeUS = 0;
+    AppTask & app = AppTask::sInstance;
     int err;
 
     err = app.Init();
@@ -103,7 +101,6 @@ void AppTask::Main(void * pvParameter)
     }
 
     EFR32_LOG("App Task started");
-    SetDeviceName("EFR32WindowCoverDemo._matter._udp.local.");
 
     while (true)
     {
@@ -169,15 +166,6 @@ void AppTask::Main(void * pvParameter)
 
         app.mStatusLED.Animate();
         app.mActionLED.Animate();
-
-        uint64_t nowUS            = chip::System::Clock::GetMonotonicMicroseconds();
-        uint64_t nextChangeTimeUS = lastChangeTimeUS + 5 * 1000 * 1000UL;
-
-        if (nowUS > nextChangeTimeUS)
-        {
-            PublishService();
-            lastChangeTimeUS = nowUS;
-        }
     }
 }
 

@@ -26,6 +26,9 @@
 
 namespace chip {
 
+template <class T, size_t N>
+class FixedSpan;
+
 /**
  * @brief A wrapper class for holding objects and its length, without the ownership of it.
  * We can use C++20 std::span once we support it, the data() and size() come from C++20 std::span.
@@ -34,7 +37,8 @@ template <class T>
 class Span
 {
 public:
-    using pointer = T *;
+    using pointer       = T *;
+    using const_pointer = const T *;
 
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
     constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
@@ -42,9 +46,24 @@ public:
     constexpr explicit Span(T (&databuf)[N]) : Span(databuf, N)
     {}
 
+    // Allow implicit construction from a Span over a type that matches our
+    // type, up to const-ness.
+    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    constexpr Span(const Span<U> & other) : Span(other.data(), other.size())
+    {}
+
+    // Allow implicit construction from a FixedSpan over a type that matches our
+    // type, up to const-ness.
+    template <class U, size_t N, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    constexpr inline Span(const FixedSpan<U, N> & other);
+
     constexpr pointer data() const { return mDataBuf; }
     constexpr size_t size() const { return mDataLen; }
     constexpr bool empty() const { return size() == 0; }
+    constexpr const_pointer begin() const { return data(); }
+    constexpr const_pointer end() const { return data() + size(); }
+    constexpr pointer begin() { return data(); }
+    constexpr pointer end() { return data() + size(); }
 
     // Allow data_equal for spans that are over the same type up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
@@ -52,19 +71,14 @@ public:
     {
         return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
     }
+    template <class U, size_t N, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    inline bool data_equal(const FixedSpan<U, N> & other) const;
 
     Span SubSpan(size_t offset, size_t length) const
     {
         VerifyOrDie(offset <= mDataLen);
         VerifyOrDie(length <= mDataLen - offset);
         return Span(mDataBuf + offset, length);
-    }
-
-    // Allow converting a span with non-const T into a span with const T.
-    template <class U = T>
-    operator typename std::enable_if_t<!std::is_const<U>::value, Span<const T>>() const
-    {
-        return Span<const T>(data(), size());
     }
 
     // Allow reducing the size of a span.
@@ -96,17 +110,28 @@ public:
     // template).
     //
     // To do that we have a template constructor enabled only when the type
-    // passed to it is a pointer type, and rely on our assignment of that
-    // pointer type to mDataBuf to verify that the pointer is to a type
-    // compatible enough with T (T itself, a subclass, a non-const version if T
-    // is const, etc).
-    template <class U, typename = std::enable_if_t<std::is_pointer<U>::value>>
+    // passed to it is a pointer type, and that pointer is to a type that
+    // matches T up to const-ness.  Importantly, we do NOT want to allow
+    // subclasses of T here, because they would have a different size and our
+    // Span would not work right.
+    template <
+        class U,
+        typename = std::enable_if_t<std::is_pointer<U>::value &&
+                                    std::is_same<std::remove_const_t<T>, std::remove_const_t<std::remove_pointer_t<U>>>::value>>
     constexpr explicit FixedSpan(U databuf) : mDataBuf(databuf)
     {}
-    template <class U, size_t M>
+    template <class U, size_t M, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
     constexpr explicit FixedSpan(U (&databuf)[M]) : mDataBuf(databuf)
     {
         static_assert(M >= N, "Passed-in buffer too small for FixedSpan");
+    }
+
+    // Allow implicit construction from a FixedSpan of sufficient size over a
+    // type that matches our type, up to const-ness.
+    template <class U, size_t M, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    constexpr FixedSpan(FixedSpan<U, M> const & other) : mDataBuf(other.data())
+    {
+        static_assert(M >= N, "Passed-in FixedSpan is smaller than we are");
     }
 
     constexpr pointer data() const { return mDataBuf; }
@@ -126,16 +151,27 @@ public:
             (!empty() && !other.empty() && (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
     }
 
-    // Allow converting a span with non-const T into a span with const T.
-    template <class U = T>
-    operator typename std::enable_if_t<!std::is_const<U>::value, FixedSpan<const T, N>>() const
+    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
+    bool data_equal(const Span<U> & other) const
     {
-        return FixedSpan<const T, N>(data());
+        return (size() == other.size() && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0)));
     }
 
 private:
     pointer mDataBuf;
 };
+
+template <class T>
+template <class U, size_t N, typename>
+constexpr Span<T>::Span(const FixedSpan<U, N> & other) : Span(other.data(), other.size())
+{}
+
+template <class T>
+template <class U, size_t N, typename>
+inline bool Span<T>::data_equal(const FixedSpan<U, N> & other) const
+{
+    return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
+}
 
 using ByteSpan        = Span<const uint8_t>;
 using MutableByteSpan = Span<uint8_t>;

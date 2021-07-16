@@ -79,3 +79,5 @@ target_link_libraries(app PUBLIC
 )
 
 target_link_libraries(pw_build INTERFACE zephyr_interface)
+
+include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)

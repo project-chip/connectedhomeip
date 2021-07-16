@@ -1,31 +1,31 @@
 {{#chip_tests tests}}
 {{#chip_tests_items}}
-- (void)testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asCamelCased command false}}
+- (void)testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"{{label}}"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIP{{asCamelCased cluster false}} * cluster = [[CHIP{{asCamelCased cluster false}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:queue];
+    CHIP{{asUpperCamelCase cluster}} * cluster = [[CHIP{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:queue];
     XCTAssertNotNil(cluster);
 
     {{#if isCommand}}
-    [cluster {{command}}:^(NSError * err, NSDictionary * values) {
+    [cluster {{asLowerCamelCase command}}:^(NSError * err, NSDictionary * values) {
     {{else if isReadAttribute}}
-    [cluster readAttribute{{asCamelCased attribute false}}WithResponseHandler:^(NSError * err, NSDictionary * values) {
+    [cluster readAttribute{{asUpperCamelCase attribute}}WithResponseHandler:^(NSError * err, NSDictionary * values) {
     {{else if isWriteAttribute}}
     {{#chip_tests_item_parameters}}
     {{#if (isString type)}}
     {{#if (isOctetString type)}}
-    NSString * {{asCamelCased name true}}ArgumentString= @"{{definedValue}}";
-    NSData * {{asCamelCased name true}}Argument = [{{asCamelCased name true}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    NSString * {{asLowerCamelCase name}}ArgumentString= @"{{definedValue}}";
+    NSData * {{asLowerCamelCase name}}Argument = [{{asLowerCamelCase name}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
     {{else}}
-    NSString * {{asCamelCased name true}}Argument= @"{{definedValue}}";
+    NSString * {{asLowerCamelCase name}}Argument= @"{{definedValue}}";
     {{/if}}
     {{else}}
-    {{chipType}} {{asCamelCased name true}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
+    {{chipType}} {{asLowerCamelCase name}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
     {{/if}}
     {{/chip_tests_item_parameters}}
-    [cluster writeAttribute{{asCamelCased attribute false}}WithValue:{{#chip_tests_item_parameters}}{{asCamelCased name true}}Argument{{/chip_tests_item_parameters}} responseHandler:^(NSError * err, NSDictionary * values) {
+    [cluster writeAttribute{{asUpperCamelCase attribute}}WithValue:{{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}} responseHandler:^(NSError * err, NSDictionary * values) {
     {{/if}}
         NSLog(@"{{label}} Error: %@", err);
 
@@ -47,12 +47,12 @@
         {{else}}
         {{#if (isString type)}}
         {{#if (isOctetString type)}}
-        NSString * {{asCamelCased name true}}ArgumentString= @"{{expectedValue}}";
-        NSData * {{asCamelCased name true}}Argument = [{{asCamelCased name true}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
-        XCTAssertTrue([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToData:{{asCamelCased name true}}Argument]);
+        NSString * {{asLowerCamelCase name}}ArgumentString= @"{{expectedValue}}";
+        NSData * {{asLowerCamelCase name}}Argument = [{{asLowerCamelCase name}}ArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+        XCTAssertTrue([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToData:{{asLowerCamelCase name}}Argument]);
         {{else}}
-        NSString * {{asCamelCased name true}}Argument= @"{{expectedValue}}";
-        XCTAssertTrue([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToString:{{asCamelCased name true}}Argument]);
+        NSString * {{asLowerCamelCase name}}Argument= @"{{expectedValue}}";
+        XCTAssertTrue([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] isEqualToString:{{asLowerCamelCase name}}Argument]);
         {{/if}}
         {{else}}
         XCTAssertEqual([values[@"{{#if parent.isReadAttribute}}value{{else}}{{name}}{{/if}}"] {{asObjectiveCNumberType "" type true}}Value], {{expectedValue}}{{asTypeLiteralSuffix}});

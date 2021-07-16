@@ -82,11 +82,26 @@
         android:text="@string/send_command_off_btn_text"
         android:textSize="16sp"/>
 
+
+    <TextView
+        android:id="@+id/readBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_margin="16dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/onBtn"
+        android:background="@android:color/darker_gray"
+        android:text="@string/read_on_off_attribute_btn_text"
+        android:textSize="16sp"/>
+
     <SeekBar
         android:id="@+id/levelBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/onBtn"
+        android:layout_below="@id/readBtn"
         android:layout_gravity="center"
         android:gravity="center"
         android:max="254"

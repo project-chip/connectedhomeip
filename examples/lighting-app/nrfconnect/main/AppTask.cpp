@@ -22,7 +22,6 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
-#include "Service.h"
 #include "ThreadUtil.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -65,7 +64,6 @@ constexpr int kAppEventQueueSize               = 10;
 constexpr int kExampleVendorID                 = 0xabcd;
 constexpr uint8_t kButtonPushEvent             = 1;
 constexpr uint8_t kButtonReleaseEvent          = 0;
-constexpr uint32_t kPublishServicePeriodUs     = 5000000;
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFunctionTimer;
@@ -142,8 +140,7 @@ int AppTask::Init()
 
 int AppTask::StartApp()
 {
-    int ret                            = Init();
-    uint64_t mLastPublishServiceTimeUS = 0;
+    int ret = Init();
 
     if (ret)
     {
@@ -213,15 +210,6 @@ int AppTask::StartApp()
         sStatusLED.Animate();
         sUnusedLED.Animate();
         sUnusedLED_1.Animate();
-
-        uint64_t nowUS            = chip::System::Clock::GetMonotonicMicroseconds();
-        uint64_t nextChangeTimeUS = mLastPublishServiceTimeUS + kPublishServicePeriodUs;
-
-        if (nowUS > nextChangeTimeUS)
-        {
-            PublishService();
-            mLastPublishServiceTimeUS = nowUS;
-        }
     }
 }
 

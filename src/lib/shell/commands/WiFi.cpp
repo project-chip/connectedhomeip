@@ -43,7 +43,7 @@ static CHIP_ERROR WiFiHelpHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-static int PrintWifiMode()
+static CHIP_ERROR PrintWifiMode()
 {
     streamer_t * sout                            = streamer_get();
     ConnectivityManager::WiFiAPMode apMode       = ConnectivityMgr().GetWiFiAPMode();
@@ -68,10 +68,10 @@ static int PrintWifiMode()
         streamer_printf(sout, "mode not supported\r\n");
     }
 
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
-static int SetWifiMode(const char * mode)
+static CHIP_ERROR SetWifiMode(const char * mode)
 {
     if (strcmp(mode, "disable") == 0)
     {
@@ -93,7 +93,7 @@ static int SetWifiMode(const char * mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR WiFiModeHandler(int argc, char ** argv)

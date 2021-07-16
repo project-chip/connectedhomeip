@@ -27,6 +27,7 @@
         "low-power-cluster.xml",
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
+        "onoff-cluster.xml",
         "operational-credentials-cluster.xml",
         "pressure-measurement-cluster.xml",
         "pump-configuration-and-control-cluster.xml",

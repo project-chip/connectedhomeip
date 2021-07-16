@@ -33,6 +33,7 @@
 #include <app/MessageDef/TimedRequest.h>
 #include <app/MessageDef/WriteRequest.h>
 #include <app/MessageDef/WriteResponse.h>
+#include <core/CHIPError.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <support/CHIPMem.h>
 #include <support/UnitTestRegistration.h>
@@ -65,7 +66,7 @@ CHIP_ERROR DebugPrettyPrint(const chip::System::PacketBufferHandle & aMsgBuf)
 
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogProgress(DataManagement, "DebugPrettyPrint fails with err %d", err);
+        ChipLogProgress(DataManagement, "DebugPrettyPrint fails with err %" CHIP_ERROR_FORMAT, chip::ChipError::FormatError(err));
     }
 
     return err;
@@ -908,10 +909,10 @@ void BuildSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter
     subscribeRequestBuilder.EventNumber(1);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.MinIntervalSeconds(1);
+    subscribeRequestBuilder.MinIntervalSeconds(2);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.MaxIntervalSeconds(1);
+    subscribeRequestBuilder.MaxIntervalSeconds(3);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     subscribeRequestBuilder.KeepExistingSubscriptions(true);
@@ -957,10 +958,10 @@ void ParseSubscribeRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader
     NL_TEST_ASSERT(apSuite, eventNumber == 1 && err == CHIP_NO_ERROR);
 
     err = subscribeRequestParser.GetMinIntervalSeconds(&minIntervalSeconds);
-    NL_TEST_ASSERT(apSuite, minIntervalSeconds == 1 && err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, minIntervalSeconds == 2 && err == CHIP_NO_ERROR);
 
     err = subscribeRequestParser.GetMaxIntervalSeconds(&maxIntervalSeconds);
-    NL_TEST_ASSERT(apSuite, maxIntervalSeconds == 1 && err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, maxIntervalSeconds == 3 && err == CHIP_NO_ERROR);
 
     err = subscribeRequestParser.GetKeepExistingSubscriptions(&keepExistingSubscription);
     NL_TEST_ASSERT(apSuite, keepExistingSubscription && err == CHIP_NO_ERROR);

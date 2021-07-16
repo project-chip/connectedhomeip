@@ -375,8 +375,8 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         // Remove from table
-        ChipLogError(ExchangeManager, "Crit-err %ld when sending CHIP MsgId:%08" PRIX32 ", send tries: %d", long(err), msgId,
-                     entry->sendCount);
+        ChipLogError(ExchangeManager, "Crit-err %" CHIP_ERROR_FORMAT " when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
+                     ChipError::FormatError(err), msgId, entry->sendCount);
 
         ClearRetransTable(*entry);
     }

@@ -3596,7 +3596,10 @@ PacketBufferHandle encodeOccupancySensingClusterReadClusterRevisionAttribute(uin
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Off                                                               |   0x00 |
+| * OffWithEffect                                                     |   0x40 |
 | * On                                                                |   0x01 |
+| * OnWithRecallGlobalScene                                           |   0x41 |
+| * OnWithTimedOff                                                    |   0x42 |
 | * Toggle                                                            |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |

@@ -289,7 +289,7 @@ CHIP_ERROR Device::Persist()
                           error = mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed to persist device %" CHIP_ERROR_FORMAT, error);
+            ChipLogError(Controller, "Failed to persist device %" CHIP_ERROR_FORMAT, ChipError::FormatError(error));
         }
     }
     return error;
@@ -339,10 +339,7 @@ CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, cons
     return CHIP_NO_ERROR;
 }
 
-void Device::OnResponseTimeout(Messaging::ExchangeContext * ec)
-{
-    ec->Close();
-}
+void Device::OnResponseTimeout(Messaging::ExchangeContext * ec) {}
 
 CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
 {
@@ -484,7 +481,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "LoadSecureSessionParameters returning error %" CHIP_ERROR_FORMAT, err);
+        ChipLogError(Controller, "LoadSecureSessionParameters returning error %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
     }
     return err;
 }
@@ -624,7 +621,7 @@ void Device::CancelResponseHandler(uint8_t seqNum)
     mCallbacksMgr.CancelResponseCallback(mDeviceId, seqNum);
 }
 
-void Device::AddIMResponseHandler(app::Command * commandObj, Callback::Cancelable * onSuccessCallback,
+void Device::AddIMResponseHandler(app::CommandSender * commandObj, Callback::Cancelable * onSuccessCallback,
                                   Callback::Cancelable * onFailureCallback)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
@@ -636,7 +633,7 @@ void Device::AddIMResponseHandler(app::Command * commandObj, Callback::Cancelabl
                                       onFailureCallback);
 }
 
-void Device::CancelIMResponseHandler(app::Command * commandObj)
+void Device::CancelIMResponseHandler(app::CommandSender * commandObj)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
     // there are only one active command transaction on one command sender object. This is a bit tricky, we try to assume that

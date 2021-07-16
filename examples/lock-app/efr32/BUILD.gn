@@ -68,7 +68,6 @@ efr32_executable("lock_app") {
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
-    "${examples_plat_dir}/Service.cpp",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.c",
     "src/AppTask.cpp",

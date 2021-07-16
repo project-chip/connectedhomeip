@@ -131,7 +131,7 @@ extern "C" uint32_t pychip_internal_Commissioner_Unpair(chip::Controller::Device
 
     chip::python::ChipMainThreadScheduleAndWait([&]() { err = commissioner->UnpairDevice(remoteDeviceId); });
 
-    return err;
+    return chip::ChipError::AsInteger(err);
 }
 
 extern "C" uint32_t pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommissioner * commissioner,
@@ -152,5 +152,5 @@ extern "C" uint32_t pychip_internal_Commissioner_BleConnectForPairing(chip::Cont
         err = commissioner->PairDevice(remoteNodeId, params);
     });
 
-    return err;
+    return chip::ChipError::AsInteger(err);
 }

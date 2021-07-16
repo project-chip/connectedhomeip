@@ -2230,7 +2230,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 2);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 3);
         [expectation fulfill];
     }];
 
@@ -2248,7 +2248,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedShortValue], 2);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 3);
         [expectation fulfill];
     }];
 
@@ -6435,7 +6435,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t value = 0x0000;
+    uint16_t value = 0;
     [cluster writeAttributeOnTimeWithValue:value
                            responseHandler:^(NSError * err, NSDictionary * values) {
                                NSLog(@"OnOff OnTime Error: %@", err);
@@ -6472,7 +6472,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint16_t value = 0x0000;
+    uint16_t value = 0;
     [cluster writeAttributeOffWaitTimeWithValue:value
                                 responseHandler:^(NSError * err, NSDictionary * values) {
                                     NSLog(@"OnOff OffWaitTime Error: %@", err);
@@ -6509,7 +6509,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t value = 0x00;
+    uint8_t value = 0;
     [cluster writeAttributeStartUpOnOffWithValue:value
                                  responseHandler:^(NSError * err, NSDictionary * values) {
                                      NSLog(@"OnOff StartUpOnOff Error: %@", err);

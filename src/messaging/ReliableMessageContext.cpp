@@ -264,12 +264,13 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
 exit:
     if (IsSendErrorNonCritical(err))
     {
-        ChipLogError(ExchangeManager, "Non-crit err %ld sending solitary ack", long(err));
+        ChipLogError(ExchangeManager, "Non-crit err %" CHIP_ERROR_FORMAT " sending solitary ack", ChipError::FormatError(err));
         err = CHIP_NO_ERROR;
     }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(ExchangeManager, "Failed to send Solitary ack for MsgId:%08" PRIX32 ":%ld", mPendingPeerAckId, (long) err);
+        ChipLogError(ExchangeManager, "Failed to send Solitary ack for MsgId:%08" PRIX32 ":%" CHIP_ERROR_FORMAT, mPendingPeerAckId,
+                     ChipError::FormatError(err));
     }
 
     return err;
