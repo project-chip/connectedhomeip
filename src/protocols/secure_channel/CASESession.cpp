@@ -1272,6 +1272,7 @@ CHIP_ERROR CASESession::ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size
     uint8_t sid[2];
     Encoding::LittleEndian::BufferWriter bbuf(sid, sizeof(sid));
     bbuf.Put16(sessionID);
+    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
 
     HKDF_sha_crypto mHKDF;
     ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mFabricSecret, mFabricSecret.Length(), bbuf.Buffer(), bbuf.Size(), kIPKInfo,
