@@ -18548,6 +18548,8 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_CC_5>(),
         make_unique<Test_TC_CC_6>(),
         make_unique<Test_TC_CC_7>(),
+        make_unique<Test_TC_WNCV_1_1>(),
+        make_unique<Test_TC_WNCV_2_1>(),
     };
 
     commands.Register(clusterName, clusterCommands);
