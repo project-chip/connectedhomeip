@@ -20,7 +20,7 @@
  * @brief Implementation for the Test Server Cluster
  ***************************************************************************/
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
@@ -146,13 +146,13 @@ void emberAfPluginTestClusterServerInitCallback(void)
     }
 }
 
-bool emberAfTestClusterClusterTestCallback(chip::app::Command *)
+bool emberAfTestClusterClusterTestCallback(chip::app::CommandHandler *)
 {
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
-bool emberAfTestClusterClusterTestSpecificCallback(chip::app::Command * apCommandObj)
+bool emberAfTestClusterClusterTestSpecificCallback(chip::app::CommandHandler * apCommandObj)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t returnValue = 7;
@@ -176,7 +176,7 @@ exit:
     return true;
 }
 
-bool emberAfTestClusterClusterTestNotHandledCallback(chip::app::Command *)
+bool emberAfTestClusterClusterTestNotHandledCallback(chip::app::CommandHandler *)
 {
     return false;
 }

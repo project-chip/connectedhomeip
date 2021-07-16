@@ -8,6 +8,8 @@
 #include <app/util/basic-types.h>
 
 #include <app/Command.h>
+#include <app/CommandHandler.h>
+#include <app/CommandSender.h>
 #include <lib/support/Span.h>
 
 /** @brief Cluster Init
@@ -170,10 +172,11 @@ void emberAf{{asUpperCamelCase label}}ClusterClientTickCallback(chip::EndpointId
 {{#zcl_clusters}}
 {{#zcl_commands}}
 /**
-* @brief {{parent.name}} Cluster {{name}} Command callback
-*/
-bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback(chip::app::Command * commandObj{{#zcl_command_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/zcl_command_arguments}});
-
+ * @brief {{parent.name}} Cluster {{name}} Command callback (from {{source}})
+ */
+bool emberAf{{asUpperCamelCase parent.label}}Cluster{{asUpperCamelCase name}}Callback(
+       {{#if (isServer source)}}chip::app::CommandSender{{else}}chip::app::CommandHandler{{/if}} * commandObj
+       {{#zcl_command_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/zcl_command_arguments}});
 {{/zcl_commands}}
 {{/zcl_clusters}}
 
