@@ -1272,9 +1272,14 @@ CHIP_ERROR CASESession::ConstructTBS3Data(const uint8_t * responderOpCert, uint3
 
 CHIP_ERROR CASESession::ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen)
 {
+    uint8_t sid[2];
+    Encoding::LittleEndian::BufferWriter bbuf(sid, sizeof(sid));
+    bbuf.Put16(sessionID);
+    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
+
     HKDF_sha_crypto mHKDF;
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mFabricSecret, mFabricSecret.Length(), reinterpret_cast<const uint8_t *>(&sessionID),
-                                           sizeof(sessionID), kIPKInfo, sizeof(kIPKInfo), ipk, ipkLen));
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(mFabricSecret, mFabricSecret.Length(), bbuf.Buffer(), bbuf.Size(), kIPKInfo,
+                                           sizeof(kIPKInfo), ipk, ipkLen));
 
     return CHIP_NO_ERROR;
 }
