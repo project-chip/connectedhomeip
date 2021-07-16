@@ -128,10 +128,8 @@ private:
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
-    CHIP_ERROR AbortExistingExchangeContext();
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
 
     // Don't need the response for report data if true
     bool mSuppressResponse = false;

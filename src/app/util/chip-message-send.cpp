@@ -130,8 +130,12 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
 
     EmberStatus err = chipSendUnicast(exchange, apsFrame, messageLength, message, sendFlags);
 
-    // Make sure we always close the temporary exchange we just created.
-    exchange->Close();
+    // Make sure we always close the temporary exchange we just created, unless
+    // we sent a message successfully.
+    if (err != EMBER_SUCCESS)
+    {
+        exchange->Close();
+    }
 
     return err;
 }

@@ -99,10 +99,8 @@ private:
     void MoveToState(const State aTargetState);
     void ClearState();
     const char * GetStateStr() const;
-    void ClearExistingExchangeContext();
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
     WriteResponse::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;
     State mState = State::Uninitialized;

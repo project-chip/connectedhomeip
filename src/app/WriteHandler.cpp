@@ -29,8 +29,6 @@ CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
 {
     VerifyOrReturnError(apDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeCtx = nullptr;
-    mpDelegate    = apDelegate;
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -50,18 +48,8 @@ void WriteHandler::Shutdown()
 {
     VerifyOrReturn(mState != State::Uninitialized);
     mMessageWriter.Reset();
-    ClearExistingExchangeContext();
-    mpDelegate = nullptr;
+    mpExchangeCtx = nullptr;
     ClearState();
-}
-
-void WriteHandler::ClearExistingExchangeContext()
-{
-    if (mpExchangeCtx != nullptr)
-    {
-        mpExchangeCtx->Close();
-        mpExchangeCtx = nullptr;
-    }
 }
 
 CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
@@ -75,8 +63,6 @@ CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeC
 
 exit:
     ChipLogFunctError(err);
-    // Keep Shutdown() from double-closing our exchange.
-    mpExchangeCtx = nullptr;
     Shutdown();
     return err;
 }

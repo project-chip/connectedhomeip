@@ -80,7 +80,9 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
 {
-    if (protocolId != Protocols::SecureChannel::Id || msgType != to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck))
+    bool isStandaloneAck =
+        (protocolId == Protocols::SecureChannel::Id) && msgType == to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck);
+    if (!isStandaloneAck)
     {
         // If we were waiting for a message send, this is it.  Standalone acks
         // are not application-level sends, which is why we don't allow those to
@@ -138,6 +140,12 @@ exit:
     {
         CancelResponseTimer();
         SetResponseExpected(false);
+    }
+
+    // Standalone acks are not application-level message sends.
+    if (err == CHIP_NO_ERROR && !isStandaloneAck)
+    {
+        MessageHandled();
     }
 
     // Release the reference to the exchange context acquired above. Under normal circumstances

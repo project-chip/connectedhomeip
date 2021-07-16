@@ -84,8 +84,6 @@ CHIP_ERROR EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     // Send an Echo Response back to the sender.
     err = ec->SendMessage(MsgType::EchoResponse, std::move(response));
 
-    // Discard the exchange context.
-    ec->Close();
     return err;
 }
 

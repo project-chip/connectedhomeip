@@ -246,10 +246,6 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
     Messaging::ExchangeContext * exchange = ctx.NewExchangeToLocal(&delegate);
     err                                   = writeHandler.OnWriteRequest(exchange, std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    // Manually close the exchange, because we're bypassing the normal "you
-    // received a message" flow for the exchange, so the automatic closing is
-    // not going to happen.
-    exchange->Close();
 
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);

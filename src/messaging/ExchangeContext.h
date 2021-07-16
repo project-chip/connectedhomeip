@@ -78,6 +78,12 @@ public:
     /**
      *  Send a CHIP message on this exchange.
      *
+     *  If SendMessage returns success and the message was not expecting a
+     *  response, the exchange will close itself before returning, unless the
+     *  message being sent is a standalone ack.  If SendMessage returns failure,
+     *  the caller is responsible for deciding what to do (e.g. closing the
+     *  exchange, trying to re-establish a secure session, etc).
+     *
      *  @param[in]    protocolId    The protocol identifier of the CHIP message to be sent.
      *
      *  @param[in]    msgType       The message type of the corresponding protocol.

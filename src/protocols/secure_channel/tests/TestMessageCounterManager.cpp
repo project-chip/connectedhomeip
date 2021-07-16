@@ -117,8 +117,6 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, peerState->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized());
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
-
-    ec->Close();
 }
 
 // Test Suite
