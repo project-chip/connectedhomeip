@@ -114,29 +114,37 @@ class BaseTestHelper:
             self.logger.exception("Failed to resolve. {}".format(ex))
 
     def TestReadBasicAttribiutes(self, nodeid: int, endpoint: int, group: int):
-        basic_cluster_attrs = [
-            "VendorName",
-            "VendorID",
-            "ProductName",
-            "ProductID",
-            "UserLabel",
-            "Location",
-            "HardwareVersion",
-            "HardwareVersionString",
-            "SoftwareVersion",
-            "SoftwareVersionString"
-        ]
-        failed_zcl = []
-        for basic_attr in basic_cluster_attrs:
+        basic_cluster_attrs = {
+            "VendorName": "TEST_VENDOR",
+            "VendorID": 9050,
+            "ProductName": "TEST_PRODUCT",
+            "ProductID": 65279,
+            "UserLabel": "",
+            "Location": "",
+            "HardwareVersion": 1,
+            "HardwareVersionString": "TEST_VERSION",
+            "SoftwareVersion": 1,
+            "SoftwareVersionString": "prerelease",
+        }
+        failed_zcl = {}
+        for basic_attr, expected_value in basic_cluster_attrs.items():
             try:
-                self.devCtrl.ZCLReadAttribute(cluster="Basic",
-                                              attribute=basic_attr,
-                                              nodeid=nodeid,
-                                              endpoint=endpoint,
-                                              groupid=group)
+                res = self.devCtrl.ZCLReadAttribute(cluster="Basic",
+                                                    attribute=basic_attr,
+                                                    nodeid=nodeid,
+                                                    endpoint=endpoint,
+                                                    groupid=group)
+                if res is None:
+                    raise Exception("Read {} attribute: no value get".format(basic_attr))
+                elif res.status != 0:
+                    raise Exception(
+                        "Read {} attribute: non-zero status code {}".format(basic_attr, res.status))
+                elif res.value != expected_value:
+                    raise Exception("Read {} attribute: expect {} got {}".format(
+                        basic_attr, repr(expected_value), repr(res.value)))
                 time.sleep(2)
-            except Exception:
-                failed_zcl.append(basic_attr)
+            except Exception as ex:
+                failed_zcl[basic_attr] = str(ex)
         if failed_zcl:
             self.logger.exception(f"Following attributes failed: {failed_zcl}")
             return False
