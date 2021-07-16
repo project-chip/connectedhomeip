@@ -79,7 +79,7 @@ void InitTestInetCommon()
 
 void InitSystemLayer()
 {
-    gSystemLayer.Init(nullptr);
+    gSystemLayer.Init();
 }
 
 void ShutdownSystemLayer()

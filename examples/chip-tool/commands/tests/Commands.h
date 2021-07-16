@@ -12247,7 +12247,7 @@ private:
         if (vendorName.size() > 32)
         {
             ChipLogError(chipTool, "Error: vendorName is too long. Max size is 32 but got '%zu'", vendorName.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -12368,7 +12368,7 @@ private:
         if (productName.size() > 32)
         {
             ChipLogError(chipTool, "Error: productName is too long. Max size is 32 but got '%zu'", productName.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -12489,7 +12489,7 @@ private:
         if (userLabel.size() > 32)
         {
             ChipLogError(chipTool, "Error: userLabel is too long. Max size is 32 but got '%zu'", userLabel.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -12556,7 +12556,7 @@ private:
         if (location.size() > 2)
         {
             ChipLogError(chipTool, "Error: location is too long. Max size is 2 but got '%zu'", location.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -12679,7 +12679,7 @@ private:
         {
             ChipLogError(chipTool, "Error: hardwareVersionString is too short. Min size is 1 but got '%zu'",
                          hardwareVersionString.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -12687,7 +12687,7 @@ private:
         {
             ChipLogError(chipTool, "Error: hardwareVersionString is too long. Max size is 64 but got '%zu'",
                          hardwareVersionString.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -12814,7 +12814,7 @@ private:
         {
             ChipLogError(chipTool, "Error: softwareVersionString is too short. Min size is 1 but got '%zu'",
                          softwareVersionString.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -12822,7 +12822,7 @@ private:
         {
             ChipLogError(chipTool, "Error: softwareVersionString is too long. Max size is 64 but got '%zu'",
                          softwareVersionString.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -12896,14 +12896,14 @@ private:
         if (manufacturingDate.size() < 8)
         {
             ChipLogError(chipTool, "Error: manufacturingDate is too short. Min size is 8 but got '%zu'", manufacturingDate.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
         if (manufacturingDate.size() > 16)
         {
             ChipLogError(chipTool, "Error: manufacturingDate is too long. Max size is 16 but got '%zu'", manufacturingDate.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -12974,7 +12974,7 @@ private:
         if (partNumber.size() > 32)
         {
             ChipLogError(chipTool, "Error: partNumber is too long. Max size is 32 but got '%zu'", partNumber.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -13047,7 +13047,7 @@ private:
         if (productURL.size() > 256)
         {
             ChipLogError(chipTool, "Error: productURL is too long. Max size is 256 but got '%zu'", productURL.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -13118,7 +13118,7 @@ private:
         if (productLabel.size() > 64)
         {
             ChipLogError(chipTool, "Error: productLabel is too long. Max size is 64 but got '%zu'", productLabel.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 
@@ -13189,7 +13189,7 @@ private:
         if (serialNumber.size() > 32)
         {
             ChipLogError(chipTool, "Error: serialNumber is too long. Max size is 32 but got '%zu'", serialNumber.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
 

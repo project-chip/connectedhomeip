@@ -164,7 +164,7 @@ AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const Optiona
                                                   "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %d", err);
+        ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
         return err;
     }
 

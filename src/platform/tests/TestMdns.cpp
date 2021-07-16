@@ -77,7 +77,7 @@ static void ErrorCallback(void * context, CHIP_ERROR error)
 {
     if (error != CHIP_NO_ERROR)
     {
-        fprintf(stderr, "Mdns error: %d\n", static_cast<int>(error));
+        fprintf(stderr, "Mdns error: %" CHIP_ERROR_FORMAT "\n", chip::ChipError::FormatError(error));
         abort();
     }
 }

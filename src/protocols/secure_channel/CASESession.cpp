@@ -303,6 +303,9 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
                  "CASESession timed out while waiting for a response from the peer. Expected message type was %" PRIu8,
                  to_underlying(mNextExpectedMsg));
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+    // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    mExchangeCtxt = nullptr;
     Clear();
 }
 

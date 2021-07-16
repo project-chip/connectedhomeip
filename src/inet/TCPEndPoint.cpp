@@ -384,7 +384,11 @@ CHIP_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
         // Ensure that TCP timers are started
         if (res == CHIP_NO_ERROR)
         {
-            res = start_tcp_timers();
+            err_t error = start_tcp_timers();
+            if (error != ERR_OK)
+            {
+                res = chip::System::MapErrorLwIP(error);
+            }
         }
 
         if (res == CHIP_NO_ERROR)
@@ -2179,7 +2183,8 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, 
 
         // Post callback to HandleConnectComplete.
         conErr = chip::System::MapErrorLwIP(lwipErr);
-        if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPConnectComplete, (uintptr_t) conErr) != CHIP_NO_ERROR)
+        if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPConnectComplete, static_cast<uintptr_t>(ChipError::AsInteger(conErr))) !=
+            CHIP_NO_ERROR)
             res = ERR_ABRT;
     }
     else
@@ -2221,7 +2226,11 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
         // Ensure that TCP timers have been started
         if (err == CHIP_NO_ERROR)
         {
-            err = start_tcp_timers();
+            err_t error = start_tcp_timers();
+            if (error != ERR_OK)
+            {
+                err = chip::System::MapErrorLwIP(error);
+            }
         }
 
         // If successful in allocating an end point...
@@ -2250,7 +2259,7 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
 
         // Otherwise, there was an error accepting the connection, so post a callback to the HandleError function.
         else
-            lSystemLayer.PostEvent(*listenEP, kInetEvent_TCPError, (uintptr_t) err);
+            lSystemLayer.PostEvent(*listenEP, kInetEvent_TCPError, static_cast<uintptr_t>(ChipError::AsInteger(err)));
     }
     else
         err = CHIP_ERROR_CONNECTION_ABORTED;
@@ -2327,7 +2336,7 @@ void TCPEndPoint::LwIPHandleError(void * arg, err_t lwipErr)
 
         // Post callback to HandleError.
         CHIP_ERROR err = chip::System::MapErrorLwIP(lwipErr);
-        lSystemLayer.PostEvent(*ep, kInetEvent_TCPError, (uintptr_t) err);
+        lSystemLayer.PostEvent(*ep, kInetEvent_TCPError, static_cast<uintptr_t>(ChipError::AsInteger(err)));
     }
 }
 

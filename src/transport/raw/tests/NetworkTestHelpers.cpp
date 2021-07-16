@@ -30,7 +30,7 @@ CHIP_ERROR IOContext::Init(nlTestSuite * suite)
 {
     CHIP_ERROR err = Platform::MemoryInit();
 
-    gSystemLayer.Init(nullptr);
+    gSystemLayer.Init();
 
     InitNetwork();
 

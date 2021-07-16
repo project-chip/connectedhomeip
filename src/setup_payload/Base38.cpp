@@ -104,7 +104,7 @@ static inline CHIP_ERROR decodeChar(char c, uint8_t & value)
         return CHIP_ERROR_INVALID_INTEGER_VALUE;
     }
     value = v;
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 } // unnamed namespace

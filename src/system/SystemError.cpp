@@ -59,7 +59,7 @@ namespace System {
 DLL_EXPORT CHIP_ERROR MapErrorPOSIX(int aError)
 {
     return (aError == 0 ? CHIP_NO_ERROR
-                        : ChipError::Encapsulate(ChipError::Range::kPOSIX, static_cast<ChipError::BaseType>(aError)));
+                        : ChipError::Encapsulate(ChipError::Range::kPOSIX, static_cast<ChipError::ValueType>(aError)));
 }
 
 /**

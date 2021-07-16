@@ -134,7 +134,7 @@ void JniReferences::CallVoidInt(JNIEnv * env, jobject object, const char * metho
     err = JniReferences::FindMethod(env, object, methodName, "(I)V", &method);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Error finding Java method: %d", err);
+        ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
     }
 
     env->ExceptionClear();

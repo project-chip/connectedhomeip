@@ -129,11 +129,16 @@ exit:
 void Command::Shutdown()
 {
     VerifyOrReturn(mState != CommandState::Uninitialized);
+    AbortExistingExchangeContext();
+    ShutdownInternal();
+}
+
+void Command::ShutdownInternal()
+{
     mCommandMessageWriter.Reset();
 
-    AbortExistingExchangeContext();
-
     mpExchangeMgr = nullptr;
+    mpExchangeCtx = nullptr;
     mpDelegate    = nullptr;
     ClearState();
 
