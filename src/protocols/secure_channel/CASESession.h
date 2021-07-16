@@ -108,7 +108,6 @@ public:
      *                                      this index value from an operationalCredentialSet's entry that matches the device's
      *                                      operational credentials
      * @param peerNodeId                    Node id of the peer node
-     * @param peerFabricId                  Fabric id of the peer node
      * @param myKeyId                       Key ID to be assigned to the secure session on the peer node
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
      * @param delegate                      Callback object
@@ -117,8 +116,8 @@ public:
      */
     CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress,
                                 Credentials::OperationalCredentialSet * operationalCredentialSet, uint8_t opCredSetIndex,
-                                NodeId peerNodeId, FabricId peerFabricId, uint16_t myKeyId,
-                                Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
+                                NodeId peerNodeId, uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
+                                SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief

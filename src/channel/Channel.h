@@ -83,13 +83,6 @@ public:
     }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
 
-    ChannelBuilder & SetPeerFabricId(FabricId peerFabricId)
-    {
-        mPeerFabricId = peerFabricId;
-        return *this;
-    }
-    FabricId GetPeerFabricId() const { return mPeerFabricId; }
-
     ChannelBuilder & SetTransportPreference(TransportPreference preference)
     {
         mTransportPreference = preference;
@@ -115,7 +108,7 @@ public:
     }
 
     uint8_t GetOperationalCredentialSetIndex() const { return mCaseParameters.mOperationalCredentialSetIndex; }
-    ChannelBuilder & SetTrustedRootId(uint8_t operationalCredentialSetIndex)
+    ChannelBuilder & SetOperationalCredentialSetIndex(uint8_t operationalCredentialSetIndex)
     {
         mCaseParameters.mOperationalCredentialSetIndex = operationalCredentialSetIndex;
         return *this;
@@ -130,7 +123,6 @@ public:
 
 private:
     NodeId mPeerNodeId                       = kUndefinedNodeId;
-    FabricId mPeerFabricId                   = kUndefinedFabricId;
     TransportPreference mTransportPreference = TransportPreference::kDefault;
     struct
     {
