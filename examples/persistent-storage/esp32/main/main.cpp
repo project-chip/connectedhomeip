@@ -27,10 +27,10 @@ const char * TAG = "persistent-storage";
 
 extern "C" void app_main()
 {
-    auto err = nvs_flash_init();
-    if (err != CHIP_NO_ERROR)
+    esp_err_t err = nvs_flash_init();
+    if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", ::chip::ErrorStr(err));
+        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
     ESP_LOGI(TAG, "=============================================");

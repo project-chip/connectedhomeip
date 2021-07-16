@@ -113,14 +113,13 @@ CHIP_ERROR AppTask::Init()
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
-    int err;
     AppEvent event;
     uint64_t mLastChangeTimeUS = 0;
 
-    err = sAppTask.Init();
+    CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGI(TAG, "AppTask.Init() failed due to %d", err);
+        ESP_LOGI(TAG, "AppTask.Init() failed due to %" CHIP_ERROR_FORMAT, chip::ChipError::FormatError(err));
         return;
     }
 

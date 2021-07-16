@@ -547,7 +547,7 @@ std::string createSetupPayload()
 
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "Couldn't get payload string %d", err);
+        ESP_LOGE(TAG, "Couldn't get payload string %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
     }
     return result;
 };
@@ -586,18 +586,11 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
              (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
-    CHIP_ERROR err; // A quick note about errors: CHIP adopts the error type and numbering
-                    // convention of the environment into which it is ported.  Thus esp_err_t
-                    // and CHIP_ERROR are in fact the same type, and both ESP-IDF errors
-                    // and CHIO-specific errors can be stored in the same value without
-                    // ambiguity.  For convenience, ESP_OK and CHIP_NO_ERROR are mapped
-                    // to the same value.
-
     // Initialize the ESP NVS layer.
-    err = nvs_flash_init();
-    if (err != CHIP_NO_ERROR)
+    esp_err_t err = nvs_flash_init();
+    if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
 
@@ -607,10 +600,10 @@ extern "C" void app_main()
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
-    err = deviceMgr.Init(&EchoCallbacks);
-    if (err != CHIP_NO_ERROR)
+    CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
+    if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
         return;
     }
 
@@ -635,8 +628,8 @@ extern "C" void app_main()
 
     {
         std::vector<char> qrCode(3 * qrCodeText.size() + 1);
-        err = EncodeQRCodeToUrl(qrCodeText.c_str(), qrCodeText.size(), qrCode.data(), qrCode.max_size());
-        if (err == CHIP_NO_ERROR)
+        error = EncodeQRCodeToUrl(qrCodeText.c_str(), qrCodeText.size(), qrCode.data(), qrCode.max_size());
+        if (error == CHIP_NO_ERROR)
         {
             ESP_LOGI(TAG, "Copy/paste the below URL in a browser to see the QR CODE:\n\t%s?data=%s", QRCODE_BASE_URL,
                      qrCode.data());
@@ -648,7 +641,7 @@ extern "C" void app_main()
     err = InitDisplay();
     if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "InitDisplay() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "InitDisplay() failed: %s", esp_err_to_name(err));
         return;
     }
 
@@ -660,9 +653,9 @@ extern "C" void app_main()
     for (int i = 0; i < buttons.size(); ++i)
     {
         err = buttons[i].Init(button_gpios[i], 50);
-        if (err != CHIP_NO_ERROR)
+        if (err != ESP_OK)
         {
-            ESP_LOGE(TAG, "Button.Init() failed: %s", ErrorStr(err));
+            ESP_LOGE(TAG, "Button.Init() failed: %s", esp_err_to_name(err));
             return;
         }
     }

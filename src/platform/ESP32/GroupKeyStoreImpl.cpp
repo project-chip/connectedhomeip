@@ -26,6 +26,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ESP32/GroupKeyStoreImpl.h>
+#include <platform/ESP32/ScopedNvsHandle.h>
 
 #include "nvs.h"
 #include "nvs_flash.h"
@@ -69,22 +70,21 @@ exit:
 
 CHIP_ERROR GroupKeyStoreImpl::StoreGroupKey(const ChipGroupKey & key)
 {
-    CHIP_ERROR err;
-    nvs_handle handle;
     char keyName[kMaxConfigKeyNameLength + 1];
     uint8_t keyData[ChipGroupKey::MaxKeySize];
-    bool needClose    = false;
     bool indexUpdated = false;
+    ScopedNvsHandle handle;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    esp_err_t err    = ESP_OK;
 
-    err = FormKeyName(key.KeyId, keyName, sizeof(keyName));
-    SuccessOrExit(err);
+    error = FormKeyName(key.KeyId, keyName, sizeof(keyName));
+    SuccessOrExit(error);
 
-    err = AddKeyToIndex(key.KeyId, indexUpdated);
-    SuccessOrExit(err);
+    error = AddKeyToIndex(key.KeyId, indexUpdated);
+    SuccessOrExit(error);
 
-    err = nvs_open(kConfigNamespace_ChipConfig, NVS_READWRITE, &handle);
-    SuccessOrExit(err);
-    needClose = true;
+    error = handle.Open(kConfigNamespace_ChipConfig, NVS_READWRITE);
+    SuccessOrExit(error);
 
     memcpy(keyData, key.Key, ChipGroupKey::MaxKeySize);
     if (key.KeyId != ChipKeyId::kFabricSecret)
@@ -112,29 +112,25 @@ CHIP_ERROR GroupKeyStoreImpl::StoreGroupKey(const ChipGroupKey & key)
 #endif // CHIP_PROGRESS_LOGGING
 
     err = nvs_set_blob(handle, keyName, keyData, ChipGroupKey::MaxKeySize);
-    SuccessOrExit(err);
+    VerifyOrExit(err == ESP_OK, error = ESP32Utils::MapError(err));
 
     if (indexUpdated)
     {
-        err = WriteKeyIndex(handle);
-        SuccessOrExit(err);
+        error = WriteKeyIndex(handle);
+        SuccessOrExit(error);
     }
 
     // Commit the value to the persistent store.
     err = nvs_commit(handle);
-    SuccessOrExit(err);
+    VerifyOrExit(err == ESP_OK, error = ESP32Utils::MapError(err));
 
 exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-    if (err != CHIP_NO_ERROR && indexUpdated)
+    if (error != CHIP_NO_ERROR && indexUpdated)
     {
         mNumKeys--;
     }
     ClearSecretData(keyData, sizeof(keyData));
-    return err;
+    return error;
 }
 
 CHIP_ERROR GroupKeyStoreImpl::DeleteGroupKey(uint32_t keyId)
@@ -206,25 +202,22 @@ exit:
 
 CHIP_ERROR GroupKeyStoreImpl::AddKeyToIndex(uint32_t keyId, bool & indexUpdated)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     indexUpdated = false;
 
     for (uint8_t i = 0; i < mNumKeys; i++)
     {
         if (mKeyIndex[i] == keyId)
         {
-            ExitNow(err = CHIP_NO_ERROR);
+            return CHIP_NO_ERROR;
         }
     }
 
-    VerifyOrExit(mNumKeys < kMaxGroupKeys, err = CHIP_ERROR_TOO_MANY_KEYS);
+    VerifyOrReturnError(mNumKeys < kMaxGroupKeys, CHIP_ERROR_TOO_MANY_KEYS);
 
     mKeyIndex[mNumKeys++] = keyId;
     indexUpdated          = true;
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GroupKeyStoreImpl::WriteKeyIndex(nvs_handle handle)
@@ -236,10 +229,8 @@ CHIP_ERROR GroupKeyStoreImpl::WriteKeyIndex(nvs_handle handle)
 
 CHIP_ERROR GroupKeyStoreImpl::DeleteKeyOrKeys(uint32_t targetKeyId, uint32_t targetKeyType)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    nvs_handle handle;
     char keyName[kMaxConfigKeyNameLength + 1];
-    bool needClose = false;
+    ScopedNvsHandle handle;
 
     for (uint8_t i = 0; i < mNumKeys;)
     {
@@ -248,17 +239,14 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteKeyOrKeys(uint32_t targetKeyId, uint32_t tar
         if ((targetKeyId == ChipKeyId::kNone && targetKeyType == ChipKeyId::kType_None) || curKeyId == targetKeyId ||
             ChipKeyId::GetType(curKeyId) == targetKeyType)
         {
-            if (!needClose)
+            if (!handle.IsOpen())
             {
-                err = nvs_open(kConfigNamespace_ChipConfig, NVS_READWRITE, &handle);
-                SuccessOrExit(err);
-                needClose = true;
+                ReturnErrorOnFailure(handle.Open(kConfigNamespace_ChipConfig, NVS_READWRITE));
             }
 
-            err = FormKeyName(curKeyId, keyName, sizeof(keyName));
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(FormKeyName(curKeyId, keyName, sizeof(keyName)));
 
-            err = nvs_erase_key(handle, keyName);
+            esp_err_t err = nvs_erase_key(handle, keyName);
 #if CHIP_PROGRESS_LOGGING
             if (err == ESP_OK)
             {
@@ -281,13 +269,12 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteKeyOrKeys(uint32_t targetKeyId, uint32_t tar
                 }
                 ChipLogProgress(DeviceLayer, "GroupKeyStore: erasing %s key %s/%s", keyType, kConfigNamespace_ChipConfig, keyName);
             }
-            else
 #endif // CHIP_PROGRESS_LOGGING
-                if (err == ESP_ERR_NVS_NOT_FOUND)
+            if (err == ESP_ERR_NVS_NOT_FOUND)
             {
-                err = CHIP_NO_ERROR;
+                err = ESP_OK;
             }
-            SuccessOrExit(err);
+            ReturnMappedErrorOnFailure(err);
 
             mNumKeys--;
 
@@ -299,29 +286,20 @@ CHIP_ERROR GroupKeyStoreImpl::DeleteKeyOrKeys(uint32_t targetKeyId, uint32_t tar
         }
     }
 
-    if (needClose)
+    if (handle.IsOpen())
     {
-        err = WriteKeyIndex(handle);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(WriteKeyIndex(handle));
 
         // Commit to the persistent store.
-        err = nvs_commit(handle);
-        SuccessOrExit(err);
+        ReturnMappedErrorOnFailure(nvs_commit(handle));
     }
 
-exit:
-    if (needClose)
-    {
-        nvs_close(handle);
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GroupKeyStoreImpl::FormKeyName(uint32_t keyId, char * buf, size_t bufSize)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(bufSize >= kMaxConfigKeyNameLength, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bufSize >= kMaxConfigKeyNameLength, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     if (keyId == ChipKeyId::kFabricSecret)
     {
@@ -332,8 +310,7 @@ CHIP_ERROR GroupKeyStoreImpl::FormKeyName(uint32_t keyId, char * buf, size_t buf
         snprintf(buf, bufSize, "%s%08" PRIX32, kGroupKeyNamePrefix, keyId);
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal

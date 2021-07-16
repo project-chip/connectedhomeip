@@ -45,7 +45,19 @@ public:
     static CHIP_ERROR GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
     static CHIP_ERROR SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo);
     static CHIP_ERROR ClearWiFiStationProvision(void);
+
+    static CHIP_ERROR MapError(esp_err_t error);
 };
+
+#define ReturnMappedErrorOnFailure(expr)                                                                                           \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        esp_err_t __err = (expr);                                                                                                  \
+        if (__err != ESP_OK)                                                                                                       \
+        {                                                                                                                          \
+            return chip::DeviceLayer::Internal::ESP32Utils::MapError(__err);                                                       \
+        }                                                                                                                          \
+    } while (false)
 
 } // namespace Internal
 } // namespace DeviceLayer

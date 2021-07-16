@@ -53,7 +53,7 @@ void ProcessShellLine(intptr_t context)
     esp_console_run(shellArgs->GetLine(), &ret);
     if (ret)
     {
-        printf("Error: %s\r\n", chip::ErrorStr(ret));
+        printf("Error: %d\r\n", ret);
     }
     else
     {
