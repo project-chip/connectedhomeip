@@ -675,6 +675,8 @@ class ChipClusters:
             "TestCluster": {
                 "Test": {
                 },
+                "TestAsyncTransaction": {
+                },
                 "TestNotHandled": {
                 },
                 "TestSpecific": {
@@ -2846,6 +2848,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_TestCluster_Test(
                 device, ZCLendpoint, ZCLgroupid
         )
+    def ClusterTestCluster_CommandTestAsyncTransaction(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_TestCluster_TestAsyncTransaction(
+                device, ZCLendpoint, ZCLgroupid
+        )
     def ClusterTestCluster_CommandTestNotHandled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled(
                 device, ZCLendpoint, ZCLgroupid
@@ -4976,6 +4982,9 @@ class ChipClusters:
         # Cluster TestCluster Command Test
         self._chipLib.chip_ime_AppendCommand_TestCluster_Test.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TestCluster_Test.restype = ctypes.c_uint32
+        # Cluster TestCluster Command TestAsyncTransaction
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestAsyncTransaction.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestAsyncTransaction.restype = ctypes.c_uint32
         # Cluster TestCluster Command TestNotHandled
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.restype = ctypes.c_uint32

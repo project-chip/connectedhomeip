@@ -172,7 +172,24 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000001_TestNotHandled
+- (void)testSendClusterTestCluster_000001_TestAsyncTransaction
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Async Command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster testAsyncTransaction:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Send Test Async Command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000002_TestNotHandled
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Not Handled Command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -189,7 +206,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000002_TestSpecific
+- (void)testSendClusterTestCluster_000003_TestSpecific
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Specific Command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -207,7 +224,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000003_ReadAttribute
+- (void)testSendClusterTestCluster_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BOOLEAN Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -225,7 +242,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000004_WriteAttribute
+- (void)testSendClusterTestCluster_000005_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute BOOLEAN True"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -244,7 +261,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000005_ReadAttribute
+- (void)testSendClusterTestCluster_000006_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BOOLEAN True"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -262,7 +279,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000006_WriteAttribute
+- (void)testSendClusterTestCluster_000007_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute BOOLEAN False"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -281,7 +298,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000007_ReadAttribute
+- (void)testSendClusterTestCluster_000008_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BOOLEAN False"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -299,7 +316,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000008_ReadAttribute
+- (void)testSendClusterTestCluster_000009_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP8 Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -317,7 +334,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000009_WriteAttribute
+- (void)testSendClusterTestCluster_000010_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute BITMAP8 Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -336,7 +353,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000010_ReadAttribute
+- (void)testSendClusterTestCluster_000011_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP8 Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -354,7 +371,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000011_WriteAttribute
+- (void)testSendClusterTestCluster_000012_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute BITMAP8 Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -373,7 +390,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000012_ReadAttribute
+- (void)testSendClusterTestCluster_000013_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP8 Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -391,7 +408,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000013_ReadAttribute
+- (void)testSendClusterTestCluster_000014_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP16 Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -409,7 +426,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000014_WriteAttribute
+- (void)testSendClusterTestCluster_000015_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute BITMAP16 Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -428,7 +445,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000015_ReadAttribute
+- (void)testSendClusterTestCluster_000016_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP16 Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -446,7 +463,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000016_WriteAttribute
+- (void)testSendClusterTestCluster_000017_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute BITMAP16 Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -465,7 +482,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000017_ReadAttribute
+- (void)testSendClusterTestCluster_000018_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP16 Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -483,7 +500,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000018_ReadAttribute
+- (void)testSendClusterTestCluster_000019_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP32 Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -501,7 +518,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000019_WriteAttribute
+- (void)testSendClusterTestCluster_000020_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute BITMAP32 Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -520,7 +537,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000020_ReadAttribute
+- (void)testSendClusterTestCluster_000021_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP32 Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -538,7 +555,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000021_WriteAttribute
+- (void)testSendClusterTestCluster_000022_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute BITMAP32 Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -557,7 +574,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000022_ReadAttribute
+- (void)testSendClusterTestCluster_000023_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP32 Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -575,7 +592,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000023_ReadAttribute
+- (void)testSendClusterTestCluster_000024_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP64 Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -593,7 +610,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000024_WriteAttribute
+- (void)testSendClusterTestCluster_000025_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute BITMAP64 Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -612,7 +629,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000025_ReadAttribute
+- (void)testSendClusterTestCluster_000026_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP64 Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -630,7 +647,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000026_WriteAttribute
+- (void)testSendClusterTestCluster_000027_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute BITMAP64 Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -649,7 +666,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000027_ReadAttribute
+- (void)testSendClusterTestCluster_000028_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute BITMAP64 Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -667,7 +684,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000028_ReadAttribute
+- (void)testSendClusterTestCluster_000029_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT8U Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -685,7 +702,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000029_WriteAttribute
+- (void)testSendClusterTestCluster_000030_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT8U Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -704,7 +721,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000030_ReadAttribute
+- (void)testSendClusterTestCluster_000031_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT8U Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -722,7 +739,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000031_WriteAttribute
+- (void)testSendClusterTestCluster_000032_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT8U Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -741,7 +758,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000032_ReadAttribute
+- (void)testSendClusterTestCluster_000033_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT8U Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -759,7 +776,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000033_ReadAttribute
+- (void)testSendClusterTestCluster_000034_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT16U Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -777,7 +794,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000034_WriteAttribute
+- (void)testSendClusterTestCluster_000035_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT16U Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -796,7 +813,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000035_ReadAttribute
+- (void)testSendClusterTestCluster_000036_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT16U Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -814,7 +831,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000036_WriteAttribute
+- (void)testSendClusterTestCluster_000037_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT16U Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -833,7 +850,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000037_ReadAttribute
+- (void)testSendClusterTestCluster_000038_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT16U Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -851,7 +868,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000038_ReadAttribute
+- (void)testSendClusterTestCluster_000039_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT32U Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -869,7 +886,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000039_WriteAttribute
+- (void)testSendClusterTestCluster_000040_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT32U Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -888,7 +905,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000040_ReadAttribute
+- (void)testSendClusterTestCluster_000041_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT32U Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -906,7 +923,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000041_WriteAttribute
+- (void)testSendClusterTestCluster_000042_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT32U Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -925,7 +942,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000042_ReadAttribute
+- (void)testSendClusterTestCluster_000043_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT32U Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -943,7 +960,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000043_ReadAttribute
+- (void)testSendClusterTestCluster_000044_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT64U Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -961,7 +978,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000044_WriteAttribute
+- (void)testSendClusterTestCluster_000045_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT64U Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -980,7 +997,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000045_ReadAttribute
+- (void)testSendClusterTestCluster_000046_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT64U Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -998,7 +1015,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000046_WriteAttribute
+- (void)testSendClusterTestCluster_000047_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT64U Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1017,7 +1034,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000047_ReadAttribute
+- (void)testSendClusterTestCluster_000048_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT64U Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1035,7 +1052,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000048_ReadAttribute
+- (void)testSendClusterTestCluster_000049_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT8S Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1053,7 +1070,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000049_WriteAttribute
+- (void)testSendClusterTestCluster_000050_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT8S Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1072,7 +1089,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000050_ReadAttribute
+- (void)testSendClusterTestCluster_000051_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT8S Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1090,7 +1107,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000051_WriteAttribute
+- (void)testSendClusterTestCluster_000052_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT8S Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1109,7 +1126,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000052_ReadAttribute
+- (void)testSendClusterTestCluster_000053_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT8S Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1127,7 +1144,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000053_WriteAttribute
+- (void)testSendClusterTestCluster_000054_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT8S Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1146,7 +1163,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000054_ReadAttribute
+- (void)testSendClusterTestCluster_000055_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT8S Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1164,7 +1181,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000055_ReadAttribute
+- (void)testSendClusterTestCluster_000056_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT16S Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1182,7 +1199,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000056_WriteAttribute
+- (void)testSendClusterTestCluster_000057_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT16S Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1201,7 +1218,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000057_ReadAttribute
+- (void)testSendClusterTestCluster_000058_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT16S Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1219,7 +1236,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000058_WriteAttribute
+- (void)testSendClusterTestCluster_000059_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT16S Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1238,7 +1255,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000059_ReadAttribute
+- (void)testSendClusterTestCluster_000060_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT16S Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1256,7 +1273,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000060_WriteAttribute
+- (void)testSendClusterTestCluster_000061_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT16S Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1275,7 +1292,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000061_ReadAttribute
+- (void)testSendClusterTestCluster_000062_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT16S Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1293,7 +1310,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000062_ReadAttribute
+- (void)testSendClusterTestCluster_000063_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT32S Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1311,7 +1328,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000063_WriteAttribute
+- (void)testSendClusterTestCluster_000064_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT32S Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1330,7 +1347,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000064_ReadAttribute
+- (void)testSendClusterTestCluster_000065_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT32S Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1348,7 +1365,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000065_WriteAttribute
+- (void)testSendClusterTestCluster_000066_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT32S Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1367,7 +1384,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000066_ReadAttribute
+- (void)testSendClusterTestCluster_000067_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT32S Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1385,7 +1402,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000067_WriteAttribute
+- (void)testSendClusterTestCluster_000068_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT32S Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1404,7 +1421,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000068_ReadAttribute
+- (void)testSendClusterTestCluster_000069_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT32S Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1422,7 +1439,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000069_ReadAttribute
+- (void)testSendClusterTestCluster_000070_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT64S Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1440,7 +1457,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000070_WriteAttribute
+- (void)testSendClusterTestCluster_000071_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT64S Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1459,7 +1476,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000071_ReadAttribute
+- (void)testSendClusterTestCluster_000072_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT64S Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1477,7 +1494,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000072_WriteAttribute
+- (void)testSendClusterTestCluster_000073_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT64S Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1496,7 +1513,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000073_ReadAttribute
+- (void)testSendClusterTestCluster_000074_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT64S Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1514,7 +1531,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000074_WriteAttribute
+- (void)testSendClusterTestCluster_000075_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute INT64S Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1533,7 +1550,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000075_ReadAttribute
+- (void)testSendClusterTestCluster_000076_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute INT64S Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1551,7 +1568,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000076_ReadAttribute
+- (void)testSendClusterTestCluster_000077_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM8 Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1569,7 +1586,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000077_WriteAttribute
+- (void)testSendClusterTestCluster_000078_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute ENUM8 Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1588,7 +1605,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000078_ReadAttribute
+- (void)testSendClusterTestCluster_000079_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM8 Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1606,7 +1623,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000079_WriteAttribute
+- (void)testSendClusterTestCluster_000080_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute ENUM8 Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1625,7 +1642,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000080_ReadAttribute
+- (void)testSendClusterTestCluster_000081_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM8 Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1643,7 +1660,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000081_ReadAttribute
+- (void)testSendClusterTestCluster_000082_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM16 Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1661,7 +1678,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000082_WriteAttribute
+- (void)testSendClusterTestCluster_000083_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute ENUM16 Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1680,7 +1697,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000083_ReadAttribute
+- (void)testSendClusterTestCluster_000084_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM16 Max Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1698,7 +1715,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000084_WriteAttribute
+- (void)testSendClusterTestCluster_000085_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute ENUM16 Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1717,7 +1734,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000085_ReadAttribute
+- (void)testSendClusterTestCluster_000086_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM16 Min Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1735,7 +1752,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000086_ReadAttribute
+- (void)testSendClusterTestCluster_000087_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute OCTET_STRING Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1755,7 +1772,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000087_WriteAttribute
+- (void)testSendClusterTestCluster_000088_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute OCTET_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1775,7 +1792,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000088_ReadAttribute
+- (void)testSendClusterTestCluster_000089_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute OCTET_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1795,7 +1812,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000089_WriteAttribute
+- (void)testSendClusterTestCluster_000090_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute OCTET_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1815,7 +1832,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000090_ReadAttribute
+- (void)testSendClusterTestCluster_000091_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute OCTET_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1835,7 +1852,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000091_WriteAttribute
+- (void)testSendClusterTestCluster_000092_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute OCTET_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1855,7 +1872,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000092_ReadAttribute
+- (void)testSendClusterTestCluster_000093_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LONG_OCTET_STRING Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1875,7 +1892,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000093_WriteAttribute
+- (void)testSendClusterTestCluster_000094_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute LONG_OCTET_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1898,7 +1915,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000094_ReadAttribute
+- (void)testSendClusterTestCluster_000095_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LONG_OCTET_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1921,7 +1938,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000095_WriteAttribute
+- (void)testSendClusterTestCluster_000096_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute LONG_OCTET_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1941,7 +1958,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000096_ReadAttribute
+- (void)testSendClusterTestCluster_000097_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute CHAR_STRING Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1960,7 +1977,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000097_WriteAttribute
+- (void)testSendClusterTestCluster_000098_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute CHAR_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1979,7 +1996,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000098_WriteAttribute
+- (void)testSendClusterTestCluster_000099_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute CHAR_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -1998,7 +2015,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000099_WriteAttribute
+- (void)testSendClusterTestCluster_000100_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute CHAR_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -2017,7 +2034,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000100_ReadAttribute
+- (void)testSendClusterTestCluster_000101_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LONG_CHAR_STRING Default Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -2036,7 +2053,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000101_WriteAttribute
+- (void)testSendClusterTestCluster_000102_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute LONG_CHAR_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -2058,7 +2075,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000102_ReadAttribute
+- (void)testSendClusterTestCluster_000103_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LONG_CHAR_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -2080,7 +2097,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000103_WriteAttribute
+- (void)testSendClusterTestCluster_000104_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute LONG_CHAR_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -2099,7 +2116,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000104_ReadAttribute
+- (void)testSendClusterTestCluster_000105_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LIST"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -2117,7 +2134,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000105_ReadAttribute
+- (void)testSendClusterTestCluster_000106_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LIST_OCTET_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -2135,7 +2152,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000106_ReadAttribute
+- (void)testSendClusterTestCluster_000107_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LIST_STRUCT_OCTET_STRING"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -2153,7 +2170,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000107_ReadAttribute
+- (void)testSendClusterTestCluster_000108_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute UNSUPPORTED"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -2176,7 +2193,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000108_WriteAttribute
+- (void)testSendClusterTestCluster_000109_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Writeattribute UNSUPPORTED"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -2200,7 +2217,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000109_Test
+- (void)testSendClusterTestCluster_000110_Test
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command to unsupported endpoint"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);

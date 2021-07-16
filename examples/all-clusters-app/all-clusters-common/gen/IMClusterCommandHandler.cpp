@@ -7001,6 +7001,12 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
             wasHandled = emberAfTestClusterClusterTestCallback(apCommandObj);
             break;
         }
+        case Clusters::TestCluster::Commands::Ids::TestAsyncTransaction: {
+
+            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+            wasHandled = emberAfTestClusterClusterTestAsyncTransactionCallback(apCommandObj);
+            break;
+        }
         case Clusters::TestCluster::Commands::Ids::TestNotHandled: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.

@@ -4398,6 +4398,10 @@ public class ChipClusters {
       test(chipClusterPtr, callback);
     }
 
+    public void testAsyncTransaction(DefaultClusterCallback callback) {
+      testAsyncTransaction(chipClusterPtr, callback);
+    }
+
     public void testNotHandled(DefaultClusterCallback callback) {
       testNotHandled(chipClusterPtr, callback);
     }
@@ -4411,6 +4415,8 @@ public class ChipClusters {
     }
 
     private native void test(long chipClusterPtr, DefaultClusterCallback callback);
+
+    private native void testAsyncTransaction(long chipClusterPtr, DefaultClusterCallback callback);
 
     private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback callback);
 

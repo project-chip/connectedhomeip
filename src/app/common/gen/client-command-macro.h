@@ -4661,6 +4661,15 @@
                                                                                                                                    \
                                                                  ZCL_TEST_UNKNOWN_COMMAND_COMMAND_ID, "", );
 
+/** @brief Command description for TestAsyncTransaction
+ *
+ * Command: TestAsyncTransaction
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestAsyncTransaction() emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_TEST_ASYNC_TRANSACTION_COMMAND_ID, "", );
+
 /** @brief Command description for GetLastMessage
  *
  * Command: GetLastMessage
