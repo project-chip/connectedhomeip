@@ -1337,7 +1337,7 @@
  *
  */
 #ifndef CHIP_PORT
-#define CHIP_PORT 11097
+#define CHIP_PORT 5540
 #endif // CHIP_PORT
 
 /**
