@@ -48,16 +48,16 @@ NodeId GetCurrentNodeId()
     // mdns advertises a single node id as parameter.
 
     // Search for one admin pairing and use its node id.
-    auto pairing = GetGlobalAdminPairingTable().cbegin();
-    if (pairing != GetGlobalAdminPairingTable().cend())
+    for (const Transport::AdminPairingInfo& pairing : GetGlobalAdminPairingTable())
     {
-        ChipLogProgress(Discovery, "Found admin pairing for admin %" PRIX16 ", node 0x" ChipLogFormatX64, pairing->GetAdminId(),
-                        ChipLogValueX64(pairing->GetNodeId()));
-        return pairing->GetNodeId();
+        if (pairing.GetNodeId() != kUndefinedNodeId)
+        {
+            return pairing.GetNodeId();
+        }
     }
 
-    ChipLogError(Discovery, "Failed to find a valid admin pairing. Node ID unknown");
-    return chip::kTestDeviceNodeId;
+    ChipLogProgress(Discovery, "Failed to find a valid admin pairing. Node ID unknown");
+    return kUndefinedNodeId;
 }
 
 // Requires an 8-byte mac to accommodate thread.
@@ -252,20 +252,17 @@ void StartServer()
 
     // TODO: advertise this only when really operational once we support both
     // operational and commisioning advertising is supported.
-    if (DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
+    if (DeviceLayer::ConfigurationMgr().IsFullyProvisioned() && GetCurrentNodeId() != kUndefinedNodeId)
     {
-        err = app::Mdns::AdvertiseOperational();
+        SuccessOrExit(err = app::Mdns::AdvertiseOperational());
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-        err = app::Mdns::AdvertiseCommissionableNode();
+        SuccessOrExit(err = app::Mdns::AdvertiseCommissionableNode());
 #endif
     }
-    else
+    else if (DeviceLayer::ConnectivityMgr().IsNetworkProvisioned())
     {
-// TODO: Thread devices are not able to advertise using mDNS before being provisioned,
-// so configuraton should be added to enable commissioning advertising based on supported
-// Rendezvous methods.
-#if (!CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS)
-        err = app::Mdns::AdvertiseCommissionableNode();
+#if CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
+        SuccessOrExit(err = app::Mdns::AdvertiseCommissionableNode());
 #endif
     }
 
@@ -273,6 +270,7 @@ void StartServer()
     err = app::Mdns::AdvertiseCommisioner();
 #endif
 
+exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to start mDNS server: %s", chip::ErrorStr(err));

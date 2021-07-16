@@ -910,13 +910,7 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
     return true;
 #else // CHIP_BYPASS_RENDEZVOUS
 
-    return
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-        ConnectivityMgr().IsWiFiStationProvisioned() &&
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        ConnectivityMgr().IsThreadProvisioned() &&
-#endif
+    return ConnectivityMgr().IsNetworkProvisioned() &&
 #if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
         (!UseManufacturerCredentialsAsOperational() && _OperationalDeviceCredentialsProvisioned()) &&
 #endif

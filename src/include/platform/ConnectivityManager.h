@@ -161,6 +161,7 @@ public:
     bool HaveServiceConnectivityViaThread();
 
     // Internet connectivity methods
+    bool IsNetworkProvisioned();
     bool HaveIPv4InternetConnectivity();
     bool HaveIPv6InternetConnectivity();
 
@@ -436,6 +437,11 @@ inline void ConnectivityManager::ErasePersistentInfo()
 inline bool ConnectivityManager::HaveServiceConnectivityViaThread()
 {
     return static_cast<ImplClass *>(this)->_HaveServiceConnectivityViaThread();
+}
+
+inline bool ConnectivityManager::IsNetworkProvisioned()
+{
+    return static_cast<ImplClass *>(this)->_IsNetworkProvisioned();
 }
 
 inline Ble::BleLayer * ConnectivityManager::GetBleLayer()

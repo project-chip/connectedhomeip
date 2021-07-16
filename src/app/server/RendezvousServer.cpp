@@ -47,8 +47,9 @@ static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Salt";
 
 void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
-    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    switch (event->Type)
     {
+    case DeviceLayer::DeviceEventType::kCommissioningComplete:
         if (event->CommissioningComplete.status == CHIP_NO_ERROR)
         {
             ChipLogProgress(Discovery, "Commissioning completed successfully");
@@ -59,11 +60,13 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
                          ChipError::FormatError(event->CommissioningComplete.status));
         }
         // TODO: Commissioning complete means we can finalize the admin in our storage
-    }
-    else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
-    {
-        app::Mdns::AdvertiseOperational();
-        ChipLogError(Discovery, "Operational advertising enabled");
+        break;
+    case DeviceLayer::DeviceEventType::kOperationalNetworkEnabled:
+    case DeviceLayer::DeviceEventType::kServiceProvisioningChange:
+        app::Mdns::StartServer();
+        break;
+    default:
+        break;
     }
 }
 

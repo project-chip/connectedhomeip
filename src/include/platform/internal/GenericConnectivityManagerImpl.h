@@ -46,6 +46,7 @@ public:
     void _SetUserSelectedMode(bool val);
     uint16_t _GetUserSelectedModeTimeout();
     void _SetUserSelectedModeTimeout(uint16_t val);
+    bool _IsNetworkProvisioned();
 
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
@@ -70,6 +71,22 @@ inline uint16_t GenericConnectivityManagerImpl<ImplClass>::_GetUserSelectedModeT
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl<ImplClass>::_SetUserSelectedModeTimeout(uint16_t val)
 {}
+
+template <class ImplClass>
+inline bool GenericConnectivityManagerImpl<ImplClass>::_IsNetworkProvisioned()
+{
+    bool result = true;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+    result = result && ConnectivityMgr().IsWiFiStationProvisioned();
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    result = result && ConnectivityMgr().IsThreadProvisioned();
+#endif
+
+    return result;
+}
 
 } // namespace Internal
 } // namespace DeviceLayer
