@@ -28,6 +28,7 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/PeerId.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -1328,6 +1329,91 @@ static void TestChipCert_ChipArrayToChipCertsNoICA(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, certSet.FindValidCert(subjectDN, subjectKeyId, validContext, resultCert) == CHIP_NO_ERROR);
 }
 
+static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)
+{
+    struct TestCase
+    {
+        uint8_t Cert;
+        uint8_t ICACert;
+        uint64_t ExpectedNodeId;
+        uint64_t ExpectedFabricId;
+    };
+
+    // clang-format off
+    static constexpr TestCase sTestCases[] = {
+        // Cert                  ICA               ExpectedNodeId      ExpectedFabricId
+        // =============================================================
+        {  TestCert::kNode01_01, TestCert::kICA01, 0xDEDEDEDE00010001, 0xFAB000000000001D },
+        {  TestCert::kNode01_02, TestCert::kNone,  0xDEDEDEDE00010002, 0xFAB000000000001D },
+        {  TestCert::kNode02_01, TestCert::kICA02, 0xDEDEDEDE00020001, 0xFAB000000000001D },
+        {  TestCert::kNode02_02, TestCert::kICA02, 0xDEDEDEDE00020002, 0xFAB000000000001D },
+        {  TestCert::kNode02_03, TestCert::kICA02, 0xDEDEDEDE00020003, 0xFAB000000000001D },
+        {  TestCert::kNode02_04, TestCert::kICA02, 0xDEDEDEDE00020004, 0xFAB000000000001D },
+        {  TestCert::kNode02_05, TestCert::kICA02, 0xDEDEDEDE00020005, 0xFAB000000000001D },
+        {  TestCert::kNode02_06, TestCert::kICA02, 0xDEDEDEDE00020006, 0xFAB000000000001D },
+        {  TestCert::kNode02_07, TestCert::kICA02, 0xDEDEDEDE00020007, 0xFAB000000000001D },
+    };
+    // clang-format on
+
+    // Test extraction from the raw ByteSpan form.
+    for (auto & testCase : sTestCases)
+    {
+        ByteSpan cert;
+        CHIP_ERROR err = GetTestCert(testCase.Cert, sNullLoadFlag, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        PeerId peerId;
+        err = ExtractPeerIdFromOpCert(cert, &peerId);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, peerId.GetNodeId() == testCase.ExpectedNodeId);
+        NL_TEST_ASSERT(inSuite, peerId.GetFabricId() == testCase.ExpectedFabricId);
+    }
+
+    // Test extraction from the parsed form.
+    ChipCertificateSet certSet;
+    for (auto & testCase : sTestCases)
+    {
+        CHIP_ERROR err = certSet.Init(1, kMaxCHIPCertDecodeBufLength);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = LoadTestCert(certSet, testCase.Cert, sNullLoadFlag, sNullDecodeFlag);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        PeerId peerId;
+        err = ExtractPeerIdFromOpCert(certSet.GetCertSet()[0], &peerId);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, peerId.GetNodeId() == testCase.ExpectedNodeId);
+        NL_TEST_ASSERT(inSuite, peerId.GetFabricId() == testCase.ExpectedFabricId);
+        certSet.Release();
+    }
+
+    // Test extraction from cert array form.
+    for (auto & testCase : sTestCases)
+    {
+        ByteSpan cert;
+        CHIP_ERROR err = GetTestCert(testCase.Cert, sDerFormFlag, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        ByteSpan icaCert;
+        if (testCase.ICACert != TestCert::kNone)
+        {
+            err = GetTestCert(testCase.ICACert, sDerFormFlag, icaCert);
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        }
+
+        uint8_t certArray[kMaxCHIPCertLength * 2];
+        MutableByteSpan certs(certArray);
+        err = ConvertX509CertsToChipCertArray(cert, icaCert, certs);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        PeerId peerId;
+        err = ExtractPeerIdFromOpCertArray(certs, &peerId);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, peerId.GetNodeId() == testCase.ExpectedNodeId);
+        NL_TEST_ASSERT(inSuite, peerId.GetFabricId() == testCase.ExpectedFabricId);
+    }
+}
+
 /**
  *  Set up the test suite.
  */
@@ -1376,6 +1462,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test CHIP Certificates X509 to CHIP Array Conversion Error Scenarios", TestChipCert_X509ToChipArrayErrorScenarios),
     NL_TEST_DEF("Test CHIP Array to Chip Certificates Conversion", TestChipCert_ChipArrayToChipCerts),
     NL_TEST_DEF("Test No ICA CHIP Array to Chip Certificates Conversion", TestChipCert_ChipArrayToChipCertsNoICA),
+    NL_TEST_DEF("Test extracting PeerId from node certificate", TestChipCert_ExtractPeerId),
     NL_TEST_SENTINEL()
 };
 // clang-format on

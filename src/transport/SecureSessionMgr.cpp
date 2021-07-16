@@ -362,7 +362,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
                 ChipLogError(Inet,
                              "Message counter synchronization for received message, failed to "
                              "QueueReceivedMessageAndStartSync, err = %" CHIP_ERROR_FORMAT,
-                             err);
+                             ChipError::FormatError(err));
             }
             else
             {
@@ -381,7 +381,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err);
+            ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
         }
         SuccessOrExit(err);
     }

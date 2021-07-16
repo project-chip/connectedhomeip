@@ -1035,7 +1035,12 @@ public:
 
     // Cluster Commands
     CHIP_ERROR Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR OffWithEffect(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t effectId,
+                             uint8_t effectVariant);
     CHIP_ERROR On(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR OnWithRecallGlobalScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR OnWithTimedOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              uint8_t onOffControl, uint16_t onTime, uint16_t offWaitTime);
     CHIP_ERROR Toggle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
     // Cluster Attributes
@@ -1058,9 +1063,12 @@ public:
     CHIP_ERROR ReportAttributeOnOff(Callback::Cancelable * onReportCallback);
 
 private:
-    static constexpr CommandId kOffCommandId    = 0x00;
-    static constexpr CommandId kOnCommandId     = 0x01;
-    static constexpr CommandId kToggleCommandId = 0x02;
+    static constexpr CommandId kOffCommandId                     = 0x00;
+    static constexpr CommandId kOffWithEffectCommandId           = 0x40;
+    static constexpr CommandId kOnCommandId                      = 0x01;
+    static constexpr CommandId kOnWithRecallGlobalSceneCommandId = 0x41;
+    static constexpr CommandId kOnWithTimedOffCommandId          = 0x42;
+    static constexpr CommandId kToggleCommandId                  = 0x02;
 };
 
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase

@@ -63,21 +63,21 @@ static bool testRegisterDeregisterErrorFormatter()
 
     // simple case
     RegisterErrorFormatter(&falseFormatter);
-    ErrorStr(1);
+    ErrorStr(CHIP_ERROR_INTERNAL);
     ret &= CHECK(falseFormatCalled == 1);
     // reset
     falseFormatCalled = 0;
 
     // re-registration should be ignored
     RegisterErrorFormatter(&falseFormatter);
-    ErrorStr(1);
+    ErrorStr(CHIP_ERROR_INTERNAL);
     ret &= CHECK(falseFormatCalled == 1);
     // reset
     falseFormatCalled = 0;
 
     // registration of a new handler, nobody handling anything
     RegisterErrorFormatter(&falseFormatter2);
-    ErrorStr(1);
+    ErrorStr(CHIP_ERROR_INTERNAL);
     ret &= CHECK(falseFormatCalled == 1);
     ret &= CHECK(falseFormat2Called == 1);
     // reset
@@ -86,7 +86,7 @@ static bool testRegisterDeregisterErrorFormatter()
 
     // registration of a true handler, gets first crack
     RegisterErrorFormatter(&trueFormatter);
-    ErrorStr(1);
+    ErrorStr(CHIP_ERROR_INTERNAL);
     ret &= CHECK(trueFormatCalled == 1);
     ret &= CHECK(falseFormatCalled == 0);
     ret &= CHECK(falseFormat2Called == 0);
@@ -95,7 +95,7 @@ static bool testRegisterDeregisterErrorFormatter()
 
     // deregister true
     DeregisterErrorFormatter(&trueFormatter);
-    ErrorStr(1);
+    ErrorStr(CHIP_ERROR_INTERNAL);
     ret &= CHECK(trueFormatCalled == 0);
     ret &= CHECK(falseFormatCalled == 1);
     ret &= CHECK(falseFormat2Called == 1);
@@ -128,30 +128,30 @@ static bool testFormatErr()
 
     strcpy(buf, "hi");
     // shouldn't touch the buffer
-    FormatError(buf, 0, subsys, 0, desc);
+    FormatError(buf, 0, subsys, CHIP_ERROR_INTERNAL, desc);
     ret &= CHECK_EQ_STR(buf, "hi");
 
     // guarantees null termination, doesn't touch past 1st byte
     strcpy(buf, "hi");
-    FormatError(buf, 1, subsys, 0, desc);
+    FormatError(buf, 1, subsys, CHIP_ERROR_INTERNAL, desc);
     ret &= CHECK_EQ_STR(buf, "");
     ret &= CHECK(buf[1] == 'i');
 
     // whole shebang
-    FormatError(buf, kBufSize, subsys, 1, desc);
-    ret &= CHECK_EQ_STR(buf, "subsys Error 1 (0x00000001): desc");
+    FormatError(buf, kBufSize, subsys, CHIP_CORE_ERROR(1), desc);
+    ret &= CHECK_EQ_STR(buf, "subsys Error 0x00000001: desc");
 
     // skip desc
-    FormatError(buf, kBufSize, subsys, 1, nullptr);
-    ret &= CHECK_EQ_STR(buf, "subsys Error 1 (0x00000001)");
+    FormatError(buf, kBufSize, subsys, CHIP_CORE_ERROR(1), nullptr);
+    ret &= CHECK_EQ_STR(buf, "subsys Error 0x00000001");
 
     // skip subsys
-    FormatError(buf, kBufSize, nullptr, 1, desc);
-    ret &= CHECK_EQ_STR(buf, "Error 1 (0x00000001): desc");
+    FormatError(buf, kBufSize, nullptr, CHIP_CORE_ERROR(1), desc);
+    ret &= CHECK_EQ_STR(buf, "Error 0x00000001: desc");
 
     // skip both
-    FormatError(buf, kBufSize, nullptr, 1, nullptr);
-    ret &= CHECK_EQ_STR(buf, "Error 1 (0x00000001)");
+    FormatError(buf, kBufSize, nullptr, CHIP_CORE_ERROR(1), nullptr);
+    ret &= CHECK_EQ_STR(buf, "Error 0x00000001");
 #endif
 
     return ret;

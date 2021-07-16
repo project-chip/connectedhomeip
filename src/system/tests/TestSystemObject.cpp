@@ -121,7 +121,6 @@ namespace {
 struct TestContext
 {
     nlTestSuite * mTestSuite;
-    void * mLayerContext;
     volatile unsigned int mAccumulator;
 };
 
@@ -136,7 +135,7 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
     Layer lLayer;
     unsigned int i, j;
 
-    lLayer.Init(lContext.mLayerContext);
+    lLayer.Init();
     memset(&sPool, 0, sizeof(sPool));
 
     for (i = 0; i < kPoolSize; ++i)
@@ -222,7 +221,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
     Layer lLayer;
     unsigned int i;
 
-    lLayer.Init(lContext.mLayerContext);
+    lLayer.Init();
 
     // Take this thread's share of objects
 
@@ -378,7 +377,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     chip::System::Stats::count_t lNumInUse;
     chip::System::Stats::count_t lHighWatermark;
 
-    lLayer.Init(lContext.mLayerContext);
+    lLayer.Init();
 
     // Take all objects one at a time and check the watermark
     // increases monotonically
@@ -486,7 +485,6 @@ static nlTestSuite sTestSuite =
 static int Initialize(void * aContext)
 {
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
-    void * lLayerContext   = nullptr;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
     static sys_mbox_t * sLwIPEventQueue = NULL;
@@ -495,13 +493,10 @@ static int Initialize(void * aContext)
     {
         sys_mbox_new(sLwIPEventQueue, 100);
     }
-
-    lLayerContext = &sLwIPEventQueue;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    lContext.mTestSuite    = &sTestSuite;
-    lContext.mLayerContext = lLayerContext;
-    lContext.mAccumulator  = 0;
+    lContext.mTestSuite   = &sTestSuite;
+    lContext.mAccumulator = 0;
 
     return SUCCESS;
 }

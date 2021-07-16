@@ -23,6 +23,10 @@ __LOG_LEVELS__ = {
 
 def ValidateRepoPath(context, parameter, value):
   """Validates that the given path looks like a valid chip repository checkout."""
+  if value.startswith('/TEST/'):
+    # Hackish command to allow for unit testing
+    return value
+
   for name in ['BUILD.gn', '.gn', os.path.join('scripts', 'bootstrap.sh')]:
     expected_file = os.path.join(value, name)
     if not os.path.exists(expected_file):

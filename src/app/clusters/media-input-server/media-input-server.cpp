@@ -21,7 +21,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
@@ -44,7 +44,7 @@ static void storeCurrentInput(chip::EndpointId endpoint, uint8_t currentInput)
     }
 }
 
-bool emberAfMediaInputClusterSelectInputCallback(chip::app::Command * command, uint8_t input)
+bool emberAfMediaInputClusterSelectInputCallback(chip::app::CommandHandler * command, uint8_t input)
 {
     bool success         = mediaInputClusterSelectInput(input);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -56,7 +56,7 @@ bool emberAfMediaInputClusterSelectInputCallback(chip::app::Command * command, u
     return true;
 }
 
-bool emberAfMediaInputClusterShowInputStatusCallback(chip::app::Command * command)
+bool emberAfMediaInputClusterShowInputStatusCallback(chip::app::CommandHandler * command)
 {
     bool success         = mediaInputClusterShowInputStatus();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -64,7 +64,7 @@ bool emberAfMediaInputClusterShowInputStatusCallback(chip::app::Command * comman
     return true;
 }
 
-bool emberAfMediaInputClusterHideInputStatusCallback(chip::app::Command * command)
+bool emberAfMediaInputClusterHideInputStatusCallback(chip::app::CommandHandler * command)
 {
     bool success         = mediaInputClusterHideInputStatus();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -72,7 +72,7 @@ bool emberAfMediaInputClusterHideInputStatusCallback(chip::app::Command * comman
     return true;
 }
 
-bool emberAfMediaInputClusterRenameInputCallback(chip::app::Command * command, uint8_t input, uint8_t * name)
+bool emberAfMediaInputClusterRenameInputCallback(chip::app::CommandHandler * command, uint8_t input, uint8_t * name)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string nameString(reinterpret_cast<char *>(name));

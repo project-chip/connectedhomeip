@@ -1927,6 +1927,28 @@
 #endif // CHIP_CONFIG_TEST
 
 /**
+ *  @def CHIP_CONFIG_ERROR_CLASS
+ *
+ *  If 0, #CHIP_ERROR is an integer type, ::chip::ChipError::StorageType.
+ *  If 1, #CHIP_ERROR is a class type, ::chip::ChipError.
+ */
+#ifndef CHIP_CONFIG_ERROR_CLASS
+#define CHIP_CONFIG_ERROR_CLASS 0
+#endif // CHIP_CONFIG_ERROR_CLASS
+
+/**
+ *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+ *
+ *  If 0, then ChipError::FormatError() returns an integer (ChipError::BaseType).
+ *  If 1, then ChipError::FormatError() returns a const char *, from chip::ErrorStr().
+ *  In either case, the macro CHIP_ERROR_FORMAT expands to a suitable printf format.
+ */
+
+#ifndef CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+#define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 0
+#endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
+
+/**
  *  @def CHIP_CONFIG_SHORT_ERROR_STR
  *
  *  @brief

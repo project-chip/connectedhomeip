@@ -26,19 +26,42 @@ using namespace ::chip;
 
 CHIP_ERROR ReportingCommand::Run()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Controller::BasicCluster cluster;
-
     auto * ctx = GetExecContext();
-    err        = ctx->commissioner->GetDevice(ctx->remoteId, &mDevice);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, ctx->localId));
 
-    AddReportCallbacks(mEndPointId);
-    cluster.Associate(mDevice, mEndPointId);
-
-    err = cluster.MfgSpecificPing(nullptr, nullptr);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err)));
+    CHIP_ERROR err =
+        ctx->commissioner->GetConnectedDevice(ctx->remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %s", ctx->remoteId,
+                              ErrorStr(err)));
 
 exit:
     return err;
+}
+
+void ReportingCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+{
+    ReportingCommand * command = reinterpret_cast<ReportingCommand *>(context);
+    VerifyOrReturn(command != nullptr,
+                   ChipLogError(chipTool, "Device connected, but cannot send the command, as the context is null"));
+
+    chip::Controller::BasicCluster cluster;
+    cluster.Associate(device, command->mEndPointId);
+
+    command->AddReportCallbacks(command->mEndPointId);
+
+    CHIP_ERROR err = cluster.MfgSpecificPing(nullptr, nullptr);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Init failure! Ping failure: %s", ErrorStr(err));
+        command->SetCommandExitStatus(err);
+    }
+}
+
+void ReportingCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR err)
+{
+    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %s", deviceId, ErrorStr(err));
+
+    ReportingCommand * command = reinterpret_cast<ReportingCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "ReportingCommand context is null"));
+    command->SetCommandExitStatus(err);
 }

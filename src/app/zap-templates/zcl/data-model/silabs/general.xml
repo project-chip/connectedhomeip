@@ -495,33 +495,6 @@ limitations under the License.
     </command>
   </cluster>
   <cluster>
-    <name>On/off</name>
-    <domain>General</domain>
-    <description>Attributes and commands for switching devices between 'On' and 'Off' states.</description>
-    <code>0x0006</code>
-    <define>ON_OFF_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="ON_OFF" type="BOOLEAN" min="0x00" max="0x01" writable="false" reportable="true" default="0x00" optional="false">on/off</attribute>
-    <attribute side="server" code="0x4003" define="START_UP_ON_OFF" type="ENUM8" min="0x00" max="0xFF" writable="true" optional="true" introducedIn="l&amp;o-1.0-15-0014-04">start up on off</attribute>
-    <command source="client" code="0x00" name="Off" optional="false" cli="zcl on-off off">
-      <description>
-        Command description for Off
-      </description>
-    </command>
-    <command source="client" code="0x01" name="On" optional="false" cli="zcl on-off on">
-      <description>
-        Command description for On
-      </description>
-    </command>
-    <command source="client" code="0x02" name="Toggle" optional="false" cli="zcl on-off toggle">
-      <description>
-        Command description for Toggle
-      </description>
-    </command>
-  </cluster>
-  <cluster>
     <name>On/off Switch Configuration</name>
     <domain>General</domain>
     <description>Attributes and commands for configuring On/Off switching devices.</description>

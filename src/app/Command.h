@@ -78,9 +78,8 @@ public:
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
 
     /**
-     *  Shutdown the CommandSender. This terminates this instance
+     *  Shutdown the Command. This terminates this instance
      *  of the object and releases all held resources.
-     *
      */
     void Shutdown();
 
@@ -125,6 +124,12 @@ protected:
     CHIP_ERROR ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandDataElement::Builder aCommandDataElement);
     void ClearState();
     const char * GetStateStr() const;
+
+    /**
+     * Internal shutdown method that we use when we know what's going on with
+     * our exchange and don't need to manually close it.
+     */
+    void ShutdownInternal();
 
     InvokeCommand::Builder mInvokeCommandBuilder;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;

@@ -56,34 +56,17 @@ namespace System {
 
 class Layer;
 class Timer;
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
 class Object;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace Platform {
-namespace Layer {
+namespace Eventing {
 
-using ::chip::System::Layer;
+extern CHIP_ERROR PostEvent(System::Layer & aLayer, Object & aTarget, EventType aType, uintptr_t aArgument);
+extern CHIP_ERROR DispatchEvents(System::Layer & aLayer);
+extern CHIP_ERROR DispatchEvent(System::Layer & aLayer, Event aEvent);
+extern CHIP_ERROR StartTimer(System::Layer & aLayer, uint32_t aMilliseconds);
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-using ::chip::System::Object;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-extern CHIP_ERROR WillInit(Layer & aLayer, void * aContext);
-extern CHIP_ERROR WillShutdown(Layer & aLayer, void * aContext);
-
-extern void DidInit(Layer & aLayer, void * aContext, CHIP_ERROR aStatus);
-extern void DidShutdown(Layer & aLayer, void * aContext, CHIP_ERROR aStatus);
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-extern CHIP_ERROR PostEvent(Layer & aLayer, void * aContext, Object & aTarget, EventType aType, uintptr_t aArgument);
-extern CHIP_ERROR DispatchEvents(Layer & aLayer, void * aContext);
-extern CHIP_ERROR DispatchEvent(Layer & aLayer, void * aContext, Event aEvent);
-extern CHIP_ERROR StartTimer(Layer & aLayer, void * aContext, uint32_t aMilliseconds);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-} // namespace Layer
+} // namespace Eventing
 } // namespace Platform
 
 /**
@@ -131,28 +114,27 @@ class DLL_EXPORT Layer
 public:
     Layer();
 
-    CHIP_ERROR Init(void * aContext);
+    CHIP_ERROR Init();
 
     // Some other layers hold pointers to System::Layer, so care must be taken
     // to ensure that they are not used after calling Shutdown().
     CHIP_ERROR Shutdown();
 
-    void * GetPlatformData() const;
-    void SetPlatformData(void * aPlatformData);
-
     LayerState State() const;
 
     CHIP_ERROR NewTimer(Timer *& aTimerPtr);
 
-    void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback); // XXX
+    void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback);
     void DispatchTimerCallbacks(Clock::MonotonicMilliseconds aCurrentTime);
 
     using TimerCompleteFunct = Timer::OnCompleteFunct;
     // typedef void (*TimerCompleteFunct)(Layer * aLayer, void * aAppState, CHIP_ERROR aError);
-    CHIP_ERROR StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState); // XXX
+    CHIP_ERROR StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState);
     void CancelTimer(TimerCompleteFunct aOnComplete, void * aAppState);
 
     CHIP_ERROR ScheduleWork(TimerCompleteFunct aComplete, void * aAppState);
+
+    Clock & GetClock() { return mClock; }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     WatchableEventManager & WatchableEvents() { return mWatchableEvents; }
@@ -182,22 +164,11 @@ public:
     dispatch_queue_t GetDispatchQueue() { return mDispatchQueue; };
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
-    Clock & GetClock() { return mClock; }
-
 private:
     LayerState mLayerState;
-    void * mContext;
     void * mPlatformData;
     chip::Callback::CallbackDeque mTimerCallbacks;
     Clock mClock;
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    static LwIPEventHandlerDelegate sSystemEventHandlerDelegate;
-
-    const LwIPEventHandlerDelegate * mEventDelegateList;
-    Timer * mTimerList;
-    bool mTimerComplete;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     WatchableEventManager mWatchableEvents;
@@ -208,15 +179,20 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+    static LwIPEventHandlerDelegate sSystemEventHandlerDelegate;
+
+    const LwIPEventHandlerDelegate * mEventDelegateList;
+    Timer * mTimerList;
+    bool mTimerComplete;
+
     static CHIP_ERROR HandleSystemLayerEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
 
     CHIP_ERROR StartPlatformTimer(uint32_t aDelayMilliseconds);
 
-    friend CHIP_ERROR Platform::Layer::PostEvent(Layer & aLayer, void * aContext, Object & aTarget, EventType aType,
-                                                 uintptr_t aArgument);
-    friend CHIP_ERROR Platform::Layer::DispatchEvents(Layer & aLayer, void * aContext);
-    friend CHIP_ERROR Platform::Layer::DispatchEvent(Layer & aLayer, void * aContext, Event aEvent);
-    friend CHIP_ERROR Platform::Layer::StartTimer(Layer & aLayer, void * aContext, uint32_t aMilliseconds);
+    friend CHIP_ERROR Platform::Eventing::PostEvent(Layer & aLayer, Object & aTarget, EventType aType, uintptr_t aArgument);
+    friend CHIP_ERROR Platform::Eventing::DispatchEvents(Layer & aLayer);
+    friend CHIP_ERROR Platform::Eventing::DispatchEvent(Layer & aLayer, Event aEvent);
+    friend CHIP_ERROR Platform::Eventing::StartTimer(Layer & aLayer, uint32_t aMilliseconds);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH

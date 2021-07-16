@@ -1,6 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +15,13 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <app/CommandHandler.h>
+#include <app/util/af.h>
 
-void SetDeviceName(const char * newDeviceName);
-void PublishService();
+bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(chip::app::CommandHandler * commandObj)
+{
+    // TODO: Implement the ResetCounts in the platform layer.
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}

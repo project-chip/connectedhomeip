@@ -151,7 +151,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     ChipLogProgress(Controller, "Java class references loaded.");
 
     // Initialize the CHIP System Layer.
-    err = sSystemLayer.Init(NULL);
+    err = sSystemLayer.Init();
     SuccessOrExit(err);
 
     // Initialize the CHIP Inet layer.
@@ -630,7 +630,7 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "OpenPairingWindow failed: %d", err);
+        ChipLogError(Controller, "OpenPairingWindow failed: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
         return false;
     }
 
@@ -1080,15 +1080,15 @@ void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName)
     else
     {
         const char * errStr;
-        switch (cbErr)
+        switch (ChipError::AsInteger(cbErr))
         {
-        case CHIP_JNI_ERROR_TYPE_NOT_FOUND:
+        case ChipError::AsInteger(CHIP_JNI_ERROR_TYPE_NOT_FOUND):
             errStr = "JNI type not found";
             break;
-        case CHIP_JNI_ERROR_METHOD_NOT_FOUND:
+        case ChipError::AsInteger(CHIP_JNI_ERROR_METHOD_NOT_FOUND):
             errStr = "JNI method not found";
             break;
-        case CHIP_JNI_ERROR_FIELD_NOT_FOUND:
+        case ChipError::AsInteger(CHIP_JNI_ERROR_FIELD_NOT_FOUND):
             errStr = "JNI field not found";
             break;
         default:
@@ -1122,18 +1122,18 @@ CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
     constructor = env->GetMethodID(sChipDeviceControllerExceptionCls, "<init>", "(ILjava/lang/String;)V");
     VerifyOrExit(constructor != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    switch (inErr)
+    switch (ChipError::AsInteger(inErr))
     {
-    case CHIP_JNI_ERROR_TYPE_NOT_FOUND:
+    case ChipError::AsInteger(CHIP_JNI_ERROR_TYPE_NOT_FOUND):
         errStr = "CHIP Device Controller Error: JNI type not found";
         break;
-    case CHIP_JNI_ERROR_METHOD_NOT_FOUND:
+    case ChipError::AsInteger(CHIP_JNI_ERROR_METHOD_NOT_FOUND):
         errStr = "CHIP Device Controller Error: JNI method not found";
         break;
-    case CHIP_JNI_ERROR_FIELD_NOT_FOUND:
+    case ChipError::AsInteger(CHIP_JNI_ERROR_FIELD_NOT_FOUND):
         errStr = "CHIP Device Controller Error: JNI field not found";
         break;
-    case CHIP_JNI_ERROR_DEVICE_NOT_FOUND:
+    case ChipError::AsInteger(CHIP_JNI_ERROR_DEVICE_NOT_FOUND):
         errStr = "CHIP Device Controller Error: Device not found";
         break;
     default:

@@ -48,7 +48,7 @@ using namespace chip;
 // Test input data.
 
 // clang-format off
-static int32_t sContext[] =
+static const CHIP_ERROR kTestElements[] =
 {
     INET_ERROR_WRONG_ADDRESS_TYPE,
     INET_ERROR_PEER_DISCONNECTED,
@@ -72,17 +72,16 @@ static int32_t sContext[] =
 static void CheckInetErrorStr(nlTestSuite * inSuite, void * inContext)
 {
     // Register the layer error formatter
-
     Inet::RegisterLayerErrorFormatter();
 
     // For each defined error...
-    for (int err : sContext)
+    for (const auto & err : kTestElements)
     {
         const char * errStr = ErrorStr(err);
         char expectedText[9];
 
         // Assert that the error string contains the error number in hex.
-        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, err);
+        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, ChipError::AsInteger(err));
         NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != nullptr));
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
@@ -119,7 +118,7 @@ int TestInetErrorStr(void)
     // clang-format on
 
     // Run test suit againt one context.
-    nlTestRunner(&theSuite, &sContext);
+    nlTestRunner(&theSuite, nullptr);
 
     return (nlTestRunnerStats(&theSuite));
 }

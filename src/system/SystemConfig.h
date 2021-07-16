@@ -359,30 +359,6 @@
 #ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX 1583
 #endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX */
-#endif /* !CHIP_SYSTEM_CONFIG_USE_LWIP */
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_LWIP_EVENT_TYPE
- *
- *  @brief
- *      This defines the type for CHIP System Layer event types, typically an integral type.
- */
-#ifndef CHIP_SYSTEM_CONFIG_LWIP_EVENT_TYPE
-#define CHIP_SYSTEM_CONFIG_LWIP_EVENT_TYPE int
-#endif /* CHIP_SYSTEM_CONFIG_LWIP_EVENT_TYPE */
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_LWIP_EVENT_UNRESERVED_CODE
- *
- *  @brief
- *      This defines the first number in the default event code space not reserved for use by the CHIP System Layer.
- *      Event codes used by each layer must not overlap.
- */
-#ifndef CHIP_SYSTEM_CONFIG_LWIP_EVENT_UNRESERVED_CODE
-#define CHIP_SYSTEM_CONFIG_LWIP_EVENT_UNRESERVED_CODE  32
-#endif /* CHIP_SYSTEM_CONFIG_LWIP_EVENT_UNRESERVED_CODE */
 
 /**
  *  @def _CHIP_SYSTEM_CONFIG_LWIP_EVENT
@@ -395,16 +371,30 @@
 #define _CHIP_SYSTEM_CONFIG_LWIP_EVENT(e) (e)
 #endif /* _CHIP_SYSTEM_CONFIG_LWIP_EVENT */
 
+#endif /* !CHIP_SYSTEM_CONFIG_USE_LWIP */
+
 /**
- *  @def CHIP_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE
+ *  @def CHIP_SYSTEM_CONFIG_EVENT_TYPE
  *
  *  @brief
- *      This defines the type of CHIP System Layer event objects or "messages" for the LwIP dispatcher.
+ *      This defines the type for CHIP System Layer event types, typically an integral type.
+ */
+#ifndef CHIP_SYSTEM_CONFIG_EVENT_TYPE
+#define CHIP_SYSTEM_CONFIG_EVENT_TYPE int
+#endif /* CHIP_SYSTEM_CONFIG_EVENT_TYPE */
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE
+ *
+ *  @brief
+ *      This defines the type of CHIP System Layer event objects or "messages".
  *
  *      Such types are not directly used by the CHIP System Layer but are "passed through". Consequently a forward declaration and
  *      a const pointer or reference are appropriate.
  */
-#ifndef CHIP_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE
+#ifndef CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 namespace chip {
 namespace System {
 
@@ -413,38 +403,30 @@ struct LwIPEvent;
 } // namespace System
 } // namespace chip
 
-#define CHIP_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE const struct chip::System::LwIPEvent*
-#endif /* CHIP_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE */
+#define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct chip::System::LwIPEvent*
+
+#else /* CHIP_SYSTEM_CONFIG_USE_LWIP */
+
+#define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
 
 #endif /* CHIP_SYSTEM_CONFIG_USE_LWIP */
 
-/**
- *  @def CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
- *
- *  @brief
- *      This defines whether (1) or not (0) your platform will provide the following platform-specific functions:
- *      - chip::System::Platform::Layer::WillInit
- *      - chip::System::Platform::Layer::WillShutdown
- *      - chip::System::Platform::Layer::DidInit
- *      - chip::System::Platform::Layer::DidShutdown
- */
-#ifndef CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS 0
-#endif /* CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS */
+#endif /* CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE */
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**
- *  @def CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
+ *  @def _CHIP_SYSTEM_CONFIG_LWIP_EVENT
  *
  *  @brief
- *      This defines whether (1) or not (0) your platform will provide the following platform-specific functions:
- *      - chip::System::Platform::Layer::PostEvent
- *      - chip::System::Platform::Layer::DispatchEvents
- *      - chip::System::Platform::Layer::DispatchEvent
- *      - chip::System::Platform::Layer::StartTimer
+ *      This defines a mapping function for CHIP System Layer codes for describing the types of events for the LwIP dispatcher,
+ *      which allows mapping such event types into a platform- or system-specific range.
  */
-#ifndef CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 0
-#endif /* CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS */
+#ifndef _CHIP_SYSTEM_CONFIG_LWIP_EVENT
+#define _CHIP_SYSTEM_CONFIG_LWIP_EVENT(e) (e)
+#endif /* _CHIP_SYSTEM_CONFIG_LWIP_EVENT */
+
+#endif /* CHIP_SYSTEM_CONFIG_USE_LWIP */
 
 /**
  *  @def CHIP_SYSTEM_CONFIG_NUM_TIMERS

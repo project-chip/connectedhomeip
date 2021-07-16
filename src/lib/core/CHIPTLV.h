@@ -1113,7 +1113,7 @@ public:
     /**
      * static_cast to enumerations' underlying type when data is an enumeration.
      */
-    template <typename T>
+    template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
     CHIP_ERROR Put(uint64_t tag, T data)
     {
         return Put(tag, to_underlying(data));

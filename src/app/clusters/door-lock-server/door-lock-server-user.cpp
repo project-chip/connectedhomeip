@@ -47,7 +47,7 @@
 #include <app/util/af.h>
 #include <app/util/time-util.h>
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <support/CodeUtils.h>
 
 using namespace chip;
@@ -220,7 +220,7 @@ static uint8_t clearUserPinOrRfid(uint16_t userId, EmberAfPluginDoorLockServerUs
     return (success ? 0x00 : 0x01); // See 7.3.2.17.8 and 7.3.2.17.25).
 }
 
-bool emberAfDoorLockClusterGetUserTypeCallback(chip::app::Command * commandObj, uint16_t userId)
+bool emberAfDoorLockClusterGetUserTypeCallback(chip::app::CommandHandler * commandObj, uint16_t userId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (emAfPluginDoorLockServerCheckForSufficientSpace(userId, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE))
@@ -247,7 +247,7 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterSetUserTypeCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userType)
+bool emberAfDoorLockClusterSetUserTypeCallback(chip::app::CommandHandler * commandObj, uint16_t userId, uint8_t userType)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // TODO: Need to validate userType.  https://github.com/project-chip/connectedhomeip/issues/3580
@@ -289,8 +289,8 @@ bool emAfPluginDoorLockServerSetPinUserType(uint16_t userId, EmberAfDoorLockUser
 // ------------------------------------------------------------------------------
 // PIN handling
 
-bool emberAfDoorLockClusterSetPinCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                          uint8_t * pin)
+bool emberAfDoorLockClusterSetPinCallback(chip::app::CommandHandler * commandObj, uint16_t userId, uint8_t userStatus,
+                                          uint8_t userType, uint8_t * pin)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // send response
@@ -341,7 +341,7 @@ static bool getSendPinOverTheAir(void)
     return sendPinOverTheAir;
 }
 
-bool emberAfDoorLockClusterGetPinCallback(chip::app::Command * commandObj, uint16_t userId)
+bool emberAfDoorLockClusterGetPinCallback(chip::app::CommandHandler * commandObj, uint16_t userId)
 {
     EmberAfPluginDoorLockServerUser user;
     EmberStatus status = EMBER_SUCCESS;
@@ -385,7 +385,7 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterClearPinCallback(chip::app::Command * commandObj, uint16_t userId)
+bool emberAfDoorLockClusterClearPinCallback(chip::app::CommandHandler * commandObj, uint16_t userId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t status = clearUserPinOrRfid(userId, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
@@ -427,7 +427,7 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterClearAllPinsCallback(chip::app::Command * commandObj)
+bool emberAfDoorLockClusterClearAllPinsCallback(chip::app::CommandHandler * commandObj)
 {
     uint8_t i;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -458,8 +458,8 @@ exit:
 // ------------------------------------------------------------------------------
 // RFID handling
 
-bool emberAfDoorLockClusterSetRfidCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                           uint8_t * rfid)
+bool emberAfDoorLockClusterSetRfidCallback(chip::app::CommandHandler * commandObj, uint16_t userId, uint8_t userStatus,
+                                           uint8_t userType, uint8_t * rfid)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t status =
@@ -482,7 +482,7 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterGetRfidCallback(chip::app::Command * commandObj, uint16_t userId)
+bool emberAfDoorLockClusterGetRfidCallback(chip::app::CommandHandler * commandObj, uint16_t userId)
 {
     EmberAfPluginDoorLockServerUser user;
     EmberStatus status = EMBER_SUCCESS;
@@ -520,7 +520,7 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterClearRfidCallback(chip::app::Command * commandObj, uint16_t userId)
+bool emberAfDoorLockClusterClearRfidCallback(chip::app::CommandHandler * commandObj, uint16_t userId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t status = clearUserPinOrRfid(userId, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE);
@@ -542,7 +542,7 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterClearAllRfidsCallback(chip::app::Command * commandObj)
+bool emberAfDoorLockClusterClearAllRfidsCallback(chip::app::CommandHandler * commandObj)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     for (uint8_t i = 0; i < EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE; i++)
@@ -624,7 +624,7 @@ static bool verifyPin(uint8_t * pin, uint8_t * userId)
     return false;
 }
 
-bool emberAfDoorLockClusterLockDoorCallback(chip::app::Command * commandObj, uint8_t * PIN)
+bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj, uint8_t * PIN)
 {
     uint8_t userId                = 0;
     bool pinVerified              = verifyPin(PIN, &userId);
@@ -688,7 +688,7 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterUnlockDoorCallback(chip::app::Command * commandObj, uint8_t * pin)
+bool emberAfDoorLockClusterUnlockDoorCallback(chip::app::CommandHandler * commandObj, uint8_t * pin)
 {
     uint8_t userId                = 0;
     bool pinVerified              = verifyPin(pin, &userId);
@@ -877,7 +877,7 @@ void emberAfDoorLockClusterServerAttributeChangedCallback(EndpointId endpoint, A
     }
 }
 
-bool emberAfDoorLockClusterUnlockWithTimeoutCallback(chip::app::Command * commandObj, uint16_t timeoutS, uint8_t * pin)
+bool emberAfDoorLockClusterUnlockWithTimeoutCallback(chip::app::CommandHandler * commandObj, uint16_t timeoutS, uint8_t * pin)
 {
     uint8_t userId;
     uint8_t status;

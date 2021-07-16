@@ -97,9 +97,9 @@ protected:
     void _OnWoBLEAdvertisingStop(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    CHIP_ERROR
-    _AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
-                   size_t aTxtEntiresSize, uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
+    CHIP_ERROR _AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
+                              const Span<const char * const> & aSubTypes, const Span<const Mdns::TextEntry> & aTxtEntries,
+                              uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR _RemoveSrpService(const char * aInstanceName, const char * aName);
     CHIP_ERROR _RemoveAllSrpServices();
     CHIP_ERROR _SetupSrpHost(const char * aHostName);
@@ -153,6 +153,11 @@ private:
             otSrpClientService mService;
             char mInstanceName[kMaxInstanceNameSize + 1];
             char mName[kMaxNameSize + 1];
+#if OPENTHREAD_API_VERSION >= 132
+            // TODO: use fixed buffer allocator to reduce the memory footprint from N*M to sum(M_i)
+            char mSubTypeBuffers[chip::Mdns::kSubTypeMaxNumber][chip::Mdns::kSubTypeMaxLength + 1];
+            const char * mSubTypes[chip::Mdns::kSubTypeMaxNumber + 1]; // extra entry for nullptr at the end
+#endif
             otDnsTxtEntry mTxtEntries[kMaxTxtEntriesNumber];
             uint8_t mTxtValueBuffers[kMaxTxtEntriesNumber][kMaxTxtValueSize];
             char mTxtKeyBuffers[kMaxTxtEntriesNumber][kMaxTxtKeySize];

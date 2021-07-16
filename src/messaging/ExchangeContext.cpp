@@ -35,6 +35,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPKeyIds.h>
+#include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
@@ -79,8 +80,13 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && msgBuf,
                                         const SendFlags & sendFlags)
 {
-    // If we were waiting for a message send, this is it.
-    mFlags.Clear(Flags::kFlagWillSendMessage);
+    if (protocolId != Protocols::SecureChannel::Id || msgType != to_underlying(Protocols::SecureChannel::MsgType::StandaloneAck))
+    {
+        // If we were waiting for a message send, this is it.  Standalone acks
+        // are not application-level sends, which is why we don't allow those to
+        // clear the WillSendMessage flag.
+        mFlags.Clear(Flags::kFlagWillSendMessage);
+    }
 
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
@@ -357,14 +363,13 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     if (ec == nullptr)
         return;
 
-    // NOTE: we don't set mResponseExpected to false here because the response could still arrive. If the user
-    // wants to never receive the response, they must close the exchange context.
-
     ec->NotifyResponseTimeout();
 }
 
 void ExchangeContext::NotifyResponseTimeout()
 {
+    SetResponseExpected(false);
+
     ExchangeDelegate * delegate = GetDelegate();
 
     // Call the user's timeout handler.
@@ -372,6 +377,8 @@ void ExchangeContext::NotifyResponseTimeout()
     {
         delegate->OnResponseTimeout(this);
     }
+
+    MessageHandled();
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,

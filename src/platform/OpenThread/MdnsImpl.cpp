@@ -40,23 +40,18 @@ const char * GetProtocolString(MdnsServiceProtocol protocol)
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    CHIP_ERROR result = CHIP_NO_ERROR;
-
-    VerifyOrExit(service, result = CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(service == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     if (strcmp(service->mHostName, "") != 0)
     {
-        CHIP_ERROR hostNameErr = ThreadStackMgr().SetupSrpHost(service->mHostName);
-        VerifyOrExit(hostNameErr == CHIP_NO_ERROR, result = hostNameErr);
+        ReturnErrorOnFailure(ThreadStackMgr().SetupSrpHost(service->mHostName));
     }
 
     char serviceType[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1];
     snprintf(serviceType, sizeof(serviceType), "%s.%s", service->mType, GetProtocolString(service->mProtocol));
 
-    result =
-        ThreadStackMgr().AddSrpService(service->mName, serviceType, service->mPort, service->mTextEntries, service->mTextEntrySize);
-
-exit:
-    return result;
+    Span<const char * const> subTypes(service->mSubTypes, service->mSubTypeSize);
+    Span<const TextEntry> textEntries(service->mTextEntries, service->mTextEntrySize);
+    return ThreadStackMgr().AddSrpService(service->mName, serviceType, service->mPort, subTypes, textEntries);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT

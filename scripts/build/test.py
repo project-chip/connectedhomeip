@@ -9,64 +9,53 @@ import subprocess
 import sys
 import time
 
-# Supported log levels, mapping string values required for argument
-# parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'fatal': logging.FATAL,
-}
+from typing import List
 
-def sameFile(a: str, b: str) -> bool:
-  with open(a, 'rt') as fa:
-    a_lines = fa.readlines()
+SCRIPT_ROOT = os.path.dirname(__file__)
 
-  with open(b, 'rt') as fb:
-    b_lines = fb.readlines()
+def build_expected_output(root: str, out: str) -> List[str]:
+  with open(os.path.join(SCRIPT_ROOT, 'expected_all_platform_commands.txt'), 'rt') as f:
+    for l in f.readlines():
+      yield l.replace("{root}", root).replace("{out}", out)
 
-  diffs = [line for line in difflib.unified_diff(a_lines, b_lines, fromfile=a, tofile=b)]
+
+def build_actual_output(root: str, out: str) -> List[str]:
+  # Fake out that we have a project root
+  os.environ['PW_PROJECT_ROOT'] = root
+
+  binary = os.path.join(SCRIPT_ROOT, 'build_examples.py')
+
+  retval = subprocess.run([
+    binary,
+    '--platform', 'all',
+    '--log-level', 'FATAL',
+    '--dry-run',
+    '--repo', root,
+    '--out-prefix', out,
+    'build'
+  ], stdout=subprocess.PIPE, check=True, encoding='UTF-8')
+
+
+  return [l + '\n' for l in retval.stdout.split('\n')]
+
+
+def main():
+  coloredlogs.install(level=logging.INFO, fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
+
+  ROOT = '/TEST/BUILD/ROOT'
+  OUT = '/OUTPUT/DIR'
+
+  expected = [l for l in build_expected_output(ROOT, OUT)]
+  actual = [l for l in build_actual_output(ROOT, OUT)]
+
+  diffs = [line for line in difflib.unified_diff(expected, actual)]
 
   if diffs:
-    logging.error("DIFFERENCE found between %s and %s" % (a, b))
+    logging.error("DIFFERENCE between expected and generated output")
     for l in diffs:
       logging.warning("  " + l.strip())
-
-    return False
-
-  return True
-
-
-@click.command()
-@click.option(
-    '--log-level',
-    default='INFO',
-    type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
-    help='Determines the verbosity of script output.')
-@click.option("--touch", type=click.Path(resolve_path=True, dir_okay=False), help="Timestamp file to touch.")
-@click.option("--repo", type=click.Path(resolve_path=True, dir_okay=True), help="Repository path used when generating.")
-@click.option("--output-root", type=click.Path(resolve_path=True, dir_okay=True), help="Build output directory")
-@click.option("--expected", type=click.File("rt"), help="Expected file content.")
-@click.option("--expected-out", type=click.File("wt"), help="Where to write expected content.")
-@click.option("--actual", type=click.Path(resolve_path=True, dir_okay=False), help="Actual file generated content.")
-def main(log_level, touch, repo, output_root, expected, expected_out, actual):
-  coloredlogs.install(
-    level=__LOG_LEVELS__[log_level],
-    fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
-
-  for l in expected.readlines():
-    expected_out.write(l.replace("{root}", repo).replace("{out}", output_root))
-  expected_out.close()
-
-
-  logging.info('Diffing %s and %s' % (expected_out.name, actual))
-  if not sameFile(expected_out.name, actual):
     sys.exit(1)
 
-  logging.info('Touching %s' % touch)
-  os.makedirs(os.path.dirname(touch), exist_ok=True)
-  with open(touch, 'wt') as f:
-    f.write("Executed at %s" % time.ctime())
 
 
 if __name__ == "__main__":

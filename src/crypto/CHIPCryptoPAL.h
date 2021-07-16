@@ -47,7 +47,7 @@ constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
 constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
 
 constexpr size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
-constexpr size_t kMax_ECDSA_Signature_Length = 72;
+constexpr size_t kMax_ECDSA_Signature_Length = kP256_ECDSA_Signature_Length_Raw;
 constexpr size_t kMAX_FE_Length              = kP256_FE_Length;
 constexpr size_t kMAX_Point_Length           = kP256_Point_Length;
 constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
@@ -68,6 +68,29 @@ constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 constexpr size_t kMAX_Spake2p_Context_Size     = 1024;
 constexpr size_t kMAX_Hash_SHA256_Context_Size = 296;
 constexpr size_t kMAX_P256Keypair_Context_Size = 512;
+
+/*
+ * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
+ *
+ * Ecdsa-Sig-Value ::= SEQUENCE {
+ *     r       INTEGER,
+ *     s       INTEGER
+ * }
+ *
+ * --> SEQUENCE, universal constructed tag (0x30), length over 2 bytes, up to 255 (to support future larger sizes up to 512 bits)
+ *   -> SEQ_OVERHEAD = 3 bytes
+ * --> INTEGER, universal primitive tag (0x02), length over 1 byte, one extra byte worst case
+ *     over max for 0x00 when MSB is set.
+ *       -> INT_OVERHEAD = 3 bytes
+ *
+ * There is 1 sequence of 2 integers. Overhead is SEQ_OVERHEAD + (2 * INT_OVERHEAD) = 3 + (2 * 3) = 9.
+ */
+constexpr size_t kMax_ECDSA_X9Dot62_Asn1_Overhead = 9;
+constexpr size_t kMax_ECDSA_Signature_Length_Der  = kMax_ECDSA_Signature_Length + kMax_ECDSA_X9Dot62_Asn1_Overhead;
+
+nlSTATIC_ASSERT_PRINT(kMax_ECDH_Secret_Length >= kP256_FE_Length, "ECDH shared secret is too short for crypto suite");
+nlSTATIC_ASSERT_PRINT(kMax_ECDSA_Signature_Length >= kP256_ECDSA_Signature_Length_Raw,
+                      "ECDSA signature buffer length is too short for crypto suite");
 
 /**
  * Spake2+ parameters for P256
@@ -154,7 +177,15 @@ public:
 
     /** @brief Returns max capacity of the buffer
      **/
-    size_t Capacity() const { return sizeof(bytes); }
+    static constexpr size_t Capacity() { return sizeof(bytes); }
+
+    /** @brief Returns pointer to start of underlying buffer
+     **/
+    uint8_t * Bytes() { return &bytes[0]; }
+
+    /** @brief Returns const pointer to start of underlying buffer
+     **/
+    const uint8_t * ConstBytes() const { return &bytes[0]; }
 
     /** @brief Returns buffer pointer
      **/
@@ -206,7 +237,7 @@ public:
      * @param msg Message that needs to be signed
      * @param msg_length Length of message
      * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
+     * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Sig & out_signature) = 0;
@@ -216,7 +247,7 @@ public:
      * @param hash Hash that needs to be signed
      * @param hash_length Length of hash
      * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
+     * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, Sig & out_signature) = 0;
@@ -278,7 +309,7 @@ public:
      * @param msg Message that needs to be signed
      * @param msg_length Length of message
      * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
+     * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) override;
@@ -288,7 +319,7 @@ public:
      * @param hash Hash that needs to be signed
      * @param hash_length Length of hash
      * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
+     * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) override;
@@ -319,6 +350,47 @@ private:
 
     void Clear();
 };
+
+/**
+ * @brief Convert a raw ECDSA signature to ASN.1 signature (per X9.62) as used by TLS libraries.
+ *
+ * Errors are:
+ *   - CHIP_ERROR_INVALID_ARGUMENT on any argument being invalid (e.g. nullptr), wrong sizes,
+ *     wrong or unsupported format,
+ *   - CHIP_ERROR_BUFFER_TOO_SMALL on running out of space at runtime.
+ *   - CHIP_ERROR_INTERNAL on any unexpected processing error.
+ *
+ * @param[in] fe_length_bytes Field Element length in bytes (e.g. 32 for P256 curve)
+ * @param[in] raw_sig Raw signature of <r,s> concatenated
+ * @param[in] raw_sig_length Raw signature length (MUST be 2*`fe_length_bytes` long)
+ * @param[out] out_asn1_sig ASN.1 DER signature format output buffer
+ * @param[in] out_asn1_sig_length ASN.1 DER signature format output buffer length. Must have space for at least
+ * kMax_ECDSA_X9Dot62_Asn1_Overhead.
+ * @param[out] out_asn1_sig_actual_length Final computed size of signature.
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const uint8_t * raw_sig, size_t raw_sig_length, uint8_t * out_asn1_sig,
+                                   size_t out_asn1_sig_length, size_t & out_asn1_sig_actual_length);
+
+/**
+ * @brief Convert an ASN.1 DER signature (per X9.62) as used by TLS libraries to SEC1 raw format
+ *
+ * Errors are:
+ *   - CHIP_ERROR_INVALID_ARGUMENT on any argument being invalid (e.g. nullptr), wrong sizes,
+ *     wrong or unsupported format,
+ *   - CHIP_ERROR_BUFFER_TOO_SMALL on running out of space at runtime.
+ *   - CHIP_ERROR_INTERNAL on any unexpected processing error.
+ *
+ * @param[in] fe_length_bytes Field Element length in bytes (e.g. 32 for P256 curve)
+ * @param[in] asn1_sig ASN.1 DER signature input
+ * @param[in] asn1_sig_length ASN.1 DER signature length
+ * @param[out] out_raw_sig Raw signature of <r,s> concatenated format output buffer
+ * @param[in] out_raw_sig_length Raw signature output buffer length. Must be at least >= `2 * fe_length_bytes`
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ */
+
+CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const uint8_t * asn1_sig, size_t asn1_sig_length, uint8_t * out_raw_sig,
+                                   size_t out_raw_sig_length);
 
 /**
  * @brief A function that implements AES-CCM encryption
