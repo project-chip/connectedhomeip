@@ -273,8 +273,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     // Ensure the exchange stays open after we send (unlike the
     // CheckCloseExchangeAndResendApplicationMessage case), by claiming to
     // expect a response.
-    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer),
-                                SendMessageFlags::kExpectResponse);
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kExpectResponse);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Ensure the message was dropped, and was added to retransmit table
