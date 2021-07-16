@@ -90,8 +90,20 @@ public class ChipDeviceController {
     pairTestDeviceWithoutSecurity(deviceControllerPtr, ipAddress);
   }
 
-  public long getDevicePointer(long deviceId) {
-    return getDevicePointer(deviceControllerPtr, deviceId);
+  /**
+   * Returns a pointer to a device with the specified nodeId. The device is not guaranteed to be
+   * connected.
+   *
+   * <p>TODO(#8443): This method and getConnectedDevicePointer() could benefit from ChipDevice
+   * abstraction to hide the pointer passing.
+   */
+  public long getDevicePointer(long nodeId) {
+    return getDevicePointer(deviceControllerPtr, nodeId);
+  }
+
+  /** Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error. */
+  public void getConnectedDevicePointer(long nodeId, GetConnectedDeviceCallback callback) {
+    getConnectedDevicePointer(deviceControllerPtr, nodeId, callback);
   }
 
   public boolean disconnectDevice(long deviceId) {
@@ -115,6 +127,12 @@ public class ChipDeviceController {
   public void onPairingComplete(int errorCode) {
     if (completionListener != null) {
       completionListener.onPairingComplete(errorCode);
+    }
+  }
+
+  public void onCommissioningComplete(long nodeId, int errorCode) {
+    if (completionListener != null) {
+      completionListener.onCommissioningComplete(nodeId, errorCode);
     }
   }
 
@@ -188,6 +206,14 @@ public class ChipDeviceController {
     updateAddress(deviceControllerPtr, deviceId, address, port);
   }
 
+  /**
+   * Indicate that operational discovery of a device is complete, kicking off connection to the
+   * device.
+   */
+  public void onOperationalDiscoveryComplete(long nodeId) {
+    onOperationalDiscoveryComplete(deviceControllerPtr, nodeId);
+  }
+
   public void sendMessage(long deviceId, String message) {
     sendMessage(deviceControllerPtr, deviceId, message);
   }
@@ -217,6 +243,9 @@ public class ChipDeviceController {
 
   private native long getDevicePointer(long deviceControllerPtr, long deviceId);
 
+  private native void getConnectedDevicePointer(
+      long deviceControllerPtr, long deviceId, GetConnectedDeviceCallback callback);
+
   private native void pairTestDeviceWithoutSecurity(long deviceControllerPtr, String ipAddress);
 
   private native boolean disconnectDevice(long deviceControllerPtr, long deviceId);
@@ -239,6 +268,8 @@ public class ChipDeviceController {
   private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
 
   private native boolean isActive(long deviceControllerPtr, long deviceId);
+
+  private native void onOperationalDiscoveryComplete(long deviceControllerPtr, long nodeId);
 
   public static native void setKeyValueStoreManager(KeyValueStoreManager manager);
 
@@ -273,6 +304,9 @@ public class ChipDeviceController {
 
     /** Notifies the deletion of pairing session. */
     void onPairingDeleted(int errorCode);
+
+    /** Notifies the completion of commissioning. */
+    void onCommissioningComplete(long nodeId, int errorCode);
 
     /** Notifies the completion of network commissioning */
     void onNetworkCommissioningComplete(int errorCode);

@@ -82,6 +82,9 @@ static void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * cbName);
 static void * IOThreadMain(void * arg);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
 
+static void OnDeviceConnectedFn(void * context, Device * device);
+static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+
 namespace {
 
 constexpr EndpointId kNodeEndpoint = 0;
@@ -333,8 +336,59 @@ JNI_METHOD(jlong, getDevicePointer)(JNIEnv * env, jobject self, jlong handle, jl
 
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
 
-    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
+    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a Java handle");
     return reinterpret_cast<jlong>(chipDevice);
+}
+
+JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jobject callback)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    Callback::Callback<OnDeviceConnected> connectedCallback(OnDeviceConnectedFn, callback);
+    Callback::Callback<OnDeviceConnectionFailure> failureCallback(OnDeviceConnectionFailureFn, callback);
+
+    wrapper->Controller()->GetConnectedDevice(nodeId, &connectedCallback, &failureCallback);
+}
+
+void OnDeviceConnectedFn(void * context, Device * device)
+{
+    JNIEnv * env     = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject callback = static_cast<jobject>(context);
+
+    jclass getConnectedDeviceCallbackCls = nullptr;
+    JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/GetConnectedDeviceCallback",
+                                             getConnectedDeviceCallbackCls);
+    VerifyOrReturn(getConnectedDeviceCallbackCls != nullptr,
+                   ChipLogError(Controller, "Could not find GetConnectedDeviceCallback class"));
+
+    jmethodID successMethod;
+    JniReferences::GetInstance().FindMethod(env, callback, "onDeviceConnected", "(J)V", &successMethod);
+    VerifyOrReturn(successMethod != nullptr, ChipLogError(Controller, "Could not find onDeviceConnected method"));
+
+    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a Java handle");
+    env->CallVoidMethod(callback, successMethod, reinterpret_cast<jlong>(device));
+}
+
+void OnDeviceConnectionFailureFn(void * context, NodeId nodeId, CHIP_ERROR error)
+{
+    JNIEnv * env     = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject callback = static_cast<jobject>(context);
+
+    jclass getConnectedDeviceCallbackCls = nullptr;
+    JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/GetConnectedDeviceCallback",
+                                             getConnectedDeviceCallbackCls);
+    VerifyOrReturn(getConnectedDeviceCallbackCls != nullptr,
+                   ChipLogError(Controller, "Could not find GetConnectedDeviceCallback class"));
+
+    jmethodID failureMethod;
+    JniReferences::GetInstance().FindMethod(env, callback, "onConnectionFailure", "(JLjava/lang/Exception;)V", &failureMethod);
+    VerifyOrReturn(failureMethod != nullptr, ChipLogError(Controller, "Could not find onConnectionFailure method"));
+
+    jthrowable exception;
+    VerifyOrReturn(N2J_Error(env, error, exception) == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Could not create exception for onConnectionFailure: %d", error));
+    env->CallVoidMethod(callback, failureMethod, nodeId, exception);
 }
 
 JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
@@ -435,11 +489,26 @@ JNI_METHOD(void, updateAddress)(JNIEnv * env, jobject self, jlong handle, jlong 
     VerifyOrExit(CanCastTo<uint16_t>(port), err = CHIP_ERROR_INVALID_ADDRESS);
 
     err = chipDevice->UpdateAddress(Transport::PeerAddress::UDP(ipAddress, port));
+    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->Controller()->PersistDevice(chipDevice);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to update address");
+        ThrowError(env, err);
+    }
+}
+
+JNI_METHOD(void, onOperationalDiscoveryComplete)(JNIEnv * env, jobject self, jlong handle, jlong nodeId)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    CHIP_ERROR err = wrapper->Controller()->OperationalDiscoveryComplete(nodeId);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "OperationalDiscoveryComplete failed");
         ThrowError(env, err);
     }
 }
