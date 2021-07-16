@@ -708,8 +708,10 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 5:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                self.devCtrl.ZCLReadAttribute(args[0], args[1], int(
+                res = self.devCtrl.ZCLReadAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]))
+                if res != None:
+                    print(repr(res))
             else:
                 self.do_help("zclread")
         except exceptions.ChipStackException as ex:

@@ -102,60 +102,6 @@ class TestPythonController(CHIPVirtualHome):
             self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["LightingManager::InitiateAction(ON_ACTION)", "LightingManager::InitiateAction(OFF_ACTION)", "No Cluster 0x6 on Endpoint 0xe9"]),
                             "Datamodel test failed: cannot find matching string from device {}".format(device_id))
 
-        # Check if the device response proper Basic Cluster values to controller.
-        fmt = "CHIP:ZCL:   ClusterId: {cluster}\n" \
-              "CHIP:ZCL:   attributeId: {attr}\n" \
-              "CHIP:ZCL:   status: EMBER_ZCL_STATUS_SUCCESS (0x00)\n" \
-              "CHIP:ZCL:   attributeType: {attr_type}\n" \
-              "CHIP:ZCL:   value: {value}"
-
-        for device_id in server_ids:
-            matchContent = []
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0001',
-                                       attr_type='0x42',
-                                       value='TEST_VENDOR').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0002',
-                                       attr_type='0x21',
-                                       value='0x235a').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0003',
-                                       attr_type='0x42',
-                                       value='TEST_PRODUCT').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0004',
-                                       attr_type='0x21',
-                                       value='0xfeff').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0005',
-                                       attr_type='0x42',
-                                       value='').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0006',
-                                       attr_type='0x42',
-                                       value='').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0007',
-                                       attr_type='0x21',
-                                       value='0x0001').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0008',
-                                       attr_type='0x42',
-                                       value='TEST_VERSION').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x0009',
-                                       attr_type='0x23',
-                                       value='0x00000001').split("\n")
-            matchContent += fmt.format(cluster='0x0028',
-                                       attr='0x000a',
-                                       attr_type='0x42',
-                                       value='prerelease').split("\n")
-
-            self.assertTrue(self.sequenceMatch(ret['output'],
-                                               matchContent),
-                            "Attribute reading response was not found {}".format(device_id))
-
 
 if __name__ == "__main__":
     sys.exit(TestPythonController(DEVICE_CONFIG).run_test())

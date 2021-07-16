@@ -2254,7 +2254,9 @@ class ChipClusters:
         if not func:
             raise UnknownAttribute(cluster, attribute)
         funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
-        funcCaller(lambda: func(device, endpoint, groupid))
+        res = funcCaller(lambda: func(device, endpoint, groupid))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
 
     def ConfigureAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, minInterval: int, maxInterval: int, change: int, imEnabled):
         func = getattr(self, "Cluster{}_ConfigureAttribute{}".format(cluster, attribute), None)
