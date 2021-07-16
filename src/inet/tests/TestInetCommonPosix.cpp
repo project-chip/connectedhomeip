@@ -148,11 +148,9 @@ void InitSystemLayer()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     AcquireLwIP();
-
-    gSystemLayer.Init(sLwIPEventQueue);
-#else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
-    gSystemLayer.Init(nullptr);
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
+
+    gSystemLayer.Init();
 }
 
 void ShutdownSystemLayer()

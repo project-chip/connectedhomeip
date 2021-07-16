@@ -216,7 +216,7 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     MockAppDelegate mockAppDelegate;
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
@@ -240,7 +240,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -305,7 +305,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -370,7 +370,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -425,7 +425,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -492,7 +492,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -574,7 +574,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     ctx.SetPeerKeyId(0);
     ctx.SetAdminId(kUndefinedAdminId);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -652,7 +652,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -726,7 +726,7 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -820,7 +820,7 @@ void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -957,7 +957,7 @@ void CheckSendUnsolicitedStandaloneAckMessage(nlTestSuite * inSuite, void * inCo
      */
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData("", 0);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -999,7 +999,7 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     MockAppDelegate mockAppDelegate;
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
@@ -1033,7 +1033,7 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
 
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
