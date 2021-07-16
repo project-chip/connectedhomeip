@@ -117,18 +117,11 @@ CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, MutableByteSpan raw_in
     return reader.ReadBytes(raw_integer_out.data() + offset, integer_len).StatusCode();
 }
 
-/**
- * @brief Utility to emit a DER-encoded INTEGER given a raw unsigned large integer
- *        in big-endian order.
- * @param[in] raw_integer Bytes of a large unsigned integer in big-endian, possibly including leading zeroes
- * @param[out] out_der_integer Buffer to receive the DER-encoded integer
- * @return The non-zero length used by DER encoding in `out_der_ingeger`, or 0 on error, such as value too large to fit output.
- */
-size_t EmitDerIntegerFromRaw(const ByteSpan & raw_integer, MutableByteSpan out_der_integer)
+CHIP_ERROR ConvertIntegerRawToDerInternal(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer, bool include_tag_and_length)
 {
-    if (raw_integer.empty())
+    if (!is_span_usable(raw_integer) || !is_span_usable(out_der_integer))
     {
-        return 0;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     Reader reader(raw_integer);
@@ -155,14 +148,17 @@ size_t EmitDerIntegerFromRaw(const ByteSpan & raw_integer, MutableByteSpan out_d
     if (length > 127)
     {
         // We do not support length over more than 1 bytes.
-        return 0;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // Put INTEGER tag
-    writer.Put(kIntegerTag);
+    if (include_tag_and_length)
+    {
+        // Put INTEGER tag
+        writer.Put(kIntegerTag);
 
-    // Put length over 1 byte (i.e. MSB clear)
-    writer.Put(static_cast<uint8_t>(length));
+        // Put length over 1 byte (i.e. MSB clear)
+        writer.Put(static_cast<uint8_t>(length));
+    }
 
     // If leading zero or no more bytes remaining, must ensure we start with at least a zero byte
     if (needs_leading_zero_byte)
@@ -183,11 +179,12 @@ size_t EmitDerIntegerFromRaw(const ByteSpan & raw_integer, MutableByteSpan out_d
     size_t actually_written = 0;
     if (!writer.Fit(actually_written))
     {
-        // Somehow it was too big, return 0 for error.
-        return 0;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    return actually_written;
+    out_der_integer = out_der_integer.SubSpan(0, actually_written);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace
@@ -495,6 +492,16 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::KDF(const uint8_t * ikm, const size_t 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer)
+{
+    return ConvertIntegerRawToDerInternal(raw_integer, out_der_integer, /* include_tag_and_length = */ false);
+}
+
+CHIP_ERROR ConvertIntegerRawToDer(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer)
+{
+    return ConvertIntegerRawToDerInternal(raw_integer, out_der_integer, /* include_tag_and_length = */ true);
+}
+
 CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_sig, MutableByteSpan & out_asn1_sig)
 {
     VerifyOrReturnError(fe_length_bytes > 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -508,18 +515,23 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_
     size_t integers_length = 0;
 
     // Write R (first `fe_length_bytes` block of raw signature)
-    size_t integer_length = EmitDerIntegerFromRaw(raw_sig.SubSpan(0, fe_length_bytes), MutableByteSpan{ cursor, remaining });
-    VerifyOrReturnError(integer_length != 0, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(integer_length < remaining, CHIP_ERROR_INTERNAL);
-    remaining -= integer_length;
-    integers_length += integer_length;
-    cursor += integer_length;
+    {
+        MutableByteSpan out_der_integer(cursor, remaining);
+        ReturnErrorOnFailure(ConvertIntegerRawToDer(raw_sig.SubSpan(0, fe_length_bytes), out_der_integer));
+        VerifyOrReturnError(out_der_integer.size() <= remaining, CHIP_ERROR_INTERNAL);
+
+        integers_length += out_der_integer.size();
+        remaining -= out_der_integer.size();
+        cursor += out_der_integer.size();
+    }
 
     // Write S (second `fe_length_bytes` block of raw signature)
-    integer_length = EmitDerIntegerFromRaw(raw_sig.SubSpan(fe_length_bytes, fe_length_bytes), MutableByteSpan{ cursor, remaining });
-    VerifyOrReturnError(integer_length != 0, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(integer_length <= remaining, CHIP_ERROR_INTERNAL);
-    integers_length += integer_length;
+    {
+        MutableByteSpan out_der_integer(cursor, remaining);
+        ReturnErrorOnFailure(ConvertIntegerRawToDer(raw_sig.SubSpan(fe_length_bytes, fe_length_bytes), out_der_integer));
+        VerifyOrReturnError(out_der_integer.size() <= remaining, CHIP_ERROR_INTERNAL);
+        integers_length += out_der_integer.size();
+    }
 
     // We only support outputs that would use 1 or 2 bytes of DER length after the SEQUENCE tag
     VerifyOrReturnError(integers_length <= UINT8_MAX, CHIP_ERROR_INVALID_ARGUMENT);

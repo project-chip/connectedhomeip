@@ -26,6 +26,7 @@
 #include "Hash_SHA256_test_vectors.h"
 #include "PBKDF2_SHA256_test_vectors.h"
 
+#include "RawIntegerToDer_test_vectors.h"
 #include "SPAKE2P_FE_MUL_test_vectors.h"
 #include "SPAKE2P_FE_RW_test_vectors.h"
 #include "SPAKE2P_HMAC_test_vectors.h"
@@ -637,11 +638,92 @@ static void TestAsn1Conversions(nlTestSuite * inSuite, void * inContext)
         MutableByteSpan out_der_sig_span(out_der_sig.Get(), out_der_sig_allocated_size);
         status = EcdsaRawSignatureToAsn1(vector->fe_length_bytes, ByteSpan{ vector->raw_version, vector->raw_version_length },
                                          out_der_sig_span);
-
         NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, out_der_sig_span.size() <= out_der_sig_allocated_size);
         NL_TEST_ASSERT(inSuite, out_der_sig_span.size() == vector->der_version_length);
         NL_TEST_ASSERT(inSuite, (memcmp(out_der_sig_span.data(), vector->der_version, vector->der_version_length) == 0));
+    }
+}
+
+static void TestRawIntegerToDerValidCases(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestCases = ArraySize(kRawIntegerToDerVectors);
+
+    for (int testIdx = 0; testIdx < numOfTestCases; testIdx ++)
+    {
+        RawIntegerToDerVector v = kRawIntegerToDerVectors[testIdx];
+
+        // Cover case with tag/length
+        {
+            chip::Platform::ScopedMemoryBuffer<uint8_t> out_der_buffer;
+            out_der_buffer.Alloc(v.expected_size);
+            NL_TEST_ASSERT(inSuite, out_der_buffer);
+
+            MutableByteSpan out_der_integer(out_der_buffer.Get(), v.expected_size);
+            CHIP_ERROR status = ConvertIntegerRawToDer(ByteSpan{v.candidate, v.candidate_size}, out_der_integer);
+            NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, out_der_integer.size() == v.expected_size);
+            NL_TEST_ASSERT(inSuite, out_der_integer.data_equal(ByteSpan(v.expected, v.expected_size)));
+
+            // Cover case of buffer too small
+            MutableByteSpan out_der_integer_too_small(out_der_buffer.Get(), v.expected_size - 1);
+            status = ConvertIntegerRawToDer(ByteSpan{v.candidate, v.candidate_size}, out_der_integer_too_small);
+            NL_TEST_ASSERT(inSuite, status == CHIP_ERROR_BUFFER_TOO_SMALL);
+        }
+
+        // Cover case without tag/length
+        {
+            chip::Platform::ScopedMemoryBuffer<uint8_t> out_der_buffer;
+            out_der_buffer.Alloc(v.expected_without_tag_size);
+            NL_TEST_ASSERT(inSuite, out_der_buffer);
+
+            MutableByteSpan out_der_integer(out_der_buffer.Get(), v.expected_without_tag_size);
+            CHIP_ERROR status = ConvertIntegerRawToDerWithoutTag(ByteSpan{v.candidate, v.candidate_size}, out_der_integer);
+
+            NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, out_der_integer.size() == v.expected_without_tag_size);
+            NL_TEST_ASSERT(inSuite, out_der_integer.data_equal(ByteSpan(v.expected_without_tag, v.expected_without_tag_size)));
+        }
+    }
+}
+
+static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inContext)
+{
+    // Cover case of invalid buffers
+    uint8_t placeholder[10] = {0};
+    MutableByteSpan good_out_buffer(placeholder, sizeof(placeholder));
+    ByteSpan good_buffer(placeholder, sizeof(placeholder));
+
+    MutableByteSpan bad_out_buffer_nullptr(nullptr, sizeof(placeholder));
+    MutableByteSpan bad_out_buffer_empty(placeholder, 0);
+
+    ByteSpan bad_buffer_nullptr(nullptr, sizeof(placeholder));
+    ByteSpan bad_buffer_empty(placeholder, 0);
+
+    struct ErrorCase {
+        const ByteSpan & input;
+        MutableByteSpan & output;
+        CHIP_ERROR expected_status;
+    };
+
+    const ErrorCase error_cases[] =
+    {
+        {.input = good_buffer, .output = bad_out_buffer_nullptr, .expected_status = CHIP_ERROR_INVALID_ARGUMENT},
+        {.input = good_buffer, .output = bad_out_buffer_empty, .expected_status = CHIP_ERROR_INVALID_ARGUMENT},
+        {.input = bad_buffer_nullptr, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT},
+        {.input = bad_buffer_empty, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT}
+    };
+
+    int case_idx = 0;
+    for (const ErrorCase & v : error_cases)
+    {
+        CHIP_ERROR status = ConvertIntegerRawToDerWithoutTag(v.input, v.output);
+        if (status != v.expected_status)
+        {
+            ChipLogError(Crypto, "Failed TestRawIntegerToDerInvalidCases sub-case %d", case_idx);
+            NL_TEST_ASSERT(inSuite, v.expected_status);
+        }
+        ++case_idx;
     }
 }
 
@@ -1594,6 +1676,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
     NL_TEST_DEF("Test ASN.1 signature conversion routines", TestAsn1Conversions),
+    NL_TEST_DEF("Test Integer to ASN.1 DER conversion", TestRawIntegerToDerValidCases),
+    NL_TEST_DEF("Test Integer to ASN.1 DER conversion error cases", TestRawIntegerToDerInvalidCases),
     NL_TEST_DEF("Test ECDSA signing and validation message using SHA256", TestECDSA_Signing_SHA256_Msg),
     NL_TEST_DEF("Test ECDSA signing and validation SHA256 Hash", TestECDSA_Signing_SHA256_Hash),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different msg", TestECDSA_ValidationFailsDifferentMessage),

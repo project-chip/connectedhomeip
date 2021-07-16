@@ -69,6 +69,9 @@ constexpr size_t kMAX_Spake2p_Context_Size     = 1024;
 constexpr size_t kMAX_Hash_SHA256_Context_Size = 296;
 constexpr size_t kMAX_P256Keypair_Context_Size = 512;
 
+constexpr size_t kEmitDerIntegerWithoutTagOverhead = 1; // 1 sign stuffer
+constexpr size_t kEmitDerIntegerOverhead = 3; // Tag + Length byte + 1 sign stuffer
+
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
  *
@@ -386,6 +389,28 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  */
 CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1_sig, MutableByteSpan & out_raw_sig);
+
+/**
+ * @brief Utility to emit a DER-encoded INTEGER given a raw unsigned large integer
+ *        in big-endian order. The `out_der_integer` span is updated to reflect the final
+ *        variable length, including tag and length, and must have at least `kEmitDerIntegerOverhead`
+ *        extra space in addition to the `raw_integer.size()`.
+ * @param[in] raw_integer Bytes of a large unsigned integer in big-endian, possibly including leading zeroes
+ * @param[out] out_der_integer Buffer to receive the DER-encoded integer
+ * @return Returns CHIP_ERROR_INVALID_ARGUMENT or CHIP_ERROR_BUFFER_TOO_SMALL on error, CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR ConvertIntegerRawToDer(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer);
+
+/**
+ * @brief Utility to emit a DER-encoded INTEGER given a raw unsigned large integer
+ *        in big-endian order. The `out_der_integer` span is updated to reflect the final
+ *        variable length, excluding tag and length, and must have at least `kEmitDerIntegerWithoutTagOverhead`
+ *        extra space in addition to the `raw_integer.size()`.
+ * @param[in] raw_integer Bytes of a large unsigned integer in big-endian, possibly including leading zeroes
+ * @param[out] out_der_integer Buffer to receive the DER-encoded integer
+ * @return Returns CHIP_ERROR_INVALID_ARGUMENT or CHIP_ERROR_BUFFER_TOO_SMALL on error, CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer);
 
 /**
  * @brief A function that implements AES-CCM encryption
