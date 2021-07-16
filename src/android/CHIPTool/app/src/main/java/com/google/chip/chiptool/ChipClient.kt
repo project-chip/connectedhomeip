@@ -17,11 +17,17 @@
  */
 package com.google.chip.chiptool
 
+import android.util.Log
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.GetConnectedDeviceCallback
+import java.lang.IllegalStateException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 /** Lazily instantiates [ChipDeviceController] and holds a reference to it. */
 object ChipClient {
-
+  private const val TAG = "ChipClient"
   private lateinit var chipDeviceController: ChipDeviceController
 
   fun getDeviceController(): ChipDeviceController {
@@ -29,5 +35,27 @@ object ChipClient {
       chipDeviceController = ChipDeviceController()
     }
     return chipDeviceController
+  }
+
+  /**
+   * Wrapper around [ChipDeviceController.getConnectedDevicePointer] to return the value directly.
+   */
+  suspend fun getConnectedDevicePointer(nodeId: Long): Long {
+    return suspendCoroutine { continuation ->
+      getDeviceController().getConnectedDevicePointer(
+        nodeId,
+        object : GetConnectedDeviceCallback {
+          override fun onDeviceConnected(devicePointer: Long) {
+            Log.d(TAG, "Got connected device pointer")
+            continuation.resume(devicePointer)
+          }
+
+          override fun onConnectionFailure(nodeId: Long, error: Exception) {
+            val errorMessage = "Unable to get connected device with nodeId $nodeId"
+            Log.e(TAG, errorMessage, error)
+            continuation.resumeWithException(IllegalStateException(errorMessage))
+          }
+        })
+    }
   }
 }
