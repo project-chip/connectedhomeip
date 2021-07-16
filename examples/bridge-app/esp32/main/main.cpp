@@ -26,8 +26,8 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <core/CHIPError.h>
-#include <support/ErrorStr.h>
 #include <support/CHIPMemString.h>
+#include <support/ErrorStr.h>
 
 #include <app/server/Server.h>
 
@@ -111,7 +111,7 @@ CHIP_ERROR AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t de
         {
             gDevices[index] = dev;
             EmberAfStatus ret;
-            while(1)
+            while (1)
             {
                 ret = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT);
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
@@ -231,7 +231,7 @@ EmberAfStatus HandleReadOnOffAttribute(Device * dev, chip::AttributeId attribute
 {
     ChipLogProgress(DeviceLayer, "HandleReadOnOffAttribute: attrId=%d, maxReadLength=%d", attributeId, maxReadLength);
 
-    ReturnErrorCodeIf ((attributeId != ZCL_ON_OFF_ATTRIBUTE_ID) || (maxReadLength != 1), EMBER_ZCL_STATUS_FAILURE);
+    ReturnErrorCodeIf((attributeId != ZCL_ON_OFF_ATTRIBUTE_ID) || (maxReadLength != 1), EMBER_ZCL_STATUS_FAILURE);
     *buffer = dev->IsOn() ? 1 : 0;
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -240,7 +240,7 @@ EmberAfStatus HandleWriteOnOffAttribute(Device * dev, chip::AttributeId attribut
 {
     ChipLogProgress(DeviceLayer, "HandleWriteOnOffAttribute: attrId=%d", attributeId);
 
-    ReturnErrorCodeIf ((attributeId != ZCL_ON_OFF_ATTRIBUTE_ID) || (!dev->IsReachable()), EMBER_ZCL_STATUS_FAILURE);
+    ReturnErrorCodeIf((attributeId != ZCL_ON_OFF_ATTRIBUTE_ID) || (!dev->IsReachable()), EMBER_ZCL_STATUS_FAILURE);
     dev->SetOnOff(*buffer == 1);
     return EMBER_ZCL_STATUS_SUCCESS;
 }
