@@ -132,9 +132,9 @@ int LightingManager::Init()
 {
     mState = kState_Off;
     mLevel = 64;
-    mX = 0; //TBD
-    mY = 0; //TBD
-    mRGB = XYToRgb(mLevel, mX, mY);
+    mXY.x = 0; //TBD
+    mXY.y = 0; //TBD
+    mRGB = XYToRgb(mLevel, mXY.x, mXY.y);
     return 0;
 }
 
@@ -174,7 +174,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
         break;
     case COLOR_ACTION:
         xy = *(XyColor_t *)(value);
-        ChipLogProgress(NotSpecified, "LightMgr:COLOR: xy:%u|%u->%u|%u", mX, mY, xy.x, xy.y);
+        ChipLogProgress(NotSpecified, "LightMgr:COLOR: xy:%u|%u->%u|%u", mXY.x, mXY.y, xy.x, xy.y);
         break;
     default:
         ChipLogProgress(NotSpecified, "LightMgr:Unknown");
@@ -204,7 +204,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
             new_state = kState_On;
         }
     }
-    else if ((aAction == COLOR_ACTION) && (xy.x != mX || xy.y != mY))
+    else if ((aAction == COLOR_ACTION) && (xy.x != mXY.x || xy.y != mXY.y))
     {
         action_initiated = true;
         if (xy.x == 0 && xy.y == 0) //TBC
@@ -248,15 +248,15 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
 void LightingManager::SetLevel(uint8_t aLevel)
 {
     mLevel = aLevel;
-    mRGB = XYToRgb(mLevel, mX, mY);
+    mRGB = XYToRgb(mLevel, mXY.x, mXY.y);
     UpdateLight();
 }
 
 void LightingManager::SetColor(uint16_t x, uint16_t y)
 {
-    mX = x;
-    mY = y;
-    mRGB = XYToRgb(mLevel, mX, mY);
+    mXY.x = x;
+    mXY.y = y;
+    mRGB = XYToRgb(mLevel, mXY.x, mXY.y);
     UpdateLight();
 }
 

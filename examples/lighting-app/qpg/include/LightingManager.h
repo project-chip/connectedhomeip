@@ -79,7 +79,7 @@ private:
     friend LightingManager & LightingMgr(void);
     State_t mState;
     uint8_t mLevel;
-    uint16_t mX, mY;
+    XyColor_t mXY;
     RgbColor_t mRGB;
 
     LightingCallback_fn mActionInitiated_CB;

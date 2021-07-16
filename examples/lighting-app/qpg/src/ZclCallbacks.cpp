@@ -64,6 +64,14 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     }
     else if (clusterId == ZCL_COLOR_CONTROL_CLUSTER_ID)
     {
+        /* ignore several attributes that are currently not processed */
+        if ((attributeId == ZCL_COLOR_CONTROL_REMAINING_TIME_ATTRIBUTE_ID) ||
+            (attributeId == ZCL_COLOR_CONTROL_ENHANCED_COLOR_MODE_ATTRIBUTE_ID) ||
+            (attributeId == ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID))
+        {
+            return;
+        }
+
         if ((attributeId != ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID) && 
             (attributeId != ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID))
         {
@@ -91,7 +99,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
-            LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, 0, sizeof(xy), (uint8_t *)&xy);
+            LightingMgr().InitiateAction(LightingManager::COLOR_ACTION, 0, sizeof(xy), (uint8_t *)&xy);
         }
         else
         {
