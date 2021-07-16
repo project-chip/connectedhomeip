@@ -87,7 +87,7 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::CancelResponseCallback(NodeId nodeId, uint8_t
 
 CHIP_ERROR CHIPDeviceCallbacksMgr::AddResponseFilter(const ResponseCallbackInfo & info, TLVDataFilter filter)
 {
-    constexpr ResponseCallbackInfo kEmptyInfo{ kAnyNodeId, 0 };
+    constexpr ResponseCallbackInfo kEmptyInfo{ kPlaceholderNodeId, 0 };
 
     for (size_t i = 0; i < kTLVFilterPoolSize; i++)
     {
@@ -112,7 +112,7 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::PopResponseFilter(const ResponseCallbackInfo 
             {
                 *outFilter = mTLVFilterPool[i].filter;
             }
-            mTLVFilterPool[i].info   = ResponseCallbackInfo{ kAnyNodeId, 0 };
+            mTLVFilterPool[i].info   = ResponseCallbackInfo{ kPlaceholderNodeId, 0 };
             mTLVFilterPool[i].filter = nullptr;
             return CHIP_NO_ERROR;
         }

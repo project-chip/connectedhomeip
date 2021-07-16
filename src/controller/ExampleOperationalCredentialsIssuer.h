@@ -69,6 +69,15 @@ public:
 
     void SetCertificateValidityPeriod(uint32_t validity) { mValidity = validity; }
 
+    /**
+     * Generate a random operational node id.
+     *
+     * @param[out] aNodeId where to place the generated id.
+     *
+     * On error no guarantees are made about the state of aNodeId.
+     */
+    static CHIP_ERROR GetRandomOperationalNodeId(NodeId * aNodeId);
+
 private:
     Crypto::P256Keypair mIssuer;
     Crypto::P256Keypair mIntermediateIssuer;

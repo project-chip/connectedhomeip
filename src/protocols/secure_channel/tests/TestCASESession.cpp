@@ -482,8 +482,8 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 
     ReturnErrorOnFailure(ctx.Init(&sSuite, &gTransportMgr));
 
-    ctx.SetSourceNodeId(kAnyNodeId);
-    ctx.SetDestinationNodeId(kAnyNodeId);
+    ctx.SetSourceNodeId(kPlaceholderNodeId);
+    ctx.SetDestinationNodeId(kPlaceholderNodeId);
     ctx.SetLocalKeyId(0);
     ctx.SetPeerKeyId(0);
     ctx.SetAdminId(kUndefinedAdminId);

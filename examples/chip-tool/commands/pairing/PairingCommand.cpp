@@ -18,6 +18,7 @@
 
 #include "PairingCommand.h"
 #include "platform/PlatformManager.h"
+#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <support/logging/CHIPLogging.h>
@@ -40,12 +41,17 @@ CHIP_ERROR PairingCommand::Run()
 #if CONFIG_PAIR_WITH_RANDOM_ID
     // Generate a random remote id so we don't end up reusing the same node id
     // for different nodes.
+    //
+    // TODO: Ideally we'd just ask for an operational cert for the commissionnee
+    // and get the node from that, but the APIs are not set up that way yet.
     NodeId randomId;
-    DRBG_get_bytes(reinterpret_cast<uint8_t *>(&randomId), sizeof(randomId));
-    ChipLogProgress(Controller, "Generated random node id: 0x" ChipLogFormatX64, ChipLogValueX64(randomId));
-    if (GetExecContext()->storage->SetRemoteNodeId(randomId) == CHIP_NO_ERROR)
+    if (Controller::ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(&randomId) == CHIP_NO_ERROR)
     {
-        GetExecContext()->remoteId = randomId;
+        ChipLogProgress(Controller, "Generated random node id: 0x" ChipLogFormatX64, ChipLogValueX64(randomId));
+        if (GetExecContext()->storage->SetRemoteNodeId(randomId) == CHIP_NO_ERROR)
+        {
+            GetExecContext()->remoteId = randomId;
+        }
     }
 #endif // CONFIG_PAIR_WITH_RANDOM_ID
 

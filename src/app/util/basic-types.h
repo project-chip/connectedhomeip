@@ -26,7 +26,7 @@
 #include <stdint.h>
 
 // Pull in NodeId
-#include <transport/raw/MessageHeader.h>
+#include <lib/core/NodeId.h>
 
 // Pull in VendorId
 #include <core/CHIPVendorIdentifiers.hpp>
