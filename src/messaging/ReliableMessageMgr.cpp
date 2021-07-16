@@ -360,8 +360,8 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     if (dispatcher == nullptr)
     {
         // Using same error message for all errors to reduce code size.
-        ChipLogError(ExchangeManager, "Crit-err %s. when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
-                     ErrorStr(CHIP_ERROR_INCORRECT_STATE), entry->retainedBuf.GetMsgId(), entry->sendCount);
+        ChipLogError(ExchangeManager, "Crit-err %" CHIP_ERROR_FORMAT " when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
+                     ChipError::FormatError(CHIP_ERROR_INCORRECT_STATE), entry->retainedBuf.GetMsgId(), entry->sendCount);
         ClearRetransTable(*entry);
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -376,6 +376,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     else
     {
         // Remove from table
+        // Using same error message for all errors to reduce code size.
         ChipLogError(ExchangeManager, "Crit-err %" CHIP_ERROR_FORMAT " when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
                      ChipError::FormatError(err), entry->retainedBuf.GetMsgId(), entry->sendCount);
 
