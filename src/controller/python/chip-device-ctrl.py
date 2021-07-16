@@ -195,6 +195,7 @@ class DeviceMgrCmd(Cmd):
 
         "connect",
         "close-ble",
+        "close-session",
         "resolve",
         "zcl",
         "zclread",
@@ -526,6 +527,23 @@ class DeviceMgrCmd(Cmd):
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return
+
+    def do_closesession(self, line):
+        """
+        close-session <nodeid>
+
+        Close any session associated with a given node ID.
+        """
+        try:
+            parser = argparse.ArgumentParser()
+            parser.add_argument('nodeid', type=int, help='Peer node ID')
+            args = parser.parse_args(shlex.split(line))
+
+            self.devCtrl.CloseSession(args.nodeid)
+        except exceptions.ChipStackException as ex:
+            print(str(ex))
+        except:
+            self.do_help("close-session")
 
     def do_resolve(self, line):
         """
