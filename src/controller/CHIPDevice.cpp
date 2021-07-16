@@ -60,11 +60,11 @@ using namespace chip::Callback;
 
 namespace chip {
 namespace Controller {
-CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle && buffer)
+CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, Messaging::SendFlags sendFlags,
+                               System::PacketBufferHandle && buffer)
 {
     System::PacketBufferHandle resend;
     bool loadedSecureSession = false;
-    Messaging::SendFlags sendFlags;
 
     VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -372,7 +372,8 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     System::PacketBufferHandle outBuffer;
     ReturnErrorOnFailure(writer.Finalize(&outBuffer));
 
-    ReturnErrorOnFailure(SendMessage(Protocols::ServiceProvisioning::MsgType::ServiceProvisioningRequest, std::move(outBuffer)));
+    ReturnErrorOnFailure(SendMessage(Protocols::ServiceProvisioning::MsgType::ServiceProvisioningRequest,
+                                     Messaging::SendMessageFlags::kNone, std::move(outBuffer)));
 
     setupPayload.version               = 0;
     setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);

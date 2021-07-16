@@ -89,13 +89,15 @@ public:
      *
      * @param payload       A PacketBufferHandle with the payload.
      * @param sendFlags     Flags set by the application for the CHIP message being sent.
+     *                      SendEchoRequest will always add
+     *                      SendMessageFlags::kExpectResponse to the flags.
      *
      * @return CHIP_ERROR_NO_MEMORY if no ExchangeContext is available.
      *         Other CHIP_ERROR codes as returned by the lower layers.
      *
      */
     CHIP_ERROR SendEchoRequest(System::PacketBufferHandle && payload,
-                               const Messaging::SendFlags & sendFlags = Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+                               Messaging::SendFlags sendFlags = Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
 
 private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;

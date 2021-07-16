@@ -111,11 +111,14 @@ void CheckExchangeChannels(nlTestSuite * inSuite, void * inContext)
     ec1->SendMessage(0x0001, 0x0002, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize));
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
+    // Need to sort out what this test should really be testing and how; sending
+    // two messages in a row on an exchange is not something that really
+    // happens.
+
     // send a good packet
     ec1->SendMessage(0x0001, 0x0001, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize));
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
-    ec1->Close();
     channelHandle.Release();
 #endif
 }
