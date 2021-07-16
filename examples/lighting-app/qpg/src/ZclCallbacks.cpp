@@ -72,8 +72,10 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             return;
         }
 
-        if ((attributeId != ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID) && (attributeId != ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID) &&
-            (attributeId != ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID) && (attributeId != ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID))
+        if ((attributeId != ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID) &&
+            (attributeId != ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID) &&
+            (attributeId != ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID) &&
+            (attributeId != ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID))
         {
             ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
             return;
@@ -110,9 +112,9 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             {
                 hsv.h = *(uint8_t *) (value);
                 // get saturation from cluster value storage
-                EmberAfStatus status =
-                    emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                               (uint8_t *) &hsv.s, sizeof(hsv.s));
+                EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
+                                                                  ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                                                                  (uint8_t *) &hsv.s, sizeof(hsv.s));
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             if (attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID)

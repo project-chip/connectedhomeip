@@ -24,20 +24,26 @@
 #include <math.h>
 
 // initialization values for Blue in XY color space
-#define BLUE_XY         {9830, 3932}
+#define BLUE_XY                                                                                                                    \
+    {                                                                                                                              \
+        9830, 3932                                                                                                                 \
+    }
 
 // initialization values for Blue in HSV color space
-#define BLUE_HSV        {240, 100, 255}
+#define BLUE_HSV                                                                                                                   \
+    {                                                                                                                              \
+        240, 100, 255                                                                                                              \
+    }
 
 // default initialization value for the light level after start
-#define DEFAULT_LEVEL   (64)
+#define DEFAULT_LEVEL (64)
 
 LightingManager LightingManager::sLight;
 
 RgbColor_t LightingManager::HsvToRgb(HsvColor_t hsv)
 {
     RgbColor_t rgb;
- 
+
     uint16_t i       = hsv.h / 60;
     uint16_t rgb_max = hsv.v;
     uint16_t rgb_min = (uint16_t)(rgb_max * (100 - hsv.s)) / 100;
@@ -47,33 +53,33 @@ RgbColor_t LightingManager::HsvToRgb(HsvColor_t hsv)
     switch (i)
     {
     case 0:
-        rgb.r = (uint8_t)rgb_max;
+        rgb.r = (uint8_t) rgb_max;
         rgb.g = (uint8_t)(rgb_min + rgb_adj);
-        rgb.b = (uint8_t)rgb_min;
+        rgb.b = (uint8_t) rgb_min;
         break;
     case 1:
         rgb.r = (uint8_t)(rgb_max - rgb_adj);
-        rgb.g = (uint8_t)rgb_max;
-        rgb.b = (uint8_t)rgb_min;
+        rgb.g = (uint8_t) rgb_max;
+        rgb.b = (uint8_t) rgb_min;
         break;
     case 2:
-        rgb.r = (uint8_t)rgb_min;
-        rgb.g = (uint8_t)rgb_max;
+        rgb.r = (uint8_t) rgb_min;
+        rgb.g = (uint8_t) rgb_max;
         rgb.b = (uint8_t)(rgb_min + rgb_adj);
         break;
     case 3:
-        rgb.r = (uint8_t)rgb_min;
+        rgb.r = (uint8_t) rgb_min;
         rgb.g = (uint8_t)(rgb_max - rgb_adj);
-        rgb.b = (uint8_t)rgb_max;
+        rgb.b = (uint8_t) rgb_max;
         break;
     case 4:
         rgb.r = (uint8_t)(rgb_min + rgb_adj);
-        rgb.g = (uint8_t)rgb_min;
-        rgb.b = (uint8_t)rgb_max;
+        rgb.g = (uint8_t) rgb_min;
+        rgb.b = (uint8_t) rgb_max;
         break;
     default:
-        rgb.r = (uint8_t)rgb_max;
-        rgb.g = (uint8_t)rgb_min;
+        rgb.r = (uint8_t) rgb_max;
+        rgb.g = (uint8_t) rgb_min;
         rgb.b = (uint8_t)(rgb_max - rgb_adj);
         break;
     }
@@ -103,7 +109,40 @@ RgbColor_t LightingManager::XYToRgb(uint8_t Level, uint16_t currentX, uint16_t c
 
     x = ((float) currentX) / 65535.0f;
     y = ((float) currentY) / 65535.0f;
-???
+
+    z = 1.0f - x - y;
+
+    // Calculate XYZ values
+
+    // Y - given brightness in 0 - 1 range
+    Y = ((float) Level) / 254.0f;
+
+    X = (Y / y) * x;
+    Z = (Y / y) * z;
+
+    // X, Y and Z input refer to a D65/2° standard illuminant.
+    // sR, sG and sB (standard RGB) output range = 0 ÷ 255
+    // convert XYZ to RGB - CIE XYZ to sRGB
+    r = (X * 3.2410f) - (Y * 1.5374f) - (Z * 0.4986f);
+    g = -(X * 0.9692f) + (Y * 1.8760f) + (Z * 0.0416f);
+    b = (X * 0.0556f) - (Y * 0.2040f) + (Z * 1.0570f);
+
+    // apply gamma 2.2 correction
+    r = r <= 0.00304f ? 12.92f * r : (1.055f) * pow(r, (1.0f / 2.4f)) - 0.055f;
+    g = g <= 0.00304f ? 12.92f * g : (1.055f) * pow(g, (1.0f / 2.4f)) - 0.055f;
+    b = b <= 0.00304f ? 12.92f * b : (1.055f) * pow(b, (1.0f / 2.4f)) - 0.055f;
+
+    // Round off
+    r = r < 0 ? 0 : (r > 1 ? 1 : r);
+    g = g < 0 ? 0 : (g > 1 ? 1 : g);
+    b = b < 0 ? 0 : (b > 1 ? 1 : b);
+
+    // these rgb values are in  the range of 0 to 1, convert to limit of HW specific LED
+    rgb.r = (uint8_t)(r * 255);
+    rgb.g = (uint8_t)(g * 255);
+    rgb.b = (uint8_t)(b * 255);
+
+    return rgb;
 }
 
 CHIP_ERROR LightingManager::Init()
@@ -114,7 +153,7 @@ CHIP_ERROR LightingManager::Init()
     mHSV   = BLUE_HSV;
     mRGB   = XYToRgb(mLevel, mXY.x, mXY.y);
 
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 bool LightingManager::IsTurnedOn()
@@ -188,7 +227,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
             new_state = kState_On;
         }
     }
-    else if ((aAction == COLOR_ACTION_XY) && (xy.x != mXY.x || xy.y != mXY.y))
+    else if (aAction == COLOR_ACTION_XY)
     {
         action_initiated = true;
         if (xy.x == 0 && xy.y == 0)
@@ -200,7 +239,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
             new_state = kState_On;
         }
     }
-    else if ((aAction == COLOR_ACTION_HSV) && (hsv.h != mHSV.h || hsv.s != mHSV.s))
+    else if (aAction == COLOR_ACTION_HSV)
     {
         action_initiated = true;
         if (hsv.h == 0 && hsv.s == 0)
@@ -264,8 +303,8 @@ void LightingManager::SetColor(uint8_t hue, uint8_t saturation)
 {
     mHSV.h = hue;
     mHSV.s = saturation;
-    mHSV.v = mLevel; //use level from Level Cluster as Vibrance parameter
-    mRGB =  HsvToRgb(mHSV);
+    mHSV.v = mLevel; // use level from Level Cluster as Vibrance parameter
+    mRGB   = HsvToRgb(mHSV);
     UpdateLight();
 }
 
