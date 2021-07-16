@@ -70,7 +70,7 @@ constexpr size_t kMAX_Hash_SHA256_Context_Size = 296;
 constexpr size_t kMAX_P256Keypair_Context_Size = 512;
 
 constexpr size_t kEmitDerIntegerWithoutTagOverhead = 1; // 1 sign stuffer
-constexpr size_t kEmitDerIntegerOverhead = 3; // Tag + Length byte + 1 sign stuffer
+constexpr size_t kEmitDerIntegerOverhead           = 3; // Tag + Length byte + 1 sign stuffer
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER

@@ -886,14 +886,16 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1Writ
         {
             MutableByteSpan derIntSpan(derInt, sizeof(derInt));
             ReturnErrorOnFailure(ConvertIntegerRawToDerWithoutTag(P256IntegerSpan(rawSig.data()), derIntSpan));
-            ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, derIntSpan.data(), static_cast<uint16_t>(derIntSpan.size())));
+            ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, derIntSpan.data(),
+                                                 static_cast<uint16_t>(derIntSpan.size())));
         }
 
         // s INTEGER
         {
             MutableByteSpan derIntSpan(derInt, sizeof(derInt));
             ReturnErrorOnFailure(ConvertIntegerRawToDerWithoutTag(P256IntegerSpan(rawSig.data() + kP256_FE_Length), derIntSpan));
-            ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, derIntSpan.data(), static_cast<uint16_t>(derIntSpan.size())));
+            ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, derIntSpan.data(),
+                                                 static_cast<uint16_t>(derIntSpan.size())));
         }
     }
     ASN1_END_SEQUENCE;

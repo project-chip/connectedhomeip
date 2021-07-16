@@ -649,7 +649,7 @@ static void TestRawIntegerToDerValidCases(nlTestSuite * inSuite, void * inContex
 {
     int numOfTestCases = ArraySize(kRawIntegerToDerVectors);
 
-    for (int testIdx = 0; testIdx < numOfTestCases; testIdx ++)
+    for (int testIdx = 0; testIdx < numOfTestCases; testIdx++)
     {
         RawIntegerToDerVector v = kRawIntegerToDerVectors[testIdx];
 
@@ -660,14 +660,14 @@ static void TestRawIntegerToDerValidCases(nlTestSuite * inSuite, void * inContex
             NL_TEST_ASSERT(inSuite, out_der_buffer);
 
             MutableByteSpan out_der_integer(out_der_buffer.Get(), v.expected_size);
-            CHIP_ERROR status = ConvertIntegerRawToDer(ByteSpan{v.candidate, v.candidate_size}, out_der_integer);
+            CHIP_ERROR status = ConvertIntegerRawToDer(ByteSpan{ v.candidate, v.candidate_size }, out_der_integer);
             NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, out_der_integer.size() == v.expected_size);
             NL_TEST_ASSERT(inSuite, out_der_integer.data_equal(ByteSpan(v.expected, v.expected_size)));
 
             // Cover case of buffer too small
             MutableByteSpan out_der_integer_too_small(out_der_buffer.Get(), v.expected_size - 1);
-            status = ConvertIntegerRawToDer(ByteSpan{v.candidate, v.candidate_size}, out_der_integer_too_small);
+            status = ConvertIntegerRawToDer(ByteSpan{ v.candidate, v.candidate_size }, out_der_integer_too_small);
             NL_TEST_ASSERT(inSuite, status == CHIP_ERROR_BUFFER_TOO_SMALL);
         }
 
@@ -678,7 +678,7 @@ static void TestRawIntegerToDerValidCases(nlTestSuite * inSuite, void * inContex
             NL_TEST_ASSERT(inSuite, out_der_buffer);
 
             MutableByteSpan out_der_integer(out_der_buffer.Get(), v.expected_without_tag_size);
-            CHIP_ERROR status = ConvertIntegerRawToDerWithoutTag(ByteSpan{v.candidate, v.candidate_size}, out_der_integer);
+            CHIP_ERROR status = ConvertIntegerRawToDerWithoutTag(ByteSpan{ v.candidate, v.candidate_size }, out_der_integer);
 
             NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, out_der_integer.size() == v.expected_without_tag_size);
@@ -690,7 +690,7 @@ static void TestRawIntegerToDerValidCases(nlTestSuite * inSuite, void * inContex
 static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inContext)
 {
     // Cover case of invalid buffers
-    uint8_t placeholder[10] = {0};
+    uint8_t placeholder[10] = { 0 };
     MutableByteSpan good_out_buffer(placeholder, sizeof(placeholder));
     ByteSpan good_buffer(placeholder, sizeof(placeholder));
 
@@ -700,18 +700,18 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
     ByteSpan bad_buffer_nullptr(nullptr, sizeof(placeholder));
     ByteSpan bad_buffer_empty(placeholder, 0);
 
-    struct ErrorCase {
+    struct ErrorCase
+    {
         const ByteSpan & input;
         MutableByteSpan & output;
         CHIP_ERROR expected_status;
     };
 
-    const ErrorCase error_cases[] =
-    {
-        {.input = good_buffer, .output = bad_out_buffer_nullptr, .expected_status = CHIP_ERROR_INVALID_ARGUMENT},
-        {.input = good_buffer, .output = bad_out_buffer_empty, .expected_status = CHIP_ERROR_INVALID_ARGUMENT},
-        {.input = bad_buffer_nullptr, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT},
-        {.input = bad_buffer_empty, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT}
+    const ErrorCase error_cases[] = {
+        { .input = good_buffer, .output = bad_out_buffer_nullptr, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input = good_buffer, .output = bad_out_buffer_empty, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input = bad_buffer_nullptr, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input = bad_buffer_empty, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT }
     };
 
     int case_idx = 0;
