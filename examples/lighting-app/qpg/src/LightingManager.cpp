@@ -38,33 +38,45 @@ RgbColor_t LightingManager::HsvToRgb(HsvColor_t hsv)
         return rgb;
     }
 
-    region = hsv.h / 43;
-    remainder = (unsigned char)((hsv.h - (region * 43)) * 6); 
+    region    = hsv.h / 43;
+    remainder = (unsigned char) ((hsv.h - (region * 43)) * 6);
 
-    p = (unsigned char)((hsv.v * (255 - hsv.s)) >> 8);
-    q = (unsigned char)((hsv.v * (255 - ((hsv.s * remainder) >> 8))) >> 8);
-    t = (unsigned char)((hsv.v * (255 - ((hsv.s * (255 - remainder)) >> 8))) >> 8);
+    p = (unsigned char) ((hsv.v * (255 - hsv.s)) >> 8);
+    q = (unsigned char) ((hsv.v * (255 - ((hsv.s * remainder) >> 8))) >> 8);
+    t = (unsigned char) ((hsv.v * (255 - ((hsv.s * (255 - remainder)) >> 8))) >> 8);
 
     switch (region)
     {
-        case 0:
-            rgb.r = hsv.v; rgb.g = t; rgb.b = p;
-            break;
-        case 1:
-            rgb.r = q; rgb.g = hsv.v; rgb.b = p;
-            break;
-        case 2:
-            rgb.r = p; rgb.g = hsv.v; rgb.b = t;
-            break;
-        case 3:
-            rgb.r = p; rgb.g = q; rgb.b = hsv.v;
-            break;
-        case 4:
-            rgb.r = t; rgb.g = p; rgb.b = hsv.v;
-            break;
-        default:
-            rgb.r = hsv.v; rgb.g = p; rgb.b = q;
-            break;
+    case 0:
+        rgb.r = hsv.v;
+        rgb.g = t;
+        rgb.b = p;
+        break;
+    case 1:
+        rgb.r = q;
+        rgb.g = hsv.v;
+        rgb.b = p;
+        break;
+    case 2:
+        rgb.r = p;
+        rgb.g = hsv.v;
+        rgb.b = t;
+        break;
+    case 3:
+        rgb.r = p;
+        rgb.g = q;
+        rgb.b = hsv.v;
+        break;
+    case 4:
+        rgb.r = t;
+        rgb.g = p;
+        rgb.b = hsv.v;
+        break;
+    default:
+        rgb.r = hsv.v;
+        rgb.g = p;
+        rgb.b = q;
+        break;
     }
 
     return rgb;
@@ -86,28 +98,28 @@ RgbColor_t LightingManager::XYToRgb(uint8_t Level, uint16_t currentX, uint16_t c
 
     RgbColor_t rgb;
 
-    float x,y,z;
-    float X,Y,Z;
-    float r,g,b;
+    float x, y, z;
+    float X, Y, Z;
+    float r, g, b;
 
-    x = ((float)currentX)/65535.0f;
-    y = ((float)currentY)/65535.0f;
+    x = ((float) currentX) / 65535.0f;
+    y = ((float) currentY) / 65535.0f;
 
     z = 1.0f - x - y;
 
     // Calculate XYZ values
 
     // Y - given brightness in 0 - 1 range
-    Y = ((float)Level)/ 254.0f;
+    Y = ((float) Level) / 254.0f;
 
     X = (Y / y) * x;
     Z = (Y / y) * z;
 
-    //X, Y and Z input refer to a D65/2° standard illuminant.
-    //sR, sG and sB (standard RGB) output range = 0 ÷ 255
+    // X, Y and Z input refer to a D65/2° standard illuminant.
+    // sR, sG and sB (standard RGB) output range = 0 ÷ 255
     // convert XYZ to RGB - CIE XYZ to sRGB
     r = (X * 3.2410f) - (Y * 1.5374f) - (Z * 0.4986f);
-    g =  - (X * 0.9692f) + (Y * 1.8760f) + (Z * 0.0416f);
+    g = -(X * 0.9692f) + (Y * 1.8760f) + (Z * 0.0416f);
     b = (X * 0.0556f) - (Y * 0.2040f) + (Z * 1.0570f);
 
     // apply gamma 2.2 correction
@@ -115,15 +127,15 @@ RgbColor_t LightingManager::XYToRgb(uint8_t Level, uint16_t currentX, uint16_t c
     g = g <= 0.00304f ? 12.92f * g : (1.055f) * pow(g, (1.0f / 2.4f)) - 0.055f;
     b = b <= 0.00304f ? 12.92f * b : (1.055f) * pow(b, (1.0f / 2.4f)) - 0.055f;
 
-    //Round off
+    // Round off
     r = r < 0 ? 0 : (r > 1 ? 1 : r);
     g = g < 0 ? 0 : (g > 1 ? 1 : g);
     b = b < 0 ? 0 : (b > 1 ? 1 : b);
 
     // these rgb values are in  the range of 0 to 1, convert to limit of HW specific LED
-    rgb.r = (unsigned char)(r * 255);
-    rgb.g = (unsigned char)(g * 255);
-    rgb.b = (unsigned char)(b * 255);
+    rgb.r = (unsigned char) (r * 255);
+    rgb.g = (unsigned char) (g * 255);
+    rgb.b = (unsigned char) (b * 255);
 
     return rgb;
 }
@@ -132,9 +144,9 @@ int LightingManager::Init()
 {
     mState = kState_Off;
     mLevel = 64;
-    mXY.x = 0; //TBD
-    mXY.y = 0; //TBD
-    mRGB = XYToRgb(mLevel, mXY.x, mXY.y);
+    mXY.x  = 0; // TBD
+    mXY.y  = 0; // TBD
+    mRGB   = XYToRgb(mLevel, mXY.x, mXY.y);
     return 0;
 }
 
@@ -173,7 +185,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
         ChipLogProgress(NotSpecified, "LightMgr:LEVEL: lev:%u->%u", mLevel, *value);
         break;
     case COLOR_ACTION:
-        xy = *(XyColor_t *)(value);
+        xy = *(XyColor_t *) (value);
         ChipLogProgress(NotSpecified, "LightMgr:COLOR: xy:%u|%u->%u|%u", mXY.x, mXY.y, xy.x, xy.y);
         break;
     default:
@@ -207,7 +219,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
     else if ((aAction == COLOR_ACTION) && (xy.x != mXY.x || xy.y != mXY.y))
     {
         action_initiated = true;
-        if (xy.x == 0 && xy.y == 0) //TBC
+        if (xy.x == 0 && xy.y == 0) // TBC
         {
             new_state = kState_Off;
         }
@@ -215,7 +227,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
         {
             new_state = kState_On;
         }
-    } 
+    }
 
     if (action_initiated)
     {
@@ -248,7 +260,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
 void LightingManager::SetLevel(uint8_t aLevel)
 {
     mLevel = aLevel;
-    mRGB = XYToRgb(mLevel, mXY.x, mXY.y);
+    mRGB   = XYToRgb(mLevel, mXY.x, mXY.y);
     UpdateLight();
 }
 
@@ -256,7 +268,7 @@ void LightingManager::SetColor(uint16_t x, uint16_t y)
 {
     mXY.x = x;
     mXY.y = y;
-    mRGB = XYToRgb(mLevel, mXY.x, mXY.y);
+    mRGB  = XYToRgb(mLevel, mXY.x, mXY.y);
     UpdateLight();
 }
 

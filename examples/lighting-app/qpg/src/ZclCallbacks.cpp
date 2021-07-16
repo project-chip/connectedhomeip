@@ -72,8 +72,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             return;
         }
 
-        if ((attributeId != ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID) && 
-            (attributeId != ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID))
+        if ((attributeId != ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID) && (attributeId != ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID))
         {
             ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
             return;
@@ -84,22 +83,24 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             XyColor_t xy;
             if (attributeId == ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID)
             {
-                xy.x = *(uint16_t *)(value);
-                //get Y from cluster value storage
-                EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, 
-                                                        ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID, (uint8_t *)&xy.y, sizeof(xy.y));
+                xy.x = *(uint16_t *) (value);
+                // get Y from cluster value storage
+                EmberAfStatus status =
+                    emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
+                                               (uint8_t *) &xy.y, sizeof(xy.y));
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             if (attributeId == ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID)
             {
-                xy.y = *(uint16_t *)(value);
-                //get X from cluster value storage
-                EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, 
-                                                        ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID, (uint8_t *)&xy.x, sizeof(xy.x));
+                xy.y = *(uint16_t *) (value);
+                // get X from cluster value storage
+                EmberAfStatus status =
+                    emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
+                                               (uint8_t *) &xy.x, sizeof(xy.x));
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
-            LightingMgr().InitiateAction(LightingManager::COLOR_ACTION, 0, sizeof(xy), (uint8_t *)&xy);
+            LightingMgr().InitiateAction(LightingManager::COLOR_ACTION, 0, sizeof(xy), (uint8_t *) &xy);
         }
         else
         {
