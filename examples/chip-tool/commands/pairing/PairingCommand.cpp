@@ -18,7 +18,9 @@
 
 #include "PairingCommand.h"
 #include "platform/PlatformManager.h"
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <support/logging/CHIPLogging.h>
 
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
@@ -34,6 +36,18 @@ CHIP_ERROR PairingCommand::Run()
 
     GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
     GetExecContext()->commissioner->RegisterPairingDelegate(this);
+
+#if CONFIG_PAIR_WITH_RANDOM_ID
+    // Generate a random remote id so we don't end up reusing the same node id
+    // for different nodes.
+    NodeId randomId;
+    DRBG_get_bytes(reinterpret_cast<uint8_t *>(&randomId), sizeof(randomId));
+    ChipLogProgress(Controller, "Generated random node id: 0x" ChipLogFormatX64, ChipLogValueX64(randomId));
+    if (GetExecContext()->storage->SetRemoteNodeId(randomId) == CHIP_NO_ERROR)
+    {
+        GetExecContext()->remoteId = randomId;
+    }
+#endif // CONFIG_PAIR_WITH_RANDOM_ID
 
     err = RunInternal(GetExecContext()->remoteId);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init Failure! PairDevice: %s", ErrorStr(err)));
