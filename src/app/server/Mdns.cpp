@@ -48,7 +48,7 @@ NodeId GetCurrentNodeId()
     // mdns advertises a single node id as parameter.
 
     // Search for one admin pairing and use its node id.
-    for (const Transport::AdminPairingInfo& pairing : GetGlobalAdminPairingTable())
+    for (const Transport::AdminPairingInfo & pairing : GetGlobalAdminPairingTable())
     {
         if (pairing.GetNodeId() != kUndefinedNodeId)
         {
