@@ -587,7 +587,7 @@ public:
 
 /**
  * @brief A cryptographically secure random number generator based on NIST SP800-90A
- * @param out_buffer Buffer to write random bytes into
+ * @param out_buffer Buffer into which to write random bytes
  * @param out_length Number of random bytes to generate
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
