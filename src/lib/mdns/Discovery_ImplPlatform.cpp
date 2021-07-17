@@ -133,7 +133,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char pairingHintBuf[kKeyPairingHintMaxLength + 1];
     char pairingInstrBuf[kKeyPairingInstructionMaxLength + 1];
     // size of textEntries array should be count of Bufs above
-    TextEntry textEntries[9];
+    TextEntry textEntries[CommissionAdvertisingParameters::kTxtMaxNumber];
     size_t textEntrySize = 0;
     // add null-character to the subtypes
     char shortDiscriminatorSubtype[kSubTypeShortDiscriminatorMaxLength + 1];
@@ -345,7 +345,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     constexpr uint8_t kMaxMRPRetryBufferSize = 7 + 1;
     char mrpRetryIntervalIdleBuf[kMaxMRPRetryBufferSize];
     char mrpRetryIntervalActiveBuf[kMaxMRPRetryBufferSize];
-    TextEntry mrpRetryIntervalEntries[OperationalAdvertisingParameters::kNumAdvertisingTxtEntries];
+    TextEntry mrpRetryIntervalEntries[OperationalAdvertisingParameters::kTxtMaxNumber];
     size_t textEntrySize = 0;
     uint32_t mrpRetryIntervalIdle, mrpRetryIntervalActive;
     int writtenCharactersNumber;
