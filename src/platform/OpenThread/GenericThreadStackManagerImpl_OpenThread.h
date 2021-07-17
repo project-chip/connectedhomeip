@@ -185,7 +185,7 @@ private:
     static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber = Mdns::CommissionAdvertisingParameters::kTxtMaxNumber;
     static constexpr uint8_t kMaxDnsServiceTxtValueSize     = Mdns::CommissionAdvertisingParameters::kTxtMaxValueSize;
     // TODO: Switch to max(commissionable TXT key size, operational TXT key size) after optimizing memory usage
-    static constexpr uint8_t kMaxDnsServiceTxtKeySize       = Mdns::OperationalAdvertisingParameters::kTxtMaxKeySize;
+    static constexpr uint8_t kMaxDnsServiceTxtKeySize = Mdns::OperationalAdvertisingParameters::kTxtMaxKeySize;
 #else
     // Thread only supports operational discovery.
     static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber = Mdns::OperationalAdvertisingParameters::kTxtMaxNumber;
