@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,8 @@
 
 /**
  *    @file
- *      This file defines objects for a CHIP Echo unsolicitied
- *      initaitor (client) and responder (server).
+ *      This file defines objects for a User-Directed Commissioning unsolicitied
+ *      initiator (client) and recipient (server).
  *
  */
 
@@ -61,9 +61,9 @@ public:
      * @param instanceName DNS-SD instance name for the client requesting commissioning
      *
      */
-    virtual void FindCommissionableNode(char * instanceName) {}
+    virtual void FindCommissionableNode(char * instanceName) = 0;
 
-    virtual ~InstanceNameResolver() {}
+    virtual ~InstanceNameResolver() = default;
 };
 
 class DLL_EXPORT UserConfirmationProvider
@@ -79,9 +79,9 @@ public:
      * @param nodeData DNS-SD node information for the client requesting commissioning
      *
      */
-    virtual void OnUserDirectedCommissioningRequest(const Mdns::DiscoveredNodeData & nodeData) {}
+    virtual void OnUserDirectedCommissioningRequest(const Mdns::DiscoveredNodeData & nodeData) = 0;
 
-    virtual ~UserConfirmationProvider() {}
+    virtual ~UserConfirmationProvider() = default;
 };
 
 class DLL_EXPORT UserDirectedCommissioningClient
@@ -92,8 +92,7 @@ public:
      *
      * @param transportMgr  A transport to use for sending the message.
      * @param payload       A PacketBufferHandle with the payload.
-     * @param commissioner  Address of destination.
-     * @param port          Port of destination.
+     * @param peerAddress   Address of destination.
      *
      * @return CHIP_ERROR_NO_MEMORY if allocation fails.
      *         Other CHIP_ERROR codes as returned by the lower layers.
@@ -101,7 +100,7 @@ public:
      */
 
     CHIP_ERROR SendUDCMessage(TransportMgrBase * transportMgr, System::PacketBufferHandle && payload,
-                              chip::Inet::IPAddress commissioner, uint16_t port);
+                              chip::Transport::PeerAddress peerAddress);
 };
 
 class DLL_EXPORT UserDirectedCommissioningServer : public TransportMgrDelegate

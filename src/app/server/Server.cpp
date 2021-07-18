@@ -47,7 +47,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT || CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT || CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <app/server/Mdns.h>
@@ -582,7 +582,7 @@ exit:
 // to send UDC from a Matter device. The UDC message payload needs to include the device's
 // randomly generated service name.
 
-CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commissioner, uint16_t port)
+CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner)
 {
     ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
 
@@ -606,7 +606,7 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commission
             return CHIP_ERROR_NO_MEMORY;
         }
 
-        err = gUDCClient.SendUDCMessage(&gTransports, std::move(payloadBuf), commissioner, port);
+        err = gUDCClient.SendUDCMessage(&gTransports, std::move(payloadBuf), commissioner);
         if (err == CHIP_NO_ERROR)
         {
             ChipLogDetail(AppServer, "Send UDC request success");
@@ -621,7 +621,7 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commission
     return err;
 }
 
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
 CHIP_ERROR AddTestPairing()
 {
@@ -663,13 +663,3 @@ AdminPairingTable & GetGlobalAdminPairingTable()
 {
     return gAdminPairings;
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-
-CHIP_ERROR ResetUDCStates()
-{
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().ResetUDCClientProcessingStates();
-
-    return CHIP_NO_ERROR;
-}
-#endif

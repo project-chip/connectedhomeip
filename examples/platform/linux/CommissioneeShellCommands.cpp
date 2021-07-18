@@ -15,6 +15,10 @@
  *    limitations under the License.
  */
 
+/**
+ * @file Contains shell commands for a commissionee (eg. end device) related to commissioning.
+ */
+
 #include <CommissioneeShellCommands.h>
 #include <app/server/Server.h>
 #include <inttypes.h>
@@ -32,7 +36,7 @@ namespace chip {
 namespace Shell {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-static CHIP_ERROR SendUDC(bool printHeader, chip::Inet::IPAddress commissioner)
+static CHIP_ERROR SendUDC(bool printHeader, chip::Transport::PeerAddress commissioner)
 {
     streamer_t * sout = streamer_get();
 
@@ -41,21 +45,22 @@ static CHIP_ERROR SendUDC(bool printHeader, chip::Inet::IPAddress commissioner)
         streamer_printf(sout, "SendUDC:        ");
     }
 
-    SendUserDirectedCommissioningRequest(commissioner, CHIP_PORT + 3);
+    SendUserDirectedCommissioningRequest(commissioner);
 
     streamer_printf(sout, "done\r\n");
 
     return CHIP_NO_ERROR;
 }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
 static int PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
     streamer_printf(sout, "  help                       Usage: commissionee <subcommand>\r\n");
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    streamer_printf(sout, "  sendudc <address>          Send UDC message to address. Usage: commissionee sendudc 127.0.0.1\r\n");
-#endif
+    streamer_printf(sout,
+                    "  sendudc <address> <port>   Send UDC message to address. Usage: commissionee sendudc 127.0.0.1 11100\r\n");
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -72,11 +77,13 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     else if (strcmp(argv[0], "sendudc") == 0)
     {
+        char * eptr;
         chip::Inet::IPAddress commissioner;
         chip::Inet::IPAddress::FromString(argv[1], commissioner);
-        return error = SendUDC(true, commissioner);
+        uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
+        return error  = SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port));
     }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     else
     {
         return CHIP_ERROR_INVALID_ARGUMENT;

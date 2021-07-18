@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements an object for a CHIP Echo unsolicitied
+ *      This file implements an object for a Matter User Directed Commissioning unsolicitied
  *      initiator (client).
  *
  */
@@ -30,16 +30,14 @@ namespace Protocols {
 namespace UserDirectedCommissioning {
 
 CHIP_ERROR UserDirectedCommissioningClient::SendUDCMessage(TransportMgrBase * transportMgr, System::PacketBufferHandle && payload,
-                                                           chip::Inet::IPAddress commissioner, uint16_t port)
+                                                           chip::Transport::PeerAddress peerAddress)
 {
     CHIP_ERROR err;
 
     PayloadHeader payloadHeader;
     PacketHeader packetHeader;
 
-    payloadHeader.SetMessageType(Protocols::UserDirectedCommissioning::Id, (uint8_t) MsgType::IdentificationDeclaration)
-        .SetInitiator(true);
-    payloadHeader.SetNeedsAck(false);
+    payloadHeader.SetMessageType(MsgType::IdentificationDeclaration).SetInitiator(true).SetNeedsAck(false);
 
     VerifyOrReturnError(!payload.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!payload->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -49,21 +47,12 @@ CHIP_ERROR UserDirectedCommissioningClient::SendUDCMessage(TransportMgrBase * tr
 
     packetHeader.SetEncryptionType(Header::EncryptionType::kEncryptionTypeNone);
 
-    uint16_t totalLen = payload->TotalLength();
-    uint16_t taglen   = 0;
-    ChipLogDetail(Inet, "SendUDCMessage totalLen=%d taglen=%d", totalLen, taglen);
-
-    payload->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
-
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(payload));
 
-    chip::Transport::PeerAddress peerAddress;
-    peerAddress = chip::Transport::PeerAddress::UDP(commissioner, port, INET_NULL_INTERFACEID);
-
-    ChipLogProgress(Inet, "Sending secure msg on generic transport");
+    ChipLogProgress(Inet, "Sending UDC msg");
     err = transportMgr->SendMessage(peerAddress, std::move(payload));
 
-    ChipLogProgress(Inet, "Secure msg send status %s", ErrorStr(err));
+    ChipLogProgress(Inet, "UDC msg send status %s", ErrorStr(err));
     return err;
 }
 

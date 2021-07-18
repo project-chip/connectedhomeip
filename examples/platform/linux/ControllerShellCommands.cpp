@@ -15,6 +15,10 @@
  *    limitations under the License.
  */
 
+/**
+ * @file Contains shell commands for for performing discovery (eg. of commissionable nodes) related to commissioning.
+ */
+
 #include <ControllerShellCommands.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
@@ -30,8 +34,9 @@
 namespace chip {
 namespace Shell {
 
-using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
-ChipDeviceCommissioner * mCommissioner;
+using namespace ::chip::Controller;
+
+DeviceCommissioner * gCommissioner;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 static CHIP_ERROR ResetUDC(bool printHeader)
@@ -49,8 +54,9 @@ static CHIP_ERROR ResetUDC(bool printHeader)
 
     return CHIP_NO_ERROR;
 }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 static CHIP_ERROR discover(bool printHeader)
 {
     streamer_t * sout = streamer_get();
@@ -61,7 +67,7 @@ static CHIP_ERROR discover(bool printHeader)
     }
 
     Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint16_t) 0);
-    mCommissioner->DiscoverCommissionableNodes(filter);
+    gCommissioner->DiscoverCommissionableNodes(filter);
 
     streamer_printf(sout, "done\r\n");
 
@@ -78,7 +84,7 @@ static CHIP_ERROR discover(bool printHeader, char * instance)
     }
 
     Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kInstanceName, instance);
-    mCommissioner->DiscoverCommissionableNodes(filter);
+    gCommissioner->DiscoverCommissionableNodes(filter);
 
     streamer_printf(sout, "done\r\n");
 
@@ -96,7 +102,7 @@ static CHIP_ERROR display(bool printHeader)
 
     for (int i = 0; i < 10; i++)
     {
-        const chip::Mdns::DiscoveredNodeData * next = mCommissioner->GetDiscoveredDevice(i);
+        const chip::Mdns::DiscoveredNodeData * next = gCommissioner->GetDiscoveredDevice(i);
         if (next == nullptr)
         {
             streamer_printf(sout, "  Entry %d null\r\n", i);
@@ -112,6 +118,7 @@ static CHIP_ERROR display(bool printHeader)
 
     return CHIP_NO_ERROR;
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 static int PrintAllCommands()
 {
@@ -120,6 +127,8 @@ static int PrintAllCommands()
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     streamer_printf(
         sout, "  resetudc                   Clear all pending UDC sessions from this UDC server. Usage: commission resetudc\r\n");
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout, "  commissionable                   Discover all commissionable nodes. Usage: commission discover\r\n");
     streamer_printf(
         sout,
@@ -127,7 +136,7 @@ static int PrintAllCommands()
         "commissionable-instance DC514873944A5CFF\r\n");
     streamer_printf(sout,
                     "  display                    Display all discovered commissionable nodes. Usage: commission display\r\n");
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -146,7 +155,8 @@ static CHIP_ERROR DiscoverHandler(int argc, char ** argv)
     {
         return error = ResetUDC(true);
     }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     else if (strcmp(argv[0], "commissionable") == 0)
     {
         return error = discover(true);
@@ -159,6 +169,7 @@ static CHIP_ERROR DiscoverHandler(int argc, char ** argv)
     {
         return error = display(true);
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     else
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -168,7 +179,7 @@ static CHIP_ERROR DiscoverHandler(int argc, char ** argv)
 
 void RegisterDiscoverCommands(chip::Controller::DeviceCommissioner * commissioner)
 {
-    mCommissioner                              = commissioner;
+    gCommissioner                              = commissioner;
     static const shell_command_t sDeviceComand = { &DiscoverHandler, "discover",
                                                    "Discover commands. Usage: discover [command_name]" };
 

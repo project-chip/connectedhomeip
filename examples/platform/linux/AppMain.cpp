@@ -36,7 +36,7 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <platform/KeyValueStoreManager.h>
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if defined(ENABLE_CHIP_SHELL)
 #include <CommissioneeShellCommands.h>
@@ -136,6 +136,7 @@ using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Messaging;
+using namespace ::chip::Controller;
 
 class MyServerStorageDelegate : public PersistentStorageDelegate
 {
@@ -158,31 +159,31 @@ class MyServerStorageDelegate : public PersistentStorageDelegate
     }
 };
 
-using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
-ChipDeviceCommissioner mCommissioner;
+DeviceCommissioner gCommissioner;
 MyServerStorageDelegate gServerStorage;
+ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 
 CHIP_ERROR InitCommissioner()
 {
     NodeId localId = chip::kAnyNodeId;
 
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
     chip::Controller::CommissionerInitParams params;
 
-    params.storageDelegate = &gServerStorage;
-    // params.mDeviceAddressUpdateDelegate   = this;
-    params.operationalCredentialsDelegate = &mOpCredsIssuer;
+    params.storageDelegate                = &gServerStorage;
+    params.mDeviceAddressUpdateDelegate   = nullptr;
+    params.operationalCredentialsDelegate = &gOpCredsIssuer;
 
-    ReturnErrorOnFailure(mOpCredsIssuer.Initialize(gServerStorage));
+    ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
 
-    // ReturnErrorOnFailure(mCommissioner.SetUdpListenPort(storage.GetListenPort()));
-    ReturnErrorOnFailure(mCommissioner.Init(localId, params));
-    ReturnErrorOnFailure(mCommissioner.ServiceEvents());
+    ReturnErrorOnFailure(gCommissioner.SetUdpListenPort(CHIP_PORT + 2));
+    ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(CHIP_PORT + 3));
+    ReturnErrorOnFailure(gCommissioner.Init(localId, params));
+    ReturnErrorOnFailure(gCommissioner.ServiceEvents());
 
     return CHIP_NO_ERROR;
 }
 
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 void ChipLinuxAppMainLoop()
 {
@@ -196,8 +197,10 @@ void ChipLinuxAppMainLoop()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     InitCommissioner();
-    chip::Shell::RegisterDiscoverCommands(&mCommissioner);
-#endif
+#if defined(ENABLE_CHIP_SHELL)
+    chip::Shell::RegisterDiscoverCommands(&gCommissioner);
+#endif // defined(ENABLE_CHIP_SHELL)
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 #if defined(ENABLE_CHIP_SHELL)

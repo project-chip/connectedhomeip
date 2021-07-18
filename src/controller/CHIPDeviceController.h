@@ -416,6 +416,13 @@ public:
     DeviceCommissioner();
     ~DeviceCommissioner() {}
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    /**
+     * Set port for User Directed Commissioning
+     */
+    CHIP_ERROR SetUdcListenPort(uint16_t listenPort);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
     /**
      * Commissioner-specific initialization, includes parameters such as the pairing delegate.
      */
@@ -576,8 +583,11 @@ private:
 
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
     DeviceTransportMgr * mUdcTransportMgr = nullptr;
+    uint16_t mUdcListenPort               = CHIP_PORT + 1;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void PersistDeviceList();
 

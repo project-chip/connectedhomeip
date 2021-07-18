@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,8 @@
 
 /**
  *    @file
- *      This file implements an object for a CHIP Echo unsolicitied
- *      responder (server).
+ *      This file implements an object for a Matter User Directed Commissioning unsolicitied
+ *      recipient (server).
  *
  */
 
@@ -29,14 +29,13 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf)
+void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msg)
 {
-    msgBuf->DebugDump("NEW UserDirectedCommissioningServer::OnMessageReceive");
-    ChipLogProgress(AppServer, "NEW UserDirectedCommissioningServer::OnMessageReceived");
+    ChipLogProgress(AppServer, "UserDirectedCommissioningServer::OnMessageReceived");
 
     PacketHeader packetHeader;
 
-    ReturnOnFailure(packetHeader.DecodeAndConsume(msgBuf));
+    ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
 
     if (packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
     {
@@ -44,24 +43,19 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
         return;
     }
 
-    // TODO: do we need these std::move calls?
-    System::PacketBufferHandle && msg = std::move(msgBuf);
-
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
-    System::PacketBufferHandle && payload = std::move(msg);
-
     char instanceName[chip::Mdns::kMaxInstanceNameSize + 1];
     size_t instanceNameLength =
-        (payload->DataLength() > (chip::Mdns::kMaxInstanceNameSize)) ? chip::Mdns::kMaxInstanceNameSize : payload->DataLength();
-    payload->Read((uint8_t *) instanceName, instanceNameLength);
+        (msg->DataLength() > (chip::Mdns::kMaxInstanceNameSize)) ? chip::Mdns::kMaxInstanceNameSize : msg->DataLength();
+    msg->Read(Uint8::from_char(instanceName), instanceNameLength);
 
     instanceName[instanceNameLength] = '\0';
 
     ChipLogProgress(AppServer, "UDC instance=%s", instanceName);
 
-    UDCClientState * client = mUdcClients.FindUDCClientState(instanceName, nullptr);
+    UDCClientState * client = mUdcClients.FindUDCClientState(instanceName);
     if (client == nullptr)
     {
         ChipLogProgress(AppServer, "UDC new instance state received");
@@ -71,11 +65,6 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "UDC error creating new connection state");
-            return;
-        }
-        if (client == nullptr)
-        {
-            ChipLogError(AppServer, "UDC no memory");
             return;
         }
 
@@ -95,7 +84,7 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
 
 void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanceName, UDCClientProcessingState state)
 {
-    UDCClientState * client = mUdcClients.FindUDCClientState(instanceName, nullptr);
+    UDCClientState * client = mUdcClients.FindUDCClientState(instanceName);
     if (client == nullptr)
     {
         // printf("SetUDCClientProcessingState new instance state received\n");
@@ -105,11 +94,6 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
         {
             ChipLogError(AppServer,
                          "UserDirectedCommissioningServer::SetUDCClientProcessingState error creating new connection state");
-            return;
-        }
-        if (client == nullptr)
-        {
-            ChipLogError(AppServer, "UserDirectedCommissioningServer::SetUDCClientProcessingState no memory");
             return;
         }
     }
@@ -125,7 +109,7 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
 
 void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Mdns::DiscoveredNodeData & nodeData)
 {
-    UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.instanceName, nullptr);
+    UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.instanceName);
     if (client != nullptr && client->GetUDCClientProcessingState() == UDCClientProcessingState::kDiscoveringNode)
     {
         ChipLogDetail(AppServer, "OnCommissionableNodeFound instance: name=%s old_state=%d new_state=%d", client->GetInstanceName(),

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -64,18 +64,17 @@ public:
             *state = nullptr;
         }
 
-        for (size_t i = 0; i < kMaxClientCount; i++)
+        for (auto & stateiter : mStates)
         {
-            if (!mStates[i].IsInitialized(currentTime))
+            if (!stateiter.IsInitialized(currentTime))
             {
-                // mStates[i].SetPeerAddress(address);
-                mStates[i].SetInstanceName(instanceName);
-                mStates[i].SetExpirationTimeMs(currentTime + kUDCClientTimeoutMs);
-                mStates[i].SetUDCClientProcessingState(UDCClientProcessingState::kDiscoveringNode);
+                stateiter.SetInstanceName(instanceName);
+                stateiter.SetExpirationTimeMs(currentTime + kUDCClientTimeoutMs);
+                stateiter.SetUDCClientProcessingState(UDCClientProcessingState::kDiscoveringNode);
 
                 if (state)
                 {
-                    *state = &mStates[i];
+                    *state = &stateiter;
                 }
 
                 err = CHIP_NO_ERROR;
@@ -90,32 +89,25 @@ public:
      * Get a UDC Client state given a Peer address.
      *
      * @param address is the connection to find (based on address)
-     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
      *
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    UDCClientState * FindUDCClientState(const PeerAddress & address, UDCClientState * begin)
+    UDCClientState * FindUDCClientState(const PeerAddress & address)
     {
         const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
 
         UDCClientState * state = nullptr;
-        UDCClientState * iter  = &mStates[0];
 
-        if (begin >= iter && begin < &mStates[kMaxClientCount])
+        for (auto & stateiter : mStates)
         {
-            iter = begin + 1;
-        }
-
-        for (; iter < &mStates[kMaxClientCount]; iter++)
-        {
-            if (!iter->IsInitialized(currentTime))
+            if (!stateiter.IsInitialized(currentTime))
             {
                 continue;
             }
-            if (iter->GetPeerAddress() == address)
+            if (stateiter.GetPeerAddress() == address)
             {
-                state = iter;
+                state = &stateiter;
                 break;
             }
         }
@@ -123,37 +115,30 @@ public:
     }
 
     /**
-     * Get a UDC Client state given a Peer address.
+     * Get a UDC Client state given an instance name.
      *
-     * @param address is the connection to find (based on address)
-     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
+     * @param instanceName is the instance name to find (based upon instance name)
      *
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    UDCClientState * FindUDCClientState(const char * instanceName, UDCClientState * begin)
+    UDCClientState * FindUDCClientState(const char * instanceName)
     {
         const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
 
         UDCClientState * state = nullptr;
-        UDCClientState * iter  = &mStates[0];
 
-        if (begin >= iter && begin < &mStates[kMaxClientCount])
+        for (auto & stateiter : mStates)
         {
-            iter = begin + 1;
-        }
-
-        for (; iter < &mStates[kMaxClientCount]; iter++)
-        {
-            if (!iter->IsInitialized(currentTime))
+            if (!stateiter.IsInitialized(currentTime))
             {
                 continue;
             }
 
             // TODO: check length of instanceName
-            if (strncmp(iter->GetInstanceName(), instanceName, chip::Mdns::kMaxInstanceNameSize + 1) == 0)
+            if (strncmp(stateiter.GetInstanceName(), instanceName, chip::Mdns::kMaxInstanceNameSize + 1) == 0)
             {
-                state = iter;
+                state = &stateiter;
                 break;
             }
         }
@@ -163,20 +148,17 @@ public:
     // Reset all states to kNotInitialized
     void ResetUDCClientStates()
     {
-        for (size_t i = 0; i < kMaxClientCount; i++)
+        for (auto & stateiter : mStates)
         {
-            mStates[i].Reset();
+            stateiter.Reset();
         }
     }
 
-    /// Convenience method to mark a peer connection state as active
+    /// Convenience method to mark a UDC Client state as active (non-expired)
     void MarkUDCClientActive(UDCClientState * state)
     {
         state->SetExpirationTimeMs(mTimeSource.GetCurrentMonotonicTimeMs() + kUDCClientTimeoutMs);
     }
-
-    /// Allows access to the underlying time source used for keeping track of connection active time
-    Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
 
 private:
     Time::TimeSource<kTimeSource> mTimeSource;

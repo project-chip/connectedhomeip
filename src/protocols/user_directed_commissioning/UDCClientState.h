@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,9 +29,6 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-/**
- * Here we specified Type to be uint8_t, so the state can be serialized easily.
- */
 enum class UDCClientProcessingState : uint8_t
 {
     kNotInitialized,

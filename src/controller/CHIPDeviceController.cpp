@@ -93,6 +93,9 @@ namespace chip {
 namespace Controller {
 
 using namespace chip::Encoding;
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+using namespace chip::Protocols::UserDirectedCommissioning;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
@@ -106,7 +109,7 @@ DeviceController::DeviceController() : mLocalNOCCallback(OnLocalNOCGenerated, th
     mLocalDeviceId            = 0;
     mStorageDelegate          = nullptr;
     mPairedDevicesInitialized = false;
-    mListenPort               = CHIP_PORT + 2; // It should not be a requirement to use the same port
+    mListenPort               = CHIP_PORT;
 }
 
 CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams params)
@@ -189,10 +192,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     ReturnErrorOnFailure(Mdns::Resolver::Instance().SetResolverDelegate(this));
-    if (params.mDeviceAddressUpdateDelegate != nullptr)
-    {
-        RegisterDeviceAddressUpdateDelegate(params.mDeviceAddressUpdateDelegate);
-    }
+    RegisterDeviceAddressUpdateDelegate(params.mDeviceAddressUpdateDelegate);
     Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
@@ -204,9 +204,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // this conflicts with app/Server commissionee code
     ReturnErrorOnFailure(LoadLocalCredentials(admin));
-#endif
 
     ReleaseAllDevices();
 
@@ -840,28 +838,27 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     mUdcTransportMgr = chip::Platform::New<DeviceTransportMgr>();
-    // TODO: fix listen port
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mInetLayer)
                                                     .SetAddressType(Inet::kIPAddressType_IPv6)
-                                                    .SetListenPort((uint16_t)(mListenPort + 1))
+                                                    .SetListenPort((uint16_t)(mUdcListenPort))
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
                                                 Transport::UdpListenParameters(mInetLayer)
                                                     .SetAddressType(Inet::kIPAddressType_IPv4)
-                                                    .SetListenPort((uint16_t)(mListenPort + 1))
-#endif
+                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+#endif // INET_CONFIG_ENABLE_IPV4
 #if CONFIG_NETWORK_LAYER_BLE
                                                     ,
                                                 Transport::BleListenParameters(mBleLayer)
-#endif
+#endif // CONFIG_NETWORK_LAYER_BLE
                                                     ));
 
-    mUdcTransportMgr->SetSecureSessionMgr(
-        &chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance());
+    UserDirectedCommissioningServer * udcServer = &UserDirectedCommissioningServer::GetInstance();
+    mUdcTransportMgr->SetSecureSessionMgr(udcServer);
 
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().SetInstanceNameResolver(this);
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().SetUserConfirmationProvider(this);
-#endif
+    udcServer->SetInstanceNameResolver(this);
+    udcServer->SetUserConfirmationProvider(this);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     return CHIP_NO_ERROR;
 }
 
@@ -876,12 +873,16 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     PersistDeviceList();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    UserDirectedCommissioningServer udcServer = UserDirectedCommissioningServer::GetInstance();
+    udcServer.SetInstanceNameResolver(nullptr);
+    udcServer.SetUserConfirmationProvider(nullptr);
+
     if (mUdcTransportMgr != nullptr)
     {
         chip::Platform::Delete(mUdcTransportMgr);
         mUdcTransportMgr = nullptr;
     }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     DeviceController::Shutdown();
     return CHIP_NO_ERROR;
@@ -1232,7 +1233,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
     ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, device->GetCSRNonce()));
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
@@ -1340,7 +1341,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
     ReturnErrorOnFailure(cluster.AddOpCert(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0), mLocalDeviceId, 0));
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
@@ -1405,7 +1406,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device)
     Callback::Cancelable * failureCallback = mOnRootCertFailureCallback.Cancel();
 
     ReturnErrorOnFailure(cluster.AddTrustedRootCertificate(successCallback, failureCallback, ByteSpan(rootCert, rootCertLen)));
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     ChipLogProgress(Controller, "Sent root certificate to the device");
 
@@ -1548,6 +1549,17 @@ const Mdns::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
 
+CHIP_ERROR DeviceCommissioner::SetUdcListenPort(uint16_t listenPort)
+{
+    if (mState == State::Initialized)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    mUdcListenPort = listenPort;
+    return CHIP_NO_ERROR;
+}
+
 void DeviceCommissioner::FindCommissionableNode(char * instanceName)
 {
     Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kInstanceName, instanceName);
@@ -1618,7 +1630,7 @@ void DeviceControllerInteractionModelDelegate::OnReportData(const app::ReadClien
 {
 #if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
     IMReadReportAttributesResponseCallback(apReadClient, aPath, apData, status);
-#endif
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 }
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::ReportError(const app::ReadClient * apReadClient, CHIP_ERROR aError)
@@ -1627,7 +1639,7 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReportError(const app::Read
     path.mNodeId = apReadClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId();
 #if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
     IMReadReportAttributesResponseCallback(apReadClient, path, nullptr, Protocols::InteractionModel::ProtocolCode::Failure);
-#endif
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     return CHIP_NO_ERROR;
 }
 
@@ -1762,7 +1774,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 
     // TODO(cecille): This should be customized per command.
     constexpr uint32_t kCommandTimeoutMs = 3000;
-#endif
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     switch (nextStage)
     {
@@ -1777,7 +1789,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 #if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
         uint16_t commissioningExpirySeconds = 5;
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
-#endif
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     }
     break;
     case CommissioningStage::kConfigRegulatory: {
@@ -1821,7 +1833,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 #if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
         genCom.SetRegulatoryConfig(mSuccess.Cancel(), mFailure.Cancel(), static_cast<uint8_t>(regulatoryLocation), countryCode,
                                    breadcrumb, kCommandTimeoutMs);
-#endif
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     }
     break;
     case CommissioningStage::kCheckCertificates: {
@@ -1860,7 +1872,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(),
                              ByteSpan(reinterpret_cast<uint8_t *>(&magicNetworkEnableCode), sizeof(magicNetworkEnableCode)),
                              breadcrumb, kCommandTimeoutMs);
-#endif
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     }
     break;
     case CommissioningStage::kFindOperational: {
@@ -1878,7 +1890,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         genCom.Associate(device, 0);
 #if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
         genCom.CommissioningComplete(mSuccess.Cancel(), mFailure.Cancel());
-#endif
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     }
     break;
     case CommissioningStage::kCleanup:

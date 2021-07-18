@@ -57,8 +57,8 @@
  *
  **********************************************/
 
-#undef DEBUG
-// #define DEBUG
+// un-comment the following line to print out header fields for debugging of messages
+// #define DEBUG_MESSAGE_HEADER
 namespace chip {
 namespace {
 
@@ -160,22 +160,22 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     err = reader.Read32(&mMessageId).StatusCode();
     SuccessOrExit(err);
 
-#ifdef DEBUG
+#ifdef DEBUG_MESSAGE_HEADER
     ChipLogDetail(Inet, "PacketHeader::Decode");
     ChipLogDetail(Inet, "  header=%u", (int) header);
     ChipLogDetail(Inet, "  mEncryptionType=%d", (int) mEncryptionType);
     ChipLogDetail(Inet, "  mFlags=%d", mFlags.Raw());
     ChipLogDetail(Inet, "  mMessageId=%d", mMessageId);
-#endif
-
+#endif // DEBUG_MESSAGE_HEADER
     if (mFlags.Has(Header::FlagValues::kSourceNodeIdPresent))
     {
         uint64_t sourceNodeId;
         err = reader.Read64(&sourceNodeId).StatusCode();
         SuccessOrExit(err);
-#ifdef DEBUG
+#ifdef DEBUG_MESSAGE_HEADER
         ChipLogDetail(Inet, "  sourceNodeId=%lu", sourceNodeId);
-#endif
+#endif // DEBUG_MESSAGE_HEADER
+
         mSourceNodeId.SetValue(sourceNodeId);
     }
     else
@@ -188,9 +188,9 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
         uint64_t destinationNodeId;
         err = reader.Read64(&destinationNodeId).StatusCode();
         SuccessOrExit(err);
-#ifdef DEBUG
+#ifdef DEBUG_MESSAGE_HEADER
         ChipLogDetail(Inet, "  destinationNodeId=%lu", destinationNodeId);
-#endif
+#endif // DEBUG_MESSAGE_HEADER
         mDestinationNodeId.SetValue(destinationNodeId);
     }
     else
@@ -199,9 +199,9 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     }
 
     err = reader.Read16(&mEncryptionKeyID).StatusCode();
-#ifdef DEBUG
+#ifdef DEBUG_MESSAGE_HEADER
     ChipLogDetail(Inet, "  mEncryptionKeyID=%d", mEncryptionKeyID);
-#endif
+#endif // DEBUG_MESSAGE_HEADER
     SuccessOrExit(err);
 
     octets_read = reader.OctetsRead();
@@ -233,12 +233,12 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
 
     mExchangeFlags.SetRaw(header);
 
-#ifdef DEBUG
+#ifdef DEBUG_MESSAGE_HEADER
     ChipLogDetail(Inet, "PayloadHeader::Decode");
     ChipLogDetail(Inet, "  header=%u", header);
     ChipLogDetail(Inet, "  mMessageType=%u", mMessageType);
     ChipLogDetail(Inet, "  mExchangeID=%u", mExchangeID);
-#endif
+#endif // DEBUG_MESSAGE_HEADER
 
     VendorId vendor_id;
     if (HaveVendorId())
@@ -247,9 +247,9 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
         err = reader.Read16(&vendor_id_raw).StatusCode();
         SuccessOrExit(err);
         vendor_id = static_cast<VendorId>(vendor_id_raw);
-#ifdef DEBUG
+#ifdef DEBUG_MESSAGE_HEADER
         ChipLogDetail(Inet, "  vendor_id_raw=%u", vendor_id_raw);
-#endif
+#endif // DEBUG_MESSAGE_HEADER
     }
     else
     {
@@ -260,9 +260,9 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
     err = reader.Read16(&protocol_id).StatusCode();
     SuccessOrExit(err);
 
-#ifdef DEBUG
+#ifdef DEBUG_MESSAGE_HEADER
     ChipLogDetail(Inet, "  protocol_id=%u", protocol_id);
-#endif
+#endif // DEBUG_MESSAGE_HEADER
 
     mProtocolID = Protocols::Id(vendor_id, protocol_id);
 
@@ -273,9 +273,9 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
         SuccessOrExit(err);
         mAckId.SetValue(ack_id);
 
-#ifdef DEBUG
+#ifdef DEBUG_MESSAGE_HEADER
         ChipLogDetail(Inet, "  exchange ack_id=%u", ack_id);
-#endif
+#endif // DEBUG_MESSAGE_HEADER
     }
     else
     {
@@ -313,32 +313,32 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     LittleEndian::Write16(p, header);
     LittleEndian::Write32(p, mMessageId);
 
-#ifdef DEBUG
+#ifdef DEBUG_MESSAGE_HEADER
     ChipLogDetail(Inet, "PacketHeader::Encode");
     ChipLogDetail(Inet, "  encodeFlags=%u", encodeFlags.Raw());
     ChipLogDetail(Inet, "  header=%u", header);
     ChipLogDetail(Inet, "  mMessageId=%u", mMessageId);
-#endif
+#endif // DEBUG_MESSAGE_HEADER
 
     if (mSourceNodeId.HasValue())
     {
         LittleEndian::Write64(p, mSourceNodeId.Value());
-#ifdef DEBUG
+#ifdef DEBUG_MESSAGE_HEADER
         ChipLogDetail(Inet, "  mSourceNodeId=%lu", mSourceNodeId.Value());
-#endif
+#endif // DEBUG_MESSAGE_HEADER
     }
     if (mDestinationNodeId.HasValue())
     {
         LittleEndian::Write64(p, mDestinationNodeId.Value());
-#ifdef DEBUG
+#ifdef DEBUG_MESSAGE_HEADER
         ChipLogDetail(Inet, "  mDestinationNodeId=%lu", mDestinationNodeId.Value());
-#endif
+#endif // DEBUG_MESSAGE_HEADER
     }
 
     LittleEndian::Write16(p, mEncryptionKeyID);
-#ifdef DEBUG
+#ifdef DEBUG_MESSAGE_HEADER
     ChipLogDetail(Inet, "  mEncryptionKeyID=%u", mEncryptionKeyID);
-#endif
+#endif // DEBUG_MESSAGE_HEADER
 
     // Written data size provided to caller on success
     VerifyOrReturnError(p - data == EncodeSizeBytes(), CHIP_ERROR_INTERNAL);
@@ -370,29 +370,35 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
     Write8(p, header);
     Write8(p, mMessageType);
     LittleEndian::Write16(p, mExchangeID);
-#ifdef DEBUG
+
+#ifdef DEBUG_MESSAGE_HEADER
     ChipLogDetail(Inet, "PayloadHeader::Encode");
     ChipLogDetail(Inet, "  header=%u", header);
     ChipLogDetail(Inet, "  mMessageType=%u", mMessageType);
     ChipLogDetail(Inet, "  mExchangeID=%u", mExchangeID);
-#endif
+#endif // DEBUG_MESSAGE_HEADER
+
     if (HaveVendorId())
     {
         LittleEndian::Write16(p, static_cast<std::underlying_type_t<VendorId>>(mProtocolID.GetVendorId()));
-#ifdef DEBUG
+
+#ifdef DEBUG_MESSAGE_HEADER
         ChipLogDetail(Inet, "  GetVendorId=%u", mProtocolID.GetVendorId());
-#endif
+#endif // DEBUG_MESSAGE_HEADER
     }
     LittleEndian::Write16(p, mProtocolID.GetProtocolId());
-#ifdef DEBUG
+
+#ifdef DEBUG_MESSAGE_HEADER
     ChipLogDetail(Inet, "  mProtocolID=%u", mProtocolID.GetProtocolId());
-#endif
+#endif // DEBUG_MESSAGE_HEADER
+
     if (mAckId.HasValue())
     {
         LittleEndian::Write32(p, mAckId.Value());
-#ifdef DEBUG
+
+#ifdef DEBUG_MESSAGE_HEADER
         ChipLogDetail(Inet, "  mAckId=%u", mAckId.Value());
-#endif
+#endif // DEBUG_MESSAGE_HEADER
     }
 
     // Written data size provided to caller on success

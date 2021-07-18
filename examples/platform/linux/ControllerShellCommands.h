@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,11 +17,7 @@
  */
 
 /**
- *  @file
- *    This file contains definitions for Device class. The objects of this
- *    class will be used by Controller applications to interact with CHIP
- *    devices. The class provides mechanism to construct, send and receive
- *    messages to and from the corresponding CHIP devices.
+ * @brief Registers shell commands for performing discovery (eg. of commissionable nodes) related to commissioning.
  */
 
 #include <controller/CHIPDeviceController.h>
