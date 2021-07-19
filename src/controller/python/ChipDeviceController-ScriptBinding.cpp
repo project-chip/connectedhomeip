@@ -52,6 +52,7 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <inet/IPAddress.h>
 #include <mdns/Resolver.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <support/BytesToHex.h>
 #include <support/CHIPMem.h>
@@ -62,11 +63,13 @@
 using namespace chip;
 using namespace chip::Ble;
 using namespace chip::Controller;
+using namespace chip::DeviceLayer;
 
 extern "C" {
 typedef void (*ConstructBytesArrayFunct)(const uint8_t * dataBuf, uint32_t dataLen);
 typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
 typedef void (*DeviceAvailableFunc)(Device * device, CHIP_ERROR err);
+typedef void (*ChipThreadTaskRunnerFunct)(intptr_t context);
 }
 
 namespace {
@@ -110,6 +113,8 @@ CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesDeviceType(chip::C
                                                                          uint16_t device_type);
 CHIP_ERROR pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled(chip::Controller::DeviceCommissioner * devCtrl,
                                                                                    uint16_t enabled);
+CHIP_ERROR pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFunct callback, void * pythonContext);
+
 CHIP_ERROR
 pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabledFromCommand(chip::Controller::DeviceCommissioner * devCtrl);
 
@@ -493,4 +498,16 @@ void pychip_Stack_SetLogFunct(LogMessageFunct logFunct)
     //
     // Ideally log redirection should work so that python code can do things
     // like using the log module.
+}
+
+CHIP_ERROR pychip_DeviceController_PostTaskOnChipThread(ChipThreadTaskRunnerFunct callback, void * pythonContext)
+{
+    if (callback == nullptr || pythonContext == nullptr)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    // This function is not called and should not be called on CHIP thread, thus we need to acquire a lock for posting tasks.
+    StackLock lock;
+    PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext));
+    return CHIP_NO_ERROR;
 }
