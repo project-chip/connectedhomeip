@@ -730,7 +730,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
 
 exit:
     aEventNumber = context.mCurrentEventNumber;
-    aEventCount  += context.mEventCount;
+    aEventCount += context.mEventCount;
     return err;
 }
 
