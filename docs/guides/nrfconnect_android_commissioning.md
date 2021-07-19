@@ -1,12 +1,13 @@
 # Commissioning nRF Connect Accessory using Android CHIPTool
 
-You can use
-[CHIPTool](../../src/android/CHIPTool/README.md) for Android smartphones to
-commission a Nordic Semiconductor device running an nRF Connect platform example
-onto a CHIP-enabled Thread network.
+You can use [CHIPTool](../../src/android/CHIPTool/README.md) for Android
+smartphones to commission a Nordic Semiconductor device running an nRF Connect
+platform example onto a CHIP-enabled Thread network.
 
-This guide references the nRF52840 DK and the [nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md),
-but the instructions are also valid for the [nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
+This guide references the nRF52840 DK and the
+[nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md),
+but the instructions are also valid for the
+[nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
 and can be adapted to other applications as well.
 
 <hr>
@@ -33,13 +34,13 @@ The commissioning process is composed of the following main stages:
     sends CHIP operational credentials and Thread provisioning data.
 3.  The accessory device joins a CHIP-enabled Thread network.
 
-CHIPTool uses both Bluetooth LE and the IPv6 connectivity.
-Bluetooth LE is used only during the commissioning phase. Afterwards, only the
-IPv6 connectivity between the smartphone and the accessory device is needed to
-send operational messages. The IPv6 address of the device is not exchanged
-during the commissioning process and CHIPTool must use DNS Service Discovery
-(DNS-SD) to learn or refresh the address before the controller initiates the
-IPv6-based communication.
+CHIPTool uses both Bluetooth LE and the IPv6 connectivity. Bluetooth LE is used
+only during the commissioning phase. Afterwards, only the IPv6 connectivity
+between the smartphone and the accessory device is needed to send operational
+messages. The IPv6 address of the device is not exchanged during the
+commissioning process and CHIPTool must use DNS Service Discovery (DNS-SD) to
+learn or refresh the address before the controller initiates the IPv6-based
+communication.
 
 Since a typical smartphone does not have a Thread radio built-in, extra effort
 is needed to prepare the fully-fledged testing environment that includes a
@@ -150,7 +151,8 @@ To prepare the accessory device for commissioning, complete the following steps:
         I: 621 [SVR]https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 
 4.  Open the URL in a web browser to have the commissioning QR code generated.
-5.  Press **Button 4** on the device (or **Button 1** on a Thingy device) to start the Bluetooth LE advertising.
+5.  Press **Button 4** on the device (or **Button 1** on a Thingy device) to
+    start the Bluetooth LE advertising.
 
 <hr>
 
@@ -198,7 +200,8 @@ Check the IPv6 connectivity with the device using the following steps:
    be it the address or an error message, will be displayed at the bottom of the
    screen.
 
-2. Tap the following buttons to change the lock state of the nRF Connect Lock Example Application referenced in this guide:
+2. Tap the following buttons to change the lock state of the nRF Connect Lock
+   Example Application referenced in this guide:
 
     - **ON** and **OFF** buttons lock and unlock the door, respectively.
     - **TOGGLE** changes the lock state to the opposite.
