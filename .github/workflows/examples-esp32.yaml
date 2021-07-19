@@ -61,8 +61,16 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Build example All Clusters App
-              timeout-minutes: 25
-              run: scripts/examples/esp_example.sh all-clusters-app
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_m5stack.defaults
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/all-clusters-app/esp32/build/chip-all-clusters-app.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf
+            - name: Build example All Clusters App C3
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_c3devkit.defaults
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
@@ -70,7 +78,7 @@ jobs:
                      example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf
             - name: Build example Pigweed App
               timeout-minutes: 5
-              run: scripts/examples/esp_example.sh pigweed-app
+              run: scripts/examples/esp_example.sh pigweed-app sdkconfig.defaults
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
@@ -78,7 +86,7 @@ jobs:
                      example_binaries/$BUILD_TYPE-build/chip-pigweed-app.elf
             - name: Build example Lock App
               timeout-minutes: 5
-              run: scripts/examples/esp_example.sh lock-app
+              run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
@@ -86,7 +94,7 @@ jobs:
                      example_binaries/$BUILD_TYPE-build/chip-lock-app.elf
             - name: Build example Persistent Storage App
               timeout-minutes: 5
-              run: scripts/examples/esp_example.sh persistent-storage
+              run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
@@ -94,20 +102,28 @@ jobs:
                      example_binaries/$BUILD_TYPE-build/chip-persistent-storage.elf
             - name: Build example Shell App
               timeout-minutes: 5
-              run: scripts/examples/esp_example.sh shell
+              run: scripts/examples/esp_example.sh shell sdkconfig.defaults
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/shell/esp32/build/chip-shell.elf \
                      example_binaries/$BUILD_TYPE-build/chip-shell.elf
             - name: Build example Temperature Measurement App
-              timeout-minutes: 25
-              run: scripts/examples/esp_example.sh temperature-measurement-app
+              timeout-minutes: 5
+              run: scripts/examples/esp_example.sh temperature-measurement-app sdkconfig.optimize.defaults
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/temperature-measurement-app/esp32/build/chip-temperature-measurement-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-temperature-measurement-app.elf
+            - name: Build example IPv6 Only App
+              timeout-minutes: 5
+              run: scripts/examples/esp_example.sh ipv6only-app sdkconfig.defaults
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/ipv6only-app/esp32/build/chip-ipv6only-app.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-ipv6only-app.elf
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
