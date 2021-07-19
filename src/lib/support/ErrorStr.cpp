@@ -64,8 +64,7 @@ DLL_EXPORT const char * ErrorStr(CHIP_ERROR err)
     const char * const file = err.GetFile();
     if (file != nullptr)
     {
-        (void) snprintf(formattedError, formattedSpace, "%s:%u: ", file, err.GetLine());
-        uint16_t n = static_cast<uint16_t>(strlen(formattedError));
+        int n = snprintf(formattedError, formattedSpace, "%s:%u: ", file, err.GetLine());
         formattedError += n;
         formattedSpace = static_cast<uint16_t>(formattedSpace - n);
     }
