@@ -193,6 +193,7 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
     printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount, gEchoCount,
            static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
 }
+
 } // namespace
 
 int main(int argc, char * argv[])

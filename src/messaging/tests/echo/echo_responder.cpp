@@ -49,7 +49,7 @@ chip::SecurePairingUsingTestSecret gTestPairing;
 // Callback handler when a CHIP EchoRequest is received.
 void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
-    payload->DebugDump("HandleEchoRequestReceived Echo Request ... sending response.");
+    printf("Echo Request, len=%u ... sending response.\n", payload->DataLength());
 }
 
 } // namespace
@@ -77,7 +77,7 @@ int main(int argc, char * argv[])
         useTCP = true;
     }
 
-    if ((argc == 2) && (strcmp(argv[1], "--disable-echo") == 0))
+    if ((argc == 2) && (strcmp(argv[1], "--disable") == 0))
     {
         disableEcho = true;
     }
@@ -99,9 +99,8 @@ int main(int argc, char * argv[])
     }
     else
     {
-        err = gUDPManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
-                                   .SetAddressType(chip::Inet::kIPAddressType_IPv4)
-                                   .SetListenPort(CHIP_PORT));
+        err = gUDPManager.Init(
+            chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
         SuccessOrExit(err);
 
         err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins,
@@ -129,8 +128,9 @@ int main(int argc, char * argv[])
     {
         // Arrange to get a callback whenever an Echo Request is received.
         gEchoServer.SetEchoRequestReceived(HandleEchoRequestReceived);
-        printf("Listening for Echo requests...\n");
     }
+
+    printf("Listening for Echo requests...\n");
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
