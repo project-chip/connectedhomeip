@@ -455,7 +455,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Ble, "HandleChipConnectionReceived failed, err = %" CHIP_ERROR_FORMAT, err);
+        ChipLogError(Ble, "HandleChipConnectionReceived failed, err = %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
     }
 
     return err;
@@ -486,7 +486,7 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleU
             CHIP_ERROR status = endPoint->Receive(std::move(pBuf));
             if (status != CHIP_NO_ERROR)
             {
-                ChipLogError(Ble, "BLEEndPoint rcv failed, err = %" CHIP_ERROR_FORMAT, status);
+                ChipLogError(Ble, "BLEEndPoint rcv failed, err = %" CHIP_ERROR_FORMAT, ChipError::FormatError(status));
             }
         }
         else
@@ -494,7 +494,8 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleU
             CHIP_ERROR status = HandleBleTransportConnectionInitiated(connObj, std::move(pBuf));
             if (status != CHIP_NO_ERROR)
             {
-                ChipLogError(Ble, "failed handle new chip BLE connection, status = %" CHIP_ERROR_FORMAT, status);
+                ChipLogError(Ble, "failed handle new chip BLE connection, status = %" CHIP_ERROR_FORMAT,
+                             ChipError::FormatError(status));
             }
         }
     }
@@ -530,7 +531,7 @@ bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const Chi
             CHIP_ERROR status = endPoint->Receive(std::move(pBuf));
             if (status != CHIP_NO_ERROR)
             {
-                ChipLogError(Ble, "BLEEndPoint rcv failed, err = %" CHIP_ERROR_FORMAT, status);
+                ChipLogError(Ble, "BLEEndPoint rcv failed, err = %" CHIP_ERROR_FORMAT, ChipError::FormatError(status));
             }
         }
         else
@@ -595,7 +596,7 @@ void BleLayer::HandleAckReceived(BLE_CONNECTION_OBJECT connObj)
 
         if (status != CHIP_NO_ERROR)
         {
-            ChipLogError(Ble, "endpoint conf recvd failed, err = %" CHIP_ERROR_FORMAT, status);
+            ChipLogError(Ble, "endpoint conf recvd failed, err = %" CHIP_ERROR_FORMAT, ChipError::FormatError(status));
         }
     }
     else

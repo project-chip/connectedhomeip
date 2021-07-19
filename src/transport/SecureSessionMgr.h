@@ -221,7 +221,7 @@ public:
      *   peer node.
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
-                          SecureSession::SessionRole direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
+                          SecureSession::SessionRole direction, Transport::AdminId admin);
 
     void ExpirePairing(SecureSessionHandle session);
     void ExpireAllPairings(NodeId peerNodeId, Transport::AdminId admin);
@@ -261,14 +261,6 @@ public:
     void SetLocalNodeId(NodeId nodeId) { mLocalNodeId = nodeId; }
 
     NodeId GetLocalNodeId() { return mLocalNodeId; }
-
-    /**
-     * @brief
-     *   Return the transport type of current connection to the node with id peerNodeId.
-     *   'Transport::Type::kUndefined' will be returned if the connection to the specified
-     *   peer node does not exist.
-     */
-    Transport::Type GetTransportType(NodeId peerNodeId);
 
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
 

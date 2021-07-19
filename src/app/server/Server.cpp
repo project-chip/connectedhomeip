@@ -180,7 +180,7 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr)
             {
                 sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
                                       session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
-                                      connection.GetAdminId(), nullptr);
+                                      connection.GetAdminId());
             }
             else
             {
@@ -392,7 +392,6 @@ public:
         }
 
     exit:
-        exchangeContext->Close();
         return err;
     }
 
@@ -556,11 +555,11 @@ void InitServer(AppDelegate * delegate)
 
     // Register to receive unsolicited legacy ZCL messages from the exchange manager.
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, &gCallbacks);
-    VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
+    SuccessOrExit(err);
 
     // Register to receive unsolicited Service Provisioning messages from the exchange manager.
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
-    VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
+    SuccessOrExit(err);
 
     err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalAdminPairingTable(),
                                                     &gSessionIDAllocator);

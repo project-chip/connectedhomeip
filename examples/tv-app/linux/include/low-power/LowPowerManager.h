@@ -23,5 +23,4 @@
 class LowPowerManager
 {
 public:
-    bool proxySleepRequest();
 };

@@ -1,9 +1,7 @@
 {{#if (zcl_command_arguments_count this.id)}}
 expectArgumentCount = {{ zcl_command_arguments_count this.id }};
 {{#zcl_command_arguments}}
-{{#if (isOctetString type)}}
-chip::ByteSpan {{asSymbol label}};
-{{else if (isString type)}}
+{{#if (isCharString type)}}
 const uint8_t * {{asSymbol label}};
 {{else}}
 {{asUnderlyingZclType type}} {{asSymbol label}};
@@ -44,7 +42,7 @@ while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
     {
         const uint8_t * data = nullptr;
         TLVUnpackError = aDataTlv.GetDataPtr(data);
-        {{asSymbol label}} = chip::ByteSpan(data, aDataTlv.GetLength());
+        {{asSymbol label}} = {{asUnderlyingZclType type}}(data, aDataTlv.GetLength());
     }
 {{else if (isString type)}}
       // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.

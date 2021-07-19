@@ -98,6 +98,42 @@ class ChipClusters:
             "BridgedDeviceBasic": {
             },
             "ColorControl": {
+                "ColorLoopSet": {
+                    "updateFlags": "int",
+                    "action": "int",
+                    "direction": "int",
+                    "time": "int",
+                    "startHue": "int",
+                    "optionsMask": "int",
+                    "optionsOverride": "int",
+                },
+                "EnhancedMoveHue": {
+                    "moveMode": "int",
+                    "rate": "int",
+                    "optionsMask": "int",
+                    "optionsOverride": "int",
+                },
+                "EnhancedMoveToHue": {
+                    "enhancedHue": "int",
+                    "direction": "int",
+                    "transitionTime": "int",
+                    "optionsMask": "int",
+                    "optionsOverride": "int",
+                },
+                "EnhancedMoveToHueAndSaturation": {
+                    "enhancedHue": "int",
+                    "saturation": "int",
+                    "transitionTime": "int",
+                    "optionsMask": "int",
+                    "optionsOverride": "int",
+                },
+                "EnhancedStepHue": {
+                    "stepMode": "int",
+                    "stepSize": "int",
+                    "transitionTime": "int",
+                    "optionsMask": "int",
+                    "optionsOverride": "int",
+                },
                 "MoveColor": {
                     "rateX": "int",
                     "rateY": "int",
@@ -304,6 +340,8 @@ class ChipClusters:
                     "pin": "str",
                 },
             },
+            "ElectricalMeasurement": {
+            },
             "EthernetNetworkDiagnostics": {
                 "ResetCounts": {
                 },
@@ -435,14 +473,14 @@ class ChipClusters:
                 },
                 "MediaRewind": {
                 },
+                "MediaSeek": {
+                    "position": "int",
+                },
                 "MediaSkipBackward": {
                     "deltaPositionMilliseconds": "int",
                 },
                 "MediaSkipForward": {
                     "deltaPositionMilliseconds": "int",
-                },
-                "MediaSkipSeek": {
-                    "position": "int",
                 },
                 "MediaStartOver": {
                 },
@@ -517,10 +555,23 @@ class ChipClusters:
                     "metadataForProvider": "bytes",
                 },
             },
+            "OccupancySensing": {
+            },
             "OnOff": {
                 "Off": {
                 },
+                "OffWithEffect": {
+                    "effectId": "int",
+                    "effectVariant": "int",
+                },
                 "On": {
+                },
+                "OnWithRecallGlobalScene": {
+                },
+                "OnWithTimedOff": {
+                    "onOffControl": "int",
+                    "onTime": "int",
+                    "offWaitTime": "int",
                 },
                 "Toggle": {
                 },
@@ -716,7 +767,7 @@ class ChipClusters:
                     "attributeId": 0x0006,
                     "type": "int",
                 },
-                "ApplicationSatus": {
+                "ApplicationStatus": {
                     "attributeId": 0x0007,
                     "type": "int",
                 },
@@ -730,6 +781,14 @@ class ChipClusters:
                     "attributeId": 0x0000,
                     "type": "int",
                 },
+                "CatalogVendorId": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "ApplicationId": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
                     "type": "int",
@@ -739,6 +798,10 @@ class ChipClusters:
                 "AudioOutputList": {
                     "attributeId": 0x0000,
                     "type": "",
+                },
+                "CurrentAudioOutput": {
+                    "attributeId": 0x0001,
+                    "type": "int",
                 },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
@@ -1220,6 +1283,56 @@ class ChipClusters:
                     "type": "int",
                 },
             },
+            "ElectricalMeasurement": {
+                "MeasurementType": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                },
+                "TotalActivePower": {
+                    "attributeId": 0x0304,
+                    "type": "int",
+                },
+                "RmsVoltage": {
+                    "attributeId": 0x0505,
+                    "type": "int",
+                },
+                "RmsVoltageMin": {
+                    "attributeId": 0x0506,
+                    "type": "int",
+                },
+                "RmsVoltageMax": {
+                    "attributeId": 0x0507,
+                    "type": "int",
+                },
+                "RmsCurrent": {
+                    "attributeId": 0x0508,
+                    "type": "int",
+                },
+                "RmsCurrentMin": {
+                    "attributeId": 0x0509,
+                    "type": "int",
+                },
+                "RmsCurrentMax": {
+                    "attributeId": 0x050A,
+                    "type": "int",
+                },
+                "ActivePower": {
+                    "attributeId": 0x050B,
+                    "type": "int",
+                },
+                "ActivePowerMin": {
+                    "attributeId": 0x050C,
+                    "type": "int",
+                },
+                "ActivePowerMax": {
+                    "attributeId": 0x050D,
+                    "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
             "EthernetNetworkDiagnostics": {
                 "PacketRxCount": {
                     "attributeId": 0x0002,
@@ -1366,6 +1479,10 @@ class ChipClusters:
                     "attributeId": 0x0000,
                     "type": "",
                 },
+                "CurrentMediaInput": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
                     "type": "int",
@@ -1384,6 +1501,25 @@ class ChipClusters:
                 },
             },
             "OtaSoftwareUpdateProvider": {
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "OccupancySensing": {
+                "Occupancy": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "reportable": True,
+                },
+                "OccupancySensorType": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                },
+                "OccupancySensorTypeBitmap": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
                     "type": "int",
@@ -1701,6 +1837,16 @@ class ChipClusters:
                 "LongOctetString": {
                     "attributeId": 0x001D,
                     "type": "bytes",
+                    "writable": True,
+                },
+                "CharString": {
+                    "attributeId": 0x001E,
+                    "type": "str",
+                    "writable": True,
+                },
+                "LongCharString": {
+                    "attributeId": 0x001F,
+                    "type": "str",
                     "writable": True,
                 },
                 "Unsupported": {
@@ -2129,7 +2275,9 @@ class ChipClusters:
         if not func:
             raise UnknownAttribute(cluster, attribute)
         funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
-        funcCaller(lambda: func(device, endpoint, groupid))
+        res = funcCaller(lambda: func(device, endpoint, groupid))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
 
     def ConfigureAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, minInterval: int, maxInterval: int, change: int, imEnabled):
         func = getattr(self, "Cluster{}_ConfigureAttribute{}".format(cluster, attribute), None)
@@ -2196,6 +2344,26 @@ class ChipClusters:
     def ClusterBinding_CommandUnbind(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nodeId: int, groupId: int, endpointId: int, clusterId: int):
         return self._chipLib.chip_ime_AppendCommand_Binding_Unbind(
                 device, ZCLendpoint, ZCLgroupid, nodeId, groupId, endpointId, clusterId
+        )
+    def ClusterColorControl_CommandColorLoopSet(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, updateFlags: int, action: int, direction: int, time: int, startHue: int, optionsMask: int, optionsOverride: int):
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_ColorLoopSet(
+                device, ZCLendpoint, ZCLgroupid, updateFlags, action, direction, time, startHue, optionsMask, optionsOverride
+        )
+    def ClusterColorControl_CommandEnhancedMoveHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionsMask: int, optionsOverride: int):
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveHue(
+                device, ZCLendpoint, ZCLgroupid, moveMode, rate, optionsMask, optionsOverride
+        )
+    def ClusterColorControl_CommandEnhancedMoveToHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, enhancedHue: int, direction: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveToHue(
+                device, ZCLendpoint, ZCLgroupid, enhancedHue, direction, transitionTime, optionsMask, optionsOverride
+        )
+    def ClusterColorControl_CommandEnhancedMoveToHueAndSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, enhancedHue: int, saturation: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveToHueAndSaturation(
+                device, ZCLendpoint, ZCLgroupid, enhancedHue, saturation, transitionTime, optionsMask, optionsOverride
+        )
+    def ClusterColorControl_CommandEnhancedStepHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedStepHue(
+                device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionsMask, optionsOverride
         )
     def ClusterColorControl_CommandMoveColor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, rateX: int, rateY: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor(
@@ -2497,6 +2665,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaRewind(
                 device, ZCLendpoint, ZCLgroupid
         )
+    def ClusterMediaPlayback_CommandMediaSeek(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, position: int):
+        return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSeek(
+                device, ZCLendpoint, ZCLgroupid, position
+        )
     def ClusterMediaPlayback_CommandMediaSkipBackward(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, deltaPositionMilliseconds: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipBackward(
                 device, ZCLendpoint, ZCLgroupid, deltaPositionMilliseconds
@@ -2504,10 +2676,6 @@ class ChipClusters:
     def ClusterMediaPlayback_CommandMediaSkipForward(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, deltaPositionMilliseconds: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipForward(
                 device, ZCLendpoint, ZCLgroupid, deltaPositionMilliseconds
-        )
-    def ClusterMediaPlayback_CommandMediaSkipSeek(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, position: int):
-        return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipSeek(
-                device, ZCLendpoint, ZCLgroupid, position
         )
     def ClusterMediaPlayback_CommandMediaStartOver(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStartOver(
@@ -2570,9 +2738,21 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OnOff_Off(
                 device, ZCLendpoint, ZCLgroupid
         )
+    def ClusterOnOff_CommandOffWithEffect(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, effectId: int, effectVariant: int):
+        return self._chipLib.chip_ime_AppendCommand_OnOff_OffWithEffect(
+                device, ZCLendpoint, ZCLgroupid, effectId, effectVariant
+        )
     def ClusterOnOff_CommandOn(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_On(
                 device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterOnOff_CommandOnWithRecallGlobalScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_OnOff_OnWithRecallGlobalScene(
+                device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterOnOff_CommandOnWithTimedOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, onOffControl: int, onTime: int, offWaitTime: int):
+        return self._chipLib.chip_ime_AppendCommand_OnOff_OnWithTimedOff(
+                device, ZCLendpoint, ZCLgroupid, onOffControl, onTime, offWaitTime
         )
     def ClusterOnOff_CommandToggle(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_Toggle(
@@ -2747,16 +2927,22 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationId(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeCatalogVendorId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_CatalogVendorId(device, ZCLendpoint, ZCLgroupid)
-    def ClusterApplicationBasic_ReadAttributeApplicationSatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationSatus(device, ZCLendpoint, ZCLgroupid)
+    def ClusterApplicationBasic_ReadAttributeApplicationStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationStatus(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationLauncher_ReadAttributeApplicationLauncherList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ApplicationLauncherList(device, ZCLendpoint, ZCLgroupid)
+    def ClusterApplicationLauncher_ReadAttributeCatalogVendorId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_CatalogVendorId(device, ZCLendpoint, ZCLgroupid)
+    def ClusterApplicationLauncher_ReadAttributeApplicationId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ApplicationId(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationLauncher_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterAudioOutput_ReadAttributeAudioOutputList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_AudioOutput_AudioOutputList(device, ZCLendpoint, ZCLgroupid)
+    def ClusterAudioOutput_ReadAttributeCurrentAudioOutput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_AudioOutput_CurrentAudioOutput(device, ZCLendpoint, ZCLgroupid)
     def ClusterAudioOutput_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_AudioOutput_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterBarrierControl_ReadAttributeBarrierMovingState(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -3030,6 +3216,30 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_DoorLock_ActuatorEnabled(device, ZCLendpoint, ZCLgroupid)
     def ClusterDoorLock_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_DoorLock_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeMeasurementType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_MeasurementType(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeTotalActivePower(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_TotalActivePower(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeRmsVoltage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltage(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeRmsVoltageMin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltageMin(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeRmsVoltageMax(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltageMax(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeRmsCurrent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrent(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeRmsCurrentMin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrentMin(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeRmsCurrentMax(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrentMax(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeActivePower(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePower(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeActivePowerMin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMin(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeActivePowerMax(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMax(device, ZCLendpoint, ZCLgroupid)
+    def ClusterElectricalMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterEthernetNetworkDiagnostics_ReadAttributePacketRxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PacketRxCount(device, ZCLendpoint, ZCLgroupid)
     def ClusterEthernetNetworkDiagnostics_ReadAttributePacketTxCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -3096,6 +3306,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_LowPower_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterMediaInput_ReadAttributeMediaInputList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_MediaInput_MediaInputList(device, ZCLendpoint, ZCLgroupid)
+    def ClusterMediaInput_ReadAttributeCurrentMediaInput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_MediaInput_CurrentMediaInput(device, ZCLendpoint, ZCLgroupid)
     def ClusterMediaInput_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_MediaInput_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterMediaPlayback_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -3104,6 +3316,16 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOtaSoftwareUpdateProvider_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOccupancySensing_ReadAttributeOccupancy(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OccupancySensing_Occupancy(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOccupancySensing_ConfigureAttributeOccupancy(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_OccupancySensing_Occupancy(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterOccupancySensing_ReadAttributeOccupancySensorType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OccupancySensing_OccupancySensorType(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOccupancySensing_ReadAttributeOccupancySensorTypeBitmap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OccupancySensing_OccupancySensorTypeBitmap(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOccupancySensing_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OccupancySensing_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ReadAttributeOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OnOff_OnOff(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ConfigureAttributeOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
@@ -3290,6 +3512,16 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_LongOctetString(device, ZCLendpoint, ZCLgroupid)
     def ClusterTestCluster_WriteAttributeLongOctetString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
         return self._chipLib.chip_ime_WriteAttribute_TestCluster_LongOctetString(device, ZCLendpoint, ZCLgroupid, value, len(value))
+    def ClusterTestCluster_ReadAttributeCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_CharString(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+        value = value.encode("utf-8") + b'\x00'
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_CharString(device, ZCLendpoint, ZCLgroupid, value, len(value))
+    def ClusterTestCluster_ReadAttributeLongCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TestCluster_LongCharString(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTestCluster_WriteAttributeLongCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
+        value = value.encode("utf-8") + b'\x00'
+        return self._chipLib.chip_ime_WriteAttribute_TestCluster_LongCharString(device, ZCLendpoint, ZCLgroupid, value, len(value))
     def ClusterTestCluster_ReadAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported(device, ZCLendpoint, ZCLgroupid)
     def ClusterTestCluster_WriteAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
@@ -3554,9 +3786,9 @@ class ChipClusters:
         # Cluster ApplicationBasic ReadAttribute CatalogVendorId
         self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_CatalogVendorId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_CatalogVendorId.restype = ctypes.c_uint32
-        # Cluster ApplicationBasic ReadAttribute ApplicationSatus
-        self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationSatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationSatus.restype = ctypes.c_uint32
+        # Cluster ApplicationBasic ReadAttribute ApplicationStatus
+        self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationStatus.restype = ctypes.c_uint32
         # Cluster ApplicationBasic ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ClusterRevision.restype = ctypes.c_uint32
@@ -3567,6 +3799,12 @@ class ChipClusters:
         # Cluster ApplicationLauncher ReadAttribute ApplicationLauncherList
         self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ApplicationLauncherList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ApplicationLauncherList.restype = ctypes.c_uint32
+        # Cluster ApplicationLauncher ReadAttribute CatalogVendorId
+        self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_CatalogVendorId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_CatalogVendorId.restype = ctypes.c_uint32
+        # Cluster ApplicationLauncher ReadAttribute ApplicationId
+        self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ApplicationId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ApplicationId.restype = ctypes.c_uint32
         # Cluster ApplicationLauncher ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ClusterRevision.restype = ctypes.c_uint32
@@ -3580,6 +3818,9 @@ class ChipClusters:
         # Cluster AudioOutput ReadAttribute AudioOutputList
         self._chipLib.chip_ime_ReadAttribute_AudioOutput_AudioOutputList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_AudioOutput_AudioOutputList.restype = ctypes.c_uint32
+        # Cluster AudioOutput ReadAttribute CurrentAudioOutput
+        self._chipLib.chip_ime_ReadAttribute_AudioOutput_CurrentAudioOutput.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_AudioOutput_CurrentAudioOutput.restype = ctypes.c_uint32
         # Cluster AudioOutput ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_AudioOutput_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_AudioOutput_ClusterRevision.restype = ctypes.c_uint32
@@ -3760,6 +4001,21 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ClusterRevision.restype = ctypes.c_uint32
         # Cluster ColorControl
+        # Cluster ColorControl Command ColorLoopSet
+        self._chipLib.chip_ime_AppendCommand_ColorControl_ColorLoopSet.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_ColorLoopSet.restype = ctypes.c_uint32
+        # Cluster ColorControl Command EnhancedMoveHue
+        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveHue.restype = ctypes.c_uint32
+        # Cluster ColorControl Command EnhancedMoveToHue
+        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveToHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveToHue.restype = ctypes.c_uint32
+        # Cluster ColorControl Command EnhancedMoveToHueAndSaturation
+        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveToHueAndSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveToHueAndSaturation.restype = ctypes.c_uint32
+        # Cluster ColorControl Command EnhancedStepHue
+        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedStepHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedStepHue.restype = ctypes.c_uint32
         # Cluster ColorControl Command MoveColor
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16, ctypes.c_int16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor.restype = ctypes.c_uint32
@@ -4130,6 +4386,43 @@ class ChipClusters:
         # Cluster DoorLock ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_DoorLock_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_DoorLock_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement
+        # Cluster ElectricalMeasurement ReadAttribute MeasurementType
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_MeasurementType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_MeasurementType.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute TotalActivePower
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_TotalActivePower.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_TotalActivePower.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute RmsVoltage
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltage.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute RmsVoltageMin
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltageMin.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltageMin.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute RmsVoltageMax
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltageMax.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsVoltageMax.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute RmsCurrent
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrent.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute RmsCurrentMin
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrentMin.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrentMin.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute RmsCurrentMax
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrentMax.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_RmsCurrentMax.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute ActivePower
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePower.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePower.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute ActivePowerMin
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMin.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMin.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute ActivePowerMax
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMax.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ActivePowerMax.restype = ctypes.c_uint32
+        # Cluster ElectricalMeasurement ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ElectricalMeasurement_ClusterRevision.restype = ctypes.c_uint32
         # Cluster EthernetNetworkDiagnostics
         # Cluster EthernetNetworkDiagnostics Command ResetCounts
         self._chipLib.chip_ime_AppendCommand_EthernetNetworkDiagnostics_ResetCounts.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -4319,6 +4612,9 @@ class ChipClusters:
         # Cluster MediaInput ReadAttribute MediaInputList
         self._chipLib.chip_ime_ReadAttribute_MediaInput_MediaInputList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_MediaInput_MediaInputList.restype = ctypes.c_uint32
+        # Cluster MediaInput ReadAttribute CurrentMediaInput
+        self._chipLib.chip_ime_ReadAttribute_MediaInput_CurrentMediaInput.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_MediaInput_CurrentMediaInput.restype = ctypes.c_uint32
         # Cluster MediaInput ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_MediaInput_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_MediaInput_ClusterRevision.restype = ctypes.c_uint32
@@ -4341,15 +4637,15 @@ class ChipClusters:
         # Cluster MediaPlayback Command MediaRewind
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaRewind.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaRewind.restype = ctypes.c_uint32
+        # Cluster MediaPlayback Command MediaSeek
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSeek.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSeek.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaSkipBackward
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipBackward.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipBackward.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaSkipForward
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipForward.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipForward.restype = ctypes.c_uint32
-        # Cluster MediaPlayback Command MediaSkipSeek
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipSeek.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipSeek.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaStartOver
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStartOver.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStartOver.restype = ctypes.c_uint32
@@ -4403,13 +4699,38 @@ class ChipClusters:
         # Cluster OtaSoftwareUpdateProvider ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OtaSoftwareUpdateProvider_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster OccupancySensing
+        # Cluster OccupancySensing ReadAttribute Occupancy
+        self._chipLib.chip_ime_ReadAttribute_OccupancySensing_Occupancy.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OccupancySensing_Occupancy.restype = ctypes.c_uint32
+        # Cluster OccupancySensing ConfigureAttribute Occupancy
+        self._chipLib.chip_ime_ConfigureAttribute_OccupancySensing_Occupancy.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_OccupancySensing_Occupancy.restype = ctypes.c_uint32
+        # Cluster OccupancySensing ReadAttribute OccupancySensorType
+        self._chipLib.chip_ime_ReadAttribute_OccupancySensing_OccupancySensorType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OccupancySensing_OccupancySensorType.restype = ctypes.c_uint32
+        # Cluster OccupancySensing ReadAttribute OccupancySensorTypeBitmap
+        self._chipLib.chip_ime_ReadAttribute_OccupancySensing_OccupancySensorTypeBitmap.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OccupancySensing_OccupancySensorTypeBitmap.restype = ctypes.c_uint32
+        # Cluster OccupancySensing ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_OccupancySensing_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OccupancySensing_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OnOff
         # Cluster OnOff Command Off
         self._chipLib.chip_ime_AppendCommand_OnOff_Off.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OnOff_Off.restype = ctypes.c_uint32
+        # Cluster OnOff Command OffWithEffect
+        self._chipLib.chip_ime_AppendCommand_OnOff_OffWithEffect.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_OnOff_OffWithEffect.restype = ctypes.c_uint32
         # Cluster OnOff Command On
         self._chipLib.chip_ime_AppendCommand_OnOff_On.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OnOff_On.restype = ctypes.c_uint32
+        # Cluster OnOff Command OnWithRecallGlobalScene
+        self._chipLib.chip_ime_AppendCommand_OnOff_OnWithRecallGlobalScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OnOff_OnWithRecallGlobalScene.restype = ctypes.c_uint32
+        # Cluster OnOff Command OnWithTimedOff
+        self._chipLib.chip_ime_AppendCommand_OnOff_OnWithTimedOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OnOff_OnWithTimedOff.restype = ctypes.c_uint32
         # Cluster OnOff Command Toggle
         self._chipLib.chip_ime_AppendCommand_OnOff_Toggle.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OnOff_Toggle.restype = ctypes.c_uint32
@@ -4775,6 +5096,18 @@ class ChipClusters:
         # Cluster TestCluster WriteAttribute LongOctetString
         self._chipLib.chip_ime_WriteAttribute_TestCluster_LongOctetString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_WriteAttribute_TestCluster_LongOctetString.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute CharString
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_CharString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_CharString.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute CharString
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_CharString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_CharString.restype = ctypes.c_uint32
+        # Cluster TestCluster ReadAttribute LongCharString
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_LongCharString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TestCluster_LongCharString.restype = ctypes.c_uint32
+        # Cluster TestCluster WriteAttribute LongCharString
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_LongCharString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_WriteAttribute_TestCluster_LongCharString.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Unsupported
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported.restype = ctypes.c_uint32

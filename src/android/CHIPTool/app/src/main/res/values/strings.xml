@@ -5,13 +5,13 @@
     <string name="location_permission_denied_title">Location permission required</string>
     <string name="location_permission_denied_message">Since location permission was denied, some functions of the app may be unavailable. </string>
     <string name="chip_device_info_title">CHIP Device Info:</string>
-    <string name="chip_device_info_subtitle">Please manually connect to this device\'s soft AP using the information below.</string>
     <string name="chip_device_info_version_label">Version:</string>
     <string name="chip_device_info_vendor_id_label">Vendor ID:</string>
     <string name="chip_device_info_product_id_label">Product ID:</string>
     <string name="chip_device_info_discriminator_label">Discriminator:</string>
     <string name="chip_device_info_setup_code_label">Setup PIN Code:</string>
     <string name="chip_device_info_optional_vendor_tags_label">Optional Vendor tags:</string>
+    <string name="chip_device_info_discovery_capabilities_text">Discovery capabilities: %1s</string>
     <string name="camera_permission_missing_alert_title">Camera permission missing</string>
     <string name="camera_permission_missing_alert_subtitle">Camera permission required to be able to scan the QR code.</string>
     <string name="camera_permission_missing_alert_try_again">Try again</string>
@@ -37,6 +37,7 @@
     <string name="send_command_on_btn_text">On</string>
     <string name="send_command_off_btn_text">Off</string>
     <string name="send_command_toggle_btn_text">Toggle</string>
+    <string name="read_on_off_attribute_btn_text">Read On/Off</string>
     <string name="send_command_type_label_text">%s/%d command sent!</string>
     <string name="rendezvous_over_ble_btn_text">Rendezvous over BLE</string>
     <string name="rendezvous_over_soft_ap_btn_text">Rendezvous over Soft AP</string>

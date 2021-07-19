@@ -52,7 +52,13 @@ exit:
 void ReadClient::Shutdown()
 {
     AbortExistingExchangeContext();
+    ShutdownInternal();
+}
+
+void ReadClient::ShutdownInternal()
+{
     mpExchangeMgr = nullptr;
+    mpExchangeCtx = nullptr;
     mpDelegate    = nullptr;
     MoveToState(ClientState::Uninitialized);
 }
@@ -111,27 +117,8 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
 
         if (aEventPathParamsListSize != 0 && apEventPathParamsList != nullptr)
         {
-            EventPathList::Builder & eventPathListBuilder = request.CreateEventPathListBuilder();
-            EventPath::Builder eventPathBuilder           = eventPathListBuilder.CreateEventPathBuilder();
-            for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
-            {
-                EventPathParams eventPath = apEventPathParamsList[eventIndex];
-                eventPathBuilder.NodeId(eventPath.mNodeId)
-                    .EventId(eventPath.mEventId)
-                    .EndpointId(eventPath.mEndpointId)
-                    .ClusterId(eventPath.mClusterId)
-                    .EndOfEventPath();
-                SuccessOrExit(err = eventPathBuilder.GetError());
-            }
-
-            eventPathListBuilder.EndOfEventPathList();
-            SuccessOrExit(err = eventPathListBuilder.GetError());
-
-            if (aEventNumber != 0)
-            {
-                // EventNumber is optional
-                request.EventNumber(aEventNumber);
-            }
+            err = GenerateEventPathList(request, apEventPathParamsList, aEventPathParamsListSize, aEventNumber);
+            SuccessOrExit(err);
         }
 
         if (aAttributePathParamsListSize != 0 && apAttributePathParamsList != nullptr)
@@ -171,6 +158,37 @@ exit:
         AbortExistingExchangeContext();
     }
 
+    return err;
+}
+
+CHIP_ERROR ReadClient::GenerateEventPathList(ReadRequest::Builder & aRequest, EventPathParams * apEventPathParamsList,
+                                             size_t aEventPathParamsListSize, EventNumber & aEventNumber)
+{
+    CHIP_ERROR err                                = CHIP_NO_ERROR;
+    EventPathList::Builder & eventPathListBuilder = aRequest.CreateEventPathListBuilder();
+    for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
+    {
+        EventPath::Builder eventPathBuilder = eventPathListBuilder.CreateEventPathBuilder();
+        EventPathParams eventPath           = apEventPathParamsList[eventIndex];
+        eventPathBuilder.NodeId(eventPath.mNodeId)
+            .EventId(eventPath.mEventId)
+            .EndpointId(eventPath.mEndpointId)
+            .ClusterId(eventPath.mClusterId)
+            .EndOfEventPath();
+        SuccessOrExit(err = eventPathBuilder.GetError());
+    }
+
+    eventPathListBuilder.EndOfEventPathList();
+    SuccessOrExit(err = eventPathListBuilder.GetError());
+
+    if (aEventNumber != 0)
+    {
+        // EventNumber is optional
+        aRequest.EventNumber(aEventNumber);
+    }
+
+exit:
+    ChipLogFunctError(err);
     return err;
 }
 
@@ -217,9 +235,6 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 exit:
     ChipLogFunctError(err);
 
-    // Close the exchange cleanly so that the ExchangeManager will send an ack for the message we just received.
-    mpExchangeCtx->Close();
-    mpExchangeCtx = nullptr;
     MoveToState(ClientState::Initialized);
 
     if (mpDelegate != nullptr)
@@ -235,7 +250,7 @@ exit:
     }
 
     // TODO(#7521): Should close it after checking moreChunkedMessages flag is not set.
-    Shutdown();
+    ShutdownInternal();
 
     return err;
 }
@@ -339,7 +354,7 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
     {
         mpDelegate->ReportError(this, CHIP_ERROR_TIMEOUT);
     }
-    Shutdown();
+    ShutdownInternal();
 }
 
 CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader)

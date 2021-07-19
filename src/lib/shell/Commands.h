@@ -74,5 +74,11 @@ void RegisterCommissioningCommands();
  */
 void RegisterNFCCommands();
 
+/**
+ * This function registers the DNS client commands.
+ *
+ */
+void RegisterDnsCommands();
+
 } // namespace Shell
 } // namespace chip

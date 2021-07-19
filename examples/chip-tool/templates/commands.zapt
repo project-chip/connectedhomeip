@@ -106,12 +106,8 @@ static void OnStringAttributeResponse(void * context, const chip::ByteSpan value
 }
 
 {{#chip_client_clusters}}
-{{#if (user_cluster_has_enabled_command name side)}}
-{{#all_user_cluster_commands}}
-{{#if (isStrEqual clusterName parent.name)}}
-{{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
-{{#if (isStrEndsWith name "Response")}}
-static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
+{{#chip_server_cluster_responses}}
+static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}(void * context{{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_server_cluster_response_arguments}})
 {
     ChipLogProgress(chipTool, "{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}");
 
@@ -119,11 +115,7 @@ static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-{{/if}}
-{{/if}}
-{{/if}}
-{{/all_user_cluster_commands}}
-{{/if}}
+{{/chip_server_cluster_responses}}
 {{/chip_client_clusters}}
 
 {{#chip_client_clusters}}
@@ -289,12 +281,12 @@ private:
 {{#if isList}}
     chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>(On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse, this);
 {{else}}
-    chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>(On{{asCallbackAttributeType atomicTypeId}}AttributeResponse, this);
+    chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
 {{/if}}
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
-{{#if (isWritableAttribute)}}
+{{#if isWritableAttribute}}
 class Write{{asCamelCased parent.name false}}{{asCamelCased name false}}: public ModelCommand
 {
 public:
@@ -335,7 +327,7 @@ private:
 };
 
 {{/if}}
-{{#if (isReportableAttribute)}}
+{{#if isReportableAttribute}}
 class Report{{asCamelCased parent.name false}}{{asCamelCased name false}}: public ModelCommand
 {
 public:
@@ -376,7 +368,7 @@ public:
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback> * onReportCallback = new chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>(On{{asCallbackAttributeType atomicTypeId}}AttributeResponse, this);
+    chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onReportCallback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     {{#if isAnalog}}
@@ -403,10 +395,10 @@ void registerCluster{{asCamelCased name false}}(Commands & commands)
         make_unique<Discover{{asCamelCased name false}}Attributes>(),
         {{#chip_server_cluster_attributes}}
         make_unique<Read{{asCamelCased parent.name false}}{{asCamelCased name false}}>(),
-        {{#if (isWritableAttribute)}}
+        {{#if isWritableAttribute}}
         make_unique<Write{{asCamelCased parent.name false}}{{asCamelCased name false}}>(),
         {{/if}}
-        {{#if (isReportableAttribute)}}
+        {{#if isReportableAttribute}}
         make_unique<Report{{asCamelCased parent.name false}}{{asCamelCased name false}}>(),
         {{/if}}
         {{/chip_server_cluster_attributes}}

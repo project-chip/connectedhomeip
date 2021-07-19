@@ -20,6 +20,7 @@
 
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <mdns/Resolver.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -53,12 +54,8 @@ public:
         ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolutionFailed");
     }
 
-    CHIP_ERROR AdvertiseCommissionableNode();
-
-    CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Inet::IPAddress commissioner, uint16_t port);
-
 protected:
-    Mdns::DiscoveredNodeData * GetDiscoveredNodes() override { return mDiscoveredCommissioners; }
+    DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mDiscoveredCommissioners); }
 
 private:
     Mdns::DiscoveredNodeData mDiscoveredCommissioners[CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES];

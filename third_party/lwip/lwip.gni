@@ -53,17 +53,6 @@ template("lwip_target") {
     lwip_6lowpan = false
   }
 
-  config("${lwip_target_name}_warnings") {
-    cflags = [
-      "-Wno-address",
-      "-Wno-format",
-      "-Wno-type-limits",
-      "-Wno-unused-variable",
-      "-Wno-maybe-uninitialized",
-      "-Wno-format-type-confusion",
-    ]
-  }
-
   config("${lwip_target_name}_base_config") {
     include_dirs = [ "${lwip_root}/repo/lwip/src/include" ]
   }
@@ -212,8 +201,12 @@ template("lwip_target") {
       sources += [ "${_lwip_root}/src/netif/lowpan6.c" ]
     }
 
-    # Relax warnings for third_party code.
-    configs += [ ":${lwip_target_name}_warnings" ]
+    if (defined(lwip_remove_configs)) {
+      configs -= lwip_remove_configs
+    }
+    if (defined(lwip_add_configs)) {
+      configs += lwip_add_configs
+    }
 
     public_configs += [ ":${lwip_target_name}_base_config" ]
   }

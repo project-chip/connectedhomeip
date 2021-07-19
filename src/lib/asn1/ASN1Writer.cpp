@@ -68,12 +68,6 @@ void ASN1Writer::InitNullWriter(void)
     mDeferredLengthCount = 0;
 }
 
-CHIP_ERROR ASN1Writer::Finalize()
-{
-    // TODO: This method is not required and can be deprecated.
-    return CHIP_NO_ERROR;
-}
-
 uint16_t ASN1Writer::GetLengthWritten() const
 {
     return (mBuf != nullptr) ? mWritePoint - mBuf : 0;
@@ -300,6 +294,9 @@ CHIP_ERROR ASN1Writer::PutConstructedType(const uint8_t * val, uint16_t valLen)
 {
     // Do nothing for a null writer.
     VerifyOrReturnError(mBuf != nullptr, CHIP_NO_ERROR);
+
+    // Make sure we have enough space to write
+    VerifyOrReturnError((mWritePoint + valLen) <= mBufEnd, ASN1_ERROR_OVERFLOW);
 
     memcpy(mWritePoint, val, valLen);
     mWritePoint += valLen;

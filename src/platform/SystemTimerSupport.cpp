@@ -30,16 +30,16 @@
 namespace chip {
 namespace System {
 namespace Platform {
-namespace Layer {
+namespace Eventing {
 
 using namespace ::chip::DeviceLayer;
 
-CHIP_ERROR StartTimer(System::Layer & aLayer, void * aContext, uint32_t aMilliseconds)
+CHIP_ERROR StartTimer(System::Layer & aLayer, uint32_t aMilliseconds)
 {
     return PlatformMgr().StartChipTimer(aMilliseconds);
 }
 
-} // namespace Layer
+} // namespace Eventing
 } // namespace Platform
 } // namespace System
 } // namespace chip

@@ -97,7 +97,7 @@ using namespace chip::Encoding;
 using namespace chip::Protocols::UserDirectedCommissioning;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
+constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondsPerSecond;
 
 constexpr uint32_t kMaxCHIPCSRLength = 1024;
 
@@ -223,7 +223,7 @@ CHIP_ERROR DeviceController::GenerateOperationalCertificates(const ByteSpan & no
 
     ChipLogProgress(Controller, "Getting intermediate CA certificate from the issuer");
     CHIP_ERROR err = mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, icaCertSpan);
-    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" CHIP_ERROR_FORMAT, err);
+    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
     if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
     {
         // This implies that the commissioner application uses root CA to sign the operational
@@ -346,8 +346,8 @@ CHIP_ERROR DeviceController::Shutdown()
     //
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
 #else
-    VerifyOrReturnError(mInetLayer->Shutdown() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(mSystemLayer->Shutdown() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(mInetLayer->Shutdown());
+    ReturnErrorOnFailure(mSystemLayer->Shutdown());
     chip::Platform::Delete(mInetLayer);
     chip::Platform::Delete(mSystemLayer);
 #endif // CONFIG_DEVICE_LAYER
@@ -573,7 +573,6 @@ CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, 
                                                const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     uint16_t index;
-    bool needClose = true;
 
     VerifyOrExit(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
 
@@ -583,14 +582,9 @@ CHIP_ERROR DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, 
     index = FindDeviceIndex(packetHeader.GetSourceNodeId().Value());
     VerifyOrExit(index < kNumMaxActiveDevices, ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
-    needClose = false; // Device will handle it
     mActiveDevices[index].OnMessageReceived(ec, packetHeader, payloadHeader, std::move(msgBuf));
 
 exit:
-    if (needClose)
-    {
-        ec->Close();
-    }
     return CHIP_NO_ERROR;
 }
 
@@ -729,7 +723,8 @@ exit:
     }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to initialize the device list with error: %" CHIP_ERROR_FORMAT, err);
+        ChipLogError(Controller, "Failed to initialize the device list with error: %" CHIP_ERROR_FORMAT,
+                     ChipError::FormatError(err));
     }
 
     return err;
@@ -829,7 +824,7 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     uint16_t nextKeyID = 0;
     uint16_t size      = sizeof(nextKeyID);
     CHIP_ERROR error   = mStorageDelegate->SyncGetKeyValue(kNextAvailableKeyID, &nextKeyID, size);
-    if (error || (size != sizeof(nextKeyID)))
+    if ((error != CHIP_NO_ERROR) || (size != sizeof(nextKeyID)))
     {
         nextKeyID = 0;
     }
@@ -938,13 +933,13 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     // If the CSRNonce is passed in, using that else using a random one..
     if (params.HasCSRNonce())
     {
-        VerifyOrReturnError(device->SetCSRNonce(params.GetCSRNonce().Value()) == CHIP_NO_ERROR, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(device->SetCSRNonce(params.GetCSRNonce().Value()));
     }
     else
     {
         uint8_t mCSRNonce[kOpCSRNonceLength];
         Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
-        VerifyOrReturnError(device->SetCSRNonce(ByteSpan(mCSRNonce)) == CHIP_NO_ERROR, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(device->SetCSRNonce(ByteSpan(mCSRNonce)));
     }
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
@@ -1036,7 +1031,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
     device->Serialize(serialized);
 
     err = mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(peerAddress), device->GetDeviceId(),
-                                  testSecurePairingSecret, SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
+                                  testSecurePairingSecret, SecureSession::SessionRole::kInitiator, mAdminId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1186,10 +1181,9 @@ void DeviceCommissioner::OnSessionEstablished()
 
     mPairingSession.PeerConnection().SetPeerNodeId(device->GetDeviceId());
 
-    CHIP_ERROR err =
-        mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-                                mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession,
-                                SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
+    CHIP_ERROR err = mSessionMgr->NewPairing(
+        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
+        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kInitiator, mAdminId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));

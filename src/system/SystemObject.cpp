@@ -95,8 +95,8 @@ void Object::DeferredRelease(Object::ReleaseDeferralErrorTactic aTactic)
             break;
 
         case kReleaseDeferralErrorTactic_Die:
-            VerifyOrDieWithMsg(false, chipSystemLayer, "Object::DeferredRelease %p->PostEvent failed err(%d)", &lSystemLayer,
-                               static_cast<int>(lError));
+            VerifyOrDieWithMsg(false, chipSystemLayer, "Object::DeferredRelease %p->PostEvent failed err(%" CHIP_ERROR_FORMAT ")",
+                               &lSystemLayer, ChipError::FormatError(lError));
             break;
         }
     }

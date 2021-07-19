@@ -58,11 +58,16 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
 void WriteClient::Shutdown()
 {
     VerifyOrReturn(mState != State::Uninitialized);
+    ClearExistingExchangeContext();
+    ShutdownInternal();
+}
+
+void WriteClient::ShutdownInternal()
+{
     mMessageWriter.Reset();
 
-    ClearExistingExchangeContext();
-
     mpExchangeMgr         = nullptr;
+    mpExchangeCtx         = nullptr;
     mpDelegate            = nullptr;
     mAttributeStatusIndex = 0;
     ClearState();
@@ -70,7 +75,7 @@ void WriteClient::Shutdown()
 
 void WriteClient::ClearExistingExchangeContext()
 {
-    // Discard any existing exchange context. Effectively we can only have one Echo exchange with
+    // Discard any existing exchange context. Effectively we can only have one IM exchange with
     // a single node at any one time.
     if (mpExchangeCtx != nullptr)
     {
@@ -255,7 +260,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdm
     ClearExistingExchangeContext();
 
     // Create a new exchange context.
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    // TODO: we temporarily create a SecureSessionHandle from node id, this will be fixed in PR 3602
     // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
     if (apSecureSession == nullptr)
     {
@@ -294,19 +299,12 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     VerifyOrDie(apExchangeContext == mpExchangeCtx);
 
-    // Verify that the message is an Invoke Command Response.
+    // Verify that the message is an Write Response.
     // If not, close the exchange and free the payload.
     if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse))
     {
-        apExchangeContext->Close();
-        mpExchangeCtx = nullptr;
         ExitNow();
     }
-
-    // Close the current exchange after receiving the response since the response message marks the
-    // end of conversation represented by the exchange. We should create an new exchange for a new
-    // conversation defined in Interaction Model protocol.
-    ClearExistingExchangeContext();
 
     err = ProcessWriteResponseMessage(std::move(aPayload));
 
@@ -322,7 +320,7 @@ exit:
             mpDelegate->WriteResponseProcessed(this);
         }
     }
-    Shutdown();
+    ShutdownInternal();
     return err;
 }
 
@@ -335,7 +333,7 @@ void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
     {
         mpDelegate->WriteResponseError(this, CHIP_ERROR_TIMEOUT);
     }
-    Shutdown();
+    ShutdownInternal();
 }
 
 CHIP_ERROR WriteClient::ProcessAttributeStatusElement(AttributeStatusElement::Parser & aAttributeStatusElement)

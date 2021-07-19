@@ -42,6 +42,7 @@
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
+#include <support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
@@ -330,8 +331,11 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
                    ChipLogError(SecureChannel, "PASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel,
                  "PASESession timed out while waiting for a response from the peer. Expected message type was %" PRIu8,
-                 static_cast<std::underlying_type_t<decltype(mNextExpectedMsg)>>(mNextExpectedMsg));
+                 to_underlying(mNextExpectedMsg));
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+    // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    mExchangeCtxt = nullptr;
     Clear();
 }
 
@@ -646,8 +650,8 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
 
     mPairingComplete = true;
 
-    // Close the exchange, as no additional messages are expected from the peer
-    CloseExchange();
+    // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -688,8 +692,8 @@ CHIP_ERROR PASESession::HandleMsg3(const System::PacketBufferHandle & msg)
 
     mPairingComplete = true;
 
-    // Close the exchange, as no additional messages are expected from the peer
-    CloseExchange();
+    // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -731,7 +735,6 @@ CHIP_ERROR PASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
         "Assuming size of Spake2pErrorMsg message is 1 octet, so that endian-ness conversion and memory alignment is not needed");
 
     Spake2pErrorMsg * pMsg = reinterpret_cast<Spake2pErrorMsg *>(msg->Start());
-    ChipLogError(SecureChannel, "Received error during pairing process. %s", ErrorStr(pMsg->error));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     switch (pMsg->error)
@@ -748,6 +751,7 @@ CHIP_ERROR PASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
         err = CHIP_ERROR_INTERNAL;
         break;
     };
+    ChipLogError(SecureChannel, "Received error during pairing process. %s", ErrorStr(err));
 
     return err;
 }
@@ -764,8 +768,6 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     {
         if (mExchangeCtxt != exchange)
         {
-            // Close the incoming exchange explicitly, as the cleanup code only closes mExchangeCtxt
-            exchange->Close();
             ReturnErrorOnFailure(CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
@@ -827,6 +829,9 @@ exit:
     // Call delegate to indicate pairing failure
     if (err != CHIP_NO_ERROR)
     {
+        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // exchange will handle that.
+        mExchangeCtxt = nullptr;
         Clear();
         ChipLogError(SecureChannel, "Failed during PASE session setup. %s", ErrorStr(err));
         mDelegate->OnSessionEstablishmentError(err);

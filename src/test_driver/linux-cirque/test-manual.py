@@ -41,7 +41,7 @@ SETUP_TEST_THREAD_NETWORK = False
 # You can define your own consts here.
 SETUPPINCODE = 12345678
 DISCRIMINATOR = 1  # Randomw number, not used
-CHIP_PORT = 11097
+CHIP_PORT = 5540
 
 #############################################################
 

@@ -17,7 +17,7 @@
 
 #include <app/util/af.h>
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 

@@ -21,10 +21,7 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/tft"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/spidriver"
     "${CMAKE_CURRENT_LIST_DIR}/../../common/QRCode"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/screen-framework"
 )
 
 project(chip-lock-app)
@@ -42,4 +39,9 @@ pw_set_backend(pw_sys_io pw_sys_io.esp32)
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
 add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sys_io)
+
+get_target_property(_target_cxx_flags pw_build.cpp17 INTERFACE_COMPILE_OPTIONS)
+list(REMOVE_ITEM _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=c++17>)
+list(APPEND _target_cxx_flags $<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>)
+set_target_properties(pw_build.cpp17 PROPERTIES INTERFACE_COMPILE_OPTIONS "${_target_cxx_flags}")
 endif(CONFIG_ENABLE_PW_RPC)

@@ -92,11 +92,6 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
 exit:
     ChipLogFunctError(err);
 
-    // Close the exchange cleanly so that the ExchangeManager will send an ack for the message we just received.
-    // This needs to be done before the Reset() call, because Reset() aborts mpExchangeCtx if its not null.
-    mpExchangeCtx->Close();
-    mpExchangeCtx = nullptr;
-
     if (mpDelegate != nullptr)
     {
         if (err != CHIP_NO_ERROR)
@@ -109,7 +104,7 @@ exit:
         }
     }
 
-    Shutdown();
+    ShutdownInternal();
     return err;
 }
 
@@ -123,7 +118,7 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
         mpDelegate->CommandResponseError(this, CHIP_ERROR_TIMEOUT);
     }
 
-    Shutdown();
+    ShutdownInternal();
 }
 
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
@@ -168,7 +163,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         err = aCommandElement.GetData(&commandDataReader);
         SuccessOrExit(err);
         // TODO(#4503): Should call callbacks of cluster that sends the command.
-        DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);
+        DispatchSingleClusterResponseCommand(clusterId, commandId, endpointId, commandDataReader, this);
     }
 
 exit:

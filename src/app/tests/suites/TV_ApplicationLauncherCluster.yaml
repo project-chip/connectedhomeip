@@ -1,0 +1,58 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Application Launcher Cluster Tests
+
+config:
+    cluster: "Application Launcher"
+    endpoint: 1
+
+tests:
+    - label: "Read attribute Application Launcher list"
+      command: "readAttribute"
+      attribute: "Application Launcher List"
+      response:
+          value: [123, 456]
+
+    - label: "Launch App Command"
+      command: "LaunchApp"
+      arguments:
+          values:
+              - name: "data"
+                value: "exampleData"
+              - name: "catalogVendorId"
+                value: 1
+              - name: "applicationId"
+                value: "appId"
+
+      # TODO: Enable this once struct as response type is supported
+      # response:
+      #     values:
+      #         - name: "status"
+      #           value: 0
+      #         - name: "data"
+      #           value: "data"
+    # TODO: Read attribute catalog vendor id and Read attribute catalog vendor id
+    # TODO: shoudl be one test, but currently struct as attribute is not supported
+    - label: "Read attribute catalog vendor id"
+      command: "readAttribute"
+      attribute: "catalog vendor id"
+      response:
+          value: 0
+
+    - label: "Read attribute application id"
+      command: "readAttribute"
+      attribute: "application id"
+      response:
+          value: 0

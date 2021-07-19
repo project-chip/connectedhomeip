@@ -43,6 +43,7 @@
 #include "app/util/common.h"
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
+#include <app/common/gen/callback.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/common/gen/print-cluster.h>
@@ -50,8 +51,6 @@
 #include <app/util/af-event.h>
 #include <app/util/af-main.h>
 #include <app/util/af.h>
-
-#include "gen/callback.h"
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 #include <app/clusters/groups-server/groups-server.h>
@@ -845,7 +844,7 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
         emberAfPutInt16uInResp(cmd->mfgCode);
     }
     emberAfPutInt8uInResp(cmd->seqNum);
-    emberAfPutInt8uInResp(ZCL_DEFAULT_RESPONSE_COMMAND_ID);
+    emberAfPutInt32uInResp(ZCL_DEFAULT_RESPONSE_COMMAND_ID);
     emberAfPutInt32uInResp(cmd->commandId);
     emberAfPutStatusInResp(status);
 
@@ -879,7 +878,7 @@ void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x)
     data[index + 3] = (uint8_t)(((x) >> 24) & 0xFF);
 }
 
-void emberAfCopyString(uint8_t * dest, const uint8_t * src, uint8_t size)
+void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
 {
     if (src == NULL)
     {
@@ -894,14 +893,15 @@ void emberAfCopyString(uint8_t * dest, const uint8_t * src, uint8_t size)
         uint8_t length = emberAfStringLength(src);
         if (size < length)
         {
-            length = size;
+            // Since we have checked that size < length, size must be able to fit into the type of length.
+            length = static_cast<decltype(length)>(size);
         }
         memmove(dest + 1, src + 1, length);
         dest[0] = length;
     }
 }
 
-void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size)
+void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
 {
     if (src == NULL)
     {
@@ -917,7 +917,8 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size)
         uint16_t length = emberAfLongStringLength(src);
         if (size < length)
         {
-            length = size;
+            // Since we have checked that size < length, size must be able to fit into the type of length.
+            length = static_cast<decltype(length)>(size);
         }
         memmove(dest + 2, src + 2, length);
         dest[0] = EMBER_LOW_BYTE(length);

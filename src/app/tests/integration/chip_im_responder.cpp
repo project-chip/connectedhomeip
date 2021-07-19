@@ -51,7 +51,7 @@ bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCom
 }
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
+                                  chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
     static bool statusCodeFlipper = false;
 
@@ -96,23 +96,25 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     statusCodeFlipper = !statusCodeFlipper;
 }
 
+void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                          chip::TLV::TLVReader & aReader, CommandSender * apCommandObj)
+{
+    ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16, aClusterId,
+                  aCommandId, aEndPointId);
+    // Nothing todo.
+}
+
 CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    uint64_t version = 0;
     VerifyOrExit(aClusterInfo.mClusterId == kTestClusterId && aClusterInfo.mEndpointId == kTestEndpointId,
                  err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(apWriter != nullptr, /* no op */);
 
-    if (aClusterInfo.mFieldId == kRootFieldId || aClusterInfo.mFieldId == 1)
-    {
-        err = apWriter->Put(TLV::ContextTag(kTestFieldId1), kTestFieldValue1);
-        SuccessOrExit(err);
-    }
-    if (aClusterInfo.mFieldId == kRootFieldId || aClusterInfo.mFieldId == 2)
-    {
-        err = apWriter->Put(TLV::ContextTag(kTestFieldId2), kTestFieldValue2);
-        SuccessOrExit(err);
-    }
+    err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_Data), kTestFieldValue1);
+    SuccessOrExit(err);
+    err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
 
 exit:
     ChipLogFunctError(err);

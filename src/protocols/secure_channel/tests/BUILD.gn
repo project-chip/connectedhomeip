@@ -23,6 +23,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/protocols",
     "${chip_root}/src/protocols/secure_channel",
+    "${chip_root}/src/transport/raw/tests:helpers",
     "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",
   ]

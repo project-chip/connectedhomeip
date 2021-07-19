@@ -87,7 +87,7 @@ using namespace ::chip::DeviceLayer;
 
 #elif CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
 
-#define STATUS_LED_GPIO_NUM GPIO_NUM_2
+#define STATUS_LED_GPIO_NUM GPIO_NUM_8
 
 #else // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
@@ -765,4 +765,9 @@ extern "C" void app_main()
 
         vTaskDelay(50 / portTICK_PERIOD_MS);
     }
+}
+
+bool lowPowerClusterSleep()
+{
+    return true;
 }

@@ -89,6 +89,14 @@ enum KeyFormat
     kKeyFormat_Chip_Base64
 };
 
+enum AttCertType
+{
+    kAttCertType_NotSpecified = 0, /**< The attestation certificate type has not been specified. */
+    kAttCertType_PAA,              /**< Product Attestation Authority (PAA) Certificate. */
+    kAttCertType_PAI,              /**< Product Attestation Intermediate (PAI) Certificate. */
+    kAttCertType_DAC,              /**< Device Attestation Certificate (DAC). */
+};
+
 struct FutureExtension
 {
     int nid;
@@ -109,6 +117,7 @@ extern bool Cmd_ConvertKey(int argc, char * argv[]);
 extern bool Cmd_ResignCert(int argc, char * argv[]);
 extern bool Cmd_ValidateCert(int argc, char * argv[]);
 extern bool Cmd_PrintCert(int argc, char * argv[]);
+extern bool Cmd_GenAttCert(int argc, char * argv[]);
 
 extern bool ReadCert(const char * fileName, X509 * cert);
 extern bool ReadCert(const char * fileName, X509 * cert, CertFormat & origCertFmt);
@@ -120,6 +129,9 @@ extern bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCe
                      uint32_t validDays, const FutureExtension * futureExts, uint8_t futureExtsCount, X509 * newCert,
                      EVP_PKEY * newKey);
 extern bool ResignCert(X509 * cert, X509 * caCert, EVP_PKEY * caKey);
+
+extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID, X509 * caCert,
+                        EVP_PKEY * caKey, const struct tm & validFrom, uint32_t validDays, X509 * newCert, EVP_PKEY * newKey);
 
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool ReadKey(const char * fileName, EVP_PKEY * key);
@@ -146,6 +158,8 @@ extern int gNIDChipFabricId;
 extern int gNIDChipAuthTag1;
 extern int gNIDChipAuthTag2;
 extern int gNIDChipCurveP256;
+extern int gNIDChipAttAttrVID;
+extern int gNIDChipAttAttrPID;
 
 /**
  *  @def VerifyTrueOrExit(aStatus)

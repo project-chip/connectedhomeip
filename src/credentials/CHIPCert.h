@@ -33,6 +33,7 @@
 #include <core/CHIPConfig.h>
 #include <core/CHIPTLV.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/PeerId.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 
@@ -48,14 +49,13 @@ static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
 static constexpr uint32_t kMaxCHIPCertLength = 400;
 static constexpr uint32_t kMaxDERCertLength  = 600;
 
+// The decode buffer is used to reconstruct TBS section of X.509 certificate, which doesn't include signature.
+static constexpr uint32_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Crypto::kMax_ECDSA_Signature_Length_Der;
+
 /** Data Element Tags for the CHIP Certificate
  */
 enum
 {
-    // ---- Top-level Protocol-Specific Tags ----
-    kTag_ChipCertificate      = 1, /**< [ structure ] A CHIP certificate. */
-    kTag_ChipCertificateArray = 2, /**< [ array ] An array of CHIP certificates. */
-
     // ---- Context-specific Tags for ChipCertificate Structure ----
     kTag_SerialNumber            = 1,  /**< [ byte string ] Certificate serial number, in BER integer encoding. */
     kTag_SignatureAlgorithm      = 2,  /**< [ unsigned int ] Enumerated value identifying the certificate signature algorithm. */
@@ -867,6 +867,37 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1::AS
  * @retval  #CHIP_NO_ERROR  If the signature value was successfully converted.
  */
 CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::TLVWriter & writer, uint64_t tag);
+
+/**
+ * Extract a PeerId from an operational certificate that has already been
+ * parsed.
+ *
+ * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have at
+ * least one NodeId RDN and one FabricId RDN in the Subject DN.  No other
+ * validation (e.g. checkign that there is exactly one RDN of each type) is
+ * performed.
+ */
+CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, PeerId * peerId);
+
+/**
+ * Extract a PeerId from an operational certificate in ByteSpan TLV-encoded
+ * form.  This does not perform any sort of validation on the certificate
+ * structure other than parsing it.
+ *
+ * Can return any error that can be returned from parsing the cert or from the
+ * ChipCertificateData* version of ExtractPeerIdFromOpCert.
+ */
+CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId);
+
+/**
+ * Extract a PeerId from an operational certificate array in ByteSpan
+ * TLV-encoded form.  This does not perform any sort of validation on the
+ * certificate structure other than parsing it.
+ *
+ * Can return any error that can be returned from parsing the array or from the
+ * ChipCertificateData* version of ExtractPeerIdFromOpCert.
+ */
+CHIP_ERROR ExtractPeerIdFromOpCertArray(const ByteSpan & opcertarray, PeerId * peerId);
 
 } // namespace Credentials
 } // namespace chip

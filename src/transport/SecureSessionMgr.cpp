@@ -110,18 +110,6 @@ void SecureSessionMgr::Shutdown()
     mCB           = nullptr;
 }
 
-Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
-{
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
-
-    if (state)
-    {
-        return state->GetPeerAddress().GetTransportType();
-    }
-
-    return Transport::Type::kUndefined;
-}
-
 CHIP_ERROR SecureSessionMgr::BuildEncryptedMessagePayload(SecureSessionHandle session, PayloadHeader & payloadHeader,
                                                           System::PacketBufferHandle && msgBuf,
                                                           EncryptedPacketBufferHandle & encryptedMessage)
@@ -181,14 +169,9 @@ CHIP_ERROR SecureSessionMgr::SendPreparedMessage(SecureSessionHandle session, co
     mPeerConnections.MarkConnectionActive(state);
 
     ChipLogProgress(Inet, "Sending msg %p to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec", &preparedMessage,
-                    ChipLogValueX64(state->GetPeerNodeId()), System::Layer::GetClock_MonotonicMS());
+                    ChipLogValueX64(state->GetPeerNodeId()), System::Clock::GetMonotonicMilliseconds());
 
-    if (state->GetTransport() != nullptr)
-    {
-        ChipLogProgress(Inet, "Sending secure msg on connection specific transport");
-        err = state->GetTransport()->SendMessage(state->GetPeerAddress(), std::move(msgBuf));
-    }
-    else if (mTransportMgr != nullptr)
+    if (mTransportMgr != nullptr)
     {
         ChipLogProgress(Inet, "Sending secure msg on generic transport");
         err = mTransportMgr->SendMessage(state->GetPeerAddress(), std::move(msgBuf));
@@ -243,8 +226,7 @@ void SecureSessionMgr::ExpireAllPairings(NodeId peerNodeId, Transport::AdminId a
 }
 
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
-                                        PairingSession * pairing, SecureSession::SessionRole direction, Transport::AdminId admin,
-                                        Transport::Base * transport)
+                                        PairingSession * pairing, SecureSession::SessionRole direction, Transport::AdminId admin)
 {
     uint16_t peerKeyId          = pairing->GetPeerKeyId();
     uint16_t localKeyId         = pairing->GetLocalKeyId();
@@ -265,7 +247,6 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     ReturnErrorCodeIf(state == nullptr, CHIP_ERROR_NO_MEMORY);
 
     state->SetAdminId(admin);
-    state->SetTransport(transport);
 
     if (peerAddr.HasValue() && peerAddr.Value().GetIPAddress() != Inet::IPAddress::Any)
     {
@@ -381,7 +362,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
                 ChipLogError(Inet,
                              "Message counter synchronization for received message, failed to "
                              "QueueReceivedMessageAndStartSync, err = %" CHIP_ERROR_FORMAT,
-                             err);
+                             ChipError::FormatError(err));
             }
             else
             {
@@ -400,7 +381,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         }
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, err);
+            ChipLogError(Inet, "Message counter verify failed, err = %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
         }
         SuccessOrExit(err);
     }
@@ -519,8 +500,8 @@ exit:
 
 void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionState & state)
 {
-    NodeId peerNodeId = state.GetPeerNodeId();
-    ChipLogDetail(Inet, "Marking old secure session for device 0x" ChipLogFormatX64 " as expired", ChipLogValueX64(peerNodeId));
+    ChipLogDetail(Inet, "Marking old secure session for device 0x" ChipLogFormatX64 " as expired",
+                  ChipLogValueX64(state.GetPeerNodeId()));
 
     if (mCB != nullptr)
     {

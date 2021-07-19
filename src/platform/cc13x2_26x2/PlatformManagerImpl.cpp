@@ -66,7 +66,7 @@ static int app_get_random(uint8_t * aOutput, size_t aLen)
         while (1)
             ;
     }
-    return CHIP_NO_ERROR;
+    return 0;
 }
 
 static void app_random_init(void)

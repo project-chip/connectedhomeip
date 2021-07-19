@@ -16,11 +16,7 @@
  */
 
 #include "TargetNavigatorManager.h"
-
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app/clusters/target-navigator-server/target-navigator-server.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -58,31 +54,12 @@ std::vector<EmberAfNavigateTargetTargetInfo> TargetNavigatorManager::proxyGetTar
     return targets;
 }
 
-TargetNavigatorLaunchResponse TargetNavigatorManager::proxyNavigateTargetRequest(uint8_t target, std::string data)
+TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std::string data)
 {
     // TODO: Insert code here
-    TargetNavigatorLaunchResponse response;
-    response.data   = "data response";
-    response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    TargetNavigatorResponse response;
+    const char * testData = "data response";
+    response.data         = (uint8_t *) testData;
+    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
     return response;
-}
-
-static void sendResponse(const char * responseName, TargetNavigatorLaunchResponse response)
-{
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_TARGET_NAVIGATOR_CLUSTER_ID,
-                              ZCL_NAVIGATE_TARGET_RESPONSE_COMMAND_ID, "us", response.status, &response.data);
-
-    EmberStatus status = emberAfSendResponse();
-    if (status != EMBER_SUCCESS)
-    {
-        ChipLogError(Zcl, "Failed to send %s. Error:%s", responseName, chip::ErrorStr(status));
-    }
-}
-
-bool emberAfTargetNavigatorClusterNavigateTargetCallback(unsigned char target, unsigned char * data)
-{
-    std::string dataString(reinterpret_cast<char *>(data));
-    TargetNavigatorLaunchResponse response = TargetNavigatorManager().proxyNavigateTargetRequest(target, dataString);
-    sendResponse("NavigateTargetResponse", response);
-    return true;
 }

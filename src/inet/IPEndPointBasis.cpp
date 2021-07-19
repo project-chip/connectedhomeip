@@ -1424,7 +1424,7 @@ CHIP_ERROR IPEndPointBasis::StartListener()
         case nw_listener_state_cancelled:
             ChipLogDetail(Inet, "Listener: Cancelled");
             if (res == CHIP_NO_ERROR)
-                res = INET_ERROR_CONNECTION_ABORTED;
+                res = CHIP_ERROR_CONNECTION_ABORTED;
 
             dispatch_semaphore_signal(mListenerSemaphore);
             break;
@@ -1480,7 +1480,7 @@ CHIP_ERROR IPEndPointBasis::StartConnection(nw_connection_t & aConnection)
         case nw_connection_state_cancelled:
             ChipLogDetail(Inet, "Connection: Cancelled");
             if (res == CHIP_NO_ERROR)
-                res = INET_ERROR_CONNECTION_ABORTED;
+                res = CHIP_ERROR_CONNECTION_ABORTED;
 
             dispatch_semaphore_signal(mConnectionSemaphore);
             break;

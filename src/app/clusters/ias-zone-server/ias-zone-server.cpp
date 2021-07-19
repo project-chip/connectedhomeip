@@ -51,18 +51,17 @@
 // *****************************************************************************
 
 #include "ias-zone-server.h"
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/att-storage.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
+#include <app/common/gen/callback.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 #include <system/SystemLayer.h>
-
-#include "gen/callback.h"
 
 using namespace chip;
 
@@ -349,7 +348,8 @@ static void updateEnrollState(EndpointId endpoint, bool enrolled)
     emberAfIasZoneClusterPrintln("IAS Zone Server State: %pEnrolled", (enrolled ? "" : "NOT "));
 }
 
-bool emberAfIasZoneClusterZoneEnrollResponseCallback(chip::app::Command * commandObj, uint8_t enrollResponseCode, uint8_t zoneId)
+bool emberAfIasZoneClusterZoneEnrollResponseCallback(chip::app::CommandHandler * commandObj, uint8_t enrollResponseCode,
+                                                     uint8_t zoneId)
 {
     EndpointId endpoint;
     uint8_t epZoneId;
@@ -408,7 +408,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(EndpointId endpoint, uint
     IasZoneStatusQueueEntry newBufferEntry;
     newBufferEntry.endpoint    = endpoint;
     newBufferEntry.status      = newStatus;
-    newBufferEntry.eventTimeMs = System::Layer::GetClock_MonotonicMS();
+    newBufferEntry.eventTimeMs = System::Clock::GetMonotonicMilliseconds();
 #endif
     EmberStatus sendStatus = EMBER_SUCCESS;
 
@@ -906,7 +906,7 @@ static int16_t popFromBuffer(IasZoneStatusQueue * ring, IasZoneStatusQueueEntry 
 
 uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry)
 {
-    uint32_t currentTimeMs = System::Layer::GetClock_MonotonicMS();
+    uint32_t currentTimeMs = System::Clock::GetMonotonicMilliseconds();
     int64_t deltaTimeMs    = currentTimeMs - entry->eventTimeMs;
 
     if (deltaTimeMs < 0)

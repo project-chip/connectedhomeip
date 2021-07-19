@@ -138,7 +138,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   group("check") {
     if (chip_link_tests) {
-      deps = [ "//src:tests_run" ]
+      deps = [
+        "//scripts/build:build_examples.tests",
+        "//src:tests_run",
+      ]
     }
   }
 
@@ -183,6 +186,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Enable building chip with gcc & mbedtls.
     enable_host_gcc_mbedtls_build = enable_default_builds && host_os != "win"
 
+    # Build the chip-cert tool.
+    enable_standalone_chip_cert_build =
+        enable_default_builds && host_os != "win" && chip_crypto == "openssl"
+
     # Build the chip-tool example.
     enable_standalone_chip_tool_build =
         enable_default_builds && host_os != "win"
@@ -217,7 +224,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_efr32_lock_app_build = enable_efr32_builds
 
     # Build the qpgxxxx lock app example.
-    enable_qpg_lock_app_build = enable_qpg_builds
+    enable_qpg_lock_app_build = enable_qpg_builds && !is_debug
 
     # Build the efr32 lighting app example.
     enable_efr32_lighting_app_build = enable_efr32_builds
@@ -273,6 +280,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   standalone_toolchain = "${chip_root}/config/standalone/toolchain:standalone"
   not_needed([ "standalone_toolchain" ])  # Might not be needed.
+
+  if (enable_standalone_chip_cert_build) {
+    group("standalone_chip_cert") {
+      deps = [ "${chip_root}/src/tools/chip-cert(${standalone_toolchain})" ]
+    }
+  }
 
   if (enable_standalone_chip_tool_build) {
     group("standalone_chip_tool") {
@@ -389,6 +402,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         ":android_x64",
         ":android_x86",
       ]
+    }
+    if (enable_standalone_chip_cert_build) {
+      deps += [ ":standalone_chip_cert" ]
     }
     if (enable_standalone_chip_tool_build) {
       deps += [ ":standalone_chip_tool" ]

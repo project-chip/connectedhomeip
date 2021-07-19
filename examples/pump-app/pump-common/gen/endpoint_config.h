@@ -588,7 +588,7 @@
     {                                                                                                                              \
                                                                                                                                    \
         /* Endpoint: 0, Cluster: On/off (server) */                                                                                \
-        { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* on/off */                                                \
+        { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* OnOff */                                                 \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) }, /* cluster revision */                                      \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Level Control (server) */                                                                     \

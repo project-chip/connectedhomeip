@@ -33,6 +33,7 @@
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
@@ -51,22 +52,7 @@ using TestContext = chip::Test::MessagingContext;
 
 TestContext sContext;
 
-class LoopbackTransport : public Transport::Base
-{
-public:
-    /// Transports are required to have a constructor that takes exactly one argument
-    CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
-
-    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
-    {
-        HandleMessageReceived(header, address, std::move(msgBuf));
-        return CHIP_NO_ERROR;
-    }
-
-    bool CanSendToPeer(const PeerAddress & address) override { return true; }
-};
-
-TransportMgr<LoopbackTransport> gTransportMgr;
+TransportMgr<Test::LoopbackTransport> gTransportMgr;
 
 class MockAppDelegate : public ExchangeDelegate
 {

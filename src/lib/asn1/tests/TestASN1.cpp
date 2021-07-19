@@ -165,9 +165,6 @@ static void TestASN1_Encode(nlTestSuite * inSuite, void * inContext)
     err = EncodeASN1TestData(writer);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = writer.Finalize();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
     encodedLen = writer.GetLengthWritten();
     NL_TEST_ASSERT(inSuite, encodedLen == sizeof(TestASN1_EncodedData));
     NL_TEST_ASSERT(inSuite, memcmp(buf, TestASN1_EncodedData, sizeof(TestASN1_EncodedData)) == 0);
@@ -299,9 +296,6 @@ static void TestASN1_NullWriter(nlTestSuite * inSuite, void * inContext)
     err = EncodeASN1TestData(writer);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = writer.Finalize();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
     encodedLen = writer.GetLengthWritten();
     NL_TEST_ASSERT(inSuite, encodedLen == 0);
 }
@@ -326,9 +320,6 @@ static void TestASN1_ObjectID(nlTestSuite * inSuite, void * inContext)
         ASN1_ENCODE_OBJECT_ID(kOID_KeyPurpose_ServerAuth);
     }
     ASN1_END_SEQUENCE;
-
-    err = writer.Finalize();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     encodedLen = writer.GetLengthWritten();
     NL_TEST_ASSERT(inSuite, encodedLen > 0);

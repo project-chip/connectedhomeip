@@ -19,8 +19,7 @@
  * @file - This file contains field element multipication test vectors.
  */
 
-#ifndef _SPAKE2P_FE_MUL_TEST_VECTORS_H_
-#define _SPAKE2P_FE_MUL_TEST_VECTORS_H_
+#pragma once
 
 namespace chip {
 namespace Crypto {
@@ -387,5 +386,3 @@ static const struct spake2p_fe_mul_tv * fe_mul_tvs[] = {
 
 } // namespace Crypto
 } // namespace chip
-
-#endif

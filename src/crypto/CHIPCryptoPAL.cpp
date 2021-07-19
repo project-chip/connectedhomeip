@@ -22,7 +22,153 @@
 
 #include "CHIPCryptoPAL.h"
 #include <string.h>
+#include <support/BufferReader.h>
+#include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
+
+using chip::Encoding::BufferWriter;
+using chip::Encoding::LittleEndian::Reader;
+
+namespace {
+
+constexpr uint8_t kIntegerTag         = 0x02u;
+constexpr uint8_t kSeqTag             = 0x30u;
+constexpr size_t kMinSequenceOverhead = 1 /* tag */ + 1 /* length */ + 1 /* actual data or second length byte*/;
+
+CHIP_ERROR ReadDerLength(Reader & reader, uint8_t & length)
+{
+    length = 0;
+
+    uint8_t cur_byte = 0;
+    ReturnErrorOnFailure(reader.Read8(&cur_byte).StatusCode());
+
+    if ((cur_byte & (1u << 7)) == 0)
+    {
+        // 7 bit length, the rest of the byte is the length.
+        length = cur_byte & 0x7Fu;
+        return CHIP_NO_ERROR;
+    }
+
+    // Did not early return: > 7 bit length, the number of bytes of the length is provided next.
+    uint8_t length_bytes = cur_byte & 0x7Fu;
+
+    if ((length_bytes > 1) || !reader.HasAtLeast(length_bytes))
+    {
+        // We only support lengths of 0..255 over 2 bytes
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    else
+    {
+        // Next byte has length 0..255.
+        return reader.Read8(&length).StatusCode();
+    }
+}
+
+CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, uint8_t * raw_integer_out, size_t raw_integer_length)
+{
+    uint8_t cur_byte = 0;
+
+    ReturnErrorOnFailure(reader.Read8(&cur_byte).StatusCode());
+
+    // We expect first tag to be INTEGER
+    VerifyOrReturnError(cur_byte == kIntegerTag, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Read the length
+    uint8_t integer_len = 0;
+    ReturnErrorOnFailure(ReadDerLength(reader, integer_len));
+
+    // Clear the destination buffer, so we can blit the unsigned value into place
+    memset(raw_integer_out, 0, raw_integer_length);
+
+    // Check for pseudo-zero to mark unsigned value
+    // This means we have too large an integer (should be at most 1 byte too large), it's invalid
+    ReturnErrorCodeIf(integer_len > (raw_integer_length + 1), CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (integer_len == (raw_integer_length + 1u))
+    {
+        // Means we had a 0x00 byte stuffed due to MSB being high in original integer
+        ReturnErrorOnFailure(reader.Read8(&cur_byte).StatusCode());
+
+        // The extra byte must be a leading zero
+        VerifyOrReturnError(cur_byte == 0, CHIP_ERROR_INVALID_ARGUMENT);
+        --integer_len;
+    }
+
+    // We now have the rest of the tag that is a "minimal length" unsigned integer.
+    // Blit it at the correct offset, since the order we use is MSB first for
+    // both ASN.1 and EC curve raw points.
+    size_t offset = raw_integer_length - integer_len;
+    return reader.ReadBytes(&raw_integer_out[offset], integer_len).StatusCode();
+}
+
+size_t EmitDerIntegerFromRaw(const uint8_t * raw_integer, size_t raw_integer_length_bytes, uint8_t * out_der_integer,
+                             size_t out_der_integer_size)
+{
+    if ((raw_integer == nullptr) || (raw_integer_length_bytes == 0))
+    {
+        return 0;
+    }
+
+    Reader reader(raw_integer, static_cast<uint16_t>(raw_integer_length_bytes));
+    BufferWriter writer(out_der_integer, static_cast<uint16_t>(out_der_integer_size));
+
+    bool needs_leading_zero_byte = false;
+
+    uint8_t cur_byte = 0;
+    while ((reader.Remaining() > 0) && (reader.Read8(&cur_byte).StatusCode() == CHIP_NO_ERROR) && (cur_byte == 0))
+    {
+        // Omit all leading zeros
+    }
+
+    if ((cur_byte & 0x80u) != 0)
+    {
+        // If overall MSB (from leftmost byte) is set, we will need to push out a zero to avoid it being
+        // considered a negative number.
+        needs_leading_zero_byte = true;
+    }
+
+    // The + 1 is to account for the last consummed byte of the loop to skip leading zeros
+    size_t length = reader.Remaining() + 1 + (needs_leading_zero_byte ? 1 : 0);
+
+    if (length > 127)
+    {
+        // We do not support length over more than 1 bytes.
+        return 0;
+    }
+
+    // Put INTEGER tag
+    writer.Put(kIntegerTag);
+
+    // Put length over 1 byte (i.e. MSB clear)
+    writer.Put(static_cast<uint8_t>(length));
+
+    // If leading zero or no more bytes remaining, must ensure we start we at least a zero byte
+    if (needs_leading_zero_byte)
+    {
+        writer.Put(static_cast<uint8_t>(0u));
+    }
+
+    // Put first consummed byte from last read iteration of leading zero suppression
+    writer.Put(cur_byte);
+
+    // Fill the rest from the input in order
+    while ((reader.Remaining() > 0) && (reader.Read8(&cur_byte).StatusCode() == CHIP_NO_ERROR))
+    {
+        // Emit all other bytes as-is
+        writer.Put(cur_byte);
+    }
+
+    size_t actually_written = 0;
+    if (!writer.Fit(actually_written))
+    {
+        // Somehow it was too big, return 0 for error.
+        return 0;
+    }
+
+    return actually_written;
+}
+
+} // namespace
 
 namespace chip {
 namespace Crypto {
@@ -47,12 +193,10 @@ CHIP_ERROR Spake2p::InternalHash(const uint8_t * in, size_t in_len)
     lb[6] = static_cast<uint8_t>((u64_len >> 48) & 0xff);
     lb[7] = static_cast<uint8_t>((u64_len >> 56) & 0xff);
 
-    CHIP_ERROR error = Hash(lb, sizeof(lb));
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(Hash(lb, sizeof(lb)));
     if (in != nullptr)
     {
-        error = Hash(in, in_len);
-        VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(Hash(in, in_len));
     }
 
     return CHIP_NO_ERROR;
@@ -89,17 +233,10 @@ CHIP_ERROR Spake2p::Init(const uint8_t * context, size_t context_len)
 {
     state = CHIP_SPAKE2P_STATE::PREINIT;
 
-    CHIP_ERROR error = InitImpl();
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = PointLoad(spake2p_M_p256, sizeof(spake2p_M_p256), M);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = PointLoad(spake2p_N_p256, sizeof(spake2p_N_p256), N);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = InternalHash(context, context_len);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(InitImpl());
+    ReturnErrorOnFailure(PointLoad(spake2p_M_p256, sizeof(spake2p_M_p256), M));
+    ReturnErrorOnFailure(PointLoad(spake2p_N_p256, sizeof(spake2p_N_p256), N));
+    ReturnErrorOnFailure(InternalHash(context, context_len));
 
     state = CHIP_SPAKE2P_STATE::INIT;
     return CHIP_NO_ERROR;
@@ -107,10 +244,8 @@ CHIP_ERROR Spake2p::Init(const uint8_t * context, size_t context_len)
 
 CHIP_ERROR Spake2p::WriteMN()
 {
-    CHIP_ERROR error = InternalHash(spake2p_M_p256, sizeof(spake2p_M_p256));
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-    error = InternalHash(spake2p_N_p256, sizeof(spake2p_N_p256));
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(InternalHash(spake2p_M_p256, sizeof(spake2p_M_p256)));
+    ReturnErrorOnFailure(InternalHash(spake2p_N_p256, sizeof(spake2p_N_p256)));
 
     return CHIP_NO_ERROR;
 }
@@ -119,27 +254,17 @@ CHIP_ERROR Spake2p::BeginVerifier(const uint8_t * my_identity, size_t my_identit
                                   size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
                                   size_t Lin_len)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::INIT, CHIP_ERROR_INTERNAL);
 
-    error = InternalHash(peer_identity, peer_identity_len);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = InternalHash(my_identity, my_identity_len);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = WriteMN();
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = FELoad(w0in, w0in_len, w0);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = PointLoad(Lin, Lin_len, L);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(InternalHash(peer_identity, peer_identity_len));
+    ReturnErrorOnFailure(InternalHash(my_identity, my_identity_len));
+    ReturnErrorOnFailure(WriteMN());
+    ReturnErrorOnFailure(FELoad(w0in, w0in_len, w0));
+    ReturnErrorOnFailure(PointLoad(Lin, Lin_len, L));
 
     state = CHIP_SPAKE2P_STATE::STARTED;
     role  = CHIP_SPAKE2P_ROLE::VERIFIER;
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p::BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
@@ -148,20 +273,11 @@ CHIP_ERROR Spake2p::BeginProver(const uint8_t * my_identity, size_t my_identity_
 {
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::INIT, CHIP_ERROR_INTERNAL);
 
-    CHIP_ERROR error = InternalHash(my_identity, my_identity_len);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = InternalHash(peer_identity, peer_identity_len);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = WriteMN();
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = FELoad(w0in, w0in_len, w0);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = FELoad(w1in, w1in_len, w1);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(InternalHash(my_identity, my_identity_len));
+    ReturnErrorOnFailure(InternalHash(peer_identity, peer_identity_len));
+    ReturnErrorOnFailure(WriteMN());
+    ReturnErrorOnFailure(FELoad(w0in, w0in_len, w0));
+    ReturnErrorOnFailure(FELoad(w1in, w1in_len, w1));
 
     state = CHIP_SPAKE2P_STATE::STARTED;
     role  = CHIP_SPAKE2P_ROLE::PROVER;
@@ -177,8 +293,7 @@ CHIP_ERROR Spake2p::ComputeRoundOne(const uint8_t * pab, size_t pab_len, uint8_t
     VerifyOrExit(state == CHIP_SPAKE2P_STATE::STARTED, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(*out_len >= point_size, error = CHIP_ERROR_INTERNAL);
 
-    error = FEGenerate(xy);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(FEGenerate(xy));
 
     if (role == CHIP_SPAKE2P_ROLE::PROVER)
     {
@@ -193,11 +308,8 @@ CHIP_ERROR Spake2p::ComputeRoundOne(const uint8_t * pab, size_t pab_len, uint8_t
     VerifyOrExit(MN != nullptr, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(XY != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    error = PointAddMul(XY, G, xy, MN, w0);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = PointWrite(XY, out, *out_len);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    SuccessOrExit(error = PointAddMul(XY, G, xy, MN, w0));
+    SuccessOrExit(error = PointWrite(XY, out, *out_len));
 
     state = CHIP_SPAKE2P_STATE::R1;
     error = CHIP_NO_ERROR;
@@ -220,14 +332,9 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
 
     if (role == CHIP_SPAKE2P_ROLE::PROVER)
     {
-        error = PointWrite(X, point_buffer, point_size);
-        VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-        error = InternalHash(point_buffer, point_size);
-        VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-        error = InternalHash(in, in_len);
-        VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+        SuccessOrExit(error = PointWrite(X, point_buffer, point_size));
+        SuccessOrExit(error = InternalHash(point_buffer, point_size));
+        SuccessOrExit(error = InternalHash(in, in_len));
 
         MN     = N;
         XY     = Y;
@@ -235,14 +342,9 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
     }
     else if (role == CHIP_SPAKE2P_ROLE::VERIFIER)
     {
-        error = InternalHash(in, in_len);
-        VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-        error = PointWrite(Y, point_buffer, point_size);
-        VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-        error = InternalHash(point_buffer, point_size);
-        VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+        SuccessOrExit(error = InternalHash(in, in_len));
+        SuccessOrExit(error = PointWrite(Y, point_buffer, point_size));
+        SuccessOrExit(error = InternalHash(point_buffer, point_size));
 
         MN     = M;
         XY     = X;
@@ -251,59 +353,36 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
     VerifyOrExit(MN != nullptr, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(XY != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    error = PointLoad(in, in_len, XY);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-    error = PointIsValid(XY);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = FEMul(tempbn, xy, w0);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = PointInvert(MN);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = PointAddMul(Z, XY, xy, MN, tempbn);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = PointCofactorMul(Z);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    SuccessOrExit(error = PointLoad(in, in_len, XY));
+    SuccessOrExit(error = PointIsValid(XY));
+    SuccessOrExit(error = FEMul(tempbn, xy, w0));
+    SuccessOrExit(error = PointInvert(MN));
+    SuccessOrExit(error = PointAddMul(Z, XY, xy, MN, tempbn));
+    SuccessOrExit(error = PointCofactorMul(Z));
 
     if (role == CHIP_SPAKE2P_ROLE::PROVER)
     {
-        error = FEMul(tempbn, w1, w0);
-        VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-        error = PointAddMul(V, XY, w1, MN, tempbn);
-        VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+        SuccessOrExit(error = FEMul(tempbn, w1, w0));
+        SuccessOrExit(error = PointAddMul(V, XY, w1, MN, tempbn));
     }
     else if (role == CHIP_SPAKE2P_ROLE::VERIFIER)
     {
-        error = PointMul(V, L, xy);
-        VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+        SuccessOrExit(error = PointMul(V, L, xy));
     }
 
-    error = PointCofactorMul(V);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    SuccessOrExit(error = PointCofactorMul(V));
+    SuccessOrExit(error = PointWrite(Z, point_buffer, point_size));
+    SuccessOrExit(error = InternalHash(point_buffer, point_size));
 
-    error = PointWrite(Z, point_buffer, point_size);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-    error = InternalHash(point_buffer, point_size);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    SuccessOrExit(error = PointWrite(V, point_buffer, point_size));
+    SuccessOrExit(error = InternalHash(point_buffer, point_size));
 
-    error = PointWrite(V, point_buffer, point_size);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-    error = InternalHash(point_buffer, point_size);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    SuccessOrExit(error = FEWrite(w0, point_buffer, fe_size));
+    SuccessOrExit(error = InternalHash(point_buffer, fe_size));
 
-    error = FEWrite(w0, point_buffer, fe_size);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-    error = InternalHash(point_buffer, fe_size);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    SuccessOrExit(error = GenerateKeys());
 
-    error = GenerateKeys();
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = Mac(Kcaorb, hash_size / 2, in, in_len, out);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    SuccessOrExit(error = Mac(Kcaorb, hash_size / 2, in, in_len, out));
 
     state = CHIP_SPAKE2P_STATE::R2;
     error = CHIP_NO_ERROR;
@@ -316,11 +395,8 @@ CHIP_ERROR Spake2p::GenerateKeys()
 {
     static const uint8_t info_keyconfirm[16] = { 'C', 'o', 'n', 'f', 'i', 'r', 'm', 'a', 't', 'i', 'o', 'n', 'K', 'e', 'y', 's' };
 
-    CHIP_ERROR error = HashFinalize(Kae);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = KDF(Ka, hash_size / 2, nullptr, 0, info_keyconfirm, sizeof(info_keyconfirm), Kcab, hash_size);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(HashFinalize(Kae));
+    ReturnErrorOnFailure(KDF(Ka, hash_size / 2, nullptr, 0, info_keyconfirm, sizeof(info_keyconfirm), Kcab, hash_size));
 
     return CHIP_NO_ERROR;
 }
@@ -346,11 +422,8 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
     VerifyOrReturnError(XY != nullptr, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(Kcaorb != nullptr, CHIP_ERROR_INTERNAL);
 
-    CHIP_ERROR error = PointWrite(XY, point_buffer, point_size);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = MacVerify(Kcaorb, hash_size / 2, in, in_len, point_buffer, point_size);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(PointWrite(XY, point_buffer, point_size));
+    ReturnErrorOnFailure(MacVerify(Kcaorb, hash_size / 2, in, in_len, point_buffer, point_size));
 
     state = CHIP_SPAKE2P_STATE::KC;
     return CHIP_NO_ERROR;
@@ -372,28 +445,20 @@ exit:
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitImpl()
 {
-    CHIP_ERROR error = sha256_hash_ctx.Begin();
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
-    error = InitInternal();
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
+    ReturnErrorOnFailure(sha256_hash_ctx.Begin());
+    ReturnErrorOnFailure(InitInternal());
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Hash(const uint8_t * in, size_t in_len)
 {
-    CHIP_ERROR error = sha256_hash_ctx.AddData(in, in_len);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
+    ReturnErrorOnFailure(sha256_hash_ctx.AddData(in, in_len));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::HashFinalize(uint8_t * out)
 {
-    CHIP_ERROR error = sha256_hash_ctx.Finish(out);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-
+    ReturnErrorOnFailure(sha256_hash_ctx.Finish(out));
     return CHIP_NO_ERROR;
 }
 
@@ -403,8 +468,111 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::KDF(const uint8_t * ikm, const size_t 
 {
     HKDF_sha_crypto mHKDF;
 
-    CHIP_ERROR error = mHKDF.HKDF_SHA256(ikm, ikm_len, salt, salt_len, info, info_len, out, out_len);
-    VerifyOrReturnError(error == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(ikm, ikm_len, salt, salt_len, info, info_len, out, out_len));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const uint8_t * raw_sig, size_t raw_sig_length, uint8_t * out_asn1_sig,
+                                   size_t out_asn1_sig_length, size_t & out_asn1_sig_actual_length)
+{
+    VerifyOrReturnError(fe_length_bytes > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(raw_sig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(raw_sig_length == (2u * fe_length_bytes), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_asn1_sig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_asn1_sig_length >= (raw_sig_length + kMax_ECDSA_X9Dot62_Asn1_Overhead), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Write both R an S integers past the overhead, we will shift them back later if we only needed 2 size bytes.
+    uint8_t * cursor = &out_asn1_sig[kMinSequenceOverhead];
+    size_t remaining = out_asn1_sig_length - kMinSequenceOverhead;
+
+    size_t integers_length = 0;
+
+    // Write R (first `fe_length_bytes` block of raw signature)
+    size_t integer_length = EmitDerIntegerFromRaw(&raw_sig[0], fe_length_bytes, cursor, remaining);
+    VerifyOrReturnError(integer_length != 0, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(integer_length < remaining, CHIP_ERROR_INTERNAL);
+    remaining -= integer_length;
+    integers_length += integer_length;
+    cursor += integer_length;
+
+    // Write S (second `fe_length_bytes` block of raw signature)
+    integer_length = EmitDerIntegerFromRaw(&raw_sig[fe_length_bytes], fe_length_bytes, cursor, remaining);
+    VerifyOrReturnError(integer_length != 0, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(integer_length <= remaining, CHIP_ERROR_INTERNAL);
+    integers_length += integer_length;
+
+    // We only support outputs that would use 1 or 2 bytes of DER length after the SEQUENCE tag
+    VerifyOrReturnError(integers_length <= UINT8_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // We now know the length of both variable sized integers in the sequence, so we
+    // can write the tag and length.
+    BufferWriter writer(out_asn1_sig, static_cast<uint16_t>(out_asn1_sig_length));
+
+    // Put SEQUENCE tag
+    writer.Put(kSeqTag);
+
+    // Put the length over 1 or two bytes depending on case
+    constexpr uint8_t kExtendedLengthMarker = 0x80u;
+    if (integers_length > 127u)
+    {
+        writer.Put(static_cast<uint8_t>(kExtendedLengthMarker | 1)); // Length is extended length, over 1 subsequent byte
+        writer.Put(static_cast<uint8_t>(integers_length));
+    }
+    else
+    {
+        // Length is directly in the first byte with MSB clear if <= 127.
+        writer.Put(static_cast<uint8_t>(integers_length));
+    }
+
+    // Put the contents of the integers previously serialized in the buffer.
+    // The writer.Put is memmove-safe, so the shifting will happen from the read
+    // of the same buffer where the write is taking place.
+    writer.Put(&out_asn1_sig[kMinSequenceOverhead], integers_length);
+
+    size_t actually_written = 0;
+    VerifyOrReturnError(writer.Fit(actually_written), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    out_asn1_sig_actual_length = actually_written;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const uint8_t * asn1_sig, size_t asn1_sig_length, uint8_t * out_raw_sig,
+                                   size_t out_raw_sig_length)
+{
+    VerifyOrReturnError(fe_length_bytes > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(asn1_sig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    VerifyOrReturnError(asn1_sig_length > kMinSequenceOverhead, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Output raw signature is <r,s> both of which are of fe_length_bytes (see SEC1).
+    VerifyOrReturnError(out_raw_sig_length >= (2u * fe_length_bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(out_raw_sig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    chip::Encoding::LittleEndian::Reader reader(asn1_sig, static_cast<uint16_t>(asn1_sig_length));
+
+    // Make sure we have a starting Sequence
+    uint8_t tag = 0;
+    ReturnErrorOnFailure(reader.Read8(&tag).StatusCode());
+    VerifyOrReturnError(tag == kSeqTag, CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Read length of sequence
+    uint8_t tag_len = 0;
+    ReturnErrorOnFailure(ReadDerLength(reader, tag_len));
+
+    // Length of sequence must match what is left of signature
+    VerifyOrReturnError(tag_len == reader.Remaining(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Can now clear raw signature integers r,s one by one
+    uint8_t * raw_cursor = out_raw_sig;
+
+    // Read R
+    ReturnErrorOnFailure(ReadDerUnsignedIntegerIntoRaw(reader, raw_cursor, fe_length_bytes));
+
+    raw_cursor += fe_length_bytes;
+
+    // Read S
+    ReturnErrorOnFailure(ReadDerUnsignedIntegerIntoRaw(reader, raw_cursor, fe_length_bytes));
 
     return CHIP_NO_ERROR;
 }

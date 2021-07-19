@@ -248,7 +248,8 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
     mRxCharCount++;
 
     // Get header flags, always in first byte.
-    VerifyOrExit(reader.Read8(rx_flags.RawStorage()).StatusCode() == CHIP_NO_ERROR, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+    err = reader.Read8(rx_flags.RawStorage()).StatusCode();
+    SuccessOrExit(err);
 #if CHIP_ENABLE_CHIPOBLE_TEST
     if (rx_flags.Has(HeaderFlags::kCommandMessage))
         SetRxPacketType(kType_Control);
@@ -261,14 +262,16 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
     // Get ack number, if any.
     if (didReceiveAck)
     {
-        VerifyOrExit(reader.Read8(&receivedAck).StatusCode() == CHIP_NO_ERROR, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+        err = reader.Read8(&receivedAck).StatusCode();
+        SuccessOrExit(err);
 
         err = HandleAckReceived(receivedAck);
         SuccessOrExit(err);
     }
 
     // Get sequence number.
-    VerifyOrExit(reader.Read8(&mRxNewestUnackedSeqNum).StatusCode() == CHIP_NO_ERROR, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+    err = reader.Read8(&mRxNewestUnackedSeqNum).StatusCode();
+    SuccessOrExit(err);
 
     // Verify that received sequence number is the next one we'd expect.
     VerifyOrExit(mRxNewestUnackedSeqNum == mRxNextSeqNum, err = BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER);
@@ -304,7 +307,8 @@ CHIP_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle &&
         // Verify StartMessage header flag set.
         VerifyOrExit(rx_flags.Has(HeaderFlags::kStartMessage), err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
 
-        VerifyOrExit(startReader.Read16(&mRxLength).StatusCode() == CHIP_NO_ERROR, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+        err = startReader.Read16(&mRxLength).StatusCode();
+        SuccessOrExit(err);
 
         mRxState = kState_InProgress;
 
@@ -365,7 +369,8 @@ exit:
         mRxState = kState_Error;
 
         // Dump protocol engine state, plus header flags and received data length.
-        ChipLogError(Ble, "HandleCharacteristicReceived failed, err = %" CHIP_ERROR_FORMAT ", rx_flags = %u", err, rx_flags.Raw());
+        ChipLogError(Ble, "HandleCharacteristicReceived failed, err = %" CHIP_ERROR_FORMAT ", rx_flags = %u",
+                     ChipError::FormatError(err), rx_flags.Raw());
         if (didReceiveAck)
         {
             ChipLogError(Ble, "With rx'd ack = %u", receivedAck);

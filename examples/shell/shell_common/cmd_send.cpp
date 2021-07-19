@@ -103,14 +103,13 @@ public:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                  const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override
     {
-        uint32_t respTime    = System::Timer::GetCurrentEpoch();
+        uint32_t respTime    = System::Clock::GetMonotonicMilliseconds();
         uint32_t transitTime = respTime - gSendArguments.GetLastSendTime();
         streamer_t * sout    = streamer_get();
 
         streamer_printf(sout, "Response received: len=%u time=%.3fms\n", buffer->DataLength(),
                         static_cast<double>(transitTime) / 1000);
 
-        gExchangeCtx->Close();
         gExchangeCtx = nullptr;
         return CHIP_NO_ERROR;
     }
@@ -120,7 +119,6 @@ public:
         streamer_t * sout = streamer_get();
         streamer_printf(sout, "No response received\n");
 
-        gExchangeCtx->Close();
         gExchangeCtx = nullptr;
     }
 } gMockAppDelegate;
@@ -163,7 +161,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     gExchangeCtx->SetResponseTimeout(kResponseTimeOut);
     sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse);
 
-    gSendArguments.SetLastSendTime(System::Timer::GetCurrentEpoch());
+    gSendArguments.SetLastSendTime(System::Clock::GetMonotonicMilliseconds());
 
     streamer_printf(stream, "\nSend CHIP message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
                     kTestDeviceNodeId);
@@ -204,7 +202,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Establish secure session failed, err: %s\n", ErrorStr(err));
-        gSendArguments.SetLastSendTime(System::Timer::GetCurrentEpoch());
+        gSendArguments.SetLastSendTime(System::Clock::GetMonotonicMilliseconds());
     }
     else
     {

@@ -28,6 +28,8 @@
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 
+#include <core/CHIPError.h>
+
 class LightingManager
 {
 public:
@@ -45,7 +47,7 @@ public:
         kState_Off,
     } State;
 
-    int Init();
+    CHIP_ERROR Init();
     bool IsTurnedOn();
     uint8_t GetLevel();
     bool InitiateAction(Action_t aAction, int32_t aActor, uint16_t size, uint8_t * value);

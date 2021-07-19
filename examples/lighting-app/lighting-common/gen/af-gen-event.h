@@ -42,6 +42,12 @@
 // Code used to configure the cluster event mechanism
 #define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
     EmberEventControl emberAfLevelControlClusterServerTickCallbackControl1;                                                        \
+    extern EmberEventControl emberAfPluginColorControlServerHueSatTransitionEventControl;                                          \
+    extern EmberEventControl emberAfPluginColorControlServerTempTransitionEventControl;                                            \
+    extern EmberEventControl emberAfPluginColorControlServerXyTransitionEventControl;                                              \
+    extern void emberAfPluginColorControlServerHueSatTransitionEventHandler(void);                                                 \
+    extern void emberAfPluginColorControlServerTempTransitionEventHandler(void);                                                   \
+    extern void emberAfPluginColorControlServerXyTransitionEventHandler(void);                                                     \
     static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)                    \
     {                                                                                                                              \
         /* emberAfPushEndpointNetworkIndex(endpoint); */                                                                           \
@@ -58,9 +64,15 @@
 
 // EmberEventData structs used to populate the EmberEventData table
 #define EMBER_AF_GENERATED_EVENTS                                                                                                  \
-    { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },
+    { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },       \
+        { &emberAfPluginColorControlServerHueSatTransitionEventControl,                                                            \
+          emberAfPluginColorControlServerHueSatTransitionEventHandler },                                                           \
+        { &emberAfPluginColorControlServerTempTransitionEventControl, emberAfPluginColorControlServerTempTransitionEventHandler }, \
+        { &emberAfPluginColorControlServerXyTransitionEventControl, emberAfPluginColorControlServerXyTransitionEventHandler },
 
-#define EMBER_AF_GENERATED_EVENT_STRINGS "Level Control Cluster Server EP 1",
+#define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
+    "Level Control Cluster Server EP 1", "Color Control Cluster Server Plugin HueSatTransition",                                   \
+        "Color Control Cluster Server Plugin TempTransition", "Color Control Cluster Server Plugin XyTransition",
 
 // The length of the event context table used to track and retrieve cluster events
 #define EMBER_AF_EVENT_CONTEXT_LENGTH 1

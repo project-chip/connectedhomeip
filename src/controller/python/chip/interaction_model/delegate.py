@@ -15,36 +15,70 @@
 '''
 
 from construct import Struct, Int32ul, Int16ul, Int8ul
-from ctypes import CFUNCTYPE, c_void_p, c_size_t, c_uint32, c_uint64, c_uint8
+from ctypes import CFUNCTYPE, c_void_p, c_size_t, c_uint32, c_uint64, c_uint8, c_uint16, c_ssize_t
 import ctypes
 import chip.native
 import threading
+import chip.tlv
 import chip.exceptions
+import typing
+from dataclasses import dataclass
 
+# The type should match CommandStatus in interaction_model/Delegate.h
+# CommandStatus should not contain padding
 IMCommandStatus = Struct(
     "ProtocolId" /  Int32ul,
     "ProtocolCode" / Int16ul,
-    "EndpointId" / Int8ul,
-    "ClusterId" / Int16ul,
-    "CommandId" / Int8ul,
+    "EndpointId" / Int16ul,
+    "ClusterId" / Int32ul,
+    "CommandId" / Int32ul,
     "CommandIndex" / Int8ul,
 )
+
+# AttributePath should not contain padding
+AttributePathStruct = Struct(
+    "EndpointId" / Int16ul,
+    "ClusterId" / Int32ul,
+    "AttributeId" / Int32ul,
+)
+
+
+@dataclass
+class AttributePath:
+    nodeId: int
+    endpointId: int
+    clusterId: int
+    attributeId: int
+
+@dataclass
+class AttributeReadResult:
+    path: AttributePath
+    status: int
+    value: 'typing.Any'
 
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,
 #                                                                                         void * commandStatusBuf);
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct)(uint64_t commandSenderPtr, uint8_t commandIndex);
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseFunct)(uint64_t commandSenderPtr, uint32_t error);
+# typedef void (*PythonInteractionModelDelegate_OnReportDataFunct)(chip::NodeId nodeId, uint64_t readClientAppIdentifier,
+#                                                                  void * attributePathBuf, size_t attributePathBufLen,
+#                                                                  uint8_t * readTlvData, size_t readTlvDataLen, uint16_t statusCode);
 _OnCommandResponseStatusCodeReceivedFunct = CFUNCTYPE(None, c_uint64, c_void_p, c_uint32)
 _OnCommandResponseProtocolErrorFunct = CFUNCTYPE(None, c_uint64, c_uint8)
 _OnCommandResponseFunct = CFUNCTYPE(None, c_uint64, c_uint32)
+_OnReportDataFunct = CFUNCTYPE(None, c_uint64, c_ssize_t, c_void_p, c_uint32, c_void_p, c_uint32, c_uint16)
 
 _commandStatusDict = dict()
 _commandIndexStatusDict = dict()
 _commandStatusLock = threading.RLock()
 _commandStatusCV = threading.Condition(_commandStatusLock)
 
+_attributeDict = dict()
+_attributeDictLock = threading.RLock()
+
 # A placeholder commandHandle, will be removed once we decouple CommandSender with CHIPClusters
 PLACEHOLDER_COMMAND_HANDLE = 1
+DEFAULT_ATTRIBUTEREAD_APPID = 0
 
 def _GetCommandStatus(commandHandle: int):
     with _commandStatusLock:
@@ -80,6 +114,27 @@ def _OnCommandResponseProtocolError(commandHandle: int, errorcode: int):
 def _OnCommandResponse(commandHandle: int, errorcode: int):
     _SetCommandStatus(PLACEHOLDER_COMMAND_HANDLE, errorcode)
 
+
+@_OnReportDataFunct
+def _OnReportData(nodeId: int, appId: int, attrPathBuf, attrPathBufLen: int, tlvDataBuf, tlvDataBufLen: int, statusCode: int):
+    attrPath = AttributePathStruct.parse(
+        ctypes.string_at(attrPathBuf, attrPathBufLen))
+    tlvData = None
+    path = AttributePath(nodeId, attrPath["EndpointId"],
+                         attrPath["ClusterId"], attrPath["AttributeId"])
+    if tlvDataBufLen > 0:
+        tlvBuf = ctypes.string_at(tlvDataBuf, tlvDataBufLen)
+        # We converts the data to AnonymousTag, and it becomes Any in decoded values.
+        tlvData = chip.tlv.TLVReader(tlvBuf).get().get('Any')
+
+    if appId < 256:
+        # For all attribute read requests using CHIPCluster API, appId is filled by CHIPDevice, and should be smaller than 256 (UINT8_MAX).
+        appId = DEFAULT_ATTRIBUTEREAD_APPID
+
+    with _attributeDictLock:
+        _attributeDict[appId] = AttributeReadResult(
+            path, statusCode, tlvData)
+
 def InitIMDelegate():
     handle = chip.native.GetLibraryHandle()
     if not handle.pychip_InteractionModelDelegate_SetCommandResponseStatusCallback.argtypes:
@@ -88,10 +143,12 @@ def InitIMDelegate():
         setter.Set("pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback", None, [_OnCommandResponseProtocolErrorFunct])
         setter.Set("pychip_InteractionModelDelegate_SetCommandResponseErrorCallback", None, [_OnCommandResponseFunct])
         setter.Set("pychip_InteractionModel_GetCommandSenderHandle", c_uint32, [ctypes.POINTER(c_uint64)])
+        setter.Set("pychip_InteractionModelDelegate_SetOnReportDataCallback", None, [_OnReportDataFunct])
 
         handle.pychip_InteractionModelDelegate_SetCommandResponseStatusCallback(_OnCommandResponseStatusCodeReceived)
         handle.pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback(_OnCommandResponseProtocolError)
         handle.pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(_OnCommandResponse)
+        handle.pychip_InteractionModelDelegate_SetOnReportDataCallback(_OnReportData)
 
 def ClearCommandStatus(commandHandle: int):
     """
@@ -140,3 +197,7 @@ def GetCommandSenderHandle()->int:
         raise chip.exceptions.ChipStackError(res)
     ClearCommandStatus(resPointer.value)
     return resPointer.value
+
+def GetAttributeReadResponse(appId: int) -> AttributeReadResult:
+    with _attributeDictLock:
+        return _attributeDict.get(appId, None)

@@ -48,7 +48,7 @@ DEVICE_CONFIG = {
 
 SETUPPINCODE = 20202021
 DISCRIMINATOR = 1  # Randomw number, not used
-CHIP_PORT = 11097
+CHIP_PORT = 5540
 
 CIRQUE_URL = "http://localhost:5000"
 
