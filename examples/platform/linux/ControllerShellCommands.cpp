@@ -118,7 +118,7 @@ static CHIP_ERROR display(bool printHeader)
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-static int PrintAllCommands()
+static CHIP_ERROR PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
     streamer_printf(sout, "  help                       Usage: discover <subcommand>\r\n");

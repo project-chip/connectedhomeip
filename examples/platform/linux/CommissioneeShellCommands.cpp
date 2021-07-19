@@ -53,7 +53,7 @@ static CHIP_ERROR SendUDC(bool printHeader, chip::Transport::PeerAddress commiss
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-static int PrintAllCommands()
+static CHIP_ERROR PrintAllCommands()
 {
     streamer_t * sout = streamer_get();
     streamer_printf(sout, "  help                       Usage: commissionee <subcommand>\r\n");
