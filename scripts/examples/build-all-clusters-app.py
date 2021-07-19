@@ -48,8 +48,6 @@ def main():
       '--generate-flash-script',
       action='store_true',
   )
-  parser.add_argument('--port', type=str, help='port to use for flashing. Ex. --port /dev/ttyUSB0')
-  parser.add_argument('--baud', type=int, help='baud rage to use for flasing')
 
   args = parser.parse_args()
 
@@ -61,25 +59,10 @@ def main():
 
   e = IDFExecutor()
 
-  port = os.getenv('ESPPORT')
-  baud = os.getenv('ESPBAUD')
   if args.generate_flash_script:
-    if args.port is not None:
-      port = args.port
-    if args.baud is not None:
-      baud = args.baud
-
-    envs_ok = True
-    if port is None:
+    if os.getenv('ESPPORT') is None:
       logging.error('Port must be set to use flashing.')
-      logging.error('This can be set using the ESPPORT environment var or the --port argument in this script')
-      envs_ok = False
-    if baud is None:
-      logging.error('Baud rate must be set to use flashing.')
-      logging.error('This can be set using the ESPBAUD environment var or the --baud argument in this script')
-      envs_ok = False
-      
-    if not envs_ok:
+      logging.error('This can be set using the ESPPORT environment var')
       return
 
   if args.clear_config:
@@ -110,6 +93,9 @@ def main():
 
   e.execute('build')
 
+  logging.info('Generating flash script')
+  if args.generate_flash_script:
+    e.execute('flashing_script')
 
 if __name__ == '__main__':
   # execute only if run as a script
