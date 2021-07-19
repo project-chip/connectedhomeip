@@ -52,12 +52,12 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <inet/IPAddress.h>
 #include <mdns/Resolver.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <support/BytesToHex.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -491,7 +491,6 @@ uint64_t pychip_GetCommandSenderHandle(chip::Controller::Device * device)
     return 0;
 }
 
-
 void pychip_Stack_SetLogFunct(LogMessageFunct logFunct)
 {
     // TODO: determine if log redirection is supposed to be functioning in CHIP
@@ -505,13 +504,15 @@ void pychip_Stack_SetLogFunct(LogMessageFunct logFunct)
 
 CHIP_ERROR pychip_DeviceController_PostTaskOnChipThread(void * pythonContext)
 {
-    if (sChipThreadRunner == nullptr) {
+    if (sChipThreadRunner == nullptr)
+    {
         return CHIP_ERROR_INCORRECT_STATE;
     }
     PlatformMgr().ScheduleWork(sChipThreadRunner, reinterpret_cast<intptr_t>(pythonContext));
     return CHIP_NO_ERROR;
 }
 
-void pychip_DeviceController_SetChipThreadRunnerCallback(ChipThreadTaskRunnerFunct callback) {
+void pychip_DeviceController_SetChipThreadRunnerCallback(ChipThreadTaskRunnerFunct callback)
+{
     sChipThreadRunner = callback;
 }
