@@ -147,7 +147,11 @@ public:
 
     bool MessagePermitted(uint16_t protocol, uint8_t type) override { return true; }
 
+    bool IsEncryptionRequired() const override { return mRequireEncryption; }
+
     bool mRetainMessageOnSend = true;
+
+    bool mRequireEncryption = false;
 };
 
 class MockSessionEstablishmentDelegate : public ExchangeDelegate
@@ -419,6 +423,44 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     exchange->Close();
 
     rm->ClearRetransTable(rc);
+}
+
+void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ctx.GetInetLayer().SystemLayer()->Init();
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    MockSessionEstablishmentDelegate mockReceiver;
+    CHIP_ERROR err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Expect the received messages to be encrypted
+    mockReceiver.mMessageDispatch.mRequireEncryption = true;
+
+    MockSessionEstablishmentDelegate mockSender;
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    err = mockSender.mMessageDispatch.Init();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    gLoopback.mSentMessageCount    = 0;
+    gLoopback.mNumMessagesToDrop   = 0;
+    gLoopback.mDroppedMessageCount = 0;
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    // Test that the message was actually sent (and not dropped)
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
+    // Test that the message was dropped by the receiver
+    NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
+
+    exchange->Close();
 }
 
 void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void * inContext)
@@ -1161,6 +1203,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test sending an unsolicited ack-soliciting 'standalone ack' message", CheckSendUnsolicitedStandaloneAckMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage", CheckSendStandaloneAckMessage),
     NL_TEST_DEF("Test command, response, default response, with receiver closing exchange after sending response", CheckMessageAfterClosed),
+    NL_TEST_DEF("Test that unencrypted message is dropped if exchange requires encryption", CheckUnencryptedMessageReceiveFailure),
 
     NL_TEST_SENTINEL()
 };
