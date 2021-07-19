@@ -2,7 +2,7 @@ import logging
 import os
 from enum import Enum, auto
 
-from .gn import GnBuilder
+from .builder import Builder
 
 
 class Efr32App(Enum):
@@ -49,7 +49,7 @@ class Efr32Board(Enum):
       return 'BRD4161A'
 
 
-class Efr32Builder(GnBuilder):
+class Efr32Builder(Builder):
 
   def __init__(self,
                root,
@@ -57,13 +57,28 @@ class Efr32Builder(GnBuilder):
                output_dir: str,
                app: Efr32App = Efr32App.LIGHT,
                board: Efr32Board = Efr32Board.BRD4161A):
-    super(Efr32Builder, self).__init__(
-        root=os.path.join(root, 'examples', app.ExampleName(), 'efr32'),
-        runner=runner,
-        output_dir=output_dir)
+    super(Efr32Builder, self).__init__(root, runner, output_dir)
 
     self.app = app
-    self.gn_build_args = ['efr32_board="%s"' % board.GnArgName()]
+    self.board = board
+    self.identifier = None
+
+  def generate(self):
+    if not os.path.exists(self.output_dir):
+      self._Execute([
+          'gn', 'gen', '--check', '--fail-on-unused-args',
+          '--root=%s' %
+          os.path.join(self.root, 'examples', self.app.ExampleName(), 'efr32'),
+          '--args=efr32_board="%s"' % self.board.GnArgName(), self.output_dir
+      ],
+                    title='Generate %s' % self.identifier)
+
+  def build(self):
+    logging.info('Compiling EFR32 at %s', self.output_dir)
+
+    self.generate()
+    self._Execute(['ninja', '-C', self.output_dir],
+                  title='Build %s' % self.identifier)
 
   def outputs(self):
     items = {

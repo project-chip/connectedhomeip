@@ -3,16 +3,26 @@
 import logging
 import os
 
-from .gn import GnBuilder
+from .builder import Builder
 
 
-class QpgBuilder(GnBuilder):
+class QpgBuilder(Builder):
 
   def __init__(self, root, runner, output_dir):
-    super(QpgBuilder, self).__init__(
-        root=os.path.join(root, 'examples/lock-app/qpg/'),
-        runner=runner,
-        output_dir=output_dir)
+    super(QpgBuilder, self).__init__(root, runner, output_dir)
+
+  def generate(self):
+    if not os.path.exists(self.output_dir):
+      self._Execute(['gn', 'gen', self.output_dir],
+                    cwd=os.path.join(self.root, 'examples/lock-app/qpg/'),
+                    title='Generating ' + self.identifier)
+
+  def build(self):
+    logging.info('Compiling QPG at %s', self.output_dir)
+
+    self.generate()
+    self._Execute(['ninja', '-C', self.output_dir],
+                  title='Building ' + self.identifier)
 
   def outputs(self):
     return {

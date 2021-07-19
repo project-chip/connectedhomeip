@@ -50,4 +50,4 @@ class ShellRunner:
       if code != 0:
         raise Exception('Command %r failed: %d' % (cmd, code))
       else:
-        logging.info('Command %r completed', cmd)
+        logging.info('Command %r completed' % cmd)
