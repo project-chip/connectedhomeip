@@ -853,11 +853,11 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
 #endif // CONFIG_NETWORK_LAYER_BLE
                                                     ));
 
-    UserDirectedCommissioningServer * udcServer = &UserDirectedCommissioningServer::GetInstance();
-    mUdcTransportMgr->SetSecureSessionMgr(udcServer);
+    mUdcServer = chip::Platform::New<UserDirectedCommissioningServer>();
+    mUdcTransportMgr->SetSecureSessionMgr(mUdcServer);
 
-    udcServer->SetInstanceNameResolver(this);
-    udcServer->SetUserConfirmationProvider(this);
+    mUdcServer->SetInstanceNameResolver(this);
+    mUdcServer->SetUserConfirmationProvider(this);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     return CHIP_NO_ERROR;
 }
@@ -873,10 +873,12 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     PersistDeviceList();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
-    UserDirectedCommissioningServer udcServer = UserDirectedCommissioningServer::GetInstance();
-    udcServer.SetInstanceNameResolver(nullptr);
-    udcServer.SetUserConfirmationProvider(nullptr);
-
+    if (mUdcServer != nullptr)
+    {
+        mUdcServer->SetInstanceNameResolver(nullptr);
+        mUdcServer->SetUserConfirmationProvider(nullptr);
+        mUdcServer = nullptr;
+    }
     if (mUdcTransportMgr != nullptr)
     {
         chip::Platform::Delete(mUdcTransportMgr);
@@ -1573,7 +1575,10 @@ void DeviceCommissioner::OnUserDirectedCommissioningRequest(const Mdns::Discover
 
 void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData)
 {
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().OnCommissionableNodeFound(nodeData);
+    if (mUdcServer != nullptr)
+    {
+        mUdcServer->OnCommissionableNodeFound(nodeData);
+    }
     return AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(nodeData);
 }
 

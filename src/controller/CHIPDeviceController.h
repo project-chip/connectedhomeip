@@ -66,6 +66,8 @@ namespace chip {
 
 namespace Controller {
 
+using namespace chip::Protocols::UserDirectedCommissioning;
+
 constexpr uint16_t kNumMaxActiveDevices = 64;
 constexpr uint16_t kNumMaxPairedDevices = 128;
 
@@ -565,7 +567,14 @@ public:
      *
      */
     void OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData) override;
-#endif
+
+    /**
+     * @brief
+     *   Return the UDC Server instance
+     *
+     */
+    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
@@ -593,6 +602,7 @@ private:
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    UserDirectedCommissioningServer * mUdcServer = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
     DeviceTransportMgr * mUdcTransportMgr = nullptr;
     uint16_t mUdcListenPort               = CHIP_PORT + 1;

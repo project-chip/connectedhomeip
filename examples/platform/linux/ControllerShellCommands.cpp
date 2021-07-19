@@ -48,15 +48,13 @@ static CHIP_ERROR ResetUDC(bool printHeader)
         streamer_printf(sout, "resetudc:        ");
     }
 
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().ResetUDCClientProcessingStates();
+    gCommissioner->GetUserDirectedCommissioningServer()->ResetUDCClientProcessingStates();
 
     streamer_printf(sout, "done\r\n");
 
     return CHIP_NO_ERROR;
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 static CHIP_ERROR discover(bool printHeader)
 {
     streamer_t * sout = streamer_get();
@@ -118,7 +116,7 @@ static CHIP_ERROR display(bool printHeader)
 
     return CHIP_NO_ERROR;
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 static int PrintAllCommands()
 {
@@ -127,8 +125,6 @@ static int PrintAllCommands()
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     streamer_printf(
         sout, "  resetudc                   Clear all pending UDC sessions from this UDC server. Usage: commission resetudc\r\n");
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     streamer_printf(sout, "  commissionable                   Discover all commissionable nodes. Usage: commission discover\r\n");
     streamer_printf(
         sout,
@@ -136,7 +132,7 @@ static int PrintAllCommands()
         "commissionable-instance DC514873944A5CFF\r\n");
     streamer_printf(sout,
                     "  display                    Display all discovered commissionable nodes. Usage: commission display\r\n");
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;

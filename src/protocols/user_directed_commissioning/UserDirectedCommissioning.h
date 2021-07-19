@@ -106,12 +106,6 @@ public:
 class DLL_EXPORT UserDirectedCommissioningServer : public TransportMgrDelegate
 {
 public:
-    static UserDirectedCommissioningServer & GetInstance()
-    {
-        static UserDirectedCommissioningServer instance;
-        return instance;
-    }
-
     /**
      * Set the listener to be called when a UDC request is received
      * and the Instance Name provided needs to be resolved.
@@ -176,7 +170,8 @@ private:
 
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
 
-    UDCClients<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mUdcClients; // < Active UDC clients
+    // Cache contains 16 clients. This may need to be tweaked.
+    UDCClients<16> mUdcClients; // < Active UDC clients
 };
 
 } // namespace UserDirectedCommissioning

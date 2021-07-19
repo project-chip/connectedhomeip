@@ -44,7 +44,7 @@ namespace {
 // The EchoServer object.
 chip::Protocols::Echo::EchoServer gEchoServer;
 chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer gUDCServer =
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance();
+    chip::Platform::New<chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer>();
 chip::TransportMgr<chip::Transport::UDP> gUDPManager; // for Echo Traffic
 chip::TransportMgr<chip::Transport::UDP> gUDCManager; // for User Directed Commissioning
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
@@ -150,8 +150,7 @@ int main(int argc, char * argv[])
                              .SetAddressType(chip::Inet::kIPAddressType_IPv4)
                              .SetListenPort(CHIP_PORT + 3));
 
-        gUDCManager.SetSecureSessionMgr(
-            &chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance());
+        gUDCManager.SetSecureSessionMgr(&gUDCServer);
 
         SuccessOrExit(err);
     }
