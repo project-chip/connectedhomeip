@@ -179,7 +179,7 @@ inline bool Span<T>::data_equal(const FixedSpan<U, N> & other) const
  * @param[in] span The Span to validate.
  */
 template <typename T>
-inline bool is_span_usable(const Span<T> & span)
+inline bool IsSpanUsable(const Span<T> & span)
 {
     return (span.data() != nullptr) && (span.size() > 0);
 }
@@ -190,7 +190,7 @@ inline bool is_span_usable(const Span<T> & span)
  * @param[in] span The FixedSpan to validate.
  */
 template <typename T, size_t N>
-inline bool is_span_usable(const FixedSpan<T, N> & span)
+inline bool IsSpanUsable(const FixedSpan<T, N> & span)
 {
     return (span.data() != nullptr);
 }

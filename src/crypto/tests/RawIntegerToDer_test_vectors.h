@@ -48,7 +48,7 @@ const uint8_t kRawToDerMsbSetNoLeadingZeroes_Expected_WithoutTag[6] = {
     0x00, 0x80, 0x01, 0x02, 0x03, 0x04,
 };
 
-RawIntegerToDerVector kRawIntegerToDerVector1 = {
+const RawIntegerToDerVector kRawIntegerToDerVector1 = {
     .candidate                 = &kRawToDerMsbSetNoLeadingZeroes_Candidate[0],
     .candidate_size            = sizeof(kRawToDerMsbSetNoLeadingZeroes_Candidate),
     .expected                  = &kRawToDerMsbSetNoLeadingZeroes_Expected[0],
@@ -70,7 +70,7 @@ const uint8_t kRawToDerMsbClearNoLeadingZeroes_Expected_WithoutTag[5] = {
     0x40, 0x01, 0x02, 0x03, 0x04,
 };
 
-RawIntegerToDerVector kRawIntegerToDerVector2 = {
+const RawIntegerToDerVector kRawIntegerToDerVector2 = {
     .candidate                 = &kRawToDerMsbClearNoLeadingZeroes_Candidate[0],
     .candidate_size            = sizeof(kRawToDerMsbClearNoLeadingZeroes_Candidate),
     .expected                  = &kRawToDerMsbClearNoLeadingZeroes_Expected[0],
@@ -95,7 +95,7 @@ const uint8_t kRawToDerThreeLeadingZeroes_Expected_WithoutTag[4] = {
     0x04,
 };
 
-RawIntegerToDerVector kRawIntegerToDerVector3 = {
+const RawIntegerToDerVector kRawIntegerToDerVector3 = {
     .candidate                 = &kRawToDerThreeLeadingZeroes_Candidate[0],
     .candidate_size            = sizeof(kRawToDerThreeLeadingZeroes_Candidate),
     .expected                  = &kRawToDerThreeLeadingZeroes_Expected[0],
@@ -119,7 +119,7 @@ const uint8_t kRawToDerLiteralZero_Expected_WithoutTag[1] = {
     0x00,
 };
 
-RawIntegerToDerVector kRawIntegerToDerVector4 = {
+const RawIntegerToDerVector kRawIntegerToDerVector4 = {
     .candidate                 = &kRawToDerLiteralZero_Candidate[0],
     .candidate_size            = sizeof(kRawToDerLiteralZero_Candidate),
     .expected                  = &kRawToDerLiteralZero_Expected[0],
@@ -146,7 +146,7 @@ const uint8_t kRawToDerOnlyLeadingZeroes_Expected_WithoutTag[1] = {
     0x00,
 };
 
-RawIntegerToDerVector kRawIntegerToDerVector5 = {
+const RawIntegerToDerVector kRawIntegerToDerVector5 = {
     .candidate                 = &kRawToDerOnlyLeadingZeroes_Candidate[0],
     .candidate_size            = sizeof(kRawToDerOnlyLeadingZeroes_Candidate),
     .expected                  = &kRawToDerOnlyLeadingZeroes_Expected[0],
@@ -172,7 +172,7 @@ const uint8_t kRawToDerMsbSetOneByte_Expected_WithoutTag[2] = {
     0xff,
 };
 
-RawIntegerToDerVector kRawIntegerToDerVector6 = {
+const RawIntegerToDerVector kRawIntegerToDerVector6 = {
     .candidate                 = &kRawToDerMsbSetOneByte_Candidate[0],
     .candidate_size            = sizeof(kRawToDerMsbSetOneByte_Candidate),
     .expected                  = &kRawToDerMsbSetOneByte_Expected[0],
@@ -196,7 +196,7 @@ const uint8_t kRawToDerMsbClearOneByte_Expected_WithoutTag[1] = {
     0x7f,
 };
 
-RawIntegerToDerVector kRawIntegerToDerVector7 = {
+const RawIntegerToDerVector kRawIntegerToDerVector7 = {
     .candidate                 = &kRawToDerMsbClearOneByte_Candidate[0],
     .candidate_size            = sizeof(kRawToDerMsbClearOneByte_Candidate),
     .expected                  = &kRawToDerMsbClearOneByte_Expected[0],
@@ -205,6 +205,6 @@ RawIntegerToDerVector kRawIntegerToDerVector7 = {
     .expected_without_tag_size = sizeof(kRawToDerMsbClearOneByte_Expected_WithoutTag),
 };
 
-RawIntegerToDerVector kRawIntegerToDerVectors[] = { kRawIntegerToDerVector1, kRawIntegerToDerVector2, kRawIntegerToDerVector3,
-                                                    kRawIntegerToDerVector4, kRawIntegerToDerVector5, kRawIntegerToDerVector6,
-                                                    kRawIntegerToDerVector7 };
+const RawIntegerToDerVector kRawIntegerToDerVectors[] = { kRawIntegerToDerVector1, kRawIntegerToDerVector2, kRawIntegerToDerVector3,
+                                                          kRawIntegerToDerVector4, kRawIntegerToDerVector5, kRawIntegerToDerVector6,
+                                                          kRawIntegerToDerVector7 };

@@ -120,7 +120,7 @@ CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, MutableByteSpan raw_in
 CHIP_ERROR ConvertIntegerRawToDerInternal(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer,
                                           bool include_tag_and_length)
 {
-    if (!is_span_usable(raw_integer) || !is_span_usable(out_der_integer))
+    if (!IsSpanUsable(raw_integer) || !IsSpanUsable(out_der_integer))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

@@ -46,8 +46,8 @@ public:
      *
      * @param buffer The octet buffer from which to read.  The caller must ensure
      *               (most simply by allocating the reader on the stack) that
-     *               the buffer outlives the reader.  The buffer is allowed to
-     *               be null if buf_len is 0.
+     *               the buffer outlives the reader. If `buffer` is nullptr,
+     *               length is automatically overridden to zero, to avoid accesses.
      * @param buf_len The number of octets in the buffer.
      */
     Reader(const uint8_t * buffer, size_t buf_len) : mBufStart(buffer), mReadPtr(buffer), mAvailable(buf_len)
@@ -63,7 +63,7 @@ public:
      *
      * @param buffer The octet buffer byte span from which to read.  The caller must ensure
      *               that the buffer outlives the reader.  The buffer's ByteSpan .data() pointer
-     *               is allowed to be null.
+     *               is is nullptr, length is automatically overridden to zero, to avoid accesses.
      */
     Reader(const ByteSpan & buffer) : Reader(buffer.data(), buffer.size()) {}
 
@@ -79,8 +79,6 @@ public:
 
     /**
      * Test whether we have at least the given number of octets left to read.
-     * This takes a size_t, not uint16_t, to make life a bit simpler for
-     * consumers and avoid casting.
      */
     bool HasAtLeast(size_t octets) const { return octets <= Remaining(); }
 
