@@ -26,7 +26,7 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-// TODO: determine when UDC client's state should time out
+// UDC client state times out after 1 hour. This may need to be tweaked.
 constexpr const uint64_t kUDCClientTimeoutMs = 60 * 60 * 1000;
 
 /**

@@ -20,7 +20,6 @@
 
 #include <mdns/Resolver.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 
 namespace chip {
 

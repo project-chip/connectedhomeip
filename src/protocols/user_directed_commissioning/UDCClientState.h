@@ -78,6 +78,7 @@ public:
 
     bool IsInitialized(uint64_t currentTime)
     {
+        // if state is not the "not-initialized" and it has not expired
         return (mUDCClientProcessingState != UDCClientProcessingState::kNotInitialized && mExpirationTimeMs > currentTime);
     }
 

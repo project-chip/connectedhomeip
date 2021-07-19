@@ -1228,7 +1228,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
@@ -1336,7 +1336,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     Callback::Cancelable * successCallback = mOpCertResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
@@ -1401,7 +1401,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device)
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     Callback::Cancelable * successCallback = mRootCertResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnRootCertFailureCallback.Cancel();
 
@@ -1571,6 +1571,12 @@ void DeviceCommissioner::OnUserDirectedCommissioningRequest(const Mdns::Discover
     ChipLogDetail(Controller, "------PROMPT USER!! OnUserDirectedCommissioningRequest instance=%s", nodeData.instanceName);
 }
 
+void DeviceCommissioner::OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData)
+{
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().OnCommissionableNodeFound(nodeData);
+    return AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(nodeData);
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(
@@ -1628,7 +1634,7 @@ void DeviceControllerInteractionModelDelegate::OnReportData(const app::ReadClien
                                                             TLV::TLVReader * apData,
                                                             Protocols::InteractionModel::ProtocolCode status)
 {
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     IMReadReportAttributesResponseCallback(apReadClient, aPath, apData, status);
 #endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 }
@@ -1637,7 +1643,7 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::ReportError(const app::Read
 {
     app::ClusterInfo path;
     path.mNodeId = apReadClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId();
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     IMReadReportAttributesResponseCallback(apReadClient, path, nullptr, Protocols::InteractionModel::ProtocolCode::Failure);
 #endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     return CHIP_NO_ERROR;
@@ -1768,7 +1774,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 
     device = &mActiveDevices[mDeviceBeingPaired];
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     // TODO(cecille): We probably want something better than this for breadcrumbs.
     uint64_t breadcrumb = static_cast<uint64_t>(nextStage);
 
@@ -1786,7 +1792,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         GeneralCommissioningCluster genCom;
         // TODO: should get the endpoint information from the descriptor cluster.
         genCom.Associate(device, 0);
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
         uint16_t commissioningExpirySeconds = 5;
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
 #endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
@@ -1830,7 +1836,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
         genCom.SetRegulatoryConfig(mSuccess.Cancel(), mFailure.Cancel(), static_cast<uint8_t>(regulatoryLocation), countryCode,
                                    breadcrumb, kCommandTimeoutMs);
 #endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
@@ -1867,7 +1873,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         // TODO: Once network credential sending is implemented, attempting to set wifi credential on an ethernet only device
         // will cause an error to be sent back. At that point, we should scan and we shoud see the proper ethernet network ID
         // returned in the scan results. For now, we use magic.
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
         char magicNetworkEnableCode[] = "ETH0";
         netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(),
                              ByteSpan(reinterpret_cast<uint8_t *>(&magicNetworkEnableCode), sizeof(magicNetworkEnableCode)),
@@ -1888,7 +1894,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         ChipLogProgress(Controller, "Calling commissioning complete");
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated
+#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
         genCom.CommissioningComplete(mSuccess.Cancel(), mFailure.Cancel());
 #endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     }

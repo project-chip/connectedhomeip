@@ -31,8 +31,6 @@ namespace Controller {
 
 void AbstractMdnsDiscoveryController::OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData)
 {
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer::GetInstance().OnCommissionableNodeFound(nodeData);
-
     Mdns::DiscoveredNodeData * mDiscoveredNodes = GetDiscoveredNodes();
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; ++i)
     {

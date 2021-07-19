@@ -556,6 +556,15 @@ public:
      *
      */
     void OnUserDirectedCommissioningRequest(const Mdns::DiscoveredNodeData & nodeData) override;
+
+    /**
+     * @brief
+     *   Overrides method from AbstractMdnsDiscoveryController
+     *
+     * @param nodeData DNS-SD node information
+     *
+     */
+    void OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData) override;
 #endif
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
