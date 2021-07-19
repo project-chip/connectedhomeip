@@ -95,7 +95,7 @@ const ble_uuid128_t UUID_CHIPoBLEChar_TX   = {
 BLEManagerImpl BLEManagerImpl::sInstance;
 
 BLEManagerImpl::BLEManagerImpl() :
-    mAdvertiseTimerCallback(HandleAdvertisementTimer, this), mFastAdvertiseTimerCallback(HandleFastAdvertisementTimer, this)
+    mAdvertiseTimerCallback(HandleAdvertisementTimer), mFastAdvertiseTimerCallback(HandleFastAdvertisementTimer)
 {}
 
 const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
@@ -174,8 +174,8 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (val)
     {
         mAdvertiseStartTime = System::Clock::GetMonotonicMilliseconds();
-        SystemLayer.StartTimer(kAdvertiseTimeout, &mAdvertiseTimerCallback);
-        SystemLayer.StartTimer(kFastAdvertiseTimeout, &mFastAdvertiseTimerCallback);
+        SystemLayer.StartTimer(kAdvertiseTimeout, mAdvertiseTimerCallback, this);
+        SystemLayer.StartTimer(kFastAdvertiseTimeout, mFastAdvertiseTimerCallback, this);
     }
 
     mFlags.Set(Flags::kFastAdvertisingEnabled, val);
@@ -187,7 +187,7 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::HandleAdvertisementTimer(void * context)
+void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError)
 {
     static_cast<BLEManagerImpl *>(context)->HandleAdvertisementTimer();
 }
@@ -203,7 +203,7 @@ void BLEManagerImpl::HandleAdvertisementTimer()
     }
 }
 
-void BLEManagerImpl::HandleFastAdvertisementTimer(void * context)
+void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError)
 {
     static_cast<BLEManagerImpl *>(context)->HandleFastAdvertisementTimer();
 }

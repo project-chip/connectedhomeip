@@ -125,9 +125,6 @@ public:
 
     CHIP_ERROR NewTimer(Timer *& aTimerPtr);
 
-    void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback);
-    void DispatchTimerCallbacks(Clock::MonotonicMilliseconds aCurrentTime);
-
     using TimerCompleteFunct = Timer::OnCompleteFunct;
     // typedef void (*TimerCompleteFunct)(Layer * aLayer, void * aAppState, CHIP_ERROR aError);
     CHIP_ERROR StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState);
@@ -165,7 +162,6 @@ public:
 private:
     LayerState mLayerState;
     void * mPlatformData;
-    chip::Callback::CallbackDeque mTimerCallbacks;
     Clock mClock;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
