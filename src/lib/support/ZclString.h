@@ -26,7 +26,7 @@ static uint8_t * MakeZclCharString(uint8_t * zclString, const char * cString)
     size_t len = strlen(cString);
     if (len > 254)
     {
-        len = 0;
+        len = 254;
     }
     zclString[0] = static_cast<uint8_t>(len);
     memcpy(&zclString[1], cString, zclString[0]);
