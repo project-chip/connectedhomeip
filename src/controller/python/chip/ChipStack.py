@@ -288,7 +288,7 @@ class ChipStack(object):
         return self.callbackRes
 
     def ErrorToException(self, err, devStatusPtr=None):
-        if err == 4044 and devStatusPtr:
+        if err == 0x2C and devStatusPtr:
             devStatus = devStatusPtr.contents
             msg = ChipUtility.CStringToString(
                 (

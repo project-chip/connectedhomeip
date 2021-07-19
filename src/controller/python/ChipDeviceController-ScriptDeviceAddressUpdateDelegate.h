@@ -22,7 +22,7 @@
 namespace chip {
 namespace Controller {
 
-extern "C" using DeviceAddressUpdateDelegate_OnUpdateComplete = void(*)(NodeId, CHIP_ERROR);
+extern "C" using DeviceAddressUpdateDelegate_OnUpdateComplete = void(*)(NodeId, ChipError::StorageType);
 
 class ScriptDeviceAddressUpdateDelegate final : public Controller::DeviceAddressUpdateDelegate
 {
