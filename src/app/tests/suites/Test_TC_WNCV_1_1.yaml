@@ -41,6 +41,7 @@ tests:
       attribute: "Cluster Revision"
       response:
           value: 3
+# TODO : Uncomment and fill properly once FEATURE MAP available
 #  WAIT FOR FEATURE MAP Proper implementation in ZAP
 #    - label: "read the optional global attribute: FeatureMap"
 #      command: "readAttribute"

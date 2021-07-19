@@ -28,7 +28,7 @@ tests:
           value: 0
 
     - label: "write a value into the RO mandatory attribute: Type"
-      disabled: true
+      disabled: true # TODO : follow chip-tool error messaging capabilities to write or not into read only attribute
       command: "writeAttribute"
       attribute: "Type"
       arguments:
@@ -50,7 +50,7 @@ tests:
           value: 3
 
     - label: "write a value into the RO mandatory attribute: ConfigStatus"
-      disabled: true
+      disabled: true # TODO : follow chip-tool error messaging capabilities to write or not into read only attribute
       command: "writeAttribute"
       attribute: "ConfigStatus"
       arguments:
@@ -72,7 +72,7 @@ tests:
           value: 0
 
     - label: "write a value into the RO mandatory attribute: OperationalStatus"
-      disabled: true
+      disabled: true # TODO : follow chip-tool error messaging capabilities to write or not into read only attribute
       command: "writeAttribute"
       attribute: "OperationalStatus"
       arguments:
@@ -94,7 +94,7 @@ tests:
           value: 0
 
     - label: "write a value into the RO mandatory attribute: EndProductType"
-      disabled: true
+      disabled: true # TODO : follow chip-tool error messaging capabilities to write or not into read only attribute
       command: "writeAttribute"
       attribute: "EndProductType"
       arguments:
