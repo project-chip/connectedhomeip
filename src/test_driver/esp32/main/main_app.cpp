@@ -80,7 +80,7 @@ extern "C" void app_main()
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "PlatformMgr().InitLocks() failed: %s", ErrorStr(error));
-        exit(ChipError::AsInteger(error));
+        exit(1);
     }
 
     err = esp_netif_init();
