@@ -39,7 +39,7 @@ using namespace chip;
 using namespace chip::Logging;
 using namespace chip::Platform;
 
-static void TestZclString64Chars(nlTestSuite * inSuite, void * inContext)
+static void TestZclStringLessThanMaximumSize(nlTestSuite * inSuite, void * inContext)
 {
     // Init zcl string
     uint8_t zclString[255];
@@ -50,25 +50,16 @@ static void TestZclString64Chars(nlTestSuite * inSuite, void * inContext)
         cString64[i] = 'A';
 
     MakeZclCharString(zclString, cString64);
-    int charIsTerminated = 0;
-    for (int i = 0; i != 256; i++)
-        if (zclString[i] == '\0')
-        {
-            charIsTerminated = 1;
-            break;
-        }
 
     // Memmory assert
     NL_TEST_ASSERT(inSuite, cString64 != nullptr);
-    // ZCL String has char terminated
-    NL_TEST_ASSERT(inSuite, charIsTerminated == 1);
     // ZCL String length assert
     NL_TEST_ASSERT(inSuite, zclString[0] == 64);
 
     chip::Platform::MemoryFree(cString64);
 }
 
-static void TestZclString254Chars(nlTestSuite * inSuite, void * inContext)
+static void TestZclStringEqualsMaximumSize(nlTestSuite * inSuite, void * inContext)
 {
     // Init zcl string
     uint8_t zclString[255];
@@ -79,25 +70,16 @@ static void TestZclString254Chars(nlTestSuite * inSuite, void * inContext)
         cString254[i] = 'A';
 
     MakeZclCharString(zclString, cString254);
-    int charIsTerminated = 0;
-    for (int i = 0; i != 256; i++)
-        if (zclString[i] == '\0')
-        {
-            charIsTerminated = 1;
-            break;
-        }
 
     // Memmory assert
     NL_TEST_ASSERT(inSuite, cString254 != nullptr);
-    // ZCL String has char terminated
-    NL_TEST_ASSERT(inSuite, charIsTerminated == 1);
     // ZCL String length assert
     NL_TEST_ASSERT(inSuite, zclString[0] == 254);
 
     chip::Platform::MemoryFree(cString254);
 }
 
-static void TestZclString255Chars(nlTestSuite * inSuite, void * inContext)
+static void TestZclStringBiggerThanMaximumSize(nlTestSuite * inSuite, void * inContext)
 {
     // Init zcl string
     uint8_t zclString[255];
@@ -108,20 +90,11 @@ static void TestZclString255Chars(nlTestSuite * inSuite, void * inContext)
         cString255[i] = 'A';
 
     MakeZclCharString(zclString, cString255);
-    int charIsTerminated = 0;
-    for (int i = 0; i != 256; i++)
-        if (zclString[i] == '\0')
-        {
-            charIsTerminated = 1;
-            break;
-        }
 
     // Memmory assert
     NL_TEST_ASSERT(inSuite, cString255 != nullptr);
-    // ZCL String has char terminated
-    NL_TEST_ASSERT(inSuite, charIsTerminated == 1);
     // ZCL String length assert
-    NL_TEST_ASSERT(inSuite, zclString[0] == 0);
+    NL_TEST_ASSERT(inSuite, zclString[0] == 254);
 
     chip::Platform::MemoryFree(cString255);
 }
@@ -151,8 +124,8 @@ int TestZclString_Teardown(void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestZclString64Chars), NL_TEST_DEF_FN(TestZclString254Chars),
-                                 NL_TEST_DEF_FN(TestZclString255Chars), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestZclStringLessThanMaximumSize), NL_TEST_DEF_FN(TestZclStringEqualsMaximumSize),
+                                 NL_TEST_DEF_FN(TestZclStringBiggerThanMaximumSize), NL_TEST_SENTINEL() };
 
 int TestZclString(void)
 {
