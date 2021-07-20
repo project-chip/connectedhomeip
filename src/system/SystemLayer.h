@@ -39,7 +39,8 @@
 
 // Include dependent headers
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <system/SystemSockets.h>
+#include <system/WakeEvent.h>
+#include <system/WatchableEventManager.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
@@ -136,14 +137,11 @@ public:
 
     Clock & GetClock() { return mClock; }
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     WatchableEventManager & WatchableEvents() { return mWatchableEvents; }
     bool GetTimeout(struct timeval & aSleepTime); // TODO(#5556): Integrate timer platform details with WatchableEventManager.
     void HandleTimeout();                         // TODO(#5556): Integrate timer platform details with WatchableEventManager.
-#endif                                            // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
-    void WakeIOThread();
-#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+#endif                                            // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     typedef CHIP_ERROR (*EventHandler)(Object & aTarget, EventType aEventType, uintptr_t aArgument);
@@ -172,8 +170,8 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     WatchableEventManager mWatchableEvents;
-    WakeEvent mWakeEvent;
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+    friend class WatchableEventManager;
     std::atomic<pthread_t> mHandleSelectThread;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK

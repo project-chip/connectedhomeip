@@ -96,27 +96,27 @@ CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_MinInterval:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MinInterval)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_MinInterval);
+        case kCsTag_MinIntervalSeconds:
+            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MinIntervalSeconds)), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_MinIntervalSeconds);
             VerifyOrReturnLogError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                uint16_t minInterval;
-                ReturnLogErrorOnFailure(reader.Get(minInterval));
-                PRETTY_PRINT("\tMinInterval = 0x%" PRIx16 ",", minInterval);
+                uint16_t minIntervalSeconds;
+                ReturnLogErrorOnFailure(reader.Get(minIntervalSeconds));
+                PRETTY_PRINT("\tMinIntervalSeconds = 0x%" PRIx16 ",", minIntervalSeconds);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_MaxInterval:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MaxInterval)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_MaxInterval);
+        case kCsTag_MaxIntervalSeconds:
+            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MaxIntervalSeconds)), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_MaxIntervalSeconds);
             VerifyOrReturnLogError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                uint16_t maxInterval;
-                ReturnLogErrorOnFailure(reader.Get(maxInterval));
-                PRETTY_PRINT("\tkMaxInterval = 0x%" PRIx16 ",", maxInterval);
+                uint16_t maxIntervalSeconds;
+                ReturnLogErrorOnFailure(reader.Get(maxIntervalSeconds));
+                PRETTY_PRINT("\tkMaxInterval = 0x%" PRIx16 ",", maxIntervalSeconds);
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -153,7 +153,7 @@ CHIP_ERROR SubscribeRequest::Parser::CheckSchemaValidity() const
     PRETTY_PRINT("");
     if (CHIP_END_OF_TLV == err)
     {
-        const uint16_t RequiredFields = (1 << kCsTag_MinInterval) | (1 << kCsTag_MaxInterval);
+        const uint16_t RequiredFields = (1 << kCsTag_MinIntervalSeconds) | (1 << kCsTag_MaxIntervalSeconds);
 
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {
@@ -197,12 +197,12 @@ CHIP_ERROR SubscribeRequest::Parser::GetEventNumber(uint64_t * const apEventNumb
 
 CHIP_ERROR SubscribeRequest::Parser::GetMinIntervalSeconds(uint16_t * const apMinIntervalSeconds) const
 {
-    return GetUnsignedInteger(kCsTag_EventNumber, apMinIntervalSeconds);
+    return GetUnsignedInteger(kCsTag_MinIntervalSeconds, apMinIntervalSeconds);
 }
 
 CHIP_ERROR SubscribeRequest::Parser::GetMaxIntervalSeconds(uint16_t * const apMaxIntervalSeconds) const
 {
-    return GetUnsignedInteger(kCsTag_EventNumber, apMaxIntervalSeconds);
+    return GetUnsignedInteger(kCsTag_MaxIntervalSeconds, apMaxIntervalSeconds);
 }
 
 CHIP_ERROR SubscribeRequest::Parser::GetKeepExistingSubscriptions(bool * const apKeepExistingSubscription) const
@@ -267,7 +267,7 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::MinIntervalSeconds(const 
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MinInterval), aMinIntervalSeconds);
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MinIntervalSeconds), aMinIntervalSeconds);
         ChipLogFunctError(mError);
     }
     return *this;
@@ -277,7 +277,7 @@ SubscribeRequest::Builder & SubscribeRequest::Builder::MaxIntervalSeconds(const 
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MaxInterval), aMaxIntervalSeconds);
+        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MaxIntervalSeconds), aMaxIntervalSeconds);
         ChipLogFunctError(mError);
     }
     return *this;

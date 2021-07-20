@@ -91,6 +91,9 @@ def main():
                                              group=GROUP_ID),
               "Failed to test Write Basic Attributes")
 
+    logger.info("Testing closing sessions")
+    FailIfNot(test.TestCloseSession(nodeid=1), "Failed to close sessions")
+
     timeoutTicker.stop()
 
     logger.info("Test finished")

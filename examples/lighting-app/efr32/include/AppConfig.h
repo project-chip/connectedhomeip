@@ -66,4 +66,7 @@ void appError(int err);
 
 #ifdef __cplusplus
 }
+
+#include <core/CHIPError.h>
+void appError(CHIP_ERROR error);
 #endif

@@ -31,10 +31,10 @@ class Context:
        to generate make/ninja instructions and to compile.
     """
 
-  def __init__(self, repository_path:str, output_prefix:str):
+  def __init__(self, runner, repository_path:str, output_prefix:str):
     self.builders = []
-    self.repository_path = repository_path
-    self.output_prefix = output_prefix
+    self.builder_factory = BuilderFactory(runner, repository_path,
+                                          output_prefix)
     self.completed_steps = set()
 
   def SetupBuilders(self, platforms: Sequence[Platform],
@@ -85,12 +85,10 @@ class Context:
     boards_with_builders = set()
     applications_with_builders = set()
 
-    factory = BuilderFactory(self.repository_path, self.output_prefix)
-
-    for platform in platforms:
-      for board in boards:
-        for application in applications:
-          builder = factory.Create(platform, board, application)
+    for platform in sorted(platforms):
+      for board in sorted(boards):
+        for application in sorted(applications):
+          builder = self.builder_factory.Create(platform, board, application)
           if not builder:
             logging.debug('Builder not supported for tuple %s/%s/%s', platform,
                           board, application)

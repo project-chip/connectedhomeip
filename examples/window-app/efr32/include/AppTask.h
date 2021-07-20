@@ -84,7 +84,7 @@ private:
     std::string mQRCode;
     bool mResetWarning;
 
-    int Init(void);
+    CHIP_ERROR Init(void);
     void DispatchEvents(void);
     void DispatchButtonEvent(AppEvent::EventType type, void * context);
     void DispatchWindowCoverEvent(AppEvent::EventType type, void * context);

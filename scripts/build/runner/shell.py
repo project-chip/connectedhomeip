@@ -36,15 +36,18 @@ class LogPipe(threading.Thread):
 
 class ShellRunner:
 
-  def Run(self, *args, **kargs):
+  def Run(self, cmd, cwd=None, title=None):
     outpipe = LogPipe(logging.INFO)
     errpipe = LogPipe(logging.WARN)
 
-    with subprocess.Popen(*args, **kargs, stdout=outpipe, stderr=errpipe) as s:
+    if title:
+      logging.info(title)
+
+    with subprocess.Popen(cmd, cwd=cwd, stdout=outpipe, stderr=errpipe) as s:
       outpipe.close()
       errpipe.close()
       code = s.wait()
       if code != 0:
-        raise Exception('Command %r failed: %d' % (args, code))
+        raise Exception('Command %r failed: %d' % (cmd, code))
       else:
-        logging.info('Command %r completed', args)
+        logging.info('Command %r completed', cmd)

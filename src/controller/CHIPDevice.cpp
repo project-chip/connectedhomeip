@@ -306,7 +306,7 @@ void Device::OnNewConnection(SecureSessionHandle session)
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
     VerifyOrReturn(connectionState != nullptr);
     MessageCounter & localCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter();
-    if (localCounter.SetCounter(mLocalMessageCounter))
+    if (localCounter.SetCounter(mLocalMessageCounter) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Unable to restore local counter to %" PRIu32, mLocalMessageCounter);
     }
@@ -374,6 +374,14 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     setupPayload.version               = 0;
     setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Device::CloseSession()
+{
+    ReturnErrorCodeIf(mState != ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    mSessionManager->ExpirePairing(mSecureSession);
+    mState = ConnectionState::NotConnected;
     return CHIP_NO_ERROR;
 }
 
@@ -505,12 +513,7 @@ void Device::OperationalCertProvisioned()
     mDeviceOperationalCertProvisioned = true;
 
     Persist();
-
-    if (mState == ConnectionState::SecureConnected)
-    {
-        mSessionManager->ExpirePairing(mSecureSession);
-        mState = ConnectionState::NotConnected;
-    }
+    CloseSession();
 }
 
 CHIP_ERROR Device::WarmupCASESession()

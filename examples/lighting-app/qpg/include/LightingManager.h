@@ -28,25 +28,7 @@
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 
-typedef struct RgbColor_
-{
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-} RgbColor_t;
-
-typedef struct HsvColor_
-{
-    uint8_t h;
-    uint8_t s;
-    uint8_t v;
-} HsvColor_t;
-
-typedef struct XyColor_
-{
-    uint16_t x;
-    uint16_t y;
-} XyColor_t;
+#include <core/CHIPError.h>
 
 class LightingManager
 {
@@ -67,7 +49,7 @@ public:
         kState_Off,
     } State;
 
-    int Init();
+    CHIP_ERROR Init();
     bool IsTurnedOn();
     uint8_t GetLevel();
     bool InitiateAction(Action_t aAction, int32_t aActor, uint16_t size, uint8_t * value);

@@ -110,7 +110,6 @@ public:
     bool operator==(const ChipError & other) const { return mError == other.mError; }
     bool operator!=(const ChipError & other) const { return mError != other.mError; }
 
-    constexpr explicit operator bool() const { return mError; }
     static constexpr StorageType AsInteger(StorageType error) { return error; }
     static constexpr StorageType AsInteger(ChipError error) { return error.mError; }
 

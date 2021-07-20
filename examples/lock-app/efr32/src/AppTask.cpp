@@ -90,8 +90,6 @@ CHIP_ERROR AppTask::StartAppTask()
 
 CHIP_ERROR AppTask::Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Init ZCL Data Model
     InitServer();
 
@@ -108,11 +106,11 @@ CHIP_ERROR AppTask::Init()
     if (sFunctionTimer == NULL)
     {
         EFR32_LOG("funct timer create failed");
-        appError(err);
+        appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
     EFR32_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
-    err = BoltLockMgr().Init();
+    CHIP_ERROR err = BoltLockMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("BoltLockMgr().Init() failed");
@@ -152,10 +150,9 @@ CHIP_ERROR AppTask::Init()
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
-    int err;
     AppEvent event;
 
-    err = sAppTask.Init();
+    CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("AppTask.Init() failed");
@@ -231,7 +228,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     bool initiated = false;
     BoltLockManager::Action_t action;
     int32_t actor;
-    int err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Lock)
     {

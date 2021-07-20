@@ -366,6 +366,11 @@ persisted by controller / device.
 
 If no nodeid given, a random Node ID will be used.
 
+### `close-session <nodeid>`
+
+If case there eixsts an open session (PASE or CASE) to the device with a given
+Node ID, mark it as expired.
+
 ### `discover`
 
 Discover available Matter accessory devices:

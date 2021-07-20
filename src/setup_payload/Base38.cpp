@@ -176,7 +176,7 @@ CHIP_ERROR base38Decode(std::string base38, std::vector<uint8_t> & result)
 
         for (int i = (base38CharactersInChunk - 1); i >= 0; i--)
         {
-            uint8_t v;
+            uint8_t v      = 0;
             CHIP_ERROR err = decodeChar(base38[static_cast<uint8_t>(decodedBase38Characters + i)], v);
 
             if (err != CHIP_NO_ERROR)

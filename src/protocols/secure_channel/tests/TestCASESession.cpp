@@ -112,9 +112,9 @@ static CHIP_ERROR InitCredentialSets()
 
     ReturnErrorOnFailure(accessoryOpKeys.Deserialize(accessoryOpKeysSerialized));
 
-    ReturnErrorOnFailure(commissionerCertificateSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength));
+    ReturnErrorOnFailure(commissionerCertificateSet.Init(kStandardCertsCount));
 
-    ReturnErrorOnFailure(accessoryCertificateSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength));
+    ReturnErrorOnFailure(accessoryCertificateSet.Init(kStandardCertsCount));
 
     // Add the trusted root certificate to the certificate set.
     ReturnErrorOnFailure(commissionerCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,

@@ -195,6 +195,7 @@ class DeviceMgrCmd(Cmd):
 
         "connect",
         "close-ble",
+        "close-session",
         "resolve",
         "zcl",
         "zclread",
@@ -527,6 +528,23 @@ class DeviceMgrCmd(Cmd):
             print(str(ex))
             return
 
+    def do_closesession(self, line):
+        """
+        close-session <nodeid>
+
+        Close any session associated with a given node ID.
+        """
+        try:
+            parser = argparse.ArgumentParser()
+            parser.add_argument('nodeid', type=int, help='Peer node ID')
+            args = parser.parse_args(shlex.split(line))
+
+            self.devCtrl.CloseSession(args.nodeid)
+        except exceptions.ChipStackException as ex:
+            print(str(ex))
+        except:
+            self.do_help("close-session")
+
     def do_resolve(self, line):
         """
         resolve <fabricid> <nodeid>
@@ -708,8 +726,10 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 5:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                self.devCtrl.ZCLReadAttribute(args[0], args[1], int(
+                res = self.devCtrl.ZCLReadAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]))
+                if res != None:
+                    print(repr(res))
             else:
                 self.do_help("zclread")
         except exceptions.ChipStackException as ex:

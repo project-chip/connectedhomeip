@@ -35,8 +35,7 @@
 namespace chip {
 namespace Credentials {
 
-static constexpr size_t kOperationalCertificatesMax          = 3;
-static constexpr size_t kOperationalCertificateDecodeBufSize = 1024;
+static constexpr size_t kOperationalCertificatesMax = 3;
 
 using namespace chip::Crypto;
 
@@ -306,7 +305,7 @@ CHIP_ERROR OperationalCredentialSet::FromSerializable(const OperationalCredentia
     ChipCertificateSet certificateSet;
     CertificateKeyId trustedRootId;
 
-    SuccessOrExit(err = certificateSet.Init(kOperationalCertificatesMax, kOperationalCertificateDecodeBufSize));
+    SuccessOrExit(err = certificateSet.Init(kOperationalCertificatesMax));
 
     err = certificateSet.LoadCert(serializable.mRootCertificate, serializable.mRootCertificateLen,
                                   BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
