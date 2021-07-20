@@ -69,13 +69,18 @@ constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 constexpr size_t kMAX_Spake2p_Context_Size     = 1024;
 constexpr size_t kMAX_P256Keypair_Context_Size = 512;
 
-// Worst case is OpenSSL, so let's use its worst case and let static assert tell us if
-// we are wrong, since `typedef SHA_LONG unsigned int` is default.
-//   SHA_LONG h[8];
-//   SHA_LONG Nl, Nh;
-//   SHA_LONG data[SHA_LBLOCK]; // SHA_LBLOCK is 16 for SHA256
-//   unsigned int num, md_len;
-constexpr size_t kMAX_Hash_SHA256_Context_Size = (sizeof(unsigned int) * (8 + 2 + 16 + 2));
+/*
+ * Worst case is OpenSSL, so let's use its worst case and let static assert tell us if
+ * we are wrong, since `typedef SHA_LONG unsigned int` is default.
+ *   SHA_LONG h[8];
+ *   SHA_LONG Nl, Nh;
+ *   SHA_LONG data[SHA_LBLOCK]; // SHA_LBLOCK is 16 for SHA256
+ *   unsigned int num, md_len;
+ *
+ * We also have to account for possibly some custom extensions on some targets,
+ * especially for mbedTLS, so an extra sizeof(uint64_t) is added to account.
+ */
+constexpr size_t kMAX_Hash_SHA256_Context_Size = ((sizeof(unsigned int) * (8 + 2 + 16 + 2)) + sizeof(uint64_t));
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER

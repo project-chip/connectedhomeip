@@ -209,6 +209,9 @@ Hash_SHA256_stream::~Hash_SHA256_stream(void)
     Clear();
 }
 
+static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(mbedtls_sha256_context),
+              "kMAX_Hash_SHA256_Context_Size is too small for the size of underlying mbedtls_sha256_context");
+
 static inline mbedtls_sha256_context * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
 {
     return SafePointerCast<mbedtls_sha256_context *>(context);
@@ -264,7 +267,7 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
 
 void Hash_SHA256_stream::Clear(void)
 {
-    memset(this, 0, sizeof(*this));
+    mbedtls_platform_zeroize(this, sizeof(*this));
 }
 
 CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
