@@ -218,7 +218,8 @@ private:
     void RetainContext();
     void ReleaseContext();
     CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
-    CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> Flags);
+    CHIP_ERROR HandleNeedsAck(uint32_t messageId, BitFlags<MessageFlagValues> messageFlags);
+    CHIP_ERROR HandleNeedsAckInner(uint32_t messageId, BitFlags<MessageFlagValues> messageFlags);
     ExchangeContext * GetExchangeContext();
 
     /**

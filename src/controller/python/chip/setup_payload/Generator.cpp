@@ -28,14 +28,14 @@ static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python ass
 
 extern "C" ChipError::StorageType pychip_SetupPayload_PrintOnboardingCodes(uint32_t passcode, uint16_t vendorId, uint16_t productId,
                                                                            uint16_t discriminator, uint8_t customFlow,
-                                                                           uint8_t capabilities)
+                                                                           uint8_t capabilities, uint8_t version)
 {
     std::string QRCode;
     std::string manualPairingCode;
     SetupPayload payload;
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kNone;
 
-    payload.version               = 0;
+    payload.version               = version;
     payload.setUpPINCode          = passcode;
     payload.vendorID              = vendorId;
     payload.productID             = productId;
