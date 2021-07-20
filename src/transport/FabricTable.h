@@ -46,8 +46,8 @@ static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 // KVS store is sensitive to length of key strings, based on the underlying
 // platform. Keeping them short.
-constexpr char kFabricTableKeyPrefix[] = "CHIPAdmin";
-constexpr char kFabricTableCountKey[]  = "CHIPAdminNextId";
+constexpr char kFabricTableKeyPrefix[] = "Fabric";
+constexpr char kFabricTableCountKey[]  = "NumFabrics";
 
 struct AccessControlList
 {
@@ -55,7 +55,7 @@ struct AccessControlList
 };
 
 /**
- * Defines state of a pairing established by an fabric.
+ * Defines state of a pairing established by a fabric.
  * ACL data can be mutated throughout the lifetime of the fabric pairing.
  * Node ID is only settable using the device operational credentials.
  *
@@ -228,17 +228,17 @@ class DLL_EXPORT FabricTableDelegate
 public:
     virtual ~FabricTableDelegate() {}
     /**
-     * Gets called when an fabric is deleted from KVS store.
+     * Gets called when a fabric is deleted from KVS store.
      **/
     virtual void OnFabricDeletedFromStorage(FabricIndex fabricId) = 0;
 
     /**
-     * Gets called when an fabric is loaded into Fabric Table from KVS store.
+     * Gets called when a fabric is loaded into Fabric Table from KVS store.
      **/
     virtual void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) = 0;
 
     /**
-     * Gets called when an fabric in Fabric Table is persisted to KVS store.
+     * Gets called when a fabric in Fabric Table is persisted to KVS store.
      **/
     virtual void OnFabricPersistedToStorage(FabricInfo * fabricInfo) = 0;
 };
