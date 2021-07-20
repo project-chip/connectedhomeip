@@ -47,8 +47,7 @@ typedef void (*Int32sAttributeCallback)(void * context, int32_t value);
 typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
 typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
 typedef void (*StringAttributeCallback)(void * context, const chip::ByteSpan value);
-typedef void (*AttributeResponseFilter)(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
-                                        chip::Callback::Cancelable * onFailure);
+typedef void (*AttributeResponseFilter)(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess, chip::Callback::Cancelable * onFailure);
 
 /**
  * BasicAttributeFilter accepts the actual type of onSuccess callback as template parameter.
@@ -80,8 +79,8 @@ template <>
 void BasicAttributeFilter<StringAttributeCallback>(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
                                                    chip::Callback::Cancelable * onFailure);
 
-typedef void (*ReadReportingConfigurationReportedCallback)(void * context, uint16_t minInterval, uint16_t maxInterval);
-typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint16_t timeout);
+typedef void (*ReadReportingConfigurationReportedCallback)(void* context, uint16_t minInterval, uint16_t maxInterval);
+typedef void (*ReadReportingConfigurationReceivedCallback)(void* context, uint16_t timeout);
 
 // Cluster Specific Response Callbacks
 
