@@ -681,14 +681,14 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
         {
             size_t rand_data_length = static_cast<unsigned int>(rand()) % (data_length + 1);
 
-            error = sha256.AddData(ByteSpan{data, rand_data_length});
+            error = sha256.AddData(ByteSpan{ data, rand_data_length });
             NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
             data += rand_data_length;
             data_length -= rand_data_length;
         }
 
-        error = sha256.AddData(ByteSpan{data, data_length});
+        error = sha256.AddData(ByteSpan{ data, data_length });
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
         MutableByteSpan out_span(out_buffer);
@@ -730,7 +730,7 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, sha256.Begin() == CHIP_NO_ERROR);
 
             // Compute partial digest after first block
-            NL_TEST_ASSERT(inSuite, sha256.AddData(ByteSpan{&source_buf[0], block1_size}) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, sha256.AddData(ByteSpan{ &source_buf[0], block1_size }) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, sha256.GetDigest(partial_digest_span1) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, partial_digest_span1.size() == kSHA256_Hash_Length);
 
@@ -739,7 +739,7 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, 0 == memcmp(partial_digest_span1.data(), partial_digest_ref, partial_digest_span1.size()));
 
             // Compute partial digest and total digest after second block
-            NL_TEST_ASSERT(inSuite, sha256.AddData(ByteSpan{&source_buf[block1_size], block2_size}) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, sha256.AddData(ByteSpan{ &source_buf[block1_size], block2_size }) == CHIP_NO_ERROR);
 
             NL_TEST_ASSERT(inSuite, sha256.GetDigest(partial_digest_span2) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, partial_digest_span2.size() == kSHA256_Hash_Length);
@@ -756,7 +756,7 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
 
     // Validate error cases
     {
-        uint8_t source_buf2[5] = {1, 2, 3, 4, 5};
+        uint8_t source_buf2[5] = { 1, 2, 3, 4, 5 };
         uint8_t digest_buf_too_small[kSHA256_Hash_Length - 1];
         uint8_t digest_buf_ok[kSHA256_Hash_Length];
         uint8_t digest_buf_ref[kSHA256_Hash_Length];
@@ -768,8 +768,7 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
         Hash_SHA256_stream sha256;
         NL_TEST_ASSERT(inSuite, sha256.Begin() == CHIP_NO_ERROR);
 
-
-        NL_TEST_ASSERT(inSuite, sha256.AddData(ByteSpan{source_buf2}) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, sha256.AddData(ByteSpan{ source_buf2 }) == CHIP_NO_ERROR);
 
         // Check that error behavior works on buffer too small
         NL_TEST_ASSERT(inSuite, sha256.GetDigest(digest_span_too_small) == CHIP_ERROR_BUFFER_TOO_SMALL);

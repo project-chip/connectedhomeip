@@ -452,7 +452,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitImpl()
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Hash(const uint8_t * in, size_t in_len)
 {
-    ReturnErrorOnFailure(sha256_hash_ctx.AddData(ByteSpan{in, in_len}));
+    ReturnErrorOnFailure(sha256_hash_ctx.AddData(ByteSpan{ in, in_len }));
     return CHIP_NO_ERROR;
 }
 

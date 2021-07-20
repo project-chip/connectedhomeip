@@ -96,15 +96,16 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t lif
     Hash_SHA256_stream hash;
     MutableByteSpan hashOutputSpan(hashOutputBuffer);
     ReturnErrorOnFailure(hash.Begin());
-    ReturnErrorOnFailure(hash.AddData(ByteSpan{Uint8::from_const_char(serialNumberBuffer), serialNumberBufferSize}));
-    ReturnErrorOnFailure(hash.AddData(ByteSpan{lifetimeCounterBuffer, sizeof(lifetimeCounter)}));
+    ReturnErrorOnFailure(hash.AddData(ByteSpan{ Uint8::from_const_char(serialNumberBuffer), serialNumberBufferSize }));
+    ReturnErrorOnFailure(hash.AddData(ByteSpan{ lifetimeCounterBuffer, sizeof(lifetimeCounter) }));
     ReturnErrorOnFailure(hash.Finish(hashOutputSpan));
 
     outputBufferWriter.Put16(lifetimeCounter);
     outputBufferWriter.Put(&hashOutputBuffer[kSHA256_Hash_Length - RotatingDeviceId::kHashSuffixLength],
                            RotatingDeviceId::kHashSuffixLength);
 
-    ReturnErrorOnFailure(BytesToUppercaseHexString(outputBuffer, outputBufferWriter.Needed(), rotatingDeviceIdBuffer, rotatingDeviceIdBufferSize));
+    ReturnErrorOnFailure(
+        BytesToUppercaseHexString(outputBuffer, outputBufferWriter.Needed(), rotatingDeviceIdBuffer, rotatingDeviceIdBufferSize));
     rotatingDeviceIdValueOutputSize = outputBufferWriter.Needed() * 2;
     ChipLogDetail(DeviceLayer, "rotatingDeviceId: %s", rotatingDeviceIdBuffer);
 

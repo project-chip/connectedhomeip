@@ -386,7 +386,7 @@ CHIP_ERROR CASESession::SendSigmaR1()
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg_R1));
 
-    ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{msg_R1->Start(), msg_R1->DataLength()}));
+    ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg_R1->Start(), msg_R1->DataLength() }));
 
     ReturnErrorOnFailure(ComputeIPK(mConnectionState.GetLocalKeyID(), mIPK, sizeof(mIPK)));
 
@@ -421,7 +421,7 @@ CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle & msg)
 
     ChipLogDetail(SecureChannel, "Received SigmaR1 msg");
 
-    err = mCommissioningHash.AddData(ByteSpan{msg->Start(), msg->DataLength()});
+    err = mCommissioningHash.AddData(ByteSpan{ msg->Start(), msg->DataLength() });
     SuccessOrExit(err);
 
     tlvReader.Init(std::move(msg));
@@ -610,7 +610,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
         SuccessOrExit(err = tlvWriter.Finalize(&msg_R2));
     }
 
-    err = mCommissioningHash.AddData(ByteSpan{msg_R2->Start(), msg_R2->DataLength()});
+    err = mCommissioningHash.AddData(ByteSpan{ msg_R2->Start(), msg_R2->DataLength() });
     SuccessOrExit(err);
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR3;
@@ -729,7 +729,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
                             kAEADKeySize);
     SuccessOrExit(err);
 
-    err = mCommissioningHash.AddData(ByteSpan{buf, buflen});
+    err = mCommissioningHash.AddData(ByteSpan{ buf, buflen });
     SuccessOrExit(err);
 
     // Step 4
@@ -926,7 +926,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
         SuccessOrExit(err);
     }
 
-    err = mCommissioningHash.AddData(ByteSpan{msg_R3->Start(), msg_R3->DataLength()});
+    err = mCommissioningHash.AddData(ByteSpan{ msg_R3->Start(), msg_R3->DataLength() });
     SuccessOrExit(err);
 
     // Call delegate to send the Msg3 to peer
@@ -1032,7 +1032,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
                             kAEADKeySize);
     SuccessOrExit(err);
 
-    err = mCommissioningHash.AddData(ByteSpan{buf, bufLen});
+    err = mCommissioningHash.AddData(ByteSpan{ buf, bufLen });
     SuccessOrExit(err);
 
     // Step 2
