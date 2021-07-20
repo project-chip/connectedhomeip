@@ -71,8 +71,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             return;
         }
         ChipLogProgress(Zcl, "Identify %u %u!!!", size, *value);
-        LightingMgr().InitiateAction(LightingManager::IDENTIFY_ACTION,
-                                     AppEvent::kEventType_Lighting, size, value);
+        LightingMgr().InitiateAction(LightingManager::IDENTIFY_ACTION, AppEvent::kEventType_Lighting, size, value);
     }
     else
     {
