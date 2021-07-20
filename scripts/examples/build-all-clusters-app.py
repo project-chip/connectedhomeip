@@ -59,12 +59,6 @@ def main():
 
   e = IDFExecutor()
 
-  if args.generate_flash_script:
-    if os.getenv('ESPPORT') is None:
-      logging.error('Port must be set to use flashing.')
-      logging.error('This can be set using the ESPPORT environment var')
-      return
-
   if args.clear_config:
     old_default_sdkconfig = None
     clear_curr = args.clear_config != 'curr'
