@@ -286,7 +286,6 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
                                                            const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
                                                            size_t Lin_len)
 {
-    CHIP_ERROR error     = CHIP_ERROR_INTERNAL;
     uint8_t w0in_mod[32] = {
         0,
     };
@@ -353,7 +352,6 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
                                                          const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
                                                          size_t w1in_len)
 {
-    CHIP_ERROR error     = CHIP_ERROR_INTERNAL;
     smStatus_t smstatus  = SM_NOT_OK;
     uint8_t w0in_mod[32] = {
         0,
