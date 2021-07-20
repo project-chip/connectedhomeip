@@ -171,16 +171,10 @@ static CHIP_ERROR generateBitSet(SetupPayload & payload, uint8_t * bits, uint8_t
     return err;
 }
 
-// TODO: issue #3663 - Unbounded stack in payloadBase38RepresentationWithTLV()
-#if !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif
-
 static CHIP_ERROR payloadBase38RepresentationWithTLV(SetupPayload & setupPayload, char * outBuffer, size_t outBufferSize,
-                                                     size_t bitsetSize, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
+                                                     uint8_t * bits, size_t bitsetSize, uint8_t * tlvDataStart,
+                                                     size_t tlvDataLengthInBytes)
 {
-    uint8_t bits[bitsetSize];
     memset(bits, 0, bitsetSize);
     ReturnErrorOnFailure(generateBitSet(setupPayload, bits, tlvDataStart, tlvDataLengthInBytes));
 
@@ -194,7 +188,7 @@ static CHIP_ERROR payloadBase38RepresentationWithTLV(SetupPayload & setupPayload
     else
     {
         strcpy(outBuffer, kQRCodePrefix);
-        err = base38Encode(bits, ArraySize(bits), outBuffer + prefixLen, outBufferSize - prefixLen);
+        err = base38Encode(bits, bitsetSize, outBuffer + prefixLen, outBufferSize - prefixLen);
     }
 
     return err;
@@ -212,13 +206,15 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string 
 {
     size_t tlvDataLengthInBytes       = 0;
     char buffer[kQRCodeMaxCharLength] = "";
+    std::vector<uint8_t> bits(kTotalPayloadDataSizeInBytes);
 
     VerifyOrReturnError(mPayload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(generateTLVFromOptionalData(mPayload, tlvDataStart, tlvDataStartSize, tlvDataLengthInBytes));
 
-    ReturnErrorOnFailure(payloadBase38RepresentationWithTLV(mPayload, buffer, kQRCodeMaxCharLength,
-                                                            kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes, tlvDataStart,
-                                                            tlvDataLengthInBytes));
+    bits.reserve(kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes);
+
+    ReturnErrorOnFailure(payloadBase38RepresentationWithTLV(mPayload, buffer, kQRCodeMaxCharLength, bits.data(), bits.capacity(),
+                                                            tlvDataStart, tlvDataLengthInBytes));
 
     base38Representation.assign(buffer);
     return CHIP_NO_ERROR;
@@ -228,13 +224,10 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(char * outBu
 {
     // Do not call overloaded functions from here. Smaller devices that don't
     // support std::string must avoid paths that bring in optional TLV data.
+    uint8_t bits[kTotalPayloadDataSizeInBytes];
     VerifyOrReturnError(mPayload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    return payloadBase38RepresentationWithTLV(mPayload, outBuffer, outBufferSize, kTotalPayloadDataSizeInBytes, nullptr, 0);
+    return payloadBase38RepresentationWithTLV(mPayload, outBuffer, outBufferSize, bits, ArraySize(bits), nullptr, 0);
 }
-
-#if !defined(__clang__)
-#pragma GCC diagnostic pop // -Wstack-usage
-#endif
 
 } // namespace chip
