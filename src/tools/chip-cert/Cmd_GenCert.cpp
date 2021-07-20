@@ -137,7 +137,9 @@ const char * const gCmdOptionHelp =
     "\n"
     "   -l, --lifetime <days>\n"
     "\n"
-    "       The lifetime for the new certificate, in whole days.\n"
+    "       The lifetime for the new certificate, in whole days. Use special value\n"
+    "       4294967295 to indicate that certificate doesn't have well defined\n"
+    "       expiration date\n"
     "\n"
     ;
 
@@ -174,7 +176,7 @@ const char * gOutCertFileName        = nullptr;
 const char * gOutKeyFileName         = nullptr;
 CertFormat gOutCertFormat            = kCertFormat_Chip_Base64;
 KeyFormat gOutKeyFormat              = kKeyFormat_Chip_Base64;
-uint32_t gValidDays                  = 0;
+uint32_t gValidDays                  = kCertValidDays_Undefined;
 FutureExtension gFutureExtensions[3] = { { 0, nullptr } };
 uint8_t gFutureExtensionsCount       = 0;
 struct tm gValidFrom;
@@ -451,7 +453,7 @@ bool Cmd_GenCert(int argc, char * argv[])
         ExitNow(res = false);
     }
 
-    if (gValidDays == 0)
+    if (gValidDays == kCertValidDays_Undefined)
     {
         fprintf(stderr, "Please specify the lifetime (in dys) for the new certificate using the --lifetime option.\n");
         ExitNow(res = false);
