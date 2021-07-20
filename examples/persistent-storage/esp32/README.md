@@ -120,7 +120,6 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 ```
         $ export ESPPORT=/dev/tty.SLAB_USBtoUART
-        $ export ESPBAUD=${baud_value}
         $ idf.py build
         $ idf.py flashing_script
         $ python ${app_name}.flash.py

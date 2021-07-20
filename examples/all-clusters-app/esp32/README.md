@@ -240,7 +240,6 @@ commissioning and cluster control.
 
 ```
         $ export ESPPORT=/dev/tty.SLAB_USBtoUART
-        $ export ESPBAUD=${baud_value}
         $ idf.py build
         $ idf.py flashing_script
         $ python ${app_name}.flash.py
