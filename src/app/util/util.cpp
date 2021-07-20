@@ -1068,6 +1068,16 @@ EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, E
     return EMBER_SUCCESS;
 }
 
+EmberStatus emberAfEndpointEventControlSetDelayMS(EmberEventControl * controls, EndpointId endpoint, uint32_t delayMs)
+{
+    uint16_t index = emberAfIndexFromEndpoint(endpoint);
+    if (index == 0xFF)
+    {
+        return EMBER_INVALID_ENDPOINT;
+    }
+    return emberEventControlSetDelayMS(&controls[index], delayMs);
+}
+
 uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,
                                 uint8_t appendingCharsLen)
 {

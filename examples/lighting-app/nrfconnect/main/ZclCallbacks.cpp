@@ -64,6 +64,16 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             ChipLogError(Zcl, "wrong length for level: %d", size);
         }
     }
+    else if (clusterId == ZCL_IDENTIFY_CLUSTER_ID)
+    {
+        if (attributeId != ZCL_IDENTIFY_COMMAND_ID)
+        {
+            ChipLogProgress(Zcl, "Unknown Identify attribute ID: %d", attributeId);
+            return;
+        }
+        ChipLogProgress(Zcl, "Identify %u %u!!!", size, *value);
+        LightingMgr().InitiateAction(LightingManager::IDENTIFY_ACTION, AppEvent::kEventType_Lighting, size, value);
+    }
     else
     {
         ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));

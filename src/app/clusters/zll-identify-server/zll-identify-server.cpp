@@ -54,13 +54,30 @@
  ******************************************************************************/
 
 // this file contains all the common includes for clusters in the util
-#include "app/framework/include/af.h"
-#include "app/framework/util/common.h"
 #include <app/CommandHandler.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
+#include <app/common/gen/enums.h>
+#include <app/util/af.h>
+#include <app/util/common.h>
 
 #ifndef EZSP_HOST
-#include "hal/hal.h"
+//#include "hal/hal.h"
 #endif
+
+using namespace chip;
+
+// Copied in from Z3LightSoc/Z3LightSoc.h
+// Use this macro to check if ZLL Identify Server plugin is included
+#define EMBER_AF_PLUGIN_ZLL_IDENTIFY_SERVER
+// User options for plugin ZLL Identify Server
+#define EMBER_AF_PLUGIN_ZLL_IDENTIFY_SERVER_EVENT_DELAY 1024
+#define EMBER_AF_PLUGIN_ZLL_IDENTIFY_SERVER_BLINK_EVENTS 2
+#define EMBER_AF_PLUGIN_ZLL_IDENTIFY_SERVER_BREATHE_EVENTS 4
+#define EMBER_AF_PLUGIN_ZLL_IDENTIFY_SERVER_OKAY_EVENTS 6
+#define EMBER_AF_PLUGIN_ZLL_IDENTIFY_SERVER_CHANNEL_CHANGE_EVENTS 8
 
 typedef struct
 {
@@ -72,29 +89,29 @@ typedef struct
     uint16_t eventDelay;
 } EmAfZllIdentifyState;
 
-void emAfPluginZllIdentifyServerBlinkEffect(uint8_t endpoint);
+void emAfPluginZllIdentifyServerBlinkEffect(EndpointId endpoint);
 
-void emAfPluginZllIdentifyServerBreatheEffect(uint8_t endpoint);
+void emAfPluginZllIdentifyServerBreatheEffect(EndpointId endpoint);
 
-void emAfPluginZllIdentifyServerOkayEffect(uint8_t endpoint);
+void emAfPluginZllIdentifyServerOkayEffect(EndpointId endpoint);
 
-void emAfPluginZllIdentifyServerChannelChangeEffect(uint8_t endpoint);
+void emAfPluginZllIdentifyServerChannelChangeEffect(EndpointId endpoint);
 
 extern EmberEventControl emberAfPluginZllIdentifyServerTriggerEffectEndpointEventControls[];
 
 static EmAfZllIdentifyState stateTable[EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT];
 
-static EmAfZllIdentifyState * getZllIdentifyState(uint8_t endpoint);
+static EmAfZllIdentifyState * getZllIdentifyState(EndpointId endpoint);
 
-static void deactivateZllIdentify(EmAfZllIdentifyState * state, uint8_t endpoint);
+static void deactivateZllIdentify(EmAfZllIdentifyState * state, EndpointId endpoint);
 
-static EmAfZllIdentifyState * getZllIdentifyState(uint8_t endpoint)
+static EmAfZllIdentifyState * getZllIdentifyState(EndpointId endpoint)
 {
     uint8_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_IDENTIFY_CLUSTER_ID);
     return (index == 0xFF ? NULL : &stateTable[index]);
 }
 
-static void deactivateZllIdentify(EmAfZllIdentifyState * state, uint8_t endpoint)
+static void deactivateZllIdentify(EmAfZllIdentifyState * state, EndpointId endpoint)
 {
     if (state == NULL)
     {
@@ -107,7 +124,7 @@ static void deactivateZllIdentify(EmAfZllIdentifyState * state, uint8_t endpoint
     emberAfEndpointEventControlSetInactive(emberAfPluginZllIdentifyServerTriggerEffectEndpointEventControls, endpoint);
 }
 
-void emberAfPluginZllIdentifyServerTriggerEffectEndpointEventHandler(uint8_t endpoint)
+void emberAfPluginZllIdentifyServerTriggerEffectEndpointEventHandler(EndpointId endpoint)
 {
     EmAfZllIdentifyState * state = getZllIdentifyState(endpoint);
 
@@ -151,7 +168,7 @@ void emberAfPluginZllIdentifyServerTriggerEffectEndpointEventHandler(uint8_t end
 
 bool emberAfIdentifyClusterTriggerEffectCallback(chip::app::CommandHandler * commandObj, uint8_t effectId, uint8_t effectVariant)
 {
-    uint8_t endpoint             = emberAfCurrentEndpoint();
+    EndpointId endpoint          = emberAfCurrentEndpoint();
     EmAfZllIdentifyState * state = getZllIdentifyState(endpoint);
     EmberAfStatus status;
 
@@ -219,7 +236,7 @@ default_response:
     return true;
 }
 
-void emAfPluginZllIdentifyServerBlinkEffect(uint8_t endpoint)
+void emAfPluginZllIdentifyServerBlinkEffect(EndpointId endpoint)
 {
     EmAfZllIdentifyState * state = getZllIdentifyState(endpoint);
 
@@ -230,26 +247,26 @@ void emAfPluginZllIdentifyServerBlinkEffect(uint8_t endpoint)
     }
 
 #ifndef EZSP_HOST
-    halToggleLed(BOARDLED0);
-    halToggleLed(BOARDLED1);
-    halToggleLed(BOARDLED2);
-    halToggleLed(BOARDLED3);
+//    halToggleLed(BOARDLED0);
+//    halToggleLed(BOARDLED1);
+//    halToggleLed(BOARDLED2);
+//    halToggleLed(BOARDLED3);
 #endif
 
     state->eventsRemaining = state->eventsRemaining - 1;
 }
 
-void emAfPluginZllIdentifyServerBreatheEffect(uint8_t endpoint)
+void emAfPluginZllIdentifyServerBreatheEffect(EndpointId endpoint)
 {
     emAfPluginZllIdentifyServerBlinkEffect(endpoint);
 }
 
-void emAfPluginZllIdentifyServerOkayEffect(uint8_t endpoint)
+void emAfPluginZllIdentifyServerOkayEffect(EndpointId endpoint)
 {
     emAfPluginZllIdentifyServerBlinkEffect(endpoint);
 }
 
-void emAfPluginZllIdentifyServerChannelChangeEffect(uint8_t endpoint)
+void emAfPluginZllIdentifyServerChannelChangeEffect(EndpointId endpoint)
 {
     emAfPluginZllIdentifyServerBlinkEffect(endpoint);
 }

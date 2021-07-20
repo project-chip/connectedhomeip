@@ -41,6 +41,7 @@
 
 // Code used to configure the cluster event mechanism
 #define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
+    EmberEventControl emberAfIdentifyClusterServerTickCallbackControl1;                                                            \
     EmberEventControl emberAfLevelControlClusterServerTickCallbackControl1;                                                        \
     extern EmberEventControl emberAfPluginColorControlServerHueSatTransitionEventControl;                                          \
     extern EmberEventControl emberAfPluginColorControlServerTempTransitionEventControl;                                            \
@@ -55,30 +56,45 @@
         (*callback)(endpoint);                                                                                                     \
         /* emberAfPopNetworkIndex(); */                                                                                            \
     }                                                                                                                              \
-                                                                                                                                   \
+    void emberAfIdentifyClusterServerTickCallbackWrapperFunction1(void)                                                            \
+    {                                                                                                                              \
+        clusterTickWrapper(&emberAfIdentifyClusterServerTickCallbackControl1, emberAfIdentifyClusterServerTickCallback, 1);        \
+    }                                                                                                                              \
     void emberAfLevelControlClusterServerTickCallbackWrapperFunction1(void)                                                        \
     {                                                                                                                              \
         clusterTickWrapper(&emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallback,    \
                            1);                                                                                                     \
+    }                                                                                                                              \
+    EmberEventControl emberAfPluginZllIdentifyServerTriggerEffectEndpointEventControls[1];                                         \
+    extern void emberAfPluginZllIdentifyServerTriggerEffectEndpointEventHandler(EndpointId endpoint);                              \
+    void emberAfPluginZllIdentifyServerTriggerEffectEndpointEventWrapper1(void)                                                    \
+    {                                                                                                                              \
+        clusterTickWrapper(&emberAfPluginZllIdentifyServerTriggerEffectEndpointEventControls[0],                                   \
+                           emberAfPluginZllIdentifyServerTriggerEffectEndpointEventHandler, 1);                                    \
     }
 
 // EmberEventData structs used to populate the EmberEventData table
 #define EMBER_AF_GENERATED_EVENTS                                                                                                  \
-    { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },       \
+    { &emberAfIdentifyClusterServerTickCallbackControl1, emberAfIdentifyClusterServerTickCallbackWrapperFunction1 },               \
+        { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },   \
         { &emberAfPluginColorControlServerHueSatTransitionEventControl,                                                            \
           emberAfPluginColorControlServerHueSatTransitionEventHandler },                                                           \
         { &emberAfPluginColorControlServerTempTransitionEventControl, emberAfPluginColorControlServerTempTransitionEventHandler }, \
-        { &emberAfPluginColorControlServerXyTransitionEventControl, emberAfPluginColorControlServerXyTransitionEventHandler },
+        { &emberAfPluginColorControlServerXyTransitionEventControl, emberAfPluginColorControlServerXyTransitionEventHandler },     \
+        { &emberAfPluginZllIdentifyServerTriggerEffectEndpointEventControls[0],                                                    \
+          emberAfPluginZllIdentifyServerTriggerEffectEndpointEventWrapper1 },
 
 #define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
-    "Level Control Cluster Server EP 1", "Color Control Cluster Server Plugin HueSatTransition",                                   \
-        "Color Control Cluster Server Plugin TempTransition", "Color Control Cluster Server Plugin XyTransition",
+    "Identify Cluster Server EP 1", "Level Control Cluster Server EP 1", "Color Control Cluster Server Plugin HueSatTransition",   \
+        "Color Control Cluster Server Plugin TempTransition", "Color Control Cluster Server Plugin XyTransition",                  \
+        "ZLL Identify Server Plugin TriggerEffect EP 1",
 
 // The length of the event context table used to track and retrieve cluster events
-#define EMBER_AF_EVENT_CONTEXT_LENGTH 1
+#define EMBER_AF_EVENT_CONTEXT_LENGTH 2
 
 // EmberAfEventContext structs used to populate the EmberAfEventContext table
 #define EMBER_AF_GENERATED_EVENT_CONTEXT                                                                                           \
-    { 0x1, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl1 },
+    { 0x1, 0x3, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfIdentifyClusterServerTickCallbackControl1 },              \
+        { 0x1, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl1 },
 
 #endif // __AF_GEN_EVENT__

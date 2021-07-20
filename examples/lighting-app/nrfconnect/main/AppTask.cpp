@@ -476,6 +476,19 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     {
         LOG_INF("Level Action has been initiated");
     }
+    else if (aAction == LightingManager::IDENTIFY_ACTION)
+    {
+        LOG_INF("Identify Action has been initiated");
+        // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
+        // except the "main" LED which is PWMed
+        sStatusLED.Set(false);
+        sUnusedLED_1.Set(false);
+        sUnusedLED.Set(false);
+
+        sStatusLED.Blink(500);
+        sUnusedLED.Blink(500);
+        sUnusedLED_1.Blink(500);
+    }
 }
 
 void AppTask::ActionCompleted(LightingManager::Action_t aAction, int32_t aActor)
@@ -491,6 +504,10 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction, int32_t aActor)
     else if (aAction == LightingManager::LEVEL_ACTION)
     {
         LOG_INF("Level Action has been completed");
+    }
+    else if (aAction == LightingManager::IDENTIFY_ACTION)
+    {
+        LOG_INF("Identify Action has been completed");
     }
 
     if (aActor == AppEvent::kEventType_Button)

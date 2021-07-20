@@ -102,6 +102,8 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
+               ${CHIP_ROOT}/src/app/clusters/identify/identify.cpp
+               ${CHIP_ROOT}/src/app/clusters/zll-identify-server/zll-identify-server.cpp
                )
 
 if (BOARD STREQUAL "nrf52840dongle_nrf52840")
