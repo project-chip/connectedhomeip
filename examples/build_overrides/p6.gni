@@ -12,22 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-import("//build_overrides/p6.gni")
-
-import("${chip_root}/examples/platform/p6/args.gni")
-
-# ARM architecture flags will be set based on p6_family.
-arm_platform_config = "${p6_sdk_build_root}/p6_arm.gni"
-
-mbedtls_target = "${p6_sdk_build_root}:p6_build"
-
-chip_device_platform = "p6"
-treat_warnings_as_errors = false
-
-lwip_platform = "p6"
-
-chip_inet_config_enable_ipv4 = true
-chip_inet_config_enable_dns_resolver = false
-
-chip_build_tests = false
+declare_args() {
+  # Root directory for P6 SDK.
+  p6_sdk_build_root = "//third_party/connectedhomeip/third_party/p6"
+}
