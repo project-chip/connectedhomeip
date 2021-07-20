@@ -121,6 +121,9 @@ public:
     static constexpr StorageType AsInteger(StorageType error) { return error; }
     static constexpr StorageType AsInteger(ChipError error) { return error.mError; }
 
+    static constexpr bool IsSuccess(StorageType error) { return error == 0; }
+    static constexpr bool IsSuccess(ChipError error) { return error.mError == 0; }
+
     /// Format an @a error for printing.
 #if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
     static FormatErrorType FormatError(ErrorType error)
