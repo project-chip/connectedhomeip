@@ -26,6 +26,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 #include <stdint.h>
 
 namespace chip {
@@ -41,32 +42,43 @@ class Reader
 {
 public:
     /**
-     * Create a data model reader from a given buffer and length.
+     * Create a buffer reader from a given buffer and length.
      *
-     * @param buffer The octet buffer to read from.  The caller must ensure
+     * @param buffer The octet buffer from which to read.  The caller must ensure
      *               (most simply by allocating the reader on the stack) that
-     *               the buffer outlives the reader.  The buffer is allowed to
-     *               be null if buf_len is 0.
+     *               the buffer outlives the reader. If `buffer` is nullptr,
+     *               length is automatically overridden to zero, to avoid accesses.
      * @param buf_len The number of octets in the buffer.
      */
-    Reader(const uint8_t * buffer, uint16_t buf_len) : mBufStart(buffer), mReadPtr(buffer), mAvailable(buf_len) {}
+    Reader(const uint8_t * buffer, size_t buf_len) : mBufStart(buffer), mReadPtr(buffer), mAvailable(buf_len)
+    {
+        if (mBufStart == nullptr)
+        {
+            mAvailable = 0;
+        }
+    }
 
     /**
-     * Number of octets we have read so far.  This might be able to go away once
-     * we do less switching back and forth between DataModelReader and raw
-     * buffers.
+     * Create a buffer reader from a given byte span.
+     *
+     * @param buffer The octet buffer byte span from which to read.  The caller must ensure
+     *               that the buffer outlives the reader.  The buffer's ByteSpan .data() pointer
+     *               is is nullptr, length is automatically overridden to zero, to avoid accesses.
      */
-    uint16_t OctetsRead() const { return static_cast<uint16_t>(mReadPtr - mBufStart); }
+    Reader(const ByteSpan & buffer) : Reader(buffer.data(), buffer.size()) {}
 
     /**
-     * Number of octets we have remaining to read.  Can be useful for logging.
+     * Number of octets we have read so far.
      */
-    uint16_t Remaining() const { return mAvailable; }
+    size_t OctetsRead() const { return static_cast<size_t>(mReadPtr - mBufStart); }
+
+    /**
+     * Number of octets we have remaining to read.
+     */
+    size_t Remaining() const { return mAvailable; }
 
     /**
      * Test whether we have at least the given number of octets left to read.
-     * This takes a size_t, not uint16_t, to make life a bit simpler for
-     * consumers and avoid casting.
      */
     bool HasAtLeast(size_t octets) const { return octets <= Remaining(); }
 
@@ -179,11 +191,11 @@ public:
      *       remaining, the Reader will advance to the end of the buffer
      *       without entering a failed-status state.
      */
-    Reader & Skip(uint16_t len)
+    Reader & Skip(size_t len)
     {
         len = ::chip::min(len, mAvailable);
         mReadPtr += len;
-        mAvailable = static_cast<uint16_t>(mAvailable - len);
+        mAvailable = static_cast<size_t>(mAvailable - len);
         return *this;
     }
 
@@ -201,7 +213,7 @@ private:
     /**
      * The number of octets we can still read starting at mReadPtr.
      */
-    uint16_t mAvailable;
+    size_t mAvailable;
 
     /**
      * Our current status.

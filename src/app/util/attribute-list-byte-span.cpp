@@ -83,7 +83,7 @@ uint16_t GetByteSpanOffsetFromIndex(const uint8_t * buffer, uint16_t bufferLen, 
         reader.Skip(entrySize);
     }
 
-    return reader.OctetsRead();
+    return static_cast<uint16_t>(reader.OctetsRead());
 }
 
 } // namespace List

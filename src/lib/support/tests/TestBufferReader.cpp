@@ -38,9 +38,13 @@ struct TestReader : public Reader
     TestReader() : Reader(test_buffer, std::extent<decltype(test_buffer)>::value) {}
 };
 
-static void TestBufferReader_Basic(nlTestSuite * inSuite, void * inContext)
+struct TestSpanReader : public Reader
 {
-    TestReader reader;
+    TestSpanReader() : Reader(ByteSpan{ test_buffer, std::extent<decltype(test_buffer)>::value }) {}
+};
+
+static void TestBufferReader_BasicImpl(nlTestSuite * inSuite, void * inContext, Reader & reader)
+{
     uint8_t first;
     uint16_t second;
     uint32_t third;
@@ -66,6 +70,20 @@ static void TestBufferReader_Basic(nlTestSuite * inSuite, void * inContext)
     uint32_t fourMore;
     err = reader.Read32(&fourMore).StatusCode();
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+}
+
+static void TestBufferReader_Basic(nlTestSuite * inSuite, void * inContext)
+{
+    TestReader reader;
+
+    TestBufferReader_BasicImpl(inSuite, inContext, reader);
+}
+
+static void TestBufferReader_BasicSpan(nlTestSuite * inSuite, void * inContext)
+{
+    TestSpanReader reader;
+
+    TestBufferReader_BasicImpl(inSuite, inContext, reader);
 }
 
 static void TestBufferReader_Saturation(nlTestSuite * inSuite, void * inContext)
@@ -102,7 +120,7 @@ static void TestBufferReader_Skip(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = reader.Skip(firstSkipLen).Read8(&temp).StatusCode();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, temp == test_buffer[firstSkipLen]);
-    NL_TEST_ASSERT(inSuite, reader.OctetsRead() == firstSkipLen + 1);
+    NL_TEST_ASSERT(inSuite, reader.OctetsRead() == (firstSkipLen + 1u));
 
     // Verify Skip() called with a length larger than available buffer space jumps to the end.
     err = reader.Skip(sizeof(test_buffer)).StatusCode();
@@ -119,8 +137,9 @@ static void TestBufferReader_Skip(nlTestSuite * inSuite, void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestBufferReader_Basic), NL_TEST_DEF_FN(TestBufferReader_Saturation),
-                                 NL_TEST_DEF_FN(TestBufferReader_Skip), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestBufferReader_Basic), NL_TEST_DEF_FN(TestBufferReader_BasicSpan),
+                                 NL_TEST_DEF_FN(TestBufferReader_Saturation), NL_TEST_DEF_FN(TestBufferReader_Skip),
+                                 NL_TEST_SENTINEL() };
 
 int TestBufferReader(void)
 {

@@ -798,6 +798,7 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
     mbedtls_ecp_keypair * keypair = nullptr;
 
     P256ECDSASignature signature;
+    MutableByteSpan out_raw_sig_span(signature.Bytes(), signature.Capacity());
 
     mbedtls_x509_csr csr;
     mbedtls_x509_csr_init(&csr);
@@ -818,9 +819,10 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
     VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
 
     // Convert DER signature to raw signature
-    error = EcdsaAsn1SignatureToRaw(kP256_FE_Length, csr.sig.p, csr.sig.len, signature.Bytes(), signature.Capacity());
+    error = EcdsaAsn1SignatureToRaw(kP256_FE_Length, ByteSpan{ csr.sig.p, csr.sig.len }, out_raw_sig_span);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
-    signature.SetLength(kP256_FE_Length * 2);
+    VerifyOrExit(out_raw_sig_span.size() == (kP256_FE_Length * 2), error = CHIP_ERROR_INTERNAL);
+    signature.SetLength(out_raw_sig_span.size());
 
     // Verify the signature using the public key
     error = pubkey.ECDSA_validate_msg_signature(csr.cri.p, csr.cri.len, signature);

@@ -173,6 +173,28 @@ inline bool Span<T>::data_equal(const FixedSpan<U, N> & other) const
     return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
 }
 
+/**
+ * @brief Returns true if the `span` could be used to access some data,
+ *        false otherwise.
+ * @param[in] span The Span to validate.
+ */
+template <typename T>
+inline bool IsSpanUsable(const Span<T> & span)
+{
+    return (span.data() != nullptr) && (span.size() > 0);
+}
+
+/**
+ * @brief Returns true if the `span` could be used to access some data,
+ *        false otherwise.
+ * @param[in] span The FixedSpan to validate.
+ */
+template <typename T, size_t N>
+inline bool IsSpanUsable(const FixedSpan<T, N> & span)
+{
+    return (span.data() != nullptr);
+}
+
 using ByteSpan        = Span<const uint8_t>;
 using MutableByteSpan = Span<uint8_t>;
 template <size_t N>

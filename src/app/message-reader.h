@@ -51,7 +51,7 @@ public:
      * we do less switching back and forth between DataModelReader and raw
      * buffers.
      */
-    uint16_t OctetsRead() const { return mReader.OctetsRead(); }
+    size_t OctetsRead() const { return mReader.OctetsRead(); }
 
     /**
      * The reader status.
