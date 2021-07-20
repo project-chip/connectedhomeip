@@ -69,7 +69,7 @@ class BLEManagerImpl final : public BLEManager,
                              private Ble::BleApplicationDelegate
 {
 public:
-    BLEManagerImpl();
+    BLEManagerImpl() {}
 
 private:
     // Allow the BLEManager interface class to delegate method calls to
@@ -199,8 +199,6 @@ private:
     static constexpr uint32_t kAdvertiseTimeout     = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
     static constexpr uint32_t kFastAdvertiseTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
     uint64_t mAdvertiseStartTime;
-    System::Layer::TimerCompleteFunct mAdvertiseTimerCallback;
-    System::Layer::TimerCompleteFunct mFastAdvertiseTimerCallback;
 
     static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError);
     void HandleFastAdvertisementTimer();

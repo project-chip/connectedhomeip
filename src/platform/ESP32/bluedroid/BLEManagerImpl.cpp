@@ -126,10 +126,6 @@ const uint16_t CHIPoBLEGATTAttrCount = sizeof(CHIPoBLEGATTAttrs) / sizeof(CHIPoB
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
-BLEManagerImpl::BLEManagerImpl() :
-    mAdvertiseTimerCallback(HandleAdvertisementTimer), mFastAdvertiseTimerCallback(HandleFastAdvertisementTimer)
-{}
-
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
@@ -181,8 +177,8 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (val)
     {
         mAdvertiseStartTime = System::Clock::GetMonotonicMilliseconds();
-        SystemLayer.StartTimer(kAdvertiseTimeout, mAdvertiseTimerCallback, this);
-        SystemLayer.StartTimer(kFastAdvertiseTimeout, mFastAdvertiseTimerCallback, this);
+        ReturnErrorOnFailure(SystemLayer.StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
+        ReturnErrorOnFailure(SystemLayer.StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
     mFlags.Set(Flags::kFastAdvertisingEnabled, val);
     mFlags.Set(Flags::kAdvertisingRefreshNeeded, 1);
