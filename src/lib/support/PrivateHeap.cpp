@@ -100,6 +100,8 @@ void ValidateHeader(const PrivateHeapBlockHeader * header)
 
 extern "C" void PrivateHeapInit(void * heap, size_t size)
 {
+    size_t pad = 0;
+
     if (heap == nullptr)
     {
         ChipLogError(Support, "Cannot initialize null heap");
@@ -114,27 +116,27 @@ extern "C" void PrivateHeapInit(void * heap, size_t size)
 
     if (reinterpret_cast<uintptr_t>(heap) % kPrivateHeapAllocationAlignment != 0)
     {
-        ChipLogError(Support, "Invalid alignment for private heap initialization");
-        chipDie();
+        pad = (kPrivateHeapAllocationAlignment - ((uintptr_t)heap % kPrivateHeapAllocationAlignment)) % kPrivateHeapAllocationAlignment;
     }
 
-    PrivateHeapBlockHeader * header = reinterpret_cast<PrivateHeapBlockHeader *>(heap);
+    PrivateHeapBlockHeader * header = reinterpret_cast<PrivateHeapBlockHeader *>((uintptr_t)heap + pad);
 
     header->prevBytes = kInvalidHeapBlockSize;
-    header->nextBytes = static_cast<uint32_t>(size - 2 * sizeof(PrivateHeapBlockHeader));
+    header->nextBytes = static_cast<uint32_t>(size - pad - 2 * sizeof(PrivateHeapBlockHeader));
     header->state     = kHeapBlockFree;
     header->checksum  = ComputeHeapBlockChecksum(header);
 
     header            = NextHeader(header);
     header->nextBytes = kInvalidHeapBlockSize;
-    header->prevBytes = static_cast<uint32_t>(size - 2 * sizeof(PrivateHeapBlockHeader));
+    header->prevBytes = static_cast<uint32_t>(size - pad - 2 * sizeof(PrivateHeapBlockHeader));
     header->state     = kHeapBlockFree; // does not matter really
     header->checksum  = ComputeHeapBlockChecksum(header);
 }
 
 extern "C" void * PrivateHeapAlloc(void * heap, size_t size)
 {
-    PrivateHeapBlockHeader * header = reinterpret_cast<PrivateHeapBlockHeader *>(heap);
+    size_t pad = (kPrivateHeapAllocationAlignment - ((uintptr_t)heap % kPrivateHeapAllocationAlignment)) % kPrivateHeapAllocationAlignment;
+    PrivateHeapBlockHeader * header = reinterpret_cast<PrivateHeapBlockHeader *>((uintptr_t)heap + pad);
 
     // we allocate aligned, no matter what
     if (size % kPrivateHeapAllocationAlignment != 0)

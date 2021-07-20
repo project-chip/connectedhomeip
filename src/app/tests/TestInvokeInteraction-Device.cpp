@@ -22,8 +22,7 @@
  *
  */
 
-#include "TestCluster.h"
-#include "messaging/ExchangeDelegate.h"
+#include <messaging/ExchangeDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
@@ -48,7 +47,6 @@
 
 #include <device/SchemaUtils.h>
 #include <TestCluster-Gen.h>
-#include <NetworkCommissioningCluster-Gen.h>
 
 namespace chip {
 static System::Layer gSystemLayer;
@@ -68,14 +66,58 @@ class TestServerCluster : public ClusterServer
 {
 public:
     TestServerCluster();
-    CHIP_ERROR OnInvokeRequest(CommandParams &commandParams, InvokeResponder &invokeInteraction, TLV::TLVReader *payload) final;
+    CHIP_ERROR OnInvokeRequest(CommandParams &commandParams, InvokeResponder &invokeInteraction, TLV::TLVReader *payload) override;
+
+    void SetAsyncResp() { mDoAsyncResp = true; }
+
+    CHIP_ERROR SendAsyncResp();
 
     bool mGotCommandA = false;
+    bool mDoAsyncResp = false;
+    InvokeResponder *mStashedInvokeResponder = nullptr;
+    CommandParams mStashedCommandParams;
 };
 
 TestServerCluster::TestServerCluster()
     : ClusterServer(chip::app::Cluster::TestCluster::kClusterId)
 {
+}
+
+CHIP_ERROR
+TestServerCluster::SendAsyncResp()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::Cluster::TestCluster::CommandB::Type resp;
+    chip::app::Cluster::TestCluster::StructA::Type e[5];
+    uint8_t d[5];
+
+    resp.a = 21;
+    resp.b = 49;
+    resp.c.x = 19;
+    resp.c.y = 233;
+    resp.d = chip::Span<uint8_t>{d};
+    resp.e = chip::Span<chip::app::Cluster::TestCluster::StructA::Type>{e};
+
+    for (size_t i = 0; i < ArraySize(d); i++) {
+        d[i] = (uint8_t)(255 - i);
+    }
+
+    for (size_t i = 0; i < ArraySize(e); i++) {
+        e[i].x = (uint8_t)(255 - i);
+        e[i].y = (uint8_t)(255 - i);
+    }
+
+    mStashedCommandParams.CommandId = chip::app::Cluster::TestCluster::kCommandBId;
+
+    err = mStashedInvokeResponder->AddResponse(mStashedCommandParams, [&](chip::TLV::TLVWriter &writer, uint64_t tag) {
+        return EncodeSchemaElement(resp, writer, tag);
+    });
+
+    NL_TEST_ASSERT(gpSuite, err == CHIP_NO_ERROR);
+
+    mStashedInvokeResponder->DecrementHoldOffRef();
+
+    return err;
 }
 
 CHIP_ERROR 
@@ -109,8 +151,8 @@ TestServerCluster::OnInvokeRequest(CommandParams &commandParams, InvokeResponder
         //
         // Send response synchronously
         //
-        
-        {
+      
+        if (!mDoAsyncResp) { 
             chip::app::Cluster::TestCluster::CommandB::Type resp;
             chip::app::Cluster::TestCluster::StructA::Type e[5];
 
@@ -137,6 +179,11 @@ TestServerCluster::OnInvokeRequest(CommandParams &commandParams, InvokeResponder
 
             NL_TEST_ASSERT(gpSuite, err == CHIP_NO_ERROR);
         }
+        else {
+            invokeInteraction.IncrementHoldOffRef();
+            mStashedInvokeResponder = &invokeInteraction;
+            mStashedCommandParams = commandParams;
+        }
 
         mGotCommandA = true;
     }
@@ -148,6 +195,7 @@ class TestInvokeInteraction : public Messaging::ExchangeContextUnitTestDelegate,
 {
 public:
     static void TestInvokeInteractionSimple(nlTestSuite * apSuite, void * apContext);
+    static void TestInvokeInteractionAsyncResponder(nlTestSuite * apSuite, void * apContext);
     void InterceptMessage(System::PacketBufferHandle buf);
     int GetNumActiveInvokes();
 
@@ -157,7 +205,8 @@ protected:
     void OnEnd(InvokeInitiator &invokeInteraction) final {}
 
     System::PacketBufferHandle mBuf;
-    bool mGotCommandB = false;
+    int mGotCommandB = 0;
+    bool mGotMessage = false;
 };
 
 using namespace chip::TLV;
@@ -165,6 +214,7 @@ using namespace chip::TLV;
 void TestInvokeInteraction::InterceptMessage(System::PacketBufferHandle buf)
 {
     mBuf = std::move(buf);
+    mGotMessage = true;
 }
 
 void
@@ -180,11 +230,7 @@ TestInvokeInteraction::OnResponse(InvokeInitiator &invokeInteraction, CommandPar
 
     if (commandParams.CommandId == chip::app::Cluster::TestCluster::kCommandBId) {
         printf("Received CommandB\n");
-
-        // 
-        // To prevent the stack from actually sending this message
-        //
-        //invokeInteraction.IncrementHoldoffRef();
+		
 
         NL_TEST_ASSERT(gpSuite, payload != nullptr); 
 
@@ -205,7 +251,7 @@ TestInvokeInteraction::OnResponse(InvokeInitiator &invokeInteraction, CommandPar
             NL_TEST_ASSERT(gpSuite, e[i].y == (uint8_t)(255 - i));
         }
 
-        mGotCommandB = true;
+        mGotCommandB++;
     }
 
     return;
@@ -247,6 +293,9 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
     TestServerCluster serverEp1;
     InvokeInitiator invokeInitiator;
 
+    // Re-init it.
+    gTestInvoke = TestInvokeInteraction();
+
     serverEp0.SetEndpoint(0);
     serverEp1.SetEndpoint(1);
     
@@ -256,6 +305,10 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
     err = chip::app::InteractionModelEngine::GetInstance()->RegisterServer(&serverEp1);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    //
+    // Initialize the invoke initiator object with the gTestInvoke object acting as the callback handler
+    // for the client.
+    //
     invokeInitiator.Init(&chip::gExchangeManager, &gTestInvoke, 0, 0, NULL);
 
     {
@@ -284,10 +337,19 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
 
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+        //
+        // At this point, gTestInvoke::InterceptMessage() intercepts the actual packet buffer right upon
+        // exit from the IM. Check that the IM did indeed try to send a message out.
+        //
         err = invokeInitiator.Send();
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, gTestInvoke.mGotMessage);
     }
 
+    //
+    // Print out the buffer contents by momentarily transferring
+    // ownership of the buffer over to the reader, before transferring it back
+    //
     {
         chip::System::PacketBufferTLVReader reader;
         reader.Init(std::move(gTestInvoke.mBuf));
@@ -295,16 +357,27 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
         buf = reader.GetBackingStore().Release();
     }
 
+    //
+    // Clear out this tracker variable that tracks if the server callback
+    // did get invoked (at which point, this pointer points to the instance of InvokeResponder
+    //
     gServerInvoke = nullptr;
 
     pRxEc = chip::gExchangeManager.NewContext({0, 0, 0}, NULL);
     NL_TEST_ASSERT(apSuite, pRxEc != nullptr);
     
+    //
+    // Pump the previously created packet buffer back into the IM to mimic the receive pathway with the newly created EC from above.
+    //
     chip::app::InteractionModelEngine::GetInstance()->OnInvokeCommandRequest(pRxEc, packetHdr, payloadHdr, std::move(buf));
     NL_TEST_ASSERT(apSuite, gServerInvoke != nullptr);
     NL_TEST_ASSERT(apSuite, serverEp0.mGotCommandA);
     NL_TEST_ASSERT(apSuite, serverEp1.mGotCommandA);
 
+    //
+    // Since there are no async activity in this test, the invoke should have been freed up and returned
+    // to the pool.
+    //
     NL_TEST_ASSERT(apSuite, gTestInvoke.GetNumActiveInvokes() == 0);
     
     {
@@ -314,8 +387,154 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
         buf = reader.GetBackingStore().Release();
     }
 
+    //
+    // Take the packetbuffer that was formed on the 'server side' that contains the InvokeResponse, and feed it back to the IM
+    // again, but on the 'client side'.
     invokeInitiator.OnMessageReceived(invokeInitiator.GetExchange(), PacketHeader(), PayloadHeader(), std::move(buf));
-    NL_TEST_ASSERT(apSuite, gTestInvoke.mGotCommandB);
+
+    //
+    // Ensure that we got two calls to handle the command on both endpoints.
+    //
+    NL_TEST_ASSERT(apSuite, gTestInvoke.mGotCommandB == 2);
+}
+
+/*
+ * @brief
+ *
+ * This test tries to achieve an 'end-to-end' test between a client and a server.
+ * Specifically, it has a client sending an invoke action to a server containing two commands targeting
+ * two different endpoints, with the server responding back with a response containing two response
+ * payloads.
+ *
+ * The key distinction between this and the previous test is that one of the responses emitted by a cluster handler
+ * is done asyncronously.
+ */
+void TestInvokeInteraction::TestInvokeInteractionAsyncResponder(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    System::PacketBufferHandle buf;
+    Messaging::ExchangeContext *pRxEc;
+    PacketHeader packetHdr;
+    PayloadHeader payloadHdr;
+    TestServerCluster serverEp0;
+    TestServerCluster serverEp1;
+    InvokeInitiator invokeInitiator;
+
+    // Re-init it.
+    gTestInvoke = TestInvokeInteraction();
+
+    serverEp0.SetEndpoint(0);
+    serverEp1.SetEndpoint(1);
+
+    // Set the server EP1 test logic to not respond syncronously.
+    serverEp1.SetAsyncResp();
+    
+    err = chip::app::InteractionModelEngine::GetInstance()->RegisterServer(&serverEp0);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = chip::app::InteractionModelEngine::GetInstance()->RegisterServer(&serverEp1);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    //
+    // Initialize the invoke initiator object with the gTestInvoke object acting as the callback handler
+    // for the client.
+    //
+    invokeInitiator.Init(&chip::gExchangeManager, &gTestInvoke, 0, 0, NULL);
+
+    {
+        chip::app::Cluster::TestCluster::CommandA::Type req;
+        uint8_t d[5];
+
+        req.a = 10;
+        req.b = 20;
+        req.c.x = 13;
+        req.c.y = 99;
+        req.d = chip::Span<uint8_t>{d};
+
+        for (size_t i = 0; i < ArraySize(d); i++) {
+            d[i] = (uint8_t)i;
+        }
+    
+        err = invokeInitiator.AddRequest(CommandParams(req, 0, true), [&req](auto &writer, auto tag) {
+            return EncodeSchemaElement(req, writer, tag);
+        });
+        
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = invokeInitiator.AddRequest(CommandParams(req, 1, true), [&req](auto &writer, auto tag) {
+            return EncodeSchemaElement(req, writer, tag);
+        });
+
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        //
+        // At this point, gTestInvoke::InterceptMessage() intercepts the actual packet buffer right upon
+        // exit from the IM. Check that the IM did indeed try to send a message out.
+        //
+        err = invokeInitiator.Send();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, gTestInvoke.mGotMessage);
+    }
+
+    //
+    // Print out the buffer contents by momentarily transferring
+    // ownership of the buffer over to the reader, before transferring it back
+    //
+    {
+        chip::System::PacketBufferTLVReader reader;
+        reader.Init(std::move(gTestInvoke.mBuf));
+        chip::TLV::Utilities::Print(reader);
+        buf = reader.GetBackingStore().Release();
+    }
+
+    //
+    // Clear out this tracker variable that tracks if the server callback
+    // did get invoked (at which point, this pointer points to the instance of InvokeResponder
+    //
+    gServerInvoke = nullptr;
+
+    pRxEc = chip::gExchangeManager.NewContext({0, 0, 0}, NULL);
+    NL_TEST_ASSERT(apSuite, pRxEc != nullptr);
+    
+    //
+    // Pump the previously created packet buffer back into the IM to mimic the receive pathway with the newly created EC from above.
+    //
+    chip::app::InteractionModelEngine::GetInstance()->OnInvokeCommandRequest(pRxEc, packetHdr, payloadHdr, std::move(buf));
+    NL_TEST_ASSERT(apSuite, gServerInvoke != nullptr);
+    NL_TEST_ASSERT(apSuite, serverEp0.mGotCommandA);
+    NL_TEST_ASSERT(apSuite, serverEp1.mGotCommandA);
+
+    // Make sure it's got the invoke responder stashed away since it's doing async.
+    NL_TEST_ASSERT(apSuite, serverEp1.mStashedInvokeResponder != nullptr);
+
+    // Make sure that we haven't detected the transmission of any buffers..
+    NL_TEST_ASSERT(apSuite, gTestInvoke.mBuf.IsNull());
+
+    // Make sure the invoke responder object has not been auto free'ed since there is still pending work on that object.
+    NL_TEST_ASSERT(apSuite, gTestInvoke.GetNumActiveInvokes() == 1);
+   
+    err = serverEp1.SendAsyncResp();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    // Now, make sure it's been freed.
+    NL_TEST_ASSERT(apSuite, gTestInvoke.GetNumActiveInvokes() == 0);
+    
+    {
+        chip::System::PacketBufferTLVReader reader;
+        reader.Init(std::move(gTestInvoke.mBuf));
+        chip::TLV::Utilities::Print(reader);
+        buf = reader.GetBackingStore().Release();
+    }
+
+    //
+    // Take the packetbuffer that was formed on the 'server side' that contains the InvokeResponse, and feed it back to the IM
+    // again, but on the 'client side'.
+    invokeInitiator.OnMessageReceived(invokeInitiator.GetExchange(), PacketHeader(), PayloadHeader(), std::move(buf));
+
+    //
+    // Ensure that we got two calls to handle the command on both endpoints.
+    //
+    NL_TEST_ASSERT(apSuite, gTestInvoke.mGotCommandB == 2);
 }
 
 } // namespace app
@@ -337,7 +556,7 @@ void InitializeChip(nlTestSuite * apSuite)
     err = chip::Platform::MemoryInit();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    chip::gSystemLayer.Init(nullptr);
+    chip::gSystemLayer.Init();
 
     err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins, &chip::gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -355,6 +574,7 @@ void InitializeChip(nlTestSuite * apSuite)
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestInvokeInteractionSimple", chip::app::TestInvokeInteraction::TestInvokeInteractionSimple),
+    NL_TEST_DEF("TestInvokeInteractionAsyncResponder", chip::app::TestInvokeInteraction::TestInvokeInteractionAsyncResponder),
     NL_TEST_SENTINEL()
 };
 // clang-format on

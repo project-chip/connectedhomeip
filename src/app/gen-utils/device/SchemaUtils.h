@@ -31,12 +31,27 @@
 #include <array>
 #include <basic-types.h>
 #include "SchemaTypes.h"
+#include <support/PrivateHeap.h>
 
 namespace chip {
 namespace app {
 
+class SchemaAllocator {
+public:
+  SchemaAllocator(void *heap, size_t size) : mHeap(heap) {
+      PrivateHeapInit(heap, size);
+  }
+
+  void *Alloc(size_t size) {
+      return PrivateHeapAlloc(mHeap, size);
+  }
+
+private:
+  void *mHeap;
+};
+
 CHIP_ERROR EncodeSchemaElement(chip::Span<const CompactFieldDescriptor> pDescriptor, void *buf, uint64_t tag, TLV::TLVWriter &writer, bool inArray = false);
-CHIP_ERROR DecodeSchemaElement(chip::Span<const CompactFieldDescriptor> pDescriptor, void *buf, TLV::TLVReader &reader, bool inArray = false);
+CHIP_ERROR DecodeSchemaElement(chip::Span<const CompactFieldDescriptor> pDescriptor, void *buf, TLV::TLVReader &reader, SchemaAllocator *heap = nullptr, bool inArray = false);
 
 template <typename GenType_t>
 CHIP_ERROR EncodeSchemaElement(GenType_t &v, TLV::TLVWriter &writer, uint64_t tag)
@@ -51,9 +66,9 @@ exit:
 }
 
 template <typename GenType_t>
-CHIP_ERROR DecodeSchemaElement(GenType_t &v, TLV::TLVReader &reader)
+CHIP_ERROR DecodeSchemaElement(GenType_t &v, TLV::TLVReader &reader, SchemaAllocator *heap = nullptr)
 {
-    CHIP_ERROR err = DecodeSchemaElement({v.mDescriptor.FieldList.data(), v.mDescriptor.FieldList.size()}, &v, reader);    
+    CHIP_ERROR err = DecodeSchemaElement({v.mDescriptor.FieldList.data(), v.mDescriptor.FieldList.size()}, &v, reader, heap);    
     SuccessOrExit(err);
 
 exit:

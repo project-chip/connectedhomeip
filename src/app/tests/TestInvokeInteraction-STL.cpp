@@ -303,10 +303,19 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
         err = invokeInitiator->AddCommand<chip::app::Cluster::TestCluster::CommandB::Type>(&req, CommandParams(req, 1, true),  onSuccessFunc);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+        //
+        // At this point, gTestInvoke::InterceptMessage() intercepts the actual packet buffer right upon
+        // exit from the IM. Check that the IM did indeed try to send a message out.
+        //
         err = invokeInitiator->Send();
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, gTestInvoke.mGotMessage);
     }
 
+    //
+    // Print out the buffer contents by momentarily transferring
+    // ownership of the buffer over to the reader, before transferring it back
+    //
     {
         chip::System::PacketBufferTLVReader reader;
         reader.Init(std::move(gTestInvoke.mBuf));
@@ -314,16 +323,27 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
         buf = reader.GetBackingStore().Release();
     }
 
+    //
+    // Clear out this tracker variable that tracks if the server callback
+    // did get invoked (at which point, this pointer points to the instance of InvokeResponder
+    //
     gServerInvoke = nullptr;
 
     pRxEc = chip::gExchangeManager.NewContext({0, 0, 0}, NULL);
     NL_TEST_ASSERT(apSuite, pRxEc != nullptr);
     
+    //
+    // Pump the previously created packet buffer back into the IM to mimic the receive pathway with the newly created EC from above.
+    //
     chip::app::InteractionModelEngine::GetInstance()->OnInvokeCommandRequest(pRxEc, packetHdr, payloadHdr, std::move(buf));
     NL_TEST_ASSERT(apSuite, gServerInvoke != nullptr);
     NL_TEST_ASSERT(apSuite, serverEp0.mGotCommandA);
     NL_TEST_ASSERT(apSuite, serverEp1.mGotCommandA);
 
+    //
+    // Since there are no async activity in this test, the invoke should have been freed up and returned
+    // to the pool.
+    //
     NL_TEST_ASSERT(apSuite, gTestInvoke.GetNumActiveInvokes() == 0);
     
     {
@@ -332,8 +352,15 @@ void TestInvokeInteraction::TestInvokeInteractionSimple(nlTestSuite * apSuite, v
         chip::TLV::Utilities::Print(reader);
         buf = reader.GetBackingStore().Release();
     }
-    
+
+    //
+    // Take the packetbuffer that was formed on the 'server side' that contains the InvokeResponse, and feed it back to the IM
+    // again, but on the 'client side'.
     invokeInitiator->GetInitiator().OnMessageReceived(invokeInitiator->GetInitiator().GetExchange(), PacketHeader(), PayloadHeader(), std::move(buf));
+
+    //
+    // Ensure that we got two calls to handle the command on both endpoints.
+    //
     NL_TEST_ASSERT(apSuite, gTestInvoke.mGotCommandB == 2);
 }
 
@@ -400,10 +427,19 @@ void TestInvokeInteraction::TestInvokeInteractionAsyncResponder(nlTestSuite * ap
         err = invokeInitiator->AddCommand<chip::app::Cluster::TestCluster::CommandB::Type>(&req, CommandParams(req, 1, true),  onSuccessFunc);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+        //
+        // At this point, gTestInvoke::InterceptMessage() intercepts the actual packet buffer right upon
+        // exit from the IM. Check that the IM did indeed try to send a message out.
+        //
         err = invokeInitiator->Send();
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, gTestInvoke.mGotMessage);
     }
 
+    //
+    // Print out the buffer contents by momentarily transferring
+    // ownership of the buffer over to the reader, before transferring it back
+    //
     {
         chip::System::PacketBufferTLVReader reader;
         reader.Init(std::move(gTestInvoke.mBuf));
@@ -411,11 +447,18 @@ void TestInvokeInteraction::TestInvokeInteractionAsyncResponder(nlTestSuite * ap
         buf = reader.GetBackingStore().Release();
     }
 
+    //
+    // Clear out this tracker variable that tracks if the server callback
+    // did get invoked (at which point, this pointer points to the instance of InvokeResponder
+    //
     gServerInvoke = nullptr;
 
     pRxEc = chip::gExchangeManager.NewContext({0, 0, 0}, NULL);
     NL_TEST_ASSERT(apSuite, pRxEc != nullptr);
     
+    //
+    // Pump the previously created packet buffer back into the IM to mimic the receive pathway with the newly created EC from above.
+    //
     chip::app::InteractionModelEngine::GetInstance()->OnInvokeCommandRequest(pRxEc, packetHdr, payloadHdr, std::move(buf));
     NL_TEST_ASSERT(apSuite, gServerInvoke != nullptr);
     NL_TEST_ASSERT(apSuite, serverEp0.mGotCommandA);
@@ -424,7 +467,10 @@ void TestInvokeInteraction::TestInvokeInteractionAsyncResponder(nlTestSuite * ap
     // Make sure it's got the invoke responder stashed away since it's doing async.
     NL_TEST_ASSERT(apSuite, serverEp1.mStashedInvokeResponder != nullptr);
 
-    // Make sure the invoke responder object has not been auto free'ed.
+    // Make sure that we haven't detected the transmission of any buffers..
+    NL_TEST_ASSERT(apSuite, gTestInvoke.mBuf.IsNull());
+    
+    // Make sure the invoke responder object has not been auto free'ed since there is still pending work on that object.
     NL_TEST_ASSERT(apSuite, gTestInvoke.GetNumActiveInvokes() == 1);
    
     err = serverEp1.SendAsyncResp();
@@ -440,7 +486,14 @@ void TestInvokeInteraction::TestInvokeInteractionAsyncResponder(nlTestSuite * ap
         buf = reader.GetBackingStore().Release();
     }
 
+    //
+    // Take the packetbuffer that was formed on the 'server side' that contains the InvokeResponse, and feed it back to the IM
+    // again, but on the 'client side'.
     invokeInitiator->GetInitiator().OnMessageReceived(invokeInitiator->GetInitiator().GetExchange(), PacketHeader(), PayloadHeader(), std::move(buf));
+
+    //
+    // Ensure that we got two calls to handle the command on both endpoints.
+    //
     NL_TEST_ASSERT(apSuite, gTestInvoke.mGotCommandB == 2);
 }
 

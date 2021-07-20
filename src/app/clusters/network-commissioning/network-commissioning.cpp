@@ -220,7 +220,7 @@ CHIP_ERROR NetworkCommissioningServer::AddWifiNetwork(chip::app::Cluster::Networ
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddWiFiNetwork: %" PRId32, err);
+    ChipLogDetail(Zcl, "AddWiFiNetwork: %s", ErrorStr(err));
     return err;
 #else
     // The target does not supports WiFiNetwork.

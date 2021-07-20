@@ -80,9 +80,8 @@ chip_test_suite("tests") {
     "TestInvokeInteraction-STL.cpp",
     "TestSchemaUtils-STL.cpp",
     # TODO: Figure out how to compile the bottom set too...
-    # "TestInvokeInteraction-Device.cpp",
-    # "TestSchemaUtils-Device.cpp",
-    
+    #"TestInvokeInteraction-Device.cpp",
+    #"TestSchemaUtils-Device.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -92,6 +91,8 @@ chip_test_suite("tests") {
     "${chip_root}/src/app",
     "${chip_root}/src/app/gen-utils:gen-utils-stl",
     "${chip_root}/gen-v2/stl",
+    #"${chip_root}/src/app/gen-utils:gen-utils-device",
+    #"${chip_root}/gen-v2/device",
     "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/messaging/tests:helpers",

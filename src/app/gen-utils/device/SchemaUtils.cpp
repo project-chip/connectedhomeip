@@ -27,6 +27,8 @@
 #include "core/CHIPTLVTags.h"
 #include "core/CHIPTLVTypes.h"
 #include <core/CHIPTLVDebug.hpp>
+#include "SchemaUtils.h"
+#include <support/PrivateHeap.h>
 
 struct Test {
 };
@@ -116,7 +118,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR DecodeSchemaElement(chip::Span<const CompactFieldDescriptor> pDescriptor, void *buf, TLV::TLVReader &reader, bool inArray)
+CHIP_ERROR DecodeSchemaElement(chip::Span<const CompactFieldDescriptor> pDescriptor, void *buf, TLV::TLVReader &reader, SchemaAllocator *heap, bool inArray)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outerContainerType;
@@ -152,12 +154,32 @@ CHIP_ERROR DecodeSchemaElement(chip::Span<const CompactFieldDescriptor> pDescrip
                     SuccessOrExit(err);
 
                     {
-                        const uint8_t *ptr = p.data();
-                        int size = (int)p.size();
+                        uint8_t *ptr;
+                        int size;
 
-                        VerifyOrExit(size, err = CHIP_ERROR_NULL_BUF_ARG);
+                        if (heap) {
+                            TLV::TLVReader tmpReader = reader;
+                            size_t elemCount = 0;
 
-                        while ((err = DecodeSchemaElement(tmpDescriptorList, (void *)ptr, reader, true) == CHIP_NO_ERROR)) {
+                            while ((err = tmpReader.Next() != CHIP_END_OF_TLV)) {
+                                elemCount++;
+                            }
+
+                            VerifyOrExit(err == CHIP_END_OF_TLV, );
+
+                            ptr = (uint8_t *)heap->Alloc(elemCount * schemaIter->TypeSize);
+                            VerifyOrExit(ptr, err = CHIP_ERROR_NO_MEMORY);
+
+                            p = chip::ByteSpan(ptr, elemCount);
+                        }
+                        else {
+                            ptr = (uint8_t *)p.data();
+                            size = p.size();
+
+                            VerifyOrExit(size, err = CHIP_ERROR_NULL_BUF_ARG);
+                        }
+
+                        while ((err = DecodeSchemaElement(tmpDescriptorList, (void *)ptr, reader, heap, true) == CHIP_NO_ERROR)) {
                             size--;
 
                             if (size == 0) {
@@ -181,7 +203,7 @@ CHIP_ERROR DecodeSchemaElement(chip::Span<const CompactFieldDescriptor> pDescrip
                     break;
                 }
                 else if (schemaIter->FieldType.Has(Type::TYPE_STRUCT)) {
-                    err = DecodeSchemaElement(schemaIter->StructDef, (void *)((uintptr_t)(buf) + schemaIter->Offset), reader, false);
+                    err = DecodeSchemaElement(schemaIter->StructDef, (void *)((uintptr_t)(buf) + schemaIter->Offset), reader, heap, false);
                     SuccessOrExit(err);
                     break;
                 }
@@ -207,25 +229,37 @@ CHIP_ERROR DecodeSchemaElement(chip::Span<const CompactFieldDescriptor> pDescrip
                     chip::ByteSpan &p = *(reinterpret_cast<chip::ByteSpan *>((uintptr_t)(buf) + schemaIter->Offset));
                     uint32_t sz = reader.GetLength();
 
-                    VerifyOrExit(p.data() && p.size() >= sz, err = CHIP_ERROR_NULL_BUF_ARG);
+                    if (heap) {
+                        void *ptr = heap->Alloc(sz);
+                        VerifyOrExit(ptr, err = CHIP_ERROR_NO_MEMORY);
+
+                        p = chip::ByteSpan((uint8_t *)ptr, sz);
+                    }
+                    else {
+                        VerifyOrExit(p.data() && p.size() >= sz, err = CHIP_ERROR_NULL_BUF_ARG);
+                        p = chip::ByteSpan(p.data(), sz);
+                    }
 
                     err = reader.GetBytes((uint8_t *)p.data(), (uint32_t)p.size());
                     SuccessOrExit(err);
-
-                    chip::ByteSpan *p1 = (reinterpret_cast<chip::ByteSpan *>((uintptr_t)(buf) + schemaIter->Offset));
-                    *p1 = chip::ByteSpan(p.data(), sz);
                 }
                 else if (schemaIter->FieldType.Has(Type::TYPE_STRING)) {
                     chip::Span<char> &p = *(reinterpret_cast<chip::Span<char> *>((uintptr_t)(buf) + schemaIter->Offset));
                     uint32_t sz = reader.GetLength();
 
-                    VerifyOrExit(p.data() && p.size() >= sz, err = CHIP_ERROR_NULL_BUF_ARG);
+                    if (heap) {
+                        void *ptr = heap->Alloc(sz + 1);
+                        VerifyOrExit(ptr, err = CHIP_ERROR_NO_MEMORY);
+
+                        p = chip::Span<char>((char *)ptr, sz + 1);
+                    }
+                    else {
+                        VerifyOrExit(p.data() && p.size() >= sz, err = CHIP_ERROR_NULL_BUF_ARG);
+                        p = chip::Span<char>(p.data(), sz + 1);
+                    }
 
                     err = reader.GetString((char *)p.data(), (uint32_t)p.size());
                     SuccessOrExit(err);
-
-                    chip::Span<char> *p1 = (reinterpret_cast<chip::Span<char> *>((uintptr_t)(buf) + schemaIter->Offset));
-                    *p1 = chip::Span<char>(p.data(), sz);
                 }
             }
         }

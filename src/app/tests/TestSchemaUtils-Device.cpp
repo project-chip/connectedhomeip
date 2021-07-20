@@ -44,7 +44,7 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
-
+#include <support/PrivateHeap.h>
 #include <nlunit-test.h>
 
 #include <TestCluster-Gen.h>
@@ -63,8 +63,10 @@ class TestSchemaUtils
 {
 public:
     static void TestSchemaUtilsEncAndDecSimple(nlTestSuite * apSuite, void * apContext);
+    static void TestSchemaUtilsEncAndDecSimplePrivateHeap(nlTestSuite * apSuite, void * apContext);
     static void TestSchemaUtilsEncAndDecNestedStruct(nlTestSuite * apSuite, void * apContext);
     static void TestSchemaUtilsEncAndDecList(nlTestSuite * apSuite, void * apContext);
+    static void TestSchemaUtilsEncAndDecListPrivateHeap(nlTestSuite * apSuite, void * apContext);
 
 private:
     void SetupBuf();
@@ -107,6 +109,54 @@ void TestSchemaUtils::SetupReader()
     err = mReader.Next();
 
     NL_TEST_ASSERT(mpSuite, err == CHIP_NO_ERROR);
+}
+
+void TestSchemaUtils::TestSchemaUtilsEncAndDecSimplePrivateHeap(nlTestSuite * apSuite, void * apContext)
+{
+    chip::app::Cluster::TestCluster::StructA::Type sa;
+    CHIP_ERROR err;
+    chip::app::TestSchemaUtils *_this = static_cast<chip::app::TestSchemaUtils *>(apContext);
+
+    {
+        uint8_t buf[4] = {0, 1, 2, 3};
+        char strbuf[10] = "chip";
+
+        _this->mpSuite = apSuite;
+        _this->SetupBuf();
+
+        sa.x = 20;
+        sa.y = 30;
+        sa.l = chip::ByteSpan{buf};
+
+        // TODO: Bug in CHIPTLVWriter/Reader that don't quite deal with the null-terminator correctly.
+        sa.m = chip::Span<char>(strbuf, strlen(strbuf));
+
+        err = chip::app::EncodeSchemaElement(sa, _this->mWriter, TLV::AnonymousTag);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        _this->DumpBuf();
+    }
+
+    sa = chip::app::Cluster::TestCluster::StructA::Type();
+
+    {
+        chip::System::PacketBufferHandle buf = System::PacketBufferHandle::New(1024);
+        SchemaAllocator allocator(buf->Start(), buf->AvailableDataLength());
+
+        _this->SetupReader();
+
+        err = chip::app::DecodeSchemaElement(sa, _this->mReader, &allocator);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(apSuite, sa.x == 20);
+        NL_TEST_ASSERT(apSuite, sa.y == 30);
+
+        for (uint32_t i = 0; i < sa.l.size(); i++) {
+            NL_TEST_ASSERT(apSuite, sa.l.data()[i] == i);
+        }
+
+        NL_TEST_ASSERT(apSuite, strncmp(sa.m.data(), "chip", ArraySize("chip")) == 0);
+    }
 }
 
 void TestSchemaUtils::TestSchemaUtilsEncAndDecSimple(nlTestSuite * apSuite, void * apContext)
@@ -186,6 +236,68 @@ void TestSchemaUtils::TestSchemaUtilsEncAndDecNestedStruct(nlTestSuite * apSuite
     NL_TEST_ASSERT(apSuite, sb.z.y == 17);
 }
 
+void TestSchemaUtils::TestSchemaUtilsEncAndDecListPrivateHeap(nlTestSuite * apSuite, void * apContext)
+{
+    chip::app::Cluster::TestCluster::StructC::Type sc;
+    CHIP_ERROR err;
+    chip::app::TestSchemaUtils *_this = static_cast<chip::app::TestSchemaUtils *>(apContext);
+
+    {
+        uint8_t d[5];
+        chip::app::Cluster::TestCluster::StructA::Type e[5];
+
+        _this->mpSuite = apSuite;
+        _this->SetupBuf();
+
+        for (size_t i = 0; i < ArraySize(d); i++) {
+            d[i] = (uint8_t)i;
+        }
+
+        sc.a = 20;
+        sc.b = 30;
+        sc.c.x = 99;
+        sc.c.y = 17;
+        sc.d = chip::Span<uint8_t>{d};
+        sc.e = chip::Span<chip::app::Cluster::TestCluster::StructA::Type>{e};
+
+        for (size_t i = 0; i < ArraySize(e); i++) {
+            e[i].x = (uint8_t)i;
+            e[i].y = (uint8_t)i;
+        }
+
+        err = chip::app::EncodeSchemaElement(sc, _this->mWriter, TLV::AnonymousTag);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        _this->DumpBuf();
+    }
+
+    sc = chip::app::Cluster::TestCluster::StructC::Type();
+
+    {
+        uint8_t privHeapBuf[1024];
+        SchemaAllocator allocator(privHeapBuf, 1024);
+
+        _this->SetupReader();
+
+        err = chip::app::DecodeSchemaElement(sc, _this->mReader, &allocator);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(apSuite, sc.a == 20);
+        NL_TEST_ASSERT(apSuite, sc.b == 30);
+        NL_TEST_ASSERT(apSuite, sc.c.x == 99);
+        NL_TEST_ASSERT(apSuite, sc.c.y == 17);
+
+        for (size_t i = 0; i < sc.d.size(); i++) {
+            NL_TEST_ASSERT(apSuite, sc.d.data()[i] == i);
+        }
+
+        for (size_t i = 0; i < sc.e.size(); i++) {
+            NL_TEST_ASSERT(apSuite, sc.e.data()[i].x == i);
+            NL_TEST_ASSERT(apSuite, sc.e.data()[i].y == i);
+        }
+    }
+}
+
 void TestSchemaUtils::TestSchemaUtilsEncAndDecList(nlTestSuite * apSuite, void * apContext)
 {
     chip::app::Cluster::TestCluster::StructC::Type sc;
@@ -262,7 +374,7 @@ void InitializeChip(nlTestSuite * apSuite)
     err = chip::Platform::MemoryInit();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    chip::gSystemLayer.Init(nullptr);
+    chip::gSystemLayer.Init();
 
     err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins, &chip::gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -278,8 +390,10 @@ void InitializeChip(nlTestSuite * apSuite)
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestSchemaUtilsEncAndDecSimple", chip::app::TestSchemaUtils::TestSchemaUtilsEncAndDecSimple),
+    NL_TEST_DEF("TestSchemaUtilsEncAndDecSimpleWithPrivateHeap", chip::app::TestSchemaUtils::TestSchemaUtilsEncAndDecSimplePrivateHeap),
     NL_TEST_DEF("TestSchemaUtilsEncAndDecNestedStruct", chip::app::TestSchemaUtils::TestSchemaUtilsEncAndDecNestedStruct),
     NL_TEST_DEF("TestSchemaUtilsEncAndDecList", chip::app::TestSchemaUtils::TestSchemaUtilsEncAndDecList),
+    NL_TEST_DEF("TestSchemaUtilsEncAndDecListWithPrivateHeap", chip::app::TestSchemaUtils::TestSchemaUtilsEncAndDecListPrivateHeap),
     NL_TEST_SENTINEL()
 };
 // clang-format on
