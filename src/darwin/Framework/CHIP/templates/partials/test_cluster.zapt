@@ -8,11 +8,8 @@
     CHIP{{asUpperCamelCase cluster}} * cluster = [[CHIP{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:queue];
     XCTAssertNotNil(cluster);
 
-    {{#if isCommand}}
-    [cluster {{asLowerCamelCase command}}:^(NSError * err, NSDictionary * values) {
-    {{else if isReadAttribute}}
-    [cluster readAttribute{{asUpperCamelCase attribute}}WithResponseHandler:^(NSError * err, NSDictionary * values) {
-    {{else if isWriteAttribute}}
+    {{#if isReadAttribute}}
+    {{else}}
     {{#chip_tests_item_parameters}}
     {{#if (isString type)}}
     {{#if (isOctetString type)}}
@@ -25,6 +22,12 @@
     {{chipType}} {{asLowerCamelCase name}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
     {{/if}}
     {{/chip_tests_item_parameters}}
+    {{/if}}
+    {{#if isCommand}}
+    [cluster {{asLowerCamelCase command}}:{{#chip_tests_item_parameters}}{{#if index includeZero=false}}{{asLowerCamelCase name}}:{{/if}}{{asLowerCamelCase name}}Argument {{#last}}responseHandler:{{/last}}{{/chip_tests_item_parameters}}^(NSError * err, NSDictionary * values) {
+    {{else if isReadAttribute}}
+    [cluster readAttribute{{asUpperCamelCase attribute}}WithResponseHandler:^(NSError * err, NSDictionary * values) {
+    {{else if isWriteAttribute}}
     [cluster writeAttribute{{asUpperCamelCase attribute}}WithValue:{{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}} responseHandler:^(NSError * err, NSDictionary * values) {
     {{/if}}
         NSLog(@"{{label}} Error: %@", err);
