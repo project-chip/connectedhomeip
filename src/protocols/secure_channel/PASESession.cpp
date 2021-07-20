@@ -230,7 +230,7 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, bool useRa
 
 CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen)
 {
-    uint8_t context[32] = {
+    uint8_t context[kSHA256_Hash_Length] = {
         0,
     };
 
