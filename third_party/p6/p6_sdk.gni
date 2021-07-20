@@ -26,7 +26,7 @@ if (is_debug) {
 } else {
   debug_str = "Release"
 }
-mtb_json = exec_script("$p6_sdk_build_root/repo/make_gni.py",
+mtb_json = exec_script("$p6_sdk_build_root/p6_sdk/make_gni.py",
                        [
                          "${p6_board}",
                          "-c",
@@ -76,21 +76,21 @@ template("p6_sdk_sources") {
     foreach(src, mtb_json.c_source) {
       sources += [ rebase_path(src,
                                "${p6_project_dir}",
-                               "${p6_sdk_build_root}/repo/") ]
+                               "${p6_sdk_build_root}/p6_sdk/") ]
     }
 
     # Pull out cpp sources from generated json
     foreach(src, mtb_json.cxx_source) {
       sources += [ rebase_path(src,
                                "${p6_project_dir}",
-                               "${p6_sdk_build_root}/repo/") ]
+                               "${p6_sdk_build_root}/p6_sdk/") ]
     }
 
     # Pull out .S files from generated json
     foreach(asm, mtb_json.asm_source) {
       sources += [ rebase_path(asm,
                                "${p6_project_dir}",
-                               "${p6_sdk_build_root}/repo/") ]
+                               "${p6_sdk_build_root}/p6_sdk/") ]
     }
 
     public_deps = []
@@ -98,12 +98,7 @@ template("p6_sdk_sources") {
       public_deps += invoker.public_deps
     }
 
-    public_deps += [
-      "${chip_root}/src/lwip:lwip",
-      #"${segger_rtt_root}:segger_rtt",
-      #"${segger_rtt_root}:segger_rtt_printf",
-      #"${segger_rtt_root}:segger_rtt_syscalls",
-    ]
+    public_deps += [ "${chip_root}/src/lwip:lwip" ]
 
     public_configs = [ ":project_configs" ]
     if (defined(invoker.public_configs)) {

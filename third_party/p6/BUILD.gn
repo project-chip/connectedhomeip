@@ -31,7 +31,7 @@ config("p6_sdk_config") {
     # Strip off leading -I part
     _include_dirs += [ "/" + rebase_path(string_replace(inc, "-I", "", 1),
                                          "/",
-                                         "${p6_sdk_build_root}/repo/") ]
+                                         "${p6_sdk_build_root}/p6_sdk/") ]
   }
 
   # Also add project include path (passed in from project build)
@@ -53,7 +53,7 @@ config("p6_sdk_config") {
   # Pull out static libs (.a files) from generated json
   libs = []
   foreach(lib, mtb_json.libs) {
-    libs += [ "/" + rebase_path(lib, "/", "${p6_sdk_build_root}/repo/") ]
+    libs += [ "/" + rebase_path(lib, "/", "${p6_sdk_build_root}/p6_sdk/") ]
   }
 
   cflags_c = mtb_json.cflags
@@ -66,7 +66,7 @@ config("p6_sdk_config") {
   foreach(flag, linker_script_flags) {
     ldflags += [ "-T/" + rebase_path(string_replace(flag, "-T", "", 1),
                                      "/",
-                                     "${p6_sdk_build_root}/repo/") ]
+                                     "${p6_sdk_build_root}/p6_sdk/") ]
   }
 
   # --specs=nano.specs is getting added twice and causing compile issues so remove from cxx flags here.

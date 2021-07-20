@@ -4,6 +4,7 @@ FROM connectedhomeip/chip-build-efr32:${VERSION} AS efr32
 FROM connectedhomeip/chip-build-android:${VERSION} AS android
 FROM connectedhomeip/chip-build-esp32-qemu:${VERSION} as esp32
 FROM connectedhomeip/chip-build-mbed-os:${VERSION} AS mbedos
+FROM connectedhomeip/chip-build-infineon:${VERSION} AS p6
 FROM connectedhomeip/chip-build:${VERSION}
 
 # qemu-src copied over because qemu directory contains symlinks to the src
@@ -23,6 +24,8 @@ COPY --from=mbedos /opt/mbed-os /opt/mbed-os
 COPY --from=mbedos /opt/mbed-os-toolchain/ /opt/mbed-os-toolchain/
 COPY --from=mbedos /opt/openocd/ /opt/openocd/
 
+COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
+
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
@@ -37,3 +40,4 @@ ENV MBED_GCC_ARM_PATH=/opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/b
 ENV MBED_OS_PATH=/opt/mbed-os/
 ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
+ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.3"

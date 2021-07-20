@@ -85,7 +85,7 @@ P6_OPTIONS = {
         },
         'sdk_path': {
             'help': 'Path to p6 sdk',
-            'default': 'third_party/p6/repo',
+            'default': 'third_party/p6/p6_sdk',
             'alias': ['-p'],
             'argparse': {
                 'metavar': 'SDK_PATH'
