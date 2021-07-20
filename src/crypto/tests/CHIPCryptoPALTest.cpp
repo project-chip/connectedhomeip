@@ -721,7 +721,7 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
         if (status != v.expected_status)
         {
             ChipLogError(Crypto, "Failed TestRawIntegerToDerInvalidCases sub-case %d", case_idx);
-            NL_TEST_ASSERT(inSuite, v.expected_status);
+            NL_TEST_ASSERT(inSuite, v.expected_status == status);
         }
         ++case_idx;
     }
