@@ -2626,6 +2626,38 @@ private:
     dispatch_queue_t mQueue;
 };
 
+class CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge
+    : public Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback> {
+public:
+    CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint8_t returnValue)
+    {
+        CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"returnValue" : [NSNumber numberWithUnsignedChar:returnValue],
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
 class CHIPTestClusterClusterTestSpecificResponseCallbackBridge
     : public Callback::Callback<TestClusterClusterTestSpecificResponseCallback> {
 public:
@@ -15466,6 +15498,33 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.Test(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)testAddArguments:(uint8_t)arg1 arg2:(uint8_t)arg2 responseHandler:(ResponseHandler)responseHandler
+{
+    CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge * onSuccess
+        = new CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.TestAddArguments(onSuccess->Cancel(), onFailure->Cancel(), arg1, arg2);
     });
 
     if (err != CHIP_NO_ERROR) {

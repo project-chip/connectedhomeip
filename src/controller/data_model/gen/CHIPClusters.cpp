@@ -9226,6 +9226,49 @@ exit:
     return err;
 }
 
+CHIP_ERROR TestClusterCluster::TestAddArguments(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint8_t arg1, uint8_t arg2)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kTestAddArgumentsCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // arg1: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg1));
+    // arg2: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg2));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
 CHIP_ERROR TestClusterCluster::TestNotHandled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;

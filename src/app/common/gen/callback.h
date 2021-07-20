@@ -16696,6 +16696,11 @@ bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::EndpointId endp
  */
 bool emberAfTestClusterClusterTestNotHandledCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj);
 /**
+ * @brief  Cluster TestAddArgumentsResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                               uint8_t returnValue);
+/**
  * @brief  Cluster TestSpecific Command callback (from client)
  */
 bool emberAfTestClusterClusterTestSpecificCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj);
@@ -16703,6 +16708,11 @@ bool emberAfTestClusterClusterTestSpecificCallback(chip::EndpointId endpoint, ch
  * @brief  Cluster TestUnknownCommand Command callback (from client)
  */
 bool emberAfTestClusterClusterTestUnknownCommandCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj);
+/**
+ * @brief  Cluster TestAddArguments Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestAddArgumentsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                       uint8_t arg1, uint8_t arg2);
 /**
  * @brief  Cluster DisplayMessage Command callback (from server)
  */

@@ -675,6 +675,10 @@ class ChipClusters:
             "TestCluster": {
                 "Test": {
                 },
+                "TestAddArguments": {
+                    "arg1": "int",
+                    "arg2": "int",
+                },
                 "TestNotHandled": {
                 },
                 "TestSpecific": {
@@ -2864,6 +2868,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_TestCluster_Test(
                 device, ZCLendpoint, ZCLgroupid
         )
+    def ClusterTestCluster_CommandTestAddArguments(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, arg1: int, arg2: int):
+        return self._chipLib.chip_ime_AppendCommand_TestCluster_TestAddArguments(
+                device, ZCLendpoint, ZCLgroupid, arg1, arg2
+        )
     def ClusterTestCluster_CommandTestNotHandled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled(
                 device, ZCLendpoint, ZCLgroupid
@@ -5006,6 +5014,9 @@ class ChipClusters:
         # Cluster TestCluster Command Test
         self._chipLib.chip_ime_AppendCommand_TestCluster_Test.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TestCluster_Test.restype = ctypes.c_uint32
+        # Cluster TestCluster Command TestAddArguments
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestAddArguments.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestAddArguments.restype = ctypes.c_uint32
         # Cluster TestCluster Command TestNotHandled
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.restype = ctypes.c_uint32
