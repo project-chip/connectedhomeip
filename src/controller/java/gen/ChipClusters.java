@@ -4398,6 +4398,10 @@ public class ChipClusters {
       test(chipClusterPtr, callback);
     }
 
+    public void testAddArguments(TestAddArgumentsResponseCallback callback, int arg1, int arg2) {
+      testAddArguments(chipClusterPtr, callback, arg1, arg2);
+    }
+
     public void testNotHandled(DefaultClusterCallback callback) {
       testNotHandled(chipClusterPtr, callback);
     }
@@ -4412,11 +4416,20 @@ public class ChipClusters {
 
     private native void test(long chipClusterPtr, DefaultClusterCallback callback);
 
+    private native void testAddArguments(
+        long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
+
     private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback callback);
 
     private native void testSpecific(long chipClusterPtr, TestSpecificResponseCallback callback);
 
     private native void testUnknownCommand(long chipClusterPtr, DefaultClusterCallback callback);
+
+    public interface TestAddArgumentsResponseCallback {
+      void onSuccess(int returnValue);
+
+      void onError(Exception error);
+    }
 
     public interface TestSpecificResponseCallback {
       void onSuccess(int returnValue);

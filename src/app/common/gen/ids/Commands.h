@@ -650,11 +650,13 @@ static constexpr CommandId Login               = 0x00000001;
 namespace TestCluster {
 namespace Commands {
 namespace Ids {
-static constexpr CommandId Test                 = 0x00000000;
-static constexpr CommandId TestSpecificResponse = 0x00000000;
-static constexpr CommandId TestNotHandled       = 0x00000001;
-static constexpr CommandId TestSpecific         = 0x00000002;
-static constexpr CommandId TestUnknownCommand   = 0x00000003;
+static constexpr CommandId Test                     = 0x00000000;
+static constexpr CommandId TestSpecificResponse     = 0x00000000;
+static constexpr CommandId TestNotHandled           = 0x00000001;
+static constexpr CommandId TestAddArgumentsResponse = 0x00000001;
+static constexpr CommandId TestSpecific             = 0x00000002;
+static constexpr CommandId TestUnknownCommand       = 0x00000003;
+static constexpr CommandId TestAddArguments         = 0x00000004;
 } // namespace Ids
 } // namespace Commands
 } // namespace TestCluster
