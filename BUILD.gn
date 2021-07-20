@@ -138,7 +138,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   group("check") {
     if (chip_link_tests) {
-      deps = [ "//src:tests_run" ]
+      deps = [
+        "//scripts/build:build_examples.tests",
+        "//src:tests_run",
+      ]
     }
   }
 
