@@ -23,59 +23,58 @@
 
 #include <math.h>
 
+// initialization values for Blue in XY color space
+#define BLUE_XY         {9830, 3932}
+
+// initialization values for Blue in HSV color space
+#define BLUE_HSV        {240, 100, 255}
+
+// default initialization value for the light level after start
+#define DEFAULT_LEVEL   (64)
+
 LightingManager LightingManager::sLight;
 
 RgbColor_t LightingManager::HsvToRgb(HsvColor_t hsv)
 {
     RgbColor_t rgb;
-    unsigned char region, remainder, p, q, t;
+ 
+    uint16_t i       = hsv.h / 60;
+    uint16_t rgb_max = hsv.v;
+    uint16_t rgb_min = (uint16_t)(rgb_max * (100 - hsv.s)) / 100;
+    uint16_t diff    = hsv.h % 60;
+    uint16_t rgb_adj = (uint16_t)((rgb_max - rgb_min) * diff) / 60;
 
-    if (hsv.s == 0)
-    {
-        rgb.r = hsv.v;
-        rgb.g = hsv.v;
-        rgb.b = hsv.v;
-        return rgb;
-    }
-
-    region    = hsv.h / 43;
-    remainder = (unsigned char) ((hsv.h - (region * 43)) * 6);
-
-    p = (unsigned char) ((hsv.v * (255 - hsv.s)) >> 8);
-    q = (unsigned char) ((hsv.v * (255 - ((hsv.s * remainder) >> 8))) >> 8);
-    t = (unsigned char) ((hsv.v * (255 - ((hsv.s * (255 - remainder)) >> 8))) >> 8);
-
-    switch (region)
+    switch (i)
     {
     case 0:
-        rgb.r = hsv.v;
-        rgb.g = t;
-        rgb.b = p;
+        rgb.r = (uint8_t)rgb_max;
+        rgb.g = (uint8_t)(rgb_min + rgb_adj);
+        rgb.b = (uint8_t)rgb_min;
         break;
     case 1:
-        rgb.r = q;
-        rgb.g = hsv.v;
-        rgb.b = p;
+        rgb.r = (uint8_t)(rgb_max - rgb_adj);
+        rgb.g = (uint8_t)rgb_max;
+        rgb.b = (uint8_t)rgb_min;
         break;
     case 2:
-        rgb.r = p;
-        rgb.g = hsv.v;
-        rgb.b = t;
+        rgb.r = (uint8_t)rgb_min;
+        rgb.g = (uint8_t)rgb_max;
+        rgb.b = (uint8_t)(rgb_min + rgb_adj);
         break;
     case 3:
-        rgb.r = p;
-        rgb.g = q;
-        rgb.b = hsv.v;
+        rgb.r = (uint8_t)rgb_min;
+        rgb.g = (uint8_t)(rgb_max - rgb_adj);
+        rgb.b = (uint8_t)rgb_max;
         break;
     case 4:
-        rgb.r = t;
-        rgb.g = p;
-        rgb.b = hsv.v;
+        rgb.r = (uint8_t)(rgb_min + rgb_adj);
+        rgb.g = (uint8_t)rgb_min;
+        rgb.b = (uint8_t)rgb_max;
         break;
     default:
-        rgb.r = hsv.v;
-        rgb.g = p;
-        rgb.b = q;
+        rgb.r = (uint8_t)rgb_max;
+        rgb.g = (uint8_t)rgb_min;
+        rgb.b = (uint8_t)(rgb_max - rgb_adj);
         break;
     }
 
@@ -143,10 +142,11 @@ RgbColor_t LightingManager::XYToRgb(uint8_t Level, uint16_t currentX, uint16_t c
 int LightingManager::Init()
 {
     mState = kState_Off;
-    mLevel = 64;
-    mXY.x  = 0; // TBD
-    mXY.y  = 0; // TBD
+    mLevel = DEFAULT_LEVEL;
+    mXY    = BLUE_XY;
+    mHSV   = BLUE_HSV;
     mRGB   = XYToRgb(mLevel, mXY.x, mXY.y);
+
     return 0;
 }
 
@@ -172,6 +172,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
     bool action_initiated = false;
     State_t new_state;
     XyColor_t xy;
+    HsvColor_t hsv;
 
     switch (aAction)
     {
@@ -184,9 +185,13 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
     case LEVEL_ACTION:
         ChipLogProgress(NotSpecified, "LightMgr:LEVEL: lev:%u->%u", mLevel, *value);
         break;
-    case COLOR_ACTION:
+    case COLOR_ACTION_XY:
         xy = *(XyColor_t *) (value);
         ChipLogProgress(NotSpecified, "LightMgr:COLOR: xy:%u|%u->%u|%u", mXY.x, mXY.y, xy.x, xy.y);
+        break;
+    case COLOR_ACTION_HSV:
+        hsv = *(HsvColor_t *) (value);
+        ChipLogProgress(NotSpecified, "LightMgr:COLOR: hsv:%u|%u->%u|%u", mHSV.h, mHSV.s, hsv.h, hsv.s);
         break;
     default:
         ChipLogProgress(NotSpecified, "LightMgr:Unknown");
@@ -216,10 +221,22 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
             new_state = kState_On;
         }
     }
-    else if ((aAction == COLOR_ACTION) && (xy.x != mXY.x || xy.y != mXY.y))
+    else if ((aAction == COLOR_ACTION_XY) && (xy.x != mXY.x || xy.y != mXY.y))
     {
         action_initiated = true;
-        if (xy.x == 0 && xy.y == 0) // TBC
+        if (xy.x == 0 && xy.y == 0)
+        {
+            new_state = kState_Off;
+        }
+        else
+        {
+            new_state = kState_On;
+        }
+    }
+    else if ((aAction == COLOR_ACTION_HSV) && (hsv.h != mHSV.h || hsv.s != mHSV.s))
+    {
+        action_initiated = true;
+        if (hsv.h == 0 && hsv.s == 0)
         {
             new_state = kState_Off;
         }
@@ -239,9 +256,13 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
         {
             SetLevel(*value);
         }
-        else if (aAction == COLOR_ACTION)
+        else if (aAction == COLOR_ACTION_XY)
         {
             SetColor(xy.x, xy.y);
+        }
+        else if (aAction == COLOR_ACTION_HSV)
+        {
+            SetColor(hsv.h, hsv.s);
         }
         else
         {
@@ -269,6 +290,15 @@ void LightingManager::SetColor(uint16_t x, uint16_t y)
     mXY.x = x;
     mXY.y = y;
     mRGB  = XYToRgb(mLevel, mXY.x, mXY.y);
+    UpdateLight();
+}
+
+void LightingManager::SetColor(uint8_t hue, uint8_t saturation)
+{
+    mHSV.h = hue;
+    mHSV.s = saturation;
+    mHSV.v = mLevel; //use level from Level Cluster as Vibrance parameter
+    mRGB =  HsvToRgb(mHSV);
     UpdateLight();
 }
 

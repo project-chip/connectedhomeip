@@ -72,7 +72,8 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             return;
         }
 
-        if ((attributeId != ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID) && (attributeId != ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID))
+        if ((attributeId != ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID) && (attributeId != ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID) &&
+            (attributeId != ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID) && (attributeId != ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID))
         {
             ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
             return;
@@ -100,11 +101,35 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
-            LightingMgr().InitiateAction(LightingManager::COLOR_ACTION, 0, sizeof(xy), (uint8_t *) &xy);
+            LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_XY, 0, sizeof(xy), (uint8_t *) &xy);
+        }
+        else if (size == sizeof(uint8_t))
+        {
+            HsvColor_t hsv;
+            if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
+            {
+                hsv.h = *(uint8_t *) (value);
+                // get saturation from cluster value storage
+                EmberAfStatus status =
+                    emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                                               (uint8_t *) &hsv.s, sizeof(hsv.s));
+                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+            }
+            if (attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID)
+            {
+                hsv.s = *(uint8_t *) (value);
+                // get hue from cluster value storage
+                EmberAfStatus status =
+                    emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
+                                               (uint8_t *) &hsv.h, sizeof(hsv.h));
+                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+            }
+            ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
+            LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_HSV, 0, sizeof(hsv), (uint8_t *) &hsv);
         }
         else
         {
-            ChipLogError(Zcl, "Wrong length for ColorControl X/Y value: %d", size);
+            ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
         }
     }
     else

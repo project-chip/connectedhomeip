@@ -30,16 +30,16 @@
 
 typedef struct RgbColor_
 {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
 } RgbColor_t;
 
 typedef struct HsvColor_
 {
-    unsigned char h;
-    unsigned char s;
-    unsigned char v;
+    uint8_t h;
+    uint8_t s;
+    uint8_t v;
 } HsvColor_t;
 
 typedef struct XyColor_
@@ -56,7 +56,8 @@ public:
         ON_ACTION = 0,
         OFF_ACTION,
         LEVEL_ACTION,
-        COLOR_ACTION,
+        COLOR_ACTION_XY,
+        COLOR_ACTION_HSV,
         INVALID_ACTION
     } Action;
 
@@ -80,6 +81,7 @@ private:
     State_t mState;
     uint8_t mLevel;
     XyColor_t mXY;
+    HsvColor_t mHSV;
     RgbColor_t mRGB;
 
     LightingCallback_fn mActionInitiated_CB;
@@ -91,6 +93,8 @@ private:
     void Set(bool aOn);
     void SetLevel(uint8_t aLevel);
     void SetColor(uint16_t x, uint16_t y);
+    void SetColor(uint8_t hue, uint8_t saturation);
+
     void UpdateLight();
 
     static LightingManager sLight;
