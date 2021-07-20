@@ -31,6 +31,7 @@ public:
         ON_ACTION = 0,
         OFF_ACTION,
         LEVEL_ACTION,
+        IDENTIFY_ACTION,
 
         INVALID_ACTION
     };
