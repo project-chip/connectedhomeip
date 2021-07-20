@@ -70,7 +70,7 @@ void GetMessageString(char * buf, uint8_t bufLen, const char * module, uint8_t c
         buf += writtenLen;
     }
 
-    writtenLen = snprintf(buf + writtenLen, bufLen, "[%s]", module);
+    writtenLen = snprintf(buf, bufLen, "[%s]", module);
 }
 
 } // namespace Platform
