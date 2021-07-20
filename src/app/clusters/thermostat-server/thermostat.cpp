@@ -56,13 +56,16 @@ bool emberAfThermostatClusterGetRelayStatusLogCallback(chip::app::CommandHandler
     return false;
 }
 
-bool emberAfThermostatClusterGetWeeklyScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t daysToReturn, uint8_t modeToReturn)
+bool emberAfThermostatClusterGetWeeklyScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t daysToReturn,
+                                                       uint8_t modeToReturn)
 {
     // TODO
     return false;
 }
 
-bool emberAfThermostatClusterSetWeeklyScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t numberOfTransitionsForSequence, uint8_t daysOfWeekForSequence, uint8_t modeForSequence, uint8_t * payload)
+bool emberAfThermostatClusterSetWeeklyScheduleCallback(chip::app::CommandHandler * commandObj,
+                                                       uint8_t numberOfTransitionsForSequence, uint8_t daysOfWeekForSequence,
+                                                       uint8_t modeForSequence, uint8_t * payload)
 {
     // TODO
     return false;
