@@ -365,6 +365,7 @@ P256Keypair * OperationalCredentialSet::GetNodeKeypairAt(const CertificateKeyId 
 
 const ChipCertificateData * OperationalCredentialSet::GetRootCertificate(const CertificateKeyId & trustedRootId) const
 {
+    // TODO: switch to size_t (mOpCredCount)
     for (uint8_t i = 0; i < mOpCredCount; i++)
     {
         ChipCertificateSet * certSet = &mOpCreds[i];

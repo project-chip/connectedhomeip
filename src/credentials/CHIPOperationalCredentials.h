@@ -262,7 +262,8 @@ public:
     const ChipCertificateData * GetRootCertificate(const CertificateKeyId & trustedRootId) const;
 
 private:
-    ChipCertificateSet * mOpCreds;     /**< Pointer to an array of certificate data. */
+    ChipCertificateSet * mOpCreds; /**< Pointer to an array of certificate data. */
+    // TODO: switch mOpCredCount var type to size_t in order to allow more than 255 credentials per controller.
     uint8_t mOpCredCount;              /**< Number of certificates in mOpCreds
                                         array. We maintain the invariant that all
                                         the slots at indices less than
@@ -277,6 +278,7 @@ private:
     NodeKeypairMap mDeviceOpCredKeypair[kOperationalCredentialsMax];
     uint8_t mDeviceOpCredKeypairCount;
 
+    // TODO: Remove TrustedRootId indexing - Replace it with size_t index.
     const NodeCredential * GetNodeCredentialAt(const CertificateKeyId & trustedRootId) const;
     P256Keypair * GetNodeKeypairAt(const CertificateKeyId & trustedRootId);
 };

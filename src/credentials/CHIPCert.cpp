@@ -313,7 +313,7 @@ exit:
 
 CHIP_ERROR ChipCertificateSet::ReleaseLastCert()
 {
-    const ChipCertificateData * lastCert = GetLastCert();
+    ChipCertificateData * lastCert = (mCertCount > 0) ? &mCerts[mCertCount - 1] : nullptr;
     VerifyOrReturnError(lastCert != nullptr, CHIP_ERROR_INTERNAL);
 
     lastCert->~ChipCertificateData();

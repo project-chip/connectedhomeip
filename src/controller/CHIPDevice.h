@@ -479,7 +479,8 @@ private:
     CASESession mCASESession;
 
     Credentials::OperationalCredentialSet * mCredentials = nullptr;
-    uint8_t * mCredentialsIndex                          = nullptr;
+    // TODO: Switch to size_t whenever OperationalCredentialSet Class is updated to support more then 255 credentials per controller
+    uint8_t * mCredentialsIndex = nullptr;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 

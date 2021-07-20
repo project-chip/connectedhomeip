@@ -470,9 +470,6 @@ public:
      **/
     CHIP_ERROR LoadCerts(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags);
 
-    /**
-     * @brief Release last certificate data in the set.
-     **/
     CHIP_ERROR ReleaseLastCert();
 
     /**

@@ -46,6 +46,7 @@
 
 namespace chip {
 
+// TODO: move this constant over to src/crypto/CHIPCryptoPAL.h - name it CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES
 constexpr uint16_t kAEADKeySize = 16;
 
 constexpr uint16_t kSigmaParamRandomNumberSize = 32;
@@ -54,7 +55,7 @@ constexpr uint16_t kMaxTrustedRootIds          = 5;
 
 constexpr uint16_t kIPKSize = 16;
 
-#ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
+#ifdef ENABLE_HSM_CASE_EPHEMERAL_KEY
 #define CASE_EPHEMERAL_KEY 0xCA5EECD0
 #endif
 
@@ -222,11 +223,12 @@ private:
     CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
 protected:
-    CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::CertificateKeyId * trustedRootId, NodeId nodeId,
-                                     FabricId fabricId, MutableByteSpan & destinationId);
+    CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::P256PublicKeySpan & rootPubkey, NodeId nodeId,
+                                     FabricId fabricId, const ByteSpan & ipk, MutableByteSpan & destinationId);
 
 private:
-    CHIP_ERROR FindDestinationIdCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom);
+    CHIP_ERROR FindDestinationIdCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
+                                          const ByteSpan * ipkList, size_t ipkListEntries);
     CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                     MutableByteSpan & salt);
     CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID);
@@ -234,6 +236,11 @@ private:
     CHIP_ERROR ConstructTBS2Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
     CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
     CHIP_ERROR RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk);
+
+    uint16_t EstimateTLVStructOverhead(uint16_t dataLen, uint16_t nFields)
+    {
+        return static_cast<uint16_t>(dataLen + sizeof(uint64_t) * nFields);
+    }
 
     void SendErrorMsg(SigmaErrorType errorCode);
 
@@ -256,7 +263,7 @@ private:
 
     Crypto::Hash_SHA256_stream mCommissioningHash;
     Crypto::P256PublicKey mRemotePubKey;
-#ifdef ENABLE_HSM_CASE_EPHERMAL_KEY
+#ifdef ENABLE_HSM_CASE_EPHEMERAL_KEY
     Crypto::P256KeypairHSM mEphemeralKey;
 #else
     Crypto::P256Keypair mEphemeralKey;

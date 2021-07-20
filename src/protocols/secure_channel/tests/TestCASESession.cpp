@@ -71,8 +71,7 @@ P256Keypair accessoryOpKeys;
 CertificateKeyId trustedRootId = CertificateKeyId(sTestCert_Root01_SubjectKeyId);
 uint8_t commissionerCredentialsIndex;
 
-NodeId Node01_01          = 0xDEDEDEDE00010001;
-FabricId Fabric_Node01_01 = 0xFAB000000000001D;
+NodeId Node01_01 = 0xDEDEDEDE00010001;
 } // namespace
 
 enum
@@ -94,10 +93,10 @@ public:
 class TestCASESessionDestinationId : public CASESession
 {
 public:
-    CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::CertificateKeyId * rootKeyId, NodeId nodeId,
-                                     FabricId fabricId, MutableByteSpan & destinationId)
+    CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::P256PublicKeySpan & rootPubkey, NodeId nodeId,
+                                     FabricId fabricId, const ByteSpan & ipk, MutableByteSpan & destinationId)
     {
-        return CASESession::GenerateDestinationID(random, rootKeyId, nodeId, fabricId, destinationId);
+        return CASESession::GenerateDestinationID(random, rootPubkey, nodeId, fabricId, ipk, destinationId);
     }
 };
 
@@ -455,49 +454,32 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
 
 void CASE_DestinationIDGenerationTest(nlTestSuite * inSuite, void * inContext)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    // Test all combinations of invalid parameters
-    TestCASESecurePairingDelegate delegate;
-    TestCASESecurePairingDelegate delegateAccessory;
     TestCASESessionDestinationId pairingCommissioner;
-    CASESession pairingAccessory;
 
     uint8_t random[kSigmaParamRandomNumberSize]        = { 0x7e, 0x17, 0x12, 0x31, 0x56, 0x8d, 0xfa, 0x17, 0x20, 0x6b, 0x3a,
                                                     0xcc, 0xf8, 0xfa, 0xec, 0x2f, 0x4d, 0x21, 0xb5, 0x80, 0x11, 0x31,
                                                     0x96, 0xf4, 0x7c, 0x7c, 0x4d, 0xeb, 0x81, 0x0a, 0x73, 0xdc };
     uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
-    // NodeId = (0xDEDE_DEDE_0001_0001)
-    // FabricId = (0xFAB0_0000_0000_001D)
-    // Root PubKey = CHIPCert_test_vectors.cpp:sTestCert_Root01_PublicKey
-    // IPK = {0x1d <repeats 16 times>}
-    uint8_t destinationIdentifierTestVector[kSHA256_Hash_Length] = { 0x34, 0x10, 0x1f, 0xd9, 0x3f, 0x0f, 0x14, 0xc8,
-                                                                     0x16, 0x84, 0x4d, 0x55, 0x01, 0xa8, 0x05, 0x28,
-                                                                     0x0f, 0xf7, 0x72, 0x33, 0x29, 0x51, 0x52, 0xb9,
-                                                                     0x19, 0xae, 0xe4, 0x12, 0xe6, 0x34, 0x05, 0x1b };
+    NodeId nodeId                                      = 0xCD5544AA7B13EF14;
+    FabricId fabricId                                  = 0x2906C908D115D362;
+    uint8_t rootPubkey[kP256_PublicKey_Length] = { 0x04, 0x4a, 0x9f, 0x42, 0xb1, 0xca, 0x48, 0x40, 0xd3, 0x72, 0x92, 0xbb, 0xc7,
+                                                   0xf6, 0xa7, 0xe1, 0x1e, 0x22, 0x20, 0x0c, 0x97, 0x6f, 0xc9, 0x00, 0xdb, 0xc9,
+                                                   0x8a, 0x7a, 0x38, 0x3a, 0x64, 0x1c, 0xb8, 0x25, 0x4a, 0x2e, 0x56, 0xd4, 0xe2,
+                                                   0x95, 0xa8, 0x47, 0x94, 0x3b, 0x4e, 0x38, 0x97, 0xc4, 0xa7, 0x73, 0xe9, 0x30,
+                                                   0x27, 0x7b, 0x4d, 0x9f, 0xbe, 0xde, 0x8a, 0x05, 0x26, 0x86, 0xbf, 0xac, 0xfa };
+    P256PublicKeySpan rootPubkeySpan(rootPubkey);
+    uint8_t destinationIdentifierTestVector[kSHA256_Hash_Length] = { 0xc8, 0xe1, 0x70, 0x0d, 0x12, 0x5a, 0xff, 0xbc,
+                                                                     0xea, 0xda, 0x34, 0x2a, 0x0d, 0x00, 0xdb, 0x7c,
+                                                                     0xa0, 0x65, 0x05, 0xae, 0x5d, 0x0b, 0x29, 0x87,
+                                                                     0xf3, 0xaf, 0x4b, 0x77, 0xe3, 0x94, 0x05, 0x1d };
 
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
-
-    ExchangeContext * context = ctx.NewExchangeToLocal(&pairingCommissioner);
-
-    NL_TEST_ASSERT(inSuite,
-                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
-                       Protocols::SecureChannel::MsgType::CASE_SigmaR1, &pairingAccessory) == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.ListenForSessionEstablishment(&accessoryDevOpCred, 0, &delegateAccessory) == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                                        commissionerCredentialsIndex, Node01_01, 0, context,
-                                                        &delegate) == CHIP_NO_ERROR);
+    uint8_t ipk[] = { 0x4a, 0x71, 0xcd, 0xd7, 0xb2, 0xa3, 0xca, 0x90, 0x24, 0xf9, 0x6f, 0x3c, 0x96, 0xa1, 0x9d, 0xee };
 
     {
         MutableByteSpan destinationIdSpan(destinationIdentifier, sizeof(destinationIdentifier));
         NL_TEST_ASSERT(inSuite,
-                       pairingCommissioner.GenerateDestinationID(ByteSpan(random, sizeof(random)), &trustedRootId, Node01_01,
-                                                                 Fabric_Node01_01, destinationIdSpan) == CHIP_NO_ERROR);
+                       pairingCommissioner.GenerateDestinationID(ByteSpan(random, sizeof(random)), rootPubkeySpan, nodeId, fabricId,
+                                                                 ByteSpan(ipk, sizeof(ipk)), destinationIdSpan) == CHIP_NO_ERROR);
     }
 
     NL_TEST_ASSERT(inSuite, memcmp(destinationIdentifier, destinationIdentifierTestVector, sizeof(destinationIdentifier)) == 0);
