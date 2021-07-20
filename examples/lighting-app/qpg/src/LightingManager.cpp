@@ -34,11 +34,87 @@
 
 LightingManager LightingManager::sLight;
 
+RgbColor_t LightingManager::HsvToRgb(HsvColor_t hsv)
+{
+    RgbColor_t rgb;
+ 
+    uint16_t i       = hsv.h / 60;
+    uint16_t rgb_max = hsv.v;
+    uint16_t rgb_min = (uint16_t)(rgb_max * (100 - hsv.s)) / 100;
+    uint16_t diff    = hsv.h % 60;
+    uint16_t rgb_adj = (uint16_t)((rgb_max - rgb_min) * diff) / 60;
+
+    switch (i)
+    {
+    case 0:
+        rgb.r = (uint8_t)rgb_max;
+        rgb.g = (uint8_t)(rgb_min + rgb_adj);
+        rgb.b = (uint8_t)rgb_min;
+        break;
+    case 1:
+        rgb.r = (uint8_t)(rgb_max - rgb_adj);
+        rgb.g = (uint8_t)rgb_max;
+        rgb.b = (uint8_t)rgb_min;
+        break;
+    case 2:
+        rgb.r = (uint8_t)rgb_min;
+        rgb.g = (uint8_t)rgb_max;
+        rgb.b = (uint8_t)(rgb_min + rgb_adj);
+        break;
+    case 3:
+        rgb.r = (uint8_t)rgb_min;
+        rgb.g = (uint8_t)(rgb_max - rgb_adj);
+        rgb.b = (uint8_t)rgb_max;
+        break;
+    case 4:
+        rgb.r = (uint8_t)(rgb_min + rgb_adj);
+        rgb.g = (uint8_t)rgb_min;
+        rgb.b = (uint8_t)rgb_max;
+        break;
+    default:
+        rgb.r = (uint8_t)rgb_max;
+        rgb.g = (uint8_t)rgb_min;
+        rgb.b = (uint8_t)(rgb_max - rgb_adj);
+        break;
+    }
+
+    return rgb;
+}
+
+RgbColor_t LightingManager::XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
+{
+    // convert xyY color space to RGB
+
+    // https://www.easyrgb.com/en/math.php
+    // https://en.wikipedia.org/wiki/SRGB
+    // refer https://en.wikipedia.org/wiki/CIE_1931_color_space#CIE_xy_chromaticity_diagram_and_the_CIE_xyY_color_space
+
+    // The currentX/currentY attribute contains the current value of the normalized chromaticity value of x/y.
+    // The value of x/y shall be related to the currentX/currentY attribute by the relationship
+    // x = currentX/65536
+    // y = currentY/65536
+    // z = 1-x-y
+
+    RgbColor_t rgb;
+
+    float x, y, z;
+    float X, Y, Z;
+    float r, g, b;
+
+    x = ((float) currentX) / 65535.0f;
+    y = ((float) currentY) / 65535.0f;
+???
+}
+
 CHIP_ERROR LightingManager::Init()
 {
     mState = kState_Off;
-    mLevel = 64;
-    return CHIP_NO_ERROR;
+    mLevel = DEFAULT_LEVEL;
+    mXY    = BLUE_XY;
+    mHSV   = BLUE_HSV;
+    mRGB   = XYToRgb(mLevel, mXY.x, mXY.y);
+
+    return 0;
 }
 
 bool LightingManager::IsTurnedOn()

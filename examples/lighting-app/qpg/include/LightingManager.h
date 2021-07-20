@@ -30,6 +30,26 @@
 
 #include <core/CHIPError.h>
 
+typedef struct RgbColor_
+{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+} RgbColor_t;
+
+typedef struct HsvColor_
+{
+    uint8_t h;
+    uint8_t s;
+    uint8_t v;
+} HsvColor_t;
+
+typedef struct XyColor_
+{
+    uint16_t x;
+    uint16_t y;
+} XyColor_t;
+
 class LightingManager
 {
 public:
