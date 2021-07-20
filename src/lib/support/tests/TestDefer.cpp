@@ -25,6 +25,8 @@
 
 using namespace chip;
 
+namespace {
+
 static void TestDeferUsage(nlTestSuite * inSuite, void * inContext)
 {
     bool deferred = false;
@@ -41,6 +43,8 @@ static void TestDeferUsage(nlTestSuite * inSuite, void * inContext)
     }
     NL_TEST_ASSERT(inSuite, deferred);
 }
+
+} // namespace
 
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
 /**

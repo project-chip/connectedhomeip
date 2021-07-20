@@ -179,36 +179,42 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
     return err;
 }
 
-CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> MsgFlags)
+CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t messageId, BitFlags<MessageFlagValues> messageFlags)
 
 {
     // Skip processing ack if drop ack debug is enabled.
     if (ShouldDropAckDebug())
         return CHIP_NO_ERROR;
 
-    auto schedule = MakeDefer([&]() {
-        // Schedule next physical wakeup on function exit
-        GetReliableMessageMgr()->StartTimer();
-    });
-
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
     GetReliableMessageMgr()->ExpireTicks();
 
+    CHIP_ERROR err = HandleNeedsAckInner(messageId, messageFlags);
+
+    // Schedule next physical wakeup on function exit
+    GetReliableMessageMgr()->StartTimer();
+
+    return err;
+}
+
+CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageId, BitFlags<MessageFlagValues> messageFlags)
+
+{
     // If the message IS a duplicate there will never be a response to it, so we
     // should not wait for one and just immediately send a standalone ack.
-    if (MsgFlags.Has(MessageFlagValues::kDuplicateMessage))
+    if (messageFlags.Has(MessageFlagValues::kDuplicateMessage))
     {
 #if !defined(NDEBUG)
-        ChipLogDetail(ExchangeManager, "Forcing tx of solitary ack for duplicate MsgId:%08" PRIX32, MessageId);
+        ChipLogDetail(ExchangeManager, "Forcing tx of solitary ack for duplicate MsgId:%08" PRIX32, messageId);
 #endif
         // Is there pending ack for a different message id.
-        bool wasAckPending = IsAckPending() && mPendingPeerAckId != MessageId;
+        bool wasAckPending = IsAckPending() && mPendingPeerAckId != messageId;
 
         // Temporary store currently pending ack id (even if there is none).
         uint32_t tempAckId = mPendingPeerAckId;
 
         // Set the pending ack id.
-        SetPendingPeerAckId(MessageId);
+        SetPendingPeerAckId(messageId);
 
         // Send the Ack for the duplication message in a SecureChannel::StandaloneAck message.
         CHIP_ERROR err = SendStandaloneAckMessage();
@@ -236,7 +242,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<M
         }
 
         // Replace the Pending ack id.
-        SetPendingPeerAckId(MessageId);
+        SetPendingPeerAckId(messageId);
         mNextAckTimeTick =
             static_cast<uint16_t>(CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK +
                                   GetReliableMessageMgr()->GetTickCounterFromTimeDelta(System::Clock::GetMonotonicMilliseconds()));
