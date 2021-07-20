@@ -23,9 +23,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/bdx/BdxTransferSession.h>
 #include <support/BitFlags.h>
-#include <system/SystemLayer.h>
-#include <system/SystemTimer.h>
 #include <system/SystemClock.h>
+#include <system/SystemLayer.h>
 
 namespace chip {
 namespace bdx {
@@ -40,7 +39,8 @@ CHIP_ERROR Endpoint::OnMessageReceived(chip::Messaging::ExchangeContext * ec, co
 
     ChipLogDetail(BDX, "%s: message 0x%x protocol %u", __FUNCTION__, static_cast<uint8_t>(payloadHeader.GetMessageType()),
                   payloadHeader.GetProtocolID().GetProtocolId());
-    CHIP_ERROR err = mTransfer.HandleMessageReceived(payloadHeader, std::move(payload), System::Platform::Clock::GetMonotonicMilliseconds());
+    CHIP_ERROR err =
+        mTransfer.HandleMessageReceived(payloadHeader, std::move(payload), System::Platform::Clock::GetMonotonicMilliseconds());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "failed to handle message: %s", ErrorStr(err));

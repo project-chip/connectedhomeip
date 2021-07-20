@@ -36,9 +36,10 @@ namespace bdx {
 /**
  * An abstract class with methods for handling BDX messages from an ExchangeContext and polling a TransferSession state machine.
  *
- * This class contains a repeating timer which regurlaly polls the TransferSession state machine. This class does not define any
- * methods for beginning a transfer or initializing the underlying TransferSession object. A CHIP node may have many Endpoints but
- * only one Endpoint should be used for each BDX transfer.
+ * This class does not define any methods for beginning a transfer or initializing the underlying TransferSession object (see
+ * Initiator and Responder below).
+ * This class contains a repeating timer which regurlaly polls the TransferSession state machine.
+ * A CHIP node may have many Endpoints but only one Endpoint should be used for each BDX transfer.
  */
 class Endpoint : public Messaging::ExchangeDelegate
 {
