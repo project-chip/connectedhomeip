@@ -177,7 +177,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
     do                                                                                                                             \
     {                                                                                                                              \
         auto __err = (expr);                                                                                                       \
-        if (!::chip::ChipError::IsSuccess(__err))                                                                                 \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
             return __err;                                                                                                          \
         }                                                                                                                          \
