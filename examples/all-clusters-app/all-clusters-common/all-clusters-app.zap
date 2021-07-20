@@ -12870,6 +12870,22 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "TestSpecific",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "TestAddArguments",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -12904,6 +12920,14 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "TestAddArgumentsResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
               "outgoing": 1
             }
           ],
