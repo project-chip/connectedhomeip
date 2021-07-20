@@ -24,21 +24,7 @@ REPO_DIR="$SOURCE_DIR/../../../"
 
 echo_source=$REPO_DIR/src/messaging/tests/echo
 
-function build_image() {
-    # These files should be successfully compiled elsewhere.
-    source "$REPO_DIR/scripts/activate.sh" >/dev/null
-    set -x
-    cd "$echo_source"
-    gn gen out >/dev/null
-    run_ninja -C out
-    docker build -t chip_echo_requester -f Dockerfile.requester . 2>&1
-    docker build -t chip_echo_responder -f Dockerfile.responder . 2>&1
-}
-
 function main() {
-    pushd .
-    build_image
-    popd
     python3 "$SOURCE_DIR/test-echo.py"
 }
 

@@ -31,20 +31,24 @@ sh.setFormatter(
         '%(asctime)s [%(name)s] %(levelname)s %(message)s'))
 logger.addHandler(sh)
 
+CHIP_REPO = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "..", "..")
+
 DEVICE_CONFIG = {
     'device0': {
         'type': 'CHIP-IM-Initiator',
-        'base_image': 'chip_im_initiator',
-        'capability': ['Thread', 'Interactive', 'TrafficControl'],
+        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'capability': ['Thread', 'Interactive', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
-        'traffic_control': {'latencyMs': 100}
+        'traffic_control': {'latencyMs': 100},
+        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     },
     'device1': {
         'type': 'CHIP-IM-Responder',
-        'base_image': 'chip_im_responder',
-        'capability': ['Thread', 'Interactive', 'TrafficControl'],
+        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'capability': ['Thread', 'Interactive', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
-        'traffic_control': {'latencyMs': 100}
+        'traffic_control': {'latencyMs': 100},
+        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     }
 }
 
@@ -68,12 +72,18 @@ class TestInteractionModel(CHIPVirtualHome):
     def run_data_model_test(self):
         resp_ips = [device['description']['ipv4_addr'] for device in self.non_ap_devices
                     if device['type'] == 'CHIP-IM-Responder']
+        resp_ids = [device['id'] for device in self.non_ap_devices
+                    if device['type'] == 'CHIP-IM-Responder']
         req_ids = [device['id'] for device in self.non_ap_devices
                    if device['type'] == 'CHIP-IM-Initiator']
 
         req_device_id = req_ids[0]
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args chip-im-initiator {}"
+        for id in resp_ids:
+            self.execute_device_cmd(id, "CHIPCirqueDaemon.py run gdb -batch -return-child-result -q -ex run -ex bt {}".format(
+                os.path.join(CHIP_REPO, "out/debug/linux_x64_gcc/chip-im-responder")))
+
+        command = "gdb -return-child-result -q -ex run -ex bt --args "+ os.path.join(CHIP_REPO, "out/debug/linux_x64_gcc/chip-im-initiator") +" {}"
 
         for ip in resp_ips:
             ret = self.execute_device_cmd(

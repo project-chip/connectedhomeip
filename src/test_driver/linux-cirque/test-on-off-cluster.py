@@ -31,26 +31,30 @@ sh.setFormatter(
         '%(asctime)s [%(name)s] %(levelname)s %(message)s'))
 logger.addHandler(sh)
 
-DEVICE_CONFIG = {
-    'device0': {
-        'type': 'CHIP-Server',
-        'base_image': 'chip_server',
-        'capability': ['Thread', 'Interactive'],
-        'rcp_mode': True,
-    },
-    'device1': {
-        'type': 'CHIP-Tool',
-        'base_image': 'chip_tool',
-        'capability': ['Thread', 'Interactive'],
-        'rcp_mode': True,
-    }
-}
-
 SETUPPINCODE = 20202021
 DISCRIMINATOR = 1  # Randomw number, not used
 CHIP_PORT = 5540
+CHIP_REPO = os.path.join(os.path.abspath(
+    os.path.dirname(__file__)), "..", "..", "..")
 
 CIRQUE_URL = "http://localhost:5000"
+
+DEVICE_CONFIG = {
+    'device0': {
+        'type': 'CHIP-Server',
+        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'capability': ['Thread', 'Interactive', 'Mount'],
+        'rcp_mode': True,
+        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+    },
+    'device1': {
+        'type': 'CHIP-Tool',
+        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'capability': ['Thread', 'Interactive', 'Mount'],
+        'rcp_mode': True,
+        "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
+    }
+}
 
 
 class TestOnOffCluster(CHIPVirtualHome):
@@ -77,13 +81,17 @@ class TestOnOffCluster(CHIPVirtualHome):
         tool_device_id = tool_ids[0]
 
         for device_id in server_ids:
+            self.execute_device_cmd(device_id, "CHIPCirqueDaemon.py run {} --thread".format(
+                os.path.join(CHIP_REPO, "out/debug/standalone/chip-lighting-app")))
             server_ip_address.add(self.get_device_thread_ip(device_id))
 
-        command = "chip-tool onoff {} 1"
+        chip_tool_path = os.path.join(CHIP_REPO, "out/debug/standalone/chip-tool")
+
+        command = chip_tool_path + " onoff {} 1"
 
         for ip in server_ip_address:
             ret = self.execute_device_cmd(
-                tool_device_id, "chip-tool pairing softap {} {} {} {}".format(SETUPPINCODE, DISCRIMINATOR, ip, CHIP_PORT))
+                tool_device_id, chip_tool_path + " pairing softap {} {} {} {}".format(SETUPPINCODE, DISCRIMINATOR, ip, CHIP_PORT))
             self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format(
                 "pairing softap", ret['output']))
 

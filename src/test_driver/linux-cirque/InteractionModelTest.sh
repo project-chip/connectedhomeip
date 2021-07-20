@@ -24,21 +24,7 @@ REPO_DIR="$SOURCE_DIR/../../../"
 
 im_source=$REPO_DIR/src/app/tests/integration
 
-function build_image() {
-    # These files should be successfully compiled elsewhere.
-    source "$REPO_DIR/scripts/activate.sh" >/dev/null
-    set -x
-    cd "$im_source"
-    gn gen out >/dev/null
-    run_ninja -C out
-    docker build -t chip_im_initiator -f Dockerfile.initiator . 2>&1
-    docker build -t chip_im_responder -f Dockerfile.responder . 2>&1
-}
-
 function main() {
-    pushd .
-    build_image
-    popd
     python3 "$SOURCE_DIR/test-interaction-model.py"
 }
 

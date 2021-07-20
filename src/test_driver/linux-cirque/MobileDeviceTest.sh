@@ -25,31 +25,7 @@ REPO_DIR="$SOURCE_DIR/../../../"
 test_script_dir=$REPO_DIR/src/controller/python
 chip_light_dir=$REPO_DIR/examples/lighting-app/linux
 
-function build_chip_controller() {
-    # These files should be successfully compiled elsewhere.
-    source "$REPO_DIR/scripts/activate.sh" >/dev/null
-    set -x
-    cd "$test_script_dir"
-    gn gen --check --fail-on-unused-args out/debug >/dev/null
-    run_ninja -C out/debug
-    docker build -t chip_mobile_device -f test/Dockerfile . 2>&1
-}
-
-function build_chip_lighting() {
-    source "$REPO_DIR/scripts/activate.sh" >/dev/null
-    set -x
-    cd "$chip_light_dir"
-    gn gen --check --fail-on-unused-args out/debug
-    run_ninja -C out/debug
-    docker build -t chip_server -f Dockerfile . 2>&1
-    set +x
-}
-
 function main() {
-    pushd .
-    build_chip_controller
-    build_chip_lighting
-    popd
     python3 "$SOURCE_DIR/test-mobile-device.py"
 }
 

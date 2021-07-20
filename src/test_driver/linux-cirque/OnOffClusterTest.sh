@@ -25,31 +25,7 @@ REPO_DIR="$SOURCE_DIR/../../../"
 chip_tool_dir=$REPO_DIR/examples/chip-tool
 chip_light_dir=$REPO_DIR/examples/lighting-app/linux
 
-function build_chip_tool() {
-    # These files should be successfully compiled elsewhere.
-    source "$REPO_DIR/scripts/activate.sh" >/dev/null
-    set -x
-    cd "$chip_tool_dir"
-    gn gen --check --fail-on-unused-args out/debug >/dev/null
-    run_ninja -C out/debug
-    docker build -t chip_tool -f Dockerfile . 2>&1
-}
-
-function build_chip_lighting() {
-    source "$REPO_DIR/scripts/activate.sh" >/dev/null
-    set -x
-    cd "$chip_light_dir"
-    gn gen --check --fail-on-unused-args out/debug
-    run_ninja -C out/debug
-    docker build -t chip_server -f Dockerfile . 2>&1
-    set +x
-}
-
 function main() {
-    pushd .
-    build_chip_tool
-    build_chip_lighting
-    popd
     python3 "$SOURCE_DIR/test-on-off-cluster.py"
 }
 
