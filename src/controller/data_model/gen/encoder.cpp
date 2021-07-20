@@ -7044,4 +7044,3 @@ PacketBufferHandle encodeWindowCoveringClusterReadClusterRevisionAttribute(uint8
        .Put32(Globals::Attributes::Ids::ClusterRevision);
     COMMAND_FOOTER();
 }
-

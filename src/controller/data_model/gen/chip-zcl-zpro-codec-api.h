@@ -3741,4 +3741,3 @@ chip::System::PacketBufferHandle encodeWindowCoveringClusterConfigureSafetyStatu
  *    Encode a Window Covering server read command for the cluster revision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeWindowCoveringClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-

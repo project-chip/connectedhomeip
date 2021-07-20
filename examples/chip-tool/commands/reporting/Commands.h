@@ -59,7 +59,7 @@ public:
     delete onReportWindowCoveringCurrentPositionTiltPercent100thsCallback;
     delete onReportWindowCoveringSafetyStatusCallback;
     }
-    
+
     void AddReportCallbacks(uint8_t endpointId) override
     {
         chip::app::CHIPDeviceCallbacksMgr & callbacksMgr = chip::app::CHIPDeviceCallbacksMgr::GetInstance();

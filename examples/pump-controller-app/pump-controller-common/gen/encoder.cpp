@@ -639,4 +639,3 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
        .Put32(Globals::Attributes::Ids::ClusterRevision);
     COMMAND_FOOTER();
 }
-

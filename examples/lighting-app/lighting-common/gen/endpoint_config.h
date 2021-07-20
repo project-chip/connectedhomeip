@@ -895,5 +895,3 @@ const EmberAfGenericClusterFunction chipFuncArrayOccupancySensingServer[] = {\
   /* Endpoint: 1, Cluster: Occupancy Sensing (server) */ \
   { ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0406, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, {{ 0, 65344, 0 }} }, /* occupancy */ \
 }
-
-

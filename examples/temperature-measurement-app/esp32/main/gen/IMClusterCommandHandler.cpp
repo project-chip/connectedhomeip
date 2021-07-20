@@ -245,7 +245,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::GeneralCommissioning::Commands::Ids::CommissioningComplete: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj);
                     break;
@@ -1131,7 +1131,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::OperationalCredentials::Commands::Ids::RemoveAllFabrics: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(apCommandObj);
                     break;

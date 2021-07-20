@@ -785,5 +785,3 @@ const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {\
   { ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x000F, ZAP_CLUSTER_MASK(SERVER), 0x0000, {{ 0, 65344, 0 }} }, /* CurrentPositionTiltPercent100ths */ \
   { ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x001A, ZAP_CLUSTER_MASK(SERVER), 0x0000, {{ 0, 65344, 0 }} }, /* SafetyStatus */ \
 }
-
-
