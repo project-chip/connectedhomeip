@@ -27,7 +27,7 @@ LightingManager LightingManager::sLight;
 
 TimerHandle_t sLightTimer;
 
-int LightingManager::Init()
+CHIP_ERROR LightingManager::Init()
 {
     // Create FreeRTOS sw timer for light timer.
     sLightTimer = xTimerCreate("lightTmr",       // Just a text name, not used by the RTOS kernel
@@ -40,7 +40,7 @@ int LightingManager::Init()
     if (sLightTimer == NULL)
     {
         EFR32_LOG("sLightTimer timer create failed");
-        appError(APP_ERROR_CREATE_TIMER_FAILED);
+        return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
     mState                 = kState_OffCompleted;

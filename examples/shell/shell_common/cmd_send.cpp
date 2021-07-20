@@ -119,7 +119,6 @@ public:
         streamer_t * sout = streamer_get();
         streamer_printf(sout, "No response received\n");
 
-        gExchangeCtx->Close();
         gExchangeCtx = nullptr;
     }
 } gMockAppDelegate;

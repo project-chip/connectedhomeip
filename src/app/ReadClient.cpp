@@ -52,7 +52,13 @@ exit:
 void ReadClient::Shutdown()
 {
     AbortExistingExchangeContext();
+    ShutdownInternal();
+}
+
+void ReadClient::ShutdownInternal()
+{
     mpExchangeMgr = nullptr;
+    mpExchangeCtx = nullptr;
     mpDelegate    = nullptr;
     MoveToState(ClientState::Uninitialized);
 }
@@ -229,9 +235,6 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 exit:
     ChipLogFunctError(err);
 
-    // Null out mpExchangeCtx, so our Shutdown() call below won't try to abort
-    // it and fail to send an ack for the message we just received.
-    mpExchangeCtx = nullptr;
     MoveToState(ClientState::Initialized);
 
     if (mpDelegate != nullptr)
@@ -247,7 +250,7 @@ exit:
     }
 
     // TODO(#7521): Should close it after checking moreChunkedMessages flag is not set.
-    Shutdown();
+    ShutdownInternal();
 
     return err;
 }
@@ -351,7 +354,7 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
     {
         mpDelegate->ReportError(this, CHIP_ERROR_TIMEOUT);
     }
-    Shutdown();
+    ShutdownInternal();
 }
 
 CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader)

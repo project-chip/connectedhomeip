@@ -55,78 +55,78 @@ bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     }
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    switch (err)
+    switch (ChipError::AsInteger(err))
     {
-    case BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK:
+    case ChipError::AsInteger(BLE_ERROR_NO_CONNECTION_RECEIVED_CALLBACK):
         desc = "No chip over BLE connection received callback set";
         break;
-    case BLE_ERROR_CENTRAL_UNSUBSCRIBED:
+    case ChipError::AsInteger(BLE_ERROR_CENTRAL_UNSUBSCRIBED):
         desc = "BLE central unsubscribed";
         break;
-    case BLE_ERROR_GATT_SUBSCRIBE_FAILED:
+    case ChipError::AsInteger(BLE_ERROR_GATT_SUBSCRIBE_FAILED):
         desc = "GATT subscribe operation failed";
         break;
-    case BLE_ERROR_GATT_UNSUBSCRIBE_FAILED:
+    case ChipError::AsInteger(BLE_ERROR_GATT_UNSUBSCRIBE_FAILED):
         desc = "GATT unsubscribe operation failed";
         break;
-    case BLE_ERROR_GATT_WRITE_FAILED:
+    case ChipError::AsInteger(BLE_ERROR_GATT_WRITE_FAILED):
         desc = "GATT write characteristic operation failed";
         break;
-    case BLE_ERROR_GATT_INDICATE_FAILED:
+    case ChipError::AsInteger(BLE_ERROR_GATT_INDICATE_FAILED):
         desc = "GATT indicate characteristic operation failed";
         break;
-    case BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT:
+    case ChipError::AsInteger(BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT):
         desc = "BLE transport protocol fired abort";
         break;
-    case BLE_ERROR_REMOTE_DEVICE_DISCONNECTED:
+    case ChipError::AsInteger(BLE_ERROR_REMOTE_DEVICE_DISCONNECTED):
         desc = "Remote device closed BLE connection";
         break;
-    case BLE_ERROR_APP_CLOSED_CONNECTION:
+    case ChipError::AsInteger(BLE_ERROR_APP_CLOSED_CONNECTION):
         desc = "Application closed BLE connection";
         break;
-    case BLE_ERROR_NOT_CHIP_DEVICE:
+    case ChipError::AsInteger(BLE_ERROR_NOT_CHIP_DEVICE):
         desc = "BLE device doesn't seem to support chip";
         break;
-    case BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS:
+    case ChipError::AsInteger(BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS):
         desc = "Incompatible BLE transport protocol versions";
         break;
-    case BLE_ERROR_INVALID_FRAGMENT_SIZE:
+    case ChipError::AsInteger(BLE_ERROR_INVALID_FRAGMENT_SIZE):
         desc = "Invalid fragment size";
         break;
-    case BLE_ERROR_START_TIMER_FAILED:
+    case ChipError::AsInteger(BLE_ERROR_START_TIMER_FAILED):
         desc = "Start timer failed";
         break;
-    case BLE_ERROR_CONNECT_TIMED_OUT:
+    case ChipError::AsInteger(BLE_ERROR_CONNECT_TIMED_OUT):
         desc = "Connect handshake timed out";
         break;
-    case BLE_ERROR_RECEIVE_TIMED_OUT:
+    case ChipError::AsInteger(BLE_ERROR_RECEIVE_TIMED_OUT):
         desc = "Receive handshake timed out";
         break;
-    case BLE_ERROR_INVALID_MESSAGE:
+    case ChipError::AsInteger(BLE_ERROR_INVALID_MESSAGE):
         desc = "Invalid message";
         break;
-    case BLE_ERROR_FRAGMENT_ACK_TIMED_OUT:
+    case ChipError::AsInteger(BLE_ERROR_FRAGMENT_ACK_TIMED_OUT):
         desc = "Message fragment acknowledgement timed out";
         break;
-    case BLE_ERROR_KEEP_ALIVE_TIMED_OUT:
+    case ChipError::AsInteger(BLE_ERROR_KEEP_ALIVE_TIMED_OUT):
         desc = "Keep-alive receipt timed out";
         break;
-    case BLE_ERROR_NO_CONNECT_COMPLETE_CALLBACK:
+    case ChipError::AsInteger(BLE_ERROR_NO_CONNECT_COMPLETE_CALLBACK):
         desc = "Missing required callback";
         break;
-    case BLE_ERROR_INVALID_ACK:
+    case ChipError::AsInteger(BLE_ERROR_INVALID_ACK):
         desc = "Received invalid BLE transport protocol fragment acknowledgement";
         break;
-    case BLE_ERROR_REASSEMBLER_MISSING_DATA:
+    case ChipError::AsInteger(BLE_ERROR_REASSEMBLER_MISSING_DATA):
         desc = "BLE message reassembler did not receive enough data";
         break;
-    case BLE_ERROR_INVALID_BTP_HEADER_FLAGS:
+    case ChipError::AsInteger(BLE_ERROR_INVALID_BTP_HEADER_FLAGS):
         desc = "Received invalid BLE transport protocol header flags";
         break;
-    case BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER:
+    case ChipError::AsInteger(BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER):
         desc = "Received invalid BLE transport protocol sequence number";
         break;
-    case BLE_ERROR_REASSEMBLER_INCORRECT_STATE:
+    case ChipError::AsInteger(BLE_ERROR_REASSEMBLER_INCORRECT_STATE):
         desc = "BLE message reassembler received packet in incorrect state";
         break;
     }

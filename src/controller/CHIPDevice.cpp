@@ -289,7 +289,7 @@ CHIP_ERROR Device::Persist()
                           error = mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed to persist device %" CHIP_ERROR_FORMAT, error);
+            ChipLogError(Controller, "Failed to persist device %" CHIP_ERROR_FORMAT, ChipError::FormatError(error));
         }
     }
     return error;
@@ -306,7 +306,7 @@ void Device::OnNewConnection(SecureSessionHandle session)
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
     VerifyOrReturn(connectionState != nullptr);
     MessageCounter & localCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter();
-    if (localCounter.SetCounter(mLocalMessageCounter))
+    if (localCounter.SetCounter(mLocalMessageCounter) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Unable to restore local counter to %" PRIu32, mLocalMessageCounter);
     }
@@ -339,10 +339,7 @@ CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, cons
     return CHIP_NO_ERROR;
 }
 
-void Device::OnResponseTimeout(Messaging::ExchangeContext * ec)
-{
-    ec->Close();
-}
+void Device::OnResponseTimeout(Messaging::ExchangeContext * ec) {}
 
 CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
 {
@@ -377,6 +374,14 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     setupPayload.version               = 0;
     setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Device::CloseSession()
+{
+    ReturnErrorCodeIf(mState != ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    mSessionManager->ExpirePairing(mSecureSession);
+    mState = ConnectionState::NotConnected;
     return CHIP_NO_ERROR;
 }
 
@@ -484,7 +489,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "LoadSecureSessionParameters returning error %" CHIP_ERROR_FORMAT, err);
+        ChipLogError(Controller, "LoadSecureSessionParameters returning error %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
     }
     return err;
 }
@@ -508,12 +513,7 @@ void Device::OperationalCertProvisioned()
     mDeviceOperationalCertProvisioned = true;
 
     Persist();
-
-    if (mState == ConnectionState::SecureConnected)
-    {
-        mSessionManager->ExpirePairing(mSecureSession);
-        mState = ConnectionState::NotConnected;
-    }
+    CloseSession();
 }
 
 CHIP_ERROR Device::WarmupCASESession()
@@ -624,7 +624,7 @@ void Device::CancelResponseHandler(uint8_t seqNum)
     mCallbacksMgr.CancelResponseCallback(mDeviceId, seqNum);
 }
 
-void Device::AddIMResponseHandler(app::Command * commandObj, Callback::Cancelable * onSuccessCallback,
+void Device::AddIMResponseHandler(app::CommandSender * commandObj, Callback::Cancelable * onSuccessCallback,
                                   Callback::Cancelable * onFailureCallback)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
@@ -636,7 +636,7 @@ void Device::AddIMResponseHandler(app::Command * commandObj, Callback::Cancelabl
                                       onFailureCallback);
 }
 
-void Device::CancelIMResponseHandler(app::Command * commandObj)
+void Device::CancelIMResponseHandler(app::CommandSender * commandObj)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
     // there are only one active command transaction on one command sender object. This is a bit tricky, we try to assume that

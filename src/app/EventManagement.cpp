@@ -404,7 +404,7 @@ EventNumber CircularEventBuffer::VendEventNumber()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(EventLogging, "%s Advance() for priority %u failed with %" CHIP_ERROR_FORMAT, __FUNCTION__,
-                     static_cast<unsigned>(mPriority), err);
+                     static_cast<unsigned>(mPriority), ChipError::FormatError(err));
     }
 
     return mLastEventNumber;
@@ -690,13 +690,14 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
 
         loadOutContext->mPreviousSystemTime.mValue = loadOutContext->mCurrentSystemTime.mValue;
         loadOutContext->mFirst                     = false;
+        loadOutContext->mEventCount++;
     }
 
     return err;
 }
 
 CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * apClusterInfolist, PriorityLevel aPriority,
-                                             EventNumber & aEventNumber)
+                                             EventNumber & aEventNumber, size_t & aEventCount)
 {
     // TODO: Add particular set of event Paths in FetchEventsSince so that we can filter the interested paths
     CHIP_ERROR err     = CHIP_NO_ERROR;
@@ -729,7 +730,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
 
 exit:
     aEventNumber = context.mCurrentEventNumber;
-
+    aEventCount += context.mEventCount;
     return err;
 }
 

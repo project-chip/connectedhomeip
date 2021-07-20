@@ -443,7 +443,7 @@ public:
     }
     CHIP_ERROR ReportError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
-        printf("ReportError with err %" CHIP_ERROR_FORMAT, aError);
+        printf("ReportError with err %" CHIP_ERROR_FORMAT, chip::ChipError::FormatError(aError));
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * apCommandSender,
@@ -482,7 +482,7 @@ public:
 
     CHIP_ERROR CommandResponseError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override
     {
-        printf("CommandResponseError happens with %d", aError);
+        printf("CommandResponseError happens with %" CHIP_ERROR_FORMAT, chip::ChipError::FormatError(aError));
         return aError;
     }
 };
@@ -499,7 +499,13 @@ bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCom
 }
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
+                                  chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
+{
+    // Nothing todo.
+}
+
+void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                          chip::TLV::TLVReader & aReader, CommandSender * apCommandObj)
 {
     if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndpointId)
     {

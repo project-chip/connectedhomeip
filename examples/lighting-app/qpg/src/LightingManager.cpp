@@ -23,11 +23,11 @@
 
 LightingManager LightingManager::sLight;
 
-int LightingManager::Init()
+CHIP_ERROR LightingManager::Init()
 {
     mState = kState_Off;
     mLevel = 64;
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 bool LightingManager::IsTurnedOn()

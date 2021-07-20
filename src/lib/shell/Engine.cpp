@@ -50,7 +50,7 @@ void Engine::ForEachCommand(shell_command_iterator_t * on_command, void * arg)
     {
         for (unsigned j = 0; j < _commandSetSize[i]; j++)
         {
-            if (on_command(&_commandSet[i][j], arg))
+            if (on_command(&_commandSet[i][j], arg) != CHIP_NO_ERROR)
             {
                 return;
             }

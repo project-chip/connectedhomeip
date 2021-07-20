@@ -731,7 +731,7 @@ menu "CHIP Device Layer"
             help
                 The IP address and port of the server to which the device should establish a service tunnel.
                 The supplied address must be a dot-notation IP address--not a host name.  The port number is
-                optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:11097).
+                optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:5540).
 
         config LOG_PROVISIONING_HASH
             bool "Enable Provisioning Hash Logging"

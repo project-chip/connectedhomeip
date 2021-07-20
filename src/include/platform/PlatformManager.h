@@ -25,22 +25,9 @@
 
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
+#include <system/SystemLayer.h>
 
 namespace chip {
-namespace System {
-namespace Platform {
-namespace Layer {
-
-CHIP_ERROR PostEvent(System::Layer & aLayer, void * aContext, System::Object & aTarget, System::EventType aType,
-                     uintptr_t aArgument);
-CHIP_ERROR DispatchEvents(System::Layer & aLayer, void * aContext);
-CHIP_ERROR DispatchEvent(System::Layer & aLayer, void * aContext, System::Event aEvent);
-CHIP_ERROR StartTimer(System::Layer & aLayer, void * aContext, uint32_t aMilliseconds);
-
-} // namespace Layer
-} // namespace Platform
-} // namespace System
-
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
@@ -183,14 +170,13 @@ private:
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
     // Parentheses used to fix clang parsing issue with these declarations
-    friend ::CHIP_ERROR(::chip::System::Platform::Layer::PostEvent)(::chip::System::Layer & aLayer, void * aContext,
-                                                                    ::chip::System::Object & aTarget,
-                                                                    ::chip::System::EventType aType, uintptr_t aArgument);
-    friend ::CHIP_ERROR(::chip::System::Platform::Layer::DispatchEvents)(::chip::System::Layer & aLayer, void * aContext);
-    friend ::CHIP_ERROR(::chip::System::Platform::Layer::DispatchEvent)(::chip::System::Layer & aLayer, void * aContext,
-                                                                        ::chip::System::Event aEvent);
-    friend ::CHIP_ERROR(::chip::System::Platform::Layer::StartTimer)(::chip::System::Layer & aLayer, void * aContext,
-                                                                     uint32_t aMilliseconds);
+    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::PostEvent)(::chip::System::Layer & aLayer,
+                                                                       ::chip::System::Object & aTarget,
+                                                                       ::chip::System::EventType aType, uintptr_t aArgument);
+    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::DispatchEvents)(::chip::System::Layer & aLayer);
+    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::DispatchEvent)(::chip::System::Layer & aLayer,
+                                                                           ::chip::System::Event aEvent);
+    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::StartTimer)(::chip::System::Layer & aLayer, uint32_t aMilliseconds);
 
     void PostEvent(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);

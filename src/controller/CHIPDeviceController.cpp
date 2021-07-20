@@ -222,7 +222,7 @@ CHIP_ERROR DeviceController::GenerateOperationalCertificates(const ByteSpan & no
 
     ChipLogProgress(Controller, "Getting intermediate CA certificate from the issuer");
     CHIP_ERROR err = mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, icaCertSpan);
-    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" CHIP_ERROR_FORMAT, err);
+    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
     if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
     {
         // This implies that the commissioner application uses root CA to sign the operational
@@ -549,11 +549,11 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-#if CONFIG_DEVICE_LAYER && CHIP_SYSTEM_CONFIG_USE_IO_THREAD
-    DeviceLayer::SystemLayer.WakeIOThread();
+#if CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
+    DeviceLayer::SystemLayer.WatchableEvents().Signal();
 #else
     ReturnErrorOnFailure(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-#endif // CONFIG_DEVICE_LAYER && CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+#endif // CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
     return CHIP_NO_ERROR;
 }
@@ -722,7 +722,8 @@ exit:
     }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to initialize the device list with error: %" CHIP_ERROR_FORMAT, err);
+        ChipLogError(Controller, "Failed to initialize the device list with error: %" CHIP_ERROR_FORMAT,
+                     ChipError::FormatError(err));
     }
 
     return err;
@@ -822,7 +823,7 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     uint16_t nextKeyID = 0;
     uint16_t size      = sizeof(nextKeyID);
     CHIP_ERROR error   = mStorageDelegate->SyncGetKeyValue(kNextAvailableKeyID, &nextKeyID, size);
-    if (error || (size != sizeof(nextKeyID)))
+    if ((error != CHIP_NO_ERROR) || (size != sizeof(nextKeyID)))
     {
         nextKeyID = 0;
     }

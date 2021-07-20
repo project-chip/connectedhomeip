@@ -38,7 +38,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
@@ -48,7 +48,7 @@ EmberAfTvChannelInfo tvChannelClusterChangeChannel(std::string match);
 bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumer, uint16_t minorNumber);
 bool tvChannelClusterSkipChannel(uint16_t count);
 
-void sendResponse(chip::app::Command * command, EmberAfTvChannelInfo channelInfo)
+void sendResponse(chip::app::CommandHandler * command, EmberAfTvChannelInfo channelInfo)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TV_CHANNEL_CLUSTER_ID,
@@ -69,7 +69,7 @@ exit:
     }
 }
 
-bool emberAfTvChannelClusterChangeChannelCallback(chip::app::Command * command, uint8_t * match)
+bool emberAfTvChannelClusterChangeChannelCallback(chip::app::CommandHandler * command, uint8_t * match)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string matchString(reinterpret_cast<char *>(match));
@@ -80,7 +80,8 @@ bool emberAfTvChannelClusterChangeChannelCallback(chip::app::Command * command, 
     return true;
 }
 
-bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::Command * command, uint16_t majorNumber, uint16_t minorNumber)
+bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::CommandHandler * command, uint16_t majorNumber,
+                                                          uint16_t minorNumber)
 {
     bool success         = tvChannelClusterChangeChannelByNumber(majorNumber, minorNumber);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -88,7 +89,7 @@ bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::Command * c
     return true;
 }
 
-bool emberAfTvChannelClusterSkipChannelCallback(chip::app::Command * command, uint16_t count)
+bool emberAfTvChannelClusterSkipChannelCallback(chip::app::CommandHandler * command, uint16_t count)
 {
     bool success         = tvChannelClusterSkipChannel(count);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;

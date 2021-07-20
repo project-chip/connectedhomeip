@@ -22,7 +22,6 @@
 #include "AppEvent.h"
 #include "ButtonHandler.h"
 #include "LEDWidget.h"
-#include "Service.h"
 #include "lcd.h"
 #include "qrcodegen.h"
 #include <app/common/gen/attribute-id.h>
@@ -158,11 +157,9 @@ CHIP_ERROR AppTask::Init()
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
-    int err;
     AppEvent event;
-    uint64_t mLastChangeTimeUS = 0;
 
-    err = sAppTask.Init();
+    CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("AppTask.Init() failed");
@@ -170,7 +167,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     EFR32_LOG("App Task started");
-    SetDeviceName("EFR32LightingDemo._matter._udp.local.");
 
     while (true)
     {
@@ -231,15 +227,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 
         sStatusLED.Animate();
         sLightLED.Animate();
-
-        uint64_t nowUS            = chip::System::Clock::GetMonotonicMicroseconds();
-        uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
-
-        if (nowUS > nextChangeTimeUS)
-        {
-            PublishService();
-            mLastChangeTimeUS = nowUS;
-        }
     }
 }
 

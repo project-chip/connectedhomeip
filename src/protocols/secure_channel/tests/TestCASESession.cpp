@@ -112,9 +112,9 @@ static CHIP_ERROR InitCredentialSets()
 
     ReturnErrorOnFailure(accessoryOpKeys.Deserialize(accessoryOpKeysSerialized));
 
-    ReturnErrorOnFailure(commissionerCertificateSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength));
+    ReturnErrorOnFailure(commissionerCertificateSet.Init(kStandardCertsCount));
 
-    ReturnErrorOnFailure(accessoryCertificateSet.Init(kStandardCertsCount, kMaxCHIPCertDecodeBufLength));
+    ReturnErrorOnFailure(accessoryCertificateSet.Init(kStandardCertsCount));
 
     // Add the trusted root certificate to the certificate set.
     ReturnErrorOnFailure(commissionerCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,
@@ -459,7 +459,7 @@ int CASE_TestSecurePairing_Teardown(void * inContext);
 // clang-format off
 static nlTestSuite sSuite =
 {
-    "Test-CHIP-SecurePairing",
+    "Test-CHIP-SecurePairing-CASE",
     &sTests[0],
     CASE_TestSecurePairing_Setup,
     CASE_TestSecurePairing_Teardown,

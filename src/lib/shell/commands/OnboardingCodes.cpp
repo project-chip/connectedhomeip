@@ -80,15 +80,13 @@ static CHIP_ERROR GetOnboardingManualPairingCode(bool printHeader)
     return CHIP_NO_ERROR;
 }
 
-static int PrintAllOnboardingCodes()
+static CHIP_ERROR PrintAllOnboardingCodes()
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    ReturnErrorOnFailure(GetOnboardingQRCode(true));
+    ReturnErrorOnFailure(GetOnboardingQRCodeUrl(true));
+    ReturnErrorOnFailure(GetOnboardingManualPairingCode(true));
 
-    error |= GetOnboardingQRCode(true);
-    error |= GetOnboardingQRCodeUrl(true);
-    error |= GetOnboardingManualPairingCode(true);
-
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR OnboardingHandler(int argc, char ** argv)

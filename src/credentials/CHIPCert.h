@@ -33,6 +33,7 @@
 #include <core/CHIPConfig.h>
 #include <core/CHIPTLV.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/PeerId.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 
@@ -365,9 +366,6 @@ public:
         aOther.mCerts        = nullptr;
         mCertCount           = aOther.mCertCount;
         mMaxCerts            = aOther.mMaxCerts;
-        mDecodeBuf           = aOther.mDecodeBuf;
-        aOther.mDecodeBuf    = nullptr;
-        mDecodeBufSize       = aOther.mDecodeBufSize;
         mMemoryAllocInternal = aOther.mMemoryAllocInternal;
 
         return *this;
@@ -379,11 +377,10 @@ public:
      *        allocated internally using chip::Platform::MemoryAlloc() and freed with chip::Platform::MemoryFree().
      *
      * @param maxCertsArraySize  Maximum number of CHIP certificates to be loaded to the set.
-     * @param decodeBufSize      Size of the buffer that should be allocated to perform CHIP certificate decoding.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Init(uint8_t maxCertsArraySize, uint16_t decodeBufSize);
+    CHIP_ERROR Init(uint8_t maxCertsArraySize);
 
     /**
      * @brief Initialize ChipCertificateSet.
@@ -392,12 +389,10 @@ public:
      *
      * @param certsArray      A pointer to the array of the ChipCertificateData structures.
      * @param certsArraySize  Number of ChipCertificateData entries in the array.
-     * @param decodeBuf       Buffer to use for temporary storage of intermediate processing results.
-     * @param decodeBufSize   Size of decoding buffer.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Init(ChipCertificateData * certsArray, uint8_t certsArraySize, uint8_t * decodeBuf, uint16_t decodeBufSize);
+    CHIP_ERROR Init(ChipCertificateData * certsArray, uint8_t certsArraySize);
 
     /**
      * @brief Release resources allocated by this class.
@@ -543,8 +538,6 @@ private:
                                      had their constructor called, or have had
                                      their destructor called since then. */
     uint8_t mMaxCerts;            /**< Length of mCerts array. */
-    uint8_t * mDecodeBuf;         /**< Certificate decode buffer. */
-    uint16_t mDecodeBufSize;      /**< Certificate decode buffer size. */
     bool mMemoryAllocInternal;    /**< Indicates whether temporary memory buffers are allocated internally. */
 
     /**
@@ -854,6 +847,37 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1::AS
  * @retval  #CHIP_NO_ERROR  If the signature value was successfully converted.
  */
 CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::TLVWriter & writer, uint64_t tag);
+
+/**
+ * Extract a PeerId from an operational certificate that has already been
+ * parsed.
+ *
+ * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have at
+ * least one NodeId RDN and one FabricId RDN in the Subject DN.  No other
+ * validation (e.g. checkign that there is exactly one RDN of each type) is
+ * performed.
+ */
+CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, PeerId * peerId);
+
+/**
+ * Extract a PeerId from an operational certificate in ByteSpan TLV-encoded
+ * form.  This does not perform any sort of validation on the certificate
+ * structure other than parsing it.
+ *
+ * Can return any error that can be returned from parsing the cert or from the
+ * ChipCertificateData* version of ExtractPeerIdFromOpCert.
+ */
+CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId);
+
+/**
+ * Extract a PeerId from an operational certificate array in ByteSpan
+ * TLV-encoded form.  This does not perform any sort of validation on the
+ * certificate structure other than parsing it.
+ *
+ * Can return any error that can be returned from parsing the array or from the
+ * ChipCertificateData* version of ExtractPeerIdFromOpCert.
+ */
+CHIP_ERROR ExtractPeerIdFromOpCertArray(const ByteSpan & opcertarray, PeerId * peerId);
 
 } // namespace Credentials
 } // namespace chip

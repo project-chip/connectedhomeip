@@ -42,7 +42,7 @@ public:
         return *this;
     }
 
-    NodeId GetFabricId() const { return mFabricId; }
+    FabricId GetFabricId() const { return mFabricId; }
     PeerId & SetFabricId(FabricId id)
     {
         mFabricId = id;
