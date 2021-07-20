@@ -118,8 +118,8 @@ static void TestChipOperationalCredentials_CertValidation(nlTestSuite * inSuite,
 
     for (unsigned i = 0; i < sNumValidationTestCases; i++)
     {
-        ChipCertificateData * resultCert    = nullptr;
-        const ValidationTestCase & testCase = sValidationTestCases[i];
+        const ChipCertificateData * resultCert = nullptr;
+        const ValidationTestCase & testCase    = sValidationTestCases[i];
 
         err = certSet.Init(kMaxCertsPerTestCase);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -160,7 +160,7 @@ static void TestChipOperationalCredentials_CertValidation(nlTestSuite * inSuite,
         const CertificateKeyId & trustedRootId = certSet.GetCertSet()[testCase.mExpectedTrustAnchorIndex].mAuthKeyId;
 
         // Invoke the FindValidCert() method (the method being tested).
-        err = opCredSet.FindValidCert(trustedRootId, subjectDN, subjectKeyId, validContext, resultCert);
+        err = opCredSet.FindValidCert(trustedRootId, subjectDN, subjectKeyId, validContext, &resultCert);
         NL_TEST_ASSERT(inSuite, err == testCase.mExpectedResult);
 
         // If the test case is expected to be successful...
