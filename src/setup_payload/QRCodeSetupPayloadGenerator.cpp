@@ -213,8 +213,7 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string 
 
     bits.reserve(kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes);
 
-    ReturnErrorOnFailure(payloadBase38RepresentationWithTLV(mPayload, buffer, kQRCodeMaxCharLength,
-                                                            bits.data(), bits.capacity(),
+    ReturnErrorOnFailure(payloadBase38RepresentationWithTLV(mPayload, buffer, kQRCodeMaxCharLength, bits.data(), bits.capacity(),
                                                             tlvDataStart, tlvDataLengthInBytes));
 
     base38Representation.assign(buffer);
