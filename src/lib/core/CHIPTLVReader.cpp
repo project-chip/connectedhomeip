@@ -207,34 +207,41 @@ CHIP_ERROR TLVReader::Get(uint64_t & v)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Get(double & v)
+namespace {
+template <typename T>
+CHIP_ERROR GetFloatingImpl(TLVElementType elementType, uint64_t elemLenOrVal, T & v)
 {
-    switch (ElementType())
+    switch (elementType)
     {
     case TLVElementType::FloatingPointNumber32: {
-        union
-        {
-            uint32_t u32;
-            float f;
-        } cvt;
-        cvt.u32 = static_cast<uint32_t>(mElemLenOrVal);
-        v       = cvt.f;
+        float f;
+        auto u32 = static_cast<uint32_t>(elemLenOrVal);
+        memcpy(&f, &u32, sizeof(f));
+        v = f;
         break;
     }
     case TLVElementType::FloatingPointNumber64: {
-        union
-        {
-            uint64_t u64;
-            double d;
-        } cvt;
-        cvt.u64 = mElemLenOrVal;
-        v       = cvt.d;
+        double d;
+        memcpy(&d, &elemLenOrVal, sizeof(d));
+        v = d;
         break;
     }
     default:
         return CHIP_ERROR_WRONG_TLV_TYPE;
     }
     return CHIP_NO_ERROR;
+}
+} // namespace
+
+
+CHIP_ERROR TLVReader::Get(float & v)
+{
+    return GetFloatingImpl(ElementType(), mElemLenOrVal, v);
+}
+
+CHIP_ERROR TLVReader::Get(double & v)
+{
+    return GetFloatingImpl(ElementType(), mElemLenOrVal, v);
 }
 
 CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, uint32_t bufSize)
