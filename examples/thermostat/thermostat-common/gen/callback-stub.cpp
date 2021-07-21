@@ -130,9 +130,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_PRESSURE_MEASUREMENT_CLUSTER_ID:
         emberAfPressureMeasurementClusterInitCallback(endpoint);
         break;
-    case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
-        emberAfPumpConfigurationAndControlClusterInitCallback(endpoint);
-        break;
     case ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID:
         emberAfRelativeHumidityMeasurementClusterInitCallback(endpoint);
         break;
@@ -344,11 +341,6 @@ void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(Endp
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfPressureMeasurementClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfPumpConfigurationAndControlClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
