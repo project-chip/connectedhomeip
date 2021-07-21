@@ -65,6 +65,7 @@ CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
 CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, Inet::IPAddressType addressType,
                           Inet::InterfaceId interface, MdnsBrowseCallback callback, void * context)
 {
+    // TODO: Implement DNS-SD browse for Android
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -119,16 +120,16 @@ void InitializeWithObject(jobject resolverObject)
     }
 }
 
-void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jlong callback, jlong context)
+void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jlong callbackHandle, jlong contextHandle)
 {
-    VerifyOrReturn(callback != 0, ChipLogError(Discovery, "HandleResolve called with callback equal to nullptr"));
+    VerifyOrReturn(callbackHandle != 0, ChipLogError(Discovery, "HandleResolve called with callback equal to nullptr"));
 
-    const auto dispatch = [callback, context](CHIP_ERROR error, MdnsService * service = nullptr) {
-        MdnsResolveCallback resolveCallback = reinterpret_cast<MdnsResolveCallback>(callback);
-        resolveCallback(reinterpret_cast<void *>(context), service, error);
+    const auto dispatch = [callbackHandle, contextHandle](CHIP_ERROR error, MdnsService * service = nullptr) {
+        MdnsResolveCallback callback = reinterpret_cast<MdnsResolveCallback>(callbackHandle);
+        callback(reinterpret_cast<void *>(contextHandle), service, error);
     };
 
-    VerifyOrReturn(address != 0 && port != 0, dispatch(CHIP_ERROR_UNKNOWN_RESOURCE_ID));
+    VerifyOrReturn(address != nullptr && port != 0, dispatch(CHIP_ERROR_UNKNOWN_RESOURCE_ID));
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     JniUtfString jniInstanceName(env, instanceName);

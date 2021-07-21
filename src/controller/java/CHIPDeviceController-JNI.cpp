@@ -270,11 +270,12 @@ JNI_METHOD(void, setServiceResolver)(JNIEnv * env, jclass self, jobject resolver
 }
 
 JNI_METHOD(void, handleServiceResolve)
-(JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring address, jint port, jlong callback, jlong context)
+(JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring address, jint port, jlong callbackHandle,
+ jlong contextHandle)
 {
     using namespace chip::Mdns;
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    HandleResolve(instanceName, serviceType, address, port, callback, context);
+    HandleResolve(instanceName, serviceType, address, port, callbackHandle, contextHandle);
 }
 
 JNI_METHOD(void, pairDevice)
