@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      Utility header to decode a Base38 String
+ *      Functions to decode a Base38 String
  */
 
 #pragma once

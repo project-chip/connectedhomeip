@@ -29,6 +29,8 @@
 
 #include "SetupPayload.h"
 
+#include <support/Span.h>
+
 #pragma once
 
 namespace chip {
@@ -87,8 +89,6 @@ public:
      *
      * @param[out] outBuffer
      *                  The buffer to copy the base38 to.
-     * @param[in]  outBufferSize
-     *                  The size of the output buffer.
      *
      * @retval #CHIP_NO_ERROR if the method succeeded.
      * @retval #CHIP_ERROR_INVALID_ARGUMENT if the payload is invalid.
@@ -96,7 +96,7 @@ public:
      *               that an error occurred preventing the function from
      *               producing the requested string.
      */
-    CHIP_ERROR payloadBase38Representation(char * outBuffer, size_t outBufferSize);
+    CHIP_ERROR payloadBase38RepresentationWithoutOptional(MutableCharSpan & outBuffer)
 
 private:
     CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,

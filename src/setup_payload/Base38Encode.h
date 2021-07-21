@@ -24,11 +24,13 @@
 
 #include "Base38.h"
 
+#include <support/Span.h>
+
 #include <stddef.h>
 
 namespace chip {
 
 // returns CHIP_NO_ERROR on successful encode
-CHIP_ERROR base38Encode(const uint8_t * in_buf, size_t in_buf_len, char * out_buf, size_t out_buf_len);
+CHIP_ERROR base38Encode(ByteSpan in_buf, MutableCharSpan & out_buf);
 
 } // namespace chip
