@@ -31,7 +31,8 @@ void InitializeWithObject(jobject resolverObject);
 /**
  * Pass results of the service resolution to the CHIP stack.
  */
-void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jlong callback, jlong context);
+void HandleResolve(jstring instanceName, jstring serviceType, jstring address, jint port, jlong callbackHandle,
+                   jlong contextHandle);
 
 } // namespace Mdns
 } // namespace chip
