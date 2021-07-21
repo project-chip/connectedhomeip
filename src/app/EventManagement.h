@@ -381,6 +381,7 @@ public:
      *                         completion, the event number of the last event
      *                         fetched.
      *
+     * @param[out] aEventCount The number of fetched event
      * @retval #CHIP_END_OF_TLV             The function has reached the end of the
      *                                       available log entries at the specified
      *                                       priority level
@@ -395,7 +396,7 @@ public:
      *
      */
     CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, PriorityLevel aPriority,
-                                EventNumber & aEventNumber);
+                                EventNumber & aEventNumber, size_t & aEventCount);
 
     /**
      * @brief

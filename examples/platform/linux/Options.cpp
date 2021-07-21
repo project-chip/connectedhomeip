@@ -37,6 +37,8 @@ enum
     kDeviceOption_Thread    = 0x1002,
 };
 
+constexpr unsigned kAppUsageLength = 64;
+
 OptionDef sDeviceOptionDefs[] = { { "ble-device", kArgumentRequired, kDeviceOption_BleDevice },
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
                                   { "wifi", kNoArgument, kDeviceOption_WiFi },
@@ -94,11 +96,17 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 OptionSet sDeviceOptions = { HandleOption, sDeviceOptionDefs, "GENERAL OPTIONS", sDeviceOptionHelp };
 
-OptionSet * sLinuxDeviceOptionSets[] = { &sDeviceOptions, nullptr };
+OptionSet * sLinuxDeviceOptionSets[] = { &sDeviceOptions, nullptr, nullptr };
 } // namespace
 
 CHIP_ERROR ParseArguments(int argc, char * argv[])
 {
+    char usage[kAppUsageLength];
+    snprintf(usage, kAppUsageLength, "Usage: %s [options]", argv[0]);
+
+    HelpOptions helpOptions(argv[0], usage, "1.0");
+    sLinuxDeviceOptionSets[1] = &helpOptions;
+
     if (!ParseArgs(argv[0], argc, argv, sLinuxDeviceOptionSets))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;

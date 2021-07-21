@@ -304,7 +304,13 @@ CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * o
 
 Hash_SHA256_stream::Hash_SHA256_stream() {}
 
-Hash_SHA256_stream::~Hash_SHA256_stream() {}
+Hash_SHA256_stream::~Hash_SHA256_stream()
+{
+    Clear();
+}
+
+static_assert(kMAX_Hash_SHA256_Context_Size >= sizeof(SHA256_CTX),
+              "kMAX_Hash_SHA256_Context_Size is too small for the size of underlying SHA256_CTX");
 
 static inline SHA256_CTX * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
 {
@@ -321,29 +327,47 @@ CHIP_ERROR Hash_SHA256_stream::Begin()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Hash_SHA256_stream::AddData(const uint8_t * data, const size_t data_length)
+CHIP_ERROR Hash_SHA256_stream::AddData(const ByteSpan data)
 {
     SHA256_CTX * const context = to_inner_hash_sha256_context(&mContext);
 
-    const int result = SHA256_Update(context, Uint8::to_const_uchar(data), data_length);
+    const int result = SHA256_Update(context, Uint8::to_const_uchar(data.data()), data.size());
     VerifyOrReturnError(result == 1, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Hash_SHA256_stream::Finish(uint8_t * out_buffer)
+CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
 {
-    SHA256_CTX * const context = to_inner_hash_sha256_context(&mContext);
+    SHA256_CTX * context = to_inner_hash_sha256_context(&mContext);
 
-    const int result = SHA256_Final(Uint8::to_uchar(out_buffer), context);
+    // Back-up context as we are about to finalize the hash to extract digest.
+    SHA256_CTX previous_ctx = *context;
+
+    // Pad + compute digest, then finalize context. It is restored next line to continue.
+    CHIP_ERROR result = Finish(out_buffer);
+
+    // Restore context prior to finalization.
+    *context = previous_ctx;
+
+    return result;
+}
+
+CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
+{
+    VerifyOrReturnError(out_buffer.size() >= kSHA256_Hash_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    SHA256_CTX * const context = to_inner_hash_sha256_context(&mContext);
+    const int result           = SHA256_Final(Uint8::to_uchar(out_buffer.data()), context);
     VerifyOrReturnError(result == 1, CHIP_ERROR_INTERNAL);
+    out_buffer = out_buffer.SubSpan(0, kSHA256_Hash_Length);
 
     return CHIP_NO_ERROR;
 }
 
 void Hash_SHA256_stream::Clear()
 {
-    memset(this, 0, sizeof(*this));
+    OPENSSL_cleanse(this, sizeof(*this));
 }
 
 CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,

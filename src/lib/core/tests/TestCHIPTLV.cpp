@@ -2732,8 +2732,12 @@ void TestCHIPTLVWriterErrorHandling(nlTestSuite * inSuite)
     err = writer.OpenContainer(ProfileTag(TestProfile_1, 1), kTLVType_Boolean, writer2);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
 
+    // Since OpenContainer failed, writer2 remains uninitialized.
+    writer2.Init(nullptr, 0);
+
     // CloseContainer() for non-container
     err = writer.CloseContainer(writer2);
+    printf("%s\n", ErrorStr(err));
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // OpenContainer() failure

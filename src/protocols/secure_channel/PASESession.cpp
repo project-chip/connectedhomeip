@@ -186,7 +186,7 @@ CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, SessionEstabl
     Clear();
 
     ReturnErrorOnFailure(mCommissioningHash.Begin());
-    ReturnErrorOnFailure(mCommissioningHash.AddData(Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext)));
+    ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext) }));
 
     mDelegate = delegate;
 
@@ -230,7 +230,7 @@ CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, bool useRa
 
 CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen)
 {
-    uint8_t context[32] = {
+    uint8_t context[kSHA256_Hash_Length] = {
         0,
     };
 
@@ -242,8 +242,10 @@ CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * s
         ReturnErrorOnFailure(PASESession::ComputePASEVerifier(mSetupPINCode, pbkdf2IterCount, salt, saltLen, mPASEVerifier));
     }
 
-    ReturnErrorOnFailure(mCommissioningHash.Finish(context));
-    ReturnErrorOnFailure(mSpake2p.Init(context, sizeof(context)));
+    MutableByteSpan contextSpan{ context, sizeof(context) };
+
+    ReturnErrorOnFailure(mCommissioningHash.Finish(contextSpan));
+    ReturnErrorOnFailure(mSpake2p.Init(contextSpan.data(), contextSpan.size()));
 
     return CHIP_NO_ERROR;
 }
@@ -356,7 +358,7 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     req->SetDataLength(kPBKDFParamRandomNumberSize);
 
     // Update commissioning hash with the pbkdf2 param request that's being sent.
-    ReturnErrorOnFailure(mCommissioningHash.AddData(req->Start(), req->DataLength()));
+    ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ req->Start(), req->DataLength() }));
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PBKDFParamResponse;
 
@@ -382,7 +384,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(const System::PacketBufferHandle
     ChipLogDetail(SecureChannel, "Received PBKDF param request");
 
     // Update commissioning hash with the received pbkdf2 param request
-    err = mCommissioningHash.AddData(req, reqlen);
+    err = mCommissioningHash.AddData(ByteSpan{ req, reqlen });
     SuccessOrExit(err);
 
     err = SendPBKDFParamResponse();
@@ -427,7 +429,7 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse()
     resp->SetDataLength(static_cast<uint16_t>(resplen));
 
     // Update commissioning hash with the pbkdf2 param response that's being sent.
-    ReturnErrorOnFailure(mCommissioningHash.AddData(resp->Start(), resp->DataLength()));
+    ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ resp->Start(), resp->DataLength() }));
     ReturnErrorOnFailure(SetupSpake2p(mIterationCount, mSalt, mSaltLength));
     ReturnErrorOnFailure(mSpake2p.ComputeL(mPoint, &sizeof_point, &mPASEVerifier[1][0], kSpake2p_WS_Length));
 
@@ -471,7 +473,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(const System::PacketBufferHandl
         VerifyOrExit(CanCastTo<uint32_t>(iterCount), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
         // Update commissioning hash with the received pbkdf2 param response
-        err = mCommissioningHash.AddData(resp, resplen);
+        err = mCommissioningHash.AddData(ByteSpan{ resp, resplen });
         SuccessOrExit(err);
 
         err = SetupSpake2p(static_cast<uint32_t>(iterCount), msgptr, saltlen);
