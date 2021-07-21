@@ -127,7 +127,7 @@ CHIP_ERROR Layer::Init()
         return CHIP_ERROR_INCORRECT_STATE;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    mWatchableEvents.Init(*this);
+    ReturnErrorOnFailure(mWatchableEvents.Init(*this));
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     this->AddEventHandlerDelegate(sSystemEventHandlerDelegate);
@@ -154,7 +154,7 @@ CHIP_ERROR Layer::Shutdown()
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    mWatchableEvents.Shutdown();
+    ReturnErrorOnFailure(mWatchableEvents.Shutdown());
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     this->mLayerState = kLayerState_NotInitialized;

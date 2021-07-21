@@ -39,7 +39,7 @@ void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    mSocket.Init(aInetLayer.SystemLayer()->WatchableEvents());
+    (void) mSocket.Init(aInetLayer.SystemLayer()->WatchableEvents());
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 

@@ -47,7 +47,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         new (&mQueue) events::EventQueue(event_size * CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
 
         mQueue.background([&](int t) {
-            MbedEventTimeout::AttachTimeout([&] { SystemLayer.WatchableEvents().Signal(); }, std::chrono::milliseconds{ t });
+            MbedEventTimeout::AttachTimeout([&] { (void) SystemLayer.WatchableEvents().Signal(); }, std::chrono::milliseconds{ t });
         });
 
         // Reinitialize the Mutexes

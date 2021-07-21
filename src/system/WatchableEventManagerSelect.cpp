@@ -45,7 +45,7 @@ void HandleMdnsTimeout();
 namespace chip {
 namespace System {
 
-void WatchableEventManager::Init(Layer & systemLayer)
+CHIP_ERROR WatchableEventManager::Init(Layer & systemLayer)
 {
     mSystemLayer = &systemLayer;
     mMaxFd       = -1;
@@ -54,16 +54,17 @@ void WatchableEventManager::Init(Layer & systemLayer)
     FD_ZERO(&mRequest.mErrorSet);
 
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
-    mWakeEvent.Open(*this);
+    return mWakeEvent.Open(*this);
 }
 
-void WatchableEventManager::Shutdown()
+CHIP_ERROR WatchableEventManager::Shutdown()
 {
-    mWakeEvent.Close();
-    mSystemLayer = nullptr;
+    CHIP_ERROR error = mWakeEvent.Close();
+    mSystemLayer     = nullptr;
+    return error;
 }
 
-void WatchableEventManager::Signal()
+CHIP_ERROR WatchableEventManager::Signal()
 {
     /*
      * Wake up the I/O thread by writing a single byte to the wake pipe.
@@ -77,7 +78,7 @@ void WatchableEventManager::Signal()
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     if (pthread_equal(mSystemLayer->mHandleSelectThread, pthread_self()))
     {
-        return;
+        return CHIP_NO_ERROR;
     }
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
@@ -87,6 +88,7 @@ void WatchableEventManager::Signal()
     {
         ChipLogError(chipSystemLayer, "System wake event notify failed: %" CHIP_ERROR_FORMAT, ChipError::FormatError(status));
     }
+    return status;
 }
 
 /**
@@ -125,7 +127,7 @@ bool WatchableEventManager::HasAny(int fd)
     return FD_ISSET(fd, &mRequest.mReadSet) || FD_ISSET(fd, &mRequest.mWriteSet) || FD_ISSET(fd, &mRequest.mErrorSet);
 }
 
-void WatchableEventManager::Set(int fd, fd_set * fds)
+CHIP_ERROR WatchableEventManager::Set(int fd, fd_set * fds)
 {
     FD_SET(fd, fds);
     if (fd > mMaxFd)
@@ -133,10 +135,10 @@ void WatchableEventManager::Set(int fd, fd_set * fds)
         mMaxFd = fd;
     }
     // Wake the thread calling select so that it starts selecting on the new socket.
-    Signal();
+    return Signal();
 }
 
-void WatchableEventManager::Clear(int fd, fd_set * fds)
+CHIP_ERROR WatchableEventManager::Clear(int fd, fd_set * fds)
 {
     FD_CLR(fd, fds);
     if (fd == mMaxFd)
@@ -144,7 +146,7 @@ void WatchableEventManager::Clear(int fd, fd_set * fds)
         MaybeLowerMaxFd();
     }
     // Wake the thread calling select so that it starts selecting on the new socket.
-    Signal();
+    return Signal();
 }
 
 void WatchableEventManager::Reset(int fd)

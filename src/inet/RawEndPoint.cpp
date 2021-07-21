@@ -352,7 +352,7 @@ CHIP_ERROR RawEndPoint::BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & 
 
 optfail:
     res = chip::System::MapErrorPOSIX(errno);
-    mSocket.Close();
+    (void) mSocket.Close(); // prefer to return the earlier error.
     mAddrType = kIPAddressType_Unknown;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -425,7 +425,7 @@ CHIP_ERROR RawEndPoint::Listen(IPEndPointBasis::OnMessageReceivedFunct onMessage
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Wait for ability to read on this endpoint.
     mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
-    mSocket.RequestCallbackOnPendingRead();
+    ReturnErrorOnFailure(mSocket.RequestCallbackOnPendingRead());
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return CHIP_NO_ERROR;
@@ -468,7 +468,7 @@ void RawEndPoint::Close()
 
         if (mSocket.HasFD())
         {
-            mSocket.Close();
+            (void) mSocket.Close();
         }
 
         // Clear any results from select() that indicate pending I/O for the socket.

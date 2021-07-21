@@ -71,30 +71,25 @@ CHIP_ERROR WakeEvent::Open(WatchableEventManager & watchState)
     if (SetNonBlockingMode(fds[FD_WRITE]) < 0)
         return chip::System::MapErrorPOSIX(errno);
 
-    mFD.Init(watchState);
-    mFD.Attach(fds[FD_READ]);
-    mFD.SetCallback(Confirm, reinterpret_cast<intptr_t>(this));
-    mFD.RequestCallbackOnPendingRead();
-
     mWriteFD = fds[FD_WRITE];
+
+    mFD.Init(watchState);
+    ReturnErrorOnFailure(mFD.Attach(fds[FD_READ]));
+    mFD.SetCallback(Confirm, reinterpret_cast<intptr_t>(this));
+    ReturnErrorOnFailure(mFD.RequestCallbackOnPendingRead());
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WakeEvent::Close()
 {
-    int res = 0;
-
-    res |= mFD.Close();
-    res |= ::close(mWriteFD);
-    mWriteFD = -1;
-
-    if (res < 0)
+    CHIP_ERROR err = mFD.Close();
+    if (::close(mWriteFD))
     {
-        return chip::System::MapErrorPOSIX(errno);
+        err = chip::System::MapErrorPOSIX(errno);
     }
-
-    return CHIP_NO_ERROR;
+    mWriteFD = -1;
+    return err;
 }
 
 void WakeEvent::Confirm()

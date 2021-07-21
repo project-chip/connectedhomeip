@@ -40,7 +40,7 @@ void WatchableSocket::OnAttach()
     evutil_make_socket_nonblocking(mFD);
 }
 
-void WatchableSocket::OnClose()
+void WatchableSocket::OnRelease()
 {
     UpdateWatch(0);
     mSharedState->RemoveFromQueueIfPresent(this);

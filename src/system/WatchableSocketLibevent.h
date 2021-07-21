@@ -40,7 +40,7 @@ class WatchableSocket : public WatchableSocketBasis<WatchableSocket>
 public:
     void OnInit();
     void OnAttach();
-    void OnClose();
+    void OnRelease();
     void OnRequestCallbackOnPendingRead() { SetWatch(EV_READ); }
     void OnRequestCallbackOnPendingWrite() { SetWatch(EV_WRITE); }
     void OnClearCallbackOnPendingRead() { ClearWatch(EV_READ); }
