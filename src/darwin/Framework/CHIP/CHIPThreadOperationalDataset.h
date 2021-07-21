@@ -74,6 +74,12 @@ extern size_t const CHIPSizeThreadPSKc;
                                        panID:(NSData *)panID;
 
 /**
+ *  Create a Thread Operational Dataset object with a RCP formatted active operational dataset.
+ *  This initializer will return nil if the input data cannot be parsed correctly
+ */
+- (nullable instancetype)initWithData:(NSData *)data;
+
+/**
  * Get the underlying data that represents the Thread Active Operational Dataset
  */
 - (NSData *)asData;
