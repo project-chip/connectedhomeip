@@ -15,20 +15,20 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Utility header to encode an input into a Base38 String
- */
-
 #pragma once
 
 #include "Base38.h"
+
+#include <support/Span.h>
 
 #include <stddef.h>
 
 namespace chip {
 
-// returns CHIP_NO_ERROR on successful encode
-CHIP_ERROR base38Encode(const uint8_t * in_buf, size_t in_buf_len, char * out_buf, size_t out_buf_len);
+// out_buf is null-terminated on success
+CHIP_ERROR base38Encode(ByteSpan in_buf, MutableCharSpan & out_buf);
+
+// returns size needed to store encoded string given number of input bytes
+size_t base38EncodedLength(size_t num_bytes);
 
 } // namespace chip

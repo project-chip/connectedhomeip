@@ -15,11 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Utility header to decode a Base38 String
- */
-
 #pragma once
 
 #include "Base38.h"
@@ -29,7 +24,6 @@
 
 namespace chip {
 
-// returns CHIP_NO_ERROR on successful decode
 CHIP_ERROR base38Decode(std::string base38, std::vector<uint8_t> & out);
 
 } // namespace chip
