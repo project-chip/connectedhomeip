@@ -29,6 +29,8 @@
 
 #include "SetupPayload.h"
 
+#include <support/Span.h>
+
 #pragma once
 
 namespace chip {
@@ -43,7 +45,7 @@ public:
 
     /**
      * This function is called to encode the binary data of a payload to a
-     * base38 string using CHIP TLV encoding scheme.
+     * base38 null-terminated string using CHIP TLV encoding scheme.
      *
      * @param[out] base38Representation
      *                  The string to copy the base38 to.
@@ -58,7 +60,7 @@ public:
 
     /**
      * This function is called to encode the binary data of a payload to a
-     * base38 string. Callers must pass a buffer of at least
+     * base38 null-terminated string. Callers must pass a buffer of at least
      * chip::kTotalPayloadDataInBytes or more if there is any serialNumber or
      * any other optional data. The buffer should be big enough to hold the
      * TLV encoded value of the payload. If not an error will be throw.
@@ -82,21 +84,20 @@ public:
 
     /**
      * This function is called to encode the binary data of a payload to a
-     * base38 string. The payload's optional data is ignored for compatibility
-     * with devices that don't support std::string or STL.
+     * base38 null-terminated string. The payload's optional data is ignored
+     * for compatibility with devices that don't support std::string or STL.
      *
      * @param[out] outBuffer
      *                  The buffer to copy the base38 to.
-     * @param[in]  outBufferSize
-     *                  The size of the output buffer.
      *
      * @retval #CHIP_NO_ERROR if the method succeeded.
      * @retval #CHIP_ERROR_INVALID_ARGUMENT if the payload is invalid.
+     * @retval #CHIP_ERROR_BUFFER_TOO_SMALL if outBuffer has insufficient size.
      * @retval other Other CHIP or platform-specific error codes indicating
      *               that an error occurred preventing the function from
      *               producing the requested string.
      */
-    CHIP_ERROR payloadBase38Representation(char * outBuffer, size_t outBufferSize);
+    CHIP_ERROR payloadBase38RepresentationWithoutOptional(MutableCharSpan & outBuffer);
 
 private:
     CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,

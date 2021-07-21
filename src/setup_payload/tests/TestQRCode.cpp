@@ -27,6 +27,7 @@
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
+#include <support/Span.h>
 #include <support/UnitTestRegistration.h>
 
 using namespace chip;
@@ -117,72 +118,80 @@ void TestPayloadBase38Rep(nlTestSuite * inSuite, void * inContext)
 
 void TestBase38(nlTestSuite * inSuite, void * inContext)
 {
-    uint8_t input[]                 = { 10, 10, 10 };
-    constexpr size_t kEncodedBufLen = 32;
-    char encodedBuf[kEncodedBufLen];
+    uint8_t input[3] = { 10, 10, 10 };
+    char encodedBuf[32];
+    MutableByteSpan inputSpan(input);
+    MutableCharSpan encodedSpan(encodedBuf);
 
     // basic stuff
-    base38Encode(input, 0, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan.SubSpan(0, 0), encodedSpan);
     NL_TEST_ASSERT(inSuite, strlen(encodedBuf) == 0);
-    base38Encode(input, 1, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan.SubSpan(0, 1), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "A0") == 0);
-    base38Encode(input, 2, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan.SubSpan(0, 2), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "OT10") == 0);
-    base38Encode(input, 3, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "-N.B0") == 0);
 
-    NL_TEST_ASSERT(inSuite, base38Encode(input, 3, encodedBuf, 2) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    // test null termination of output buffer
+    NL_TEST_ASSERT(inSuite, base38Encode(inputSpan.SubSpan(0, 1), encodedSpan.SubSpan(0, 2)) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    // Force no nulls in output buffer
+    memset(encodedSpan.data(), '?', encodedSpan.size());
+    base38Encode(inputSpan.SubSpan(0, 1), encodedSpan.SubSpan(0, 3));
+    size_t encodedLen = strnlen(encodedSpan.data(), ArraySize(encodedBuf));
+    NL_TEST_ASSERT(inSuite, encodedLen == strlen("A0"));
+    NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "A0") == 0);
 
     // test single odd byte corner conditions
     input[2] = 0;
-    base38Encode(input, 3, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "OT100") == 0);
     input[2] = 40;
-    base38Encode(input, 3, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "Y6V91") == 0);
     input[2] = 41;
-    base38Encode(input, 3, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "KL0B1") == 0);
     input[2] = 255;
-    base38Encode(input, 3, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "Q-M08") == 0);
 
     // verify chunks of 1,2 and 3 bytes result in fixed-length strings padded with '0'
     // for 1 byte we need always 2 characters
     input[0] = 35;
-    base38Encode(input, 1, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan.SubSpan(0, 1), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "Z0") == 0);
     // for 2 bytes we need always 4 characters
     input[0] = 255;
     input[1] = 0;
-    base38Encode(input, 2, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan.SubSpan(0, 2), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "R600") == 0);
     // for 3 bytes we need always 5 characters
     input[0] = 46;
     input[1] = 0;
     input[2] = 0;
-    base38Encode(input, 3, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "81000") == 0);
 
     // verify maximum available values for each chunk size to check selecting proper characters number
     // for 1 byte we need 2 characters
     input[0] = 255;
-    base38Encode(input, 1, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan.SubSpan(0, 1), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "R6") == 0);
     // for 2 bytes we need 4 characters
     input[0] = 255;
     input[1] = 255;
-    base38Encode(input, 2, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan.SubSpan(0, 2), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "NE71") == 0);
     // for 3 bytes we need 5 characters
     input[0] = 255;
     input[1] = 255;
     input[2] = 255;
-    base38Encode(input, 3, encodedBuf, kEncodedBufLen);
+    base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "PLS18") == 0);
 
     // fun with strings
-    base38Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1, encodedBuf, kEncodedBufLen);
+    base38Encode(ByteSpan((uint8_t *) "Hello World!", sizeof("Hello World!") - 1), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "KKHF3W2S013OPM3EJX11") == 0);
 
     vector<uint8_t> decoded = vector<uint8_t>();
