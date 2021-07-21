@@ -41,31 +41,31 @@ static const uint8_t kMaxBytesSingleChunkLen = 3;
 
 namespace chip {
 
-CHIP_ERROR base38Encode(const uint8_t * in_buf, size_t in_buf_len, char * out_buf, size_t out_buf_len)
+CHIP_ERROR base38Encode(ByteSpan in_buf, MutableCharSpan & out_buf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int out_idx    = 0;
-
-    memset(out_buf, '\0', out_buf_len);
+    CHIP_ERROR err             = CHIP_NO_ERROR;
+    const uint8_t * in_buf_ptr = in_buf.data();
+    size_t in_buf_len          = in_buf.size();
+    size_t out_idx             = 0;
 
     while (in_buf_len > 0)
     {
         uint32_t value = 0;
-        static_assert(sizeof(value) * CHAR_BIT >= kMaxBytesSingleChunkLen * 8, "value might overflow");
+        static_assert((sizeof(value) * CHAR_BIT) >= (kMaxBytesSingleChunkLen * 8), "Type for value is too small for conversions");
 
         size_t bytesInChunk = (in_buf_len >= kMaxBytesSingleChunkLen) ? kMaxBytesSingleChunkLen : in_buf_len;
 
-        for (uint8_t byte = 0; byte < bytesInChunk; byte++)
+        for (uint8_t byte_idx = 0; byte_idx < bytesInChunk; byte_idx++)
         {
-            value += static_cast<uint32_t>(in_buf[byte] << (8 * byte));
+            value += static_cast<uint32_t>(in_buf_ptr[byte_idx] << (8 * byte_idx));
         }
         in_buf_len -= bytesInChunk;
-        in_buf += bytesInChunk;
+        in_buf_ptr += bytesInChunk;
 
         // Without code length optimization there is constant characters number needed for specific chunk size.
-        const int base38CharactersNeeded = kBase38CharactersNeededInNBytesChunk[bytesInChunk - 1];
+        const uint8_t base38CharactersNeeded = kBase38CharactersNeededInNBytesChunk[bytesInChunk - 1];
 
-        if (out_idx + base38CharactersNeeded >= static_cast<int>(out_buf_len))
+        if ((out_idx + base38CharactersNeeded) >= out_buf.size())
         {
             err = CHIP_ERROR_BUFFER_TOO_SMALL;
             break;
@@ -73,12 +73,21 @@ CHIP_ERROR base38Encode(const uint8_t * in_buf, size_t in_buf_len, char * out_bu
 
         for (uint8_t character = 0; character < base38CharactersNeeded; character++)
         {
-            out_buf[out_idx++] = kCodes[value % kRadix];
+            out_buf.data()[out_idx++] = kCodes[value % kRadix];
             value /= kRadix;
         }
     }
 
+    out_buf.data()[out_idx] = '\0';
+
     return err;
+}
+
+size_t base38EncodedLength(size_t num_bytes)
+{
+    // Each group of 3 bytes converts to 5 chars, and each remaining byte converts to 2 chars.
+    // Add one for the null terminator.
+    return (num_bytes / 3) * 5 + (num_bytes % 3) * 2 + 1;
 }
 
 } // namespace chip
