@@ -621,7 +621,7 @@ bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * me
             cb->mCall(cb->mContext, status);
         }
 
-        // The current code is written matching the current API where there is a single attribute report 
+        // The current code is written matching the current API where there is a single attribute report
         // per configure command. So if multiple attributes are configured at the same time, something is wrong
         // somewhere.
         if (messageLen)

@@ -115,7 +115,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::BarrierControl::Commands::Ids::BarrierControlStop: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfBarrierControlClusterBarrierControlStopCallback(apCommandObj);
                     break;
@@ -1619,13 +1619,13 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
         switch (aCommandId)
         {
         case Clusters::DoorLock::Commands::Ids::ClearAllPins: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfDoorLockClusterClearAllPinsCallback(apCommandObj);
                     break;
         }
         case Clusters::DoorLock::Commands::Ids::ClearAllRfids: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfDoorLockClusterClearAllRfidsCallback(apCommandObj);
                     break;
@@ -3089,7 +3089,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::GeneralCommissioning::Commands::Ids::CommissioningComplete: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj);
                     break;
@@ -3410,7 +3410,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::Groups::Commands::Ids::RemoveAllGroups: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfGroupsClusterRemoveAllGroupsCallback(apCommandObj);
                     break;
@@ -3758,7 +3758,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::Identify::Commands::Ids::IdentifyQuery: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfIdentifyClusterIdentifyQueryCallback(apCommandObj);
                     break;
@@ -4288,7 +4288,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::LevelControl::Commands::Ids::StopWithOnOff: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(apCommandObj);
                     break;
@@ -4345,7 +4345,7 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
         switch (aCommandId)
         {
         case Clusters::LowPower::Commands::Ids::Sleep: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfLowPowerClusterSleepCallback(apCommandObj);
                     break;
@@ -5378,19 +5378,19 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
         switch (aCommandId)
         {
         case Clusters::OnOff::Commands::Ids::Off: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfOnOffClusterOffCallback(apCommandObj);
                     break;
         }
         case Clusters::OnOff::Commands::Ids::On: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfOnOffClusterOnCallback(apCommandObj);
                     break;
         }
         case Clusters::OnOff::Commands::Ids::Toggle: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfOnOffClusterToggleCallback(apCommandObj);
                     break;
@@ -5652,7 +5652,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::OperationalCredentials::Commands::Ids::RemoveAllFabrics: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(apCommandObj);
                     break;
@@ -6460,19 +6460,19 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
         switch (aCommandId)
         {
         case Clusters::TestCluster::Commands::Ids::Test: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfTestClusterClusterTestCallback(apCommandObj);
                     break;
         }
         case Clusters::TestCluster::Commands::Ids::TestNotHandled: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfTestClusterClusterTestNotHandledCallback(apCommandObj);
                     break;
         }
         case Clusters::TestCluster::Commands::Ids::TestSpecific: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfTestClusterClusterTestSpecificCallback(apCommandObj);
                     break;
