@@ -5235,7 +5235,7 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_Thermostat_SystemMode(chip:
         cluster.WriteAttributeSystemMode(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value));
 }
 
-  CHIP_ERROR chip_ime_ReadAttribute_Thermostat_StartOfWeek(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+CHIP_ERROR chip_ime_ReadAttribute_Thermostat_StartOfWeek(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                          chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
