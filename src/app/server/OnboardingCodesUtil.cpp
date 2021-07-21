@@ -67,6 +67,39 @@ void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
     }
 }
 
+void PrintOnboardingCodes(const chip::SetupPayload & payload)
+{
+    std::string QRCode;
+    std::string manualPairingCode;
+
+    if (GetQRCode(QRCode, payload) == CHIP_NO_ERROR)
+    {
+        chip::Platform::ScopedMemoryBuffer<char> qrCodeBuffer;
+        const size_t qrCodeBufferMaxSize = strlen(kQrCodeBaseUrl) + strlen(kUrlDataAssignmentPhrase) + 3 * QRCode.size() + 1;
+        qrCodeBuffer.Alloc(qrCodeBufferMaxSize);
+
+        ChipLogProgress(AppServer, "SetupQRCode: [%s]", QRCode.c_str());
+        if (GetQRCodeUrl(&qrCodeBuffer[0], qrCodeBufferMaxSize, QRCode) == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(AppServer, "Copy/paste the below URL in a browser to see the QR Code:");
+            ChipLogProgress(AppServer, "%s", &qrCodeBuffer[0]);
+        }
+    }
+    else
+    {
+        ChipLogError(AppServer, "Getting QR code failed!");
+    }
+
+    if (GetManualPairingCode(manualPairingCode, payload) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Manual pairing code: [%s]", manualPairingCode.c_str());
+    }
+    else
+    {
+        ChipLogError(AppServer, "Getting manual pairing code failed!");
+    }
+}
+
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC
 void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags)
 {
@@ -138,6 +171,18 @@ CHIP_ERROR GetQRCode(std::string & aQRCode, chip::RendezvousInformationFlags aRe
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR GetQRCode(std::string & aQRCode, const chip::SetupPayload & payload)
+{
+    CHIP_ERROR err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(aQRCode);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Generating QR Code failed: %s", chip::ErrorStr(err));
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR GetQRCodeUrl(char * aQRCodeUrl, size_t aUrlMaxSize, const std::string & aQRCode)
 {
     VerifyOrReturnError(aQRCodeUrl, CHIP_ERROR_INVALID_ARGUMENT);
@@ -164,6 +209,18 @@ CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, chip::Rendezvo
     }
 
     err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(aManualPairingCode);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Generating Manual Pairing Code failed: %s", chip::ErrorStr(err));
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, const chip::SetupPayload & payload)
+{
+    CHIP_ERROR err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(aManualPairingCode);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "Generating Manual Pairing Code failed: %s", chip::ErrorStr(err));
