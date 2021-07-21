@@ -513,7 +513,7 @@ public:
      * @param[in]  subjectDN     Subject distinguished name to use as certificate search parameter.
      * @param[in]  subjectKeyId  Subject key identifier to use as certificate search parameter.
      * @param[in]  context       Certificate validation context.
-     * @param[out] certData      A pointer to a pointer to the CHIP certificate data that matches search criteria.
+     * @param[out] certData      A slot to write a pointer to the CHIP certificate data that matches search criteria.
      *
      * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
      **/
@@ -550,7 +550,7 @@ private:
      * @param[in]  context        Certificate validation context.
      * @param[in]  validateFlags  Certificate validation flags.
      * @param[in]  depth          Depth of the current certificate in the certificate validation chain.
-     * @param[out] certData       A pointer to a pointer to the CHIP certificate data that matches search criteria.
+     * @param[out] certData       A slot to write a pointer to the CHIP certificate data that matches search criteria.
      *
      * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
      **/

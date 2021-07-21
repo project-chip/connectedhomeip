@@ -202,7 +202,7 @@ public:
      * @param[in]  subjectDN     Subject distinguished name to use as certificate search parameter.
      * @param[in]  subjectKeyId  Subject key identifier to use as certificate search parameter.
      * @param[in]  context       Certificate validation context.
-     * @param[out] certData      A pointer to a pointer to the CHIP certificate data that matches search criteria.
+     * @param[out] certData      A slot to write a pointer to the CHIP certificate data that matches search criteria.
      *
      * @return Returns a CHIP_ERROR if no valid certificate could be found
      **/
