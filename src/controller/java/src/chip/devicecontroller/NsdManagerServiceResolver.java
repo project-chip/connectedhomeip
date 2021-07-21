@@ -22,8 +22,7 @@ import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
-public class NsdManagerServiceResolver implements ServiceResolver
-{
+public class NsdManagerServiceResolver implements ServiceResolver {
   private final String TAG = NsdManagerServiceResolver.class.getSimpleName();
   private final NsdManager nsdManager;
 
@@ -32,35 +31,43 @@ public class NsdManagerServiceResolver implements ServiceResolver
   }
 
   @Override
-  public void resolve(final String instanceName, final String serviceType, final long callbackHandle, final long contextHandle) {
+  public void resolve(
+      final String instanceName,
+      final String serviceType,
+      final long callbackHandle,
+      final long contextHandle) {
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
     serviceInfo.setServiceName(instanceName);
     serviceInfo.setServiceType(serviceType);
 
-    this.nsdManager.resolveService(serviceInfo, new NsdManager.ResolveListener() {
-      @Override
-      public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-        Log.w(TAG, "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
-        ChipDeviceController.handleServiceResolve(
-            instanceName,
-            serviceType,
-            null,
-            0,
-            callbackHandle,
-            contextHandle);
-      }
+    this.nsdManager.resolveService(
+        serviceInfo,
+        new NsdManager.ResolveListener() {
+          @Override
+          public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+            Log.w(
+                TAG,
+                "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
+            ChipDeviceController.handleServiceResolve(
+                instanceName, serviceType, null, 0, callbackHandle, contextHandle);
+          }
 
-      @Override
-      public void onServiceResolved(NsdServiceInfo serviceInfo) {
-        Log.i(TAG, "Resolved service '" + serviceInfo.getServiceName() + "' to " + serviceInfo.getHost());
-        ChipDeviceController.handleServiceResolve(
-            instanceName,
-            serviceType,
-            serviceInfo.getHost().getHostAddress(),
-            serviceInfo.getPort(),
-            callbackHandle,
-            contextHandle);
-      }
-    });
+          @Override
+          public void onServiceResolved(NsdServiceInfo serviceInfo) {
+            Log.i(
+                TAG,
+                "Resolved service '"
+                    + serviceInfo.getServiceName()
+                    + "' to "
+                    + serviceInfo.getHost());
+            ChipDeviceController.handleServiceResolve(
+                instanceName,
+                serviceType,
+                serviceInfo.getHost().getHostAddress(),
+                serviceInfo.getPort(),
+                callbackHandle,
+                contextHandle);
+          }
+        });
   }
 }

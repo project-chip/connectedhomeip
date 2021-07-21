@@ -242,9 +242,14 @@ public class ChipDeviceController {
   public static native void setKeyValueStoreManager(KeyValueStoreManager manager);
 
   public static native void setServiceResolver(ServiceResolver resolver);
+
   public static native void handleServiceResolve(
-      String instanceName, String serviceType, String address, int port,
-      long callback, long context);
+      String instanceName,
+      String serviceType,
+      String address,
+      int port,
+      long callback,
+      long context);
 
   static {
     System.loadLibrary("CHIPController");
