@@ -42,6 +42,7 @@ constexpr size_t kP256_FE_Length                  = 32;
 constexpr size_t kP256_ECDSA_Signature_Length_Raw = (2 * kP256_FE_Length);
 constexpr size_t kP256_Point_Length               = (2 * kP256_FE_Length + 1);
 constexpr size_t kSHA256_Hash_Length              = 32;
+constexpr size_t kSHA1_Hash_Length                = 20;
 
 constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
 constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
@@ -66,11 +67,23 @@ constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
  * the implementation files.
  */
 constexpr size_t kMAX_Spake2p_Context_Size     = 1024;
-constexpr size_t kMAX_Hash_SHA256_Context_Size = 296;
 constexpr size_t kMAX_P256Keypair_Context_Size = 512;
 
 constexpr size_t kEmitDerIntegerWithoutTagOverhead = 1; // 1 sign stuffer
 constexpr size_t kEmitDerIntegerOverhead           = 3; // Tag + Length byte + 1 sign stuffer
+
+/*
+ * Worst case is OpenSSL, so let's use its worst case and let static assert tell us if
+ * we are wrong, since `typedef SHA_LONG unsigned int` is default.
+ *   SHA_LONG h[8];
+ *   SHA_LONG Nl, Nh;
+ *   SHA_LONG data[SHA_LBLOCK]; // SHA_LBLOCK is 16 for SHA256
+ *   unsigned int num, md_len;
+ *
+ * We also have to account for possibly some custom extensions on some targets,
+ * especially for mbedTLS, so an extra sizeof(uint64_t) is added to account.
+ */
+constexpr size_t kMAX_Hash_SHA256_Context_Size = ((sizeof(unsigned int) * (8 + 2 + 16 + 2)) + sizeof(uint64_t));
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
@@ -509,9 +522,52 @@ public:
     Hash_SHA256_stream();
     ~Hash_SHA256_stream();
 
+    /**
+     * @brief Re-initialize digest computation to an empty context.
+     *
+     * @return CHIP_ERROR_INTERNAL on failure to initialize the context,
+     *         CHIP_NO_ERROR otherwise.
+     */
     CHIP_ERROR Begin();
-    CHIP_ERROR AddData(const uint8_t * data, size_t data_length);
-    CHIP_ERROR Finish(uint8_t * out_buffer);
+
+    /**
+     * @brief Add some data to the digest computation, updating internal state.
+     *
+     * @param[in] data The span of bytes to include in the digest update process.
+     *
+     * @return CHIP_ERROR_INTERNAL on failure to ingest the data, CHIP_NO_ERROR otherwise.
+     */
+    CHIP_ERROR AddData(const ByteSpan data);
+
+    /**
+     * @brief Get the intermediate padded digest for the current state of the stream.
+     *
+     * More data can be added before finish is called.
+     *
+     * @param[inout] out_buffer Output buffer to receive the digest. `out_buffer` must
+     * be at least `kSHA256_Hash_Length` bytes long. The `out_buffer` size
+     * will be set to `kSHA256_Hash_Length` on success.
+     *
+     * @return CHIP_ERROR_INTERNAL on failure to compute the digest, CHIP_ERROR_BUFFER_TOO_SMALL
+     *         if out_buffer is too small, CHIP_NO_ERROR otherwise.
+     */
+    CHIP_ERROR GetDigest(MutableByteSpan & out_buffer);
+
+    /**
+     * @brief Finalize the stream digest computation, getting the final digest.
+     *
+     * @param[inout] out_buffer Output buffer to receive the digest. `out_buffer` must
+     * be at least `kSHA256_Hash_Length` bytes long. The `out_buffer` size
+     * will be set to `kSHA256_Hash_Length` on success.
+     *
+     * @return CHIP_ERROR_INTERNAL on failure to compute the digest, CHIP_ERROR_BUFFER_TOO_SMALL
+     *         if out_buffer is too small, CHIP_NO_ERROR otherwise.
+     */
+    CHIP_ERROR Finish(MutableByteSpan & out_buffer);
+
+    /**
+     * @brief Clear-out internal digest data to avoid lingering the state.
+     */
     void Clear();
 
 private:

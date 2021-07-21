@@ -386,7 +386,7 @@ CHIP_ERROR CASESession::SendSigmaR1()
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg_R1));
 
-    ReturnErrorOnFailure(mCommissioningHash.AddData(msg_R1->Start(), msg_R1->DataLength()));
+    ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg_R1->Start(), msg_R1->DataLength() }));
 
     ReturnErrorOnFailure(ComputeIPK(mConnectionState.GetLocalKeyID(), mIPK, sizeof(mIPK)));
 
@@ -421,7 +421,7 @@ CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle & msg)
 
     ChipLogDetail(SecureChannel, "Received SigmaR1 msg");
 
-    err = mCommissioningHash.AddData(msg->Start(), msg->DataLength());
+    err = mCommissioningHash.AddData(ByteSpan{ msg->Start(), msg->DataLength() });
     SuccessOrExit(err);
 
     tlvReader.Init(std::move(msg));
@@ -610,7 +610,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
         SuccessOrExit(err = tlvWriter.Finalize(&msg_R2));
     }
 
-    err = mCommissioningHash.AddData(msg_R2->Start(), msg_R2->DataLength());
+    err = mCommissioningHash.AddData(ByteSpan{ msg_R2->Start(), msg_R2->DataLength() });
     SuccessOrExit(err);
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR3;
@@ -729,7 +729,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
                             kAEADKeySize);
     SuccessOrExit(err);
 
-    err = mCommissioningHash.AddData(buf, buflen);
+    err = mCommissioningHash.AddData(ByteSpan{ buf, buflen });
     SuccessOrExit(err);
 
     // Step 4
@@ -812,6 +812,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    MutableByteSpan messageDigestSpan(mMessageDigest);
     System::PacketBufferHandle msg_R3;
     uint16_t data_len;
 
@@ -925,7 +926,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
         SuccessOrExit(err);
     }
 
-    err = mCommissioningHash.AddData(msg_R3->Start(), msg_R3->DataLength());
+    err = mCommissioningHash.AddData(ByteSpan{ msg_R3->Start(), msg_R3->DataLength() });
     SuccessOrExit(err);
 
     // Call delegate to send the Msg3 to peer
@@ -934,7 +935,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
     ChipLogDetail(SecureChannel, "Sent SigmaR3 msg");
 
-    err = mCommissioningHash.Finish(mMessageDigest);
+    err = mCommissioningHash.Finish(messageDigestSpan);
     SuccessOrExit(err);
 
     mPairingComplete = true;
@@ -957,6 +958,7 @@ exit:
 CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    MutableByteSpan messageDigestSpan(mMessageDigest);
     System::PacketBufferTLVReader tlvReader;
     System::PacketBufferTLVReader suppTlvReader;
     TLV::TLVReader decryptedDataTlvReader;
@@ -1030,7 +1032,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
                             kAEADKeySize);
     SuccessOrExit(err);
 
-    err = mCommissioningHash.AddData(buf, bufLen);
+    err = mCommissioningHash.AddData(ByteSpan{ buf, bufLen });
     SuccessOrExit(err);
 
     // Step 2
@@ -1078,7 +1080,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
     err = remoteCredential.ECDSA_validate_msg_signature(msg_R3_Signed.Get(), msg_r3_signed_len, sigmaR3SignedData);
     SuccessOrExit(err);
 
-    err = mCommissioningHash.Finish(mMessageDigest);
+    err = mCommissioningHash.Finish(messageDigestSpan);
     SuccessOrExit(err);
 
     mPairingComplete = true;
@@ -1165,8 +1167,9 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR2(const ByteSpan & rand, const P256Pu
     bbuf.Put(ipk, ipkLen);
     bbuf.Put(rand.data(), kSigmaParamRandomNumberSize);
     bbuf.Put(pubkey, pubkey.Length());
-    ReturnErrorOnFailure(mCommissioningHash.Finish(md));
-    bbuf.Put(md, kSHA256_Hash_Length);
+    MutableByteSpan messageDigestSpan(md);
+    ReturnErrorOnFailure(mCommissioningHash.Finish(messageDigestSpan));
+    bbuf.Put(messageDigestSpan.data(), messageDigestSpan.size());
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
@@ -1181,8 +1184,9 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR3(const uint8_t * ipk, size_t ipkLen,
     Encoding::LittleEndian::BufferWriter bbuf(salt.data(), salt.size());
 
     bbuf.Put(ipk, ipkLen);
-    ReturnErrorOnFailure(mCommissioningHash.Finish(md));
-    bbuf.Put(md, kSHA256_Hash_Length);
+    MutableByteSpan messageDigestSpan(md);
+    ReturnErrorOnFailure(mCommissioningHash.Finish(messageDigestSpan));
+    bbuf.Put(messageDigestSpan.data(), messageDigestSpan.size());
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
