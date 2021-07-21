@@ -17004,7 +17004,7 @@ class Test_TC_CC_7: public TestCommand
         runner->NextTest();
     }
 
-    // Test Enhanced Move Hue Down command 
+    // Test Enhanced Move Hue Down command
     using SuccessCallback_5 = void (*)(void * context);
     chip::Callback::Callback<SuccessCallback_5> mOnSuccessCallback_5 { OnTestSendClusterColorControlCommandEnhancedMoveHue_5_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5 { OnTestSendClusterColorControlCommandEnhancedMoveHue_5_FailureResponse, this };

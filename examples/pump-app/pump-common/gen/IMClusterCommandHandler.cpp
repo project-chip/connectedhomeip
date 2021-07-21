@@ -296,7 +296,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::GeneralCommissioning::Commands::Ids::CommissioningComplete: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj);
                     break;
@@ -898,7 +898,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::LevelControl::Commands::Ids::StopWithOnOff: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(apCommandObj);
                     break;
@@ -1590,19 +1590,19 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
         switch (aCommandId)
         {
         case Clusters::OnOff::Commands::Ids::Off: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfOnOffClusterOffCallback(apCommandObj);
                     break;
         }
         case Clusters::OnOff::Commands::Ids::On: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfOnOffClusterOnCallback(apCommandObj);
                     break;
         }
         case Clusters::OnOff::Commands::Ids::Toggle: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfOnOffClusterToggleCallback(apCommandObj);
                     break;
@@ -1864,7 +1864,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::OperationalCredentials::Commands::Ids::RemoveAllFabrics: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(apCommandObj);
                     break;

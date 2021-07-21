@@ -123,7 +123,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::GeneralCommissioning::Commands::Ids::CommissioningComplete: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj);
                     break;
@@ -1151,7 +1151,7 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::OperationalCredentials::Commands::Ids::RemoveAllFabrics: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(apCommandObj);
                     break;
@@ -1457,7 +1457,7 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
         switch (aCommandId)
         {
         case Clusters::WindowCovering::Commands::Ids::DownOrClose: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfWindowCoveringClusterDownOrCloseCallback(apCommandObj);
                     break;
@@ -1707,13 +1707,13 @@ if (CHIP_END_OF_TLV == TLVError)
             break;
         }
         case Clusters::WindowCovering::Commands::Ids::StopMotion: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfWindowCoveringClusterStopMotionCallback(apCommandObj);
                     break;
         }
         case Clusters::WindowCovering::Commands::Ids::UpOrOpen: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         wasHandled = emberAfWindowCoveringClusterUpOrOpenCallback(apCommandObj);
                     break;
