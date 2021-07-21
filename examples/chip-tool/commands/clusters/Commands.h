@@ -18687,6 +18687,10 @@ private:
 | * OccupiedHeatingSetpoint                                           | 0x0012 |
 | * ControlSequenceOfOperation                                        | 0x001B |
 | * SystemMode                                                        | 0x001C |
+| * StartOfWeek                                                       | 0x0020 |
+| * NumberOfWeeklyTransitions                                         | 0x0021 |
+| * NumberOfDailyTransitions                                          | 0x0022 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -19239,6 +19243,142 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mValue;
+};
+
+/*
+ * Attribute StartOfWeek
+ */
+class ReadThermostatStartOfWeek : public ModelCommand
+{
+public:
+    ReadThermostatStartOfWeek() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "start-of-week");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatStartOfWeek()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeStartOfWeek(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute NumberOfWeeklyTransitions
+ */
+class ReadThermostatNumberOfWeeklyTransitions : public ModelCommand
+{
+public:
+    ReadThermostatNumberOfWeeklyTransitions() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "number-of-weekly-transitions");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatNumberOfWeeklyTransitions()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNumberOfWeeklyTransitions(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute NumberOfDailyTransitions
+ */
+class ReadThermostatNumberOfDailyTransitions : public ModelCommand
+{
+public:
+    ReadThermostatNumberOfDailyTransitions() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "number-of-daily-transitions");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatNumberOfDailyTransitions()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNumberOfDailyTransitions(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadThermostatFeatureMap : public ModelCommand
+{
+public:
+    ReadThermostatFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatFeatureMap()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -24001,6 +24141,10 @@ void registerClusterThermostat(Commands & commands)
         make_unique<WriteThermostatControlSequenceOfOperation>(),
         make_unique<ReadThermostatSystemMode>(),
         make_unique<WriteThermostatSystemMode>(),
+        make_unique<ReadThermostatStartOfWeek>(),
+        make_unique<ReadThermostatNumberOfWeeklyTransitions>(),
+        make_unique<ReadThermostatNumberOfDailyTransitions>(),
+        make_unique<ReadThermostatFeatureMap>(),
         make_unique<ReadThermostatClusterRevision>(),
     };
 
