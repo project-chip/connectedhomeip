@@ -248,8 +248,8 @@ public class ChipDeviceController {
       String serviceType,
       String address,
       int port,
-      long callback,
-      long context);
+      long callbackHandle,
+      long contextHandle);
 
   static {
     System.loadLibrary("CHIPController");

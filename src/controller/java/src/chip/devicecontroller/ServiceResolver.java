@@ -18,6 +18,6 @@
 package chip.devicecontroller;
 
 public interface ServiceResolver {
-  public void resolve(
+  void resolve(
       String instanceName, String serviceType, long callbackHandle, long contextHandle);
 }
