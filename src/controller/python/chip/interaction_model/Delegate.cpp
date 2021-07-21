@@ -149,12 +149,15 @@ PythonInteractionModelDelegate & PythonInteractionModelDelegate::Instance()
 
 extern "C" {
 
-CHIP_ERROR pychip_InteractionModel_GetCommandSenderHandle(uint64_t * commandSender)
+static_assert(std::is_same<uint32_t, chip::ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
+
+chip::ChipError::StorageType pychip_InteractionModel_GetCommandSenderHandle(uint64_t * commandSender)
 {
     chip::app::CommandSender * commandSenderObj = nullptr;
-    VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&commandSenderObj));
+    VerifyOrReturnError(commandSender != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&commandSenderObj);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, chip::ChipError::AsInteger(err));
     *commandSender = reinterpret_cast<uint64_t>(commandSenderObj);
-    return CHIP_NO_ERROR;
+    return chip::ChipError::AsInteger(CHIP_NO_ERROR);
 }
 }

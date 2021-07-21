@@ -123,9 +123,11 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
     return result.release();
 }
 
+static_assert(std::is_same<uint32_t, chip::ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
+
 /// Returns CHIP_ERROR corresponding to an UnpairDevice call
-extern "C" uint32_t pychip_internal_Commissioner_Unpair(chip::Controller::DeviceCommissioner * commissioner,
-                                                        uint64_t remoteDeviceId)
+extern "C" chip::ChipError::StorageType pychip_internal_Commissioner_Unpair(chip::Controller::DeviceCommissioner * commissioner,
+                                                                            uint64_t remoteDeviceId)
 {
     CHIP_ERROR err;
 
@@ -134,9 +136,9 @@ extern "C" uint32_t pychip_internal_Commissioner_Unpair(chip::Controller::Device
     return chip::ChipError::AsInteger(err);
 }
 
-extern "C" uint32_t pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommissioner * commissioner,
-                                                                      uint64_t remoteNodeId, uint32_t pinCode,
-                                                                      uint16_t discriminator)
+extern "C" chip::ChipError::StorageType
+pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommissioner * commissioner, uint64_t remoteNodeId,
+                                                  uint32_t pinCode, uint16_t discriminator)
 {
 
     CHIP_ERROR err;

@@ -31,8 +31,8 @@ namespace chip {
 namespace Controller {
 
 extern "C" {
-typedef void (*DevicePairingDelegate_OnPairingCompleteFunct)(CHIP_ERROR err);
-typedef void (*DevicePairingDelegate_OnCommissioningCompleteFunct)(NodeId nodeId, CHIP_ERROR err);
+typedef void (*DevicePairingDelegate_OnPairingCompleteFunct)(ChipError::StorageType err);
+typedef void (*DevicePairingDelegate_OnCommissioningCompleteFunct)(NodeId nodeId, ChipError::StorageType err);
 }
 
 class ScriptDevicePairingDelegate final : public Controller::DevicePairingDelegate
