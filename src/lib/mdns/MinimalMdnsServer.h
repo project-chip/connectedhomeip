@@ -16,6 +16,9 @@
  */
 
 #include <mdns/minimal/Server.h>
+#ifdef MDNS_MINIMAL_TEST_SERVER
+#include <mdns/minimal/tests/CheckOnlyServer.h>
+#endif
 
 namespace chip {
 namespace Mdns {
@@ -71,7 +74,11 @@ class GlobalMinimalMdnsServer : public mdns::Minimal::ServerDelegate
 public:
     static constexpr size_t kMaxEndPoints = 30;
 
+#ifdef MDNS_MINIMAL_TEST_SERVER
+    using ServerType = mdns::Minimal::test::CheckOnlyServer;
+#else
     using ServerType = mdns::Minimal::Server<kMaxEndPoints>;
+#endif
 
     GlobalMinimalMdnsServer() { mServer.SetDelegate(this); }
 

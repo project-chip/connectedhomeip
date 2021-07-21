@@ -103,6 +103,37 @@ public:
         }
     }
     mdns::Minimal::QueryResponder<kMaxRecords + 1> * GetQueryResponder() { return &mQueryResponder; }
+    const mdns::Minimal::RecordResponder * GetResponder(const mdns::Minimal::QType & qtype,
+                                                        const mdns::Minimal::FullQName & qname) const
+    {
+        for (size_t i = 0; i < kMaxRecords; ++i)
+        {
+            if (mAllocatedResponders[i] != nullptr && mAllocatedResponders[i]->GetQType() == qtype &&
+                mAllocatedResponders[i]->GetQName() == qname)
+            {
+                return mAllocatedResponders[i];
+            }
+        }
+        return nullptr;
+    }
+    bool IsEmpty() const
+    {
+        for (size_t i = 0; i < kMaxRecords; i++)
+        {
+            if (mAllocatedResponders[i] != nullptr)
+            {
+                return false;
+            }
+        }
+        for (size_t i = 0; i < kMaxAllocatedQNameData; i++)
+        {
+            if (mAllocatedQNameParts[i] != nullptr)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
 protected:
     // For testing.
