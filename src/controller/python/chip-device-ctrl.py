@@ -448,18 +448,10 @@ class DeviceMgrCmd(Cmd):
             print("Waiting for device responses...")
             strlen = 100;
             addrStrStorage = ctypes.create_string_buffer(strlen)
-            count = 0
             # If this device is on the network and we're looking specifically for 1 device,
             # expect a quick response.
-            maxWaitTime = 1
-            ok = False
-            while count < maxWaitTime:
-                ok = self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen)
-                if ok:
-                    break
-                time.sleep(0.2)
-                count = count + 0.2
-            if ok:
+            if self.wait_for_one_discovered_device():
+                self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen)
                 addrStr = addrStrStorage.value.decode('utf-8')
                 print("Connecting to device at " + addrStr)
                 pincode = ctypes.c_uint32(int(setupPayload.attributes['SetUpPINCode']))
@@ -578,6 +570,7 @@ class DeviceMgrCmd(Cmd):
         while (not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen) and count < maxWaitTime):
             time.sleep(0.2)
             count = count + 0.2
+        return count < maxWaitTime
 
     def wait_for_many_discovered_devices(self):
         # Discovery happens through mdns, which means we need to wait for responses to come back.
