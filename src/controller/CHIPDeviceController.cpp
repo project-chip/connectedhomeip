@@ -1206,10 +1206,10 @@ void DeviceCommissioner::OnSessionEstablished()
 
     if (sendOperationalCertsImmediately)
     {
-        err = SendTrustedRootCertificate(device);
+        err = SendOperationalCertificateSigningRequestCommand(device);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Ble, "Failed in sending 'add trusted root' command to the device: err %s", ErrorStr(err));
+            ChipLogError(Ble, "Failed in sending 'CSR request' command to the device: err %s", ErrorStr(err));
             OnSessionEstablishmentError(err);
             return;
         }
@@ -1258,12 +1258,19 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
     commissioner->mOpCSRResponseCallback.Cancel();
     commissioner->mOnCSRFailureCallback.Cancel();
 
-    if (commissioner->ProcessOpCSR(CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature) != CHIP_NO_ERROR)
+    Device * device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
+
+    // Verify that Nonce matches with what we sent, and we have sent the root certificate
+    if (!CSRNonce.data_equal(device->GetCSRNonce()) || commissioner->SendTrustedRootCertificate(device) != CHIP_NO_ERROR)
     {
         // Handle error, and notify session failure to the commissioner application.
         ChipLogError(Controller, "Failed to process the certificate signing request");
         // TODO: Map error status to correct error code
         commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
+    }
+    else
+    {
+        device->SetCSR(CSR);
     }
 }
 
@@ -1304,19 +1311,9 @@ exit:
     }
 }
 
-CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
-                                            const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3,
-                                            const ByteSpan & Signature)
+CHIP_ERROR DeviceCommissioner::ProcessOpCSR(Device * device, const ByteSpan & CSR)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mDeviceBeingPaired < kNumMaxActiveDevices, CHIP_ERROR_INCORRECT_STATE);
-
-    Device * device = &mActiveDevices[mDeviceBeingPaired];
-
-    // Verify that Nonce matches with what we sent
-    const ByteSpan nonce = device->GetCSRNonce();
-    VerifyOrReturnError(CSRNonce.size() == nonce.size(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(memcmp(CSRNonce.data(), nonce.data(), CSRNonce.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipOpCert;
     ReturnErrorCodeIf(!chipOpCert.Alloc(kMaxCHIPCertLength * 2), CHIP_ERROR_NO_MEMORY);
@@ -1460,7 +1457,7 @@ void DeviceCommissioner::OnRootCertSuccessResponse(void * context)
 
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
 
-    err = commissioner->SendOperationalCertificateSigningRequestCommand(device);
+    err = commissioner->ProcessOpCSR(device, device->GetCSR());
     SuccessOrExit(err);
 
 exit:
@@ -1879,10 +1876,10 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         ChipLogProgress(Controller, "Exchanging certificates");
         // TODO(cecille): Once this is implemented through the clusters, it should be moved to the proper stage and the callback
         // should advance the commissioning stage
-        CHIP_ERROR status = SendTrustedRootCertificate(device);
+        CHIP_ERROR status = SendOperationalCertificateSigningRequestCommand(device);
         if (status != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed in sending 'add trusted root' command to the device: err %s", ErrorStr(err));
+            ChipLogError(Controller, "Failed in sending 'CSR Request' command to the device: err %s", ErrorStr(err));
             OnSessionEstablishmentError(err);
             return;
         }
