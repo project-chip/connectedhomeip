@@ -986,7 +986,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
 
     mPairingComplete = true;
 
-    // Forget our exchange, as no additional messages are expected from the peer
+    // Forget our exchange, no additional messages are expected from the peer
     mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
