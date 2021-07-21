@@ -264,15 +264,17 @@ JNI_METHOD(void, setKeyValueStoreManager)(JNIEnv * env, jclass self, jobject man
 
 JNI_METHOD(void, setServiceResolver)(JNIEnv * env, jclass self, jobject resolver)
 {
+    using namespace chip::Mdns;
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    chip::Mdns::InitializeWithObject(resolver);
+    InitializeWithObject(resolver);
 }
 
 JNI_METHOD(void, handleServiceResolve)
 (JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring address, jint port, jlong callback, jlong context)
 {
+    using namespace chip::Mdns;
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    chip::Mdns::HandleResolve(instanceName, serviceType, address, port, callback, context);
+    HandleResolve(instanceName, serviceType, address, port, callback, context);
 }
 
 JNI_METHOD(void, pairDevice)
