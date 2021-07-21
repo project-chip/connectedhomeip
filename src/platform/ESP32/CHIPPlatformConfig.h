@@ -47,6 +47,8 @@
 
 #define ChipDie() abort()
 
+#define CHIP_CONFIG_ERROR_CLASS 1
+
 // ==================== Security Adaptations ====================
 
 #define CHIP_CONFIG_USE_OPENSSL_ECC 0

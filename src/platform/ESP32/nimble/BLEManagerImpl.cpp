@@ -1025,13 +1025,13 @@ exit:
     // Schedule DriveBLEState() to run.
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
-    return err;
+    return ChipError::AsInteger(err);
 }
 
 int BLEManagerImpl::gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg)
 {
     struct ble_gatt_char_context param;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    int err = 0;
 
     memset(&param, 0, sizeof(struct ble_gatt_char_context));
 
