@@ -142,7 +142,7 @@ EmberAfStatus SetBattery3PercentageThreshold3(chip::EndpointId endpoint, uint8_t
 EmberAfStatus GetBattery3AlarmState(chip::EndpointId endpoint, uint32_t * battery3AlarmState); // bitmap32
 EmberAfStatus SetBattery3AlarmState(chip::EndpointId endpoint, uint32_t battery3AlarmState);
 } // namespace Attributes
-} // PowerConfiguration
+} // namespace PowerConfiguration
 
 namespace DeviceTemperatureConfiguration {
 namespace Attributes {
@@ -161,7 +161,7 @@ EmberAfStatus SetLowTempThreshold(chip::EndpointId endpoint, int16_t lowTempThre
 EmberAfStatus GetHighTempThreshold(chip::EndpointId endpoint, int16_t * highTempThreshold); // int16s
 EmberAfStatus SetHighTempThreshold(chip::EndpointId endpoint, int16_t highTempThreshold);
 } // namespace Attributes
-} // DeviceTemperatureConfiguration
+} // namespace DeviceTemperatureConfiguration
 
 namespace Identify {
 namespace Attributes {
@@ -170,14 +170,14 @@ EmberAfStatus SetIdentifyTime(chip::EndpointId endpoint, uint16_t identifyTime);
 EmberAfStatus GetCommissionState(chip::EndpointId endpoint, uint8_t * commissionState); // bitmap8
 EmberAfStatus SetCommissionState(chip::EndpointId endpoint, uint8_t commissionState);
 } // namespace Attributes
-} // Identify
+} // namespace Identify
 
 namespace Groups {
 namespace Attributes {
 EmberAfStatus GetNameSupport(chip::EndpointId endpoint, uint8_t * nameSupport); // bitmap8
 EmberAfStatus SetNameSupport(chip::EndpointId endpoint, uint8_t nameSupport);
 } // namespace Attributes
-} // Groups
+} // namespace Groups
 
 namespace Scenes {
 namespace Attributes {
@@ -192,19 +192,23 @@ EmberAfStatus SetSceneValid(chip::EndpointId endpoint, uint8_t sceneValid);
 EmberAfStatus GetNameSupport(chip::EndpointId endpoint, uint8_t * nameSupport); // bitmap8
 EmberAfStatus SetNameSupport(chip::EndpointId endpoint, uint8_t nameSupport);
 } // namespace Attributes
-} // Scenes
+} // namespace Scenes
 
 namespace OnOff {
 namespace Attributes {
 EmberAfStatus GetOnOff(chip::EndpointId endpoint, uint8_t * onOff); // boolean
 EmberAfStatus SetOnOff(chip::EndpointId endpoint, uint8_t onOff);
-EmberAfStatus GetSampleMfgSpecificAttribute0x00000x1002(chip::EndpointId endpoint, uint16_t * sampleMfgSpecificAttribute0x00000x1002); // int16u
+EmberAfStatus GetSampleMfgSpecificAttribute0x00000x1002(chip::EndpointId endpoint,
+                                                        uint16_t * sampleMfgSpecificAttribute0x00000x1002); // int16u
 EmberAfStatus SetSampleMfgSpecificAttribute0x00000x1002(chip::EndpointId endpoint, uint16_t sampleMfgSpecificAttribute0x00000x1002);
-EmberAfStatus GetSampleMfgSpecificAttribute0x00000x1049(chip::EndpointId endpoint, uint8_t * sampleMfgSpecificAttribute0x00000x1049); // int8u
+EmberAfStatus GetSampleMfgSpecificAttribute0x00000x1049(chip::EndpointId endpoint,
+                                                        uint8_t * sampleMfgSpecificAttribute0x00000x1049); // int8u
 EmberAfStatus SetSampleMfgSpecificAttribute0x00000x1049(chip::EndpointId endpoint, uint8_t sampleMfgSpecificAttribute0x00000x1049);
-EmberAfStatus GetSampleMfgSpecificAttribute0x00010x1002(chip::EndpointId endpoint, uint8_t * sampleMfgSpecificAttribute0x00010x1002); // int8u
+EmberAfStatus GetSampleMfgSpecificAttribute0x00010x1002(chip::EndpointId endpoint,
+                                                        uint8_t * sampleMfgSpecificAttribute0x00010x1002); // int8u
 EmberAfStatus SetSampleMfgSpecificAttribute0x00010x1002(chip::EndpointId endpoint, uint8_t sampleMfgSpecificAttribute0x00010x1002);
-EmberAfStatus GetSampleMfgSpecificAttribute0x00010x1040(chip::EndpointId endpoint, uint16_t * sampleMfgSpecificAttribute0x00010x1040); // int16u
+EmberAfStatus GetSampleMfgSpecificAttribute0x00010x1040(chip::EndpointId endpoint,
+                                                        uint16_t * sampleMfgSpecificAttribute0x00010x1040); // int16u
 EmberAfStatus SetSampleMfgSpecificAttribute0x00010x1040(chip::EndpointId endpoint, uint16_t sampleMfgSpecificAttribute0x00010x1040);
 EmberAfStatus GetGlobalSceneControl(chip::EndpointId endpoint, uint8_t * globalSceneControl); // boolean
 EmberAfStatus SetGlobalSceneControl(chip::EndpointId endpoint, uint8_t globalSceneControl);
@@ -215,7 +219,7 @@ EmberAfStatus SetOffWaitTime(chip::EndpointId endpoint, uint16_t offWaitTime);
 EmberAfStatus GetStartUpOnOff(chip::EndpointId endpoint, uint8_t * startUpOnOff); // enum8
 EmberAfStatus SetStartUpOnOff(chip::EndpointId endpoint, uint8_t startUpOnOff);
 } // namespace Attributes
-} // OnOff
+} // namespace OnOff
 
 namespace OnOffSwitchConfiguration {
 namespace Attributes {
@@ -224,7 +228,7 @@ EmberAfStatus SetSwitchType(chip::EndpointId endpoint, uint8_t switchType);
 EmberAfStatus GetSwitchActions(chip::EndpointId endpoint, uint8_t * switchActions); // enum8
 EmberAfStatus SetSwitchActions(chip::EndpointId endpoint, uint8_t switchActions);
 } // namespace Attributes
-} // OnOffSwitchConfiguration
+} // namespace OnOffSwitchConfiguration
 
 namespace LevelControl {
 namespace Attributes {
@@ -247,19 +251,19 @@ EmberAfStatus SetDefaultMoveRate(chip::EndpointId endpoint, uint8_t defaultMoveR
 EmberAfStatus GetStartUpCurrentLevel(chip::EndpointId endpoint, uint8_t * startUpCurrentLevel); // int8u
 EmberAfStatus SetStartUpCurrentLevel(chip::EndpointId endpoint, uint8_t startUpCurrentLevel);
 } // namespace Attributes
-} // LevelControl
+} // namespace LevelControl
 
 namespace Alarms {
 namespace Attributes {
 EmberAfStatus GetAlarmCount(chip::EndpointId endpoint, uint16_t * alarmCount); // int16u
 EmberAfStatus SetAlarmCount(chip::EndpointId endpoint, uint16_t alarmCount);
 } // namespace Attributes
-} // Alarms
+} // namespace Alarms
 
 namespace Time {
 namespace Attributes {
-EmberAfStatus GetTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t *  * time); // utc
-EmberAfStatus SetTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t *  time);
+EmberAfStatus GetTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** time); // utc
+EmberAfStatus SetTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * time);
 EmberAfStatus GetTimeStatus(chip::EndpointId endpoint, uint8_t * timeStatus); // bitmap8
 EmberAfStatus SetTimeStatus(chip::EndpointId endpoint, uint8_t timeStatus);
 EmberAfStatus GetTimeZone(chip::EndpointId endpoint, int32_t * timeZone); // int32s
@@ -274,12 +278,12 @@ EmberAfStatus GetStandardTime(chip::EndpointId endpoint, uint32_t * standardTime
 EmberAfStatus SetStandardTime(chip::EndpointId endpoint, uint32_t standardTime);
 EmberAfStatus GetLocalTime(chip::EndpointId endpoint, uint32_t * localTime); // int32u
 EmberAfStatus SetLocalTime(chip::EndpointId endpoint, uint32_t localTime);
-EmberAfStatus GetLastSetTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t *  * lastSetTime); // utc
-EmberAfStatus SetLastSetTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t *  lastSetTime);
-EmberAfStatus GetValidUntilTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t *  * validUntilTime); // utc
-EmberAfStatus SetValidUntilTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t *  validUntilTime);
+EmberAfStatus GetLastSetTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** lastSetTime); // utc
+EmberAfStatus SetLastSetTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * lastSetTime);
+EmberAfStatus GetValidUntilTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t ** validUntilTime); // utc
+EmberAfStatus SetValidUntilTime(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t * validUntilTime);
 } // namespace Attributes
-} // Time
+} // namespace Time
 
 namespace BinaryInputBasic {
 namespace Attributes {
@@ -296,7 +300,7 @@ EmberAfStatus SetStatusFlags(chip::EndpointId endpoint, uint8_t statusFlags);
 EmberAfStatus GetApplicationType(chip::EndpointId endpoint, uint32_t * applicationType); // int32u
 EmberAfStatus SetApplicationType(chip::EndpointId endpoint, uint32_t applicationType);
 } // namespace Attributes
-} // BinaryInputBasic
+} // namespace BinaryInputBasic
 
 namespace PowerProfile {
 namespace Attributes {
@@ -311,7 +315,7 @@ EmberAfStatus SetEnergyRemote(chip::EndpointId endpoint, uint8_t energyRemote);
 EmberAfStatus GetScheduleMode(chip::EndpointId endpoint, uint8_t * scheduleMode); // bitmap8
 EmberAfStatus SetScheduleMode(chip::EndpointId endpoint, uint8_t scheduleMode);
 } // namespace Attributes
-} // PowerProfile
+} // namespace PowerProfile
 
 namespace ApplianceControl {
 namespace Attributes {
@@ -322,12 +326,12 @@ EmberAfStatus SetFinishTime(chip::EndpointId endpoint, uint16_t finishTime);
 EmberAfStatus GetRemainingTime(chip::EndpointId endpoint, uint16_t * remainingTime); // int16u
 EmberAfStatus SetRemainingTime(chip::EndpointId endpoint, uint16_t remainingTime);
 } // namespace Attributes
-} // ApplianceControl
+} // namespace ApplianceControl
 
 namespace Descriptor {
 namespace Attributes {
 } // namespace Attributes
-} // Descriptor
+} // namespace Descriptor
 
 namespace PollControl {
 namespace Attributes {
@@ -346,7 +350,7 @@ EmberAfStatus SetLongPollIntervalMin(chip::EndpointId endpoint, uint32_t longPol
 EmberAfStatus GetFastPollTimeoutMax(chip::EndpointId endpoint, uint16_t * fastPollTimeoutMax); // int16u
 EmberAfStatus SetFastPollTimeoutMax(chip::EndpointId endpoint, uint16_t fastPollTimeoutMax);
 } // namespace Attributes
-} // PollControl
+} // namespace PollControl
 
 namespace Basic {
 namespace Attributes {
@@ -365,14 +369,14 @@ EmberAfStatus SetLocalConfigDisabled(chip::EndpointId endpoint, uint8_t localCon
 EmberAfStatus GetReachable(chip::EndpointId endpoint, uint8_t * reachable); // boolean
 EmberAfStatus SetReachable(chip::EndpointId endpoint, uint8_t reachable);
 } // namespace Attributes
-} // Basic
+} // namespace Basic
 
 namespace GeneralCommissioning {
 namespace Attributes {
 EmberAfStatus GetBreadcrumb(chip::EndpointId endpoint, uint64_t * breadcrumb); // int64u
 EmberAfStatus SetBreadcrumb(chip::EndpointId endpoint, uint64_t breadcrumb);
 } // namespace Attributes
-} // GeneralCommissioning
+} // namespace GeneralCommissioning
 
 namespace GeneralDiagnostics {
 namespace Attributes {
@@ -385,7 +389,7 @@ EmberAfStatus SetTotalOperationalHours(chip::EndpointId endpoint, uint32_t total
 EmberAfStatus GetBootReasons(chip::EndpointId endpoint, uint8_t * bootReasons); // enum8
 EmberAfStatus SetBootReasons(chip::EndpointId endpoint, uint8_t bootReasons);
 } // namespace Attributes
-} // GeneralDiagnostics
+} // namespace GeneralDiagnostics
 
 namespace SoftwareDiagnostics {
 namespace Attributes {
@@ -396,7 +400,7 @@ EmberAfStatus SetCurrentHeapUsed(chip::EndpointId endpoint, uint64_t currentHeap
 EmberAfStatus GetCurrentHeapHighWatermark(chip::EndpointId endpoint, uint64_t * currentHeapHighWatermark); // int64u
 EmberAfStatus SetCurrentHeapHighWatermark(chip::EndpointId endpoint, uint64_t currentHeapHighWatermark);
 } // namespace Attributes
-} // SoftwareDiagnostics
+} // namespace SoftwareDiagnostics
 
 namespace ThreadNetworkDiagnostics {
 namespace Attributes {
@@ -432,7 +436,8 @@ EmberAfStatus GetAttachAttemptCount(chip::EndpointId endpoint, uint16_t * attach
 EmberAfStatus SetAttachAttemptCount(chip::EndpointId endpoint, uint16_t attachAttemptCount);
 EmberAfStatus GetPartitionIdChangeCount(chip::EndpointId endpoint, uint16_t * partitionIdChangeCount); // int16u
 EmberAfStatus SetPartitionIdChangeCount(chip::EndpointId endpoint, uint16_t partitionIdChangeCount);
-EmberAfStatus GetBetterPartitionAttachAttemptCount(chip::EndpointId endpoint, uint16_t * betterPartitionAttachAttemptCount); // int16u
+EmberAfStatus GetBetterPartitionAttachAttemptCount(chip::EndpointId endpoint,
+                                                   uint16_t * betterPartitionAttachAttemptCount); // int16u
 EmberAfStatus SetBetterPartitionAttachAttemptCount(chip::EndpointId endpoint, uint16_t betterPartitionAttachAttemptCount);
 EmberAfStatus GetParentChangeCount(chip::EndpointId endpoint, uint16_t * parentChangeCount); // int16u
 EmberAfStatus SetParentChangeCount(chip::EndpointId endpoint, uint16_t parentChangeCount);
@@ -513,7 +518,7 @@ EmberAfStatus SetDelay(chip::EndpointId endpoint, uint32_t delay);
 EmberAfStatus GetChannelMask(chip::EndpointId endpoint, uint8_t * channelMask); // int8u
 EmberAfStatus SetChannelMask(chip::EndpointId endpoint, uint8_t channelMask);
 } // namespace Attributes
-} // ThreadNetworkDiagnostics
+} // namespace ThreadNetworkDiagnostics
 
 namespace WiFiNetworkDiagnostics {
 namespace Attributes {
@@ -542,7 +547,7 @@ EmberAfStatus SetCurrentMaxRate(chip::EndpointId endpoint, uint64_t currentMaxRa
 EmberAfStatus GetOverrunCount(chip::EndpointId endpoint, uint64_t * overrunCount); // int64u
 EmberAfStatus SetOverrunCount(chip::EndpointId endpoint, uint64_t overrunCount);
 } // namespace Attributes
-} // WiFiNetworkDiagnostics
+} // namespace WiFiNetworkDiagnostics
 
 namespace EthernetNetworkDiagnostics {
 namespace Attributes {
@@ -565,7 +570,7 @@ EmberAfStatus SetCarrierDetect(chip::EndpointId endpoint, uint8_t carrierDetect)
 EmberAfStatus GetTimeSinceReset(chip::EndpointId endpoint, uint64_t * timeSinceReset); // int64u
 EmberAfStatus SetTimeSinceReset(chip::EndpointId endpoint, uint64_t timeSinceReset);
 } // namespace Attributes
-} // EthernetNetworkDiagnostics
+} // namespace EthernetNetworkDiagnostics
 
 namespace BridgedDeviceBasic {
 namespace Attributes {
@@ -578,7 +583,7 @@ EmberAfStatus SetSoftwareVersion(chip::EndpointId endpoint, uint32_t softwareVer
 EmberAfStatus GetReachable(chip::EndpointId endpoint, uint8_t * reachable); // boolean
 EmberAfStatus SetReachable(chip::EndpointId endpoint, uint8_t reachable);
 } // namespace Attributes
-} // BridgedDeviceBasic
+} // namespace BridgedDeviceBasic
 
 namespace Switch {
 namespace Attributes {
@@ -589,17 +594,17 @@ EmberAfStatus SetCurrentPosition(chip::EndpointId endpoint, uint8_t currentPosit
 EmberAfStatus GetMultiPressMax(chip::EndpointId endpoint, uint8_t * multiPressMax); // int8u
 EmberAfStatus SetMultiPressMax(chip::EndpointId endpoint, uint8_t multiPressMax);
 } // namespace Attributes
-} // Switch
+} // namespace Switch
 
 namespace OperationalCredentials {
 namespace Attributes {
 } // namespace Attributes
-} // OperationalCredentials
+} // namespace OperationalCredentials
 
 namespace FixedLabel {
 namespace Attributes {
 } // namespace Attributes
-} // FixedLabel
+} // namespace FixedLabel
 
 namespace ShadeConfiguration {
 namespace Attributes {
@@ -614,7 +619,7 @@ EmberAfStatus SetClosedLimit(chip::EndpointId endpoint, uint16_t closedLimit);
 EmberAfStatus GetMode(chip::EndpointId endpoint, uint8_t * mode); // enum8
 EmberAfStatus SetMode(chip::EndpointId endpoint, uint8_t mode);
 } // namespace Attributes
-} // ShadeConfiguration
+} // namespace ShadeConfiguration
 
 namespace DoorLock {
 namespace Attributes {
@@ -640,11 +645,14 @@ EmberAfStatus GetNumPinUsersSupported(chip::EndpointId endpoint, uint16_t * numP
 EmberAfStatus SetNumPinUsersSupported(chip::EndpointId endpoint, uint16_t numPinUsersSupported);
 EmberAfStatus GetNumRfidUsersSupported(chip::EndpointId endpoint, uint16_t * numRfidUsersSupported); // int16u
 EmberAfStatus SetNumRfidUsersSupported(chip::EndpointId endpoint, uint16_t numRfidUsersSupported);
-EmberAfStatus GetNumWeekdaySchedulesSupportedPerUser(chip::EndpointId endpoint, uint8_t * numWeekdaySchedulesSupportedPerUser); // int8u
+EmberAfStatus GetNumWeekdaySchedulesSupportedPerUser(chip::EndpointId endpoint,
+                                                     uint8_t * numWeekdaySchedulesSupportedPerUser); // int8u
 EmberAfStatus SetNumWeekdaySchedulesSupportedPerUser(chip::EndpointId endpoint, uint8_t numWeekdaySchedulesSupportedPerUser);
-EmberAfStatus GetNumYeardaySchedulesSupportedPerUser(chip::EndpointId endpoint, uint8_t * numYeardaySchedulesSupportedPerUser); // int8u
+EmberAfStatus GetNumYeardaySchedulesSupportedPerUser(chip::EndpointId endpoint,
+                                                     uint8_t * numYeardaySchedulesSupportedPerUser); // int8u
 EmberAfStatus SetNumYeardaySchedulesSupportedPerUser(chip::EndpointId endpoint, uint8_t numYeardaySchedulesSupportedPerUser);
-EmberAfStatus GetNumHolidaySchedulesSupportedPerUser(chip::EndpointId endpoint, uint8_t * numHolidaySchedulesSupportedPerUser); // int8u
+EmberAfStatus GetNumHolidaySchedulesSupportedPerUser(chip::EndpointId endpoint,
+                                                     uint8_t * numHolidaySchedulesSupportedPerUser); // int8u
 EmberAfStatus SetNumHolidaySchedulesSupportedPerUser(chip::EndpointId endpoint, uint8_t numHolidaySchedulesSupportedPerUser);
 EmberAfStatus GetMaxPinLength(chip::EndpointId endpoint, uint8_t * maxPinLength); // int8u
 EmberAfStatus SetMaxPinLength(chip::EndpointId endpoint, uint8_t maxPinLength);
@@ -703,7 +711,7 @@ EmberAfStatus SetRfProgrammingEventMask(chip::EndpointId endpoint, uint16_t rfPr
 EmberAfStatus GetRfidProgrammingEventMask(chip::EndpointId endpoint, uint16_t * rfidProgrammingEventMask); // bitmap16
 EmberAfStatus SetRfidProgrammingEventMask(chip::EndpointId endpoint, uint16_t rfidProgrammingEventMask);
 } // namespace Attributes
-} // DoorLock
+} // namespace DoorLock
 
 namespace WindowCovering {
 namespace Attributes {
@@ -758,7 +766,7 @@ EmberAfStatus SetMode(chip::EndpointId endpoint, uint8_t mode);
 EmberAfStatus GetSafetyStatus(chip::EndpointId endpoint, uint16_t * safetyStatus); // bitmap16
 EmberAfStatus SetSafetyStatus(chip::EndpointId endpoint, uint16_t safetyStatus);
 } // namespace Attributes
-} // WindowCovering
+} // namespace WindowCovering
 
 namespace BarrierControl {
 namespace Attributes {
@@ -783,7 +791,7 @@ EmberAfStatus SetBarrierClosePeriod(chip::EndpointId endpoint, uint16_t barrierC
 EmberAfStatus GetBarrierPosition(chip::EndpointId endpoint, uint8_t * barrierPosition); // int8u
 EmberAfStatus SetBarrierPosition(chip::EndpointId endpoint, uint8_t barrierPosition);
 } // namespace Attributes
-} // BarrierControl
+} // namespace BarrierControl
 
 namespace PumpConfigurationAndControl {
 namespace Attributes {
@@ -832,7 +840,7 @@ EmberAfStatus SetControlMode(chip::EndpointId endpoint, uint8_t controlMode);
 EmberAfStatus GetAlarmMask(chip::EndpointId endpoint, uint16_t * alarmMask); // bitmap16
 EmberAfStatus SetAlarmMask(chip::EndpointId endpoint, uint16_t alarmMask);
 } // namespace Attributes
-} // PumpConfigurationAndControl
+} // namespace PumpConfigurationAndControl
 
 namespace Thermostat {
 namespace Attributes {
@@ -896,7 +904,8 @@ EmberAfStatus GetTemperatureSetpointHold(chip::EndpointId endpoint, uint8_t * te
 EmberAfStatus SetTemperatureSetpointHold(chip::EndpointId endpoint, uint8_t temperatureSetpointHold);
 EmberAfStatus GetTemperatureSetpointHoldDuration(chip::EndpointId endpoint, uint16_t * temperatureSetpointHoldDuration); // int16u
 EmberAfStatus SetTemperatureSetpointHoldDuration(chip::EndpointId endpoint, uint16_t temperatureSetpointHoldDuration);
-EmberAfStatus GetThermostatProgrammingOperationMode(chip::EndpointId endpoint, uint8_t * thermostatProgrammingOperationMode); // bitmap8
+EmberAfStatus GetThermostatProgrammingOperationMode(chip::EndpointId endpoint,
+                                                    uint8_t * thermostatProgrammingOperationMode); // bitmap8
 EmberAfStatus SetThermostatProgrammingOperationMode(chip::EndpointId endpoint, uint8_t thermostatProgrammingOperationMode);
 EmberAfStatus GetHvacRelayState(chip::EndpointId endpoint, uint16_t * hvacRelayState); // bitmap16
 EmberAfStatus SetHvacRelayState(chip::EndpointId endpoint, uint16_t hvacRelayState);
@@ -904,8 +913,10 @@ EmberAfStatus GetSetpointChangeSource(chip::EndpointId endpoint, uint8_t * setpo
 EmberAfStatus SetSetpointChangeSource(chip::EndpointId endpoint, uint8_t setpointChangeSource);
 EmberAfStatus GetSetpointChangeAmount(chip::EndpointId endpoint, int16_t * setpointChangeAmount); // int16s
 EmberAfStatus SetSetpointChangeAmount(chip::EndpointId endpoint, int16_t setpointChangeAmount);
-EmberAfStatus GetSetpointChangeSourceTimestamp(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t *  * setpointChangeSourceTimestamp); // utc
-EmberAfStatus SetSetpointChangeSourceTimestamp(chip::EndpointId endpoint, /* TYPE WARNING: utc defaults to */ uint8_t *  setpointChangeSourceTimestamp);
+EmberAfStatus GetSetpointChangeSourceTimestamp(chip::EndpointId endpoint,
+                                               /* TYPE WARNING: utc defaults to */ uint8_t ** setpointChangeSourceTimestamp); // utc
+EmberAfStatus SetSetpointChangeSourceTimestamp(chip::EndpointId endpoint,
+                                               /* TYPE WARNING: utc defaults to */ uint8_t * setpointChangeSourceTimestamp);
 EmberAfStatus GetAcType(chip::EndpointId endpoint, uint8_t * acType); // enum8
 EmberAfStatus SetAcType(chip::EndpointId endpoint, uint8_t acType);
 EmberAfStatus GetAcCapacity(chip::EndpointId endpoint, uint16_t * acCapacity); // int16u
@@ -923,7 +934,7 @@ EmberAfStatus SetAcCoilTemperature(chip::EndpointId endpoint, int16_t acCoilTemp
 EmberAfStatus GetAcCapacityFormat(chip::EndpointId endpoint, uint8_t * acCapacityFormat); // enum8
 EmberAfStatus SetAcCapacityFormat(chip::EndpointId endpoint, uint8_t acCapacityFormat);
 } // namespace Attributes
-} // Thermostat
+} // namespace Thermostat
 
 namespace FanControl {
 namespace Attributes {
@@ -932,7 +943,7 @@ EmberAfStatus SetFanMode(chip::EndpointId endpoint, uint8_t fanMode);
 EmberAfStatus GetFanModeSequence(chip::EndpointId endpoint, uint8_t * fanModeSequence); // enum8
 EmberAfStatus SetFanModeSequence(chip::EndpointId endpoint, uint8_t fanModeSequence);
 } // namespace Attributes
-} // FanControl
+} // namespace FanControl
 
 namespace DehumidificationControl {
 namespace Attributes {
@@ -953,7 +964,7 @@ EmberAfStatus SetDehumidificationMaxCool(chip::EndpointId endpoint, uint8_t dehu
 EmberAfStatus GetRelativeHumidityDisplay(chip::EndpointId endpoint, uint8_t * relativeHumidityDisplay); // enum8
 EmberAfStatus SetRelativeHumidityDisplay(chip::EndpointId endpoint, uint8_t relativeHumidityDisplay);
 } // namespace Attributes
-} // DehumidificationControl
+} // namespace DehumidificationControl
 
 namespace ThermostatUserInterfaceConfiguration {
 namespace Attributes {
@@ -964,7 +975,7 @@ EmberAfStatus SetKeypadLockout(chip::EndpointId endpoint, uint8_t keypadLockout)
 EmberAfStatus GetScheduleProgrammingVisibility(chip::EndpointId endpoint, uint8_t * scheduleProgrammingVisibility); // enum8
 EmberAfStatus SetScheduleProgrammingVisibility(chip::EndpointId endpoint, uint8_t scheduleProgrammingVisibility);
 } // namespace Attributes
-} // ThermostatUserInterfaceConfiguration
+} // namespace ThermostatUserInterfaceConfiguration
 
 namespace ColorControl {
 namespace Attributes {
@@ -1071,7 +1082,7 @@ EmberAfStatus SetCoupleColorTempToLevelMinMireds(chip::EndpointId endpoint, uint
 EmberAfStatus GetStartUpColorTemperatureMireds(chip::EndpointId endpoint, uint16_t * startUpColorTemperatureMireds); // int16u
 EmberAfStatus SetStartUpColorTemperatureMireds(chip::EndpointId endpoint, uint16_t startUpColorTemperatureMireds);
 } // namespace Attributes
-} // ColorControl
+} // namespace ColorControl
 
 namespace BallastConfiguration {
 namespace Attributes {
@@ -1098,7 +1109,7 @@ EmberAfStatus SetLampQuality(chip::EndpointId endpoint, uint8_t lampQuality);
 EmberAfStatus GetLampAlarmMode(chip::EndpointId endpoint, uint8_t * lampAlarmMode); // bitmap8
 EmberAfStatus SetLampAlarmMode(chip::EndpointId endpoint, uint8_t lampAlarmMode);
 } // namespace Attributes
-} // BallastConfiguration
+} // namespace BallastConfiguration
 
 namespace IlluminanceMeasurement {
 namespace Attributes {
@@ -1113,7 +1124,7 @@ EmberAfStatus SetTolerance(chip::EndpointId endpoint, uint16_t tolerance);
 EmberAfStatus GetLightSensorType(chip::EndpointId endpoint, uint8_t * lightSensorType); // enum8
 EmberAfStatus SetLightSensorType(chip::EndpointId endpoint, uint8_t lightSensorType);
 } // namespace Attributes
-} // IlluminanceMeasurement
+} // namespace IlluminanceMeasurement
 
 namespace IlluminanceLevelSensing {
 namespace Attributes {
@@ -1124,7 +1135,7 @@ EmberAfStatus SetLightSensorType(chip::EndpointId endpoint, uint8_t lightSensorT
 EmberAfStatus GetIlluminanceLevelTarget(chip::EndpointId endpoint, uint16_t * illuminanceLevelTarget); // int16u
 EmberAfStatus SetIlluminanceLevelTarget(chip::EndpointId endpoint, uint16_t illuminanceLevelTarget);
 } // namespace Attributes
-} // IlluminanceLevelSensing
+} // namespace IlluminanceLevelSensing
 
 namespace TemperatureMeasurement {
 namespace Attributes {
@@ -1137,7 +1148,7 @@ EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, int16_t maxMeasured
 EmberAfStatus GetTolerance(chip::EndpointId endpoint, uint16_t * tolerance); // int16u
 EmberAfStatus SetTolerance(chip::EndpointId endpoint, uint16_t tolerance);
 } // namespace Attributes
-} // TemperatureMeasurement
+} // namespace TemperatureMeasurement
 
 namespace PressureMeasurement {
 namespace Attributes {
@@ -1160,7 +1171,7 @@ EmberAfStatus SetScaledTolerance(chip::EndpointId endpoint, uint16_t scaledToler
 EmberAfStatus GetScale(chip::EndpointId endpoint, int8_t * scale); // int8s
 EmberAfStatus SetScale(chip::EndpointId endpoint, int8_t scale);
 } // namespace Attributes
-} // PressureMeasurement
+} // namespace PressureMeasurement
 
 namespace FlowMeasurement {
 namespace Attributes {
@@ -1173,7 +1184,7 @@ EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, int16_t maxMeasured
 EmberAfStatus GetTolerance(chip::EndpointId endpoint, uint16_t * tolerance); // int16u
 EmberAfStatus SetTolerance(chip::EndpointId endpoint, uint16_t tolerance);
 } // namespace Attributes
-} // FlowMeasurement
+} // namespace FlowMeasurement
 
 namespace RelativeHumidityMeasurement {
 namespace Attributes {
@@ -1186,7 +1197,7 @@ EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, uint16_t maxMeasure
 EmberAfStatus GetTolerance(chip::EndpointId endpoint, uint16_t * tolerance); // int16u
 EmberAfStatus SetTolerance(chip::EndpointId endpoint, uint16_t tolerance);
 } // namespace Attributes
-} // RelativeHumidityMeasurement
+} // namespace RelativeHumidityMeasurement
 
 namespace OccupancySensing {
 namespace Attributes {
@@ -1202,410 +1213,510 @@ EmberAfStatus GetPirUnoccupiedToOccupiedDelay(chip::EndpointId endpoint, uint16_
 EmberAfStatus SetPirUnoccupiedToOccupiedDelay(chip::EndpointId endpoint, uint16_t pirUnoccupiedToOccupiedDelay);
 EmberAfStatus GetPirUnoccupiedToOccupiedThreshold(chip::EndpointId endpoint, uint8_t * pirUnoccupiedToOccupiedThreshold); // int8u
 EmberAfStatus SetPirUnoccupiedToOccupiedThreshold(chip::EndpointId endpoint, uint8_t pirUnoccupiedToOccupiedThreshold);
-EmberAfStatus GetUltrasonicOccupiedToUnoccupiedDelay(chip::EndpointId endpoint, uint16_t * ultrasonicOccupiedToUnoccupiedDelay); // int16u
+EmberAfStatus GetUltrasonicOccupiedToUnoccupiedDelay(chip::EndpointId endpoint,
+                                                     uint16_t * ultrasonicOccupiedToUnoccupiedDelay); // int16u
 EmberAfStatus SetUltrasonicOccupiedToUnoccupiedDelay(chip::EndpointId endpoint, uint16_t ultrasonicOccupiedToUnoccupiedDelay);
-EmberAfStatus GetUltrasonicUnoccupiedToOccupiedDelay(chip::EndpointId endpoint, uint16_t * ultrasonicUnoccupiedToOccupiedDelay); // int16u
+EmberAfStatus GetUltrasonicUnoccupiedToOccupiedDelay(chip::EndpointId endpoint,
+                                                     uint16_t * ultrasonicUnoccupiedToOccupiedDelay); // int16u
 EmberAfStatus SetUltrasonicUnoccupiedToOccupiedDelay(chip::EndpointId endpoint, uint16_t ultrasonicUnoccupiedToOccupiedDelay);
-EmberAfStatus GetUltrasonicUnoccupiedToOccupiedThreshold(chip::EndpointId endpoint, uint8_t * ultrasonicUnoccupiedToOccupiedThreshold); // int8u
-EmberAfStatus SetUltrasonicUnoccupiedToOccupiedThreshold(chip::EndpointId endpoint, uint8_t ultrasonicUnoccupiedToOccupiedThreshold);
-EmberAfStatus GetPhysicalContactOccupiedToUnoccupiedDelay(chip::EndpointId endpoint, uint16_t * physicalContactOccupiedToUnoccupiedDelay); // int16u
-EmberAfStatus SetPhysicalContactOccupiedToUnoccupiedDelay(chip::EndpointId endpoint, uint16_t physicalContactOccupiedToUnoccupiedDelay);
-EmberAfStatus GetPhysicalContactUnoccupiedToOccupiedDelay(chip::EndpointId endpoint, uint16_t * physicalContactUnoccupiedToOccupiedDelay); // int16u
-EmberAfStatus SetPhysicalContactUnoccupiedToOccupiedDelay(chip::EndpointId endpoint, uint16_t physicalContactUnoccupiedToOccupiedDelay);
-EmberAfStatus GetPhysicalContactUnoccupiedToOccupiedThreshold(chip::EndpointId endpoint, uint8_t * physicalContactUnoccupiedToOccupiedThreshold); // int8u
-EmberAfStatus SetPhysicalContactUnoccupiedToOccupiedThreshold(chip::EndpointId endpoint, uint8_t physicalContactUnoccupiedToOccupiedThreshold);
+EmberAfStatus GetUltrasonicUnoccupiedToOccupiedThreshold(chip::EndpointId endpoint,
+                                                         uint8_t * ultrasonicUnoccupiedToOccupiedThreshold); // int8u
+EmberAfStatus SetUltrasonicUnoccupiedToOccupiedThreshold(chip::EndpointId endpoint,
+                                                         uint8_t ultrasonicUnoccupiedToOccupiedThreshold);
+EmberAfStatus GetPhysicalContactOccupiedToUnoccupiedDelay(chip::EndpointId endpoint,
+                                                          uint16_t * physicalContactOccupiedToUnoccupiedDelay); // int16u
+EmberAfStatus SetPhysicalContactOccupiedToUnoccupiedDelay(chip::EndpointId endpoint,
+                                                          uint16_t physicalContactOccupiedToUnoccupiedDelay);
+EmberAfStatus GetPhysicalContactUnoccupiedToOccupiedDelay(chip::EndpointId endpoint,
+                                                          uint16_t * physicalContactUnoccupiedToOccupiedDelay); // int16u
+EmberAfStatus SetPhysicalContactUnoccupiedToOccupiedDelay(chip::EndpointId endpoint,
+                                                          uint16_t physicalContactUnoccupiedToOccupiedDelay);
+EmberAfStatus GetPhysicalContactUnoccupiedToOccupiedThreshold(chip::EndpointId endpoint,
+                                                              uint8_t * physicalContactUnoccupiedToOccupiedThreshold); // int8u
+EmberAfStatus SetPhysicalContactUnoccupiedToOccupiedThreshold(chip::EndpointId endpoint,
+                                                              uint8_t physicalContactUnoccupiedToOccupiedThreshold);
 } // namespace Attributes
-} // OccupancySensing
+} // namespace OccupancySensing
 
 namespace CarbonMonoxideConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // CarbonMonoxideConcentrationMeasurement
+} // namespace CarbonMonoxideConcentrationMeasurement
 
 namespace CarbonDioxideConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // CarbonDioxideConcentrationMeasurement
+} // namespace CarbonDioxideConcentrationMeasurement
 
 namespace EthyleneConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // EthyleneConcentrationMeasurement
+} // namespace EthyleneConcentrationMeasurement
 
 namespace EthyleneOxideConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // EthyleneOxideConcentrationMeasurement
+} // namespace EthyleneOxideConcentrationMeasurement
 
 namespace HydrogenConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // HydrogenConcentrationMeasurement
+} // namespace HydrogenConcentrationMeasurement
 
 namespace HydrogenSulphideConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // HydrogenSulphideConcentrationMeasurement
+} // namespace HydrogenSulphideConcentrationMeasurement
 
 namespace NitricOxideConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // NitricOxideConcentrationMeasurement
+} // namespace NitricOxideConcentrationMeasurement
 
 namespace NitrogenDioxideConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // NitrogenDioxideConcentrationMeasurement
+} // namespace NitrogenDioxideConcentrationMeasurement
 
 namespace OxygenConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // OxygenConcentrationMeasurement
+} // namespace OxygenConcentrationMeasurement
 
 namespace OzoneConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // OzoneConcentrationMeasurement
+} // namespace OzoneConcentrationMeasurement
 
 namespace SulfurDioxideConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // SulfurDioxideConcentrationMeasurement
+} // namespace SulfurDioxideConcentrationMeasurement
 
 namespace DissolvedOxygenConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // DissolvedOxygenConcentrationMeasurement
+} // namespace DissolvedOxygenConcentrationMeasurement
 
 namespace BromateConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // BromateConcentrationMeasurement
+} // namespace BromateConcentrationMeasurement
 
 namespace ChloraminesConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // ChloraminesConcentrationMeasurement
+} // namespace ChloraminesConcentrationMeasurement
 
 namespace ChlorineConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // ChlorineConcentrationMeasurement
+} // namespace ChlorineConcentrationMeasurement
 
 namespace FecalColiformAndEColiConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // FecalColiformAndEColiConcentrationMeasurement
+} // namespace FecalColiformAndEColiConcentrationMeasurement
 
 namespace FluorideConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // FluorideConcentrationMeasurement
+} // namespace FluorideConcentrationMeasurement
 
 namespace HaloaceticAcidsConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // HaloaceticAcidsConcentrationMeasurement
+} // namespace HaloaceticAcidsConcentrationMeasurement
 
 namespace TotalTrihalomethanesConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // TotalTrihalomethanesConcentrationMeasurement
+} // namespace TotalTrihalomethanesConcentrationMeasurement
 
 namespace TotalColiformBacteriaConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // TotalColiformBacteriaConcentrationMeasurement
+} // namespace TotalColiformBacteriaConcentrationMeasurement
 
 namespace TurbidityConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // TurbidityConcentrationMeasurement
+} // namespace TurbidityConcentrationMeasurement
 
 namespace CopperConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // CopperConcentrationMeasurement
+} // namespace CopperConcentrationMeasurement
 
 namespace LeadConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // LeadConcentrationMeasurement
+} // namespace LeadConcentrationMeasurement
 
 namespace ManganeseConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // ManganeseConcentrationMeasurement
+} // namespace ManganeseConcentrationMeasurement
 
 namespace SulfateConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // SulfateConcentrationMeasurement
+} // namespace SulfateConcentrationMeasurement
 
 namespace BromodichloromethaneConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // BromodichloromethaneConcentrationMeasurement
+} // namespace BromodichloromethaneConcentrationMeasurement
 
 namespace BromoformConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // BromoformConcentrationMeasurement
+} // namespace BromoformConcentrationMeasurement
 
 namespace ChlorodibromomethaneConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // ChlorodibromomethaneConcentrationMeasurement
+} // namespace ChlorodibromomethaneConcentrationMeasurement
 
 namespace ChloroformConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // ChloroformConcentrationMeasurement
+} // namespace ChloroformConcentrationMeasurement
 
 namespace SodiumConcentrationMeasurement {
 namespace Attributes {
-EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * measuredValue); // single
-EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  measuredValue);
-EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * minMeasuredValue); // single
-EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  minMeasuredValue);
-EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * maxMeasuredValue); // single
-EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  maxMeasuredValue);
-EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  * tolerance); // single
-EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t *  tolerance);
+EmberAfStatus GetMeasuredValue(chip::EndpointId endpoint,
+                               /* TYPE WARNING: single defaults to */ uint8_t ** measuredValue); // single
+EmberAfStatus SetMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * measuredValue);
+EmberAfStatus GetMinMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** minMeasuredValue); // single
+EmberAfStatus SetMinMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * minMeasuredValue);
+EmberAfStatus GetMaxMeasuredValue(chip::EndpointId endpoint,
+                                  /* TYPE WARNING: single defaults to */ uint8_t ** maxMeasuredValue); // single
+EmberAfStatus SetMaxMeasuredValue(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * maxMeasuredValue);
+EmberAfStatus GetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t ** tolerance); // single
+EmberAfStatus SetTolerance(chip::EndpointId endpoint, /* TYPE WARNING: single defaults to */ uint8_t * tolerance);
 } // namespace Attributes
-} // SodiumConcentrationMeasurement
+} // namespace SodiumConcentrationMeasurement
 
 namespace IasZone {
 namespace Attributes {
@@ -1619,36 +1730,37 @@ EmberAfStatus GetIasCieAddress(chip::EndpointId endpoint, chip::NodeId * iasCieA
 EmberAfStatus SetIasCieAddress(chip::EndpointId endpoint, chip::NodeId iasCieAddress);
 EmberAfStatus GetZoneId(chip::EndpointId endpoint, uint8_t * zoneId); // int8u
 EmberAfStatus SetZoneId(chip::EndpointId endpoint, uint8_t zoneId);
-EmberAfStatus GetNumberOfZoneSensitivityLevelsSupported(chip::EndpointId endpoint, uint8_t * numberOfZoneSensitivityLevelsSupported); // int8u
+EmberAfStatus GetNumberOfZoneSensitivityLevelsSupported(chip::EndpointId endpoint,
+                                                        uint8_t * numberOfZoneSensitivityLevelsSupported); // int8u
 EmberAfStatus SetNumberOfZoneSensitivityLevelsSupported(chip::EndpointId endpoint, uint8_t numberOfZoneSensitivityLevelsSupported);
 EmberAfStatus GetCurrentZoneSensitivityLevel(chip::EndpointId endpoint, uint8_t * currentZoneSensitivityLevel); // int8u
 EmberAfStatus SetCurrentZoneSensitivityLevel(chip::EndpointId endpoint, uint8_t currentZoneSensitivityLevel);
 } // namespace Attributes
-} // IasZone
+} // namespace IasZone
 
 namespace IasWd {
 namespace Attributes {
 EmberAfStatus GetMaxDuration(chip::EndpointId endpoint, uint16_t * maxDuration); // int16u
 EmberAfStatus SetMaxDuration(chip::EndpointId endpoint, uint16_t maxDuration);
 } // namespace Attributes
-} // IasWd
+} // namespace IasWd
 
 namespace WakeOnLan {
 namespace Attributes {
 } // namespace Attributes
-} // WakeOnLan
+} // namespace WakeOnLan
 
 namespace TvChannel {
 namespace Attributes {
 } // namespace Attributes
-} // TvChannel
+} // namespace TvChannel
 
 namespace TargetNavigator {
 namespace Attributes {
 EmberAfStatus GetCurrentNavigatorTarget(chip::EndpointId endpoint, uint8_t * currentNavigatorTarget); // int8u
 EmberAfStatus SetCurrentNavigatorTarget(chip::EndpointId endpoint, uint8_t currentNavigatorTarget);
 } // namespace Attributes
-} // TargetNavigator
+} // namespace TargetNavigator
 
 namespace MediaPlayback {
 namespace Attributes {
@@ -1669,26 +1781,26 @@ EmberAfStatus SetSeekRangeEnd(chip::EndpointId endpoint, uint64_t seekRangeEnd);
 EmberAfStatus GetSeekRangeStart(chip::EndpointId endpoint, uint64_t * seekRangeStart); // int64u
 EmberAfStatus SetSeekRangeStart(chip::EndpointId endpoint, uint64_t seekRangeStart);
 } // namespace Attributes
-} // MediaPlayback
+} // namespace MediaPlayback
 
 namespace MediaInput {
 namespace Attributes {
 EmberAfStatus GetCurrentMediaInput(chip::EndpointId endpoint, uint8_t * currentMediaInput); // int8u
 EmberAfStatus SetCurrentMediaInput(chip::EndpointId endpoint, uint8_t currentMediaInput);
 } // namespace Attributes
-} // MediaInput
+} // namespace MediaInput
 
 namespace ContentLauncher {
 namespace Attributes {
 } // namespace Attributes
-} // ContentLauncher
+} // namespace ContentLauncher
 
 namespace AudioOutput {
 namespace Attributes {
 EmberAfStatus GetCurrentAudioOutput(chip::EndpointId endpoint, uint8_t * currentAudioOutput); // int8u
 EmberAfStatus SetCurrentAudioOutput(chip::EndpointId endpoint, uint8_t currentAudioOutput);
 } // namespace Attributes
-} // AudioOutput
+} // namespace AudioOutput
 
 namespace ApplicationLauncher {
 namespace Attributes {
@@ -1697,7 +1809,7 @@ EmberAfStatus SetCatalogVendorId(chip::EndpointId endpoint, uint8_t catalogVendo
 EmberAfStatus GetApplicationId(chip::EndpointId endpoint, uint8_t * applicationId); // int8u
 EmberAfStatus SetApplicationId(chip::EndpointId endpoint, uint8_t applicationId);
 } // namespace Attributes
-} // ApplicationLauncher
+} // namespace ApplicationLauncher
 
 namespace ApplicationBasic {
 namespace Attributes {
@@ -1710,7 +1822,7 @@ EmberAfStatus SetCatalogVendorId(chip::EndpointId endpoint, uint16_t catalogVend
 EmberAfStatus GetApplicationStatus(chip::EndpointId endpoint, uint8_t * applicationStatus); // enum8
 EmberAfStatus SetApplicationStatus(chip::EndpointId endpoint, uint8_t applicationStatus);
 } // namespace Attributes
-} // ApplicationBasic
+} // namespace ApplicationBasic
 
 namespace TestCluster {
 namespace Attributes {
@@ -1747,7 +1859,7 @@ EmberAfStatus SetEnum16(chip::EndpointId endpoint, uint16_t enum16);
 EmberAfStatus GetUnsupported(chip::EndpointId endpoint, uint8_t * unsupported); // boolean
 EmberAfStatus SetUnsupported(chip::EndpointId endpoint, uint8_t unsupported);
 } // namespace Attributes
-} // TestCluster
+} // namespace TestCluster
 
 namespace ApplianceIdentification {
 namespace Attributes {
@@ -1760,7 +1872,7 @@ EmberAfStatus SetProductTypeId(chip::EndpointId endpoint, uint16_t productTypeId
 EmberAfStatus GetCecedSpecificationVersion(chip::EndpointId endpoint, uint8_t * cecedSpecificationVersion); // int8u
 EmberAfStatus SetCecedSpecificationVersion(chip::EndpointId endpoint, uint8_t cecedSpecificationVersion);
 } // namespace Attributes
-} // ApplianceIdentification
+} // namespace ApplianceIdentification
 
 namespace MeterIdentification {
 namespace Attributes {
@@ -1769,7 +1881,7 @@ EmberAfStatus SetMeterTypeId(chip::EndpointId endpoint, uint16_t meterTypeId);
 EmberAfStatus GetDataQualityId(chip::EndpointId endpoint, uint16_t * dataQualityId); // int16u
 EmberAfStatus SetDataQualityId(chip::EndpointId endpoint, uint16_t dataQualityId);
 } // namespace Attributes
-} // MeterIdentification
+} // namespace MeterIdentification
 
 namespace ApplianceStatistics {
 namespace Attributes {
@@ -1778,7 +1890,7 @@ EmberAfStatus SetLogMaxSize(chip::EndpointId endpoint, uint32_t logMaxSize);
 EmberAfStatus GetLogQueueMaxSize(chip::EndpointId endpoint, uint8_t * logQueueMaxSize); // int8u
 EmberAfStatus SetLogQueueMaxSize(chip::EndpointId endpoint, uint8_t logQueueMaxSize);
 } // namespace Attributes
-} // ApplianceStatistics
+} // namespace ApplianceStatistics
 
 namespace ElectricalMeasurement {
 namespace Attributes {
@@ -1898,7 +2010,8 @@ EmberAfStatus GetApparentPower(chip::EndpointId endpoint, uint16_t * apparentPow
 EmberAfStatus SetApparentPower(chip::EndpointId endpoint, uint16_t apparentPower);
 EmberAfStatus GetPowerFactor(chip::EndpointId endpoint, int8_t * powerFactor); // int8s
 EmberAfStatus SetPowerFactor(chip::EndpointId endpoint, int8_t powerFactor);
-EmberAfStatus GetAverageRmsVoltageMeasurementPeriod(chip::EndpointId endpoint, uint16_t * averageRmsVoltageMeasurementPeriod); // int16u
+EmberAfStatus GetAverageRmsVoltageMeasurementPeriod(chip::EndpointId endpoint,
+                                                    uint16_t * averageRmsVoltageMeasurementPeriod); // int16u
 EmberAfStatus SetAverageRmsVoltageMeasurementPeriod(chip::EndpointId endpoint, uint16_t averageRmsVoltageMeasurementPeriod);
 EmberAfStatus GetAverageRmsUnderVoltageCounter(chip::EndpointId endpoint, uint16_t * averageRmsUnderVoltageCounter); // int16u
 EmberAfStatus SetAverageRmsUnderVoltageCounter(chip::EndpointId endpoint, uint16_t averageRmsUnderVoltageCounter);
@@ -1980,15 +2093,21 @@ EmberAfStatus GetApparentPowerPhaseB(chip::EndpointId endpoint, uint16_t * appar
 EmberAfStatus SetApparentPowerPhaseB(chip::EndpointId endpoint, uint16_t apparentPowerPhaseB);
 EmberAfStatus GetPowerFactorPhaseB(chip::EndpointId endpoint, int8_t * powerFactorPhaseB); // int8s
 EmberAfStatus SetPowerFactorPhaseB(chip::EndpointId endpoint, int8_t powerFactorPhaseB);
-EmberAfStatus GetAverageRmsVoltageMeasurementPeriodPhaseB(chip::EndpointId endpoint, uint16_t * averageRmsVoltageMeasurementPeriodPhaseB); // int16u
-EmberAfStatus SetAverageRmsVoltageMeasurementPeriodPhaseB(chip::EndpointId endpoint, uint16_t averageRmsVoltageMeasurementPeriodPhaseB);
-EmberAfStatus GetAverageRmsOverVoltageCounterPhaseB(chip::EndpointId endpoint, uint16_t * averageRmsOverVoltageCounterPhaseB); // int16u
+EmberAfStatus GetAverageRmsVoltageMeasurementPeriodPhaseB(chip::EndpointId endpoint,
+                                                          uint16_t * averageRmsVoltageMeasurementPeriodPhaseB); // int16u
+EmberAfStatus SetAverageRmsVoltageMeasurementPeriodPhaseB(chip::EndpointId endpoint,
+                                                          uint16_t averageRmsVoltageMeasurementPeriodPhaseB);
+EmberAfStatus GetAverageRmsOverVoltageCounterPhaseB(chip::EndpointId endpoint,
+                                                    uint16_t * averageRmsOverVoltageCounterPhaseB); // int16u
 EmberAfStatus SetAverageRmsOverVoltageCounterPhaseB(chip::EndpointId endpoint, uint16_t averageRmsOverVoltageCounterPhaseB);
-EmberAfStatus GetAverageRmsUnderVoltageCounterPhaseB(chip::EndpointId endpoint, uint16_t * averageRmsUnderVoltageCounterPhaseB); // int16u
+EmberAfStatus GetAverageRmsUnderVoltageCounterPhaseB(chip::EndpointId endpoint,
+                                                     uint16_t * averageRmsUnderVoltageCounterPhaseB); // int16u
 EmberAfStatus SetAverageRmsUnderVoltageCounterPhaseB(chip::EndpointId endpoint, uint16_t averageRmsUnderVoltageCounterPhaseB);
-EmberAfStatus GetRmsExtremeOverVoltagePeriodPhaseB(chip::EndpointId endpoint, uint16_t * rmsExtremeOverVoltagePeriodPhaseB); // int16u
+EmberAfStatus GetRmsExtremeOverVoltagePeriodPhaseB(chip::EndpointId endpoint,
+                                                   uint16_t * rmsExtremeOverVoltagePeriodPhaseB); // int16u
 EmberAfStatus SetRmsExtremeOverVoltagePeriodPhaseB(chip::EndpointId endpoint, uint16_t rmsExtremeOverVoltagePeriodPhaseB);
-EmberAfStatus GetRmsExtremeUnderVoltagePeriodPhaseB(chip::EndpointId endpoint, uint16_t * rmsExtremeUnderVoltagePeriodPhaseB); // int16u
+EmberAfStatus GetRmsExtremeUnderVoltagePeriodPhaseB(chip::EndpointId endpoint,
+                                                    uint16_t * rmsExtremeUnderVoltagePeriodPhaseB); // int16u
 EmberAfStatus SetRmsExtremeUnderVoltagePeriodPhaseB(chip::EndpointId endpoint, uint16_t rmsExtremeUnderVoltagePeriodPhaseB);
 EmberAfStatus GetRmsVoltageSagPeriodPhaseB(chip::EndpointId endpoint, uint16_t * rmsVoltageSagPeriodPhaseB); // int16u
 EmberAfStatus SetRmsVoltageSagPeriodPhaseB(chip::EndpointId endpoint, uint16_t rmsVoltageSagPeriodPhaseB);
@@ -2024,27 +2143,33 @@ EmberAfStatus GetApparentPowerPhaseC(chip::EndpointId endpoint, uint16_t * appar
 EmberAfStatus SetApparentPowerPhaseC(chip::EndpointId endpoint, uint16_t apparentPowerPhaseC);
 EmberAfStatus GetPowerFactorPhaseC(chip::EndpointId endpoint, int8_t * powerFactorPhaseC); // int8s
 EmberAfStatus SetPowerFactorPhaseC(chip::EndpointId endpoint, int8_t powerFactorPhaseC);
-EmberAfStatus GetAverageRmsVoltageMeasurementPeriodPhaseC(chip::EndpointId endpoint, uint16_t * averageRmsVoltageMeasurementPeriodPhaseC); // int16u
-EmberAfStatus SetAverageRmsVoltageMeasurementPeriodPhaseC(chip::EndpointId endpoint, uint16_t averageRmsVoltageMeasurementPeriodPhaseC);
-EmberAfStatus GetAverageRmsOverVoltageCounterPhaseC(chip::EndpointId endpoint, uint16_t * averageRmsOverVoltageCounterPhaseC); // int16u
+EmberAfStatus GetAverageRmsVoltageMeasurementPeriodPhaseC(chip::EndpointId endpoint,
+                                                          uint16_t * averageRmsVoltageMeasurementPeriodPhaseC); // int16u
+EmberAfStatus SetAverageRmsVoltageMeasurementPeriodPhaseC(chip::EndpointId endpoint,
+                                                          uint16_t averageRmsVoltageMeasurementPeriodPhaseC);
+EmberAfStatus GetAverageRmsOverVoltageCounterPhaseC(chip::EndpointId endpoint,
+                                                    uint16_t * averageRmsOverVoltageCounterPhaseC); // int16u
 EmberAfStatus SetAverageRmsOverVoltageCounterPhaseC(chip::EndpointId endpoint, uint16_t averageRmsOverVoltageCounterPhaseC);
-EmberAfStatus GetAverageRmsUnderVoltageCounterPhaseC(chip::EndpointId endpoint, uint16_t * averageRmsUnderVoltageCounterPhaseC); // int16u
+EmberAfStatus GetAverageRmsUnderVoltageCounterPhaseC(chip::EndpointId endpoint,
+                                                     uint16_t * averageRmsUnderVoltageCounterPhaseC); // int16u
 EmberAfStatus SetAverageRmsUnderVoltageCounterPhaseC(chip::EndpointId endpoint, uint16_t averageRmsUnderVoltageCounterPhaseC);
-EmberAfStatus GetRmsExtremeOverVoltagePeriodPhaseC(chip::EndpointId endpoint, uint16_t * rmsExtremeOverVoltagePeriodPhaseC); // int16u
+EmberAfStatus GetRmsExtremeOverVoltagePeriodPhaseC(chip::EndpointId endpoint,
+                                                   uint16_t * rmsExtremeOverVoltagePeriodPhaseC); // int16u
 EmberAfStatus SetRmsExtremeOverVoltagePeriodPhaseC(chip::EndpointId endpoint, uint16_t rmsExtremeOverVoltagePeriodPhaseC);
-EmberAfStatus GetRmsExtremeUnderVoltagePeriodPhaseC(chip::EndpointId endpoint, uint16_t * rmsExtremeUnderVoltagePeriodPhaseC); // int16u
+EmberAfStatus GetRmsExtremeUnderVoltagePeriodPhaseC(chip::EndpointId endpoint,
+                                                    uint16_t * rmsExtremeUnderVoltagePeriodPhaseC); // int16u
 EmberAfStatus SetRmsExtremeUnderVoltagePeriodPhaseC(chip::EndpointId endpoint, uint16_t rmsExtremeUnderVoltagePeriodPhaseC);
 EmberAfStatus GetRmsVoltageSagPeriodPhaseC(chip::EndpointId endpoint, uint16_t * rmsVoltageSagPeriodPhaseC); // int16u
 EmberAfStatus SetRmsVoltageSagPeriodPhaseC(chip::EndpointId endpoint, uint16_t rmsVoltageSagPeriodPhaseC);
 EmberAfStatus GetRmsVoltageSwellPeriodPhaseC(chip::EndpointId endpoint, uint16_t * rmsVoltageSwellPeriodPhaseC); // int16u
 EmberAfStatus SetRmsVoltageSwellPeriodPhaseC(chip::EndpointId endpoint, uint16_t rmsVoltageSwellPeriodPhaseC);
 } // namespace Attributes
-} // ElectricalMeasurement
+} // namespace ElectricalMeasurement
 
 namespace GroupKeyManagement {
 namespace Attributes {
 } // namespace Attributes
-} // GroupKeyManagement
+} // namespace GroupKeyManagement
 
 namespace SampleMfgSpecificCluster {
 namespace Attributes {
@@ -2053,7 +2178,7 @@ EmberAfStatus SetEmberSampleAttribute(chip::EndpointId endpoint, uint8_t emberSa
 EmberAfStatus GetEmberSampleAttribute2(chip::EndpointId endpoint, uint8_t * emberSampleAttribute2); // int8u
 EmberAfStatus SetEmberSampleAttribute2(chip::EndpointId endpoint, uint8_t emberSampleAttribute2);
 } // namespace Attributes
-} // SampleMfgSpecificCluster
+} // namespace SampleMfgSpecificCluster
 
 namespace SampleMfgSpecificCluster2 {
 namespace Attributes {
@@ -2062,9 +2187,8 @@ EmberAfStatus SetEmberSampleAttribute3(chip::EndpointId endpoint, uint16_t ember
 EmberAfStatus GetEmberSampleAttribute4(chip::EndpointId endpoint, uint16_t * emberSampleAttribute4); // int16u
 EmberAfStatus SetEmberSampleAttribute4(chip::EndpointId endpoint, uint16_t emberSampleAttribute4);
 } // namespace Attributes
-} // SampleMfgSpecificCluster2
+} // namespace SampleMfgSpecificCluster2
 
-
-} // Clusters
-} // app
-} // chip
+} // namespace Clusters
+} // namespace app
+} // namespace chip
