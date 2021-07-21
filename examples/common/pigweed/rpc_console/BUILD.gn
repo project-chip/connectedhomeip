@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,24 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import("//build_overrides/chip.gni")
-import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
-import("${chip_root}/src/app/chip_data_model.gni")
+import("//build_overrides/pigweed.gni")
 
-if (chip_enable_pw_rpc) {
-  import("//build_overrides/pigweed.gni")
-  import("$dir_pw_protobuf_compiler/proto.gni")
-
-  pw_proto_library("locking_service") {
-    sources = [ "locking_service/locking_service.proto" ]
-    deps = [ "$dir_pw_protobuf:common_protos" ]
-  }
-}
-
-chip_data_model("lock-common") {
-  zap_file = "lock-app.zap"
-
-  zap_pregenerated_dir = "gen"
-  is_server = true
+group("default") {
+  deps = [
+    "py:chip_rpc.install",
+    "py:chip_rpc_wheel",
+  ]
 }

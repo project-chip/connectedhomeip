@@ -19,25 +19,29 @@ import("$dir_pw_build/mirror_tree.gni")
 import("$dir_pw_build/python.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
-pw_python_package("lighting_app") {
+pw_python_package("chip_rpc") {
   generate_setup = {
-    name = "lighting_app"
+    name = "chip_rpc"
     version = "0.0.1"
     install_requires = [ "ipython" ]
   }
-  sources = [ "lighting_app/rpc_console.py" ]
+  sources = [ "chip_rpc/console.py" ]
   python_deps = [
+    "$dir_pw_console/py",
     "$dir_pw_hdlc/py",
+    "$dir_pw_log_tokenized/py",
     "$dir_pw_protobuf_compiler/py",
     "$dir_pw_rpc/py",
     "${chip_root}/examples/common/pigweed:button_service.python",
     "${chip_root}/examples/common/pigweed:device_service.python",
+    "${chip_root}/examples/ipv6only-app/common:wifi_service.python",
     "${chip_root}/examples/lighting-app/lighting-common:lighting_service.python",
+    "${chip_root}/examples/lock-app/lock-common:locking_service.python",
   ]
 }
 
-pw_mirror_tree("lighting_app_wheel") {
+pw_mirror_tree("chip_rpc_wheel") {
   path_data_keys = [ "pw_python_package_wheels" ]
-  deps = [ ":lighting_app.wheel" ]
-  directory = "$root_out_dir/lighting_app_wheels"
+  deps = [ ":chip_rpc.wheel" ]
+  directory = "$root_out_dir/chip_rpc_console_wheels"
 }
