@@ -233,7 +233,6 @@ CHIP_ERROR GetFloatingImpl(TLVElementType elementType, uint64_t elemLenOrVal, T 
 }
 } // namespace
 
-
 CHIP_ERROR TLVReader::Get(float & v)
 {
     return GetFloatingImpl(ElementType(), mElemLenOrVal, v);
