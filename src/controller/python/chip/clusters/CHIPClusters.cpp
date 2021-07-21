@@ -5274,7 +5274,7 @@ CHIP_ERROR chip_ime_ReadAttribute_Thermostat_FeatureMap(chip::Controller::Device
 }
 
 CHIP_ERROR chip_ime_ReadAttribute_Thermostat_ClusterRevision(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                             chip::GroupId /* ZCLgroupId */)  
+                                                             chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
     chip::Controller::ThermostatCluster cluster;
