@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "gdm_wifi_service.h"
+#include "wifi_service.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
@@ -197,9 +197,9 @@ wifi_ap_record_t scan_records[kScanRecordsMax] = { 0 };
 
 } // namespace
 
-GDMWifiBase GDMWifiBase::instance_;
+Wifi Wifi::instance_;
 
-pw::Status GDMWifiBase::Init()
+pw::Status Wifi::Init()
 {
     wifi_connected_semaphore_ = xSemaphoreCreateBinary();
     PW_TRY(EspToPwStatus(esp_netif_init()));
@@ -218,7 +218,7 @@ pw::Status GDMWifiBase::Init()
     return pw::OkStatus();
 }
 
-pw::Status GDMWifiBase::Connect(ServerContext &, const chip_rpc_ConnectionData & request, chip_rpc_ConnectionResult & response)
+pw::Status Wifi::Connect(ServerContext &, const chip_rpc_ConnectionData & request, chip_rpc_ConnectionResult & response)
 {
     wifi_config_t wifi_config {
         .sta = {
@@ -263,7 +263,7 @@ pw::Status GDMWifiBase::Connect(ServerContext &, const chip_rpc_ConnectionData &
     return pw::OkStatus();
 }
 
-void GDMWifiBase::StartScan(ServerContext &, const chip_rpc_ScanConfig & request, ServerWriter<chip_rpc_ScanResults> & writer)
+void Wifi::StartScan(ServerContext &, const chip_rpc_ScanConfig & request, ServerWriter<chip_rpc_ScanResults> & writer)
 {
     wifi_scan_config_t scan_config{ 0 };
     if (request.ssid_count != 0)
@@ -321,7 +321,7 @@ void GDMWifiBase::StartScan(ServerContext &, const chip_rpc_ScanConfig & request
     writer.Finish();
 }
 
-void GDMWifiBase::WifiEventHandler(void * arg, esp_event_base_t event_base, int32_t event_id, void * event_data)
+void Wifi::WifiEventHandler(void * arg, esp_event_base_t event_base, int32_t event_id, void * event_data)
 {
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
     {

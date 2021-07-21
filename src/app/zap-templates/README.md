@@ -11,7 +11,13 @@ This directory contains generation templates for ZAP, ZCL Advanced Platform.
 Run ZAP with UI to configure endpoints and clusters
 
 ```
-./scripts/tools/zap/configure.sh
+./scripts/tools/zap/run_zaptool.sh
+```
+
+or
+
+```
+./scripts/tools/zap/run_zaptool.sh <path to *.zap file>
 ```
 
 ### How to generate files for all applications

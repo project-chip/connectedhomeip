@@ -53,7 +53,7 @@ uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * 
                                .ReadOctet(&outApsFrame->radius)
                                .StatusCode();
 
-    return err == CHIP_NO_ERROR ? reader.OctetsRead() : 0;
+    return err == CHIP_NO_ERROR ? static_cast<uint16_t>(reader.OctetsRead()) : 0;
 }
 
 void printApsFrame(EmberApsFrame * frame)

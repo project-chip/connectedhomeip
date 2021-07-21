@@ -49,11 +49,11 @@ CHIP_ERROR WriteChipTLVString(uint8_t * buf, uint32_t bufLen, const char * data,
 
 // Helper method: read a TLV structure with a single tag and string and verify it matches expected string.
 CHIP_ERROR ReadAndVerifyTLVString(nlTestSuite * inSuite, void * inContext, const uint8_t * dataStart, uint32_t len,
-                                  const char * expected, uint16_t expectedLen)
+                                  const char * expected, size_t expectedLen)
 {
     TLV::TLVReader reader;
-    char tmp[64]        = { 0 };
-    uint32_t readLength = 0;
+    char tmp[64]      = { 0 };
+    size_t readLength = 0;
     VerifyOrReturnError(sizeof(tmp) > len, CHIP_ERROR_INTERNAL);
 
     reader.Init(dataStart, len);
@@ -407,9 +407,9 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, respondingSender.GetTransferBlockSize() == initiatingReceiver.GetTransferBlockSize());
 
     // Verify parsed TLV metadata matches the original
-    err =
-        ReadAndVerifyTLVString(inSuite, inContext, outEvent.transferAcceptData.Metadata, outEvent.transferAcceptData.MetadataLength,
-                               metadataStr, static_cast<uint16_t>(strlen(metadataStr)));
+    err = ReadAndVerifyTLVString(inSuite, inContext, outEvent.transferAcceptData.Metadata,
+                                 static_cast<uint32_t>(outEvent.transferAcceptData.MetadataLength), metadataStr,
+                                 static_cast<uint16_t>(strlen(metadataStr)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Test BlockQuery -> Block -> BlockAck
@@ -491,8 +491,9 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
                               respondingReceiver, receiverOpts, transferBlockSize);
 
     // Verify parsed TLV metadata matches the original
-    err = ReadAndVerifyTLVString(inSuite, inContext, outEvent.transferInitData.Metadata, outEvent.transferInitData.MetadataLength,
-                                 metadataStr, static_cast<uint16_t>(strlen(metadataStr)));
+    err = ReadAndVerifyTLVString(inSuite, inContext, outEvent.transferInitData.Metadata,
+                                 static_cast<uint32_t>(outEvent.transferInitData.MetadataLength), metadataStr,
+                                 static_cast<uint16_t>(strlen(metadataStr)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Compose SendAccept parameters struct and give to respondingSender
