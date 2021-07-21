@@ -550,7 +550,7 @@ class DeviceMgrCmd(Cmd):
         while (not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen) and count < maxWaitTime):
             time.sleep(0.2)
             count = count + 0.2
-        return count != maxWaitTime
+        return count < maxWaitTime
 
     def wait_for_many_discovered_devices(self):
         # Discovery happens through mdns, which means we need to wait for responses to come back.
