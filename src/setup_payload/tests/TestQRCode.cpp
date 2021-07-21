@@ -134,8 +134,7 @@ void TestBase38(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "-N.B0") == 0);
 
     // test null termination of output buffer
-    NL_TEST_ASSERT(inSuite,
-                   base38Encode(inputSpan.SubSpan(0, 1), encodedSpan.SubSpan(0, 2)) == CHIP_ERROR_BUFFER_TOO_SMALL);
+    NL_TEST_ASSERT(inSuite, base38Encode(inputSpan.SubSpan(0, 1), encodedSpan.SubSpan(0, 2)) == CHIP_ERROR_BUFFER_TOO_SMALL);
     base38Encode(inputSpan.SubSpan(0, 1), encodedSpan.SubSpan(0, 3));
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "A0") == 0);
 

@@ -171,8 +171,8 @@ static CHIP_ERROR generateBitSet(SetupPayload & payload, uint8_t * bits, uint8_t
     return err;
 }
 
-static CHIP_ERROR payloadBase38RepresentationWithTLV(SetupPayload & setupPayload, MutableCharSpan & outBuffer,
-                                                     MutableByteSpan bits, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
+static CHIP_ERROR payloadBase38RepresentationWithTLV(SetupPayload & setupPayload, MutableCharSpan & outBuffer, MutableByteSpan bits,
+                                                     uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
 {
     memset(bits.data(), 0, bits.size());
     ReturnErrorOnFailure(generateBitSet(setupPayload, bits.data(), tlvDataStart, tlvDataLengthInBytes));

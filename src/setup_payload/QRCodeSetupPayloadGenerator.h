@@ -98,9 +98,8 @@ public:
      */
     CHIP_ERROR payloadBase38RepresentationWithoutOptional(MutableCharSpan & outBuffer)
 
-private:
-    CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,
-                                           size_t & tlvDataLengthInBytes);
+        private : CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,
+                                                         size_t & tlvDataLengthInBytes);
 };
 
 } // namespace chip
