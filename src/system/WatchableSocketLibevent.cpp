@@ -17,17 +17,153 @@
 
 /**
  *    @file
- *      This file implements WatchableSocket using libevent.
+ *      This file implements WatchableEvents using libevent.
  */
 
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <support/CodeUtils.h>
 #include <system/SystemLayer.h>
-#include <system/WatchableEventManager.h>
-#include <system/WatchableSocket.h>
+#include <system/SystemSockets.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+
+namespace chip {
+namespace Mdns {
+void GetMdnsTimeout(timeval & timeout);
+void HandleMdnsTimeout();
+} // namespace Mdns
+} // namespace chip
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+
+#ifndef CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
+#define CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS 1 // TODO(#5556): default to off
+#endif
 
 namespace chip {
 namespace System {
+
+namespace {
+
+System::SocketEvents SocketEventsFromLibeventFlags(short eventFlags)
+{
+    return System::SocketEvents()
+        .Set(SocketEventFlags::kRead, eventFlags & EV_READ)
+        .Set(SocketEventFlags::kWrite, eventFlags & EV_WRITE);
+}
+
+void TimeoutCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
+{
+    event * const ev = reinterpret_cast<event *>(data);
+    evtimer_del(ev);
+}
+
+} // anonymous namespace
+
+void WatchableEventManager::Init(System::Layer & systemLayer)
+{
+#if CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
+    static bool enabled_event_debug_mode = false;
+    if (!enabled_event_debug_mode)
+    {
+        enabled_event_debug_mode = true;
+        event_enable_debug_mode();
+    }
+#endif // CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
+
+    mEventBase     = event_base_new();
+    mTimeoutEvent  = evtimer_new(mEventBase, TimeoutCallbackHandler, event_self_cbarg());
+    mActiveSockets = nullptr;
+    mSystemLayer   = &systemLayer;
+}
+
+void WatchableEventManager::PrepareEvents()
+{
+    // TODO(#5556): Integrate timer platform details with WatchableEventManager.
+    timeval nextTimeout = { 0, 0 };
+    PrepareEventsWithTimeout(nextTimeout);
+}
+
+void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeout)
+{
+    // TODO(#5556): Integrate timer platform details with WatchableEventManager.
+    mSystemLayer->GetTimeout(nextTimeout);
+    if (nextTimeout.tv_sec || nextTimeout.tv_usec)
+    {
+        evtimer_add(mTimeoutEvent, &nextTimeout);
+    }
+}
+
+void WatchableEventManager::WaitForEvents()
+{
+    VerifyOrDie(mEventBase != nullptr);
+    event_base_loop(mEventBase, EVLOOP_ONCE);
+}
+
+void WatchableEventManager::HandleEvents()
+{
+    mSystemLayer->HandleTimeout();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+    chip::Mdns::HandleMdnsTimeout();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+
+    while (mActiveSockets != nullptr)
+    {
+        WatchableSocket * const watcher = mActiveSockets;
+        mActiveSockets                  = watcher->mActiveNext;
+        watcher->InvokeCallback();
+    }
+}
+
+void WatchableEventManager::Shutdown()
+{
+    event_base_loopbreak(mEventBase);
+    event_free(mTimeoutEvent);
+    mTimeoutEvent = nullptr;
+    event_base_free(mEventBase);
+    mEventBase = nullptr;
+}
+
+// static
+void WatchableEventManager::LibeventCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
+{
+    WatchableSocket * const watcher = reinterpret_cast<WatchableSocket *>(data);
+    VerifyOrDie(watcher != nullptr);
+    VerifyOrDie(watcher->mFD == fd);
+
+    watcher->mPendingIO = SocketEventsFromLibeventFlags(eventFlags);
+
+    // Add to active list.
+    WatchableSocket ** pp = &watcher->mSharedState->mActiveSockets;
+    while (*pp != nullptr)
+    {
+        if (*pp == watcher)
+        {
+            return;
+        }
+        pp = &(*pp)->mActiveNext;
+    }
+    *pp                  = watcher;
+    watcher->mActiveNext = nullptr;
+}
+
+void WatchableEventManager::RemoveFromQueueIfPresent(WatchableSocket * watcher)
+{
+    VerifyOrDie(watcher != nullptr);
+    VerifyOrDie(watcher->mSharedState == this);
+
+    WatchableSocket ** pp = &mActiveSockets;
+    while (*pp != nullptr)
+    {
+        if (*pp == watcher)
+        {
+            *pp = watcher->mActiveNext;
+            return;
+        }
+        pp = &(*pp)->mActiveNext;
+    }
+}
 
 void WatchableSocket::OnInit()
 {
@@ -38,12 +174,6 @@ void WatchableSocket::OnInit()
 void WatchableSocket::OnAttach()
 {
     evutil_make_socket_nonblocking(mFD);
-}
-
-void WatchableSocket::OnClose()
-{
-    UpdateWatch(0);
-    mSharedState->RemoveFromQueueIfPresent(this);
 }
 
 void WatchableSocket::SetWatch(short eventFlags)

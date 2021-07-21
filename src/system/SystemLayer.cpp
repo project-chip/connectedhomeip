@@ -133,6 +133,11 @@ CHIP_ERROR Layer::Init()
     this->AddEventHandlerDelegate(sSystemEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    // Create an event to allow an arbitrary thread to wake the thread in the select loop.
+    ReturnErrorOnFailure(this->mWakeEvent.Open(mWatchableEvents));
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
     this->mLayerState = kLayerState_Initialized;
 
     return CHIP_NO_ERROR;
@@ -142,6 +147,10 @@ CHIP_ERROR Layer::Shutdown()
 {
     if (this->mLayerState == kLayerState_NotInitialized)
         return CHIP_ERROR_INCORRECT_STATE;
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    ReturnErrorOnFailure(mWakeEvent.Close());
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     for (size_t i = 0; i < Timer::sPool.Size(); ++i)
     {
@@ -445,6 +454,42 @@ void Layer::HandleTimeout()
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+
+/**
+ * Wake up the I/O thread by writing a single byte to the wake pipe.
+ *
+ *  @note
+ *      If @p WakeIOThread() is being called from within an I/O event callback, then writing to the wake pipe can be skipped,
+ * since the I/O thread is already awake.
+ *
+ *      Furthermore, we don't care if this write fails as the only reasonably likely failure is that the pipe is full, in which
+ *      case the select calling thread is going to wake up anyway.
+ */
+void Layer::WakeIOThread()
+{
+    CHIP_ERROR lReturn;
+
+    if (this->State() != kLayerState_Initialized)
+        return;
+
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+    if (pthread_equal(this->mHandleSelectThread, pthread_self()))
+    {
+        return;
+    }
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+
+    // Send notification to wake up the select call.
+    lReturn = this->mWakeEvent.Notify();
+    if (lReturn != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipSystemLayer, "System wake event notify failed: %s", ErrorStr(lReturn));
+    }
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 LwIPEventHandlerDelegate Layer::sSystemEventHandlerDelegate;

@@ -17,23 +17,70 @@
 
 /**
  *    @file
- *      This file declares an implementation of WatchableSocket using select().
+ *      This file declares an implementation of WatchableEvents using select().
  */
 
 #pragma once
 
-#if !INCLUDING_CHIP_SYSTEM_WATCHABLE_SOCKET_CONFIG_FILE
-#error "This file should only be included from <system/WatchableSocket.h>"
-#include <system/WatchableSocket.h>
-#endif //  !INCLUDING_CHIP_SYSTEM_WATCHABLE_SOCKET_CONFIG_FILE
-
 #include <sys/select.h>
 
 #include <support/BitFlags.h>
-#include <support/logging/CHIPLogging.h>
+
+#if !INCLUDING_CHIP_SYSTEM_WATCHABLE_SOCKET_CONFIG_FILE
+#error "This file should only be included from <system/SystemSockets.h>"
+#endif //  !INCLUDING_CHIP_SYSTEM_WATCHABLE_SOCKET_CONFIG_FILE
 
 namespace chip {
+
 namespace System {
+
+class WatchableEventManager
+{
+public:
+    void Init(System::Layer & systemLayer);
+    void Shutdown();
+
+    void EventLoopBegins() {}
+    void PrepareEvents();
+    void WaitForEvents();
+    void HandleEvents();
+    void EventLoopEnds() {}
+
+    // TODO(#5556): Some unit tests supply a timeout at low level, due to originally using select(); these should a proper timer.
+    void PrepareEventsWithTimeout(timeval & nextTimeout);
+
+    static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
+
+protected:
+    friend class WatchableSocket;
+
+    void Set(int fd, fd_set * fds);
+    void Clear(int fd, fd_set * fds);
+
+    Layer * mSystemLayer               = nullptr;
+    WatchableSocket * mAttachedSockets = nullptr;
+
+    // TODO(#5556): Integrate timer platform details with WatchableEventManager.
+    struct timeval mNextTimeout;
+
+    // Members for select loop
+    struct SelectSets
+    {
+        fd_set mReadSet;
+        fd_set mWriteSet;
+        fd_set mErrorSet;
+    };
+    SelectSets mRequest;
+    SelectSets mSelected;
+    int mMaxFd;
+    int mSelectResult; ///< return value from select()
+
+private:
+    bool HasAny(int fd);
+    void MaybeLowerMaxFd();
+    void Reset(int fd);
+    void WakeSelect();
+};
 
 class WatchableSocket : public WatchableSocketBasis<WatchableSocket>
 {
@@ -42,10 +89,10 @@ public:
     void OnAttach();
     void OnClose();
 
-    void OnRequestCallbackOnPendingRead();
-    void OnRequestCallbackOnPendingWrite();
-    void OnClearCallbackOnPendingRead();
-    void OnClearCallbackOnPendingWrite();
+    void OnRequestCallbackOnPendingRead() { mSharedState->Set(mFD, &mSharedState->mRequest.mReadSet); }
+    void OnRequestCallbackOnPendingWrite() { mSharedState->Set(mFD, &mSharedState->mRequest.mWriteSet); }
+    void OnClearCallbackOnPendingRead() { mSharedState->Clear(mFD, &mSharedState->mRequest.mReadSet); }
+    void OnClearCallbackOnPendingWrite() { mSharedState->Clear(mFD, &mSharedState->mRequest.mWriteSet); }
 
     void SetPendingIO(SocketEvents events) { mPendingIO = events; }
     void SetFDs(int & nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds);

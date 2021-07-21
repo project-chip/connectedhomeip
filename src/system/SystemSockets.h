@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file declares the WatchableSocket abstraction of socket (file descriptor) events.
+ *      This file declares the abstraction of socket (file descriptor) events.
  */
 
 #pragma once
@@ -27,16 +27,16 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#include <unistd.h>
-
 #include <support/BitFlags.h>
+#include <system/SystemError.h>
+
+#include <unistd.h>
 
 namespace chip {
 
 namespace System {
 
 class Layer;
-class WatchableEventManager;
 
 enum class SocketEventFlags : uint8_t
 {
@@ -47,6 +47,30 @@ enum class SocketEventFlags : uint8_t
 };
 
 using SocketEvents = BitFlags<SocketEventFlags>;
+
+/**
+ * @class WatchableEventManager
+ *
+ * An instance of this type is contained in System::Layer. Its purpose is to hold socket-event system state
+ * or methods available to every associated instance of WatchableSocket.
+ *
+ * It MUST provide at least two methods:
+ *
+ *  void Init(System::Layer & systemLayer) -- called from System::Layer::Init()
+ *  void Shutdown()                        -- called from System::Layer::Shutdown()
+ *
+ * Other contents depend on the contract between socket-event implementation and platform layer implementation.
+ * For POSIX-like platforms, WatchableEventManager provides a set of functions called from the event loop:
+ *
+ *  void EventLoopBegins()  -- Called before the first iterations of the event loop.
+ *  void PrepareEvents()    -- Called at the start of each iteration of the event loop.
+ *  void WaitForEvents()    -- Called on each iteration of the event loop, between PrepareEvents() and HandleEvents().
+ *                             Uniquely, this method gets called with the CHIP stack NOT locked, so it can block.
+ *                             For example, the select()-based implementation calls select() here.
+ *  void HandleEvents()     -- Called at the end of each iteration of the event loop.
+ *  void EventLoopEnds()    -- Called after the last iteration of the event loop.
+ */
+class WatchableEventManager;
 
 /**
  * @class WatchableSocket
@@ -281,5 +305,36 @@ protected:
 #include <system/WatchableSocketSelect.h>
 #endif // CHIP_SYSTEM_WATCHABLE_SOCKET_CONFIG_FILE
 #undef INCLUDING_CHIP_SYSTEM_WATCHABLE_SOCKET_CONFIG_FILE
+
+namespace chip {
+namespace System {
+
+/**
+ * @class WakeEvent
+ *
+ * An instance of this type is contained in System::Layer. Its purpose is to allow other threads
+ * to wake the event loop thread via System::Layer::WakeIOThread().
+ */
+class WakeEvent
+{
+public:
+    CHIP_ERROR Open(WatchableEventManager & watchState); /**< Initialize the pipeline */
+    CHIP_ERROR Close();                                  /**< Close both ends of the pipeline. */
+
+    int GetNotifFD() const { return mFD.GetFD(); }
+
+    CHIP_ERROR Notify(); /**< Set the event. */
+    void Confirm();      /**< Clear the event. */
+    static void Confirm(WatchableSocket & socket) { reinterpret_cast<WakeEvent *>(socket.GetCallbackData())->Confirm(); }
+
+private:
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
+    int mWriteFD;
+#endif
+    WatchableSocket mFD;
+};
+
+} // namespace System
+} // namespace chip
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

@@ -18,19 +18,192 @@
 
 /**
  *    @file
- *      This file implements WatchableSocket using select().
+ *      This file implements WatchableEvents using select().
  */
 
 #include <platform/LockTracker.h>
 #include <support/CodeUtils.h>
 #include <system/SystemLayer.h>
-#include <system/WatchableEventManager.h>
-#include <system/WatchableSocket.h>
+#include <system/SystemSockets.h>
 
 #include <errno.h>
 
+#define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+
+namespace chip {
+namespace Mdns {
+void GetMdnsTimeout(timeval & timeout);
+void HandleMdnsTimeout();
+} // namespace Mdns
+} // namespace chip
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+
 namespace chip {
 namespace System {
+
+void WatchableEventManager::Init(Layer & systemLayer)
+{
+    mSystemLayer = &systemLayer;
+    mMaxFd       = -1;
+    FD_ZERO(&mRequest.mReadSet);
+    FD_ZERO(&mRequest.mWriteSet);
+    FD_ZERO(&mRequest.mErrorSet);
+}
+
+void WatchableEventManager::Shutdown()
+{
+    mSystemLayer = nullptr;
+}
+
+/**
+ *  Set the read, write or exception bit flags for the specified socket based on its status in
+ *  the corresponding file descriptor sets.
+ *
+ *  @param[in]    socket    The file descriptor for which the bit flags are being set.
+ *
+ *  @param[in]    readfds   A pointer to the set of readable file descriptors.
+ *
+ *  @param[in]    writefds  A pointer to the set of writable file descriptors.
+ *
+ *  @param[in]    exceptfds  A pointer to the set of file descriptors with errors.
+ */
+SocketEvents WatchableEventManager::SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds,
+                                                        const fd_set & exceptfds)
+{
+    SocketEvents res;
+
+    if (socket >= 0)
+    {
+        // POSIX does not define the fd_set parameter of FD_ISSET() as const, even though it isn't modified.
+        if (FD_ISSET(socket, const_cast<fd_set *>(&readfds)))
+            res.Set(SocketEventFlags::kRead);
+        if (FD_ISSET(socket, const_cast<fd_set *>(&writefds)))
+            res.Set(SocketEventFlags::kWrite);
+        if (FD_ISSET(socket, const_cast<fd_set *>(&exceptfds)))
+            res.Set(SocketEventFlags::kExcept);
+    }
+
+    return res;
+}
+
+bool WatchableEventManager::HasAny(int fd)
+{
+    return FD_ISSET(fd, &mRequest.mReadSet) || FD_ISSET(fd, &mRequest.mWriteSet) || FD_ISSET(fd, &mRequest.mErrorSet);
+}
+
+void WatchableEventManager::WakeSelect()
+{
+#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+    mSystemLayer->WakeIOThread();
+#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+}
+
+void WatchableEventManager::Set(int fd, fd_set * fds)
+{
+    FD_SET(fd, fds);
+    if (fd > mMaxFd)
+    {
+        mMaxFd = fd;
+    }
+    // Wake the thread calling select so that it starts selecting on the new socket.
+    WakeSelect();
+}
+
+void WatchableEventManager::Clear(int fd, fd_set * fds)
+{
+    FD_CLR(fd, fds);
+    if (fd == mMaxFd)
+    {
+        MaybeLowerMaxFd();
+    }
+    // Wake the thread calling select so that it starts selecting on the new socket.
+    WakeSelect();
+}
+
+void WatchableEventManager::Reset(int fd)
+{
+    FD_CLR(fd, &mRequest.mReadSet);
+    FD_CLR(fd, &mRequest.mWriteSet);
+    FD_CLR(fd, &mRequest.mErrorSet);
+    if (fd == mMaxFd)
+    {
+        MaybeLowerMaxFd();
+    }
+}
+
+void WatchableEventManager::MaybeLowerMaxFd()
+{
+    int fd;
+    for (fd = mMaxFd; fd >= 0; --fd)
+    {
+        if (HasAny(fd))
+        {
+            break;
+        }
+    }
+    mMaxFd = fd;
+}
+
+void WatchableEventManager::PrepareEvents()
+{
+    assertChipStackLockedByCurrentThread();
+
+    // Max out this duration and let CHIP set it appropriately.
+    mNextTimeout.tv_sec  = DEFAULT_MIN_SLEEP_PERIOD;
+    mNextTimeout.tv_usec = 0;
+    PrepareEventsWithTimeout(mNextTimeout);
+}
+
+void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeout)
+{
+    // TODO(#5556): Integrate timer platform details with WatchableEventManager.
+    mSystemLayer->GetTimeout(nextTimeout);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
+    chip::Mdns::GetMdnsTimeout(nextTimeout);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+
+    mSelected = mRequest;
+}
+
+void WatchableEventManager::WaitForEvents()
+{
+    mSelectResult = select(mMaxFd + 1, &mSelected.mReadSet, &mSelected.mWriteSet, &mSelected.mErrorSet, &mNextTimeout);
+}
+
+void WatchableEventManager::HandleEvents()
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (mSelectResult < 0)
+    {
+        ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(System::MapErrorPOSIX(errno)));
+        return;
+    }
+
+    VerifyOrDie(mSystemLayer != nullptr);
+    mSystemLayer->HandleTimeout();
+
+    for (WatchableSocket * watchable = mAttachedSockets; watchable != nullptr; watchable = watchable->mAttachedNext)
+    {
+        watchable->SetPendingIO(
+            SocketEventsFromFDs(watchable->GetFD(), mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet));
+    }
+    for (WatchableSocket * watchable = mAttachedSockets; watchable != nullptr; watchable = watchable->mAttachedNext)
+    {
+        if (watchable->mPendingIO.HasAny())
+        {
+            watchable->InvokeCallback();
+        }
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
+    chip::Mdns::HandleMdnsTimeout();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+}
 
 void WatchableSocket::OnAttach()
 {
@@ -57,30 +230,10 @@ void WatchableSocket::OnClose()
         pp = &(*pp)->mAttachedNext;
     }
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
     // Wake the thread calling select so that it stops selecting on the socket.
-    mSharedState->Signal();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-}
-
-void WatchableSocket::OnRequestCallbackOnPendingRead()
-{
-    mSharedState->Set(mFD, &mSharedState->mRequest.mReadSet);
-}
-
-void WatchableSocket::OnRequestCallbackOnPendingWrite()
-{
-    mSharedState->Set(mFD, &mSharedState->mRequest.mWriteSet);
-}
-
-void WatchableSocket::OnClearCallbackOnPendingRead()
-{
-    mSharedState->Clear(mFD, &mSharedState->mRequest.mReadSet);
-}
-
-void WatchableSocket::OnClearCallbackOnPendingWrite()
-{
-    mSharedState->Clear(mFD, &mSharedState->mRequest.mWriteSet);
+    mSharedState->WakeSelect();
+#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
 }
 
 /**

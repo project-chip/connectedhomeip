@@ -21,15 +21,12 @@
  *      data stream built on top of two file descriptors.
  */
 
-#include <system/SystemConfig.h>
+#include <system/SystemSockets.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-#include <system/WakeEvent.h>
-
 // Include additional CHIP headers
 #include <support/CodeUtils.h>
-#include <system/SystemError.h>
 
 // Include system and language headers
 #include <errno.h>

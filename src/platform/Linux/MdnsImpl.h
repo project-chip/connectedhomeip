@@ -34,7 +34,7 @@
 #include <avahi-common/watch.h>
 
 #include "lib/mdns/platform/Mdns.h"
-#include "system/WatchableSocket.h"
+#include "system/SystemSockets.h"
 
 struct AvahiWatch
 {

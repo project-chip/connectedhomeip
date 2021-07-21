@@ -23,8 +23,7 @@
 #pragma once
 
 #if !INCLUDING_CHIP_SYSTEM_WATCHABLE_SOCKET_CONFIG_FILE
-#error "This file should only be included from <system/WatchableSocket.h>"
-#include <system/WatchableSocket.h>
+#error "This file should only be included from <system/SystemSockets.h>"
 #endif //  !INCLUDING_CHIP_SYSTEM_WATCHABLE_SOCKET_CONFIG_FILE
 
 #include <event2/event.h>
@@ -33,14 +32,49 @@ namespace chip {
 
 namespace System {
 
-class WatchableEventManager;
+class WatchableEventManager
+{
+public:
+    WatchableEventManager() : mActiveSockets(nullptr), mSystemLayer(nullptr), mEventBase(nullptr), mTimeoutEvent(nullptr) {}
+    void Init(Layer & systemLayer);
+    void Shutdown();
+
+    void EventLoopBegins() {}
+    void PrepareEvents();
+    void WaitForEvents();
+    void HandleEvents();
+    void EventLoopEnds() {}
+
+    // TODO(#5556): Some unit tests supply a timeout at low level, due to originally using select(); these should a proper timer.
+    void PrepareEventsWithTimeout(timeval & nextTimeout);
+
+private:
+    /*
+     * In this implementation, libevent invokes LibeventCallbackHandler from beneath WaitForEvents(),
+     * which means that the CHIP stack is unlocked. LibeventCallbackHandler adds the WatchableSocket
+     * to a queue (implemented as a simple intrusive list to avoid dynamic memory allocation), and
+     * then HandleEvents() invokes the WatchableSocket callbacks.
+     */
+    friend class WatchableSocket;
+    static void LibeventCallbackHandler(evutil_socket_t fd, short eventFlags, void * data);
+    void RemoveFromQueueIfPresent(WatchableSocket * watcher);
+    WatchableSocket * mActiveSockets; ///< List of sockets activated by libevent.
+
+    Layer * mSystemLayer;
+    event_base * mEventBase; ///< libevent shared state.
+    event * mTimeoutEvent;
+};
 
 class WatchableSocket : public WatchableSocketBasis<WatchableSocket>
 {
 public:
     void OnInit();
     void OnAttach();
-    void OnClose();
+    void OnClose()
+    {
+        UpdateWatch(0);
+        mSharedState->RemoveFromQueueIfPresent(this);
+    }
     void OnRequestCallbackOnPendingRead() { SetWatch(EV_READ); }
     void OnRequestCallbackOnPendingWrite() { SetWatch(EV_WRITE); }
     void OnClearCallbackOnPendingRead() { ClearWatch(EV_READ); }

@@ -127,7 +127,9 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEve
 {
     mChipEventQueue.Push(*event);
 
-    SystemLayer.WatchableEvents().Signal(); // Trigger wake select on CHIP thread
+#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+    SystemLayer.WakeIOThread(); // Trigger wake select on CHIP thread
+#endif                          // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
 }
 
 template <class ImplClass>
@@ -257,7 +259,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
         // SystemLayer.
         //
         Impl()->LockChipStack();
-        SystemLayer.WatchableEvents().Signal();
+        SystemLayer.WakeIOThread();
         Impl()->UnlockChipStack();
 
         pthread_mutex_lock(&mStateLock);
