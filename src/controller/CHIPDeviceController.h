@@ -677,10 +677,15 @@ private:
      *   This function processes the CSR sent by the device.
      *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
      *
-     * @param[in] device The object that contains device's current state.
-     * @param[in] CSR    The Certificate Signing Request.
+     * @param[in] CSR             The Certificate Signing Request.
+     * @param[in] CSRNonce        The Nonce sent by us when we requested the CSR.
+     * @param[in] VendorReserved1 vendor-specific information that may aid in device commissioning.
+     * @param[in] VendorReserved2 vendor-specific information that may aid in device commissioning.
+     * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
+     * @param[in] Signature       Cryptographic signature generated for all the above fields.
      */
-    CHIP_ERROR ProcessOpCSR(Device * device, const ByteSpan & CSR);
+    CHIP_ERROR ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
+                            const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
 
     // Cluster callbacks for advancing commissioning flows
     Callback::Callback<BasicSuccessCallback> mSuccess;

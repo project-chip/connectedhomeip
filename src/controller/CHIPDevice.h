@@ -382,27 +382,15 @@ public:
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
-    CHIP_ERROR SetCSR(ByteSpan csr)
+    CHIP_ERROR SetNOC(ByteSpan noc)
     {
-        ReleaseCSR();
-        mCSR = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(csr.size()));
-        ReturnErrorCodeIf(mCSR == nullptr, CHIP_ERROR_NO_MEMORY);
-        memcpy(mCSR, csr.data(), csr.size());
-        mCSRLength = csr.size();
+        VerifyOrReturnError(noc.size() <= sizeof(mNOC), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mNOC, noc.data(), noc.size());
+        mNOCLength = noc.size();
         return CHIP_NO_ERROR;
     }
 
-    ByteSpan GetCSR() const { return ByteSpan(mCSR, mCSRLength); }
-
-    void ReleaseCSR()
-    {
-        if (mCSR != nullptr)
-        {
-            chip::Platform::MemoryFree(mCSR);
-        }
-        mCSR       = nullptr;
-        mCSRLength = 0;
-    }
+    ByteSpan GetNOC() const { return ByteSpan(mNOC, mNOCLength); }
 
     /*
      * This function can be called to establish a secure session with the device.
@@ -512,8 +500,8 @@ private:
 
     uint8_t mCSRNonce[kOpCSRNonceLength];
 
-    uint8_t * mCSR    = nullptr;
-    size_t mCSRLength = 0;
+    uint8_t mNOC[Credentials::kMaxDERCertLength];
+    size_t mNOCLength = 0;
 
     SessionIDAllocator * mIDAllocator = nullptr;
 

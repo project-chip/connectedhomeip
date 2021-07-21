@@ -1258,19 +1258,12 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
     commissioner->mOpCSRResponseCallback.Cancel();
     commissioner->mOnCSRFailureCallback.Cancel();
 
-    Device * device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
-
-    // Verify that Nonce matches with what we sent, and we have sent the root certificate
-    if (!CSRNonce.data_equal(device->GetCSRNonce()) || commissioner->SendTrustedRootCertificate(device) != CHIP_NO_ERROR)
+    if (commissioner->ProcessOpCSR(CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature) != CHIP_NO_ERROR)
     {
         // Handle error, and notify session failure to the commissioner application.
         ChipLogError(Controller, "Failed to process the certificate signing request");
         // TODO: Map error status to correct error code
         commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
-    }
-    else
-    {
-        device->SetCSR(CSR);
     }
 }
 
@@ -1280,28 +1273,16 @@ void DeviceCommissioner::OnDeviceNOCGenerated(void * context, const ByteSpan & n
 
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
-    // The operational certificate array can contain upto 2 certificates (NOC, and ICAC)
-    // The memory is allocated to account for both these certificates.
-    uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
-
     Device * device = nullptr;
     VerifyOrExit(commissioner->mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(commissioner->mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
+    err    = device->SetNOC(noc);
+    SuccessOrExit(err);
 
-    VerifyOrExit(chipCert.Alloc(chipCertAllocatedLen), err = CHIP_ERROR_NO_MEMORY);
-
-    {
-        MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
-        err = commissioner->GenerateOperationalCertificates(noc, chipCertSpan);
-        SuccessOrExit(err);
-
-        ChipLogProgress(Controller, "Sending operational certificate to the device");
-        err = commissioner->SendOperationalCertificate(device, chipCertSpan);
-        SuccessOrExit(err);
-    }
+    err = commissioner->SendTrustedRootCertificate(device);
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1311,9 +1292,19 @@ exit:
     }
 }
 
-CHIP_ERROR DeviceCommissioner::ProcessOpCSR(Device * device, const ByteSpan & CSR)
+CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
+                                            const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3,
+                                            const ByteSpan & Signature)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDeviceBeingPaired < kNumMaxActiveDevices, CHIP_ERROR_INCORRECT_STATE);
+
+    Device * device = &mActiveDevices[mDeviceBeingPaired];
+
+    // Verify that Nonce matches with what we sent
+    const ByteSpan nonce = device->GetCSRNonce();
+    VerifyOrReturnError(CSRNonce.size() == nonce.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(memcmp(CSRNonce.data(), nonce.data(), CSRNonce.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipOpCert;
     ReturnErrorCodeIf(!chipOpCert.Alloc(kMaxCHIPCertLength * 2), CHIP_ERROR_NO_MEMORY);
@@ -1448,6 +1439,11 @@ void DeviceCommissioner::OnRootCertSuccessResponse(void * context)
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
 
+    // The operational certificate array can contain upto 2 certificates (NOC, and ICAC)
+    // The memory is allocated to account for both these certificates.
+    uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
+
     VerifyOrExit(commissioner->mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     commissioner->mRootCertResponseCallback.Cancel();
@@ -1457,8 +1453,17 @@ void DeviceCommissioner::OnRootCertSuccessResponse(void * context)
 
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
 
-    err = commissioner->ProcessOpCSR(device, device->GetCSR());
-    SuccessOrExit(err);
+    VerifyOrExit(chipCert.Alloc(chipCertAllocatedLen), err = CHIP_ERROR_NO_MEMORY);
+
+    {
+        MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
+        err = commissioner->GenerateOperationalCertificates(device->GetNOC(), chipCertSpan);
+        SuccessOrExit(err);
+
+        ChipLogProgress(Controller, "Sending operational certificate to the device");
+        err = commissioner->SendOperationalCertificate(device, chipCertSpan);
+        SuccessOrExit(err);
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
