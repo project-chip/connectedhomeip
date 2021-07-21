@@ -140,12 +140,11 @@ void TestSchemaUtils::TestSchemaUtilsEncAndDecSimplePrivateHeap(nlTestSuite * ap
     sa = chip::app::Cluster::TestCluster::StructA::Type();
 
     {
-        chip::System::PacketBufferHandle buf = System::PacketBufferHandle::New(1024);
-        SchemaAllocator allocator(buf->Start(), buf->AvailableDataLength());
+        SchemaAllocator schemaAllocator;
 
         _this->SetupReader();
 
-        err = chip::app::DecodeSchemaElement(sa, _this->mReader, &allocator);
+        err = chip::app::DecodeSchemaElement(sa, _this->mReader, &schemaAllocator);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(apSuite, sa.x == 20);
