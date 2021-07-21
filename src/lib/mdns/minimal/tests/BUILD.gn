@@ -26,13 +26,16 @@ chip_test_suite("tests") {
     "TestQueryReplyFilter.cpp",
     "TestRecordData.cpp",
     "TestResponseSender.cpp",
+    "TestAdvertiser.cpp",
   ]
+
+  defines = [ "MDNS_MINIMAL_TEST_SERVER=true"]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/mdns/minimal",
+    "${chip_root}/src/lib/mdns:minimal_mdns_tests",
     "${nlunit_test_root}:nlunit-test",
   ]
 }

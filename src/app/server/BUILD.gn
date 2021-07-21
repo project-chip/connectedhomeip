@@ -47,7 +47,7 @@ static_library("server") {
 
   public_deps = [
     "${chip_root}/src/app",
-    "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/lib/mdns:mdns",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",

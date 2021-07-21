@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/device.gni")
+import("//build_overrides/nlunit_test.gni")
 
 source_set("platform_header") {
   sources = [ "platform/Mdns.h" ]
@@ -57,4 +58,28 @@ static_library("mdns") {
   } else {
     assert(false, "Unknown mDNS advertiser implementation.")
   }
+}
+
+static_library("minimal_mdns_tests") {
+    public_deps = [
+    ":platform_header",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+  defines = [ "MDNS_MINIMAL_TEST_SERVER=true"]
+  sources = [
+    "Advertiser.h",
+    "Advertiser_ImplMinimalMdns.cpp",
+    "Resolver.h",
+    "ServiceNaming.cpp",
+    "ServiceNaming.h",
+    "TxtFields.cpp",
+    "TxtFields.h",
+    "MinimalMdnsServer.cpp",
+    "MinimalMdnsServer.h",
+  ]
+  public_deps += [
+    "${chip_root}/src/lib/mdns/minimal",
+    "${nlunit_test_root}:nlunit-test",
+  ]
 }
