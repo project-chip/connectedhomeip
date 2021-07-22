@@ -184,8 +184,8 @@ public class ChipDeviceController {
     return getIpAddress(deviceControllerPtr, deviceId);
   }
 
-  public void updateAddress(long deviceId, String address, int port) {
-    updateAddress(deviceControllerPtr, deviceId, address, port);
+  public void updateDevice(long fabricId, long deviceId) {
+    updateDevice(deviceControllerPtr, fabricId, deviceId);
   }
 
   public void sendMessage(long deviceId, String message) {
@@ -225,8 +225,7 @@ public class ChipDeviceController {
 
   private native String getIpAddress(long deviceControllerPtr, long deviceId);
 
-  private native void updateAddress(
-      long deviceControllerPtr, long deviceId, String address, int port);
+  private native void updateDevice(long deviceControllerPtr, long fabricId, long deviceId);
 
   private native void sendMessage(long deviceControllerPtr, long deviceId, String message);
 
@@ -241,6 +240,16 @@ public class ChipDeviceController {
   private native boolean isActive(long deviceControllerPtr, long deviceId);
 
   public static native void setKeyValueStoreManager(KeyValueStoreManager manager);
+
+  public static native void setServiceResolver(ServiceResolver resolver);
+
+  public static native void handleServiceResolve(
+      String instanceName,
+      String serviceType,
+      String address,
+      int port,
+      long callbackHandle,
+      long contextHandle);
 
   static {
     System.loadLibrary("CHIPController");
