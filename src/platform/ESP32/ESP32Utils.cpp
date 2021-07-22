@@ -315,7 +315,7 @@ CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
 }
 
 /**
- * Given a CHP error value that represents an ESP32 error, returns a
+ * Given a CHIP error value that represents an ESP32 error, returns a
  * human-readable NULL-terminated C string describing the error.
  *
  * @param[in] buf                   Buffer into which the error string will be placed.
