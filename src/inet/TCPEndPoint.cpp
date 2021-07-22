@@ -1671,7 +1671,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
             }
 
             CHIP_ERROR status = mSocket.Close();
-            if (status != CHIP_NO_ERROR && err == CHIP_NO_ERROR)
+            if (err == CHIP_NO_ERROR)
                 err = status;
         }
     }
