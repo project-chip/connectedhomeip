@@ -189,7 +189,8 @@ bool emberAfTestClusterClusterTestNotHandledCallback(chip::app::CommandHandler *
 
 bool emberAfTestClusterClusterTestAddArgumentsCallback(app::CommandHandler * apCommandObj, uint8_t arg1, uint8_t arg2)
 {
-    if (arg1 > UINT8_MAX - arg2) {
+    if (arg1 > UINT8_MAX - arg2)
+    {
         return emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
