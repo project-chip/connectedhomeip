@@ -67,37 +67,41 @@ void Endpoint::PollForOutput()
     mTransfer.PollOutput(outEvent, System::Platform::Clock::GetMonotonicMilliseconds());
     HandleTransferSessionOutput(outEvent);
 
-#if CONFIG_DEVICE_LAYER
-    DeviceLayer::SystemLayer.StartTimer(mPollFreqMs, PollTimerHandler, this);
-#endif
+    VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
+    mSystemLayer->StartTimer(mPollFreqMs, PollTimerHandler, this);
 }
 
 void Endpoint::ScheduleImmediatePoll()
 {
-#if CONFIG_DEVICE_LAYER
-    DeviceLayer::SystemLayer.StartTimer(kImmediatePollDelayMs, PollTimerHandler, this);
-#endif
+    VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
+    mSystemLayer->StartTimer(kImmediatePollDelayMs, PollTimerHandler, this);
 }
 
-CHIP_ERROR Responder::PrepareForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
-                                         uint32_t timeoutMs, uint32_t pollFreqMs)
+CHIP_ERROR Responder::PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
+                                         uint16_t maxBlockSize, uint32_t timeoutMs, uint32_t pollFreqMs)
 {
-    mPollFreqMs = pollFreqMs;
+    VerifyOrReturnError(layer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mPollFreqMs  = pollFreqMs;
+    mSystemLayer = layer;
+
     ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, timeoutMs));
-#if CONFIG_DEVICE_LAYER
-    DeviceLayer::SystemLayer.StartTimer(mPollFreqMs, PollTimerHandler, this);
-#endif
+
+    mSystemLayer->StartTimer(mPollFreqMs, PollTimerHandler, this);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Initiator::InitiateTransfer(TransferRole role, const TransferSession::TransferInitData & initData, uint32_t timeoutMs,
-                                       uint32_t pollFreqMs)
+CHIP_ERROR Initiator::InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
+                                       uint32_t timeoutMs, uint32_t pollFreqMs)
 {
-    mPollFreqMs = pollFreqMs;
+    VerifyOrReturnError(layer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mPollFreqMs  = pollFreqMs;
+    mSystemLayer = layer;
+
     ReturnErrorOnFailure(mTransfer.StartTransfer(role, initData, timeoutMs));
-#if CONFIG_DEVICE_LAYER
-    DeviceLayer::SystemLayer.StartTimer(mPollFreqMs, PollTimerHandler, this);
-#endif
+
+    mSystemLayer->StartTimer(mPollFreqMs, PollTimerHandler, this);
     return CHIP_NO_ERROR;
 }
 

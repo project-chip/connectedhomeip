@@ -44,7 +44,7 @@ namespace bdx {
 class Endpoint : public Messaging::ExchangeDelegate
 {
 public:
-    Endpoint() : mExchangeCtx(nullptr), mPollFreqMs(kDefaultPollFreqMs) {}
+    Endpoint() : mExchangeCtx(nullptr), mSystemLayer(nullptr), mPollFreqMs(kDefaultPollFreqMs) {}
     ~Endpoint() = default;
 
 private:
@@ -78,6 +78,7 @@ protected:
 
     TransferSession mTransfer;
     Messaging::ExchangeContext * mExchangeCtx;
+    System::Layer * mSystemLayer;
     uint32_t mPollFreqMs;
     static constexpr uint32_t kDefaultPollFreqMs    = 500;
     static constexpr uint32_t kImmediatePollDelayMs = 1;
@@ -85,6 +86,8 @@ protected:
 
 /**
  * An Endpoint that is initialized to respond to an incoming BDX transfer request.
+ *
+ * It is intended that this class will be used as a delegate for handling an unsolicited BDX message.
  */
 class Responder : public Endpoint
 {
@@ -92,14 +95,15 @@ public:
     /**
      * Initialize the TransferSession state machine to be ready for an incoming transfer request, and start the polling timer.
      *
+     * @param[in] layer           A System::Layer pointer to use to start the polling timer
      * @param[in] role            The role of this Endpoint: Sender or Receiver of BDX data
      * @param[in] xferControlOpts Supported transfer modes (see TransferControlFlags)
      * @param[in] maxBlockSize    The supported maximum size of BDX Block data
      * @param[in] timeoutMs       The chosen timeout delay for the BDX transfer in milliseconds
      * @param[in] pollFreqMs      The period for the TransferSession poll timer in milliseconds
      */
-    CHIP_ERROR PrepareForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
-                                  uint32_t timeoutMs, uint32_t pollFreqMs = Endpoint::kDefaultPollFreqMs);
+    CHIP_ERROR PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
+                                  uint16_t maxBlockSize, uint32_t timeoutMs, uint32_t pollFreqMs = Endpoint::kDefaultPollFreqMs);
 };
 
 /**
@@ -112,13 +116,14 @@ public:
      * Initialize the TransferSession state machine to prepare a transfer request message (does not send the message) and start the
      * poll timer.
      *
+     * @param[in] layer      A System::Layer pointer to use to start the polling timer
      * @param[in] role       The role of this Endpoint: Sender or Receiver of BDX data
      * @param[in] initData   Data needed for preparing a transfer request BDX message
      * @param[in] timeoutMs  The chosen timeout delay for the BDX transfer in milliseconds
      * @param[in] pollFreqMs The period for the TransferSession poll timer in milliseconds
      */
-    CHIP_ERROR InitiateTransfer(TransferRole role, const TransferSession::TransferInitData & initData, uint32_t timeoutMs,
-                                uint32_t pollFreqMs = Endpoint::kDefaultPollFreqMs);
+    CHIP_ERROR InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
+                                uint32_t timeoutMs, uint32_t pollFreqMs = Endpoint::kDefaultPollFreqMs);
 };
 
 } // namespace bdx
