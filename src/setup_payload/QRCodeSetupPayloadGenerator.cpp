@@ -152,22 +152,27 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR generateBitSet(SetupPayload & payload, MutableByteSpan & bits, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
+static CHIP_ERROR generateBitSet(SetupPayload & payload, MutableByteSpan & bits, uint8_t * tlvDataStart,
+                                 size_t tlvDataLengthInBytes)
 {
     size_t offset                 = 0;
     size_t totalPayloadSizeInBits = kTotalPayloadDataSizeInBits + (tlvDataLengthInBytes * 8);
     VerifyOrReturnError(bits.size() * 8 >= totalPayloadSizeInBits, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.version, kVersionFieldLengthInBits, kTotalPayloadDataSizeInBits));
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.vendorID, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits));
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits));
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, static_cast<uint64_t>(payload.commissioningFlow), kCommissioningFlowFieldLengthInBits,
-                                      kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(
+        populateBits(bits.data(), offset, payload.version, kVersionFieldLengthInBits, kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(
+        populateBits(bits.data(), offset, payload.vendorID, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(
+        populateBits(bits.data(), offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(populateBits(bits.data(), offset, static_cast<uint64_t>(payload.commissioningFlow),
+                                      kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.rendezvousInformation.Raw(), kRendezvousInfoFieldLengthInBits,
                                       kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.discriminator, kPayloadDiscriminatorFieldLengthInBits,
                                       kTotalPayloadDataSizeInBits));
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(
+        populateBits(bits.data(), offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateTLVBits(bits.data(), offset, tlvDataStart, tlvDataLengthInBytes, totalPayloadSizeInBits));
 
