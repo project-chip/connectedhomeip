@@ -117,7 +117,7 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
     auto dataset = chip::Thread::OperationalDataset();
     CHIP_ERROR error = dataset.Init(span);
     if (error != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Failed to parse data, cannot construct Operational Dataset. %d", error);
+        CHIP_LOG_ERROR("Failed to parse data, cannot construct Operational Dataset. %s", chip::ErrorStr(error));
         return nil;
     }
     // len+1 for null termination

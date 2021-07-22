@@ -76,7 +76,7 @@ public:
         CHIPDefaultFailureCallbackBridge * callback = reinterpret_cast<CHIPDefaultFailureCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                NSError * error = [CHIPError errorForCHIPErrorCode:status];
+                NSError * error = [CHIPError errorForZCLErrorCode:status];
                 callback->mHandler(error, nil);
                 callback->Cancel();
                 delete callback;
