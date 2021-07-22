@@ -67,12 +67,16 @@ void Endpoint::PollForOutput()
     mTransfer.PollOutput(outEvent, System::Platform::Clock::GetMonotonicMilliseconds());
     HandleTransferSessionOutput(outEvent);
 
+#if CONFIG_DEVICE_LAYER
     DeviceLayer::SystemLayer.StartTimer(mPollFreqMs, PollTimerHandler, this);
+#endif
 }
 
 void Endpoint::ScheduleImmediatePoll()
 {
+#if CONFIG_DEVICE_LAYER
     DeviceLayer::SystemLayer.StartTimer(kImmediatePollDelayMs, PollTimerHandler, this);
+#endif
 }
 
 CHIP_ERROR Responder::PrepareForTransfer(TransferRole role, BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
@@ -80,7 +84,9 @@ CHIP_ERROR Responder::PrepareForTransfer(TransferRole role, BitFlags<TransferCon
 {
     mPollFreqMs = pollFreqMs;
     ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, timeoutMs));
+#if CONFIG_DEVICE_LAYER
     DeviceLayer::SystemLayer.StartTimer(mPollFreqMs, PollTimerHandler, this);
+#endif
     return CHIP_NO_ERROR;
 }
 
@@ -89,7 +95,9 @@ CHIP_ERROR Initiator::InitiateTransfer(TransferRole role, const TransferSession:
 {
     mPollFreqMs = pollFreqMs;
     ReturnErrorOnFailure(mTransfer.StartTransfer(role, initData, timeoutMs));
+#if CONFIG_DEVICE_LAYER
     DeviceLayer::SystemLayer.StartTimer(mPollFreqMs, PollTimerHandler, this);
+#endif
     return CHIP_NO_ERROR;
 }
 
