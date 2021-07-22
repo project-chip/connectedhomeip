@@ -108,10 +108,13 @@ class OnOffClientFragment : Fragment() {
 
   private fun updateAddressClick() {
     try{
-      deviceController.updateDevice(fabricIdEd.text.toString().toLong(), deviceIdEd.text.toString().toLong())
+      deviceController.updateDevice(
+          fabricIdEd.text.toString().toULong().toLong(),
+          deviceIdEd.text.toString().toULong().toLong()
+      )
       showMessage("Address update started")
-    } catch (e: ChipDeviceControllerException) {
-      showMessage(e.toString())
+    } catch (ex: Exception) {
+      showMessage("Address update failed: $ex")
     }
   }
 
