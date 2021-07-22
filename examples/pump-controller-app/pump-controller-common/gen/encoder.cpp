@@ -22,6 +22,7 @@
 #include <support/BufferWriter.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
 
 #include <app/common/gen/ids/Attributes.h>
 #include <app/common/gen/ids/Clusters.h>
