@@ -23,7 +23,7 @@ namespace Controller {
 void ScriptDeviceAddressUpdateDelegate::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error)
 {
     if (mOnAddressUpdateComplete != nullptr)
-        mOnAddressUpdateComplete(nodeId, error);
+        mOnAddressUpdateComplete(nodeId, ChipError::AsInteger(error));
 }
 
 } // namespace Controller

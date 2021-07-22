@@ -11,6 +11,7 @@ This example demonstrates the mapping of OnOff cluster to lock/unlock logic.
         -   [Commissioning over BLE](#commissioning-over-ble)
         -   [Cluster control](#cluster-control)
     -   [Example Demo](#example-demo)
+    -   [Using the RPC Console](#using-the-rpc-console)
 
 ---
 
@@ -195,3 +196,16 @@ endpoint and lock/unlock status of door using LED's. For `ESP32-DevKitC`, a GPIO
 through the on/off/toggle commands from the `python-controller`. If you wish to
 see the actual effect of the commands on `ESP32-DevKitC`, you will have to
 connect an external LED to GPIO.
+
+## Using the RPC console
+
+Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
+
+Start the console
+
+    python -m chip_rpc.console --device /dev/ttyUSB0
+
+From within the console you can then invoke rpcs:
+
+    rpcs.chip.rpc.Locking.Get()
+    rpcs.chip.rpc.Locking.Set(locked=True)

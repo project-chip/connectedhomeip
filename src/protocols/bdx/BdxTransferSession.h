@@ -52,7 +52,7 @@ public:
 
         // Additional metadata (optional, TLV format)
         const uint8_t * Metadata = nullptr;
-        uint16_t MetadataLength  = 0;
+        size_t MetadataLength    = 0;
     };
 
     struct TransferAcceptData
@@ -65,7 +65,7 @@ public:
 
         // Additional metadata (optional, TLV format)
         const uint8_t * Metadata = nullptr;
-        uint16_t MetadataLength  = 0;
+        size_t MetadataLength    = 0;
     };
 
     struct StatusReportData
@@ -76,7 +76,7 @@ public:
     struct BlockData
     {
         const uint8_t * Data = nullptr;
-        uint16_t Length      = 0;
+        size_t Length        = 0;
         bool IsEof           = false;
     };
 
@@ -332,7 +332,7 @@ private:
     BlockData mBlockEventData;
     MessageTypeData mMsgTypeData;
 
-    uint32_t mNumBytesProcessed = 0;
+    size_t mNumBytesProcessed = 0;
 
     uint32_t mLastBlockNum = 0;
     uint32_t mNextBlockNum = 0;
