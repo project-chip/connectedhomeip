@@ -43,10 +43,10 @@ namespace chip {
 
 CHIP_ERROR base38Encode(ByteSpan in_buf, MutableCharSpan & out_buf)
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    CHIP_ERROR err             = CHIP_NO_ERROR;
     const uint8_t * in_buf_ptr = in_buf.data();
-    size_t in_buf_len    = in_buf.size();
-    size_t out_idx       = 0;
+    size_t in_buf_len          = in_buf.size();
+    size_t out_idx             = 0;
 
     while (in_buf_len > 0)
     {
