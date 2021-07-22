@@ -55,7 +55,6 @@
     XCTAssertEqualObjects(reconstructed.PSKc, dataset.PSKc);
     XCTAssertEqualObjects(reconstructed.extendedPANID, dataset.extendedPANID);
     XCTAssertEqual(reconstructed.channel, dataset.channel);
-
 }
 
 - (void)testThreadOperationalDatasetInvalid

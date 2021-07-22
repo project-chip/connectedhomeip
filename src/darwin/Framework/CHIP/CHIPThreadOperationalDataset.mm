@@ -111,14 +111,12 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
     return YES;
 }
 
-
 - (nullable instancetype)initWithData:(NSData *)data
 {
-    chip::ByteSpan span = chip::ByteSpan((uint8_t *)data.bytes, data.length);
+    chip::ByteSpan span = chip::ByteSpan((uint8_t *) data.bytes, data.length);
     auto dataset = chip::Thread::OperationalDataset();
     CHIP_ERROR error = dataset.Init(span);
-    if (error != CHIP_NO_ERROR)
-    {
+    if (error != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Failed to parse data, cannot construct Operational Dataset. %d", error);
         return nil;
     }
