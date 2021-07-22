@@ -39,6 +39,7 @@ static_library("framework") {
     "CHIPDevice_Internal.h",
     "CHIPError.h",
     "CHIPError.mm",
+    "CHIPError_Internal.h",
     "CHIPLogging.h",
     "CHIPManualSetupPayloadParser.h",
     "CHIPManualSetupPayloadParser.mm",
