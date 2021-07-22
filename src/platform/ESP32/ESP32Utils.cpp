@@ -315,7 +315,7 @@ CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
 }
 
 /**
- * Given an OpenChip error value that represents an OpenThread error, returns a
+ * Given a CHP error value that represents an ESP32 error, returns a
  * human-readable NULL-terminated C string describing the error.
  *
  * @param[in] buf                   Buffer into which the error string will be placed.
@@ -323,7 +323,7 @@ CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
  * @param[in] err                   The error to be described.
  *
  * @return true                     If a description string was written into the supplied buffer.
- * @return false                    If the supplied error was not an OpenThread error.
+ * @return false                    If the supplied error was not an ESP32 error.
  *
  */
 bool ESP32Utils::FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err)
@@ -339,13 +339,13 @@ bool ESP32Utils::FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     const char * desc = esp_err_to_name((esp_err_t) ChipError::GetValue(err));
 #endif // CHIP_CONFIG_SHORT_ERROR_STR
 
-    chip::FormatError(buf, bufSize, "OpenThread", err, desc);
+    chip::FormatError(buf, bufSize, "ESP32", err, desc);
 
     return true;
 }
 
 /**
- * Register a text error formatter for OpenThread errors.
+ * Register a text error formatter for ESP32 errors.
  */
 void ESP32Utils::RegisterESP32ErrorFormatter()
 {
