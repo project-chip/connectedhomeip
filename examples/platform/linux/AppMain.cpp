@@ -25,6 +25,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <core/CHIPError.h>
+#include <core/NodeId.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CHIPMem.h>
@@ -165,7 +166,7 @@ ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 
 CHIP_ERROR InitCommissioner()
 {
-    NodeId localId = chip::kAnyNodeId;
+    NodeId localId = chip::kPlaceholderNodeId;
 
     chip::Controller::CommissionerInitParams params;
 
