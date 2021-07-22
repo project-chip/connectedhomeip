@@ -20,6 +20,7 @@ package chip.devicecontroller;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.util.Log;
+import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -103,7 +104,8 @@ public class ChipDeviceController {
 
   /** Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error. */
   public void getConnectedDevicePointer(long nodeId, GetConnectedDeviceCallback callback) {
-    getConnectedDevicePointer(deviceControllerPtr, nodeId, callback);
+    GetConnectedDeviceCallbackJni jniCallback = new GetConnectedDeviceCallbackJni(callback);
+    getConnectedDevicePointer(deviceControllerPtr, nodeId, jniCallback.getCallbackHandle());
   }
 
   public boolean disconnectDevice(long deviceId) {
@@ -244,7 +246,7 @@ public class ChipDeviceController {
   private native long getDevicePointer(long deviceControllerPtr, long deviceId);
 
   private native void getConnectedDevicePointer(
-      long deviceControllerPtr, long deviceId, GetConnectedDeviceCallback callback);
+      long deviceControllerPtr, long deviceId, long callbackHandle);
 
   private native void pairTestDeviceWithoutSecurity(long deviceControllerPtr, String ipAddress);
 
