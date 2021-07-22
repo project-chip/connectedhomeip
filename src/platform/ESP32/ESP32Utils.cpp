@@ -313,3 +313,43 @@ CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
     }
     return ChipError::Encapsulate(ChipError::Range::kPlatform, error);
 }
+
+/**
+ * Given an OpenChip error value that represents an OpenThread error, returns a
+ * human-readable NULL-terminated C string describing the error.
+ *
+ * @param[in] buf                   Buffer into which the error string will be placed.
+ * @param[in] bufSize               Size of the supplied buffer in bytes.
+ * @param[in] err                   The error to be described.
+ *
+ * @return true                     If a description string was written into the supplied buffer.
+ * @return false                    If the supplied error was not an OpenThread error.
+ *
+ */
+bool ESP32Utils::FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err)
+{
+    if (!ChipError::IsRange(ChipError::Range::kPlatform, err))
+    {
+        return false;
+    }
+
+#if CHIP_CONFIG_SHORT_ERROR_STR
+    const char * desc = NULL;
+#else  // CHIP_CONFIG_SHORT_ERROR_STR
+    const char * desc = esp_err_to_name((esp_err_t) ChipError::GetValue(err));
+#endif // CHIP_CONFIG_SHORT_ERROR_STR
+
+    chip::FormatError(buf, bufSize, "OpenThread", err, desc);
+
+    return true;
+}
+
+/**
+ * Register a text error formatter for OpenThread errors.
+ */
+void ESP32Utils::RegisterESP32ErrorFormatter()
+{
+    static ErrorFormatter sErrorFormatter = { ESP32Utils::FormatError, NULL };
+
+    RegisterErrorFormatter(&sErrorFormatter);
+}
