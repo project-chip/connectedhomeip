@@ -58,7 +58,7 @@ void Endpoint::OnResponseTimeout(Messaging::ExchangeContext * ec)
 void Endpoint::PollTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
 {
     VerifyOrReturn(appState != nullptr);
-    static_cast<chip::bdx::Endpoint *>(appState)->PollForOutput();
+    static_cast<Endpoint *>(appState)->PollForOutput();
 }
 
 void Endpoint::PollForOutput()
