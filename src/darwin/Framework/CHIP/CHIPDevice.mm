@@ -16,8 +16,8 @@
  */
 
 #import "CHIPDevice_Internal.h"
+#import "CHIPError_Internal.h"
 #import "CHIPLogging.h"
-#import <CHIP/CHIPError.h>
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
 

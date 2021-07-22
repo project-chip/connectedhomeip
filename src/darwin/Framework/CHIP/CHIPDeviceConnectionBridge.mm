@@ -17,7 +17,7 @@
 
 #import "CHIPDeviceConnectionBridge.h"
 #import "CHIPDevice_Internal.h"
-#import "CHIPError.h"
+#import "CHIPError_Internal.h"
 
 void CHIPDeviceConnectionBridge::OnConnected(void * context, chip::Controller::Device * device)
 {

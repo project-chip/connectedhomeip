@@ -23,9 +23,6 @@
 // module headers
 #import <CHIP/CHIP.h>
 
-// additional includes
-#import "CHIPError.h"
-
 // system dependencies
 #import <XCTest/XCTest.h>
 
