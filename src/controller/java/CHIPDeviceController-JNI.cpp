@@ -443,7 +443,7 @@ JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong f
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    CHIP_ERROR err                           = wrapper->Controller()->UpdateDevice(deviceId, fabricId);
+    CHIP_ERROR err = wrapper->Controller()->UpdateDevice(static_cast<chip::NodeId>(deviceId), static_cast<uint64_t>(fabricId));
 
     if (err != CHIP_NO_ERROR)
     {
