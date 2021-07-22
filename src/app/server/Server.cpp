@@ -30,6 +30,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
+#include <mdns/ServiceNaming.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
@@ -43,6 +44,10 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT || CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT || CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <app/server/Mdns.h>
@@ -411,6 +416,13 @@ secure_channel::MessageCounterManager gMessageCounterManager;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
+constexpr chip::Transport::AdminId gAdminId = 0;
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
 } // namespace
 
 CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindowAdvertisement advertisementMode)
@@ -563,6 +575,52 @@ exit:
         ChipLogProgress(AppServer, "Server Listening...");
     }
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+// NOTE: UDC client is located in Server.cpp because it really only makes sense
+// to send UDC from a Matter device. The UDC message payload needs to include the device's
+// randomly generated service name.
+
+CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner)
+{
+    ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
+
+    CHIP_ERROR err;
+    char nameBuffer[chip::Mdns::kMaxInstanceNameSize + 1];
+    err = app::Mdns::GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to get mdns instance name error: %s", ErrorStr(err));
+        return err;
+    }
+    ChipLogDetail(AppServer, "instanceName=%s", nameBuffer);
+
+    // send UDC message 5 times per spec (no ACK on this message)
+    for (unsigned int i = 0; i < 5; i++)
+    {
+        chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
+        if (payloadBuf.IsNull())
+        {
+            ChipLogError(AppServer, "Unable to allocate packet buffer\n");
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        err = gUDCClient.SendUDCMessage(&gTransports, std::move(payloadBuf), commissioner);
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogDetail(AppServer, "Send UDC request success");
+        }
+        else
+        {
+            ChipLogError(AppServer, "Send UDC request failed, err: %s\n", chip::ErrorStr(err));
+        }
+
+        sleep(1);
+    }
+    return err;
+}
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
 CHIP_ERROR AddTestPairing()
 {
