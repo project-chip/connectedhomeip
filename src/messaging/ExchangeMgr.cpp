@@ -201,9 +201,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 {
     UnsolicitedMessageHandler * matchingUMH = nullptr;
 
-    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %" PRIu32 " on exchange %d",
-                    payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(),
-                    payloadHeader.GetExchangeID());
+    ChipLogProgress(ExchangeManager, "Received message of type 0x%02x with vendorId 0x%04x and protocolId 0x%04x on exchange %d",
+                    payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().GetVendorId(),
+                    payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetExchangeID());
 
     MessageFlags msgFlags;
     if (isDuplicate == DuplicateMessage::Yes)
