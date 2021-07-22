@@ -378,7 +378,7 @@ CHIP_ERROR P256PublicKeyHSM::ECDSA_validate_msg_signature(const uint8_t * msg, s
     };
     size_t hash_length          = sizeof(hash);
     sss_object_t keyObject      = { 0 };
-    uint8_t signature_se05x[80] = { 0 };
+    uint8_t signature_se05x[kMax_ECDSA_Signature_Length_Der] = { 0 };
     size_t signature_se05x_len  = sizeof(signature_se05x);
 
     VerifyOrReturnError(msg != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
