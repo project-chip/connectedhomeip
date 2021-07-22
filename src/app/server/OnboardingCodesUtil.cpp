@@ -82,7 +82,7 @@ void PrintOnboardingCodes(const chip::SetupPayload & payload)
         if (GetQRCodeUrl(&qrCodeBuffer[0], qrCodeBufferMaxSize, QRCode) == CHIP_NO_ERROR)
         {
             ChipLogProgress(AppServer, "Copy/paste the below URL in a browser to see the QR Code:");
-            ChipLogProgress(AppServer, "%s", &qrCodeBuffer[0]);
+            ChipLogProgress(AppServer, "%s", qrCodeBuffer.Get());
         }
     }
     else
