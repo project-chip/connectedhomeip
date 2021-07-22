@@ -19,7 +19,7 @@ package com.google.chip.chiptool
 
 import android.util.Log
 import chip.devicecontroller.ChipDeviceController
-import chip.devicecontroller.GetConnectedDeviceCallback
+import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
 import java.lang.IllegalStateException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException

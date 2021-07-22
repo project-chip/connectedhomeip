@@ -25,6 +25,7 @@
 #include "AndroidBleApplicationDelegate.h"
 #include "AndroidBleConnectionDelegate.h"
 #include "AndroidBlePlatformDelegate.h"
+#include "AndroidCallbacks.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include "CHIPJNIError.h"
 #include "JniReferences.h"
@@ -82,9 +83,6 @@ static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * cbName);
 static void * IOThreadMain(void * arg);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
-
-static void OnDeviceConnectedFn(void * context, Device * device);
-static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
 namespace {
 
@@ -357,55 +355,14 @@ JNI_METHOD(jlong, getDevicePointer)(JNIEnv * env, jobject self, jlong handle, jl
     return reinterpret_cast<jlong>(chipDevice);
 }
 
-JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jobject callback)
+JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jlong callbackHandle)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    Callback::Callback<OnDeviceConnected> connectedCallback(OnDeviceConnectedFn, callback);
-    Callback::Callback<OnDeviceConnectionFailure> failureCallback(OnDeviceConnectionFailureFn, callback);
-
-    wrapper->Controller()->GetConnectedDevice(nodeId, &connectedCallback, &failureCallback);
-}
-
-void OnDeviceConnectedFn(void * context, Device * device)
-{
-    JNIEnv * env     = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject callback = static_cast<jobject>(context);
-
-    jclass getConnectedDeviceCallbackCls = nullptr;
-    JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/GetConnectedDeviceCallback",
-                                             getConnectedDeviceCallbackCls);
-    VerifyOrReturn(getConnectedDeviceCallbackCls != nullptr,
-                   ChipLogError(Controller, "Could not find GetConnectedDeviceCallback class"));
-
-    jmethodID successMethod;
-    JniReferences::GetInstance().FindMethod(env, callback, "onDeviceConnected", "(J)V", &successMethod);
-    VerifyOrReturn(successMethod != nullptr, ChipLogError(Controller, "Could not find onDeviceConnected method"));
-
-    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a Java handle");
-    env->CallVoidMethod(callback, successMethod, reinterpret_cast<jlong>(device));
-}
-
-void OnDeviceConnectionFailureFn(void * context, NodeId nodeId, CHIP_ERROR error)
-{
-    JNIEnv * env     = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject callback = static_cast<jobject>(context);
-
-    jclass getConnectedDeviceCallbackCls = nullptr;
-    JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/GetConnectedDeviceCallback",
-                                             getConnectedDeviceCallbackCls);
-    VerifyOrReturn(getConnectedDeviceCallbackCls != nullptr,
-                   ChipLogError(Controller, "Could not find GetConnectedDeviceCallback class"));
-
-    jmethodID failureMethod;
-    JniReferences::GetInstance().FindMethod(env, callback, "onConnectionFailure", "(JLjava/lang/Exception;)V", &failureMethod);
-    VerifyOrReturn(failureMethod != nullptr, ChipLogError(Controller, "Could not find onConnectionFailure method"));
-
-    jthrowable exception;
-    VerifyOrReturn(N2J_Error(env, error, exception) == CHIP_NO_ERROR,
-                   ChipLogError(Controller, "Could not create exception for onConnectionFailure: %d", error));
-    env->CallVoidMethod(callback, failureMethod, nodeId, exception);
+    GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
+    VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallback handle is nullptr"));
+    wrapper->Controller()->GetConnectedDevice(nodeId, &connectedDeviceCallback->mOnSuccess, &connectedDeviceCallback->mOnFailure);
 }
 
 JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
@@ -496,18 +453,8 @@ JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong f
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
 
-<<<<<<< HEAD
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
     CHIP_ERROR err = wrapper->Controller()->UpdateDevice(static_cast<chip::NodeId>(deviceId), static_cast<uint64_t>(fabricId));
-=======
-    Inet::IPAddress ipAddress = {};
-    JniUtfString addressAccessor(env, address);
-    VerifyOrExit(Inet::IPAddress::FromString(addressAccessor.c_str(), ipAddress), err = CHIP_ERROR_INVALID_ADDRESS);
-    VerifyOrExit(CanCastTo<uint16_t>(port), err = CHIP_ERROR_INVALID_ADDRESS);
-
-    err = chipDevice->UpdateAddress(Transport::PeerAddress::UDP(ipAddress, port));
-    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->Controller()->PersistDevice(chipDevice);
->>>>>>> e37274bc84a (Use CASE in Android controller)
 
     if (err != CHIP_NO_ERROR)
     {
