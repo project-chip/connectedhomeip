@@ -16,9 +16,9 @@
  */
 
 #import "CHIPError.h"
+#import "CHIPError_Internal.h"
 
 #import <app/util/af-enums.h>
-#import <core/CHIPError.h>
 #import <inet/InetError.h>
 
 NSString * const CHIPErrorDomain = @"CHIPErrorDomain";

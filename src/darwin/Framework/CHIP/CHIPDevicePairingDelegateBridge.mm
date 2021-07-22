@@ -16,7 +16,7 @@
  */
 
 #import "CHIPDevicePairingDelegateBridge.h"
-#import "CHIPError.h"
+#import "CHIPError_Internal.h"
 
 CHIPDevicePairingDelegateBridge::CHIPDevicePairingDelegateBridge(void)
     : mDelegate(nil)
