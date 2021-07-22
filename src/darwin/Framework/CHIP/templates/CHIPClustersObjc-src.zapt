@@ -584,7 +584,7 @@ private:
 
 {{#chip_server_cluster_commands}}
 {{#if (zcl_command_arguments_count this.id)}}
-- (void){{asLowerCamelCase name}}:{{#chip_server_cluster_command_arguments}}{{#if index includeZero=false}}{{asLowerCamelCase label}}:{{/if}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_server_cluster_command_arguments}}responseHandler:(ResponseHandler)responseHandler
+- (void){{asLowerCamelCase name}}:{{#chip_server_cluster_command_arguments}}{{#not_first}}{{asLowerCamelCase label}}:{{/not_first}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_server_cluster_command_arguments}}responseHandler:(ResponseHandler)responseHandler
 {{else}}
 - (void){{asLowerCamelCase name}}:(ResponseHandler)responseHandler
 {{/if}}
