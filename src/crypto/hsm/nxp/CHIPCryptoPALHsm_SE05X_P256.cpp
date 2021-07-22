@@ -212,7 +212,7 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_hash(const uint8_t * hash, size_t hash_len
     sss_asymmetric_t asymm_ctx  = { 0 };
     sss_status_t status         = kStatus_SSS_Success;
     sss_object_t keyObject      = { 0 };
-    uint8_t signature_se05x[80] = { 0 };
+    uint8_t signature_se05x[kMax_ECDSA_Signature_Length_Der] = { 0 };
     size_t signature_se05x_len  = sizeof(signature_se05x);
 
     VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
