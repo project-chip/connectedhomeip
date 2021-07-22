@@ -1289,6 +1289,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPWiFiNetworkDiagnostics : CHIPCluster
 
+- (void)resetCounts:(ResponseHandler)responseHandler;
+
 - (void)readAttributeBssidWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeSecurityTypeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeWiFiVersionWithResponseHandler:(ResponseHandler)responseHandler;
