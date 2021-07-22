@@ -162,8 +162,8 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @def ReturnErrorOnFailure(expr)
  *
  *  @brief
- *    Returns the error code if the expression returns something different
- *    than CHIP_NO_ERROR.
+ *    Returns the error code if the expression returns an error. For a CHIP_ERROR expression, this means any value other
+ *    than CHIP_NO_ERROR. For an integer expression, this means non-zero.
  *
  *  Example usage:
  *
@@ -171,13 +171,13 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *    ReturnErrorOnFailure(channel->SendMsg(msg));
  *  @endcode
  *
- *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ *  @param[in]  expr        An expression to be tested.
  */
 #define ReturnErrorOnFailure(expr)                                                                                                 \
     do                                                                                                                             \
     {                                                                                                                              \
-        CHIP_ERROR __err = (expr);                                                                                                 \
-        if (__err != CHIP_NO_ERROR)                                                                                                \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
             return __err;                                                                                                          \
         }                                                                                                                          \
@@ -213,7 +213,8 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @def ReturnOnFailure(expr)
  *
  *  @brief
- *    Returns if the expression returns something different than CHIP_NO_ERROR
+ *    Returns if the expression returns an error. For a CHIP_ERROR expression, this means any value other
+ *    than CHIP_NO_ERROR. For an integer expression, this means non-zero.
  *
  *  Example usage:
  *
@@ -221,13 +222,13 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *    ReturnOnFailure(channel->SendMsg(msg));
  *  @endcode
  *
- *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ *  @param[in]  expr        An expression to be tested.
  */
 #define ReturnOnFailure(expr)                                                                                                      \
     do                                                                                                                             \
     {                                                                                                                              \
-        CHIP_ERROR __err = (expr);                                                                                                 \
-        if (__err != CHIP_NO_ERROR)                                                                                                \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
             return;                                                                                                                \
         }                                                                                                                          \
@@ -360,7 +361,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @param[in]  aStatus     A scalar status to be evaluated against zero (0).
  *
  */
-#define SuccessOrExit(aStatus) nlEXPECT((aStatus) == CHIP_NO_ERROR, exit)
+#define SuccessOrExit(aStatus) nlEXPECT(::chip::ChipError::IsSuccess((aStatus)), exit)
 
 /**
  *  @def VerifyOrExit(aCondition, anAction)

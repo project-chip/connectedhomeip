@@ -20,10 +20,12 @@
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/enums.h"
+#include <app/CommandHandler.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
+#include <app/common/gen/enums.h>
 
 using namespace chip;
 
@@ -43,36 +45,38 @@ void emberAfThermostatClusterServerInitCallback(void)
     // or should this just be the responsibility of the thermostat application?
 }
 
-bool emberAfThermostatClusterClearWeeklyScheduleCallback()
+bool emberAfThermostatClusterClearWeeklyScheduleCallback(chip::app::CommandHandler * commandObj)
 {
     // TODO
     return false;
 }
-bool emberAfThermostatClusterGetRelayStatusLogCallback()
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterGetWeeklyScheduleCallback(uint8_t daysToReturn, uint8_t modeToReturn)
+bool emberAfThermostatClusterGetRelayStatusLogCallback(chip::app::CommandHandler * commandObj)
 {
     // TODO
     return false;
 }
 
-bool emberAfThermostatClusterSetWeeklyScheduleCallback(uint8_t numberOfTransitionsForSequence, uint8_t daysOfWeekForSequence,
+bool emberAfThermostatClusterGetWeeklyScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t daysToReturn,
+                                                       uint8_t modeToReturn)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterSetWeeklyScheduleCallback(chip::app::CommandHandler * commandObj,
+                                                       uint8_t numberOfTransitionsForSequence, uint8_t daysOfWeekForSequence,
                                                        uint8_t modeForSequence, uint8_t * payload)
 {
     // TODO
     return false;
 }
 
-bool emberAfThermostatClusterSetpointRaiseLowerCallback(uint8_t mode, int8_t amount)
+bool emberAfThermostatClusterSetpointRaiseLowerCallback(chip::app::CommandHandler * commandObj, uint8_t mode, int8_t amount)
 {
     bool result             = false;
     EndpointId endpoint     = 1;                            // Hard code to 1 for now/
     int32_t HeatingSetpoint = 2000, CoolingSetpoint = 2600; // Set to defaults to be safe
-    EmberAfStatus status;
+    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     switch (mode)
     {
     case EMBER_ZCL_SETPOINT_ADJUST_MODE_HEAT_AND_COOL_SETPOINTS: {

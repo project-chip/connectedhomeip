@@ -271,7 +271,7 @@ void StartServer()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     err = app::Mdns::AdvertiseCommisioner();
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     if (err != CHIP_NO_ERROR)
     {

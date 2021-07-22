@@ -169,10 +169,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     }
 
     // Restore WiFi persistent settings to default values.
-    err = esp_wifi_restore();
-    if (err != ESP_OK)
+    esp_err_t error = esp_wifi_restore();
+    if (error != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", esp_err_to_name(error));
     }
 
     // Restart the system.
