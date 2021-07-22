@@ -65,6 +65,7 @@ using namespace chip::Encoding::LittleEndian;
 | AudioOutput                                                         | 0x050B |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0028 |
+| Basic                                                               | 0x0028 |
 | BinaryInputBasic                                                    | 0x000F |
 | Binding                                                             | 0xF000 |
 | BridgedDeviceBasic                                                  | 0x0039 |
@@ -78,23 +79,30 @@ using namespace chip::Encoding::LittleEndian;
 | FixedLabel                                                          | 0x0040 |
 | FlowMeasurement                                                     | 0x0404 |
 | GeneralCommissioning                                                | 0x0030 |
+| GeneralCommissioning                                                | 0x0030 |
 | GeneralDiagnostics                                                  | 0x0033 |
 | GroupKeyManagement                                                  | 0xF004 |
 | Groups                                                              | 0x0004 |
+| Groups                                                              | 0x0004 |
 | Identify                                                            | 0x0003 |
 | KeypadInput                                                         | 0x0509 |
+| LevelControl                                                        | 0x0008 |
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
+| NetworkCommissioning                                                | 0x0031 |
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
 | OccupancySensing                                                    | 0x0406 |
 | OnOff                                                               | 0x0006 |
+| OnOff                                                               | 0x0006 |
+| OperationalCredentials                                              | 0x003E |
 | OperationalCredentials                                              | 0x003E |
 | PressureMeasurement                                                 | 0x0403 |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | RelativeHumidityMeasurement                                         | 0x0405 |
+| Scenes                                                              | 0x0005 |
 | Scenes                                                              | 0x0005 |
 | SoftwareDiagnostics                                                 | 0x0034 |
 | Switch                                                              | 0x003B |
@@ -1245,11 +1253,6 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadClusterRevisionAttribute(u
 | Cluster ColorControl                                                | 0x0300 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ColorLoopSet                                                      |   0x44 |
-| * EnhancedMoveHue                                                   |   0x41 |
-| * EnhancedMoveToHue                                                 |   0x40 |
-| * EnhancedMoveToHueAndSaturation                                    |   0x43 |
-| * EnhancedStepHue                                                   |   0x42 |
 | * MoveColor                                                         |   0x08 |
 | * MoveColorTemperature                                              |   0x4B |
 | * MoveHue                                                           |   0x01 |
@@ -1306,14 +1309,6 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadClusterRevisionAttribute(u
 | * ColorPointBX                                                      | 0x003A |
 | * ColorPointBY                                                      | 0x003B |
 | * ColorPointBIntensity                                              | 0x003C |
-| * EnhancedCurrentHue                                                | 0x4000 |
-| * EnhancedColorMode                                                 | 0x4001 |
-| * ColorLoopActive                                                   | 0x4002 |
-| * ColorLoopDirection                                                | 0x4003 |
-| * ColorLoopTime                                                     | 0x4004 |
-| * ColorCapabilities                                                 | 0x400A |
-| * ColorTempPhysicalMin                                              | 0x400B |
-| * ColorTempPhysicalMax                                              | 0x400C |
 | * CoupleColorTempToLevelMinMireds                                   | 0x400D |
 | * StartUpColorTemperatureMireds                                     | 0x4010 |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -2081,110 +2076,6 @@ PacketBufferHandle encodeColorControlClusterWriteColorPointBIntensityAttribute(u
         .Put32(ColorControl::Attributes::Ids::ColorPointBIntensity)
         .Put8(32)
         .Put8(static_cast<uint8_t>(colorPointBIntensity));
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute EnhancedCurrentHue
- */
-PacketBufferHandle encodeColorControlClusterReadEnhancedCurrentHueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadColorControlEnhancedCurrentHue", ColorControl::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put32(Globals::Commands::Ids::ReadAttributes)
-        .Put32(ColorControl::Attributes::Ids::EnhancedCurrentHue);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute EnhancedColorMode
- */
-PacketBufferHandle encodeColorControlClusterReadEnhancedColorModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadColorControlEnhancedColorMode", ColorControl::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put32(Globals::Commands::Ids::ReadAttributes)
-        .Put32(ColorControl::Attributes::Ids::EnhancedColorMode);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ColorLoopActive
- */
-PacketBufferHandle encodeColorControlClusterReadColorLoopActiveAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadColorControlColorLoopActive", ColorControl::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put32(Globals::Commands::Ids::ReadAttributes)
-        .Put32(ColorControl::Attributes::Ids::ColorLoopActive);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ColorLoopDirection
- */
-PacketBufferHandle encodeColorControlClusterReadColorLoopDirectionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadColorControlColorLoopDirection", ColorControl::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put32(Globals::Commands::Ids::ReadAttributes)
-        .Put32(ColorControl::Attributes::Ids::ColorLoopDirection);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ColorLoopTime
- */
-PacketBufferHandle encodeColorControlClusterReadColorLoopTimeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadColorControlColorLoopTime", ColorControl::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put32(Globals::Commands::Ids::ReadAttributes)
-        .Put32(ColorControl::Attributes::Ids::ColorLoopTime);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ColorCapabilities
- */
-PacketBufferHandle encodeColorControlClusterReadColorCapabilitiesAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadColorControlColorCapabilities", ColorControl::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put32(Globals::Commands::Ids::ReadAttributes)
-        .Put32(ColorControl::Attributes::Ids::ColorCapabilities);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ColorTempPhysicalMin
- */
-PacketBufferHandle encodeColorControlClusterReadColorTempPhysicalMinAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadColorControlColorTempPhysicalMin", ColorControl::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put32(Globals::Commands::Ids::ReadAttributes)
-        .Put32(ColorControl::Attributes::Ids::ColorTempPhysicalMin);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ColorTempPhysicalMax
- */
-PacketBufferHandle encodeColorControlClusterReadColorTempPhysicalMaxAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadColorControlColorTempPhysicalMax", ColorControl::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put32(Globals::Commands::Ids::ReadAttributes)
-        .Put32(ColorControl::Attributes::Ids::ColorTempPhysicalMax);
     COMMAND_FOOTER();
 }
 

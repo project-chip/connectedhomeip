@@ -1095,6 +1095,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | AudioOutput                                                         | 0x050B |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0028 |
+| Basic                                                               | 0x0028 |
 | BinaryInputBasic                                                    | 0x000F |
 | Binding                                                             | 0xF000 |
 | BridgedDeviceBasic                                                  | 0x0039 |
@@ -1108,23 +1109,30 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | FixedLabel                                                          | 0x0040 |
 | FlowMeasurement                                                     | 0x0404 |
 | GeneralCommissioning                                                | 0x0030 |
+| GeneralCommissioning                                                | 0x0030 |
 | GeneralDiagnostics                                                  | 0x0033 |
 | GroupKeyManagement                                                  | 0xF004 |
 | Groups                                                              | 0x0004 |
+| Groups                                                              | 0x0004 |
 | Identify                                                            | 0x0003 |
 | KeypadInput                                                         | 0x0509 |
+| LevelControl                                                        | 0x0008 |
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
+| NetworkCommissioning                                                | 0x0031 |
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
 | OccupancySensing                                                    | 0x0406 |
 | OnOff                                                               | 0x0006 |
+| OnOff                                                               | 0x0006 |
+| OperationalCredentials                                              | 0x003E |
 | OperationalCredentials                                              | 0x003E |
 | PressureMeasurement                                                 | 0x0403 |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | RelativeHumidityMeasurement                                         | 0x0405 |
+| Scenes                                                              | 0x0005 |
 | Scenes                                                              | 0x0005 |
 | SoftwareDiagnostics                                                 | 0x0034 |
 | Switch                                                              | 0x003B |
@@ -4332,11 +4340,6 @@ private:
 | Cluster ColorControl                                                | 0x0300 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ColorLoopSet                                                      |   0x44 |
-| * EnhancedMoveHue                                                   |   0x41 |
-| * EnhancedMoveToHue                                                 |   0x40 |
-| * EnhancedMoveToHueAndSaturation                                    |   0x43 |
-| * EnhancedStepHue                                                   |   0x42 |
 | * MoveColor                                                         |   0x08 |
 | * MoveColorTemperature                                              |   0x4B |
 | * MoveHue                                                           |   0x01 |
@@ -4393,235 +4396,10 @@ private:
 | * ColorPointBX                                                      | 0x003A |
 | * ColorPointBY                                                      | 0x003B |
 | * ColorPointBIntensity                                              | 0x003C |
-| * EnhancedCurrentHue                                                | 0x4000 |
-| * EnhancedColorMode                                                 | 0x4001 |
-| * ColorLoopActive                                                   | 0x4002 |
-| * ColorLoopDirection                                                | 0x4003 |
-| * ColorLoopTime                                                     | 0x4004 |
-| * ColorCapabilities                                                 | 0x400A |
-| * ColorTempPhysicalMin                                              | 0x400B |
-| * ColorTempPhysicalMax                                              | 0x400C |
 | * CoupleColorTempToLevelMinMireds                                   | 0x400D |
 | * StartUpColorTemperatureMireds                                     | 0x4010 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
-
-/*
- * Command ColorLoopSet
- */
-class ColorControlColorLoopSet : public ModelCommand
-{
-public:
-    ColorControlColorLoopSet() : ModelCommand("color-loop-set")
-    {
-        AddArgument("UpdateFlags", 0, UINT8_MAX, &mUpdateFlags);
-        AddArgument("Action", 0, UINT8_MAX, &mAction);
-        AddArgument("Direction", 0, UINT8_MAX, &mDirection);
-        AddArgument("Time", 0, UINT16_MAX, &mTime);
-        AddArgument("StartHue", 0, UINT16_MAX, &mStartHue);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
-        ModelCommand::AddArguments();
-    }
-    ~ColorControlColorLoopSet()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x44) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ColorLoopSet(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUpdateFlags, mAction, mDirection,
-                                    mTime, mStartHue, mOptionsMask, mOptionsOverride);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mUpdateFlags;
-    uint8_t mAction;
-    uint8_t mDirection;
-    uint16_t mTime;
-    uint16_t mStartHue;
-    uint8_t mOptionsMask;
-    uint8_t mOptionsOverride;
-};
-
-/*
- * Command EnhancedMoveHue
- */
-class ColorControlEnhancedMoveHue : public ModelCommand
-{
-public:
-    ColorControlEnhancedMoveHue() : ModelCommand("enhanced-move-hue")
-    {
-        AddArgument("MoveMode", 0, UINT8_MAX, &mMoveMode);
-        AddArgument("Rate", 0, UINT16_MAX, &mRate);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
-        ModelCommand::AddArguments();
-    }
-    ~ColorControlEnhancedMoveHue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x41) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.EnhancedMoveHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMoveMode, mRate, mOptionsMask,
-                                       mOptionsOverride);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mMoveMode;
-    uint16_t mRate;
-    uint8_t mOptionsMask;
-    uint8_t mOptionsOverride;
-};
-
-/*
- * Command EnhancedMoveToHue
- */
-class ColorControlEnhancedMoveToHue : public ModelCommand
-{
-public:
-    ColorControlEnhancedMoveToHue() : ModelCommand("enhanced-move-to-hue")
-    {
-        AddArgument("EnhancedHue", 0, UINT16_MAX, &mEnhancedHue);
-        AddArgument("Direction", 0, UINT8_MAX, &mDirection);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mTransitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
-        ModelCommand::AddArguments();
-    }
-    ~ColorControlEnhancedMoveToHue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x40) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.EnhancedMoveToHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mEnhancedHue, mDirection,
-                                         mTransitionTime, mOptionsMask, mOptionsOverride);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint16_t mEnhancedHue;
-    uint8_t mDirection;
-    uint16_t mTransitionTime;
-    uint8_t mOptionsMask;
-    uint8_t mOptionsOverride;
-};
-
-/*
- * Command EnhancedMoveToHueAndSaturation
- */
-class ColorControlEnhancedMoveToHueAndSaturation : public ModelCommand
-{
-public:
-    ColorControlEnhancedMoveToHueAndSaturation() : ModelCommand("enhanced-move-to-hue-and-saturation")
-    {
-        AddArgument("EnhancedHue", 0, UINT16_MAX, &mEnhancedHue);
-        AddArgument("Saturation", 0, UINT8_MAX, &mSaturation);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mTransitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
-        ModelCommand::AddArguments();
-    }
-    ~ColorControlEnhancedMoveToHueAndSaturation()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x43) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.EnhancedMoveToHueAndSaturation(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mEnhancedHue,
-                                                      mSaturation, mTransitionTime, mOptionsMask, mOptionsOverride);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint16_t mEnhancedHue;
-    uint8_t mSaturation;
-    uint16_t mTransitionTime;
-    uint8_t mOptionsMask;
-    uint8_t mOptionsOverride;
-};
-
-/*
- * Command EnhancedStepHue
- */
-class ColorControlEnhancedStepHue : public ModelCommand
-{
-public:
-    ColorControlEnhancedStepHue() : ModelCommand("enhanced-step-hue")
-    {
-        AddArgument("StepMode", 0, UINT8_MAX, &mStepMode);
-        AddArgument("StepSize", 0, UINT16_MAX, &mStepSize);
-        AddArgument("TransitionTime", 0, UINT16_MAX, &mTransitionTime);
-        AddArgument("OptionsMask", 0, UINT8_MAX, &mOptionsMask);
-        AddArgument("OptionsOverride", 0, UINT8_MAX, &mOptionsOverride);
-        ModelCommand::AddArguments();
-    }
-    ~ColorControlEnhancedStepHue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x42) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.EnhancedStepHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mStepMode, mStepSize,
-                                       mTransitionTime, mOptionsMask, mOptionsOverride);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mStepMode;
-    uint16_t mStepSize;
-    uint16_t mTransitionTime;
-    uint8_t mOptionsMask;
-    uint8_t mOptionsOverride;
-};
 
 /*
  * Command MoveColor
@@ -7239,278 +7017,6 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint8_t mValue;
-};
-
-/*
- * Attribute EnhancedCurrentHue
- */
-class ReadColorControlEnhancedCurrentHue : public ModelCommand
-{
-public:
-    ReadColorControlEnhancedCurrentHue() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "enhanced-current-hue");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadColorControlEnhancedCurrentHue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeEnhancedCurrentHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute EnhancedColorMode
- */
-class ReadColorControlEnhancedColorMode : public ModelCommand
-{
-public:
-    ReadColorControlEnhancedColorMode() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "enhanced-color-mode");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadColorControlEnhancedColorMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeEnhancedColorMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute ColorLoopActive
- */
-class ReadColorControlColorLoopActive : public ModelCommand
-{
-public:
-    ReadColorControlColorLoopActive() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "color-loop-active");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadColorControlColorLoopActive()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorLoopActive(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute ColorLoopDirection
- */
-class ReadColorControlColorLoopDirection : public ModelCommand
-{
-public:
-    ReadColorControlColorLoopDirection() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "color-loop-direction");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadColorControlColorLoopDirection()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorLoopDirection(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute ColorLoopTime
- */
-class ReadColorControlColorLoopTime : public ModelCommand
-{
-public:
-    ReadColorControlColorLoopTime() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "color-loop-time");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadColorControlColorLoopTime()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorLoopTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute ColorCapabilities
- */
-class ReadColorControlColorCapabilities : public ModelCommand
-{
-public:
-    ReadColorControlColorCapabilities() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "color-capabilities");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadColorControlColorCapabilities()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorCapabilities(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute ColorTempPhysicalMin
- */
-class ReadColorControlColorTempPhysicalMin : public ModelCommand
-{
-public:
-    ReadColorControlColorTempPhysicalMin() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "color-temp-physical-min");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadColorControlColorTempPhysicalMin()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorTempPhysicalMin(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
- * Attribute ColorTempPhysicalMax
- */
-class ReadColorControlColorTempPhysicalMax : public ModelCommand
-{
-public:
-    ReadColorControlColorTempPhysicalMax() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "color-temp-physical-max");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadColorControlColorTempPhysicalMax()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorTempPhysicalMax(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -23344,11 +22850,6 @@ void registerClusterColorControl(Commands & commands)
     const char * clusterName = "ColorControl";
 
     commands_list clusterCommands = {
-        make_unique<ColorControlColorLoopSet>(),
-        make_unique<ColorControlEnhancedMoveHue>(),
-        make_unique<ColorControlEnhancedMoveToHue>(),
-        make_unique<ColorControlEnhancedMoveToHueAndSaturation>(),
-        make_unique<ColorControlEnhancedStepHue>(),
         make_unique<ColorControlMoveColor>(),
         make_unique<ColorControlMoveColorTemperature>(),
         make_unique<ColorControlMoveHue>(),
@@ -23421,14 +22922,6 @@ void registerClusterColorControl(Commands & commands)
         make_unique<WriteColorControlColorPointBY>(),
         make_unique<ReadColorControlColorPointBIntensity>(),
         make_unique<WriteColorControlColorPointBIntensity>(),
-        make_unique<ReadColorControlEnhancedCurrentHue>(),
-        make_unique<ReadColorControlEnhancedColorMode>(),
-        make_unique<ReadColorControlColorLoopActive>(),
-        make_unique<ReadColorControlColorLoopDirection>(),
-        make_unique<ReadColorControlColorLoopTime>(),
-        make_unique<ReadColorControlColorCapabilities>(),
-        make_unique<ReadColorControlColorTempPhysicalMin>(),
-        make_unique<ReadColorControlColorTempPhysicalMax>(),
         make_unique<ReadColorControlCoupleColorTempToLevelMinMireds>(),
         make_unique<ReadColorControlStartUpColorTemperatureMireds>(),
         make_unique<WriteColorControlStartUpColorTemperatureMireds>(),

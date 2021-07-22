@@ -98,42 +98,6 @@ class ChipClusters:
             "BridgedDeviceBasic": {
             },
             "ColorControl": {
-                "ColorLoopSet": {
-                    "updateFlags": "int",
-                    "action": "int",
-                    "direction": "int",
-                    "time": "int",
-                    "startHue": "int",
-                    "optionsMask": "int",
-                    "optionsOverride": "int",
-                },
-                "EnhancedMoveHue": {
-                    "moveMode": "int",
-                    "rate": "int",
-                    "optionsMask": "int",
-                    "optionsOverride": "int",
-                },
-                "EnhancedMoveToHue": {
-                    "enhancedHue": "int",
-                    "direction": "int",
-                    "transitionTime": "int",
-                    "optionsMask": "int",
-                    "optionsOverride": "int",
-                },
-                "EnhancedMoveToHueAndSaturation": {
-                    "enhancedHue": "int",
-                    "saturation": "int",
-                    "transitionTime": "int",
-                    "optionsMask": "int",
-                    "optionsOverride": "int",
-                },
-                "EnhancedStepHue": {
-                    "stepMode": "int",
-                    "stepSize": "int",
-                    "transitionTime": "int",
-                    "optionsMask": "int",
-                    "optionsOverride": "int",
-                },
                 "MoveColor": {
                     "rateX": "int",
                     "rateY": "int",
@@ -1179,38 +1143,6 @@ class ChipClusters:
                     "attributeId": 0x003C,
                     "type": "int",
                     "writable": True,
-                },
-                "EnhancedCurrentHue": {
-                    "attributeId": 0x4000,
-                    "type": "int",
-                },
-                "EnhancedColorMode": {
-                    "attributeId": 0x4001,
-                    "type": "int",
-                },
-                "ColorLoopActive": {
-                    "attributeId": 0x4002,
-                    "type": "int",
-                },
-                "ColorLoopDirection": {
-                    "attributeId": 0x4003,
-                    "type": "int",
-                },
-                "ColorLoopTime": {
-                    "attributeId": 0x4004,
-                    "type": "int",
-                },
-                "ColorCapabilities": {
-                    "attributeId": 0x400A,
-                    "type": "int",
-                },
-                "ColorTempPhysicalMin": {
-                    "attributeId": 0x400B,
-                    "type": "int",
-                },
-                "ColorTempPhysicalMax": {
-                    "attributeId": 0x400C,
-                    "type": "int",
                 },
                 "CoupleColorTempToLevelMinMireds": {
                     "attributeId": 0x400D,
@@ -2345,26 +2277,6 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_Binding_Unbind(
                 device, ZCLendpoint, ZCLgroupid, nodeId, groupId, endpointId, clusterId
         )
-    def ClusterColorControl_CommandColorLoopSet(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, updateFlags: int, action: int, direction: int, time: int, startHue: int, optionsMask: int, optionsOverride: int):
-        return self._chipLib.chip_ime_AppendCommand_ColorControl_ColorLoopSet(
-                device, ZCLendpoint, ZCLgroupid, updateFlags, action, direction, time, startHue, optionsMask, optionsOverride
-        )
-    def ClusterColorControl_CommandEnhancedMoveHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionsMask: int, optionsOverride: int):
-        return self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveHue(
-                device, ZCLendpoint, ZCLgroupid, moveMode, rate, optionsMask, optionsOverride
-        )
-    def ClusterColorControl_CommandEnhancedMoveToHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, enhancedHue: int, direction: int, transitionTime: int, optionsMask: int, optionsOverride: int):
-        return self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveToHue(
-                device, ZCLendpoint, ZCLgroupid, enhancedHue, direction, transitionTime, optionsMask, optionsOverride
-        )
-    def ClusterColorControl_CommandEnhancedMoveToHueAndSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, enhancedHue: int, saturation: int, transitionTime: int, optionsMask: int, optionsOverride: int):
-        return self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveToHueAndSaturation(
-                device, ZCLendpoint, ZCLgroupid, enhancedHue, saturation, transitionTime, optionsMask, optionsOverride
-        )
-    def ClusterColorControl_CommandEnhancedStepHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionsMask: int, optionsOverride: int):
-        return self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedStepHue(
-                device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionsMask, optionsOverride
-        )
     def ClusterColorControl_CommandMoveColor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, rateX: int, rateY: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor(
                 device, ZCLendpoint, ZCLgroupid, rateX, rateY, optionsMask, optionsOverride
@@ -3166,22 +3078,6 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBIntensity(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_WriteAttributeColorPointBIntensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointBIntensity(device, ZCLendpoint, ZCLgroupid, value)
-    def ClusterColorControl_ReadAttributeEnhancedCurrentHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedCurrentHue(device, ZCLendpoint, ZCLgroupid)
-    def ClusterColorControl_ReadAttributeEnhancedColorMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedColorMode(device, ZCLendpoint, ZCLgroupid)
-    def ClusterColorControl_ReadAttributeColorLoopActive(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopActive(device, ZCLendpoint, ZCLgroupid)
-    def ClusterColorControl_ReadAttributeColorLoopDirection(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopDirection(device, ZCLendpoint, ZCLgroupid)
-    def ClusterColorControl_ReadAttributeColorLoopTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopTime(device, ZCLendpoint, ZCLgroupid)
-    def ClusterColorControl_ReadAttributeColorCapabilities(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorCapabilities(device, ZCLendpoint, ZCLgroupid)
-    def ClusterColorControl_ReadAttributeColorTempPhysicalMin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTempPhysicalMin(device, ZCLendpoint, ZCLgroupid)
-    def ClusterColorControl_ReadAttributeColorTempPhysicalMax(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTempPhysicalMax(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeCoupleColorTempToLevelMinMireds(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_CoupleColorTempToLevelMinMireds(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeStartUpColorTemperatureMireds(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -4001,21 +3897,6 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_ClusterRevision.restype = ctypes.c_uint32
         # Cluster ColorControl
-        # Cluster ColorControl Command ColorLoopSet
-        self._chipLib.chip_ime_AppendCommand_ColorControl_ColorLoopSet.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
-        self._chipLib.chip_ime_AppendCommand_ColorControl_ColorLoopSet.restype = ctypes.c_uint32
-        # Cluster ColorControl Command EnhancedMoveHue
-        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
-        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveHue.restype = ctypes.c_uint32
-        # Cluster ColorControl Command EnhancedMoveToHue
-        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveToHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
-        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveToHue.restype = ctypes.c_uint32
-        # Cluster ColorControl Command EnhancedMoveToHueAndSaturation
-        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveToHueAndSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
-        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedMoveToHueAndSaturation.restype = ctypes.c_uint32
-        # Cluster ColorControl Command EnhancedStepHue
-        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedStepHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
-        self._chipLib.chip_ime_AppendCommand_ColorControl_EnhancedStepHue.restype = ctypes.c_uint32
         # Cluster ColorControl Command MoveColor
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16, ctypes.c_int16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor.restype = ctypes.c_uint32
@@ -4229,30 +4110,6 @@ class ChipClusters:
         # Cluster ColorControl WriteAttribute ColorPointBIntensity
         self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointBIntensity.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_WriteAttribute_ColorControl_ColorPointBIntensity.restype = ctypes.c_uint32
-        # Cluster ColorControl ReadAttribute EnhancedCurrentHue
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedCurrentHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedCurrentHue.restype = ctypes.c_uint32
-        # Cluster ColorControl ReadAttribute EnhancedColorMode
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedColorMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedColorMode.restype = ctypes.c_uint32
-        # Cluster ColorControl ReadAttribute ColorLoopActive
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopActive.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopActive.restype = ctypes.c_uint32
-        # Cluster ColorControl ReadAttribute ColorLoopDirection
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopDirection.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopDirection.restype = ctypes.c_uint32
-        # Cluster ColorControl ReadAttribute ColorLoopTime
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopTime.restype = ctypes.c_uint32
-        # Cluster ColorControl ReadAttribute ColorCapabilities
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorCapabilities.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorCapabilities.restype = ctypes.c_uint32
-        # Cluster ColorControl ReadAttribute ColorTempPhysicalMin
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTempPhysicalMin.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTempPhysicalMin.restype = ctypes.c_uint32
-        # Cluster ColorControl ReadAttribute ColorTempPhysicalMax
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTempPhysicalMax.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTempPhysicalMax.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute CoupleColorTempToLevelMinMireds
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CoupleColorTempToLevelMinMireds.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CoupleColorTempToLevelMinMireds.restype = ctypes.c_uint32

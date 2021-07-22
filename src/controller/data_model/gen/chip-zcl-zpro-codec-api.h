@@ -50,8 +50,10 @@
 | GeneralDiagnostics                                                  | 0x0033 |
 | GroupKeyManagement                                                  | 0xF004 |
 | Groups                                                              | 0x0004 |
+| Groups                                                              | 0x0004 |
 | Identify                                                            | 0x0003 |
 | KeypadInput                                                         | 0x0509 |
+| LevelControl                                                        | 0x0008 |
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
 | MediaInput                                                          | 0x0507 |
@@ -60,10 +62,12 @@
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
 | OccupancySensing                                                    | 0x0406 |
 | OnOff                                                               | 0x0006 |
+| OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PressureMeasurement                                                 | 0x0403 |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | RelativeHumidityMeasurement                                         | 0x0405 |
+| Scenes                                                              | 0x0005 |
 | Scenes                                                              | 0x0005 |
 | SoftwareDiagnostics                                                 | 0x0034 |
 | Switch                                                              | 0x003B |

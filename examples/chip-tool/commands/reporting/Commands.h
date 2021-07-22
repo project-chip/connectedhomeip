@@ -39,7 +39,9 @@ public:
         delete onReportColorControlColorTemperatureCallback;
         delete onReportDoorLockLockStateCallback;
         delete onReportLevelControlCurrentLevelCallback;
+        delete onReportLevelControlCurrentLevelCallback;
         delete onReportOccupancySensingOccupancyCallback;
+        delete onReportOnOffOnOffCallback;
         delete onReportOnOffOnOffCallback;
         delete onReportPressureMeasurementMeasuredValueCallback;
         delete onReportPumpConfigurationAndControlCapacityCallback;
@@ -78,8 +80,12 @@ public:
                                        onReportDoorLockLockStateCallback->Cancel());
         callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0008, 0x0000,
                                        onReportLevelControlCurrentLevelCallback->Cancel());
+        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0008, 0x0000,
+                                       onReportLevelControlCurrentLevelCallback->Cancel());
         callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0406, 0x0000,
                                        onReportOccupancySensingOccupancyCallback->Cancel());
+        callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0006, 0x0000,
+                                       onReportOnOffOnOffCallback->Cancel());
         callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0006, 0x0000,
                                        onReportOnOffOnOffCallback->Cancel());
         callbacksMgr.AddReportCallback(GetExecContext()->storage->GetRemoteNodeId(), endpointId, 0x0403, 0x0000,
@@ -163,8 +169,12 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+//    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
+//        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportOccupancySensingOccupancyCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+//    chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
+//        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportPressureMeasurementMeasuredValueCallback =

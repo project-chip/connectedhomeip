@@ -15771,22 +15771,19 @@ public:
             err = TestSendClusterColorControlCommandReadAttribute_7();
             break;
         case 8:
-            err = TestSendClusterColorControlCommandStopMoveStep_8();
+            err = TestSendClusterColorControlCommandReadAttribute_8();
             break;
         case 9:
             err = TestSendClusterColorControlCommandReadAttribute_9();
             break;
         case 10:
-            err = TestSendClusterColorControlCommandReadAttribute_10();
+            err = TestSendClusterColorControlCommandStepColor_10();
             break;
         case 11:
-            err = TestSendClusterColorControlCommandStepColor_11();
+            err = TestSendClusterColorControlCommandReadAttribute_11();
             break;
         case 12:
             err = TestSendClusterColorControlCommandReadAttribute_12();
-            break;
-        case 13:
-            err = TestSendClusterColorControlCommandReadAttribute_13();
             break;
         }
 
@@ -15799,7 +15796,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 14;
+    const uint16_t mTestCount = 13;
 
     //
     // Tests methods
@@ -16291,36 +16288,37 @@ private:
         runner->NextTest();
     }
 
-    // Test Stop Move Step command
-    using SuccessCallback_8 = void (*)(void * context);
+    // Test Check current x attribute value matched the value sent by the last command
+    using SuccessCallback_8 = void (*)(void * context, uint16_t currentX);
     chip::Callback::Callback<SuccessCallback_8> mOnSuccessCallback_8{
-        OnTestSendClusterColorControlCommandStopMoveStep_8_SuccessResponse, this
+        OnTestSendClusterColorControlCommandReadAttribute_8_SuccessResponse, this
     };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{
-        OnTestSendClusterColorControlCommandStopMoveStep_8_FailureResponse, this
+        OnTestSendClusterColorControlCommandReadAttribute_8_FailureResponse, this
     };
     bool mIsFailureExpected_8 = 0;
 
-    CHIP_ERROR TestSendClusterColorControlCommandStopMoveStep_8()
+    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_8()
     {
-        ChipLogProgress(chipTool, "Color Control - Stop Move Step command: Sending command...");
+        ChipLogProgress(
+            chipTool,
+            "Color Control - Check current x attribute value matched the value sent by the last command: Sending command...");
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint8_t optionsMaskArgument     = 0;
-        uint8_t optionsOverrideArgument = 0;
-        err = cluster.StopMoveStep(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel(), optionsMaskArgument,
-                                   optionsOverrideArgument);
+        err = cluster.ReadAttributeCurrentX(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel());
 
         return err;
     }
 
-    static void OnTestSendClusterColorControlCommandStopMoveStep_8_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterColorControlCommandReadAttribute_8_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Color Control - Stop Move Step command: Failure Response");
+        ChipLogProgress(
+            chipTool,
+            "Color Control - Check current x attribute value matched the value sent by the last command: Failure Response");
 
         Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
 
@@ -16334,9 +16332,11 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterColorControlCommandStopMoveStep_8_SuccessResponse(void * context)
+    static void OnTestSendClusterColorControlCommandReadAttribute_8_SuccessResponse(void * context, uint16_t currentX)
     {
-        ChipLogProgress(chipTool, "Color Control - Stop Move Step command: Success Response");
+        ChipLogProgress(
+            chipTool,
+            "Color Control - Check current x attribute value matched the value sent by the last command: Success Response");
 
         Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
 
@@ -16350,8 +16350,8 @@ private:
         runner->NextTest();
     }
 
-    // Test Check current x attribute value matched the value sent by the last command
-    using SuccessCallback_9 = void (*)(void * context, uint16_t currentX);
+    // Test Check current y attribute value matched the value sent by the last command
+    using SuccessCallback_9 = void (*)(void * context, uint16_t currentY);
     chip::Callback::Callback<SuccessCallback_9> mOnSuccessCallback_9{
         OnTestSendClusterColorControlCommandReadAttribute_9_SuccessResponse, this
     };
@@ -16364,14 +16364,14 @@ private:
     {
         ChipLogProgress(
             chipTool,
-            "Color Control - Check current x attribute value matched the value sent by the last command: Sending command...");
+            "Color Control - Check current y attribute value matched the value sent by the last command: Sending command...");
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeCurrentX(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
+        err = cluster.ReadAttributeCurrentY(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
 
         return err;
     }
@@ -16380,7 +16380,7 @@ private:
     {
         ChipLogProgress(
             chipTool,
-            "Color Control - Check current x attribute value matched the value sent by the last command: Failure Response");
+            "Color Control - Check current y attribute value matched the value sent by the last command: Failure Response");
 
         Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
 
@@ -16394,11 +16394,11 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterColorControlCommandReadAttribute_9_SuccessResponse(void * context, uint16_t currentX)
+    static void OnTestSendClusterColorControlCommandReadAttribute_9_SuccessResponse(void * context, uint16_t currentY)
     {
         ChipLogProgress(
             chipTool,
-            "Color Control - Check current x attribute value matched the value sent by the last command: Success Response");
+            "Color Control - Check current y attribute value matched the value sent by the last command: Success Response");
 
         Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
 
@@ -16412,79 +16412,17 @@ private:
         runner->NextTest();
     }
 
-    // Test Check current y attribute value matched the value sent by the last command
-    using SuccessCallback_10 = void (*)(void * context, uint16_t currentY);
+    // Test Step Color command
+    using SuccessCallback_10 = void (*)(void * context);
     chip::Callback::Callback<SuccessCallback_10> mOnSuccessCallback_10{
-        OnTestSendClusterColorControlCommandReadAttribute_10_SuccessResponse, this
+        OnTestSendClusterColorControlCommandStepColor_10_SuccessResponse, this
     };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{
-        OnTestSendClusterColorControlCommandReadAttribute_10_FailureResponse, this
+        OnTestSendClusterColorControlCommandStepColor_10_FailureResponse, this
     };
     bool mIsFailureExpected_10 = 0;
 
-    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_10()
-    {
-        ChipLogProgress(
-            chipTool,
-            "Color Control - Check current y attribute value matched the value sent by the last command: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReadAttributeCurrentY(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel());
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_10_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(
-            chipTool,
-            "Color Control - Check current y attribute value matched the value sent by the last command: Failure Response");
-
-        Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
-
-        if (runner->mIsFailureExpected_10 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_10_SuccessResponse(void * context, uint16_t currentY)
-    {
-        ChipLogProgress(
-            chipTool,
-            "Color Control - Check current y attribute value matched the value sent by the last command: Success Response");
-
-        Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
-
-        if (runner->mIsFailureExpected_10 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Step Color command
-    using SuccessCallback_11 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_11> mOnSuccessCallback_11{
-        OnTestSendClusterColorControlCommandStepColor_11_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_11{
-        OnTestSendClusterColorControlCommandStepColor_11_FailureResponse, this
-    };
-    bool mIsFailureExpected_11 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandStepColor_11()
+    CHIP_ERROR TestSendClusterColorControlCommandStepColor_10()
     {
         ChipLogProgress(chipTool, "Color Control - Step Color command: Sending command...");
 
@@ -16498,15 +16436,75 @@ private:
         uint16_t transitionTimeArgument = 50U;
         uint8_t optionsMaskArgument     = 0;
         uint8_t optionsOverrideArgument = 0;
-        err = cluster.StepColor(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel(), stepXArgument, stepYArgument,
+        err = cluster.StepColor(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel(), stepXArgument, stepYArgument,
                                 transitionTimeArgument, optionsMaskArgument, optionsOverrideArgument);
 
         return err;
     }
 
-    static void OnTestSendClusterColorControlCommandStepColor_11_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterColorControlCommandStepColor_10_FailureResponse(void * context, uint8_t status)
     {
         ChipLogProgress(chipTool, "Color Control - Step Color command: Failure Response");
+
+        Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
+
+        if (runner->mIsFailureExpected_10 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterColorControlCommandStepColor_10_SuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Color Control - Step Color command: Success Response");
+
+        Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
+
+        if (runner->mIsFailureExpected_10 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Check current x attribute value matched the value sent by the last command
+    using SuccessCallback_11 = void (*)(void * context, uint16_t currentX);
+    chip::Callback::Callback<SuccessCallback_11> mOnSuccessCallback_11{
+        OnTestSendClusterColorControlCommandReadAttribute_11_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_11{
+        OnTestSendClusterColorControlCommandReadAttribute_11_FailureResponse, this
+    };
+    bool mIsFailureExpected_11 = 0;
+
+    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_11()
+    {
+        ChipLogProgress(
+            chipTool,
+            "Color Control - Check current x attribute value matched the value sent by the last command: Sending command...");
+
+        chip::Controller::ColorControlCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeCurrentX(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterColorControlCommandReadAttribute_11_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(
+            chipTool,
+            "Color Control - Check current x attribute value matched the value sent by the last command: Failure Response");
 
         Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
 
@@ -16520,9 +16518,11 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterColorControlCommandStepColor_11_SuccessResponse(void * context)
+    static void OnTestSendClusterColorControlCommandReadAttribute_11_SuccessResponse(void * context, uint16_t currentX)
     {
-        ChipLogProgress(chipTool, "Color Control - Step Color command: Success Response");
+        ChipLogProgress(
+            chipTool,
+            "Color Control - Check current x attribute value matched the value sent by the last command: Success Response");
 
         Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
 
@@ -16536,8 +16536,8 @@ private:
         runner->NextTest();
     }
 
-    // Test Check current x attribute value matched the value sent by the last command
-    using SuccessCallback_12 = void (*)(void * context, uint16_t currentX);
+    // Test Check current y attribute value matched the value sent by the last command
+    using SuccessCallback_12 = void (*)(void * context, uint16_t currentY);
     chip::Callback::Callback<SuccessCallback_12> mOnSuccessCallback_12{
         OnTestSendClusterColorControlCommandReadAttribute_12_SuccessResponse, this
     };
@@ -16550,14 +16550,14 @@ private:
     {
         ChipLogProgress(
             chipTool,
-            "Color Control - Check current x attribute value matched the value sent by the last command: Sending command...");
+            "Color Control - Check current y attribute value matched the value sent by the last command: Sending command...");
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeCurrentX(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
+        err = cluster.ReadAttributeCurrentY(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
 
         return err;
     }
@@ -16566,7 +16566,7 @@ private:
     {
         ChipLogProgress(
             chipTool,
-            "Color Control - Check current x attribute value matched the value sent by the last command: Failure Response");
+            "Color Control - Check current y attribute value matched the value sent by the last command: Failure Response");
 
         Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
 
@@ -16580,69 +16580,7 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterColorControlCommandReadAttribute_12_SuccessResponse(void * context, uint16_t currentX)
-    {
-        ChipLogProgress(
-            chipTool,
-            "Color Control - Check current x attribute value matched the value sent by the last command: Success Response");
-
-        Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
-
-        if (runner->mIsFailureExpected_12 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Check current y attribute value matched the value sent by the last command
-    using SuccessCallback_13 = void (*)(void * context, uint16_t currentY);
-    chip::Callback::Callback<SuccessCallback_13> mOnSuccessCallback_13{
-        OnTestSendClusterColorControlCommandReadAttribute_13_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_13{
-        OnTestSendClusterColorControlCommandReadAttribute_13_FailureResponse, this
-    };
-    bool mIsFailureExpected_13 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_13()
-    {
-        ChipLogProgress(
-            chipTool,
-            "Color Control - Check current y attribute value matched the value sent by the last command: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReadAttributeCurrentY(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_13_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(
-            chipTool,
-            "Color Control - Check current y attribute value matched the value sent by the last command: Failure Response");
-
-        Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
-
-        if (runner->mIsFailureExpected_13 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_13_SuccessResponse(void * context, uint16_t currentY)
+    static void OnTestSendClusterColorControlCommandReadAttribute_12_SuccessResponse(void * context, uint16_t currentY)
     {
         ChipLogProgress(
             chipTool,
@@ -16650,7 +16588,7 @@ private:
 
         Test_TC_CC_5 * runner = reinterpret_cast<Test_TC_CC_5 *>(context);
 
-        if (runner->mIsFailureExpected_13 == true)
+        if (runner->mIsFailureExpected_12 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -16690,40 +16628,22 @@ public:
             err = TestSendClusterOnOffCommandReadAttribute_1();
             break;
         case 2:
-            err = TestSendClusterColorControlCommandMoveToColorTemperature_2();
+            err = TestSendClusterColorControlCommandReadAttribute_2();
             break;
         case 3:
             err = TestSendClusterColorControlCommandReadAttribute_3();
             break;
         case 4:
-            err = TestSendClusterColorControlCommandMoveColorTemperature_4();
+            err = TestSendClusterColorControlCommandReadAttribute_4();
             break;
         case 5:
             err = TestSendClusterColorControlCommandReadAttribute_5();
             break;
         case 6:
-            err = TestSendClusterColorControlCommandMoveColorTemperature_6();
+            err = TestSendClusterColorControlCommandReadAttribute_6();
             break;
         case 7:
             err = TestSendClusterColorControlCommandReadAttribute_7();
-            break;
-        case 8:
-            err = TestSendClusterColorControlCommandMoveColorTemperature_8();
-            break;
-        case 9:
-            err = TestSendClusterColorControlCommandReadAttribute_9();
-            break;
-        case 10:
-            err = TestSendClusterColorControlCommandStepColorTemperature_10();
-            break;
-        case 11:
-            err = TestSendClusterColorControlCommandReadAttribute_11();
-            break;
-        case 12:
-            err = TestSendClusterColorControlCommandStepColorTemperature_12();
-            break;
-        case 13:
-            err = TestSendClusterColorControlCommandReadAttribute_13();
             break;
         }
 
@@ -16736,7 +16656,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 14;
+    const uint16_t mTestCount = 8;
 
     //
     // Tests methods
@@ -16857,38 +16777,33 @@ private:
         runner->NextTest();
     }
 
-    // Test Move To Color Temperature command
-    using SuccessCallback_2 = void (*)(void * context);
+    // Test Read current color temprature
+    using SuccessCallback_2 = void (*)(void * context, uint16_t colorTemperature);
     chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
-        OnTestSendClusterColorControlCommandMoveToColorTemperature_2_SuccessResponse, this
+        OnTestSendClusterColorControlCommandReadAttribute_2_SuccessResponse, this
     };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
-        OnTestSendClusterColorControlCommandMoveToColorTemperature_2_FailureResponse, this
+        OnTestSendClusterColorControlCommandReadAttribute_2_FailureResponse, this
     };
     bool mIsFailureExpected_2 = 0;
 
-    CHIP_ERROR TestSendClusterColorControlCommandMoveToColorTemperature_2()
+    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_2()
     {
-        ChipLogProgress(chipTool, "Color Control - Move To Color Temperature command: Sending command...");
+        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Sending command...");
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint16_t colorTemperatureArgument = 100U;
-        uint16_t transitionTimeArgument   = 10U;
-        uint8_t optionsMaskArgument       = 0;
-        uint8_t optionsOverrideArgument   = 0;
-        err = cluster.MoveToColorTemperature(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(), colorTemperatureArgument,
-                                             transitionTimeArgument, optionsMaskArgument, optionsOverrideArgument);
+        err = cluster.ReadAttributeColorTemperature(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
 
         return err;
     }
 
-    static void OnTestSendClusterColorControlCommandMoveToColorTemperature_2_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterColorControlCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Color Control - Move To Color Temperature command: Failure Response");
+        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Failure Response");
 
         Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
 
@@ -16902,9 +16817,9 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterColorControlCommandMoveToColorTemperature_2_SuccessResponse(void * context)
+    static void OnTestSendClusterColorControlCommandReadAttribute_2_SuccessResponse(void * context, uint16_t colorTemperature)
     {
-        ChipLogProgress(chipTool, "Color Control - Move To Color Temperature command: Success Response");
+        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Success Response");
 
         Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
 
@@ -16974,41 +16889,33 @@ private:
         runner->NextTest();
     }
 
-    // Test Move up color temperature command
-    using SuccessCallback_4 = void (*)(void * context);
+    // Test Read current color temprature
+    using SuccessCallback_4 = void (*)(void * context, uint16_t colorTemperature);
     chip::Callback::Callback<SuccessCallback_4> mOnSuccessCallback_4{
-        OnTestSendClusterColorControlCommandMoveColorTemperature_4_SuccessResponse, this
+        OnTestSendClusterColorControlCommandReadAttribute_4_SuccessResponse, this
     };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
-        OnTestSendClusterColorControlCommandMoveColorTemperature_4_FailureResponse, this
+        OnTestSendClusterColorControlCommandReadAttribute_4_FailureResponse, this
     };
     bool mIsFailureExpected_4 = 0;
 
-    CHIP_ERROR TestSendClusterColorControlCommandMoveColorTemperature_4()
+    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_4()
     {
-        ChipLogProgress(chipTool, "Color Control - Move up color temperature command: Sending command...");
+        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Sending command...");
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint8_t moveModeArgument                 = 1;
-        uint16_t rateArgument                    = 10U;
-        uint16_t colorTemperatureMinimumArgument = 1U;
-        uint16_t colorTemperatureMaximumArgument = 255U;
-        uint8_t optionsMaskArgument              = 0;
-        uint8_t optionsOverrideArgument          = 0;
-        err = cluster.MoveColorTemperature(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel(), moveModeArgument,
-                                           rateArgument, colorTemperatureMinimumArgument, colorTemperatureMaximumArgument,
-                                           optionsMaskArgument, optionsOverrideArgument);
+        err = cluster.ReadAttributeColorTemperature(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
 
         return err;
     }
 
-    static void OnTestSendClusterColorControlCommandMoveColorTemperature_4_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterColorControlCommandReadAttribute_4_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Color Control - Move up color temperature command: Failure Response");
+        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Failure Response");
 
         Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
 
@@ -17022,9 +16929,9 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterColorControlCommandMoveColorTemperature_4_SuccessResponse(void * context)
+    static void OnTestSendClusterColorControlCommandReadAttribute_4_SuccessResponse(void * context, uint16_t colorTemperature)
     {
-        ChipLogProgress(chipTool, "Color Control - Move up color temperature command: Success Response");
+        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Success Response");
 
         Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
 
@@ -17094,41 +17001,33 @@ private:
         runner->NextTest();
     }
 
-    // Test Stop Color Temperature command
-    using SuccessCallback_6 = void (*)(void * context);
+    // Test Read current color temprature
+    using SuccessCallback_6 = void (*)(void * context, uint16_t colorTemperature);
     chip::Callback::Callback<SuccessCallback_6> mOnSuccessCallback_6{
-        OnTestSendClusterColorControlCommandMoveColorTemperature_6_SuccessResponse, this
+        OnTestSendClusterColorControlCommandReadAttribute_6_SuccessResponse, this
     };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
-        OnTestSendClusterColorControlCommandMoveColorTemperature_6_FailureResponse, this
+        OnTestSendClusterColorControlCommandReadAttribute_6_FailureResponse, this
     };
     bool mIsFailureExpected_6 = 0;
 
-    CHIP_ERROR TestSendClusterColorControlCommandMoveColorTemperature_6()
+    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_6()
     {
-        ChipLogProgress(chipTool, "Color Control - Stop Color Temperature command: Sending command...");
+        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Sending command...");
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint8_t moveModeArgument                 = 0;
-        uint16_t rateArgument                    = 10U;
-        uint16_t colorTemperatureMinimumArgument = 1U;
-        uint16_t colorTemperatureMaximumArgument = 255U;
-        uint8_t optionsMaskArgument              = 0;
-        uint8_t optionsOverrideArgument          = 0;
-        err = cluster.MoveColorTemperature(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel(), moveModeArgument,
-                                           rateArgument, colorTemperatureMinimumArgument, colorTemperatureMaximumArgument,
-                                           optionsMaskArgument, optionsOverrideArgument);
+        err = cluster.ReadAttributeColorTemperature(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel());
 
         return err;
     }
 
-    static void OnTestSendClusterColorControlCommandMoveColorTemperature_6_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterColorControlCommandReadAttribute_6_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Color Control - Stop Color Temperature command: Failure Response");
+        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Failure Response");
 
         Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
 
@@ -17142,9 +17041,9 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterColorControlCommandMoveColorTemperature_6_SuccessResponse(void * context)
+    static void OnTestSendClusterColorControlCommandReadAttribute_6_SuccessResponse(void * context, uint16_t colorTemperature)
     {
-        ChipLogProgress(chipTool, "Color Control - Stop Color Temperature command: Success Response");
+        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Success Response");
 
         Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
 
@@ -17213,368 +17112,6 @@ private:
 
         runner->NextTest();
     }
-
-    // Test Move down color temperature command
-    using SuccessCallback_8 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_8> mOnSuccessCallback_8{
-        OnTestSendClusterColorControlCommandMoveColorTemperature_8_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{
-        OnTestSendClusterColorControlCommandMoveColorTemperature_8_FailureResponse, this
-    };
-    bool mIsFailureExpected_8 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandMoveColorTemperature_8()
-    {
-        ChipLogProgress(chipTool, "Color Control - Move down color temperature command: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        uint8_t moveModeArgument                 = 3;
-        uint16_t rateArgument                    = 20U;
-        uint16_t colorTemperatureMinimumArgument = 1U;
-        uint16_t colorTemperatureMaximumArgument = 255U;
-        uint8_t optionsMaskArgument              = 0;
-        uint8_t optionsOverrideArgument          = 0;
-        err = cluster.MoveColorTemperature(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel(), moveModeArgument,
-                                           rateArgument, colorTemperatureMinimumArgument, colorTemperatureMaximumArgument,
-                                           optionsMaskArgument, optionsOverrideArgument);
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandMoveColorTemperature_8_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Move down color temperature command: Failure Response");
-
-        Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
-
-        if (runner->mIsFailureExpected_8 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandMoveColorTemperature_8_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "Color Control - Move down color temperature command: Success Response");
-
-        Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
-
-        if (runner->mIsFailureExpected_8 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Read current color temprature
-    using SuccessCallback_9 = void (*)(void * context, uint16_t colorTemperature);
-    chip::Callback::Callback<SuccessCallback_9> mOnSuccessCallback_9{
-        OnTestSendClusterColorControlCommandReadAttribute_9_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
-        OnTestSendClusterColorControlCommandReadAttribute_9_FailureResponse, this
-    };
-    bool mIsFailureExpected_9 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_9()
-    {
-        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReadAttributeColorTemperature(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel());
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_9_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Failure Response");
-
-        Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
-
-        if (runner->mIsFailureExpected_9 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_9_SuccessResponse(void * context, uint16_t colorTemperature)
-    {
-        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Success Response");
-
-        Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
-
-        if (runner->mIsFailureExpected_9 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Step up color temperature command
-    using SuccessCallback_10 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_10> mOnSuccessCallback_10{
-        OnTestSendClusterColorControlCommandStepColorTemperature_10_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{
-        OnTestSendClusterColorControlCommandStepColorTemperature_10_FailureResponse, this
-    };
-    bool mIsFailureExpected_10 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandStepColorTemperature_10()
-    {
-        ChipLogProgress(chipTool, "Color Control - Step up color temperature command: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        uint8_t stepModeArgument                 = 1;
-        uint16_t stepSizeArgument                = 5U;
-        uint16_t transitionTimeArgument          = 50U;
-        uint16_t colorTemperatureMinimumArgument = 5U;
-        uint16_t colorTemperatureMaximumArgument = 100U;
-        uint8_t optionsMaskArgument              = 0;
-        uint8_t optionsOverrideArgument          = 0;
-        err = cluster.StepColorTemperature(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel(), stepModeArgument,
-                                           stepSizeArgument, transitionTimeArgument, colorTemperatureMinimumArgument,
-                                           colorTemperatureMaximumArgument, optionsMaskArgument, optionsOverrideArgument);
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandStepColorTemperature_10_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Step up color temperature command: Failure Response");
-
-        Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
-
-        if (runner->mIsFailureExpected_10 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandStepColorTemperature_10_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "Color Control - Step up color temperature command: Success Response");
-
-        Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
-
-        if (runner->mIsFailureExpected_10 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Read current color temprature
-    using SuccessCallback_11 = void (*)(void * context, uint16_t colorTemperature);
-    chip::Callback::Callback<SuccessCallback_11> mOnSuccessCallback_11{
-        OnTestSendClusterColorControlCommandReadAttribute_11_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_11{
-        OnTestSendClusterColorControlCommandReadAttribute_11_FailureResponse, this
-    };
-    bool mIsFailureExpected_11 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_11()
-    {
-        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReadAttributeColorTemperature(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel());
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_11_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Failure Response");
-
-        Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
-
-        if (runner->mIsFailureExpected_11 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_11_SuccessResponse(void * context, uint16_t colorTemperature)
-    {
-        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Success Response");
-
-        Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
-
-        if (runner->mIsFailureExpected_11 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Step down color temperature command
-    using SuccessCallback_12 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_12> mOnSuccessCallback_12{
-        OnTestSendClusterColorControlCommandStepColorTemperature_12_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_12{
-        OnTestSendClusterColorControlCommandStepColorTemperature_12_FailureResponse, this
-    };
-    bool mIsFailureExpected_12 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandStepColorTemperature_12()
-    {
-        ChipLogProgress(chipTool, "Color Control - Step down color temperature command: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        uint8_t stepModeArgument                 = 3;
-        uint16_t stepSizeArgument                = 5U;
-        uint16_t transitionTimeArgument          = 50U;
-        uint16_t colorTemperatureMinimumArgument = 5U;
-        uint16_t colorTemperatureMaximumArgument = 100U;
-        uint8_t optionsMaskArgument              = 0;
-        uint8_t optionsOverrideArgument          = 0;
-        err = cluster.StepColorTemperature(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel(), stepModeArgument,
-                                           stepSizeArgument, transitionTimeArgument, colorTemperatureMinimumArgument,
-                                           colorTemperatureMaximumArgument, optionsMaskArgument, optionsOverrideArgument);
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandStepColorTemperature_12_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Step down color temperature command: Failure Response");
-
-        Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
-
-        if (runner->mIsFailureExpected_12 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandStepColorTemperature_12_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "Color Control - Step down color temperature command: Success Response");
-
-        Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
-
-        if (runner->mIsFailureExpected_12 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Read current color temprature
-    using SuccessCallback_13 = void (*)(void * context, uint16_t colorTemperature);
-    chip::Callback::Callback<SuccessCallback_13> mOnSuccessCallback_13{
-        OnTestSendClusterColorControlCommandReadAttribute_13_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_13{
-        OnTestSendClusterColorControlCommandReadAttribute_13_FailureResponse, this
-    };
-    bool mIsFailureExpected_13 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_13()
-    {
-        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReadAttributeColorTemperature(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_13_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Failure Response");
-
-        Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
-
-        if (runner->mIsFailureExpected_13 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_13_SuccessResponse(void * context, uint16_t colorTemperature)
-    {
-        ChipLogProgress(chipTool, "Color Control - Read current color temprature: Success Response");
-
-        Test_TC_CC_6 * runner = reinterpret_cast<Test_TC_CC_6 *>(context);
-
-        if (runner->mIsFailureExpected_13 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
 };
 
 class Test_TC_CC_7 : public TestCommand
@@ -17606,40 +17143,10 @@ public:
             err = TestSendClusterOnOffCommandReadAttribute_1();
             break;
         case 2:
-            err = TestSendClusterColorControlCommandEnhancedMoveToHue_2();
+            err = TestSendClusterColorControlCommandReadAttribute_2();
             break;
         case 3:
             err = TestSendClusterColorControlCommandReadAttribute_3();
-            break;
-        case 4:
-            err = TestSendClusterColorControlCommandReadAttribute_4();
-            break;
-        case 5:
-            err = TestSendClusterColorControlCommandEnhancedMoveHue_5();
-            break;
-        case 6:
-            err = TestSendClusterColorControlCommandEnhancedMoveHue_6();
-            break;
-        case 7:
-            err = TestSendClusterColorControlCommandEnhancedMoveHue_7();
-            break;
-        case 8:
-            err = TestSendClusterColorControlCommandEnhancedMoveHue_8();
-            break;
-        case 9:
-            err = TestSendClusterColorControlCommandEnhancedStepHue_9();
-            break;
-        case 10:
-            err = TestSendClusterColorControlCommandEnhancedStepHue_10();
-            break;
-        case 11:
-            err = TestSendClusterColorControlCommandEnhancedMoveToHueAndSaturation_11();
-            break;
-        case 12:
-            err = TestSendClusterColorControlCommandReadAttribute_12();
-            break;
-        case 13:
-            err = TestSendClusterColorControlCommandReadAttribute_13();
             break;
         }
 
@@ -17652,7 +17159,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 14;
+    const uint16_t mTestCount = 4;
 
     //
     // Tests methods
@@ -17773,39 +17280,37 @@ private:
         runner->NextTest();
     }
 
-    // Test Enhanced Move To Hue command
-    using SuccessCallback_2 = void (*)(void * context);
+    // Test Check Remaining time attribute value matched the value sent by the last command
+    using SuccessCallback_2 = void (*)(void * context, uint16_t remainingTime);
     chip::Callback::Callback<SuccessCallback_2> mOnSuccessCallback_2{
-        OnTestSendClusterColorControlCommandEnhancedMoveToHue_2_SuccessResponse, this
+        OnTestSendClusterColorControlCommandReadAttribute_2_SuccessResponse, this
     };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_2{
-        OnTestSendClusterColorControlCommandEnhancedMoveToHue_2_FailureResponse, this
+        OnTestSendClusterColorControlCommandReadAttribute_2_FailureResponse, this
     };
     bool mIsFailureExpected_2 = 0;
 
-    CHIP_ERROR TestSendClusterColorControlCommandEnhancedMoveToHue_2()
+    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_2()
     {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move To Hue command: Sending command...");
+        ChipLogProgress(
+            chipTool,
+            "Color Control - Check Remaining time attribute value matched the value sent by the last command: Sending command...");
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(mDevice, 1);
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        uint16_t enhancedHueArgument    = 1025U;
-        uint8_t directionArgument       = 0;
-        uint16_t transitionTimeArgument = 1U;
-        uint8_t optionsMaskArgument     = 0;
-        uint8_t optionsOverrideArgument = 0;
-        err = cluster.EnhancedMoveToHue(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel(), enhancedHueArgument,
-                                        directionArgument, transitionTimeArgument, optionsMaskArgument, optionsOverrideArgument);
+        err = cluster.ReadAttributeRemainingTime(mOnSuccessCallback_2.Cancel(), mOnFailureCallback_2.Cancel());
 
         return err;
     }
 
-    static void OnTestSendClusterColorControlCommandEnhancedMoveToHue_2_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterColorControlCommandReadAttribute_2_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move To Hue command: Failure Response");
+        ChipLogProgress(
+            chipTool,
+            "Color Control - Check Remaining time attribute value matched the value sent by the last command: Failure Response");
 
         Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
 
@@ -17819,67 +17324,7 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterColorControlCommandEnhancedMoveToHue_2_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move To Hue command: Success Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_2 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Check Remaining time attribute value matched the value sent by the last command
-    using SuccessCallback_3 = void (*)(void * context, uint16_t remainingTime);
-    chip::Callback::Callback<SuccessCallback_3> mOnSuccessCallback_3{
-        OnTestSendClusterColorControlCommandReadAttribute_3_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
-        OnTestSendClusterColorControlCommandReadAttribute_3_FailureResponse, this
-    };
-    bool mIsFailureExpected_3 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_3()
-    {
-        ChipLogProgress(
-            chipTool,
-            "Color Control - Check Remaining time attribute value matched the value sent by the last command: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReadAttributeRemainingTime(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_3_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(
-            chipTool,
-            "Color Control - Check Remaining time attribute value matched the value sent by the last command: Failure Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_3 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_3_SuccessResponse(void * context, uint16_t remainingTime)
+    static void OnTestSendClusterColorControlCommandReadAttribute_2_SuccessResponse(void * context, uint16_t remainingTime)
     {
         ChipLogProgress(
             chipTool,
@@ -17887,7 +17332,7 @@ private:
 
         Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
 
-        if (runner->mIsFailureExpected_3 == true)
+        if (runner->mIsFailureExpected_2 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -17904,573 +17349,17 @@ private:
         runner->NextTest();
     }
 
-    // Test Check EnhancedCurrentHue attribute value matched the value sent by the last command
-    using SuccessCallback_4 = void (*)(void * context, uint16_t enhancedCurrentHue);
-    chip::Callback::Callback<SuccessCallback_4> mOnSuccessCallback_4{
-        OnTestSendClusterColorControlCommandReadAttribute_4_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_4{
-        OnTestSendClusterColorControlCommandReadAttribute_4_FailureResponse, this
-    };
-    bool mIsFailureExpected_4 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_4()
-    {
-        ChipLogProgress(chipTool,
-                        "Color Control - Check EnhancedCurrentHue attribute value matched the value sent by the last command: "
-                        "Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReadAttributeEnhancedCurrentHue(mOnSuccessCallback_4.Cancel(), mOnFailureCallback_4.Cancel());
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_4_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool,
-                        "Color Control - Check EnhancedCurrentHue attribute value matched the value sent by the last command: "
-                        "Failure Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_4 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_4_SuccessResponse(void * context, uint16_t enhancedCurrentHue)
-    {
-        ChipLogProgress(chipTool,
-                        "Color Control - Check EnhancedCurrentHue attribute value matched the value sent by the last command: "
-                        "Success Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_4 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Enhanced Move Hue Down command
-    using SuccessCallback_5 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_5> mOnSuccessCallback_5{
-        OnTestSendClusterColorControlCommandEnhancedMoveHue_5_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_5{
-        OnTestSendClusterColorControlCommandEnhancedMoveHue_5_FailureResponse, this
-    };
-    bool mIsFailureExpected_5 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandEnhancedMoveHue_5()
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Down command : Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        uint8_t moveModeArgument        = 3;
-        uint16_t rateArgument           = 5U;
-        uint8_t optionsMaskArgument     = 0;
-        uint8_t optionsOverrideArgument = 0;
-        err = cluster.EnhancedMoveHue(mOnSuccessCallback_5.Cancel(), mOnFailureCallback_5.Cancel(), moveModeArgument, rateArgument,
-                                      optionsMaskArgument, optionsOverrideArgument);
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedMoveHue_5_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Down command : Failure Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_5 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedMoveHue_5_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Down command : Success Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_5 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Enhanced Move Hue Stop command
-    using SuccessCallback_6 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_6> mOnSuccessCallback_6{
-        OnTestSendClusterColorControlCommandEnhancedMoveHue_6_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_6{
-        OnTestSendClusterColorControlCommandEnhancedMoveHue_6_FailureResponse, this
-    };
-    bool mIsFailureExpected_6 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandEnhancedMoveHue_6()
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Stop command: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        uint8_t moveModeArgument        = 0;
-        uint16_t rateArgument           = 0U;
-        uint8_t optionsMaskArgument     = 0;
-        uint8_t optionsOverrideArgument = 0;
-        err = cluster.EnhancedMoveHue(mOnSuccessCallback_6.Cancel(), mOnFailureCallback_6.Cancel(), moveModeArgument, rateArgument,
-                                      optionsMaskArgument, optionsOverrideArgument);
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedMoveHue_6_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Stop command: Failure Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_6 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedMoveHue_6_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Stop command: Success Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_6 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Enhanced Move Hue Up command
-    using SuccessCallback_7 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_7> mOnSuccessCallback_7{
-        OnTestSendClusterColorControlCommandEnhancedMoveHue_7_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_7{
-        OnTestSendClusterColorControlCommandEnhancedMoveHue_7_FailureResponse, this
-    };
-    bool mIsFailureExpected_7 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandEnhancedMoveHue_7()
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Up command: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        uint8_t moveModeArgument        = 1;
-        uint16_t rateArgument           = 50U;
-        uint8_t optionsMaskArgument     = 0;
-        uint8_t optionsOverrideArgument = 0;
-        err = cluster.EnhancedMoveHue(mOnSuccessCallback_7.Cancel(), mOnFailureCallback_7.Cancel(), moveModeArgument, rateArgument,
-                                      optionsMaskArgument, optionsOverrideArgument);
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedMoveHue_7_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Up command: Failure Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_7 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedMoveHue_7_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Up command: Success Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_7 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Enhanced Move Hue Stop command
-    using SuccessCallback_8 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_8> mOnSuccessCallback_8{
-        OnTestSendClusterColorControlCommandEnhancedMoveHue_8_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_8{
-        OnTestSendClusterColorControlCommandEnhancedMoveHue_8_FailureResponse, this
-    };
-    bool mIsFailureExpected_8 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandEnhancedMoveHue_8()
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Stop command: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        uint8_t moveModeArgument        = 0;
-        uint16_t rateArgument           = 0U;
-        uint8_t optionsMaskArgument     = 0;
-        uint8_t optionsOverrideArgument = 0;
-        err = cluster.EnhancedMoveHue(mOnSuccessCallback_8.Cancel(), mOnFailureCallback_8.Cancel(), moveModeArgument, rateArgument,
-                                      optionsMaskArgument, optionsOverrideArgument);
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedMoveHue_8_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Stop command: Failure Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_8 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedMoveHue_8_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Move Hue Stop command: Success Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_8 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Enhanced Step Hue Up command
-    using SuccessCallback_9 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_9> mOnSuccessCallback_9{
-        OnTestSendClusterColorControlCommandEnhancedStepHue_9_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_9{
-        OnTestSendClusterColorControlCommandEnhancedStepHue_9_FailureResponse, this
-    };
-    bool mIsFailureExpected_9 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandEnhancedStepHue_9()
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Step Hue Up command: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        uint8_t stepModeArgument        = 0;
-        uint16_t stepSizeArgument       = 50U;
-        uint16_t transitionTimeArgument = 1U;
-        uint8_t optionsMaskArgument     = 0;
-        uint8_t optionsOverrideArgument = 0;
-        err = cluster.EnhancedStepHue(mOnSuccessCallback_9.Cancel(), mOnFailureCallback_9.Cancel(), stepModeArgument,
-                                      stepSizeArgument, transitionTimeArgument, optionsMaskArgument, optionsOverrideArgument);
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedStepHue_9_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Step Hue Up command: Failure Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_9 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedStepHue_9_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Step Hue Up command: Success Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_9 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Enhanced Step Hue Down command
-    using SuccessCallback_10 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_10> mOnSuccessCallback_10{
-        OnTestSendClusterColorControlCommandEnhancedStepHue_10_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_10{
-        OnTestSendClusterColorControlCommandEnhancedStepHue_10_FailureResponse, this
-    };
-    bool mIsFailureExpected_10 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandEnhancedStepHue_10()
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Step Hue Down command: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        uint8_t stepModeArgument        = 1;
-        uint16_t stepSizeArgument       = 75U;
-        uint16_t transitionTimeArgument = 1U;
-        uint8_t optionsMaskArgument     = 0;
-        uint8_t optionsOverrideArgument = 0;
-        err = cluster.EnhancedStepHue(mOnSuccessCallback_10.Cancel(), mOnFailureCallback_10.Cancel(), stepModeArgument,
-                                      stepSizeArgument, transitionTimeArgument, optionsMaskArgument, optionsOverrideArgument);
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedStepHue_10_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Step Hue Down command: Failure Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_10 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedStepHue_10_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced Step Hue Down command: Success Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_10 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Enhanced move to hue and saturation command
-    using SuccessCallback_11 = void (*)(void * context);
-    chip::Callback::Callback<SuccessCallback_11> mOnSuccessCallback_11{
-        OnTestSendClusterColorControlCommandEnhancedMoveToHueAndSaturation_11_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_11{
-        OnTestSendClusterColorControlCommandEnhancedMoveToHueAndSaturation_11_FailureResponse, this
-    };
-    bool mIsFailureExpected_11 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandEnhancedMoveToHueAndSaturation_11()
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced move to hue and saturation command: Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        uint16_t enhancedHueArgument    = 1200U;
-        uint8_t saturationArgument      = 90;
-        uint16_t transitionTimeArgument = 10U;
-        uint8_t optionsMaskArgument     = 0;
-        uint8_t optionsOverrideArgument = 0;
-        err = cluster.EnhancedMoveToHueAndSaturation(mOnSuccessCallback_11.Cancel(), mOnFailureCallback_11.Cancel(),
-                                                     enhancedHueArgument, saturationArgument, transitionTimeArgument,
-                                                     optionsMaskArgument, optionsOverrideArgument);
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedMoveToHueAndSaturation_11_FailureResponse(void * context,
-                                                                                                      uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced move to hue and saturation command: Failure Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_11 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandEnhancedMoveToHueAndSaturation_11_SuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "Color Control - Enhanced move to hue and saturation command: Success Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_11 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    // Test Check EnhancedCurrentHue attribute value matched the value sent by the last command
-    using SuccessCallback_12 = void (*)(void * context, uint16_t enhancedCurrentHue);
-    chip::Callback::Callback<SuccessCallback_12> mOnSuccessCallback_12{
-        OnTestSendClusterColorControlCommandReadAttribute_12_SuccessResponse, this
-    };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_12{
-        OnTestSendClusterColorControlCommandReadAttribute_12_FailureResponse, this
-    };
-    bool mIsFailureExpected_12 = 0;
-
-    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_12()
-    {
-        ChipLogProgress(chipTool,
-                        "Color Control - Check EnhancedCurrentHue attribute value matched the value sent by the last command: "
-                        "Sending command...");
-
-        chip::Controller::ColorControlCluster cluster;
-        cluster.Associate(mDevice, 1);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = cluster.ReadAttributeEnhancedCurrentHue(mOnSuccessCallback_12.Cancel(), mOnFailureCallback_12.Cancel());
-
-        return err;
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_12_FailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool,
-                        "Color Control - Check EnhancedCurrentHue attribute value matched the value sent by the last command: "
-                        "Failure Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_12 == false)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
-    static void OnTestSendClusterColorControlCommandReadAttribute_12_SuccessResponse(void * context, uint16_t enhancedCurrentHue)
-    {
-        ChipLogProgress(chipTool,
-                        "Color Control - Check EnhancedCurrentHue attribute value matched the value sent by the last command: "
-                        "Success Response");
-
-        Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
-
-        if (runner->mIsFailureExpected_12 == true)
-        {
-            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
-        runner->NextTest();
-    }
-
     // Test Check Saturation attribute value matched the value sent by the last command
-    using SuccessCallback_13 = void (*)(void * context, uint8_t currentSaturation);
-    chip::Callback::Callback<SuccessCallback_13> mOnSuccessCallback_13{
-        OnTestSendClusterColorControlCommandReadAttribute_13_SuccessResponse, this
+    using SuccessCallback_3 = void (*)(void * context, uint8_t currentSaturation);
+    chip::Callback::Callback<SuccessCallback_3> mOnSuccessCallback_3{
+        OnTestSendClusterColorControlCommandReadAttribute_3_SuccessResponse, this
     };
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_13{
-        OnTestSendClusterColorControlCommandReadAttribute_13_FailureResponse, this
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_3{
+        OnTestSendClusterColorControlCommandReadAttribute_3_FailureResponse, this
     };
-    bool mIsFailureExpected_13 = 0;
+    bool mIsFailureExpected_3 = 0;
 
-    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_13()
+    CHIP_ERROR TestSendClusterColorControlCommandReadAttribute_3()
     {
         ChipLogProgress(
             chipTool,
@@ -18481,12 +17370,12 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        err = cluster.ReadAttributeCurrentSaturation(mOnSuccessCallback_13.Cancel(), mOnFailureCallback_13.Cancel());
+        err = cluster.ReadAttributeCurrentSaturation(mOnSuccessCallback_3.Cancel(), mOnFailureCallback_3.Cancel());
 
         return err;
     }
 
-    static void OnTestSendClusterColorControlCommandReadAttribute_13_FailureResponse(void * context, uint8_t status)
+    static void OnTestSendClusterColorControlCommandReadAttribute_3_FailureResponse(void * context, uint8_t status)
     {
         ChipLogProgress(
             chipTool,
@@ -18494,7 +17383,7 @@ private:
 
         Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
 
-        if (runner->mIsFailureExpected_13 == false)
+        if (runner->mIsFailureExpected_3 == false)
         {
             ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -18504,7 +17393,7 @@ private:
         runner->NextTest();
     }
 
-    static void OnTestSendClusterColorControlCommandReadAttribute_13_SuccessResponse(void * context, uint8_t currentSaturation)
+    static void OnTestSendClusterColorControlCommandReadAttribute_3_SuccessResponse(void * context, uint8_t currentSaturation)
     {
         ChipLogProgress(
             chipTool,
@@ -18512,7 +17401,7 @@ private:
 
         Test_TC_CC_7 * runner = reinterpret_cast<Test_TC_CC_7 *>(context);
 
-        if (runner->mIsFailureExpected_13 == true)
+        if (runner->mIsFailureExpected_3 == true)
         {
             ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
