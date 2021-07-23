@@ -129,9 +129,9 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length
     uint8_t hash[kSHA256_Hash_Length] = {
         0,
     };
-    size_t hashLen              = sizeof(hash);
-    sss_status_t status         = kStatus_SSS_Success;
-    sss_object_t keyObject      = { 0 };
+    size_t hashLen                                           = sizeof(hash);
+    sss_status_t status                                      = kStatus_SSS_Success;
+    sss_object_t keyObject                                   = { 0 };
     uint8_t signature_se05x[kMax_ECDSA_Signature_Length_Der] = { 0 };
     size_t signature_se05x_len  = sizeof(signature_se05x);
     MutableByteSpan out_raw_sig_span(out_signature.Bytes(), out_signature.Capacity());
@@ -207,10 +207,10 @@ exit:
 
 CHIP_ERROR P256KeypairHSM::ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature)
 {
-    CHIP_ERROR error            = CHIP_ERROR_INTERNAL;
-    sss_asymmetric_t asymm_ctx  = { 0 };
-    sss_status_t status         = kStatus_SSS_Success;
-    sss_object_t keyObject      = { 0 };
+    CHIP_ERROR error                                         = CHIP_ERROR_INTERNAL;
+    sss_asymmetric_t asymm_ctx                               = { 0 };
+    sss_status_t status                                      = kStatus_SSS_Success;
+    sss_object_t keyObject                                   = { 0 };
     uint8_t signature_se05x[kMax_ECDSA_Signature_Length_Der] = { 0 };
     size_t signature_se05x_len  = sizeof(signature_se05x);
     MutableByteSpan out_raw_sig_span(out_signature.Bytes(), out_signature.Capacity());
@@ -374,8 +374,8 @@ CHIP_ERROR P256PublicKeyHSM::ECDSA_validate_msg_signature(const uint8_t * msg, s
     uint8_t hash[32]           = {
         0,
     };
-    size_t hash_length          = sizeof(hash);
-    sss_object_t keyObject      = { 0 };
+    size_t hash_length                                       = sizeof(hash);
+    sss_object_t keyObject                                   = { 0 };
     uint8_t signature_se05x[kMax_ECDSA_Signature_Length_Der] = { 0 };
     size_t signature_se05x_len  = sizeof(signature_se05x);
     MutableByteSpan out_der_sig_span(signature_se05x, signature_se05x_len);
@@ -469,10 +469,10 @@ exit:
 CHIP_ERROR P256PublicKeyHSM::ECDSA_validate_hash_signature(const uint8_t * hash, size_t hash_length,
                                                            const P256ECDSASignature & signature) const
 {
-    CHIP_ERROR error            = CHIP_ERROR_INTERNAL;
-    sss_status_t status         = kStatus_SSS_Success;
-    sss_asymmetric_t asymm_ctx  = { 0 };
-    sss_object_t keyObject      = { 0 };
+    CHIP_ERROR error                                         = CHIP_ERROR_INTERNAL;
+    sss_status_t status                                      = kStatus_SSS_Success;
+    sss_asymmetric_t asymm_ctx                               = { 0 };
+    sss_object_t keyObject                                   = { 0 };
     uint8_t signature_se05x[kMax_ECDSA_Signature_Length_Der] = { 0 };
     size_t signature_se05x_len  = sizeof(signature_se05x);
     MutableByteSpan out_der_sig_span(signature_se05x, signature_se05x_len);
