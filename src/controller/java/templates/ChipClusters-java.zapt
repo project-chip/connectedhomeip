@@ -72,12 +72,12 @@ public class ChipClusters {
   {{#chip_server_cluster_commands}}
 
   {{#if (zcl_command_arguments_count this.id)}}
-    public void {{asCamelCased name}}({{#if hasSpecificResponse}}{{asCamelCased responseName false}}Callback{{else}}DefaultClusterCallback{{/if}} callback, {{#chip_server_cluster_command_arguments}}{{asJavaBasicType type}} {{asCamelCased label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/chip_server_cluster_command_arguments}}) {
+    public void {{asCamelCased name}}({{#if hasSpecificResponse}}{{asCamelCased responseName false}}Callback{{else}}DefaultClusterCallback{{/if}} callback, {{#chip_server_cluster_command_arguments}}{{asJavaBasicType type}} {{asCamelCased label}}{{#not_last}}, {{/not_last}}{{/chip_server_cluster_command_arguments}}) {
   {{else}}
     public void {{asCamelCased name}}({{#if hasSpecificResponse}}{{asCamelCased responseName false}}Callback{{else}}DefaultClusterCallback{{/if}} callback) {
   {{/if}}
   {{#if (zcl_command_arguments_count this.id)}}
-      {{asCamelCased name}}(chipClusterPtr, callback, {{#chip_server_cluster_command_arguments}}{{asCamelCased label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/chip_server_cluster_command_arguments}});
+      {{asCamelCased name}}(chipClusterPtr, callback, {{#chip_server_cluster_command_arguments}}{{asCamelCased label}}{{#not_last}}, {{/not_last}}{{/chip_server_cluster_command_arguments}});
   {{else}}
       {{asCamelCased name}}(chipClusterPtr, callback);
   {{/if}}    
@@ -86,7 +86,7 @@ public class ChipClusters {
   {{/chip_server_cluster_commands}}
   {{#chip_server_cluster_commands}}
   {{#if (zcl_command_arguments_count this.id)}}
-    private native void {{asCamelCased name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asCamelCased responseName false}}Callback{{else}}DefaultClusterCallback{{/if}} callback, {{#chip_server_cluster_command_arguments}}{{asJavaBasicType type}} {{asCamelCased label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/chip_server_cluster_command_arguments}});
+    private native void {{asCamelCased name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asCamelCased responseName false}}Callback{{else}}DefaultClusterCallback{{/if}} callback, {{#chip_server_cluster_command_arguments}}{{asJavaBasicType type}} {{asCamelCased label}}{{#not_last}}, {{/not_last}}{{/chip_server_cluster_command_arguments}});
   {{else}}
     private native void {{asCamelCased name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asCamelCased responseName false}}Callback{{else}}DefaultClusterCallback{{/if}} callback);
   {{/if}}
@@ -133,11 +133,11 @@ public class ChipClusters {
       public {{asCamelCased name false}}Attribute(
         {{#chip_attribute_list_entryTypes}}
         {{#if (isOctetString type)}}
-        byte[] {{asCamelCased name true}}{{#unless (isLastElement index count)}},{{/unless}}
+        byte[] {{asCamelCased name true}}{{#not_last}},{{/not_last}}
         {{else if (isCharString type)}}
         // Add String field here after ByteSpan is properly emitted in C++ layer
         {{else}}
-        {{asJavaBasicType label type}} {{asCamelCased name true}}{{#unless (isLastElement index count)}},{{/unless}}
+        {{asJavaBasicType label type}} {{asCamelCased name true}}{{#not_last}},{{/not_last}}
         {{/if}}
         {{/chip_attribute_list_entryTypes}}
       ) {
@@ -199,9 +199,9 @@ public class ChipClusters {
   {{/if}}
   {{/chip_server_cluster_attributes}}
   }
-  {{#unless (isLastElement index count)}}
+  {{#not_last}}
 
-  {{/unless}}
+  {{/not_last}}
   {{/chip_client_clusters}}
 }
 {{/if}}
