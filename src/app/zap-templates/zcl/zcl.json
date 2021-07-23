@@ -22,6 +22,7 @@
         "flow-measurement-cluster.xml",
         "general-commissioning-cluster.xml",
         "general-diagnostics-cluster.xml",
+        "global-attributes.xml",
         "group-key-mgmt-cluster.xml",
         "keypad-input-cluster.xml",
         "low-power-cluster.xml",

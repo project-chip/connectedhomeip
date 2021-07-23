@@ -162,10 +162,6 @@ limitations under the License.
       <arg name="discoveryComplete" type="INT8U"/>
       <arg name="extendedDiscoverAttributesInfoRecords" type="ExtendedDiscoverAttributesInfoRecord" array="true"/>
     </command>
-    <attribute side="client" code="0xFFFD" define="CLUSTER_REVISION_CLIENT" type="INT16U" min="0x0001" max="0xFFFE" writable="false" default="0x0001" optional="false" introducedIn="zcl-6.0-15-02017-001">cluster revision</attribute>
-    <attribute side="client" code="0xFFFC" define="FEATURE_MAP_CLIENT" type="INT32U" writable="false" default="0x0000" optional="true">feature map</attribute>
-    <attribute side="server" code="0xFFFD" define="CLUSTER_REVISION_SERVER" type="INT16U" min="0x0001" max="0xFFFE" writable="false" default="0x0001" optional="false" introducedIn="zcl-6.0-15-02017-001">cluster revision</attribute>
-    <attribute side="server" code="0xFFFC" define="FEATURE_MAP_SERVER" type="INT32U" writable="false" default="0x0000" optional="true">feature map</attribute>
   </global>
   <cluster singleton="true">
     <name>Power Configuration</name>
