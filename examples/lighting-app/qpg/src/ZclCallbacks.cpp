@@ -22,6 +22,7 @@
 #include "LightingManager.h"
 
 #include <app/chip-zcl-zpro-codec.h>
+#include <app/common/gen/attributes/Accessors.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
@@ -30,6 +31,7 @@
 #include <app/util/util.h>
 
 using namespace ::chip;
+using namespace chip::app::Clusters;
 
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
@@ -86,20 +88,16 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             XyColor_t xy;
             if (attributeId == ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID)
             {
-                xy.x = *(uint16_t *) (value);
+                xy.x = *static_cast<uint16_t*>(static_cast<void*>(value));
                 // get Y from cluster value storage
-                EmberAfStatus status =
-                    emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
-                                               (uint8_t *) &xy.y, sizeof(xy.y));
+                EmberAfStatus status = ColorControl::Attributes::GetCurrentY(endpoint, &xy.y);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             if (attributeId == ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID)
             {
-                xy.y = *(uint16_t *) (value);
+                xy.y = *static_cast<uint16_t*>(static_cast<void*>(value));
                 // get X from cluster value storage
-                EmberAfStatus status =
-                    emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
-                                               (uint8_t *) &xy.x, sizeof(xy.x));
+                EmberAfStatus status = ColorControl::Attributes::GetCurrentX(endpoint, &xy.x);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
@@ -110,20 +108,16 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             HsvColor_t hsv;
             if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
             {
-                hsv.h = *(uint8_t *) (value);
+                hsv.h = *value;
                 // get saturation from cluster value storage
-                EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                                                  ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                                                  (uint8_t *) &hsv.s, sizeof(hsv.s));
+                EmberAfStatus status = ColorControl::Attributes::GetCurrentSaturation(endpoint, &hsv.s);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             if (attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID)
             {
-                hsv.s = *(uint8_t *) (value);
+                hsv.s = *value;
                 // get hue from cluster value storage
-                EmberAfStatus status =
-                    emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
-                                               (uint8_t *) &hsv.h, sizeof(hsv.h));
+                EmberAfStatus status = ColorControl::Attributes::GetCurrentHue(endpoint, &hsv.h);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
