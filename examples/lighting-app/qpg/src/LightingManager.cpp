@@ -192,11 +192,11 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
         ChipLogProgress(NotSpecified, "LightMgr:LEVEL: lev:%u->%u", mLevel, *value);
         break;
     case COLOR_ACTION_XY:
-        xy = *static_cast<XyColor_t *>(static_cast<void*>(value));
+        xy = *static_cast<XyColor_t *>(static_cast<void *>(value));
         ChipLogProgress(NotSpecified, "LightMgr:COLOR: xy:%u|%u->%u|%u", mXY.x, mXY.y, xy.x, xy.y);
         break;
     case COLOR_ACTION_HSV:
-        hsv = *static_cast<HsvColor_t *>(static_cast<void*>(value));
+        hsv = *static_cast<HsvColor_t *>(static_cast<void *>(value));
         ChipLogProgress(NotSpecified, "LightMgr:COLOR: hsv:%u|%u->%u|%u", mHSV.h, mHSV.s, hsv.h, hsv.s);
         break;
     default:
