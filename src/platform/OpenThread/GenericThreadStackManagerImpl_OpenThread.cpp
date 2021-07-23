@@ -1325,21 +1325,21 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     otDnsInitTxtEntryIterator(&iterator, serviceInfo.mTxtData, serviceInfo.mTxtDataSize);
 
     otDnsTxtEntry txtEntry;
+    FixedBufferAllocator alloc(serviceTxtEntries.mBuffer);
 
     uint8_t entryIndex = 0;
     while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < kMaxDnsServiceTxtEntriesNumber)
     {
-        if (txtEntry.mKey && strlen(txtEntry.mKey) <= kMaxDnsServiceTxtKeySize && txtEntry.mValue &&
-            txtEntry.mValueLength <= kMaxDnsServiceTxtValueSize)
-        {
-            strcpy(serviceTxtEntries.mTxtKeyBuffers[entryIndex], txtEntry.mKey);
-            serviceTxtEntries.mTxtEntries[entryIndex].mKey      = serviceTxtEntries.mTxtKeyBuffers[entryIndex];
-            serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
-            memcpy(serviceTxtEntries.mTxtValueBuffers[entryIndex], txtEntry.mValue, txtEntry.mValueLength);
-            serviceTxtEntries.mTxtEntries[entryIndex].mData = serviceTxtEntries.mTxtValueBuffers[entryIndex];
-            entryIndex++;
-        }
+        if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
+            continue;
+
+        serviceTxtEntries.mTxtEntries[entryIndex].mKey      = alloc.Clone(txtEntry.mKey);
+        serviceTxtEntries.mTxtEntries[entryIndex].mData     = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
+        serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
+        entryIndex++;
     }
+
+    ReturnErrorCodeIf(alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
     mdnsService.mTextEntrySize = entryIndex;
@@ -1357,9 +1357,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
     char type[chip::Mdns::kMdnsTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
     // hostname buffer size is kMdnsHostNameMaxSize + . + kMaxDomainNameSize + . + termination character
     char hostname[chip::Mdns::kMdnsHostNameMaxSize + SrpClient::kMaxDomainNameSize + 3];
-
-    uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber *
-                      (kMaxDnsServiceTxtKeySize + 1 + kMaxDnsServiceTxtValueSize + sizeof(chip::Mdns::TextEntry))];
+    // secure space for the raw TXT data in the worst-case scenario relevant for Matter:
+    // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
+    uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
     otDnsServiceInfo serviceInfo;
     uint16_t index = 0;
     bool wasAnythingBrowsed;
@@ -1448,8 +1448,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
     char type[chip::Mdns::kMdnsTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
     // hostname buffer size is kMdnsHostNameMaxSize + . + kMaxDomainNameSize + . + termination character
     char hostname[chip::Mdns::kMdnsHostNameMaxSize + SrpClient::kMaxDomainNameSize + 3];
-    uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber *
-                      (kMaxDnsServiceTxtKeySize + 1 + kMaxDnsServiceTxtValueSize + sizeof(chip::Mdns::TextEntry))];
+    // secure space for the raw TXT data in the worst-case scenario relevant for Matter:
+    // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
+    uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
     otDnsServiceInfo serviceInfo;
 
     if (ThreadStackMgrImpl().mDnsResolveCallback == nullptr)
