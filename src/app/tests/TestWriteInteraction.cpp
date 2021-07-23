@@ -214,7 +214,7 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
     AddAttributeDataElement(apSuite, apContext, writeClient);
 
     SecureSessionHandle session = ctx.GetSessionLocalToPeer();
-    err                         = writeClient.SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetAdminId(), &session);
+    err                         = writeClient.SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateWriteResponse(apSuite, apContext, buf);
@@ -304,7 +304,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
     NL_TEST_ASSERT(apSuite, !delegate.mGotResponse);
 
     SecureSessionHandle session = ctx.GetSessionLocalToPeer();
-    err                         = writeClient->SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetAdminId(), &session);
+    err                         = writeClient->SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, delegate.mGotResponse);
