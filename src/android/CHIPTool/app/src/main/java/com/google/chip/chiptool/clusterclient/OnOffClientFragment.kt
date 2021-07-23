@@ -1,8 +1,5 @@
 package com.google.chip.chiptool.clusterclient
 
-import android.content.Context
-import android.net.nsd.NsdManager
-import android.net.nsd.NsdServiceInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -110,39 +107,14 @@ class OnOffClientFragment : Fragment() {
   }
 
   private fun updateAddressClick() {
-    val serviceInfo = NsdServiceInfo().apply {
-      serviceName = "%016X-%016X".format(
-        fabricIdEd.text.toString().toLong(),
-        deviceIdEd.text.toString().toLong()
+    try{
+      deviceController.updateDevice(
+          fabricIdEd.text.toString().toULong().toLong(),
+          deviceIdEd.text.toString().toULong().toLong()
       )
-      serviceType = "_matter._tcp"
-    }
-
-    // TODO: implement the common CHIP mDNS interface for Android and make CHIP stack call the resolver
-    val resolverListener = object : NsdManager.ResolveListener {
-      override fun onResolveFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
-        showMessage("Address resolution failed: $errorCode")
-      }
-
-      override fun onServiceResolved(serviceInfo: NsdServiceInfo?) {
-        val hostAddress = serviceInfo?.host?.hostAddress ?: ""
-        val port = serviceInfo?.port ?: 0
-
-        showMessage("Address: ${hostAddress}:${port}")
-
-        if (hostAddress == "" || port == 0)
-          return
-
-        try {
-          deviceController.updateAddress(deviceIdEd.text.toString().toLong(), hostAddress, port)
-        } catch (e: ChipDeviceControllerException) {
-          showMessage(e.toString())
-        }
-      }
-    }
-
-    (requireContext().getSystemService(Context.NSD_SERVICE) as NsdManager).apply {
-      resolveService(serviceInfo, resolverListener)
+      showMessage("Address update started")
+    } catch (ex: Exception) {
+      showMessage("Address update failed: $ex")
     }
   }
 

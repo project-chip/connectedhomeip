@@ -814,18 +814,6 @@ inline bool IsChipDNAttr(chip::ASN1::OID oid)
 CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint16_t rawIntLen);
 
 /**
- * @brief Convert a raw integer in big-endian form to an ASN.1 DER encoded integer.
- *
- * @param rawInt        P256 integer in raw form.
- * @param derInt        Buffer to store converted ASN.1 DER encoded integer.
- * @param derIntBufSize The size of the buffer to store ASN.1 DER encoded integer.
- * @param derIntLen     The length of the ASN.1 DER encoded integer.
- *
- * @retval  #CHIP_NO_ERROR  If the integer value was successfully converted.
- */
-CHIP_ERROR ConvertIntegerRawToDER(P256IntegerSpan rawInt, uint8_t * derInt, const uint16_t derIntBufSize, uint16_t & derIntLen);
-
-/**
  * @brief Convert a raw CHIP signature to an ASN.1 DER encoded signature structure.
  *
  * @param rawSig        P256 ECDSA signature in raw form.

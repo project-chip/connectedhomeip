@@ -22,18 +22,12 @@
 
 esp_err_t Button::Init(gpio_num_t gpioNum, uint16_t debouncePeriod)
 {
-    esp_err_t err;
-
     mGPIONum         = gpioNum;
     mDebouncePeriod  = debouncePeriod / portTICK_PERIOD_MS;
     mState           = false;
     mLastPolledState = false;
 
-    err = gpio_set_direction(gpioNum, GPIO_MODE_INPUT);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return gpio_set_direction(gpioNum, GPIO_MODE_INPUT);
 }
 
 bool Button::Poll()

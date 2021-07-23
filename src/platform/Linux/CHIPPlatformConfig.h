@@ -40,6 +40,7 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 
 #define CHIP_CONFIG_ERROR_CLASS 1
 #define CHIP_CONFIG_ERROR_FORMAT_AS_STRING 1
+#define CHIP_CONFIG_ERROR_SOURCE 1
 
 // ==================== Security Adaptations ====================
 
@@ -121,3 +122,7 @@ using CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE = const char *;
 #ifndef CHIP_CONFIG_ENABLE_CASE_RESPONDER
 #define CHIP_CONFIG_ENABLE_CASE_RESPONDER 1
 #endif // CHIP_CONFIG_ENABLE_CASE_RESPONDER
+
+#ifndef CHIP_CONFIG_KVS_PATH
+#define CHIP_CONFIG_KVS_PATH "/tmp/chip_kvs"
+#endif // CHIP_CONFIG_KVS_PATH

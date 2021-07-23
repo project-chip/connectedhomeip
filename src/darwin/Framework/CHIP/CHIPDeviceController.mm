@@ -18,7 +18,7 @@
 
 #import "CHIPDevicePairingDelegateBridge.h"
 #import "CHIPDevice_Internal.h"
-#import "CHIPError.h"
+#import "CHIPError_Internal.h"
 #import "CHIPLogging.h"
 #import "CHIPOperationalCredentialsDelegate.h"
 #import "CHIPPersistentStorageDelegateBridge.h"

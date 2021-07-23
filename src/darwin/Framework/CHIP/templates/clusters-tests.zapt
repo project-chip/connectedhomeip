@@ -6,9 +6,6 @@
 // module headers
 #import <CHIP/CHIP.h>
 
-// additional includes
-#import "CHIPError.h"
-
 // system dependencies
 #import <XCTest/XCTest.h>
 
@@ -137,7 +134,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-{{>test_cluster tests="TestCluster, Test_TC_OO_1_1, Test_TC_OO_2_1, Test_TC_OO_2_2, Test_TC_DM_1_1, Test_TC_DM_3_1"}}
+{{>test_cluster tests="TestCluster, Test_TC_OO_1_1, Test_TC_OO_2_1, Test_TC_OO_2_2, Test_TC_DM_1_1, Test_TC_DM_3_1, Test_TC_WNCV_1_1, Test_TC_WNCV_2_1"}}
 
 {{#chip_client_clusters}}
 {{#unless (isStrEqual "Test Cluster" name)}}

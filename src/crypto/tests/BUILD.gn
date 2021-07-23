@@ -32,6 +32,7 @@ chip_test_suite("tests") {
     "Hash_SHA256_test_vectors.h",
     "PBKDF2_SHA256_test_vectors.h",
     "PBKDF2_SHA256_test_vectors.h",
+    "RawIntegerToDer_test_vectors.h",
     "SPAKE2P_FE_MUL_test_vectors.h",
     "SPAKE2P_FE_RW_test_vectors.h",
     "SPAKE2P_HMAC_test_vectors.h",

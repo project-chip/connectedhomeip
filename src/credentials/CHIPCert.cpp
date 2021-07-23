@@ -838,41 +838,6 @@ CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint1
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConvertIntegerRawToDER(P256IntegerSpan rawInt, uint8_t * derInt, const uint16_t derIntBufSize, uint16_t & derIntLen)
-{
-    static_assert(rawInt.size() <= UINT16_MAX - 1, "P256 raw integer doesn't fit in a uint16_t");
-
-    VerifyOrReturnError(!rawInt.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(derInt != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    const uint8_t * rawIntData = rawInt.data();
-    size_t rawIntLen           = rawInt.size();
-
-    while (*rawIntData == 0)
-    {
-        rawIntData++;
-        rawIntLen--;
-    }
-
-    if (*rawIntData & 0x80) /* Need Leading Zero */
-    {
-        VerifyOrReturnError(derIntBufSize >= rawIntLen + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        *derInt++ = 0;
-        derIntLen = static_cast<uint16_t>(rawIntLen + 1);
-    }
-    else
-    {
-        VerifyOrReturnError(derIntBufSize >= rawIntLen, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        derIntLen = static_cast<uint16_t>(rawIntLen);
-    }
-
-    memcpy(derInt, rawIntData, rawIntLen);
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, uint8_t * derSig, const uint16_t derSigBufSize,
                                          uint16_t & derSigLen)
 {
@@ -892,8 +857,7 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, uint8_t 
 CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t derInt[kP256_FE_Length + 1];
-    uint16_t derIntLen;
+    uint8_t derInt[kP256_FE_Length + kEmitDerIntegerWithoutTagOverhead];
 
     VerifyOrReturnError(!rawSig.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -901,13 +865,20 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1Writ
     ASN1_START_SEQUENCE
     {
         // r INTEGER
-        ReturnErrorOnFailure(ConvertIntegerRawToDER(P256IntegerSpan(rawSig.data()), derInt, sizeof(derInt), derIntLen));
-        ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, derInt, derIntLen));
+        {
+            MutableByteSpan derIntSpan(derInt, sizeof(derInt));
+            ReturnErrorOnFailure(ConvertIntegerRawToDerWithoutTag(P256IntegerSpan(rawSig.data()), derIntSpan));
+            ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, derIntSpan.data(),
+                                                 static_cast<uint16_t>(derIntSpan.size())));
+        }
 
         // s INTEGER
-        ReturnErrorOnFailure(
-            ConvertIntegerRawToDER(P256IntegerSpan(rawSig.data() + kP256_FE_Length), derInt, sizeof(derInt), derIntLen));
-        ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, derInt, derIntLen));
+        {
+            MutableByteSpan derIntSpan(derInt, sizeof(derInt));
+            ReturnErrorOnFailure(ConvertIntegerRawToDerWithoutTag(P256IntegerSpan(rawSig.data() + kP256_FE_Length), derIntSpan));
+            ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, derIntSpan.data(),
+                                                 static_cast<uint16_t>(derIntSpan.size())));
+        }
     }
     ASN1_END_SEQUENCE;
 

@@ -11,7 +11,7 @@ cd -
 
 # Generating esp32-devkitc-all_clusters
 cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_devkit.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all_clusters reconfigure'
+bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all_clusters reconfigure'
 cd -
 
 # Generating esp32-devkitc-lock
@@ -50,7 +50,7 @@ bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-m5stack-all_clust
 
 # Generating esp32-devkitc-all_clusters
 cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_devkit.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all_clusters reconfigure'
+bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all_clusters reconfigure'
 cd -
 
 # Building esp32-devkitc-all_clusters

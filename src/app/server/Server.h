@@ -47,6 +47,10 @@ using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
  */
 void InitServer(AppDelegate * delegate = nullptr);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
 CHIP_ERROR AddTestPairing();
 
 chip::Transport::AdminPairingTable & GetGlobalAdminPairingTable();
@@ -64,6 +68,7 @@ enum class PairingWindowAdvertisement
     kBle,
     kMdns,
 };
+
 } // namespace chip
 
 /**

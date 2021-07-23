@@ -20,25 +20,18 @@
 NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSErrorDomain const CHIPErrorDomain;
 
-typedef uint32_t CHIP_ERROR;
-
-typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode) {
-    CHIPSuccess = 0,
-    CHIPErrorCodeUndefinedError = 1,
-    CHIPErrorCodeInvalidStringLength = 2,
-    CHIPErrorCodeInvalidIntegerValue = 3,
-    CHIPErrorCodeInvalidArgument = 4,
+typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode){
+    CHIPSuccess                       = 0,
+    CHIPErrorCodeUndefinedError       = 1,
+    CHIPErrorCodeInvalidStringLength  = 2,
+    CHIPErrorCodeInvalidIntegerValue  = 3,
+    CHIPErrorCodeInvalidArgument      = 4,
     CHIPErrorCodeInvalidMessageLength = 5,
-    CHIPErrorCodeInvalidState = 6,
-    CHIPErrorCodeWrongAddressType = 7,
+    CHIPErrorCodeInvalidState         = 6,
+    CHIPErrorCodeWrongAddressType     = 7,
     CHIPErrorCodeIntegrityCheckFailed = 8,
-    CHIPErrorCodeDuplicateExists = 9,
+    CHIPErrorCodeDuplicateExists      = 9,
     CHIPErrorCodeUnsupportedAttribute = 10,
 };
-
-@interface CHIPError : NSObject
-+ (nullable NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
-+ (CHIP_ERROR)errorToCHIPErrorCode:(NSError *)errorCode;
-@end
 
 NS_ASSUME_NONNULL_END
