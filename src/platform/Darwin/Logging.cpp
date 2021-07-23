@@ -62,7 +62,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
         break;
 
     case kLogCategory_Detail:
-        os_log_with_type(log, OS_LOG_TYPE_DEBUG, "🟢 %{public}s", formattedMsg);
+        os_log_with_type(log, OS_LOG_TYPE_DEFAULT, "🟢 %{public}s", formattedMsg);
 #if TARGET_OS_MAC && TARGET_OS_IPHONE == 0
         fprintf(stdout, "\033[0;34m");
 #endif
