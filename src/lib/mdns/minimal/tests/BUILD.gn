@@ -22,14 +22,14 @@ chip_test_suite("tests") {
   output_name = "libMinimalMdnstests"
 
   test_sources = [
+    "TestAdvertiser.cpp",
     "TestMinimalMdnsAllocator.cpp",
     "TestQueryReplyFilter.cpp",
     "TestRecordData.cpp",
     "TestResponseSender.cpp",
-    "TestAdvertiser.cpp",
   ]
 
-  defines = [ "MDNS_MINIMAL_TEST_SERVER=true"]
+  defines = [ "MDNS_MINIMAL_TEST_SERVER=true" ]
 
   cflags = [ "-Wconversion" ]
 
