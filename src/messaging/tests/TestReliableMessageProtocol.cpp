@@ -445,6 +445,11 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+    NL_TEST_ASSERT(inSuite, rc != nullptr);
+
     err = mockSender.mMessageDispatch.Init();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -459,6 +464,9 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
     // Test that the message was dropped by the receiver
     NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
+
+    // Since peer dropped the message, we might have pending acks. Let's clear the table
+    rm->ClearRetransTable(rc);
 
     exchange->Close();
 }
