@@ -169,12 +169,12 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-//    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
-//        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    //    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
+    //        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportOccupancySensingOccupancyCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-//    chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
-//        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    //    chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
+    //        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportPressureMeasurementMeasuredValueCallback =

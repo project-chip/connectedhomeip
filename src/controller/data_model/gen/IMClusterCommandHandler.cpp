@@ -294,19 +294,19 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
         case Clusters::Basic::Commands::Ids::Leave: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-//            wasHandled = emberAfBasicClusterLeaveCallback(apCommandObj);
+            //            wasHandled = emberAfBasicClusterLeaveCallback(apCommandObj);
             break;
         }
         case Clusters::Basic::Commands::Ids::ShutDown: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-//            wasHandled = emberAfBasicClusterShutDownCallback(apCommandObj);
+            //            wasHandled = emberAfBasicClusterShutDownCallback(apCommandObj);
             break;
         }
         case Clusters::Basic::Commands::Ids::StartUp: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-//            wasHandled = emberAfBasicClusterStartUpCallback(apCommandObj);
+            //            wasHandled = emberAfBasicClusterStartUpCallback(apCommandObj);
             break;
         }
         default: {
