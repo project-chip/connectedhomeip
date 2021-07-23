@@ -22,8 +22,8 @@
 void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags);
 void PrintOnboardingCodes(const chip::SetupPayload & payload);
 void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags);
-CHIP_ERROR GetQRCode(std::string & QRCode, chip::RendezvousInformationFlags aRendezvousFlags);
-CHIP_ERROR GetQRCode(std::string & QRCode, const chip::SetupPayload & payload);
+CHIP_ERROR GetQRCode(std::string & aQRCode, chip::RendezvousInformationFlags aRendezvousFlags);
+CHIP_ERROR GetQRCode(std::string & aQRCode, const chip::SetupPayload & payload);
 CHIP_ERROR GetQRCodeUrl(char * aQRCodeUrl, size_t aUrlMaxSize, const std::string & aQRCode);
 CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags);
 CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, const chip::SetupPayload & payload);

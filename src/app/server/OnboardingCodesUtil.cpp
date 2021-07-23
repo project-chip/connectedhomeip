@@ -36,17 +36,17 @@ using namespace ::chip::DeviceLayer;
 
 void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
 {
-    std::string QRCode;
+    std::string qrCode;
     std::string manualPairingCode;
 
-    if (GetQRCode(QRCode, aRendezvousFlags) == CHIP_NO_ERROR)
+    if (GetQRCode(qrCode, aRendezvousFlags) == CHIP_NO_ERROR)
     {
         chip::Platform::ScopedMemoryBuffer<char> qrCodeBuffer;
-        const size_t qrCodeBufferMaxSize = strlen(kQrCodeBaseUrl) + strlen(kUrlDataAssignmentPhrase) + 3 * QRCode.size() + 1;
+        const size_t qrCodeBufferMaxSize = strlen(kQrCodeBaseUrl) + strlen(kUrlDataAssignmentPhrase) + 3 * qrCode.size() + 1;
         qrCodeBuffer.Alloc(qrCodeBufferMaxSize);
 
-        ChipLogProgress(AppServer, "SetupQRCode: [%s]", QRCode.c_str());
-        if (GetQRCodeUrl(&qrCodeBuffer[0], qrCodeBufferMaxSize, QRCode) == CHIP_NO_ERROR)
+        ChipLogProgress(AppServer, "SetupQRCode: [%s]", qrCode.c_str());
+        if (GetQRCodeUrl(&qrCodeBuffer[0], qrCodeBufferMaxSize, qrCode) == CHIP_NO_ERROR)
         {
             ChipLogProgress(AppServer, "Copy/paste the below URL in a browser to see the QR Code:");
             ChipLogProgress(AppServer, "%s", &qrCodeBuffer[0]);
@@ -69,17 +69,17 @@ void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
 
 void PrintOnboardingCodes(const chip::SetupPayload & payload)
 {
-    std::string QRCode;
+    std::string qrCode;
     std::string manualPairingCode;
 
-    if (GetQRCode(QRCode, payload) == CHIP_NO_ERROR)
+    if (GetQRCode(qrCode, payload) == CHIP_NO_ERROR)
     {
         chip::Platform::ScopedMemoryBuffer<char> qrCodeBuffer;
-        const size_t qrCodeBufferMaxSize = strlen(kQrCodeBaseUrl) + strlen(kUrlDataAssignmentPhrase) + 3 * QRCode.size() + 1;
+        const size_t qrCodeBufferMaxSize = strlen(kQrCodeBaseUrl) + strlen(kUrlDataAssignmentPhrase) + 3 * qrCode.size() + 1;
         qrCodeBuffer.Alloc(qrCodeBufferMaxSize);
 
-        ChipLogProgress(AppServer, "SetupQRCode: [%s]", QRCode.c_str());
-        if (GetQRCodeUrl(qrCodeBuffer.Get(), qrCodeBufferMaxSize, QRCode) == CHIP_NO_ERROR)
+        ChipLogProgress(AppServer, "SetupQRCode: [%s]", qrCode.c_str());
+        if (GetQRCodeUrl(qrCodeBuffer.Get(), qrCodeBufferMaxSize, qrCode) == CHIP_NO_ERROR)
         {
             ChipLogProgress(AppServer, "Copy/paste the below URL in a browser to see the QR Code:");
             ChipLogProgress(AppServer, "%s", qrCodeBuffer.Get());
@@ -104,10 +104,10 @@ void PrintOnboardingCodes(const chip::SetupPayload & payload)
 void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags)
 {
     // Get QR Code and emulate its content using NFC tag
-    std::string QRCode;
-    ReturnOnFailure(GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)));
+    std::string qrCode;
+    ReturnOnFailure(GetQRCode(qrCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)));
 
-    ReturnOnFailure(NFCMgr().StartTagEmulation(QRCode.c_str(), QRCode.size()));
+    ReturnOnFailure(NFCMgr().StartTagEmulation(qrCode.c_str(), qrCode.size()));
 }
 #endif
 
