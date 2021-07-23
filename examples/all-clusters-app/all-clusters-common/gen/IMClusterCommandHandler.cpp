@@ -5755,7 +5755,7 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
             uint16_t imageType;
             uint16_t hardwareVersion;
             uint32_t currentVersion;
-            /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported;
+            uint8_t protocolsSupported;
             const uint8_t * location;
             uint8_t requestorCanConsent;
             chip::ByteSpan metadataForProvider;
@@ -5804,8 +5804,7 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                     TLVUnpackError = aDataTlv.Get(currentVersion);
                     break;
                 case 5:
-                    // Just for compatibility, we will add array type support in IM later.
-                    TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>(protocolsSupported));
+                    TLVUnpackError = aDataTlv.Get(protocolsSupported);
                     break;
                 case 6:
                     // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.

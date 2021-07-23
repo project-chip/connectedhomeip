@@ -1736,20 +1736,18 @@
  * @param imageType INT16U
  * @param hardwareVersion INT16U
  * @param currentVersion INT32U
- * @param protocolsSupported OTADownloadProtocol []
- * @param protocolsSupportedLen int
+ * @param protocolsSupported OTADownloadProtocol
  * @param location CHAR_STRING
  * @param requestorCanConsent BOOLEAN
  * @param metadataForProvider OCTET_STRING
  */
 #define emberAfFillCommandOTA                                                                                                      \
     Software Update ProviderClusterQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported, \
-                                              protocolsSupportedLen, location, requestorCanConsent, metadataForProvider)           \
+                                              location, requestorCanConsent, metadataForProvider)                                  \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_QUERY_IMAGE_COMMAND_ID, "uuuuubuuu", vendorId, productId, imageType, hardwareVersion,        \
-                                  currentVersion, protocolsSupported, protocolsSupportedLen, location, requestorCanConsent,        \
-                                  metadataForProvider);
+                                  ZCL_QUERY_IMAGE_COMMAND_ID, "uuuuuuuuu", vendorId, productId, imageType, hardwareVersion,        \
+                                  currentVersion, protocolsSupported, location, requestorCanConsent, metadataForProvider);
 
 /** @brief Command description for ApplyUpdateRequest
  *

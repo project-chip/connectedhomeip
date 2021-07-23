@@ -151,11 +151,12 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::ap
  * @param metadataForProvider Optional, max 512 octets. A TLV-encoded Vendor-specific payload.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-    chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
-    uint32_t currentVersion,
-    /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint8_t * location, uint8_t clientCanConsent,
-    chip::ByteSpan metadataForProvider)
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(chip::app::CommandHandler * commandObj, uint16_t vendorId,
+                                                               uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
+                                                               uint32_t currentVersion,
+                                                               /* TODO(#8605): change this to list */ uint8_t protocolsSupported,
+                                                               uint8_t * location, uint8_t clientCanConsent,
+                                                               chip::ByteSpan metadataForProvider)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     chip::EndpointId endpointId    = emberAfCurrentEndpoint();
