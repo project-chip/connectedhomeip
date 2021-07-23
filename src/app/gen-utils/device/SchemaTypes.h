@@ -31,6 +31,7 @@
 #include <support/BitFlags.h>
 #include <array>
 #include <basic-types.h>
+#include <type_traits>
 
 namespace chip {
 namespace app {
@@ -45,10 +46,92 @@ enum class Type: uint8_t
     TYPE_UINT8 = (1 << 0),
     TYPE_UINT32 = (1 << 1),
     TYPE_ARRAY = (1 << 2),
-    TYPE_STRUCT = (1 << 3),
-    TYPE_UINT64 = (1 << 4),
-    TYPE_OCTSTR = (1 << 5),
+    TYPE_ITER_ARRAY = (1 << 3),
+    TYPE_STRUCT = (1 << 4),
+    TYPE_UINT64 = (1 << 5),
+    TYPE_OCTSTR = (1 << 6),
     TYPE_STRING = (1 << 6)
+};
+
+/*
+ * @brief
+ *
+ * Instead of using chip::Span to back list instances in code-generated types,
+ * this class provides an iteratable list with support for input iterators (read-only)
+ * that can be de-referenced to retrieve the underlying value at that reader location.
+ */
+template <typename T>
+class IteratableList {
+public:
+    void SetReader(TLV::TLVReader& reader) { mReader = reader; }
+
+    class Iterator {
+    public:
+        Iterator(TLV::TLVReader *reader, uintptr_t signature, bool isBegining = true, bool isEnd = false) {
+            if (reader) {
+                mReader = *reader;
+            }
+
+            mSignature = signature;
+            mIsEnd = isEnd;
+            mReader.EnterContainer(mContainerType);
+            mReader.Next();
+        }
+
+        Iterator(const Iterator &a) {
+        }
+
+        friend bool operator==(const Iterator& a, const Iterator& b) {
+            return ((a.mSignature == b.mSignature) && ((a.mIsEnd == b.mIsEnd)));
+        }
+
+        template <typename X = T, typename std::enable_if<std::is_class<X>::value, int>::type = 0>
+        X& operator*() {
+            VerifyOrDie(mVal.Decode(mReader) == CHIP_NO_ERROR);
+            return mVal;
+        }
+
+        template <typename X = T, typename std::enable_if<std::is_integral<X>::value, int>::type = 0>
+        X& operator*() {
+            VerifyOrDie(mReader.Get(mVal) == CHIP_NO_ERROR);
+            return mVal;
+        }
+
+        template <typename X = T, typename std::enable_if<std::is_base_of<chip::ByteSpan, X>::value, int>::type = 0>
+        X& operator*() {
+            const uint8_t *p;
+            VerifyOrDie(mReader.GetDataPtr(p));
+            mVal = chip::ByteSpan(p, mReader.GetLength());
+        }
+
+        template <typename X = T, typename std::enable_if<std::is_base_of<chip::Span<char>, X>::value, int>::type = 0>
+        X& operator*() {
+            const uint8_t *p;
+            VerifyOrDie(mReader.GetDataPtr(p));
+            mVal = chip::Span<char>((char *)p, mReader.GetLength());
+        }
+
+        Iterator& operator++() {
+            if (mReader.Next() == CHIP_END_OF_TLV) {
+                mIsEnd = true;
+            }
+
+            return *this;
+        }
+
+    private:
+        T mVal;
+        uintptr_t mSignature;
+        TLV::TLVType mContainerType;
+        TLV::TLVReader mReader;
+        bool mIsEnd;
+    };
+
+    Iterator begin() { return Iterator(&mReader, (uintptr_t)this, true, false); }
+    Iterator end() { return Iterator(&mReader, (uintptr_t)this, false, true); }
+
+private:
+    TLV::TLVReader mReader;
 };
 
 /*

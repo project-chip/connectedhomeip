@@ -48,6 +48,7 @@
 #include <nlunit-test.h>
 
 #include <TestCluster-Gen.h>
+#include <TestCluster2-Gen.h>
 
 namespace chip {
 static System::Layer gSystemLayer;
@@ -66,6 +67,7 @@ public:
     static void TestSchemaUtilsEncAndDecSimplePrivateHeap(nlTestSuite * apSuite, void * apContext);
     static void TestSchemaUtilsEncAndDecNestedStruct(nlTestSuite * apSuite, void * apContext);
     static void TestSchemaUtilsEncAndDecList(nlTestSuite * apSuite, void * apContext);
+    static void TestSchemaUtilsEncAndDecIteratableList(nlTestSuite * apSuite, void * apContext);
     static void TestSchemaUtilsEncAndDecListPrivateHeap(nlTestSuite * apSuite, void * apContext);
 
 private:
@@ -356,6 +358,71 @@ void TestSchemaUtils::TestSchemaUtilsEncAndDecList(nlTestSuite * apSuite, void *
     }
 }
 
+void TestSchemaUtils::TestSchemaUtilsEncAndDecIteratableList(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err;
+    chip::app::TestSchemaUtils *_this = static_cast<chip::app::TestSchemaUtils *>(apContext);
+
+    _this->mpSuite = apSuite;
+    _this->SetupBuf();
+    
+    {    
+        chip::app::Cluster::TestCluster::StructC::Type sc;
+        uint8_t d[5];
+        chip::app::Cluster::TestCluster::StructA::Type e[5];
+
+
+        for (size_t i = 0; i < ArraySize(d); i++) {
+            d[i] = (uint8_t)i;
+        }
+
+        sc.a = 20;
+        sc.b = 30;
+        sc.c.x = 99;
+        sc.c.y = 17;
+        sc.d = chip::Span<uint8_t>{d};
+        sc.e = chip::Span<chip::app::Cluster::TestCluster::StructA::Type>{e};
+
+        for (size_t i = 0; i < ArraySize(e); i++) {
+            e[i].x = (uint8_t)i;
+            e[i].y = (uint8_t)i;
+        }
+
+        err = chip::app::EncodeSchemaElement(sc, _this->mWriter, TLV::AnonymousTag);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    }
+
+    _this->DumpBuf();
+    _this->SetupReader();
+
+    {
+        chip::app::Cluster::TestCluster2::IteratableStructC::Type sc;
+        int i;
+
+        err = sc.Decode(_this->mReader);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(apSuite, sc.a == 20);
+        NL_TEST_ASSERT(apSuite, sc.b == 30);
+        NL_TEST_ASSERT(apSuite, sc.c.x == 99);
+        NL_TEST_ASSERT(apSuite, sc.c.y == 17);
+
+        i = 0;
+        for (auto iter = sc.d.begin(); !(iter == sc.d.end()); ++iter) {
+            NL_TEST_ASSERT(apSuite, *iter == i);
+            i++;
+        }
+
+        i = 0;
+        for (auto iter = sc.e.begin(); !(iter == sc.e.end()); ++iter) {
+            auto val = *iter;
+            NL_TEST_ASSERT(apSuite, val.x == i);
+            NL_TEST_ASSERT(apSuite, val.y == i);
+            i++;
+        }
+    }
+}
+
 } // namespace app
 } // namespace chip
 
@@ -392,6 +459,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestSchemaUtilsEncAndDecSimpleWithPrivateHeap", chip::app::TestSchemaUtils::TestSchemaUtilsEncAndDecSimplePrivateHeap),
     NL_TEST_DEF("TestSchemaUtilsEncAndDecNestedStruct", chip::app::TestSchemaUtils::TestSchemaUtilsEncAndDecNestedStruct),
     NL_TEST_DEF("TestSchemaUtilsEncAndDecList", chip::app::TestSchemaUtils::TestSchemaUtilsEncAndDecList),
+    NL_TEST_DEF("TestSchemaUtilsEncAndDecIteratableList", chip::app::TestSchemaUtils::TestSchemaUtilsEncAndDecIteratableList),
     NL_TEST_DEF("TestSchemaUtilsEncAndDecListWithPrivateHeap", chip::app::TestSchemaUtils::TestSchemaUtilsEncAndDecListPrivateHeap),
     NL_TEST_SENTINEL()
 };

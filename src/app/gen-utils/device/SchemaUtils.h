@@ -31,6 +31,7 @@
 #include <array>
 #include <basic-types.h>
 #include "SchemaTypes.h"
+#include "core/CHIPTLVTypes.h"
 #include "system/SystemPacketBuffer.h"
 #include <support/PrivateHeap.h>
 #include <Cluster.h>
