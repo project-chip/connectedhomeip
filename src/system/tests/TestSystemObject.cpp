@@ -95,7 +95,9 @@ private:
 
     void Delay(volatile unsigned int & aAccumulator);
     static void * CheckConcurrencyThread(void * aContext);
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     static void * CheckHighWatermarkThread(void * aContext);
+#endif
     static void MultithreadedTest(nlTestSuite * inSuite, void * aContext, void * (*aStartRoutine)(void *) );
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
@@ -317,6 +319,30 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
     return aContext;
 }
 
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+void * TestObject::CheckHighWatermarkThread(void * aContext)
+{
+    TestContext & lContext = *static_cast<TestContext *>(aContext);
+    int i;
+    chip::System::Stats::count_t lNumInUse;
+    chip::System::Stats::count_t lHighWatermark;
+
+    i = (rand() % CHIP_SYS_STATS_COUNT_MAX);
+
+    sPool.UpdateHighWatermark(static_cast<unsigned int>(i));
+
+    sPool.GetStatistics(lNumInUse, lHighWatermark);
+
+    NL_TEST_ASSERT(lContext.mTestSuite, lHighWatermark >= i);
+    if (lHighWatermark < i)
+    {
+        printf("hwm: %d, i: %d\n", lHighWatermark, i);
+    }
+
+    return aContext;
+}
+#endif
+
 void TestObject::MultithreadedTest(nlTestSuite * inSuite, void * aContext, void * (*aStartRoutine)(void *) )
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
@@ -348,28 +374,6 @@ void TestObject::CheckConcurrency(nlTestSuite * inSuite, void * aContext)
 }
 
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-void * TestObject::CheckHighWatermarkThread(void * aContext)
-{
-    TestContext & lContext = *static_cast<TestContext *>(aContext);
-    int i;
-    chip::System::Stats::count_t lNumInUse;
-    chip::System::Stats::count_t lHighWatermark;
-
-    i = (rand() % CHIP_SYS_STATS_COUNT_MAX);
-
-    sPool.UpdateHighWatermark(static_cast<unsigned int>(i));
-
-    sPool.GetStatistics(lNumInUse, lHighWatermark);
-
-    NL_TEST_ASSERT(lContext.mTestSuite, lHighWatermark >= i);
-    if (lHighWatermark < i)
-    {
-        printf("hwm: %d, i: %d\n", lHighWatermark, i);
-    }
-
-    return aContext;
-}
-
 void TestObject::CheckHighWatermarkConcurrency(nlTestSuite * inSuite, void * aContext)
 {
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
@@ -468,7 +472,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
 
     lLayer.Shutdown();
 }
-#endif
+#endif // !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 // Test Suite
 
