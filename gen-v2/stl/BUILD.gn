@@ -22,21 +22,21 @@ static_library("stl") {
   output_name = "libStlSchema"
 
   sources = [
-    "OperationalCredentialCluster.cpp",
     "OperationalCredentialCluster-Gen.h",
-    "TestCluster.cpp",
+    "OperationalCredentialCluster.cpp",
     "TestCluster-Gen.h",
+    "TestCluster.cpp",
   ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/app"
   ]
 
   public_configs = [
     "${chip_root}/src/app:app_config",
-    ":includes"
+    ":includes",
   ]
 
   defines = []

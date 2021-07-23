@@ -22,19 +22,19 @@ static_library("gen-utils-device") {
   output_name = "libGenUtilsDevice"
 
   sources = [
+    "device/SchemaTypes.h",
     "device/SchemaUtils.cpp",
-    "device/SchemaTypes.h"
   ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/app"
   ]
 
   public_configs = [
     "${chip_root}/src/app:app_config",
-    ":includes"
+    ":includes",
   ]
 
   defines = []
@@ -45,20 +45,19 @@ static_library("gen-utils-stl") {
 
   sources = [
     "stl/DemuxedInvokeInitiator.cpp",
-    "stl/DemuxedInvokeInitiator.h"
+    "stl/DemuxedInvokeInitiator.h",
   ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/app"
   ]
 
   public_configs = [
     "${chip_root}/src/app:app_config",
-    ":includes"
+    ":includes",
   ]
 
   defines = []
 }
-

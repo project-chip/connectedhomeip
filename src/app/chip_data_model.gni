@@ -140,9 +140,7 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/door-lock-server-user.cpp",
         ]
       } else if (cluster == "network-commissioning") {
-        sources += [
-          "${_app_root}/clusters/${cluster}/${cluster}-ember.cpp",
-        ]
+        sources += [ "${_app_root}/clusters/${cluster}/${cluster}-ember.cpp" ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
@@ -192,9 +190,7 @@ template("chip_data_model") {
     cflags += [ "-Wconversion" ]
 
     if (!defined(public_configs)) {
-      public_configs = [
-          "${chip_root}/gen-v2/device:includes"
-      ]
+      public_configs = [ "${chip_root}/gen-v2/device:includes" ]
     }
 
     public_configs += [ ":${_data_model_name}_config" ]
