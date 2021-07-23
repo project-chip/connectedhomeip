@@ -158,11 +158,13 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     const NodeId peerNodeId = mConnectionState.GetPeerNodeId();
     VerifyOrReturnError(CanCastTo<uint16_t>(mSharedSecret.Length()), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mMessageDigest)), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mIPK)), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint64_t>(peerNodeId), CHIP_ERROR_INTERNAL);
 
     memset(&serializable, 0, sizeof(serializable));
     serializable.mSharedSecretLen  = static_cast<uint16_t>(mSharedSecret.Length());
     serializable.mMessageDigestLen = static_cast<uint16_t>(sizeof(mMessageDigest));
+    serializable.mIPKLen           = static_cast<uint16_t>(sizeof(mIPK));
     serializable.mPairingComplete  = (mPairingComplete) ? 1 : 0;
     serializable.mPeerNodeId       = peerNodeId;
     serializable.mLocalKeyId       = mConnectionState.GetLocalKeyID();
@@ -170,6 +172,7 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
 
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
     memcpy(serializable.mMessageDigest, mMessageDigest, sizeof(mMessageDigest));
+    memcpy(serializable.mIPK, mIPK, sizeof(mIPK));
 
     return CHIP_NO_ERROR;
 }
@@ -180,10 +183,12 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     ReturnErrorOnFailure(mSharedSecret.SetLength(static_cast<size_t>(serializable.mSharedSecretLen)));
 
     VerifyOrReturnError(serializable.mMessageDigestLen <= sizeof(mMessageDigest), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(serializable.mIPKLen <= sizeof(mIPK), CHIP_ERROR_INVALID_ARGUMENT);
 
     memset(mSharedSecret, 0, sizeof(mSharedSecret.Capacity()));
     memcpy(mSharedSecret, serializable.mSharedSecret, mSharedSecret.Length());
     memcpy(mMessageDigest, serializable.mMessageDigest, serializable.mMessageDigestLen);
+    memcpy(mIPK, serializable.mIPK, serializable.mIPKLen);
 
     mConnectionState.SetPeerNodeId(serializable.mPeerNodeId);
     mConnectionState.SetLocalKeyID(serializable.mLocalKeyId);
@@ -281,7 +286,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
 
 CHIP_ERROR CASESession::DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role)
 {
-    uint16_t saltlen;
+    size_t saltlen;
 
     (void) kKDFSEInfo;
     (void) kKDFSEInfoLength;
@@ -289,13 +294,13 @@ CHIP_ERROR CASESession::DeriveSecureSession(SecureSession & session, SecureSessi
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
 
     // Generate Salt for Encryption keys
-    saltlen = kSHA256_Hash_Length;
+    saltlen = sizeof(mIPK) + kSHA256_Hash_Length;
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_salt;
     ReturnErrorCodeIf(!msg_salt.Alloc(saltlen), CHIP_ERROR_NO_MEMORY);
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg_salt.Get(), saltlen);
-        // TODO: Add IPK to Salt
+        bbuf.Put(mIPK, sizeof(mIPK));
         bbuf.Put(mMessageDigest, sizeof(mMessageDigest));
 
         VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -344,17 +349,16 @@ CHIP_ERROR CASESession::SendSigmaR1()
         VerifyOrReturnError(rootCertificate->mPublicKey.size() == kP256_PublicKey_Length, CHIP_ERROR_INTERNAL);
         ChipCertificateData nodeOperationalCertificate;
         FabricId fabricId;
-        MutableByteSpan destinationIdSpan(destinationIdentifier, sizeof(destinationIdentifier));
+        MutableByteSpan destinationIdSpan(destinationIdentifier);
 
         ReturnErrorOnFailure(DecodeChipCert(mOpCredSet->GetDevOpCred(mTrustedRootId), mOpCredSet->GetDevOpCredLen(mTrustedRootId),
                                             nodeOperationalCertificate));
         ReturnErrorOnFailure(nodeOperationalCertificate.mSubjectDN.GetCertFabricId(fabricId));
         // retrieve Fabric IPK
-        MutableByteSpan ipkSpan(mIPK, sizeof(mIPK));
+        MutableByteSpan ipkSpan(mIPK);
         ReturnErrorOnFailure(RetrieveIPK(fabricId, ipkSpan));
-        ReturnErrorOnFailure(GenerateDestinationID(ByteSpan(initiatorRandom, sizeof(initiatorRandom)), rootCertificate->mPublicKey,
-                                                   mConnectionState.GetPeerNodeId(), fabricId, ByteSpan(mIPK, sizeof(mIPK)),
-                                                   destinationIdSpan));
+        ReturnErrorOnFailure(GenerateDestinationID(ByteSpan(initiatorRandom), rootCertificate->mPublicKey,
+                                                   mConnectionState.GetPeerNodeId(), fabricId, ByteSpan(mIPK), destinationIdSpan));
     }
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(3), destinationIdentifier, sizeof(destinationIdentifier)));
 
@@ -422,8 +426,7 @@ CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle & msg)
     {
         // TODO: Remove this list. Replace it with an actual method to retrieve an IPK list (e.g. from a Crypto Store API)
         const ByteSpan ipkListSpan[] = { ByteSpan(sIPKList[0], sizeof(sIPKList[0])), ByteSpan(sIPKList[1], sizeof(sIPKList[1])) };
-        SuccessOrExit(err = FindDestinationIdCandidate(ByteSpan(destinationIdentifier, sizeof(destinationIdentifier)),
-                                                       ByteSpan(initiatorRandom, sizeof(initiatorRandom)), ipkListSpan,
+        SuccessOrExit(err = FindDestinationIdCandidate(ByteSpan(destinationIdentifier), ByteSpan(initiatorRandom), ipkListSpan,
                                                        sizeof(ipkListSpan) / sizeof(ipkListSpan[0])));
     }
 
@@ -485,8 +488,8 @@ CHIP_ERROR CASESession::SendSigmaR2()
 
     {
         MutableByteSpan saltSpan(msg_salt.Get(), saltlen);
-        err = ConstructSaltSigmaR2(ByteSpan(msg_rand.Get(), kSigmaParamRandomNumberSize), mEphemeralKey.Pubkey(),
-                                   ByteSpan(mIPK, sizeof(mIPK)), saltSpan);
+        err = ConstructSaltSigmaR2(ByteSpan(msg_rand.Get(), kSigmaParamRandomNumberSize), mEphemeralKey.Pubkey(), ByteSpan(mIPK),
+                                   saltSpan);
         SuccessOrExit(err);
     }
 
@@ -671,8 +674,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
 
     {
         MutableByteSpan saltSpan(msg_salt.Get(), saltlen);
-        SuccessOrExit(err = ConstructSaltSigmaR2(ByteSpan(responderRandom, sizeof(responderRandom)), mRemotePubKey,
-                                                 ByteSpan(mIPK, sizeof(mIPK)), saltSpan));
+        SuccessOrExit(err = ConstructSaltSigmaR2(ByteSpan(responderRandom), mRemotePubKey, ByteSpan(mIPK), saltSpan));
     }
 
     SuccessOrExit(err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt.Get(), saltlen, kKDFSR2Info,
@@ -767,7 +769,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
     {
         MutableByteSpan saltSpan(msg_salt.Get(), saltlen);
-        err = ConstructSaltSigmaR3(ByteSpan(mIPK, sizeof(mIPK)), saltSpan);
+        err = ConstructSaltSigmaR3(ByteSpan(mIPK), saltSpan);
         SuccessOrExit(err);
     }
 
@@ -936,7 +938,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
 
     {
         MutableByteSpan saltSpan(msg_salt.Get(), saltlen);
-        SuccessOrExit(err = ConstructSaltSigmaR3(ByteSpan(mIPK, sizeof(mIPK)), saltSpan));
+        SuccessOrExit(err = ConstructSaltSigmaR3(ByteSpan(mIPK), saltSpan));
     }
 
     SuccessOrExit(err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt.Get(), saltlen, kKDFSR3Info,
@@ -986,7 +988,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
 
     mPairingComplete = true;
 
-    // Forget our exchange, no additional messages are expected from the peer
+    // Forget our exchange, as no additional messages are expected from the peer
     mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
@@ -1048,7 +1050,7 @@ CHIP_ERROR CASESession::FindDestinationIdCandidate(const ByteSpan & destinationI
 {
     uint8_t nCertificateSets = mOpCredSet->GetCertCount();
 
-    for (uint8_t i = 0; i < nCertificateSets; ++i)
+    for (size_t certChainIdx = 0; certChainIdx < nCertificateSets; ++certChainIdx)
     {
         uint8_t candidate[kSHA256_Hash_Length] = { 0 };
         CertificateKeyId trustedRootId;
@@ -1056,7 +1058,7 @@ CHIP_ERROR CASESession::FindDestinationIdCandidate(const ByteSpan & destinationI
         NodeId nodeId;
         FabricId fabricId;
 
-        trustedRootId = mOpCredSet->GetTrustedRootId(i);
+        trustedRootId = mOpCredSet->GetTrustedRootId(static_cast<uint16_t>(certChainIdx));
 
         ReturnErrorOnFailure(DecodeChipCert(mOpCredSet->GetDevOpCred(trustedRootId), mOpCredSet->GetDevOpCredLen(trustedRootId),
                                             nodeOperationalCertificate));
@@ -1069,16 +1071,16 @@ CHIP_ERROR CASESession::FindDestinationIdCandidate(const ByteSpan & destinationI
         VerifyOrReturnError(!rootCertificate->mPublicKey.empty(), CHIP_ERROR_INTERNAL);
         VerifyOrReturnError(rootCertificate->mPublicKey.size() == kP256_PublicKey_Length, CHIP_ERROR_INTERNAL);
 
-        for (size_t j = 0; j < ipkListEntries; ++j)
+        for (size_t ipkIdx = 0; ipkIdx < ipkListEntries; ++ipkIdx)
         {
-            MutableByteSpan candidateSpan(candidate, sizeof(candidate));
-            ReturnErrorOnFailure(
-                GenerateDestinationID(initiatorRandom, rootCertificate->mPublicKey, nodeId, fabricId, ipkList[j], candidateSpan));
+            MutableByteSpan candidateSpan(candidate);
+            ReturnErrorOnFailure(GenerateDestinationID(initiatorRandom, rootCertificate->mPublicKey, nodeId, fabricId,
+                                                       ipkList[ipkIdx], candidateSpan));
 
             if (destinationId.data_equal(candidateSpan))
             {
-                VerifyOrReturnError(sizeof(mIPK) == ipkList[j].size(), CHIP_ERROR_INTERNAL);
-                memcpy(mIPK, ipkList[j].data(), ipkList[j].size());
+                VerifyOrReturnError(sizeof(mIPK) == ipkList[ipkIdx].size(), CHIP_ERROR_INTERNAL);
+                memcpy(mIPK, ipkList[ipkIdx].data(), ipkList[ipkIdx].size());
                 mTrustedRootId = trustedRootId;
                 break;
             }

@@ -67,6 +67,8 @@ struct CASESessionSerializable
     uint8_t mSharedSecret[Crypto::kMax_ECDH_Secret_Length];
     uint16_t mMessageDigestLen;
     uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
+    uint16_t mIPKLen;
+    uint8_t mIPK[kIPKSize];
     uint8_t mPairingComplete;
     NodeId mPeerNodeId;
     uint16_t mLocalKeyId;

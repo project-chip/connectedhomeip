@@ -223,7 +223,7 @@ public:
                        P256ECDSASignature & out_signature);
 
     /**
-     * @return A pointer to device credentials (in x509 format).
+     * @return A pointer to device credentials (in chip format).
      **/
     const uint8_t * GetDevOpCred(const CertificateKeyId & trustedRootId) const
     {

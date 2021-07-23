@@ -365,14 +365,13 @@ P256Keypair * OperationalCredentialSet::GetNodeKeypairAt(const CertificateKeyId 
 
 const ChipCertificateData * OperationalCredentialSet::GetRootCertificate(const CertificateKeyId & trustedRootId) const
 {
-    // TODO: switch to size_t (mOpCredCount)
-    for (uint8_t i = 0; i < mOpCredCount; i++)
+    for (size_t certChainIdx = 0; certChainIdx < mOpCredCount; certChainIdx++)
     {
-        ChipCertificateSet * certSet = &mOpCreds[i];
+        ChipCertificateSet * certSet = &mOpCreds[certChainIdx];
 
-        for (uint8_t j = 0; j < certSet->GetCertCount(); j++)
+        for (size_t ipkIdx = 0; ipkIdx < certSet->GetCertCount(); ipkIdx++)
         {
-            const ChipCertificateData * cert = &certSet->GetCertSet()[j];
+            const ChipCertificateData * cert = &certSet->GetCertSet()[ipkIdx];
             if (cert->mCertFlags.Has(CertFlags::kIsTrustAnchor) && cert->mAuthKeyId.data_equal(trustedRootId))
             {
                 return cert;

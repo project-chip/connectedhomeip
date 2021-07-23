@@ -768,6 +768,7 @@ CHIP_ERROR ChipDN::GetCertFabricId(uint64_t & fabricId) const
         switch (rdn[i].mAttrOID)
         {
         case kOID_AttributeType_ChipFabricId:
+            // Ensure only one FabricID RDN present, since start value is 0, which is reserved and never seen.
             VerifyOrReturnError(fabricId == 0, CHIP_ERROR_WRONG_CERT_TYPE);
 
             fabricId = rdn[i].mChipVal;
