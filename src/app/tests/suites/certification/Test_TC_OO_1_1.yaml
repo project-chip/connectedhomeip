@@ -21,7 +21,7 @@ config:
 tests:
     - label: "read the global attribute: ClusterRevision"
       command: "readAttribute"
-      attribute: "Cluster Revision"
+      attribute: "ClusterRevision"
       response:
           value: 3
 
@@ -30,7 +30,7 @@ tests:
           ClusterRevision"
       disabled: true
       command: "writeAttribute"
-      attribute: "Cluster Revision"
+      attribute: "ClusterRevision"
       arguments:
           value: 3
       response:
@@ -38,20 +38,20 @@ tests:
 
     - label: "reads back global attribute: ClusterRevision"
       command: "readAttribute"
-      attribute: "Cluster Revision"
+      attribute: "ClusterRevision"
       response:
           value: 3
 
     - label: "read the optional global attribute: FeatureMap"
       command: "readAttribute"
-      attribute: "Feature Map"
+      attribute: "FeatureMap"
       response:
           value: 0
 
     - label: "write the default values to optional global attribute: FeatureMap"
       disabled: true
       command: "writeAttribute"
-      attribute: "Feature Map"
+      attribute: "FeatureMap"
       arguments:
           value: 0
       response:
@@ -59,6 +59,6 @@ tests:
 
     - label: "reads back optional global attribute: FeatureMap"
       command: "readAttribute"
-      attribute: "Feature Map"
+      attribute: "FeatureMap"
       response:
           value: 0

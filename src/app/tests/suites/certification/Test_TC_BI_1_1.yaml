@@ -21,7 +21,7 @@ config:
 tests:
     - label: "read the global attribute: ClusterRevision"
       command: "readAttribute"
-      attribute: "Cluster Revision"
+      attribute: "ClusterRevision"
       response:
           value: 1
 
@@ -30,7 +30,7 @@ tests:
           ClusterRevision"
       disabled: true
       command: "writeAttribute"
-      attribute: "Cluster Revision"
+      attribute: "ClusterRevision"
       arguments:
           value: 1
       response:
@@ -38,6 +38,6 @@ tests:
 
     - label: "reads back global attribute: ClusterRevision"
       command: "readAttribute"
-      attribute: "Cluster Revision"
+      attribute: "ClusterRevision"
       response:
           value: 1
