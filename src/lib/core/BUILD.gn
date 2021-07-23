@@ -113,6 +113,7 @@ static_library("core") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
+    "${chip_root}/src/csg_test_harness",
   ]
 
   allow_circular_includes_from = [

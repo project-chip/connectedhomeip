@@ -1,0 +1,4 @@
+# To ensure app dependencies are ported from your virtual environment/host machine into your container, run 'pip freeze > requirements.txt' in the terminal to overwrite this file
+pycairo==1.20.0
+six==1.14.0
+PyGObject==3.36.0

@@ -105,3 +105,14 @@ class SetupPayload:
         setter.Set("pychip_SetupPayload_PrintOnboardingCodes",
                    c_int32,
                    [c_uint32, c_uint16, c_uint16, c_uint16, uint8_t, uint8_t])
+
+######----------------------------------------------------------------------------------------######
+
+    def Dictionary(self):
+        payload_dict = {}
+        for name, value in self.attributes.items():
+            payload_dict[name] = value
+        for tag, value in self.vendor_attributes.items():
+            payload_dict[tag] = value
+
+        return payload_dict

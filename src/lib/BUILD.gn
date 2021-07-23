@@ -35,6 +35,7 @@ static_library("lib") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/system",
     "${chip_root}/src/transport",
+    "${chip_root}/src/csg_test_harness",
   ]
 
   if (chip_build_libshell) {

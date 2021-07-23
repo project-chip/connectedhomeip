@@ -45,7 +45,12 @@ import traceback
 from cmd import Cmd
 from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 from chip.setup_payload import SetupPayload
+from xmlrpc.server import SimpleXMLRPCServer
+from enum import Enum
+from typing import Any, Dict,Optional
 
+from enum import Enum
+from typing import Any, Dict,Optional
 # Extend sys.path with one or more directories, relative to the location of the
 # running script, in which the chip package might be found .  This makes it
 # possible to run the device manager shell from a non-standard install location,
@@ -72,6 +77,16 @@ if platform.system() == 'Darwin':
     from chip.ChipCoreBluetoothMgr import CoreBluetoothManager as BleManager
 elif sys.platform.startswith('linux'):
     from chip.ChipBluezMgr import BluezManager as BleManager
+
+
+class StatusCodeEnum(Enum):
+    SUCCESS = 0
+    FAILED =  1
+
+class RPCResponseKeyEnum(Enum):
+    STATUS = "status"
+    RESULT = "result"
+    ERROR  = "error"
 
 # The exceptions for CHIP Device Controller CLI
 
@@ -854,8 +869,264 @@ class DeviceMgrCmd(Cmd):
     def emptyline(self):
         pass
 
+###  Additions needed by the Test Harness Tool ###
+# TODO: Implement a custom device manager instead of using the existing manager object
+# https://github.com/chip-csg/connectedhomeip/issues/8
+device_manager = DeviceMgrCmd(rendezvousAddr=None,
+                             controllerNodeId=0, bluetoothAdapter=0)
+
+
+# CHIP commands needed by the Harness Tool
+def echo_alive(message):
+    print(message)
+    return message
+
+def resolve(fabric_id: int, node_id: int) -> Dict[str, Any]:
+    try:
+        __check_supported_os()
+        err = device_manager.devCtrl.ResolveNode(fabric_id, node_id)
+        if err != 0:
+            return __get_response_dict(status=StatusCodeEnum.FAILED, error=f"Failed to resolve node, with error code: {err}")
+
+        address = device_manager.devCtrl.GetAddressAndPort(node_id)
+        if address is not None:
+            address = "{}:{}".format(
+                *address)  
+            return __get_response_dict(status=StatusCodeEnum.SUCCESS, result={'address': address}) 
+            
+    except Exception as e:
+        return __get_response_dict(status=StatusCodeEnum.FAILED, error=str(e))
+
+def zcl_command(
+        cluster: str,
+        command: str,
+        node_id: int,
+        endpoint_id: Optional[int] = 1,
+        group_id: Optional[int] = 0,
+        optional_args: Optional[dict] = {}
+        ) -> Dict[str, Any] :
+    """Generic API for sending ZCL Cluster commands
+    Each ZCL command has following format:
+    zcl <Cluster> <Command> <Node Id> <Endpoint Id> <Group Id> [optional arguments]
+    
+    Args:
+        cluster (str): Name of cluster
+        command (str): Command to be run for the mentioned cluster
+        node_id (int): node_id assigned to the DUT
+        endpoint_id (int): Optional, endpoint id
+        group_ip (int): Optional, group id
+        optional_args (dict): Optinal, dictionary of optional arguements for zcl
+        cluster commands
+
+    Raises:
+        exceptions.UnknownCommand: when incorrect cluster and/or command passed
+
+    Returns:
+        Dict[str, Any]: Dictionary of RPC response for ZCL cluster command  
+    """
+    try:
+        __check_supported_os()
+
+        all_commands = device_manager.devCtrl.ZCLCommandList()
+        command_arg = all_commands.get(cluster).get(command, None)
+        if command_arg is None:
+            raise exceptions.UnknownCommand(cluster, command)
+        formatted_zcl_args = __format_zcl_arguments_from_dict(optional_args, command_arg)
+
+        error, response = device_manager.devCtrl.ZCLSend(
+                cluster=cluster,
+                command=command,
+                nodeid=node_id,
+                endpoint=endpoint_id,
+                groupid=group_id,
+                args=formatted_zcl_args,
+                blocking=True)
+        if error:
+            return __get_response_dict(status = StatusCodeEnum.FAILED)
+        elif response:
+            return __get_response_dict(status = StatusCodeEnum.SUCCESS, result = str(response))
+        else:
+            return __get_response_dict(status = StatusCodeEnum.SUCCESS)
+
+    except Exception as e:
+        return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
+
+def __format_zcl_arguments_from_dict(optional_args: dict, command: dict) -> Dict[str, Any]:
+    formatted_command_args = {}
+    for key, value in optional_args.items():
+        valueType = command.get(key, None)
+        if valueType == 'int':
+            formatted_command_args[key] = int(value)
+        elif valueType == 'str':
+            formatted_command_args[key] = value
+        elif valueType == 'bytes':
+            formatted_command_args[key] = ParseEncodedString(value)
+    return formatted_command_args
+    
+
+def zcl_add_network(node_id: int, ssid: str, password: str, endpoint_id: Optional[int] = 1, group_id: Optional[int] = 0, breadcrumb: Optional[int] = 0, timeoutMs: Optional[int] = 1000) -> Dict[str, Any] :
+    try:
+        __check_supported_os()
+        args = {}
+        args['ssid'] = ssid.encode("utf-8") + b'\x00'
+        args['credentials'] = password.encode("utf-8") + b'\x00'
+        args['breadcrumb'] = breadcrumb
+        args['timeoutMs'] = timeoutMs 
+        err, res = device_manager.devCtrl.ZCLSend("NetworkCommissioning", "AddWiFiNetwork", node_id, endpoint_id, group_id, args, blocking=True)
+        if err != 0:
+            return __get_response_dict(status=StatusCodeEnum.FAILED)
+        elif res != None:
+            return __get_response_dict(status=StatusCodeEnum.SUCCESS, result=str(res))
+        else:
+            return __get_response_dict(status=StatusCodeEnum.SUCCESS)
+
+    except Exception as e:
+        return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
+
+def zcl_enable_network(node_id: int, ssid:str, endpoint_id: Optional[int] = 1, group_id: Optional[int] = 0, breadcrumb: Optional[int] = 0, timeoutMs: Optional[int] = 1000) -> Dict[str, Any]:
+    try:
+        __check_supported_os()
+        args = {}
+        args['networkID'] = ssid.encode("utf-8") + b'\x00'
+        args['breadcrumb'] = breadcrumb
+        args['timeoutMs'] = timeoutMs 
+  
+        err, res = device_manager.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", node_id, endpoint_id, group_id, args, blocking=True)
+        if err != 0:
+            return __get_response_dict(status=StatusCodeEnum.FAILED)
+        else:
+            return __get_response_dict(status=StatusCodeEnum.SUCCESS, result=str(res))
+        
+    except Exception as e:
+        return __get_response_dict(status=StatusCodeEnum.FAILED, error=str(e))
+
+def ble_scan():
+    try:
+        __check_supported_os()
+        device_manager.do_blescan("")
+        return __get_response_dict(status=StatusCodeEnum.SUCCESS, result=__get_peripheral_list())
+    except Exception as e:
+        return __get_response_dict(status=StatusCodeEnum.FAILED, error=str(e))
+
+def __get_peripheral_list() -> Dict[Any, Any]:
+    device_list = []
+    for device in device_manager.bleMgr.peripheral_list:
+        device_detail = {}       
+        devIdInfo = device_manager.bleMgr.get_peripheral_devIdInfo(device)
+        if devIdInfo != None:
+            device_detail['name'] = str(device.Name)
+            device_detail['id'] = str(device.device_id)
+            device_detail['rssi'] = str(device.RSSI)
+            device_detail['address'] = str(device.Address)
+            device_detail['pairing_state'] = devIdInfo.pairingState
+            device_detail['discriminator'] = devIdInfo.discriminator
+            device_detail['vendor_id'] = devIdInfo.vendorId
+            device_detail['product_id'] = devIdInfo.productId
+            if device.ServiceData:
+                for advuuid in device.ServiceData:
+                    device_detail['adv_uuid'] = str(advuuid)
+            device_list.append(device_detail)
+    return device_list
+
+def ble_connect(discriminator: int, pin_code: int, node_id: int) -> Dict[str, Any]:
+    try:
+        __check_supported_os()
+        device_manager.devCtrl.ConnectBLE(discriminator, pin_code, node_id)
+        return __get_response_dict(status=StatusCodeEnum.SUCCESS)
+    except Exception as e:
+        return __get_response_dict(status=StatusCodeEnum.FAILED, error=str(e))
+
+def ip_connect(ip_address: string, pin_code: int, node_id: int) -> Dict[str, Any]:
+    try:
+        __check_supported_os()
+        device_manager.devCtrl.ConnectIP(ip_address.encode("utf-8"), pin_code, node_id)
+        return __get_response_dict(status=StatusCodeEnum.SUCCESS)
+    except Exception as e:
+        return __get_response_dict(status=StatusCodeEnum.FAILED, error=str(e))
+
+def qr_code_parse(qr_code):
+    try:
+        result = SetupPayload().ParseQrCode(qr_code).Dictionary()
+        return __get_response_dict(status=StatusCodeEnum.SUCCESS, result=result)
+    except Exception as e:
+         return __get_response_dict(status=StatusCodeEnum.FAILED, error=str(e))
+
+def pin_code_parse(pin_code):
+    try:
+        result = SetupPayload().ParseManualPairingCode(pin_code).Dictionary()
+        return __get_response_dict(status=StatusCodeEnum.SUCCESS, result=result)
+    except Exception as e:
+         return __get_response_dict(status=StatusCodeEnum.FAILED, error=str(e))
+
+def get_fabric_id():
+    try:
+        fabricID = device_manager.devCtrl.GetFabricId()
+        if fabricID == 0:
+            return __get_response_dict(status=StatusCodeEnum.FAILED, error="Fabric ID not created or encountered an error")
+        return __get_response_dict(status=StatusCodeEnum.SUCCESS, result=fabricID)
+    except Exception as e:
+         return __get_response_dict(status=StatusCodeEnum.FAILED, error=str(e))
+
+def ble_close():
+    try:
+        __check_supported_os()
+        device_manager.devCtrl.CloseBLEConnection()
+        return __get_response_dict(status=StatusCodeEnum.SUCCESS, result=str(0))
+    except Exception as e:
+        return __get_response_dict(status=StatusCodeEnum.FAILED, error=str(e))
+
+def get_pase_data() -> Dict[Any, Any]:
+    """
+    This method will return valid data only after the ble_connect, ip_connect method has been called
+    """
+    try:
+        __check_supported_os()
+        pase_data = device_manager.devCtrl.GetPASEData()
+        return __get_response_dict(status = StatusCodeEnum.SUCCESS, result=pase_data)
+    except Exception as e:
+        return __get_response_dict(status = StatusCodeEnum.FAILED, error=str(e))
+
+def start_rpc_server():
+    with SimpleXMLRPCServer(("0.0.0.0", 5000), allow_none=True) as server:
+        server.register_function(echo_alive)
+        server.register_function(ble_scan)
+        server.register_function(resolve)
+        server.register_function(ble_connect)
+        server.register_function(ip_connect)
+        server.register_function(zcl_command)
+        server.register_function(zcl_add_network)
+        server.register_function(zcl_enable_network)
+        server.register_function(resolve)
+        server.register_function(qr_code_parse)
+        server.register_function(get_pase_data)
+        server.register_function(get_fabric_id)
+        server.register_function(pin_code_parse)
+        server.register_multicall_functions()
+        server.register_function(ble_close)
+        server.register_introspection_functions()
+        print('Serving XML-RPC on localhost port 5000')
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            print("\nKeyboard interrupt received, exiting.")
+            sys.exit(0)
+
+def __get_response_dict(status: StatusCodeEnum, result: Optional[Dict[Any, Any]] = None, error:Optional[str] = None) -> Dict [str, Any]:
+    return { RPCResponseKeyEnum.STATUS.value : status.value, RPCResponseKeyEnum.RESULT.value : result, RPCResponseKeyEnum.ERROR.value : error }
+
+def __check_supported_os()-> bool:
+    if platform.system().lower() == 'darwin':
+        raise Exception(platform.system() + " not supported")
+    elif sys.platform.lower().startswith('linux'):
+        return True
+
+    raise Exception("OS Not Supported")
+######--------------------------------------------------######
 
 def main():
+    start_rpc_server()
+
+    # Never Executed: does not return here
     optParser = OptionParser()
     optParser.add_option(
         "-r",

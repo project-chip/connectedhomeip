@@ -36,6 +36,7 @@ from .interaction_model import delegate as im
 from .exceptions import *
 import enum
 
+import yaml
 
 __all__ = ["ChipDeviceController"]
 
@@ -183,6 +184,17 @@ class ChipDeviceController(object):
             lambda: self._dmLib.pychip_DeviceController_ConnectIP(
                 self.devCtrl, ipaddr, setupPinCode, nodeid)
         )
+
+    def GetPASEData(self):
+        pase_yaml_str =  self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetPASEData(self.devCtrl)
+        )
+        pase_dict = yaml.safe_load(pase_yaml_str)
+        if pase_dict is None:
+            print("ERROR: Failed to parse yaml data returned")
+            raise ValueError(f"Invalid PASE yaml string returned: {pase_yaml_str}")
+        return pase_dict
+
 
     def ResolveNode(self, fabricid, nodeid):
         return self._ChipStack.CallAsync(
@@ -358,6 +370,9 @@ class ChipDeviceController(object):
             self._dmLib.pychip_DeviceController_DeleteDeviceController.argtypes = [
                 c_void_p]
             self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_GetPASEData.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceController_GetPASEData.restype = c_char_p
 
             self._dmLib.pychip_DeviceController_ConnectBLE.argtypes = [
                 c_void_p, c_uint16, c_uint32, c_uint64]

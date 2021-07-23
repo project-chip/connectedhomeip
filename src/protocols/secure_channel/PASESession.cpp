@@ -44,6 +44,7 @@
 #include <support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 
+#include <csg_test_harness/constants.h>
 namespace chip {
 
 using namespace Crypto;
@@ -110,6 +111,13 @@ void PASESession::CloseExchange()
         mExchangeCtxt = nullptr;
     }
 }
+
+#if CHIP_CSG_TEST_HARNESS //CSG_TRACE_BEGIN
+std::map<std::string, std::map<std::string, std::string>> * PASESession::getPASETrace()
+{
+    return &mPASETrace;
+}
+#endif //CSG_TRACE_END
 
 CHIP_ERROR PASESession::Serialize(PASESessionSerialized & output)
 {
@@ -184,6 +192,18 @@ CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, SessionEstabl
     // Reset any state maintained by PASESession object (in case it's being reused for pairing)
     Clear();
 
+#if CHIP_CSG_TEST_HARNESS //CSG_TRACE_BEGIN
+    /*
+    TODO: Fix memory leak here? 
+    https://github.com/chip-csg/connectedhomeip/issues/32
+    */
+    mPASETrace =  std::map<std::string, std::map<std::string, std::string>>();
+    request_message_map = {};
+    response_message_map = {};
+    pake_1_message_map = {};
+    pake_2_message_map = {};
+    pake_3_message_map = {};
+#endif //CSG_TRACE_END
     ReturnErrorOnFailure(mCommissioningHash.Begin());
     ReturnErrorOnFailure(mCommissioningHash.AddData(Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext)));
 
@@ -344,6 +364,11 @@ CHIP_ERROR PASESession::DeriveSecureSession(SecureSession & session, SecureSessi
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
 {
+#ifdef CHIP_CSG_TEST_HARNESS //CSG_TRACE_BEGIN
+    std::map<std::string,std::string> random_initiator_map = {};
+    std::string random_number_string;
+#endif //CSG_TRACE_END
+
     System::PacketBufferHandle req = System::PacketBufferHandle::New(kPBKDFParamRandomNumberSize);
     VerifyOrReturnError(!req.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -352,6 +377,12 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     req->SetDataLength(kPBKDFParamRandomNumberSize);
 
     // Update commissioning hash with the pbkdf2 param request that's being sent.
+
+#ifdef CHIP_CSG_TEST_HARNESS //CSG_TRACE_BEGIN
+    request_message_map.insert(std::make_pair(messageFromInitiator_key, stringForDataBuffer(req->Start(), req->DataLength()))); 
+    mPASETrace.insert (std::make_pair(PBKDFParamRequest_key, request_message_map));
+#endif //CSG_TRACE_END
+
     ReturnErrorOnFailure(mCommissioningHash.AddData(req->Start(), req->DataLength()));
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PBKDFParamResponse;
@@ -472,6 +503,12 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(const System::PacketBufferHandl
 
         err = SetupSpake2p(static_cast<uint32_t>(iterCount), msgptr, saltlen);
         SuccessOrExit(err);
+#if CHIP_CSG_TEST_HARNESS //CSG_TRACE_BEGIN
+        response_message_map.insert(std::make_pair(messageFromResponder_key, stringForDataBuffer(msg->Start(), msg->DataLength())));
+        response_message_map.insert(std::make_pair(PBKDFParamResponse_salt_length_key, std::to_string(saltlen)));
+        response_message_map.insert(std::make_pair(PBKDFParamResponse_iter_count_key, std::to_string(iterCount)));
+        mPASETrace.insert (std::make_pair(PBKDFParamResponse_key, response_message_map));
+#endif //CSG_TRACE_END
     }
 
     err = SendMsg1();
@@ -508,6 +545,11 @@ CHIP_ERROR PASESession::SendMsg1()
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
     ChipLogDetail(SecureChannel, "Sent spake2p msg1");
 
+#if CHIP_CSG_TEST_HARNESS //CSG_TRACE_BEGIN
+        pake_1_message_map.insert(std::make_pair(PAKE_1_Pa_key, stringForDataBuffer(&X[0], (uint16_t)X_len)));
+        pake_1_message_map.insert(std::make_pair(PAKE_1_key_id_key, std::to_string(mConnectionState.GetLocalKeyID())));
+        mPASETrace.insert (std::make_pair(PAKE_1_key, pake_1_message_map));
+#endif //CSG_TRACE_END
     return CHIP_NO_ERROR;
 }
 
@@ -617,6 +659,11 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
     VerifyOrExit(CanCastTo<uint16_t>(verifier_len_raw), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     verifier_len = static_cast<uint16_t>(verifier_len_raw);
 
+#if CHIP_CSG_TEST_HARNESS //CSG_TRACE_BEGIN
+        pake_2_message_map.insert(std::make_pair(messageFromResponder_key, stringForDataBuffer(msg->Start(), msg->DataLength())));
+        pake_2_message_map.insert(std::make_pair(PAKE_2_encryption_id_key, std::to_string(encryptionKeyId)));
+        mPASETrace.insert (std::make_pair(PAKE_2_key, pake_2_message_map));
+#endif //CSG_TRACE_END
     {
         const uint8_t * hash = &buf[kMAX_Point_Length];
         err                  = mSpake2p.KeyConfirm(hash, kMAX_Hash_Length);
@@ -640,6 +687,10 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
         // Call delegate to send the Msg3 to peer
         err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2p3, bbuf.Finalize());
         SuccessOrExit(err);
+#if CHIP_CSG_TEST_HARNESS //CSG_TRACE_BEGIN
+        pake_3_message_map.insert(std::make_pair(messageFromInitiator_key, stringForDataBuffer(&verifier[0], verifier_len)));
+        mPASETrace.insert (std::make_pair(PAKE_3_key, pake_3_message_map));
+#endif //CSG_TRACE_END
     }
 
     ChipLogDetail(SecureChannel, "Sent spake2p msg3");
