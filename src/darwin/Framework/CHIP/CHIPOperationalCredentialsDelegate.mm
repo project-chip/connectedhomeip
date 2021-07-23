@@ -61,7 +61,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::init(CHIPPersistentStorageDelegat
         // err = SetIssuerID(storage);
     }
 
-    CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate::init returning %d", err);
+    CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate::init returning %s", chip::ErrorStr(err));
     return err;
 }
 

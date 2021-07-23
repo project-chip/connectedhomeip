@@ -20,8 +20,8 @@ static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
-    "AdminPairingTable.cpp",
-    "AdminPairingTable.h",
+    "FabricTable.cpp",
+    "FabricTable.h",
     "MessageCounter.cpp",
     "MessageCounter.h",
     "PeerConnectionState.h",

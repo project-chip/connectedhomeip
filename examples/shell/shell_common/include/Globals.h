@@ -35,7 +35,7 @@ extern chip::Messaging::ExchangeManager gExchangeManager;
 extern chip::SecureSessionMgr gSessionManager;
 extern chip::Inet::IPAddress gDestAddr;
 
-extern chip::Transport::AdminId gAdminId;
+extern chip::FabricIndex gFabricIndex;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 extern chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;

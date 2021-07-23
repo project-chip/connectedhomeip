@@ -16,7 +16,7 @@
  */
 #import "CHIPManualSetupPayloadParser.h"
 
-#import "CHIPError.h"
+#import "CHIPError_Internal.h"
 #import "CHIPLogging.h"
 #import "CHIPSetupPayload_Internal.h"
 
@@ -50,7 +50,7 @@
     if (_chipManualSetupPayloadParser) {
         CHIP_ERROR chipError = _chipManualSetupPayloadParser->populatePayload(cPlusPluspayload);
 
-        if (chipError == 0) {
+        if (chipError == CHIP_NO_ERROR) {
             payload = [[CHIPSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
         } else if (error) {
             *error = [CHIPError errorForCHIPErrorCode:chipError];

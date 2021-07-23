@@ -317,7 +317,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     auto * pairingCommissioner = chip::Platform::New<CASESession>();
 
-    AdminPairingTable adminTable;
+    FabricTable fabricTable;
     TestPersistentStorageDelegate storageDelegate;
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -327,13 +327,13 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     SessionIDAllocator idAllocator;
 
-    adminTable.Init(&storageDelegate);
+    fabricTable.Init(&storageDelegate);
 
-    AdminPairingInfo * admin = adminTable.AssignAdminId(0);
+    FabricInfo * fabric = fabricTable.AssignFabricIndex(0);
 
-    NL_TEST_ASSERT(inSuite, admin->SetOperationalKey(accessoryOpKeys) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, fabric->SetOperationalKey(accessoryOpKeys) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, admin->SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, fabric->SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)) == CHIP_NO_ERROR);
 
     uint8_t chipCert[kMaxCHIPCertLength * 2];
     MutableByteSpan chipCertSpan(chipCert, sizeof(chipCert));
@@ -341,22 +341,22 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                    ConvertX509CertsToChipCertArray(ByteSpan(sTestCert_Node01_01_DER, sTestCert_Node01_01_DER_Len),
                                                    ByteSpan(sTestCert_ICA01_DER, sTestCert_ICA01_DER_Len),
                                                    chipCertSpan) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, admin->SetOperationalCertsFromCertArray(chipCertSpan) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, fabric->SetOperationalCertsFromCertArray(chipCertSpan) == CHIP_NO_ERROR);
 
-    adminTable.Store(0);
-    adminTable.ReleaseAdminId(0);
+    fabricTable.Store(0);
+    fabricTable.ReleaseFabricIndex(0);
 
-    adminTable.LoadFromStorage(0);
-    admin = adminTable.FindAdminWithId(0);
+    fabricTable.LoadFromStorage(0);
+    fabric = fabricTable.FindFabricWithIndex(0);
 
     ChipCertificateSet certificates;
     OperationalCredentialSet credentials;
     CertificateKeyId rootKeyId;
-    NL_TEST_ASSERT(inSuite, admin->GetCredentials(credentials, certificates, rootKeyId) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, fabric->GetCredentials(credentials, certificates, rootKeyId) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
                    gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &gTransportMgr,
-                                                                &ctx.GetSecureSessionManager(), &adminTable,
+                                                                &ctx.GetSecureSessionManager(), &fabricTable,
                                                                 &idAllocator) == CHIP_NO_ERROR);
 
     ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(pairingCommissioner);
@@ -486,7 +486,7 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ctx.SetDestinationNodeId(kPlaceholderNodeId);
     ctx.SetLocalKeyId(0);
     ctx.SetPeerKeyId(0);
-    ctx.SetAdminId(kUndefinedAdminId);
+    ctx.SetFabricIndex(kUndefinedFabricIndex);
 
     gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());
 
