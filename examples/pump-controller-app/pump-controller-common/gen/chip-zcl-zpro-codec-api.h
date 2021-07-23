@@ -97,7 +97,7 @@ chip::System::PacketBufferHandle encodeFlowMeasurementClusterReadMaxMeasuredValu
 
 /**
  * @brief
- *    Encode a Flow Measurement server read command for the cluster revision attribute into buffer including the APS frame
+ *    Encode a Flow Measurement server read command for the ClusterRevision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeFlowMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                           chip::EndpointId destinationEndpoint);
@@ -144,7 +144,7 @@ chip::System::PacketBufferHandle encodeLevelControlClusterConfigureCurrentLevelA
 
 /**
  * @brief
- *    Encode a Level Control server read command for the cluster revision attribute into buffer including the APS frame
+ *    Encode a Level Control server read command for the ClusterRevision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeLevelControlClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                        chip::EndpointId destinationEndpoint);
@@ -176,7 +176,7 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadOnOffAttribute(uint8_t se
 
 /**
  * @brief
- *    Encode a On/off server read command for the cluster revision attribute into buffer including the APS frame
+ *    Encode a On/off server read command for the ClusterRevision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                 chip::EndpointId destinationEndpoint);
@@ -232,7 +232,7 @@ encodePressureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum, ch
 
 /**
  * @brief
- *    Encode a Pressure Measurement server read command for the cluster revision attribute into buffer including the APS frame
+ *    Encode a Pressure Measurement server read command for the ClusterRevision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodePressureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                               chip::EndpointId destinationEndpoint);
@@ -332,7 +332,7 @@ encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(uint8_t seqN
 
 /**
  * @brief
- *    Encode a Pump Configuration and Control server read command for the cluster revision attribute into buffer including the APS
+ *    Encode a Pump Configuration and Control server read command for the ClusterRevision attribute into buffer including the APS
  * frame
  */
 chip::System::PacketBufferHandle
@@ -389,7 +389,7 @@ encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum,
 
 /**
  * @brief
- *    Encode a Temperature Measurement server read command for the cluster revision attribute into buffer including the APS frame
+ *    Encode a Temperature Measurement server read command for the ClusterRevision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle
 encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
