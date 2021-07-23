@@ -126,7 +126,7 @@ function cirquetest_run_test() {
     mkdir -p "$DEVICE_LOG_DIR"
     __cirquetest_start_flask
     sleep 5
-    "$TEST_DIR/$CURRENT_TEST.sh" "$@"
+    "$TEST_DIR/$CURRENT_TEST.py" "$@"
     exitcode=$?
     __cirquetest_clean_flask
     # TODO: Do docker system prune, we cannot filter which container
