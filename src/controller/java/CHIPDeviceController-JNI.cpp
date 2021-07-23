@@ -25,6 +25,7 @@
 #include "AndroidBleApplicationDelegate.h"
 #include "AndroidBleConnectionDelegate.h"
 #include "AndroidBlePlatformDelegate.h"
+#include "AndroidCallbacks.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include "CHIPJNIError.h"
 #include "JniReferences.h"
@@ -350,8 +351,18 @@ JNI_METHOD(jlong, getDevicePointer)(JNIEnv * env, jobject self, jlong handle, jl
 
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
 
-    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
+    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a Java handle");
     return reinterpret_cast<jlong>(chipDevice);
+}
+
+JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jlong callbackHandle)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
+    VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallback handle is nullptr"));
+    wrapper->Controller()->GetConnectedDevice(nodeId, &connectedDeviceCallback->mOnSuccess, &connectedDeviceCallback->mOnFailure);
 }
 
 JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)

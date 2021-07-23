@@ -26,10 +26,17 @@ import kotlinx.android.synthetic.main.on_off_client_fragment.view.onBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.readBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.toggleBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.updateAddressBtn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class OnOffClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController()
+
+  private val scope = CoroutineScope(Dispatchers.Main + Job())
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -40,9 +47,10 @@ class OnOffClientFragment : Fragment() {
       deviceController.setCompletionListener(ChipControllerCallback())
 
       updateAddressBtn.setOnClickListener { updateAddressClick() }
-      onBtn.setOnClickListener { sendOnCommandClick() }
-      offBtn.setOnClickListener { sendOffCommandClick() }
-      toggleBtn.setOnClickListener { sendToggleCommandClick() }
+      onBtn.setOnClickListener { scope.launch { sendOnCommandClick() } }
+      offBtn.setOnClickListener { scope.launch { sendOffCommandClick() } }
+      toggleBtn.setOnClickListener { scope.launch { sendToggleCommandClick() } }
+      readBtn.setOnClickListener { scope.launch { sendReadOnOffClick() } }
 
       levelBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
@@ -58,14 +66,13 @@ class OnOffClientFragment : Fragment() {
             "Level is: " + levelBar.progress,
             Toast.LENGTH_SHORT
           ).show()
-          sendLevelCommandClick()
+          scope.launch { sendLevelCommandClick() }
         }
       })
-      readBtn.setOnClickListener { sendReadOnOffClick() }
     }
   }
 
-  private fun sendReadOnOffClick() {
+  private suspend fun sendReadOnOffClick() {
     getOnOffClusterForDevice().readOnOffAttribute(object : ChipClusters.BooleanAttributeCallback {
       override fun onSuccess(on: Boolean) {
         Log.v(TAG, "On/Off attribute value: $on")
@@ -89,6 +96,10 @@ class OnOffClientFragment : Fragment() {
   inner class ChipControllerCallback : GenericChipDeviceListener() {
     override fun onConnectDeviceComplete() {}
 
+    override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+      Log.d(TAG, "onCommissioningComplete for nodeId $nodeId: $errorCode")
+    }
+
     override fun onSendMessageComplete(message: String?) {
       commandStatusTv.text = requireContext().getString(R.string.echo_status_response, message)
     }
@@ -106,6 +117,11 @@ class OnOffClientFragment : Fragment() {
     }
   }
 
+  override fun onStop() {
+    super.onStop()
+    scope.cancel()
+  }
+
   private fun updateAddressClick() {
     try{
       deviceController.updateDevice(
@@ -118,10 +134,9 @@ class OnOffClientFragment : Fragment() {
     }
   }
 
-  private fun sendLevelCommandClick() {
+  private suspend fun sendLevelCommandClick() {
     val cluster = ChipClusters.LevelControlCluster(
-      ChipClient.getDeviceController()
-        .getDevicePointer(deviceIdEd.text.toString().toLong()), 1
+      ChipClient.getConnectedDevicePointer(deviceIdEd.text.toString().toLong()), 1
     )
     cluster.moveToLevel(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
@@ -136,7 +151,7 @@ class OnOffClientFragment : Fragment() {
     }, levelBar.progress, 0, 0, 0)
   }
 
-  private fun sendOnCommandClick() {
+  private suspend fun sendOnCommandClick() {
     getOnOffClusterForDevice().on(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
         showMessage("ON command success")
@@ -150,7 +165,7 @@ class OnOffClientFragment : Fragment() {
     })
   }
 
-  private fun sendOffCommandClick() {
+  private suspend fun sendOffCommandClick() {
     getOnOffClusterForDevice().off(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
         showMessage("OFF command success")
@@ -163,7 +178,7 @@ class OnOffClientFragment : Fragment() {
     })
   }
 
-  private fun sendToggleCommandClick() {
+  private suspend fun sendToggleCommandClick() {
     getOnOffClusterForDevice().toggle(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
         showMessage("TOGGLE command success")
@@ -176,10 +191,9 @@ class OnOffClientFragment : Fragment() {
     })
   }
 
-  private fun getOnOffClusterForDevice(): OnOffCluster {
+  private suspend fun getOnOffClusterForDevice(): OnOffCluster {
     return OnOffCluster(
-      ChipClient.getDeviceController()
-        .getDevicePointer(deviceIdEd.text.toString().toLong()), 1
+      ChipClient.getConnectedDevicePointer(deviceIdEd.text.toString().toLong()), 1
     )
   }
 
