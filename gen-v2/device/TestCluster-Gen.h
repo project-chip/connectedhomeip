@@ -6,12 +6,12 @@
 
 namespace chip {
 namespace app {
-namespace Cluster { 
+namespace Cluster {
 namespace TestCluster {
     namespace StructA {
         constexpr int NumImplementedFields = GetNumImplementedFields(_Schema);
         extern const StructDescriptor<NumImplementedFields> Descriptor;
-        
+
         struct Type {
             uint8_t x;
             uint8_t y;
@@ -21,11 +21,11 @@ namespace TestCluster {
             static const StructDescriptor<NumImplementedFields> &mDescriptor;
         };
     }
-    
+
     namespace StructB {
         constexpr int NumImplementedFields = GetNumImplementedFields(_Schema);
         extern const StructDescriptor<NumImplementedFields> Descriptor;
-        
+
         struct Type {
             uint8_t x;
             uint8_t y;
@@ -38,7 +38,7 @@ namespace TestCluster {
     namespace StructC {
         constexpr int NumImplementedFields = GetNumImplementedFields(_Schema);
         extern const StructDescriptor<NumImplementedFields> Descriptor;
-        
+
         struct Type {
             struct empty {};
 
@@ -55,7 +55,7 @@ namespace TestCluster {
     namespace CommandA {
         constexpr int NumImplementedFields = GetNumImplementedFields(_Schema);
         extern const StructDescriptor<NumImplementedFields> Descriptor;
-        
+
         struct Type {
             struct empty {};
 
@@ -70,11 +70,11 @@ namespace TestCluster {
             static const StructDescriptor<NumImplementedFields> &mDescriptor;
         };
     }
-    
+
     namespace CommandB {
         constexpr int NumImplementedFields = GetNumImplementedFields(_Schema);
         extern const StructDescriptor<NumImplementedFields> Descriptor;
-        
+
         struct Type {
             struct empty {};
 
@@ -94,7 +94,7 @@ namespace TestCluster {
     namespace Attributes {
         constexpr int NumImplementedFields = GetNumImplementedFields(_Schema);
         extern const StructDescriptor<NumImplementedFields> Descriptor;
-        
+
         struct Type {
             struct empty {};
 

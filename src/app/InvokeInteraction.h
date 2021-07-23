@@ -98,7 +98,7 @@ struct CommandParams
  * invoke interaction over the wire. Consequently, the lifetime of this object is limited to a SINGLE interaction backed by a SINGLE exchange context.
  *
  * This object permits a single request + response. It does not permit multiple responses to be sequenced in order.
- * 
+ *
  * It provides a number of overloaded methods that permit adding multiple command payloads into the message.
  *
  * It also provides a means to register callbacks on receipt of responses or errors to the originating invoke request.
@@ -122,7 +122,7 @@ public:
          *
          * @param invokeInteraction         A reference to the invoke interaction instance that corresponds to the invoke response being processed.
          * @param commandParams             A reference to an object containing the parameters of the command response.
-         * @param payload                   If a data payload is present, a TLV reader positioned at that payload is provided. The reader 
+         * @param payload                   If a data payload is present, a TLV reader positioned at that payload is provided. The reader
          *                                  shall not be assumed to exist past this call, so the application should save off the data if they desire to.
          */
         virtual void OnResponse(InvokeInitiator &invokeInteraction, CommandParams &commandParams, TLV::TLVReader *payload) = 0;
@@ -178,7 +178,7 @@ public:
      *
      */
     CHIP_ERROR AddRequest(CommandParams aParams, IEncodableElement *serializable);
-   
+
     /*
      * @brief
      *
@@ -199,7 +199,7 @@ public:
         err = StartCommandHeader(aParams);
         SuccessOrExit(err);
 
-        // 
+        //
         // Invoke the passed in closure that will actually write out the command payload if any
         //
         err = f(*mInvokeCommandBuilder.GetWriter(), TLV::ContextTag(CommandDataElement::kCsTag_Data));
@@ -221,7 +221,7 @@ exit:
      *
      */
     CHIP_ERROR AddRequestAndSend(CommandParams aParams, IEncodableElement *serializable);
-   
+
     /*
      * @brief
      *
@@ -246,7 +246,7 @@ exit:
     CHIP_ERROR Send();
 
     Messaging::ExchangeContext *GetExchange() { return mpExchangeCtx; }
-   
+
 private:
     enum State
     {
@@ -254,7 +254,7 @@ private:
         kStateAwaitingResponse = 1,
     };
 
-    
+
     CHIP_ERROR StartCommandHeader(const CommandParams &aParams);
     void CloseExchange();
 
@@ -267,8 +267,8 @@ private:
 
     CHIP_ERROR FinalizeMessage(System::PacketBufferHandle &aBuf);
     CHIP_ERROR SendMessage(System::PacketBufferHandle aBuf);
-  
-private: 
+
+private:
     enum Mode
     {
         kModeUnset = 0,
@@ -295,7 +295,7 @@ private:
  * This object permits a single request + response. It does not permit multiple responses to be sequenced in order.
  *
  * This object comes into existence at the point that an invoke request has to be handled. Upon initialization of the object with the packet buffer, this
- * object parses the various command data elements embedded in the message and dispatches them to ClusterServer objects registered with the 
+ * object parses the various command data elements embedded in the message and dispatches them to ClusterServer objects registered with the
  * InteractionModel engine.
  *
  * Upon dispatch, the ClusterServer instance's OnInvokeRequest method is invoked. The cluster's OnInvokeRequest implementation has to follow one of the following
@@ -325,12 +325,12 @@ public:
          *
          * @param invokeInteraction         A reference to the invoke interaction instance that corresponds to the invoke request being processed.
          * @param commandParams             A reference to an object containing the parameters of the command request.
-         * @param payload                   If a data payload is present, a TLV reader positioned at that payload is provided. The reader 
+         * @param payload                   If a data payload is present, a TLV reader positioned at that payload is provided. The reader
          *                                  shall not be assumed to exist past this call, so the application should save off the data if they desire to.
          */
         virtual CHIP_ERROR OnInvokeRequest(CommandParams &commandParams, InvokeResponder &invokeInteraction, TLV::TLVReader *payload) = 0;
 
-        virtual ~CommandHandler() {} 
+        virtual ~CommandHandler() {}
     };
 
     /*
@@ -341,16 +341,16 @@ public:
      *
      */
     CHIP_ERROR Init(Messaging::ExchangeContext *apContext, System::PacketBufferHandle &&aBufferHandle);
-   
+
     /*
      * @brief
      *
      * Encode a response to a request by providing command parameters as well as a pointer to an encodable object.
-     * The object's contents are immediately serialized into a response packet buffer. 
+     * The object's contents are immediately serialized into a response packet buffer.
      *
      */
     CHIP_ERROR AddResponse(CommandParams aParams, IEncodableElement *serializable);
-   
+
     /*
      * @brief
      *
@@ -368,7 +368,7 @@ public:
         err = StartCommandHeader(aParams);
         SuccessOrExit(err);
 
-        // 
+        //
         // Invoke the passed in closure that will actually write out the command payload if any
         //
         err = f(*mInvokeCommandBuilder.GetWriter(), TLV::ContextTag(CommandDataElement::kCsTag_Data));
@@ -392,7 +392,7 @@ exit:
     /*
      * @brief
      *
-     * Increments the hold-off ref, signalling to the responder object that it should not dispatch any queued up responses till a 
+     * Increments the hold-off ref, signalling to the responder object that it should not dispatch any queued up responses till a
      * matching call to DecrementHoldOffRef() has been made. This also prevents the de-allocation of this object till the matching call
      * has been made.
      *
@@ -432,7 +432,7 @@ private:
     chip::System::PacketBufferTLVWriter mWriter;
     Messaging::ExchangeContext *mpExchangeCtx = nullptr;
 };
-    
+
 
 } // namespace app
 } // namespace chip

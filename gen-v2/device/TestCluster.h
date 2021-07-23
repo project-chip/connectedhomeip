@@ -7,10 +7,10 @@
 
 namespace chip {
 namespace app {
-namespace Cluster { 
+namespace Cluster {
 namespace TestCluster {
     constexpr chip::ClusterId kClusterId = 0x000000001;
-    
+
     enum CommandId {
         kCommandAId = 1,
         kCommandBId = 2
@@ -36,7 +36,7 @@ namespace TestCluster {
             {kFieldIdM, Type::TYPE_STRING,  kNone,                  FieldM, {}},
         };
     }
-    
+
     namespace StructB {
         enum FieldId {
             kFieldIdX = 0,
@@ -145,7 +145,7 @@ namespace TestCluster {
         constexpr uint64_t FieldD = (0x00000001ULL << 32) | 0x05;
         constexpr uint64_t FieldE = (0x00000001ULL << 32) | 0x06;
         constexpr uint64_t FieldF = (0x00000001ULL << 32) | 0x07;
-        
+
         constexpr FullFieldDescriptor _Schema[] = {
             {kFieldIdA, Type::TYPE_UINT8,           kNone,                  FieldA,     {}},
             {kFieldIdB, Type::TYPE_UINT8,           kNullable,              FieldB,     {}},

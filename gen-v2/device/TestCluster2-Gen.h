@@ -10,7 +10,7 @@
 
 namespace chip {
 namespace app {
-namespace Cluster { 
+namespace Cluster {
 namespace TestCluster2 {
     constexpr chip::ClusterId kClusterId = 0x000000001;
 
@@ -18,7 +18,7 @@ namespace TestCluster2 {
         kCommandAId = 1,
         kCommandBId = 2
     };
-    
+
     namespace StructA {
         enum FieldId {
             kFieldIdJ = 0,
@@ -26,7 +26,7 @@ namespace TestCluster2 {
             kFieldIdL = 2,
             kFieldIdM = 3
         };
-        
+
         struct Type {
                 uint8_t x;
                 uint8_t y;
@@ -46,7 +46,7 @@ namespace TestCluster2 {
             kFieldIdD = 3,
             kFieldIdE = 4,
         };
-        
+
         struct Type {
             public:
                 struct empty {};
@@ -71,7 +71,7 @@ namespace TestCluster2 {
             kFieldIdD = 3,
             kFieldIdE = 4,
         };
-        
+
         struct Type {
             public:
                 struct empty {};

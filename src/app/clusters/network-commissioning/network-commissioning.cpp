@@ -274,7 +274,7 @@ CHIP_ERROR NetworkCommissioningServer::EnableNetwork(NetworkCommissioningCluster
 {
     size_t networkSeq;
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-	
+
     // TODO(cecille): This is very dangerous - need to check against real netif name, ensure no password.
     constexpr char ethernetNetifMagicCode[] = "ETH0";
     if (request.NetworkId.size() == sizeof(ethernetNetifMagicCode) &&

@@ -1,7 +1,7 @@
 #include "TestCluster-Gen.h"
 namespace chip {
 namespace app {
-namespace Cluster { 
+namespace Cluster {
 namespace TestCluster {
     namespace StructA {
         constexpr std::array<TypeOffsetInfo,NumImplementedFields> InitializeOffsets() {
@@ -20,7 +20,7 @@ namespace TestCluster {
         }
 
         constexpr std::array<TypeOffsetInfo, NumImplementedFields> Offsets = InitializeOffsets();
-        
+
         const StructDescriptor<NumImplementedFields> Descriptor = {
             .FieldList = PopulateFieldDescriptors<NumImplementedFields, ArraySize(_Schema)>(_Schema, Offsets)
         };
@@ -43,9 +43,9 @@ namespace TestCluster {
 
             return r;
         }
-        
+
         constexpr std::array<TypeOffsetInfo, NumImplementedFields> Offsets = InitializeOffsets();
-        
+
         const StructDescriptor<NumImplementedFields> Descriptor = {
             .FieldList = PopulateFieldDescriptors<NumImplementedFields, ArraySize(_Schema)>(_Schema, Offsets,
                 chip::Span<const CompactFieldDescriptor>({StructA::Descriptor.FieldList.data(), StructA::Descriptor.FieldList.size()}))
@@ -53,7 +53,7 @@ namespace TestCluster {
 
         const StructDescriptor<NumImplementedFields>& Type::mDescriptor = Descriptor;
     }
-    
+
     namespace StructC {
         constexpr std::array<TypeOffsetInfo,NumImplementedFields> InitializeOffsets() {
             using result_t = ::std::array<TypeOffsetInfo, NumImplementedFields>;
@@ -71,9 +71,9 @@ namespace TestCluster {
 
             return r;
         }
-        
+
         constexpr std::array<TypeOffsetInfo, NumImplementedFields> Offsets = InitializeOffsets();
-        
+
         const StructDescriptor<NumImplementedFields> Descriptor = {
             .FieldList = PopulateFieldDescriptors<NumImplementedFields, ArraySize(_Schema)>(_Schema, Offsets,
                 chip::Span<const CompactFieldDescriptor>({StructA::Descriptor.FieldList.data(), StructA::Descriptor.FieldList.size()}),
@@ -98,9 +98,9 @@ namespace TestCluster {
 
             return r;
         }
-        
+
         constexpr std::array<TypeOffsetInfo, NumImplementedFields> Offsets = InitializeOffsets();
-        
+
         const StructDescriptor<NumImplementedFields> Descriptor = {
             .FieldList = PopulateFieldDescriptors<NumImplementedFields, ArraySize(_Schema)>(_Schema, Offsets,
                 chip::Span<const CompactFieldDescriptor>({StructA::Descriptor.FieldList.data(), StructA::Descriptor.FieldList.size()}))
@@ -108,7 +108,7 @@ namespace TestCluster {
 
         const StructDescriptor<NumImplementedFields>& Type::mDescriptor = Descriptor;
     }
-   
+
     namespace CommandB {
         constexpr std::array<TypeOffsetInfo,NumImplementedFields> InitializeOffsets() {
             using result_t = ::std::array<TypeOffsetInfo, NumImplementedFields>;
@@ -125,9 +125,9 @@ namespace TestCluster {
 
             return r;
         }
-        
+
         constexpr std::array<TypeOffsetInfo, NumImplementedFields> Offsets = InitializeOffsets();
-        
+
         const StructDescriptor<NumImplementedFields> Descriptor = {
             .FieldList = PopulateFieldDescriptors<NumImplementedFields, ArraySize(_Schema)>(_Schema, Offsets,
                 chip::Span<const CompactFieldDescriptor>({StructA::Descriptor.FieldList.data(), StructA::Descriptor.FieldList.size()}),
@@ -164,7 +164,7 @@ namespace TestCluster {
 
             return r;
         }
-        
+
         constexpr std::array<TypeOffsetInfo, NumImplementedFields> Offsets = InitializeOffsets();
 
         const StructDescriptor<NumImplementedFields> Descriptor = {

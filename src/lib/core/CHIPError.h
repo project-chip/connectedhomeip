@@ -2020,7 +2020,7 @@ using CHIP_ERROR = ::chip::ChipError::ErrorType;
  *
  * @brief
  *  A buffer that was passed in is unexpectedly null.
- */ 
+ */
 #define CHIP_ERROR_NULL_BUF_ARG                                CHIP_CORE_ERROR(197)
 
 
@@ -2029,7 +2029,7 @@ using CHIP_ERROR = ::chip::ChipError::ErrorType;
  *
  * @brief
  *  Requested cluster with a specific Cluster ID was not found
- */ 
+ */
 #define CHIP_ERROR_CLUSTER_NOT_FOUND                            CHIP_CORE_ERROR(198)
 
 /**
@@ -2037,7 +2037,7 @@ using CHIP_ERROR = ::chip::ChipError::ErrorType;
  *
  * @brief
  *  A status response containing an error was received.
- */ 
+ */
 #define CHIP_ERROR_STATUS_RESPONSE_RECEIVED                     CHIP_CORE_ERROR(199)
 /**
  *  @}

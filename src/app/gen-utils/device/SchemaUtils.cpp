@@ -76,11 +76,11 @@ CHIP_ERROR EncodeSchemaElement(chip::Span<const CompactFieldDescriptor> pDescrip
             }
         }
         else if (schemaIter->FieldType.Has(Type::TYPE_STRUCT)) {
-            err = EncodeSchemaElement(schemaIter->StructDef, (void *)((uintptr_t)(buf) + schemaIter->Offset), 
+            err = EncodeSchemaElement(schemaIter->StructDef, (void *)((uintptr_t)(buf) + schemaIter->Offset),
                                       fieldTag, writer, false);
             SuccessOrExit(err);
         }
-        
+
         else if (schemaIter->FieldType.Has(Type::TYPE_UINT8)) {
             uint8_t *v = (uint8_t *)((uintptr_t)(buf) + schemaIter->Offset);
             err = writer.Put(fieldTag, *v);

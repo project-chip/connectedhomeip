@@ -75,10 +75,10 @@ CHIP_ERROR DecodeSchemaElement(chip::Span<const CompactFieldDescriptor> pDescrip
 template <typename GenType_t>
 CHIP_ERROR EncodeSchemaElement(GenType_t &v, TLV::TLVWriter &writer, uint64_t tag)
 {
-    CHIP_ERROR err = EncodeSchemaElement({v.mDescriptor.FieldList.data(), v.mDescriptor.FieldList.size()}, &v, tag, writer);    
+    CHIP_ERROR err = EncodeSchemaElement({v.mDescriptor.FieldList.data(), v.mDescriptor.FieldList.size()}, &v, tag, writer);
     SuccessOrExit(err);
 
-    err = writer.Finalize(); 
+    err = writer.Finalize();
 
 exit:
     return err;
@@ -87,7 +87,7 @@ exit:
 template <typename GenType_t>
 CHIP_ERROR DecodeSchemaElement(GenType_t &v, TLV::TLVReader &reader, SchemaAllocator *heap = nullptr)
 {
-    CHIP_ERROR err = DecodeSchemaElement({v.mDescriptor.FieldList.data(), v.mDescriptor.FieldList.size()}, &v, reader, heap);    
+    CHIP_ERROR err = DecodeSchemaElement({v.mDescriptor.FieldList.data(), v.mDescriptor.FieldList.size()}, &v, reader, heap);
     SuccessOrExit(err);
 
 exit:
@@ -111,7 +111,7 @@ public:
             return EncodeSchemaElement(resp, writer, tag);
         });
     }
-  
+
     template <typename GenType_t, typename HandlerFunc>
     CHIP_ERROR DispatchCommand(CommandParams &commandParams, TLV::TLVReader &reader, InvokeResponder &invokeInteraction, HandlerFunc handlerFunc) {
         if (commandParams.CommandId == GenType_t::GetCommandId()) {

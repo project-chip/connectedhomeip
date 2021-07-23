@@ -1185,7 +1185,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     chip::app::Cluster::OperationalCredentialCluster::OpCsrRequest::Type req;
 
     ChipLogDetail(Controller, "Sending OpCSR request to %p device", device);
-    
+
     auto pInitiator = CreateInitiator(device);
     VerifyOrReturnError(pInitiator != nullptr, CHIP_ERROR_INTERNAL);
 
@@ -1214,7 +1214,7 @@ void DeviceCommissioner::OnCSRFailureResponse(app::DemuxedInvokeInitiator& invok
     OnSessionEstablishmentError(error);
 }
 
-void DeviceCommissioner::OnOperationalCertificateSigningRequest(app::DemuxedInvokeInitiator& invokeInitiator, app::CommandParams &params, 
+void DeviceCommissioner::OnOperationalCertificateSigningRequest(app::DemuxedInvokeInitiator& invokeInitiator, app::CommandParams &params,
                                                        chip::app::Cluster::OperationalCredentialCluster::OpCsrResponse::Type *resp)
 {
     ChipLogProgress(Controller, "Received certificate signing request from the device");
@@ -1290,7 +1290,7 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const chip::app::Cluster::Operationa
     //       This will be done when device attestation is implemented.
     ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
             Optional<NodeId>(device->GetDeviceId()), 0, chip::ByteSpan{resp.csr.data(), resp.csr.size()}, ByteSpan(), &mDeviceNOCCallback));
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -1300,12 +1300,12 @@ void DeviceCommissioner::OnInvokeDone(app::DemuxedInvokeInitiator &demuxedInitia
     // This method gets invoked when all work has completed on the invoke object, at which point, we can free up the object.
     // Track it down in our list, and approriately release it.
     //
-    auto it = find_if(mDemuxedInvokeInitiatorList.begin(), mDemuxedInvokeInitiatorList.end(), [&](std::unique_ptr<app::DemuxedInvokeInitiator> &obj) { 
+    auto it = find_if(mDemuxedInvokeInitiatorList.begin(), mDemuxedInvokeInitiatorList.end(), [&](std::unique_ptr<app::DemuxedInvokeInitiator> &obj) {
         return (obj.get() == &demuxedInitiator);
     });
 
     if (it != mDemuxedInvokeInitiatorList.end()) {
-        mDemuxedInvokeInitiatorList.erase(it); 
+        mDemuxedInvokeInitiatorList.erase(it);
     }
 }
 

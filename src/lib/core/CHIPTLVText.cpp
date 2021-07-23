@@ -35,7 +35,7 @@ namespace TLV {
 
 namespace Utilities {
 
-void PrintTabs(int tabLevel) 
+void PrintTabs(int tabLevel)
 {
     for (int i = 0; i < tabLevel; i++) {
         printf("\t");

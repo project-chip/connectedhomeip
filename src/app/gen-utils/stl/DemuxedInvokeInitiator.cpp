@@ -44,7 +44,7 @@ CHIP_ERROR DemuxedInvokeInitiator::AddCommand(IEncodableElement *request, Comman
     return mInitiator.AddRequest(params, request);
 }
 
-void DemuxedInvokeInitiator::OnResponse(InvokeInitiator &initiator, CommandParams &params, TLV::TLVReader *payload) 
+void DemuxedInvokeInitiator::OnResponse(InvokeInitiator &initiator, CommandParams &params, TLV::TLVReader *payload)
 {
     bool foundMatch = false;
 
@@ -56,12 +56,12 @@ void DemuxedInvokeInitiator::OnResponse(InvokeInitiator &initiator, CommandParam
     }
 
     if (!foundMatch) {
-        ChipLogProgress(DataManagement, "Could not find a matching demuxed handler for command! (ClusterId = %" PRIx32 ", Endpoint = %lu, Command = %lu)", 
+        ChipLogProgress(DataManagement, "Could not find a matching demuxed handler for command! (ClusterId = %" PRIx32 ", Endpoint = %lu, Command = %lu)",
                         params.ClusterId, (unsigned long)params.EndpointId, (unsigned long)params.CommandId);
-    }           
+    }
 }
 
-void DemuxedInvokeInitiator::OnError(InvokeInitiator &initiator, CommandParams *params, CHIP_ERROR error, StatusResponse *statusResponse) 
+void DemuxedInvokeInitiator::OnError(InvokeInitiator &initiator, CommandParams *params, CHIP_ERROR error, StatusResponse *statusResponse)
 {
     for (auto iter : mHandlers) {
         if ((params && (iter.clusterId == params->ClusterId && iter.commandId == params->CommandId)) || (!params)) {
@@ -71,7 +71,7 @@ void DemuxedInvokeInitiator::OnError(InvokeInitiator &initiator, CommandParams *
     }
 }
 
-void DemuxedInvokeInitiator::OnEnd(InvokeInitiator &initiator) 
+void DemuxedInvokeInitiator::OnEnd(InvokeInitiator &initiator)
 {
     mOnDoneFunc(*this);
 }

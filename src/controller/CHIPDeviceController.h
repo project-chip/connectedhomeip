@@ -530,10 +530,10 @@ public:
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
     void OnInvokeDone(app::DemuxedInvokeInitiator &demuxedInitiator);
-    
+
 private:
     std::vector<std::unique_ptr<app::DemuxedInvokeInitiator>> mDemuxedInvokeInitiatorList;
-    
+
     DevicePairingDelegate * mPairingDelegate;
 
     /* This field is an index in mActiveDevices list. The object at this index in the list
@@ -557,7 +557,7 @@ private:
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
     std::unique_ptr<app::DemuxedInvokeInitiator> CreateInitiator(Device *device);
-    
+
     void PersistDeviceList();
 
     void FreeRendezvousSession();
@@ -603,9 +603,9 @@ private:
      * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
      * @param[in] Signature       Cryptographic signature generated for the fields in the response message.
      */
-    void OnOperationalCertificateSigningRequest(app::DemuxedInvokeInitiator& invokeInitiator, app::CommandParams &params, 
+    void OnOperationalCertificateSigningRequest(app::DemuxedInvokeInitiator& invokeInitiator, app::CommandParams &params,
                                                        chip::app::Cluster::OperationalCredentialCluster::OpCsrResponse::Type *resp);
-                                                       
+
 
     /* Callback when adding operational certs to device results in failure */
     void OnAddOpCertFailureResponse(app::DemuxedInvokeInitiator& invokeInitiator, CHIP_ERROR error, chip::app::StatusResponse *response);

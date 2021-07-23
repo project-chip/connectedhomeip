@@ -7,7 +7,7 @@
 
 namespace chip {
 namespace app {
-namespace Cluster { 
+namespace Cluster {
 namespace NetworkCommissioningCluster {
     constexpr chip::ClusterId kClusterId = 0x0031;
 
@@ -41,7 +41,7 @@ namespace NetworkCommissioningCluster {
         constexpr FullFieldDescriptor _Schema[] = {
             {kOperationalDatasetFieldId,    BitFlags<Type>(Type::TYPE_OCTSTR),      kNone,   0,       {}},
             {kBreadcrumbFieldId,            BitFlags<Type>(Type::TYPE_UINT64),      kNone,   0,       {}},
-            {kTimeoutMsFieldId,             BitFlags<Type>(Type::TYPE_UINT32),      kNone,   0,       {}} 
+            {kTimeoutMsFieldId,             BitFlags<Type>(Type::TYPE_UINT32),      kNone,   0,       {}}
         };
     };
 
@@ -57,7 +57,7 @@ namespace NetworkCommissioningCluster {
             {kSsidFieldId,                  BitFlags<Type>(Type::TYPE_OCTSTR),      kNone,   0,       {}},
             {kCredentialsFieldId,           BitFlags<Type>(Type::TYPE_OCTSTR),      kNone,   0,       {}},
             {kBreadcrumbFieldId,            BitFlags<Type>(Type::TYPE_UINT64),      kNone,   0,       {}},
-            {kTimeoutMsFieldId,             BitFlags<Type>(Type::TYPE_UINT32),      kNone,   0,       {}} 
+            {kTimeoutMsFieldId,             BitFlags<Type>(Type::TYPE_UINT32),      kNone,   0,       {}}
         };
     };
 
@@ -71,7 +71,7 @@ namespace NetworkCommissioningCluster {
         constexpr FullFieldDescriptor _Schema[] = {
             {kNetworkId,                    BitFlags<Type>(Type::TYPE_OCTSTR),      kNone,   0,       {}},
             {kBreadcrumbFieldId,            BitFlags<Type>(Type::TYPE_UINT64),      kNone,   0,       {}},
-            {kTimeoutMsFieldId,             BitFlags<Type>(Type::TYPE_UINT32),      kNone,   0,       {}} 
+            {kTimeoutMsFieldId,             BitFlags<Type>(Type::TYPE_UINT32),      kNone,   0,       {}}
         };
     };
 
@@ -85,7 +85,7 @@ namespace NetworkCommissioningCluster {
         constexpr FullFieldDescriptor _Schema[] = {
             {kNetworkId,                    BitFlags<Type>(Type::TYPE_OCTSTR),      kNone,   0,       {}},
             {kBreadcrumbFieldId,            BitFlags<Type>(Type::TYPE_UINT64),      kNone,   0,       {}},
-            {kTimeoutMsFieldId,             BitFlags<Type>(Type::TYPE_UINT32),      kNone,   0,       {}} 
+            {kTimeoutMsFieldId,             BitFlags<Type>(Type::TYPE_UINT32),      kNone,   0,       {}}
         };
     };
 
@@ -99,18 +99,18 @@ namespace NetworkCommissioningCluster {
         constexpr FullFieldDescriptor _Schema[] = {
             {kNetworkId,                    BitFlags<Type>(Type::TYPE_OCTSTR),      kNone,   0,       {}},
             {kBreadcrumbFieldId,            BitFlags<Type>(Type::TYPE_UINT64),      kNone,   0,       {}},
-            {kTimeoutMsFieldId,             BitFlags<Type>(Type::TYPE_UINT32),      kNone,   0,       {}} 
+            {kTimeoutMsFieldId,             BitFlags<Type>(Type::TYPE_UINT32),      kNone,   0,       {}}
         };
     };
-    
-    
+
+
     namespace GetLastNetworkCommissioningResultCommand {
         enum FieldId {
             kTimeoutMsFieldId = 0
         };
 
         constexpr FullFieldDescriptor _Schema[] = {
-            {kTimeoutMsFieldId,             BitFlags<Type>(Type::TYPE_UINT32),      kNone,   0,       {}} 
+            {kTimeoutMsFieldId,             BitFlags<Type>(Type::TYPE_UINT32),      kNone,   0,       {}}
         };
     };
 }

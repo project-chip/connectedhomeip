@@ -99,7 +99,7 @@ public :
     */
    template <typename T>
    CHIP_ERROR AddCommand(IEncodableElement *request, CommandParams params,
-                  std::function<void (DemuxedInvokeInitiator &invokeInitiator, CommandParams&, T* t1)> onDataFunc, 
+                  std::function<void (DemuxedInvokeInitiator &invokeInitiator, CommandParams&, T* t1)> onDataFunc,
                   std::function<void (DemuxedInvokeInitiator &invokeInitiator, CHIP_ERROR error, StatusResponse *response)> onErrorFunc = {}) {
         auto onDataClosure = [onDataFunc](DemuxedInvokeInitiator& initiator, CommandParams &param, TLV::TLVReader *reader) {
             if (reader) {
@@ -124,7 +124,7 @@ public :
     *
     */
    CHIP_ERROR AddCommand(IEncodableElement *request, CommandParams params,
-                  std::function<void (DemuxedInvokeInitiator& invokeInitiator, CommandParams&)> onDataFunc = {}, 
+                  std::function<void (DemuxedInvokeInitiator& invokeInitiator, CommandParams&)> onDataFunc = {},
                   std::function<void (DemuxedInvokeInitiator& invokeInitiator, CHIP_ERROR error, StatusResponse *response)> onErrorFunc = {});
 
    CHIP_ERROR Send() {
@@ -132,7 +132,7 @@ public :
    }
 
    InvokeInitiator &GetInitiator() { return mInitiator; }
-   
+
    ~DemuxedInvokeInitiator() {}
 
 private:
@@ -143,7 +143,7 @@ private:
    void OnEnd(InvokeInitiator &initiator) final;
 
    struct Handler {
-       std::function<void (DemuxedInvokeInitiator& invokeInitiator, CommandParams &params, TLV::TLVReader *reader)> onDataClosure; 
+       std::function<void (DemuxedInvokeInitiator& invokeInitiator, CommandParams &params, TLV::TLVReader *reader)> onDataClosure;
        std::function<void (DemuxedInvokeInitiator& invokeInitiator, CHIP_ERROR error, StatusResponse *response)> onErrorFunc;
        chip::ClusterId clusterId;
        chip::CommandId commandId;

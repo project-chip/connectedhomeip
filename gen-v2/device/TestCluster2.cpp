@@ -6,7 +6,7 @@
 
 namespace chip {
 namespace app {
-namespace Cluster { 
+namespace Cluster {
 namespace TestCluster2 {
     namespace StructA {
         CHIP_ERROR Type::Encode(TLV::TLVWriter &writer, uint64_t tag) {
@@ -70,7 +70,7 @@ namespace TestCluster2 {
                 }
                 ReturnErrorOnFailure(writer.EndContainer(outer1));
             }
-            
+
             {
                 TLV::TLVType outer1;
                 ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(kFieldIdE), TLV::kTLVType_Array, outer1));

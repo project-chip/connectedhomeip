@@ -236,7 +236,7 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
     CHIP_ERROR err = CHIP_NO_ERROR;
     InvokeResponder *responder = nullptr;
     bool isLegacy = false;
-    
+
     responder = mInvokeResponders.CreateObject();
     assert(responder != nullptr);
 
@@ -264,7 +264,7 @@ CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeCon
             }
         }
     }
-    
+
 exit:
     ChipLogFunctError(err);
 

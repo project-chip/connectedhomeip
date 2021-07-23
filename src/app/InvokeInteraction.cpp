@@ -41,7 +41,7 @@ CHIP_ERROR InvokeResponder::Init(Messaging::ExchangeContext *apContext, System::
     TLV::TLVReader commandListReader;
     InvokeCommand::Parser invokeCommandParser;
     CommandList::Parser commandListParser;
-    
+
     VerifyOrReturnError(apContext != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mpExchangeCtx = apContext;
@@ -52,7 +52,7 @@ CHIP_ERROR InvokeResponder::Init(Messaging::ExchangeContext *apContext, System::
     // aggregated them all.
     //
     IncrementHoldOffRef();
-    
+
     reader.Init(std::move(aBufferHandle));
 
     err = reader.Next();
@@ -120,12 +120,12 @@ CHIP_ERROR InvokeResponder::Init(Messaging::ExchangeContext *apContext, System::
             });
 
             if (!foundClusterInstance) {
-                ChipLogProgress(DataManagement, "Could not find a matching server cluster for command! (ClusterId = %" PRIx32 ", Endpoint = %lu, Command = %lu)", 
+                ChipLogProgress(DataManagement, "Could not find a matching server cluster for command! (ClusterId = %" PRIx32 ", Endpoint = %lu, Command = %lu)",
                                 params.ClusterId, (unsigned long)params.EndpointId, (unsigned long)params.CommandId);
 
                 //
                 // To permit a gradual transition away from the legacy Ember approach of handling commands, we need a way to 'fall-back' to the legacy approach
-                // if we don't find a registered ClusterServer object. Returning a very specific error code here from this command signals to the caler to 
+                // if we don't find a registered ClusterServer object. Returning a very specific error code here from this command signals to the caler to
                 // switch back to the legacy call flow.
                 //
                 // TODO: Remove this once all legacy callers have moved over to the new model. In turn, re-enable the status report dispatch path below.
@@ -144,7 +144,7 @@ CHIP_ERROR InvokeResponder::Init(Messaging::ExchangeContext *apContext, System::
 
 exit:
     //
-    // Decrement hold-off, and if zero, fire off any queued up responses and 
+    // Decrement hold-off, and if zero, fire off any queued up responses and
     // shut outselves down.
     //
     DecrementHoldOffRef();
@@ -158,7 +158,7 @@ CHIP_ERROR InvokeResponder::AddResponse(CommandParams aParams, IEncodableElement
     err = StartCommandHeader(aParams);
     SuccessOrExit(err);
 
-    // 
+    //
     // Invoke the passed in closure that will actually write out the command payload if any
     //
     err = serializable->Encode(*mInvokeCommandBuilder.GetWriter(), TLV::ContextTag(CommandDataElement::kCsTag_Data));
@@ -172,7 +172,7 @@ exit:
 }
 
 CHIP_ERROR InvokeResponder::AddStatusCode(const CommandParams &aParams, const StatusResponse &statusResponse)
-                             
+
 {
     CHIP_ERROR err;
     StatusElement::Builder statusBuilder;
@@ -248,7 +248,7 @@ CHIP_ERROR InvokeResponder::Shutdown()
     }
 
     mState = kStateReleased;
-    
+
     //DeviceLayer::PlatformMgr().ScheduleWork(InteractionModelEngine::FreeReleasedInvokeResponderObjects, (intptr_t)InteractionModelEngine::GetInstance());
 
     //
@@ -330,7 +330,7 @@ CHIP_ERROR InvokeResponder::SendMessage(System::PacketBufferHandle aBuf)
 
     VerifyOrExit(!aBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, 
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest,
                                      std::move(aBuf), Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
 
@@ -438,7 +438,7 @@ CHIP_ERROR InvokeInitiator::OnMessageReceived(Messaging::ExchangeContext * apExc
 
     // Now that we've received the response, move our state back to ready to permit adding commands
     mState = kStateReady;
-    
+
     reader.Init(std::move(aPayload));
 
     err = reader.Next();
@@ -487,7 +487,7 @@ CHIP_ERROR InvokeInitiator::OnMessageReceived(Messaging::ExchangeContext * apExc
         else {
             StatusResponse statusResponse;
             uint32_t protocolId;
-            
+
             err = statusElementParser.DecodeStatusElement(&statusResponse.generalCode, &protocolId, &statusResponse.protocolCode);
             SuccessOrExit(err);
 
@@ -512,7 +512,7 @@ CHIP_ERROR InvokeInitiator::OnMessageReceived(Messaging::ExchangeContext * apExc
 
 exit:
     CloseExchange();
-    
+
    //
    // We're done with this object now. Let's signal the application to indicate the completion
    // of this interaction.
@@ -520,10 +520,10 @@ exit:
    mHandler->OnEnd(*this);
    mHandler = nullptr;
 
-   return err; 
+   return err;
 }
 
-void InvokeInitiator::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) 
+void InvokeInitiator::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
     if (mHandler) {
         mHandler->OnError(*this, NULL, CHIP_ERROR_TIMEOUT, nullptr);
@@ -532,7 +532,7 @@ void InvokeInitiator::OnResponseTimeout(Messaging::ExchangeContext * apExchangeC
     }
 }
 
-CHIP_ERROR InvokeInitiator::AddRequest(CommandParams aParams, IEncodableElement *serializable) 
+CHIP_ERROR InvokeInitiator::AddRequest(CommandParams aParams, IEncodableElement *serializable)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -545,7 +545,7 @@ CHIP_ERROR InvokeInitiator::AddRequest(CommandParams aParams, IEncodableElement 
     err = StartCommandHeader(aParams);
     SuccessOrExit(err);
 
-    // 
+    //
     // Invoke the passed in closure that will actually write out the command payload if any
     //
     err = serializable->Encode(*mInvokeCommandBuilder.GetWriter(), TLV::ContextTag(CommandDataElement::kCsTag_Data));
@@ -563,7 +563,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR InvokeInitiator::AddRequestAndSend(CommandParams aParams, IEncodableElement *serializable) 
+CHIP_ERROR InvokeInitiator::AddRequestAndSend(CommandParams aParams, IEncodableElement *serializable)
 {
     CHIP_ERROR err;
 
@@ -589,8 +589,8 @@ CHIP_ERROR InvokeInitiator::Send()
     VerifyOrExit(mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mState == kStateReady, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mWriter.HasBuffer(), );
-   
-    { 
+
+    {
         System::PacketBufferHandle buf;
 
         err = FinalizeMessage(buf);
@@ -607,7 +607,7 @@ exit:
         mHandler->OnEnd(*this);
         mHandler = nullptr;
     }
-    
+
     return err;
 }
 
@@ -648,7 +648,7 @@ CHIP_ERROR InvokeInitiator::SendMessage(System::PacketBufferHandle aBuf)
 
     VerifyOrExit(!aBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, 
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest,
                                      std::move(aBuf), Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
 
