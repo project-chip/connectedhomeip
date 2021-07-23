@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <OperationalCredentialCluster-Gen.h>
 #include <app/InteractionModelDelegate.h>
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
@@ -38,19 +39,18 @@
 #include <core/CHIPTLV.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <lib/support/Span.h>
+#include <memory>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#include <stl/DemuxedInvokeInitiator.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
-#include <stl/DemuxedInvokeInitiator.h>
-#include <OperationalCredentialCluster-Gen.h>
-#include <memory>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -345,7 +345,6 @@ protected:
     Credentials::OperationalCredentialSet mCredentials;
     Credentials::CertificateKeyId mRootKeyId;
 
-
     SessionIDAllocator mIDAllocator;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
@@ -529,7 +528,7 @@ public:
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
-    void OnInvokeDone(app::DemuxedInvokeInitiator &demuxedInitiator);
+    void OnInvokeDone(app::DemuxedInvokeInitiator & demuxedInitiator);
 
 private:
     std::vector<std::unique_ptr<app::DemuxedInvokeInitiator>> mDemuxedInvokeInitiatorList;
@@ -556,7 +555,7 @@ private:
 
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
-    std::unique_ptr<app::DemuxedInvokeInitiator> CreateInitiator(Device *device);
+    std::unique_ptr<app::DemuxedInvokeInitiator> CreateInitiator(Device * device);
 
     void PersistDeviceList();
 
@@ -588,7 +587,8 @@ private:
     CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(Device * device);
 
     /* Callback when the previously sent CSR request results in failure */
-    void OnCSRFailureResponse(app::DemuxedInvokeInitiator& invokeInitiator, CHIP_ERROR error, chip::app::StatusResponse *response);
+    void OnCSRFailureResponse(app::DemuxedInvokeInitiator & invokeInitiator, CHIP_ERROR error,
+                              chip::app::StatusResponse * response);
 
     /**
      * @brief
@@ -603,16 +603,15 @@ private:
      * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
      * @param[in] Signature       Cryptographic signature generated for the fields in the response message.
      */
-    void OnOperationalCertificateSigningRequest(app::DemuxedInvokeInitiator& invokeInitiator, app::CommandParams &params,
-                                                       chip::app::Cluster::OperationalCredentialCluster::OpCsrResponse::Type *resp);
-
+    void OnOperationalCertificateSigningRequest(app::DemuxedInvokeInitiator & invokeInitiator, app::CommandParams & params,
+                                                chip::app::Cluster::OperationalCredentialCluster::OpCsrResponse::Type * resp);
 
     /* Callback when adding operational certs to device results in failure */
-    void OnAddOpCertFailureResponse(app::DemuxedInvokeInitiator& invokeInitiator, CHIP_ERROR error, chip::app::StatusResponse *response);
+    void OnAddOpCertFailureResponse(app::DemuxedInvokeInitiator & invokeInitiator, CHIP_ERROR error,
+                                    chip::app::StatusResponse * response);
 
     /* Callback when the device confirms that it has added the operational certificates */
-    void OnOperationalCertificateAddResponse(app::DemuxedInvokeInitiator& invokeInitiator, app::CommandParams &params);
-
+    void OnOperationalCertificateAddResponse(app::DemuxedInvokeInitiator & invokeInitiator, app::CommandParams & params);
 
     /* Callback when the device confirms that it has added the root certificate */
     static void OnRootCertSuccessResponse(void * context);
@@ -636,7 +635,7 @@ private:
      * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
      * @param[in] Signature       Cryptographic signature generated for all the above fields.
      */
-    CHIP_ERROR ProcessOpCSR(const chip::app::Cluster::OperationalCredentialCluster::OpCsrResponse::Type& resp);
+    CHIP_ERROR ProcessOpCSR(const chip::app::Cluster::OperationalCredentialCluster::OpCsrResponse::Type & resp);
 
     // Cluster callbacks for advancing commissioning flows
     Callback::Callback<BasicSuccessCallback> mSuccess;

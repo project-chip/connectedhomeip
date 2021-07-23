@@ -21,31 +21,29 @@
  *      This file implements unit tests for CHIP Interaction Model Command Interaction
  *
  */
-#include <core/CHIPCore.h>
-#include <core/CHIPTLVDebug.hpp>
-#include <support/CodeUtils.h>
-#include <core/CHIPTLVTags.h>
 #include <app/InteractionModelEngine.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
-#include <core/CHIPTLVText.hpp>
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVDebug.hpp>
+#include <core/CHIPTLVTags.h>
+#include <core/CHIPTLVText.hpp>
 #include <core/CHIPTLVUtilities.hpp>
+#include <memory>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <nlunit-test.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
-#include <memory>
-#include <nlunit-test.h>
 
 #include <TestCluster-Gen.h>
 
@@ -74,7 +72,7 @@ private:
     chip::System::TLVPacketBufferBackingStore mStore;
     chip::TLV::TLVWriter mWriter;
     chip::TLV::TLVReader mReader;
-    nlTestSuite *mpSuite;
+    nlTestSuite * mpSuite;
 };
 
 using namespace chip::TLV;
@@ -113,14 +111,14 @@ void TestSchemaUtils::TestSchemaUtilsEncAndDecSimple(nlTestSuite * apSuite, void
 {
     chip::app::Cluster::TestCluster::StructA::Type sa;
     CHIP_ERROR err;
-    chip::app::TestSchemaUtils *_this = static_cast<chip::app::TestSchemaUtils *>(apContext);
+    chip::app::TestSchemaUtils * _this = static_cast<chip::app::TestSchemaUtils *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
 
     sa.x = 20;
     sa.y = 30;
-    sa.l = {0, 1, 2, 3};
+    sa.l = { 0, 1, 2, 3 };
     sa.m = "chip";
 
     err = sa.Encode(_this->mWriter, TLV::AnonymousTag);
@@ -138,7 +136,8 @@ void TestSchemaUtils::TestSchemaUtilsEncAndDecSimple(nlTestSuite * apSuite, void
     NL_TEST_ASSERT(apSuite, sa.x == 20);
     NL_TEST_ASSERT(apSuite, sa.y == 30);
 
-    for (size_t i = 0; i < sa.l.size(); i++) {
+    for (size_t i = 0; i < sa.l.size(); i++)
+    {
         NL_TEST_ASSERT(apSuite, sa.l[i] == i);
     }
 
@@ -149,13 +148,13 @@ void TestSchemaUtils::TestSchemaUtilsEncAndDecNestedStruct(nlTestSuite * apSuite
 {
     chip::app::Cluster::TestCluster::StructB::Type sb;
     CHIP_ERROR err;
-    chip::app::TestSchemaUtils *_this = static_cast<chip::app::TestSchemaUtils *>(apContext);
+    chip::app::TestSchemaUtils * _this = static_cast<chip::app::TestSchemaUtils *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
 
-    sb.x = 20;
-    sb.y = 30;
+    sb.x   = 20;
+    sb.y   = 30;
     sb.z.x = 99;
     sb.z.y = 17;
 
@@ -181,27 +180,29 @@ void TestSchemaUtils::TestSchemaUtilsEncAndDecList(nlTestSuite * apSuite, void *
 {
     chip::app::Cluster::TestCluster::StructC::Type sc;
     CHIP_ERROR err;
-    chip::app::TestSchemaUtils *_this = static_cast<chip::app::TestSchemaUtils *>(apContext);
+    chip::app::TestSchemaUtils * _this = static_cast<chip::app::TestSchemaUtils *>(apContext);
 
     _this->mpSuite = apSuite;
     _this->SetupBuf();
 
-    for (size_t i = 0; i < 5; i++) {
-        sc.d.insert(sc.d.begin() + (long)i, (uint8_t)i);
+    for (size_t i = 0; i < 5; i++)
+    {
+        sc.d.insert(sc.d.begin() + (long) i, (uint8_t) i);
     }
 
-    sc.a = 20;
-    sc.b = 30;
+    sc.a   = 20;
+    sc.b   = 30;
     sc.c.x = 99;
     sc.c.y = 17;
 
-    for (size_t i = 0; i < 7; i++) {
+    for (size_t i = 0; i < 7; i++)
+    {
         chip::app::Cluster::TestCluster::StructA::Type t;
 
-        t.x = (uint8_t)i;
-        t.y = (uint8_t)i;
+        t.x = (uint8_t) i;
+        t.y = (uint8_t) i;
 
-        sc.e.insert(sc.e.begin() + (long)i, t);
+        sc.e.insert(sc.e.begin() + (long) i, t);
     }
 
     err = sc.Encode(_this->mWriter, TLV::AnonymousTag);
@@ -220,11 +221,13 @@ void TestSchemaUtils::TestSchemaUtilsEncAndDecList(nlTestSuite * apSuite, void *
     NL_TEST_ASSERT(apSuite, sc.c.x == 99);
     NL_TEST_ASSERT(apSuite, sc.c.y == 17);
 
-    for (size_t i = 0; i < 5; i++) {
+    for (size_t i = 0; i < 5; i++)
+    {
         NL_TEST_ASSERT(apSuite, sc.d[i] == i);
     }
 
-    for (size_t i = 0; i < 7; i++) {
+    for (size_t i = 0; i < 7; i++)
+    {
         NL_TEST_ASSERT(apSuite, sc.e[i].x == i);
         NL_TEST_ASSERT(apSuite, sc.e[i].y == i);
     }
@@ -249,7 +252,8 @@ void InitializeChip(nlTestSuite * apSuite)
 
     chip::gSystemLayer.Init();
 
-    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins, &chip::gMessageCounterManager);
+    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins,
+                                     &chip::gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = chip::gExchangeManager.Init(&chip::gSessionManager);

@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include "Cluster.h"
 #include <app/MessageDef/ReportData.h>
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
@@ -32,12 +33,11 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
-#include "Cluster.h"
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <support/Pool.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
-#include <support/Pool.h>
 
 #include <app/ClusterInfo.h>
 #include <app/Command.h>
@@ -153,7 +153,7 @@ public:
     uint16_t GetReadClientArrayIndex(const ReadClient * const apReadClient) const;
 
     uint16_t GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const;
-    CHIP_ERROR RegisterServer(ClusterServer *apServer);
+    CHIP_ERROR RegisterServer(ClusterServer * apServer);
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
@@ -212,15 +212,15 @@ private:
     friend class InvokeResponder;
 
 private:
-    BitMapObjectPool<ClusterServer*, CHIP_CONFIG_MAX_CLUSTER_SERVERS> mClusterServers;
+    BitMapObjectPool<ClusterServer *, CHIP_CONFIG_MAX_CLUSTER_SERVERS> mClusterServers;
     BitMapObjectPool<InvokeResponder, CHIP_MAX_NUM_INVOKE_INTERACTIONS> mInvokeResponders;
 
     friend class TestInvokeInteraction;
 
     auto GetClusterServerSet() -> decltype(mClusterServers) & { return mClusterServers; }
 
-	ClusterInfo mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS];
-	ClusterInfo * mpNextAvailableClusterInfo = nullptr;
+    ClusterInfo mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS];
+    ClusterInfo * mpNextAvailableClusterInfo = nullptr;
 };
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,

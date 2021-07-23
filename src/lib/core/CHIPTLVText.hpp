@@ -46,7 +46,7 @@ namespace TLV {
  */
 namespace Utilities {
 
-CHIP_ERROR Print(TLV::TLVReader &reader, int tabLevel = 0);
+CHIP_ERROR Print(TLV::TLVReader & reader, int tabLevel = 0);
 
 } // namespace Utilities
 

@@ -22,9 +22,8 @@
 #include "core/CHIPError.h"
 #include "protocols/secure_channel/Constants.h"
 
-#include <device/SchemaUtils.h>
 #include <cstring>
-#include <type_traits>
+#include <device/SchemaUtils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/Span.h>
@@ -33,6 +32,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/DeviceControlServer.h>
+#include <type_traits>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
@@ -54,68 +54,62 @@ namespace app {
 namespace clusters {
 namespace NetworkCommissioning {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
-{
-}
+void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv) {}
 
-}
-}
-}
-}
+} // namespace NetworkCommissioning
+} // namespace clusters
+} // namespace app
+} // namespace chip
 
-NetworkCommissioningServer::NetworkCommissioningServer()
-    : ClusterServer(NetworkCommissioningCluster::kClusterId)
-{
-}
+NetworkCommissioningServer::NetworkCommissioningServer() : ClusterServer(NetworkCommissioningCluster::kClusterId) {}
 
-CHIP_ERROR NetworkCommissioningServer::OnInvokeRequest(CommandParams &commandParams, InvokeResponder &invokeInteraction, TLV::TLVReader *payload)
+CHIP_ERROR NetworkCommissioningServer::OnInvokeRequest(CommandParams & commandParams, InvokeResponder & invokeInteraction,
+                                                       TLV::TLVReader * payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    switch (commandParams.CommandId) {
-        case NetworkCommissioningCluster::kAddThreadNetworkRequestCommandId:
-            {
-                NetworkCommissioningCluster::AddThreadNetworkCommand::Type req;
-                uint8_t DataSet[200];
+    switch (commandParams.CommandId)
+    {
+    case NetworkCommissioningCluster::kAddThreadNetworkRequestCommandId: {
+        NetworkCommissioningCluster::AddThreadNetworkCommand::Type req;
+        uint8_t DataSet[200];
 
-                req.OperationalDataSet = chip::ByteSpan{DataSet};
+        req.OperationalDataSet = chip::ByteSpan{ DataSet };
 
-                err = DecodeSchemaElement(req, *payload);
-                SuccessOrExit(err);
+        err = DecodeSchemaElement(req, *payload);
+        SuccessOrExit(err);
 
-                err = AddThreadNetwork(req);
-                break;
-            }
+        err = AddThreadNetwork(req);
+        break;
+    }
 
-        case NetworkCommissioningCluster::kAddWifiNetworkRequestCommandId:
-            {
-                NetworkCommissioningCluster::AddWifiNetworkCommand::Type req;
-                uint8_t Ssid[200];
-                uint8_t Credentials[200];
+    case NetworkCommissioningCluster::kAddWifiNetworkRequestCommandId: {
+        NetworkCommissioningCluster::AddWifiNetworkCommand::Type req;
+        uint8_t Ssid[200];
+        uint8_t Credentials[200];
 
-                req.Ssid = chip::ByteSpan{Ssid};
-                req.Credentials = chip::ByteSpan{Credentials};
+        req.Ssid        = chip::ByteSpan{ Ssid };
+        req.Credentials = chip::ByteSpan{ Credentials };
 
-                err = DecodeSchemaElement(req, *payload);
-                SuccessOrExit(err);
+        err = DecodeSchemaElement(req, *payload);
+        SuccessOrExit(err);
 
-                err = AddWifiNetwork(req);
-                break;
-            }
+        err = AddWifiNetwork(req);
+        break;
+    }
 
-        case NetworkCommissioningCluster::kEnableNetworkRequestCommandId:
-            {
-                NetworkCommissioningCluster::EnableNetworkCommand::Type req;
-                uint8_t NetworkId[64];
+    case NetworkCommissioningCluster::kEnableNetworkRequestCommandId: {
+        NetworkCommissioningCluster::EnableNetworkCommand::Type req;
+        uint8_t NetworkId[64];
 
-                req.NetworkId = chip::ByteSpan{NetworkId};
+        req.NetworkId = chip::ByteSpan{ NetworkId };
 
-                err = DecodeSchemaElement(req, *payload);
-                SuccessOrExit(err);
+        err = DecodeSchemaElement(req, *payload);
+        SuccessOrExit(err);
 
-                err = EnableNetwork(req);
-                break;
-            }
+        err = EnableNetwork(req);
+        break;
+    }
     }
 
 exit:
@@ -123,11 +117,12 @@ exit:
     // This is unfortunate that we're diluting errors returned down to a singular code. We should in-fact, be sending
     // back either IM or Cluster status codes within each of the 'handlers' above.
     //
-    err = invokeInteraction.AddStatusCode(commandParams, {Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::InteractionModel::Id, (uint16_t)err});
+    err = invokeInteraction.AddStatusCode(
+        commandParams, { Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::InteractionModel::Id, (uint16_t) err });
     return err;
 }
 
-CHIP_ERROR NetworkCommissioningServer::AddThreadNetwork(NetworkCommissioningCluster::AddThreadNetworkCommand::Type &request)
+CHIP_ERROR NetworkCommissioningServer::AddThreadNetwork(NetworkCommissioningCluster::AddThreadNetworkCommand::Type & request)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -173,7 +168,8 @@ exit:
 #endif
 }
 
-CHIP_ERROR NetworkCommissioningServer::AddWifiNetwork(chip::app::Cluster::NetworkCommissioningCluster::AddWifiNetworkCommand::Type &request)
+CHIP_ERROR
+NetworkCommissioningServer::AddWifiNetwork(chip::app::Cluster::NetworkCommissioningCluster::AddWifiNetworkCommand::Type & request)
 {
 #if defined(CHIP_DEVICE_LAYER_TARGET)
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -182,8 +178,7 @@ CHIP_ERROR NetworkCommissioningServer::AddWifiNetwork(chip::app::Cluster::Networ
     {
         if (mNetworks[i].mNetworkType == NetworkType::kUndefined)
         {
-            VerifyOrExit(request.Ssid.size() <= sizeof(mNetworks[i].mData.mWiFi.mSSID),
-                         err = CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrExit(request.Ssid.size() <= sizeof(mNetworks[i].mData.mWiFi.mSSID), err = CHIP_ERROR_INVALID_ARGUMENT);
             memcpy(mNetworks[i].mData.mWiFi.mSSID, request.Ssid.data(), request.Ssid.size());
 
             using WiFiSSIDLenType = decltype(mNetworks[i].mData.mWiFi.mSSIDLen);
@@ -195,8 +190,7 @@ CHIP_ERROR NetworkCommissioningServer::AddWifiNetwork(chip::app::Cluster::Networ
             memcpy(mNetworks[i].mData.mWiFi.mCredentials, request.Credentials.data(), request.Credentials.size());
 
             using WiFiCredentialsLenType = decltype(mNetworks[i].mData.mWiFi.mCredentialsLen);
-            VerifyOrExit(chip::CanCastTo<WiFiCredentialsLenType>(request.Ssid.size()),
-                         err = CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrExit(chip::CanCastTo<WiFiCredentialsLenType>(request.Ssid.size()), err = CHIP_ERROR_INVALID_ARGUMENT);
             mNetworks[i].mData.mWiFi.mCredentialsLen = static_cast<WiFiCredentialsLenType>(request.Credentials.size());
 
             VerifyOrExit(request.Ssid.size() <= sizeof(mNetworks[i].mNetworkID), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -233,7 +227,7 @@ CHIP_ERROR NetworkCommissioningServer::DoEnableNetwork(NetworkInfo * network)
 {
     switch (network->mNetworkType)
     {
-        case NetworkType::kThread:
+    case NetworkType::kThread:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 // TODO: On linux, we are using Reset() instead of Detach() to disable thread network, which is not expected.
 // Upstream issue: https://github.com/openthread/ot-br-posix/issues/755
@@ -248,18 +242,18 @@ CHIP_ERROR NetworkCommissioningServer::DoEnableNetwork(NetworkInfo * network)
         break;
     case NetworkType::kWiFi:
 #if defined(CHIP_DEVICE_LAYER_TARGET)
-        {
-            // TODO: Currently, DeviceNetworkProvisioningDelegateImpl assumes that ssid and credentials are null terminated strings,
-            // which is not correct, this should be changed once we have better method for commissioning wifi networks.
-            DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
-            ReturnErrorOnFailure(deviceDelegate.ProvisionWiFi(reinterpret_cast<const char *>(network->mData.mWiFi.mSSID),
-                                                              reinterpret_cast<const char *>(network->mData.mWiFi.mCredentials)));
-            break;
-        }
+    {
+        // TODO: Currently, DeviceNetworkProvisioningDelegateImpl assumes that ssid and credentials are null terminated strings,
+        // which is not correct, this should be changed once we have better method for commissioning wifi networks.
+        DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
+        ReturnErrorOnFailure(deviceDelegate.ProvisionWiFi(reinterpret_cast<const char *>(network->mData.mWiFi.mSSID),
+                                                          reinterpret_cast<const char *>(network->mData.mWiFi.mCredentials)));
+        break;
+    }
 #else
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
-        break;
+    break;
     case NetworkType::kEthernet:
     case NetworkType::kUndefined:
     default:
@@ -270,7 +264,7 @@ CHIP_ERROR NetworkCommissioningServer::DoEnableNetwork(NetworkInfo * network)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR NetworkCommissioningServer::EnableNetwork(NetworkCommissioningCluster::EnableNetworkCommand::Type &request)
+CHIP_ERROR NetworkCommissioningServer::EnableNetwork(NetworkCommissioningCluster::EnableNetworkCommand::Type & request)
 {
     size_t networkSeq;
     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -292,8 +286,7 @@ CHIP_ERROR NetworkCommissioningServer::EnableNetwork(NetworkCommissioningCluster
         {
             // TODO: Currently, we cannot figure out the detailed error from network provisioning on DeviceLayer, we should
             // implement this in device layer.
-            VerifyOrExit(DoEnableNetwork(&mNetworks[networkSeq]) == CHIP_NO_ERROR,
-                         err = CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrExit(DoEnableNetwork(&mNetworks[networkSeq]) == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
             ExitNow(err = CHIP_NO_ERROR);
         }
     }

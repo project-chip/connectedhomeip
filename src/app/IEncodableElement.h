@@ -23,12 +23,12 @@
 
 #pragma once
 
+#include <array>
+#include <core/CHIPConfig.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
-#include <support/CodeUtils.h>
-#include <core/CHIPConfig.h>
 #include <support/BitFlags.h>
-#include <array>
+#include <support/CodeUtils.h>
 
 namespace chip {
 namespace app {
@@ -40,10 +40,11 @@ namespace app {
  *
  * This interface is supported by the various interaction objects in the IM.
  */
-class IEncodableElement {
+class IEncodableElement
+{
 public:
-    virtual CHIP_ERROR Encode(TLV::TLVWriter &writer, uint64_t tag) = 0;
-    virtual CHIP_ERROR Decode(TLV::TLVReader &reader) = 0;
+    virtual CHIP_ERROR Encode(TLV::TLVWriter & writer, uint64_t tag) = 0;
+    virtual CHIP_ERROR Decode(TLV::TLVReader & reader)               = 0;
     virtual ~IEncodableElement() {}
 };
 

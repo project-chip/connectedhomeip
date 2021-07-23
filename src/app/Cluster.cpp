@@ -22,8 +22,8 @@
  *
  */
 
-#include "InvokeInteraction.h"
 #include "InteractionModelEngine.h"
+#include "InvokeInteraction.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
 #include <core/CHIPTLVDebug.hpp>
@@ -36,5 +36,5 @@ ClusterServer::ClusterServer(ClusterId clusterId)
     mClusterId = clusterId;
 }
 
-}
-}
+} // namespace app
+} // namespace chip

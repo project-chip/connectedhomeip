@@ -18,14 +18,14 @@
 
 #pragma once
 
+#include <Cluster.h>
+#include <NetworkCommissioningCluster-Gen.h>
 #include <app/CommandHandler.h>
 #include <app/common/gen/enums.h>
 #include <lib/core/CHIPCore.h>
-#include <platform/internal/DeviceNetworkProvisioning.h>
-#include <Cluster.h>
-#include <NetworkCommissioningCluster-Gen.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/internal/DeviceNetworkProvisioning.h>
 
 namespace chip {
 namespace app {
@@ -35,15 +35,17 @@ namespace Cluster {
 #define CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS 4
 #endif // CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS
 
-class NetworkCommissioningServer : public ClusterServer {
+class NetworkCommissioningServer : public ClusterServer
+{
 public:
     NetworkCommissioningServer();
 
 private:
-    CHIP_ERROR OnInvokeRequest(CommandParams &commandParams, InvokeResponder &invokeInteraction, TLV::TLVReader *payload) override;
-    CHIP_ERROR AddThreadNetwork(chip::app::Cluster::NetworkCommissioningCluster::AddThreadNetworkCommand::Type &request);
-    CHIP_ERROR AddWifiNetwork(chip::app::Cluster::NetworkCommissioningCluster::AddWifiNetworkCommand::Type &request);
-    CHIP_ERROR EnableNetwork(chip::app::Cluster::NetworkCommissioningCluster::EnableNetworkCommand::Type &request);
+    CHIP_ERROR OnInvokeRequest(CommandParams & commandParams, InvokeResponder & invokeInteraction,
+                               TLV::TLVReader * payload) override;
+    CHIP_ERROR AddThreadNetwork(chip::app::Cluster::NetworkCommissioningCluster::AddThreadNetworkCommand::Type & request);
+    CHIP_ERROR AddWifiNetwork(chip::app::Cluster::NetworkCommissioningCluster::AddWifiNetworkCommand::Type & request);
+    CHIP_ERROR EnableNetwork(chip::app::Cluster::NetworkCommissioningCluster::EnableNetworkCommand::Type & request);
 
 private:
     constexpr static uint8_t kMaxNetworkIDLen       = 32;
@@ -91,13 +93,12 @@ private:
         } mData;
     };
 
-    CHIP_ERROR DoEnableNetwork(NetworkInfo *network);
+    CHIP_ERROR DoEnableNetwork(NetworkInfo * network);
 
 private:
     NetworkInfo mNetworks[kMaxNetworks];
-
 };
 
-} // namespace clusters
+} // namespace Cluster
 } // namespace app
 } // namespace chip

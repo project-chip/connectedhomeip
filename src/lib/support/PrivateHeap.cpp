@@ -116,10 +116,11 @@ extern "C" void PrivateHeapInit(void * heap, size_t size)
 
     if (reinterpret_cast<uintptr_t>(heap) % kPrivateHeapAllocationAlignment != 0)
     {
-        pad = (kPrivateHeapAllocationAlignment - ((uintptr_t)heap % kPrivateHeapAllocationAlignment)) % kPrivateHeapAllocationAlignment;
+        pad = (kPrivateHeapAllocationAlignment - ((uintptr_t) heap % kPrivateHeapAllocationAlignment)) %
+            kPrivateHeapAllocationAlignment;
     }
 
-    PrivateHeapBlockHeader * header = reinterpret_cast<PrivateHeapBlockHeader *>((uintptr_t)heap + pad);
+    PrivateHeapBlockHeader * header = reinterpret_cast<PrivateHeapBlockHeader *>((uintptr_t) heap + pad);
 
     header->prevBytes = kInvalidHeapBlockSize;
     header->nextBytes = static_cast<uint32_t>(size - pad - 2 * sizeof(PrivateHeapBlockHeader));
@@ -135,8 +136,9 @@ extern "C" void PrivateHeapInit(void * heap, size_t size)
 
 extern "C" void * PrivateHeapAlloc(void * heap, size_t size)
 {
-    size_t pad = (kPrivateHeapAllocationAlignment - ((uintptr_t)heap % kPrivateHeapAllocationAlignment)) % kPrivateHeapAllocationAlignment;
-    PrivateHeapBlockHeader * header = reinterpret_cast<PrivateHeapBlockHeader *>((uintptr_t)heap + pad);
+    size_t pad =
+        (kPrivateHeapAllocationAlignment - ((uintptr_t) heap % kPrivateHeapAllocationAlignment)) % kPrivateHeapAllocationAlignment;
+    PrivateHeapBlockHeader * header = reinterpret_cast<PrivateHeapBlockHeader *>((uintptr_t) heap + pad);
 
     // we allocate aligned, no matter what
     if (size % kPrivateHeapAllocationAlignment != 0)
