@@ -420,7 +420,6 @@ SecurePairingUsingTestSecret gTestPairing;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
 chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
-constexpr chip::Transport::AdminId gAdminId = 0;
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
