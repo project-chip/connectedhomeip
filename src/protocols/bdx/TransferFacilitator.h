@@ -39,13 +39,13 @@ namespace bdx {
  * This class does not define any methods for beginning a transfer or initializing the underlying TransferSession object (see
  * Initiator and Responder below).
  * This class contains a repeating timer which regurlaly polls the TransferSession state machine.
- * A CHIP node may have many Endpoints but only one Endpoint should be used for each BDX transfer.
+ * A CHIP node may have many TransferFacilitator instances but only one TransferFacilitator should be used for each BDX transfer.
  */
-class Endpoint : public Messaging::ExchangeDelegate
+class TransferFacilitator : public Messaging::ExchangeDelegate
 {
 public:
-    Endpoint() : mExchangeCtx(nullptr), mSystemLayer(nullptr), mPollFreqMs(kDefaultPollFreqMs) {}
-    ~Endpoint() = default;
+    TransferFacilitator() : mExchangeCtx(nullptr), mSystemLayer(nullptr), mPollFreqMs(kDefaultPollFreqMs) {}
+    ~TransferFacilitator() = default;
 
 private:
     // Inherited from ExchangeContext
@@ -85,31 +85,36 @@ protected:
 };
 
 /**
- * An Endpoint that is initialized to respond to an incoming BDX transfer request.
+ * A TransferFacilitator that is initialized to respond to an incoming BDX transfer request.
  *
- * It is intended that this class will be used as a delegate for handling an unsolicited BDX message.
+ * Provides a method for initializing the TransferSession member but still needs to be extended to implement
+ * HandleTransferSessionOutput. It is intended that this class will be used as a delegate for handling an unsolicited BDX message.
  */
-class Responder : public Endpoint
+class Responder : public TransferFacilitator
 {
 public:
     /**
      * Initialize the TransferSession state machine to be ready for an incoming transfer request, and start the polling timer.
      *
      * @param[in] layer           A System::Layer pointer to use to start the polling timer
-     * @param[in] role            The role of this Endpoint: Sender or Receiver of BDX data
+     * @param[in] role            The role of the Responder: Sender or Receiver of BDX data
      * @param[in] xferControlOpts Supported transfer modes (see TransferControlFlags)
      * @param[in] maxBlockSize    The supported maximum size of BDX Block data
      * @param[in] timeoutMs       The chosen timeout delay for the BDX transfer in milliseconds
      * @param[in] pollFreqMs      The period for the TransferSession poll timer in milliseconds
      */
     CHIP_ERROR PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
-                                  uint16_t maxBlockSize, uint32_t timeoutMs, uint32_t pollFreqMs = Endpoint::kDefaultPollFreqMs);
+                                  uint16_t maxBlockSize, uint32_t timeoutMs,
+                                  uint32_t pollFreqMs = TransferFacilitator::kDefaultPollFreqMs);
 };
 
 /**
- * An Endpoint that initiates a BDX transfer.
+ * A TransferFacilitator that initiates a BDX transfer.
+ *
+ * Provides a method for initializing the TransferSession member (thus beginning the transfer) but still needs to be extended to
+ * implement HandleTransferSessionOutput.
  */
-class Initiator : public Endpoint
+class Initiator : public TransferFacilitator
 {
 public:
     /**
@@ -117,13 +122,13 @@ public:
      * poll timer.
      *
      * @param[in] layer      A System::Layer pointer to use to start the polling timer
-     * @param[in] role       The role of this Endpoint: Sender or Receiver of BDX data
+     * @param[in] role       The role of the Initiator: Sender or Receiver of BDX data
      * @param[in] initData   Data needed for preparing a transfer request BDX message
      * @param[in] timeoutMs  The chosen timeout delay for the BDX transfer in milliseconds
      * @param[in] pollFreqMs The period for the TransferSession poll timer in milliseconds
      */
     CHIP_ERROR InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
-                                uint32_t timeoutMs, uint32_t pollFreqMs = Endpoint::kDefaultPollFreqMs);
+                                uint32_t timeoutMs, uint32_t pollFreqMs = TransferFacilitator::kDefaultPollFreqMs);
 };
 
 } // namespace bdx

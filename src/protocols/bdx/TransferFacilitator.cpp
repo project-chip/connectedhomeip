@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "BdxEndpoint.h"
+#include "TransferFacilitator.h"
 
 #include <core/CHIPError.h>
 #include <messaging/ExchangeContext.h>
@@ -29,8 +29,9 @@
 namespace chip {
 namespace bdx {
 
-CHIP_ERROR Endpoint::OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PacketHeader & packetHeader,
-                                       const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle && payload)
+CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PacketHeader & packetHeader,
+                                                  const chip::PayloadHeader & payloadHeader,
+                                                  chip::System::PacketBufferHandle && payload)
 {
     if (mExchangeCtx == nullptr)
     {
@@ -48,20 +49,20 @@ CHIP_ERROR Endpoint::OnMessageReceived(chip::Messaging::ExchangeContext * ec, co
     return err;
 }
 
-void Endpoint::OnResponseTimeout(Messaging::ExchangeContext * ec)
+void TransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
     ChipLogError(BDX, "%s, ec: %d", __FUNCTION__, ec->GetExchangeId());
     mExchangeCtx = nullptr;
     mTransfer.Reset();
 }
 
-void Endpoint::PollTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
+void TransferFacilitator::PollTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
 {
     VerifyOrReturn(appState != nullptr);
-    static_cast<Endpoint *>(appState)->PollForOutput();
+    static_cast<TransferFacilitator *>(appState)->PollForOutput();
 }
 
-void Endpoint::PollForOutput()
+void TransferFacilitator::PollForOutput()
 {
     TransferSession::OutputEvent outEvent;
     mTransfer.PollOutput(outEvent, System::Platform::Clock::GetMonotonicMilliseconds());
@@ -71,7 +72,7 @@ void Endpoint::PollForOutput()
     mSystemLayer->StartTimer(mPollFreqMs, PollTimerHandler, this);
 }
 
-void Endpoint::ScheduleImmediatePoll()
+void TransferFacilitator::ScheduleImmediatePoll()
 {
     VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
     mSystemLayer->StartTimer(kImmediatePollDelayMs, PollTimerHandler, this);
