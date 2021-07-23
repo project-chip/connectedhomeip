@@ -53,8 +53,8 @@ shared_library("ChipDeviceCtrl") {
     "chip/internal/CommissionerImpl.cpp",
     "chip/logging/LoggingRedirect.cpp",
     "chip/native/StackInit.cpp",
-    "chip/setup_payload/Generator.cpp",
     "chip/server/ServerInit.cpp",
+    "chip/setup_payload/Generator.cpp",
     "chip/setup_payload/Parser.cpp",
   ]
 
