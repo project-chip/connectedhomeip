@@ -279,7 +279,6 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 
     AppEvent button_event              = {};
     button_event.Type                  = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.ButtonIdx = btnIdx;
     button_event.ButtonEvent.Action    = btnAction;
 
     if (btnIdx == APP_LOCK_BUTTON && btnAction == APP_BUTTON_PRESSED)
@@ -340,11 +339,6 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
 void AppTask::FunctionHandler(AppEvent * aEvent)
 {
-    if (aEvent->ButtonEvent.ButtonIdx != APP_FUNCTION_BUTTON)
-    {
-        return;
-    }
-
     // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
     // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
     // APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +

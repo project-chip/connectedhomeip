@@ -17,7 +17,6 @@
  *    limitations under the License.
  */
 
-#include <bsp.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -36,6 +35,8 @@
 #include <AppTask.h>
 
 #include "AppConfig.h"
+#include "sl_simple_button_instances.h"
+#include "sl_system_kernel.h"
 #include "init_efrPlatform.h"
 #include <app/server/Server.h>
 
@@ -120,7 +121,6 @@ int main(void)
     EFR32_LOG("==================================================");
 
     EFR32_LOG("Init CHIP Stack");
-
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
@@ -177,11 +177,17 @@ int main(void)
     }
 
     EFR32_LOG("Starting FreeRTOS scheduler");
-    vTaskStartScheduler();
+    sl_system_kernel_start();
 
     chip::Platform::MemoryShutdown();
 
     // Should never get here.
     EFR32_LOG("vTaskStartScheduler() failed");
     appError(ret);
+}
+
+
+void sl_button_on_change(const sl_button_t *handle)
+{
+    GetAppTask().ButtonEventHandler(handle, sl_button_get_state(handle));
 }

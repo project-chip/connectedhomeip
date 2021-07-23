@@ -47,7 +47,7 @@ declare_args() {
 show_qr_code = true
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
+if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A" || efr32_board == "BRD4186A") {
   show_qr_code = false
 }
 
@@ -62,6 +62,7 @@ efr32_sdk("sdk") {
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}",
+    "${examples_plat_dir}/sl_codebase",
   ]
 
   defines = [
@@ -85,8 +86,14 @@ efr32_executable("lighting_app") {
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.c",
+    "${examples_plat_dir}/sl_codebase/sl_board_default_init.c",
+    "${examples_plat_dir}/sl_codebase/sl_device_init_clocks.c",
+    "${examples_plat_dir}/sl_codebase/sl_event_handler.c",
+    "${examples_plat_dir}/sl_codebase/sl_simple_button_instances.c",
+    "${examples_plat_dir}/sl_codebase/sl_simple_led_instances.c",
+    "${examples_plat_dir}/sl_codebase/sl_uartdrv_init.c",
+
     "src/AppTask.cpp",
-    "src/ButtonHandler.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
@@ -149,11 +156,7 @@ efr32_executable("lighting_app") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  if (efr32_family == "efr32mg12") {
-    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG12P.ld"
-  } else if (efr32_family == "efr32mg21") {
-    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG21.ld"
-  }
+  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
 
   inputs = [ ldscript ]
 

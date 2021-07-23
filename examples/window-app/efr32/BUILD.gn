@@ -113,11 +113,7 @@ efr32_executable("window_app") {
     sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
   }
 
-  if (efr32_family == "efr32mg12") {
-    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG12P.ld"
-  } else if (efr32_family == "efr32mg21") {
-    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG21.ld"
-  }
+  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
 
   inputs = [ ldscript ]
 

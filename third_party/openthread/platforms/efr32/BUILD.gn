@@ -31,7 +31,7 @@ config("openthread_efr32_config") {
     "${chip_root}/examples/platform/efr32",
     "${chip_root}/examples/platform/efr32/${efr32_family}/${efr32_board}",
     "${openthread_efr32_root}/src/src",
-    "${openthread_efr32_root}/src/${efr32_family}",
+    "${openthread_efr32_root}/src/${efr32_family}/brd4161a",
   ]
 }
 
@@ -47,9 +47,9 @@ source_set("openthread_core_config_efr32") {
   public_configs = [ ":openthread_efr32_config" ]
 }
 
-source_set("openthread_mbedtls_config_efr32") {
-  sources = [ "${openthread_efr32_root}/src/${efr32_family}/crypto/mbedtls_config_autogen.h" ]
-}
+#source_set("openthread_mbedtls_config_efr32") {
+#  sources = [ "${openthread_efr32_root}/src/${efr32_family}/crypto/mbedtls_config_autogen.h" ]
+#}
 
 source_set("libopenthread-efr32") {
   sources = [

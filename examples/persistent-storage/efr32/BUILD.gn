@@ -39,6 +39,7 @@ efr32_sdk("sdk") {
     "${efr32_project_dir}/src",
     "${examples_plat_dir}",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}",
+    "${examples_plat_dir}/sl_codebase",
   ]
 
   defines = [ "BOARD_ID=${efr32_board}" ]
@@ -52,6 +53,12 @@ efr32_executable("persistent_storage") {
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.c",
+    "${examples_plat_dir}/sl_codebase/sl_board_default_init.c",
+    "${examples_plat_dir}/sl_codebase/sl_device_init_clocks.c",
+    "${examples_plat_dir}/sl_codebase/sl_event_handler.c",
+    "${examples_plat_dir}/sl_codebase/sl_simple_button_instances.c",
+    "${examples_plat_dir}/sl_codebase/sl_simple_led_instances.c",
+    "${examples_plat_dir}/sl_codebase/sl_uartdrv_init.c",
     "main.cpp",
   ]
 
@@ -67,11 +74,7 @@ efr32_executable("persistent_storage") {
     "${efr32_project_dir}/include",
   ]
 
-  if (efr32_family == "efr32mg12") {
-    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG12P.ld"
-  } else if (efr32_family == "efr32mg21") {
-    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG21.ld"
-  }
+  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
 
   inputs = [ ldscript ]
 

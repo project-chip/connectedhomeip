@@ -103,8 +103,17 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
+#include "RTE_Components.h"
+#include CMSIS_device_header
+
+#include "em_assert.h"
 #include "em_device.h"
-#include <stdio.h>
+
+#if defined(SL_COMPONENT_CATALOG_PRESENT)
+#include "sl_component_catalog.h"
+#endif
 
 /*-----------------------------------------------------------
  * Application specific definitions.
@@ -184,34 +193,16 @@ runs at 32768/8=4096Hz.  Ensure the tick rate is a multiple of the clock. */
 
 /* Software timer related definitions. */
 #define configUSE_TIMERS (1)
-#define configTIMER_TASK_PRIORITY (configMAX_PRIORITIES - 1) /* Highest priority */
+#define configTIMER_TASK_PRIORITY (40) /* Highest priority */
 #define configTIMER_QUEUE_LENGTH (10)
 #define configTIMER_TASK_STACK_DEPTH (1024)
 
-/* Cortex-M specific definitions. */
-#ifdef __NVIC_PRIO_BITS
-/* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
-#define configPRIO_BITS (__NVIC_PRIO_BITS)
-#else
-#define configPRIO_BITS 3 /* 7 priority levels */
-#endif
-
-/* The lowest interrupt priority that can be used in a call to a "set priority"
-function. */
-#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY (0x07)
-
-/* The highest interrupt priority that can be used by any interrupt service
-routine that makes calls to interrupt safe FreeRTOS API functions.  DO NOT CALL
-INTERRUPT SAFE FREERTOS API FUNCTIONS FROM ANY INTERRUPT THAT HAS A HIGHER
-PRIORITY THAN THIS! (higher priorities are lower numeric values. */
-#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY (0x03)
-
 /* Interrupt priorities used by the kernel port layer itself.  These are generic
 to all Cortex-M ports, and do not rely on any particular library functions. */
-#define configKERNEL_INTERRUPT_PRIORITY (configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
+#define configKERNEL_INTERRUPT_PRIORITY (255)
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY    96
 
 /* FreeRTOS MPU specific definitions. */
 #define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS (1)
@@ -219,22 +210,24 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configCPU_CLOCK_HZ (SystemCoreClock)
 #define configUSE_PREEMPTION (1)
 #define configUSE_TIME_SLICING (1)
-#define configUSE_PORT_OPTIMISED_TASK_SELECTION (1)
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION (0)
 #define configUSE_TICKLESS_IDLE_SIMPLE_DEBUG (1) /* See into vPortSuppressTicksAndSleep source code for explanation */
-#define configMAX_PRIORITIES (8)
+#define configMAX_PRIORITIES (56)
 #define configMINIMAL_STACK_SIZE (140) /* Number of words to use for Idle and Timer stacks */
 #define configMAX_TASK_NAME_LEN (10)
 #define configUSE_16_BIT_TICKS (0)
-#define configIDLE_SHOULD_YIELD (0)
+#define configIDLE_SHOULD_YIELD (1)
 #define configUSE_MUTEXES (1)
 #define configUSE_RECURSIVE_MUTEXES (1)
 #define configUSE_COUNTING_SEMAPHORES (1)
-#define configUSE_ALTERNATIVE_API (0) /* Deprecated! */
+#define configUSE_TASK_NOTIFICATIONS            1
+#define configUSE_TRACE_FACILITY                1
 #define configQUEUE_REGISTRY_SIZE (10)
 #define configUSE_QUEUE_SETS (0)
 #define configUSE_NEWLIB_REENTRANT (0)
 #define configENABLE_BACKWARD_COMPATIBILITY (1)
 #define configSUPPORT_STATIC_ALLOCATION (1)
+#define configSUPPORT_DYNAMIC_ALLOCATION (1)
 #define configTOTAL_HEAP_SIZE ((size_t)(16 * 1024))
 
 /* Optional functions - most linkers will remove unused functions anyway. */
@@ -253,6 +246,8 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define INCLUDE_pcTaskGetTaskName (1)
 #define INCLUDE_eTaskGetState (1)
 #define INCLUDE_xEventGroupSetBitFromISR (1)
+#define INCLUDE_xEventGroupSetBitsFromISR (1)
+#define INCLUDE_xSemaphoreGetMutexHolder  (1)
 #define INCLUDE_xTimerPendFunctionCall (1)
 #define INCLUDE_xTaskGetHandle (1)
 
@@ -277,7 +272,8 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
-#define xPortSysTickHandler SysTick_Handler
+/* Ensure Cortex-M port compatibility. */
+#define SysTick_Handler                         xPortSysTickHandler
 
 #if defined(__GNUC__)
 /* For the linker. */
