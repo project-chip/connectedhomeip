@@ -5520,6 +5520,12 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public void resetCounts(DefaultClusterCallback callback) {
+      resetCounts(chipClusterPtr, callback);
+    }
+
+    private native void resetCounts(long chipClusterPtr, DefaultClusterCallback callback);
+
     public void readBssidAttribute(OctetStringAttributeCallback callback) {
       readBssidAttribute(chipClusterPtr, callback);
     }

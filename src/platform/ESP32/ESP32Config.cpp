@@ -404,6 +404,7 @@ CHIP_ERROR ESP32Config::EnsureNamespace(const char * ns)
     {
         ReturnErrorOnFailure(handle.Open(ns, NVS_READWRITE));
         ReturnMappedErrorOnFailure(nvs_commit(handle));
+        return CHIP_NO_ERROR;
     }
     return err;
 }

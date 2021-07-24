@@ -709,6 +709,8 @@ class ChipClusters:
             "WakeOnLan": {
             },
             "WiFiNetworkDiagnostics": {
+                "ResetCounts": {
+                },
             },
             "WindowCovering": {
                 "DownOrClose": {
@@ -2880,6 +2882,10 @@ class ChipClusters:
         )
     def ClusterThreadNetworkDiagnostics_CommandResetCounts(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_ThreadNetworkDiagnostics_ResetCounts(
+                device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterWiFiNetworkDiagnostics_CommandResetCounts(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_WiFiNetworkDiagnostics_ResetCounts(
                 device, ZCLendpoint, ZCLgroupid
         )
     def ClusterWindowCovering_CommandDownOrClose(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -5361,6 +5367,9 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_WakeOnLan_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WakeOnLan_ClusterRevision.restype = ctypes.c_uint32
         # Cluster WiFiNetworkDiagnostics
+        # Cluster WiFiNetworkDiagnostics Command ResetCounts
+        self._chipLib.chip_ime_AppendCommand_WiFiNetworkDiagnostics_ResetCounts.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WiFiNetworkDiagnostics_ResetCounts.restype = ctypes.c_uint32
         # Cluster WiFiNetworkDiagnostics ReadAttribute Bssid
         self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Bssid.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Bssid.restype = ctypes.c_uint32

@@ -1552,6 +1552,9 @@ public:
     WiFiNetworkDiagnosticsCluster() : ClusterBase(kWiFiNetworkDiagnosticsClusterId) {}
     ~WiFiNetworkDiagnosticsCluster() {}
 
+    // Cluster Commands
+    CHIP_ERROR ResetCounts(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeBssid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -1560,6 +1563,9 @@ public:
     CHIP_ERROR ReadAttributeChannelNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeRssi(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kResetCountsCommandId = 0x00;
 };
 
 class DLL_EXPORT WindowCoveringCluster : public ClusterBase

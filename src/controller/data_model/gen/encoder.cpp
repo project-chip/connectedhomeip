@@ -6335,6 +6335,7 @@ PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t se
 | Cluster WiFiNetworkDiagnostics                                      | 0x0036 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ResetCounts                                                       |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Bssid                                                             | 0x0000 |
