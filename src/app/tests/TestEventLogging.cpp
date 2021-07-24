@@ -54,7 +54,7 @@ static const chip::ClusterId kLivenessClusterId = 0x00000022;
 static const uint32_t kLivenessChangeEvent      = 1;
 static const chip::EndpointId kTestEndpointId   = 2;
 static const uint64_t kLivenessDeviceStatus     = chip::TLV::ContextTag(1);
-static const chip::Transport::AdminId gAdminId  = 0;
+static const chip::FabricIndex gFabricIndex     = 0;
 static chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 static chip::System::Layer gSystemLayer;
 
@@ -71,17 +71,17 @@ void InitializeChip(nlTestSuite * apSuite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, kTestDeviceNodeId1);
+    chip::Transport::FabricTable fabrics;
+    chip::Transport::FabricInfo * fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, kTestDeviceNodeId1);
 
-    NL_TEST_ASSERT(apSuite, adminInfo != nullptr);
+    NL_TEST_ASSERT(apSuite, fabricInfo != nullptr);
 
     err = chip::Platform::MemoryInit();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     gSystemLayer.Init();
 
-    err = gSessionManager.Init(kTestDeviceNodeId1, &gSystemLayer, &gTransportManager, &admins, &gMessageCounterManager);
+    err = gSessionManager.Init(kTestDeviceNodeId1, &gSystemLayer, &gTransportManager, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = gExchangeManager.Init(&gSessionManager);

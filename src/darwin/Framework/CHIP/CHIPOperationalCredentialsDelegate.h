@@ -18,7 +18,7 @@
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
 
-#import "CHIPError.h"
+#import "CHIPError_Internal.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 
 #include <controller/OperationalCredentialsDelegate.h>

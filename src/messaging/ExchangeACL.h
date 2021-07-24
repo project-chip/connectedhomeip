@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 
 namespace chip {
 namespace Messaging {
@@ -102,7 +102,7 @@ private:
 class DLL_EXPORT CASEExchangeACL : public ExchangeACL
 {
 public:
-    CASEExchangeACL(Transport::AdminPairingInfo * info) : mAdminInfo(info) {}
+    CASEExchangeACL(Transport::FabricInfo * info) : mFabricInfo(info) {}
     virtual ~CASEExchangeACL() {}
 
     PermissionLevel GetPermissionLevel(const ACLSubject & subject, const ACLTarget & target) override
@@ -110,13 +110,13 @@ public:
         // TODO: Lookup the ACL corresponding to the subject, and the target,
         //       and enforce it.
 
-        ReturnErrorCodeIf(mAdminInfo == nullptr, PermissionLevel::kNone);
+        ReturnErrorCodeIf(mFabricInfo == nullptr, PermissionLevel::kNone);
 
         return PermissionLevel::kOperate;
     }
 
 private:
-    Transport::AdminPairingInfo * mAdminInfo;
+    Transport::FabricInfo * mFabricInfo;
 };
 
 } // namespace Messaging

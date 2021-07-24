@@ -172,16 +172,16 @@ public:
      *
      * @param[in] params       Wrapper object for transport manager etc.
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
-     * @param[in] admin        Local administrator that's initializing this device object
+     * @param[in] fabric        Local administrator that's initializing this device object
      */
-    void Init(ControllerDeviceInitParams params, uint16_t listenPort, Transport::AdminId admin)
+    void Init(ControllerDeviceInitParams params, uint16_t listenPort, FabricIndex fabric)
     {
         mTransportMgr    = params.transportMgr;
         mSessionManager  = params.sessionMgr;
         mExchangeMgr     = params.exchangeMgr;
         mInetLayer       = params.inetLayer;
         mListenPort      = listenPort;
-        mAdminId         = admin;
+        mFabricIndex     = fabric;
         mStorageDelegate = params.storageDelegate;
         mCredentials     = params.credentials;
         mIDAllocator     = params.idAllocator;
@@ -205,12 +205,12 @@ public:
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
      * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
-     * @param[in] admin        Local administrator that's initializing this device object
+     * @param[in] fabric        Local administrator that's initializing this device object
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, NodeId deviceId, const Transport::PeerAddress & peerAddress,
-              Transport::AdminId admin)
+              FabricIndex fabric)
     {
-        Init(params, mListenPort, admin);
+        Init(params, mListenPort, fabric);
         mDeviceId = deviceId;
         mState    = ConnectionState::Connecting;
 
@@ -470,7 +470,7 @@ private:
 
     uint16_t mListenPort;
 
-    Transport::AdminId mAdminId = Transport::kUndefinedAdminId;
+    FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
 
     bool mDeviceOperationalCertProvisioned = false;
 
@@ -534,8 +534,8 @@ typedef struct SerializableDevice
     PASESessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort; /* This field is serialized in LittleEndian byte order */
-    uint16_t mAdminId;    /* This field is serialized in LittleEndian byte order */
+    uint16_t mDevicePort;  /* This field is serialized in LittleEndian byte order */
+    uint16_t mFabricIndex; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceTransport;
     uint8_t mDeviceOperationalCertProvisioned;
     uint8_t mInterfaceName[kMaxInterfaceName];

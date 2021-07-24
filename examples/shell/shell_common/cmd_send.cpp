@@ -140,7 +140,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     }
 
     // Create a new exchange context.
-    gExchangeCtx = gExchangeManager.NewContext({ kTestDeviceNodeId, 0, gAdminId }, &gMockAppDelegate);
+    gExchangeCtx = gExchangeManager.NewContext({ kTestDeviceNodeId, 0, gFabricIndex }, &gMockAppDelegate);
     VerifyOrExit(gExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     payloadBuf = MessagePacketBuffer::New(payloadSize);
@@ -196,7 +196,7 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & 
 
     // Attempt to connect to the peer.
     err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, SecureSession::SessionRole::kInitiator,
-                                     gAdminId);
+                                     gFabricIndex);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -216,9 +216,9 @@ void ProcessCommand(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::AdminPairingTable admins;
+    Transport::FabricTable fabrics;
     Transport::PeerAddress peerAddress;
-    Transport::AdminPairingInfo * adminInfo = nullptr;
+    Transport::FabricInfo * fabricInfo = nullptr;
 
     if (!chip::Inet::IPAddress::FromString(destination, gDestAddr))
     {
@@ -226,8 +226,8 @@ void ProcessCommand(streamer_t * stream, char * destination)
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    adminInfo = admins.AssignAdminId(gAdminId, kTestControllerNodeId);
-    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, kTestControllerNodeId);
+    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
@@ -247,7 +247,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
         peerAddress = Transport::PeerAddress::TCP(gDestAddr, gSendArguments.GetPort());
 
         err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins, &gMessageCounterManager);
+            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &fabrics, &gMessageCounterManager);
         SuccessOrExit(err);
     }
     else
@@ -256,7 +256,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
         peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), INET_NULL_INTERFACEID);
 
         err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins, &gMessageCounterManager);
+            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &fabrics, &gMessageCounterManager);
         SuccessOrExit(err);
     }
 

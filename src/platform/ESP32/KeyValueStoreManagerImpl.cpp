@@ -63,7 +63,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     VerifyOrReturnError(value, CHIP_ERROR_INVALID_ARGUMENT);
 
     Internal::ScopedNvsHandle handle;
-    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READONLY));
+    ReturnErrorOnFailure(handle.Open(kNamespace, NVS_READWRITE));
 
     ReturnMappedErrorOnFailure(nvs_set_blob(handle, key, value, value_size));
 

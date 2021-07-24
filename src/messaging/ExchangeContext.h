@@ -148,14 +148,14 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
+    ExchangeACL * GetExchangeACL(Transport::FabricTable & table)
     {
         if (mExchangeACL == nullptr)
         {
-            Transport::AdminPairingInfo * admin = table.FindAdminWithId(mSecureSession.GetAdminId());
-            if (admin != nullptr)
+            Transport::FabricInfo * fabric = table.FindFabricWithIndex(mSecureSession.GetFabricIndex());
+            if (fabric != nullptr)
             {
-                mExchangeACL = chip::Platform::New<CASEExchangeACL>(admin);
+                mExchangeACL = chip::Platform::New<CASEExchangeACL>(fabric);
             }
         }
 

@@ -16,7 +16,7 @@
  */
 
 #import "CHIPDevicePairingDelegateBridge.h"
-#import "CHIPError.h"
+#import "CHIPError_Internal.h"
 
 CHIPDevicePairingDelegateBridge::CHIPDevicePairingDelegateBridge(void)
     : mDelegate(nil)
@@ -67,7 +67,7 @@ void CHIPDevicePairingDelegateBridge::OnStatusUpdate(chip::Controller::DevicePai
 
 void CHIPDevicePairingDelegateBridge::OnPairingComplete(CHIP_ERROR error)
 {
-    NSLog(@"DevicePairingDelegate Pairing complete. Status %d", error);
+    NSLog(@"DevicePairingDelegate Pairing complete. Status %s", chip::ErrorStr(error));
 
     id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
     if ([strongDelegate respondsToSelector:@selector(onPairingComplete:)]) {
@@ -82,7 +82,7 @@ void CHIPDevicePairingDelegateBridge::OnPairingComplete(CHIP_ERROR error)
 
 void CHIPDevicePairingDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
 {
-    NSLog(@"DevicePairingDelegate Pairing deleted. Status %d", error);
+    NSLog(@"DevicePairingDelegate Pairing deleted. Status %s", chip::ErrorStr(error));
 
     id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
     if ([strongDelegate respondsToSelector:@selector(onPairingDeleted:)]) {
@@ -97,7 +97,7 @@ void CHIPDevicePairingDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
 
 void CHIPDevicePairingDelegateBridge::OnAddressUpdateComplete(chip::NodeId nodeId, CHIP_ERROR error)
 {
-    NSLog(@"OnAddressUpdateComplete. Status %d", error);
+    NSLog(@"OnAddressUpdateComplete. Status %s", chip::ErrorStr(error));
 
     id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
     if ([strongDelegate respondsToSelector:@selector(onAddressUpdated:)]) {

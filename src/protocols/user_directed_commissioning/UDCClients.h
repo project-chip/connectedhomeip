@@ -20,7 +20,6 @@
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
 #include <system/TimeSource.h>
-#include <transport/AdminPairingTable.h>
 
 namespace chip {
 namespace Protocols {
