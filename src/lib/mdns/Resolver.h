@@ -25,6 +25,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
+#include <support/BytesToHex.h>
 
 namespace chip {
 namespace Mdns {
@@ -74,6 +75,7 @@ struct DiscoveredNodeData
     size_t rotatingIdLen;
     char pairingInstruction[kMaxPairingInstructionLen + 1];
     uint16_t pairingHint;
+    uint16_t port;
     int numIPs;
     Inet::IPAddress ipAddress[kMaxIPAddresses];
     void Reset()
@@ -100,6 +102,66 @@ struct DiscoveredNodeData
     DiscoveredNodeData() { Reset(); }
     bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
+    void Print() const
+    {
+        if (rotatingIdLen > 0)
+        {
+            char rotatingIdString[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
+            Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
+            printf("Rotating ID: %s\n", rotatingIdString);
+        }
+        if (strcmp(deviceName, "") != 0)
+        {
+            printf("Device Name: %s\n", deviceName);
+        }
+        if (vendorId > 0)
+        {
+            printf("Vendor ID: %u\n", vendorId);
+        }
+        if (productId > 0)
+        {
+            printf("Product ID: %u\n", productId);
+        }
+        if (deviceType > 0)
+        {
+            printf("Device Type: %u\n", deviceType);
+        }
+        if (longDiscriminator > 0)
+        {
+            printf("Long Discriminator: %u\n", longDiscriminator);
+        }
+        if (!IsHost(""))
+        {
+            printf("Hostname: %s\n", hostName);
+        }
+        if (additionalPairing > 0)
+        {
+            printf("Additional Pairing: %u\n", additionalPairing);
+        }
+        if (strcmp(pairingInstruction, "") != 0)
+        {
+            printf("Pairing Instruction: %s\n", pairingInstruction);
+        }
+        if (pairingHint > 0)
+        {
+            printf("Pairing Hint: 0x%x\n", pairingHint);
+        }
+        if (port > 0)
+        {
+            printf("Port: %u\n", port);
+        }
+        if (numIPs > 0)
+        {
+            printf("Number of IP addresses: %d. IP Adddress(es): ", numIPs);
+            for (int j = 0; j < numIPs; j++)
+            {
+                char ipAddressString[Inet::kMaxIPAddressStringLength];
+                printf("%s, ", ipAddress[j].ToString(ipAddressString, sizeof(ipAddressString)));
+            }
+            printf("\n");
+        }
+        printf("Commissioning Mode: %u\n", commissioningMode);
+    }
 };
 
 enum class DiscoveryFilterType : uint8_t

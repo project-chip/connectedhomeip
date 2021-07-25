@@ -35,41 +35,7 @@ void DiscoverCommissionersCommand::Shutdown()
         if (commissioner != nullptr)
         {
             printf("Discovered Commisioner #%d\n", ++commissionerCount);
-            if (strcmp(commissioner->deviceName, "") != 0)
-            {
-                printf("Device Name: %s\n", commissioner->deviceName);
-            }
-            if (commissioner->vendorId > 0)
-            {
-                printf("Vendor ID: %d\n", commissioner->vendorId);
-            }
-            if (commissioner->productId > 0)
-            {
-                printf("Product ID: %d\n", commissioner->productId);
-            }
-            if (commissioner->deviceType > 0)
-            {
-                printf("Device Type: %d\n", commissioner->deviceType);
-            }
-            if (commissioner->longDiscriminator > 0)
-            {
-                printf("Long Discriminator: %d\n", commissioner->longDiscriminator);
-            }
-            if (!commissioner->IsHost(""))
-            {
-                printf("Hostname: %s\n", commissioner->hostName);
-            }
-            if (commissioner->numIPs > 0)
-            {
-                printf("Number of IP addresses: %d. IP Adddress(es): ", commissioner->numIPs);
-                for (int j = 0; j < commissioner->numIPs; j++)
-                {
-                    char ipAddress[Inet::kMaxIPAddressStringLength];
-                    printf("%s, ", commissioner->ipAddress[j].ToString(ipAddress, sizeof(ipAddress)));
-                }
-                printf("\n");
-            }
-
+            commissioner->Print();
             printf("\n");
         }
     }

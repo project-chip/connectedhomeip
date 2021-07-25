@@ -477,6 +477,8 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, MdnsService * resu
         data.ipAddress[data.numIPs++] = result->mAddress.Value();
     }
 
+    data.port = result->mPort;
+
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
         ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));

@@ -20,6 +20,9 @@
 #include <app/server/Mdns.h>
 #include <app/server/StorablePeerConnection.h>
 #include <core/CHIPError.h>
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceEvent.h>
+#endif // CONFIG_DEVICE_LAYER
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
@@ -36,15 +39,18 @@ using namespace ::chip::DeviceLayer;
 namespace chip {
 
 namespace {
+#if CONFIG_DEVICE_LAYER
 void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     RendezvousServer * server = reinterpret_cast<RendezvousServer *>(arg);
     server->OnPlatformEvent(event);
 }
+#endif // CONFIG_DEVICE_LAYER
 } // namespace
 
 void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
+#if CONFIG_DEVICE_LAYER
     if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
         if (event->CommissioningComplete.status == CHIP_NO_ERROR)
@@ -63,6 +69,7 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
         app::Mdns::AdvertiseOperational();
         ChipLogError(Discovery, "Operational advertising enabled");
     }
+#endif // ONFIG_DEVICE_LAYER
 }
 
 CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params, uint32_t pbkdf2IterCount, const ByteSpan & salt,
@@ -162,8 +169,9 @@ void RendezvousServer::OnSessionEstablished()
         mDelegate->OnRendezvousStarted();
     }
 
+#if CONFIG_DEVICE_LAYER
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
-
+#endif // CONFIG_DEVICE_LAYER
     if (mPairingSession.PeerConnection().GetPeerAddress().GetTransportType() == Transport::Type::kBle)
     {
         Cleanup();

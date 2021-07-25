@@ -32,7 +32,6 @@
 #include <inet/InetLayer.h>
 #include <mdns/ServiceNaming.h>
 #include <messaging/ExchangeMgr.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -45,6 +44,10 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/FabricTable.h>
 #include <transport/SecureSessionMgr.h>
+
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT || CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
@@ -62,6 +65,7 @@ using namespace ::chip::Messaging;
 
 namespace {
 
+#if CONFIG_DEVICE_LAYER
 constexpr bool isRendezvousBypassed()
 {
 #if defined(CHIP_BYPASS_RENDEZVOUS) && CHIP_BYPASS_RENDEZVOUS
@@ -81,6 +85,7 @@ constexpr bool useTestPairing()
     // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'.
     return isRendezvousBypassed();
 }
+#endif
 
 class ServerStorageDelegate : public PersistentStorageDelegate
 {
@@ -118,6 +123,7 @@ CHIP_ERROR PersistFabricToKVS(FabricInfo * fabric, FabricIndex nextAvailableId)
     return CHIP_NO_ERROR;
 }
 
+#if CONFIG_DEVICE_LAYER
 CHIP_ERROR RestoreAllFabricsFromKVS(FabricTable & fabrics, FabricIndex & nextAvailableId)
 {
     // It's not an error if the key doesn't exist. Just return right away.
@@ -206,6 +212,7 @@ void EraseAllSessionsUpTo(uint16_t nextSessionKeyId)
         StorablePeerConnection::DeleteFromKVS(gServerStorage, keyId);
     }
 }
+#endif // CONFIG_DEVICE_LAYER
 
 // TODO: The following class is setting the discriminator in Persistent Storage. This is
 //       is needed since BLE reads the discriminator using ConfigurationMgr APIs. The
@@ -217,6 +224,7 @@ class DeviceDiscriminatorCache
 public:
     CHIP_ERROR UpdateDiscriminator(uint16_t discriminator)
     {
+#if CONFIG_DEVICE_LAYER
         if (!mOriginalDiscriminatorCached)
         {
             // Cache the original discriminator
@@ -225,10 +233,14 @@ public:
         }
 
         return DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(discriminator);
+#else
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
     }
 
     CHIP_ERROR RestoreDiscriminator()
     {
+#if CONFIG_DEVICE_LAYER
         if (mOriginalDiscriminatorCached)
         {
             // Restore the original discriminator
@@ -237,11 +249,16 @@ public:
         }
 
         return CHIP_NO_ERROR;
+#else
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
     }
 
 private:
+#if CONFIG_DEVICE_LAYER
     bool mOriginalDiscriminatorCached = false;
     uint16_t mOriginalDiscriminator   = 0;
+#endif // CONFIG_DEVICE_LAYER
 };
 
 DeviceDiscriminatorCache gDeviceDiscriminatorCache;
@@ -256,7 +273,11 @@ public:
     {
         if (isBLE)
         {
+#if CONFIG_DEVICE_LAYER
             ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
+#else
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
         }
         if (mDelegate != nullptr)
         {
@@ -273,7 +294,11 @@ public:
 
         if (isBLE)
         {
+#if CONFIG_DEVICE_LAYER
             ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false));
+#else
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
         }
 
         if (mDelegate != nullptr)
@@ -359,16 +384,19 @@ chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDC
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
+#if CONFIG_DEVICE_LAYER
 void HandlePairingWindowTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
 {
     ClosePairingWindow();
 }
+#endif
 
 } // namespace
 
 CHIP_ERROR OpenDefaultPairingWindow(ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds,
                                     chip::PairingWindowAdvertisement advertisementMode)
 {
+#if CONFIG_DEVICE_LAYER
     // TODO(cecille): If this is re-called when the window is already open, what should happen?
     gDeviceDiscriminatorCache.RestoreDiscriminator();
 
@@ -414,6 +442,9 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetFabrics resetFabrics, uint16_t commissi
     }
 
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t commissioningTimeoutSeconds, uint16_t discriminator, PASEVerifier & verifier,
@@ -436,8 +467,12 @@ CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t commissioningTimeoutSeconds, 
 
     if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
+#if CONFIG_DEVICE_LAYER
         ReturnErrorOnFailure(
             DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
+#else
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
     }
 
     return CHIP_NO_ERROR;
@@ -461,6 +496,7 @@ bool IsPairingWindowOpen()
 // The server assumes the platform's networking has been setup already
 void InitServer(AppDelegate * delegate)
 {
+#if CONFIG_DEVICE_LAYER
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     chip::Platform::MemoryInit();
@@ -567,6 +603,7 @@ exit:
     {
         ChipLogProgress(AppServer, "Server Listening...");
     }
+#endif // CONFIG_DEVICE_LAYER
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
