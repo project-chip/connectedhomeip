@@ -36,8 +36,8 @@ will then join the network.
 -   [Modustoolbox Software](https://www.cypress.com/products/modustoolbox)
 
     Refer to `integrations/docker/images/chip-build-infineon/Dockerfile` or
-    `scripts/examples/gn_p6_example.sh` for downloading the Software and 
-    related tools.
+    `scripts/examples/gn_p6_example.sh` for downloading the Software and related
+    tools.
 
 -   Install some additional tools (likely already present for Matter
     developers): \$ sudo apt install gcc g++ clang ninja-build python
@@ -52,7 +52,7 @@ will then join the network.
           $ cd ~/connectedhomeip
           $ ./gn_build.sh enable_p6_builds=true
 
-     Or Using P6 build script
+    Or Using P6 build script
 
           $ ./scripts/examples/gn_p6_example.sh examples/lock-app/p6
 
