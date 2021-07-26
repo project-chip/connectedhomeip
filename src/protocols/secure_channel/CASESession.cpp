@@ -63,13 +63,6 @@ constexpr size_t kTAGSize = 16;
 
 constexpr size_t kDestinationMessageLen = kSigmaParamRandomNumberSize + kP256_PublicKey_Length + sizeof(FabricId) + sizeof(NodeId);
 
-// TODO: Remove this list. Replace it with an actual method to retrieve an IPK list (e.g. from a Crypto Store API)
-static uint8_t sIPKList[][kIPKSize] = {
-    { 0 }, /* Corresponds to the FabricID for the Commissioning Example. All zeros. */
-    { 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D,
-      0x1D }, /* Corresponds to the FabricID for the Node01_01 Test Vector */
-};
-
 #ifdef ENABLE_HSM_HKDF
 using HKDF_sha_crypto = HKDF_shaHSM;
 #else
@@ -424,10 +417,9 @@ CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle & msg)
     SuccessOrExit(err = tlvReader.GetBytes(destinationIdentifier, sizeof(destinationIdentifier)));
 
     {
-        // TODO: Remove this list. Replace it with an actual method to retrieve an IPK list (e.g. from a Crypto Store API)
-        const ByteSpan ipkListSpan[] = { ByteSpan(sIPKList[0], sizeof(sIPKList[0])), ByteSpan(sIPKList[1], sizeof(sIPKList[1])) };
+        const ByteSpan * ipkListSpan = GetIPKList();
         SuccessOrExit(err = FindDestinationIdCandidate(ByteSpan(destinationIdentifier), ByteSpan(initiatorRandom), ipkListSpan,
-                                                       sizeof(ipkListSpan) / sizeof(ipkListSpan[0])));
+                                                       GetIPKListEntries()));
     }
 
     SuccessOrExit(err = tlvReader.Next());

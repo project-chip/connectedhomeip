@@ -100,6 +100,31 @@ public:
     }
 };
 
+class TestCASESessionIPK : public CASESession
+{
+protected:
+    ByteSpan * GetIPKList() const override
+    {
+        // TODO: Remove this list. Replace it with an actual method to retrieve an IPK list (e.g. from a Crypto Store API)
+        static uint8_t sIPKList[][kIPKSize] = {
+            { 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D, 0x1D,
+              0x1D }, /* Corresponds to the FabricID for the Node01_01 Test Vector */
+        };
+        static ByteSpan ipkListSpan[] = { ByteSpan(sIPKList[0]) };
+        return ipkListSpan;
+    }
+    size_t GetIPKListEntries() const override { return 1; }
+};
+
+class TestCASEServerIPK : public CASEServer
+{
+public:
+    TestCASESessionIPK & GetSession() override { return mPairingSession; }
+
+private:
+    TestCASESessionIPK mPairingSession;
+};
+
 static CHIP_ERROR InitCredentialSets()
 {
     commissionerDevOpCred.Release();
@@ -164,7 +189,7 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 {
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
-    CASESession pairing;
+    TestCASESessionIPK pairing;
 
     NL_TEST_ASSERT(inSuite, pairing.ListenForSessionEstablishment(&accessoryDevOpCred, 0, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite, pairing.ListenForSessionEstablishment(&accessoryDevOpCred, 0, &delegate) == CHIP_NO_ERROR);
@@ -213,7 +238,7 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
 
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegateAccessory;
-    CASESession pairingAccessory;
+    TestCASESessionIPK pairingAccessory;
     CASESessionSerializable serializableCommissioner;
     CASESessionSerializable serializableAccessory;
 
@@ -323,7 +348,7 @@ private:
     uint16_t valuesize[16];
 };
 
-CASEServer gPairingServer;
+TestCASEServerIPK gPairingServer;
 
 void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext)
 {
@@ -533,8 +558,8 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 
     ReturnErrorOnFailure(ctx.Init(&sSuite, &gTransportMgr));
 
-    ctx.SetSourceNodeId(kAnyNodeId);
-    ctx.SetDestinationNodeId(kAnyNodeId);
+    ctx.SetSourceNodeId(kPlaceholderNodeId);
+    ctx.SetDestinationNodeId(kPlaceholderNodeId);
     ctx.SetLocalKeyId(0);
     ctx.SetPeerKeyId(0);
     ctx.SetAdminId(kUndefinedAdminId);

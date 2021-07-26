@@ -43,7 +43,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     mExchangeManager = exchangeManager;
     mIDAllocator     = idAllocator;
 
-    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transportMgr));
+    ReturnErrorOnFailure(GetSession().MessageDispatch().Init(transportMgr));
 
     ExchangeDelegate * delegate = this;
     ReturnErrorOnFailure(
@@ -79,10 +79,10 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     ReturnErrorOnFailure(mIDAllocator->Allocate(mSessionKeyId));
 
     // Setup CASE state machine using the credentials for the current admin.
-    ReturnErrorOnFailure(mPairingSession.ListenForSessionEstablishment(&mCredentials, mSessionKeyId, this));
+    ReturnErrorOnFailure(GetSession().ListenForSessionEstablishment(&mCredentials, mSessionKeyId, this));
 
     // Hand over the exchange context to the CASE session.
-    ec->SetDelegate(&mPairingSession);
+    ec->SetDelegate(&GetSession());
 
     return CHIP_NO_ERROR;
 }
@@ -93,7 +93,7 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     ChipLogProgress(Inet, "CASE Server received SigmaR1 message. Starting handshake. EC %p", ec);
     ReturnErrorOnFailure(InitCASEHandshake(ec));
 
-    mPairingSession.OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));
+    GetSession().OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));
 
     return CHIP_NO_ERROR;
     // TODO - Enable multiple concurrent CASE session establishment
@@ -105,7 +105,7 @@ void CASEServer::Cleanup()
     mAdminId = Transport::kUndefinedAdminId;
     mCredentials.Release();
     mCertificates.Release();
-    mPairingSession.Clear();
+    GetSession().Clear();
 }
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
@@ -118,11 +118,11 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 void CASEServer::OnSessionEstablished()
 {
     ChipLogProgress(Inet, "CASE Session established. Setting up the secure channel.");
-    mSessionMgr->ExpireAllPairings(mPairingSession.PeerConnection().GetPeerNodeId(), mAdminId);
+    mSessionMgr->ExpireAllPairings(GetSession().PeerConnection().GetPeerNodeId(), mAdminId);
 
     CHIP_ERROR err = mSessionMgr->NewPairing(
-        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kResponder, mAdminId);
+        Optional<Transport::PeerAddress>::Value(GetSession().PeerConnection().GetPeerAddress()),
+        GetSession().PeerConnection().GetPeerNodeId(), &GetSession(), SecureSession::SessionRole::kResponder, mAdminId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed in setting up secure channel: err %s", ErrorStr(err));

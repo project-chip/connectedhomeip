@@ -290,6 +290,17 @@ protected:
     bool mPairingComplete = false;
 
     Transport::PeerConnectionState mConnectionState;
+
+    virtual ByteSpan * GetIPKList() const
+    {
+        // TODO: Remove this list. Replace it with an actual method to retrieve an IPK list (e.g. from a Crypto Store API)
+        static uint8_t sIPKList[][kIPKSize] = {
+            { 0 }, /* Corresponds to the FabricID for the Commissioning Example. All zeros. */
+        };
+        static ByteSpan ipkListSpan[] = { ByteSpan(sIPKList[0]) };
+        return ipkListSpan;
+    }
+    virtual size_t GetIPKListEntries() const { return 1; }
 };
 
 typedef struct CASESessionSerialized

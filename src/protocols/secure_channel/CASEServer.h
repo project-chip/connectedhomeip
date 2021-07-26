@@ -53,10 +53,10 @@ public:
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * reliableMessageManager,
                                                             SecureSessionMgr * sessionMgr) override
     {
-        return mPairingSession.GetMessageDispatch(reliableMessageManager, sessionMgr);
+        return GetSession().GetMessageDispatch(reliableMessageManager, sessionMgr);
     }
 
-    CASESession & GetSession() { return mPairingSession; }
+    virtual CASESession & GetSession() { return mPairingSession; }
 
 private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
