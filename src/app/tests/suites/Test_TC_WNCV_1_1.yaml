@@ -25,7 +25,9 @@ tests:
       response:
           value: 3
 
-    - label: "write the default value to mandatory global attribute: ClusterRevision"
+    - label:
+          "write the default value to mandatory global attribute:
+          ClusterRevision"
       disabled: true
       command: "writeAttribute"
       attribute: "ClusterRevision"
