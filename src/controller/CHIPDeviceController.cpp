@@ -319,7 +319,7 @@ CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::FabricInfo * fabric
     }
 
     ChipLogProgress(Controller, "Generating credentials");
-    ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId));
+    ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId, mCredentialsIndex));
 
     ChipLogProgress(Controller, "Loaded credentials successfully");
     return CHIP_NO_ERROR;
@@ -838,12 +838,12 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     mUdcTransportMgr = chip::Platform::New<DeviceTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mInetLayer)
                                                     .SetAddressType(Inet::kIPAddressType_IPv6)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort((uint16_t) (mUdcListenPort))
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
                                                 Transport::UdpListenParameters(mInetLayer)
                                                     .SetAddressType(Inet::kIPAddressType_IPv4)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort((uint16_t) (mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
 #if CONFIG_NETWORK_LAYER_BLE
                                                     ,

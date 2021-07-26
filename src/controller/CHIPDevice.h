@@ -177,15 +177,16 @@ public:
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, FabricIndex fabric)
     {
-        mTransportMgr    = params.transportMgr;
-        mSessionManager  = params.sessionMgr;
-        mExchangeMgr     = params.exchangeMgr;
-        mInetLayer       = params.inetLayer;
-        mListenPort      = listenPort;
-        mFabricIndex     = fabric;
-        mStorageDelegate = params.storageDelegate;
-        mCredentials     = params.credentials;
-        mIDAllocator     = params.idAllocator;
+        mTransportMgr     = params.transportMgr;
+        mSessionManager   = params.sessionMgr;
+        mExchangeMgr      = params.exchangeMgr;
+        mInetLayer        = params.inetLayer;
+        mListenPort       = listenPort;
+        mFabricIndex      = fabric;
+        mStorageDelegate  = params.storageDelegate;
+        mCredentials      = params.credentials;
+        mCredentialsIndex = params.credentialsIndex;
+        mIDAllocator      = params.idAllocator;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif

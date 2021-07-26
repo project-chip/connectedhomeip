@@ -73,12 +73,13 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     }
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId));
+    uint8_t credentialsIndex;
+    ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId, credentialsIndex));
 
     ReturnErrorOnFailure(mIDAllocator->Allocate(mSessionKeyId));
 
     // Setup CASE state machine using the credentials for the current fabric.
-    ReturnErrorOnFailure(mPairingSession.ListenForSessionEstablishment(&mCredentials, mSessionKeyId, this));
+    ReturnErrorOnFailure(GetSession().ListenForSessionEstablishment(&mCredentials, mSessionKeyId, this));
 
     // Hand over the exchange context to the CASE session.
     ec->SetDelegate(&GetSession());
@@ -117,11 +118,11 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 void CASEServer::OnSessionEstablished()
 {
     ChipLogProgress(Inet, "CASE Session established. Setting up the secure channel.");
-    mSessionMgr->ExpireAllPairings(mPairingSession.PeerConnection().GetPeerNodeId(), mFabricIndex);
+    mSessionMgr->ExpireAllPairings(GetSession().PeerConnection().GetPeerNodeId(), mFabricIndex);
 
     CHIP_ERROR err = mSessionMgr->NewPairing(
-        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kResponder, mFabricIndex);
+        Optional<Transport::PeerAddress>::Value(GetSession().PeerConnection().GetPeerAddress()),
+        GetSession().PeerConnection().GetPeerNodeId(), &GetSession(), SecureSession::SessionRole::kResponder, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed in setting up secure channel: err %s", ErrorStr(err));

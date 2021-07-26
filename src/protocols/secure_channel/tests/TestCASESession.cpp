@@ -391,7 +391,8 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     ChipCertificateSet certificates;
     OperationalCredentialSet credentials;
     CertificateKeyId rootKeyId;
-    NL_TEST_ASSERT(inSuite, fabric->GetCredentials(credentials, certificates, rootKeyId) == CHIP_NO_ERROR);
+    uint8_t credentialsIndex;
+    NL_TEST_ASSERT(inSuite, fabric->GetCredentials(credentials, certificates, rootKeyId, credentialsIndex) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
                    gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &gTransportMgr,

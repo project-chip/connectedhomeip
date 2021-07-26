@@ -41,8 +41,7 @@
 namespace chip {
 namespace Transport {
 
-typedef uint16_t FabricIndex;
-static constexpr FabricIndex kUndefinedFabricIndex    = UINT16_MAX;
+static constexpr FabricIndex kUndefinedFabricIndex    = UINT8_MAX;
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 // KVS store is sensitive to length of key strings, based on the underlying

@@ -356,13 +356,8 @@ CHIP_ERROR FabricInfo::SetOperationalCertsFromCertArray(const ByteSpan & certArr
     return err;
 }
 
-<<<<<<< HEAD:src/transport/AdminPairingTable.cpp
-CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentials, ChipCertificateSet & certificates,
-                                            CertificateKeyId & rootKeyId, uint8_t & credentialsIndex)
-=======
 CHIP_ERROR FabricInfo::GetCredentials(OperationalCredentialSet & credentials, ChipCertificateSet & certificates,
-                                      CertificateKeyId & rootKeyId)
->>>>>>> master:src/transport/FabricTable.cpp
+                                      CertificateKeyId & rootKeyId, uint8_t & credentialsIndex)
 {
     constexpr uint8_t kMaxNumCertsInOpCreds = 3;
     ReturnErrorOnFailure(certificates.Init(kMaxNumCertsInOpCreds));
