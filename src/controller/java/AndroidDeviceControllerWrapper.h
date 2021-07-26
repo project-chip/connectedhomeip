@@ -55,6 +55,7 @@ public:
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
+    void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
 
     // OperationalCredentialsDelegate implementation
     CHIP_ERROR
@@ -87,7 +88,7 @@ private:
     chip::Crypto::P256Keypair mIssuer;
     bool mInitialized  = false;
     uint32_t mIssuerId = 0;
-    uint32_t mNow      = chip::CalendarToChipEpochTime(2021, 06, 10, 0, 0, 0, mNow);
+    uint32_t mNow      = 0;
     uint32_t mValidity = 10 * chip::kSecondsPerStandardYear;
 
     ChipDeviceControllerPtr mController;
@@ -102,7 +103,9 @@ private:
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, pthread_mutex_t * stackLock) :
         mController(std::move(controller)), mStackLock(stackLock)
-    {}
+    {
+        chip::CalendarToChipEpochTime(2021, 06, 10, 0, 0, 0, mNow);
+    }
 };
 
 inline jlong AndroidDeviceControllerWrapper::ToJNIHandle()

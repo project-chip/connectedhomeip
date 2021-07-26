@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 #include <transport/SecureSession.h>
 #include <transport/SessionMessageCounter.h>
 #include <transport/raw/Base.h>
@@ -77,8 +77,8 @@ public:
 
     SecureSession & GetSecureSession() { return mSecureSession; }
 
-    Transport::AdminId GetAdminId() const { return mAdmin; }
-    void SetAdminId(Transport::AdminId admin) { mAdmin = admin; }
+    FabricIndex GetFabricIndex() const { return mFabric; }
+    void SetFabricIndex(FabricIndex fabricIndex) { mFabric = fabricIndex; }
 
     bool IsInitialized()
     {
@@ -120,7 +120,7 @@ private:
     uint64_t mLastActivityTimeMs = 0;
     SecureSession mSecureSession;
     SessionMessageCounter mSessionMessageCounter;
-    Transport::AdminId mAdmin = kUndefinedAdminId;
+    FabricIndex mFabric = kUndefinedFabricIndex;
 };
 
 } // namespace Transport

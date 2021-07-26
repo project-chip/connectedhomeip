@@ -301,6 +301,12 @@ CHIP_ERROR TCPEndPoint::Listen(uint16_t backlog)
 
     if (listen(mSocket.GetFD(), backlog) != 0)
         res = chip::System::MapErrorPOSIX(errno);
+    else
+    {
+        // Enable non-blocking mode for the socket.
+        int flags = fcntl(mSocket.GetFD(), F_GETFL, 0);
+        fcntl(mSocket.GetFD(), F_SETFL, flags | O_NONBLOCK);
+    }
 
     // Wait for ability to read on this endpoint.
     mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
@@ -2473,11 +2479,17 @@ void TCPEndPoint::HandlePendingIO()
         // The socket being writable indicates the connection has completed (successfully or otherwise).
         if (mSocket.HasPendingWrite())
         {
+#if !__MBED__
             // Get the connection result from the socket.
             int osConRes;
             socklen_t optLen = sizeof(osConRes);
             if (getsockopt(mSocket.GetFD(), SOL_SOCKET, SO_ERROR, &osConRes, &optLen) != 0)
                 osConRes = errno;
+#else
+            // On Mbed OS, connect blocks and never returns EINPROGRESS
+            // The socket option SO_ERROR is not available.
+            int osConRes = 0;
+#endif
             CHIP_ERROR conRes = chip::System::MapErrorPOSIX(osConRes);
 
             // Process the connection result.
@@ -2655,7 +2667,16 @@ void TCPEndPoint::HandleIncomingConnection()
     // Accept the new connection.
     int conSocket = accept(mSocket.GetFD(), &sa.any, &saLen);
     if (conSocket == -1)
-        err = chip::System::MapErrorPOSIX(errno);
+    {
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+        {
+            return;
+        }
+        else
+        {
+            err = chip::System::MapErrorPOSIX(errno);
+        }
+    }
 
     // If there's no callback available, fail with an error.
     if (err == CHIP_NO_ERROR && OnConnectionReceived == nullptr)

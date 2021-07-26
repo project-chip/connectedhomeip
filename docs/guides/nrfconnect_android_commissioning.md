@@ -1,18 +1,21 @@
 # Commissioning nRF Connect Accessory using Android CHIPTool
 
-This article describes how to use
-[CHIPTool](../../src/android/CHIPTool/README.md) for Android smartphones to
-commission a Nordic Semiconductor nRF52840 DK running
-[nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md)
-onto a CHIP-enabled Thread network. The instructions are also valid for
-[nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md).
+You can use [CHIPTool](../../src/android/CHIPTool/README.md) for Android
+smartphones to commission a Nordic Semiconductor device running an nRF Connect
+platform example onto a CHIP-enabled Thread network.
+
+This guide references the nRF52840 DK and the
+[nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md),
+but the instructions are also valid for the
+[nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
+and can be adapted to other applications as well.
 
 <hr>
 
 -   [Overview](#overview)
 -   [Requirements](#requirements)
 -   [Setting up Thread Border Router](#setting-up-thread-border-router)
--   [Building and programming nRF Connect Lock Example Application](#building-example)
+-   [Building and programming nRF Connect Example Application](#building-example)
 -   [Building and installing Android CHIPTool](#building-chiptool)
 -   [Preparing accessory device](#preparing-accessory)
 -   [Commissioning accessory device](#commissioning-accessory)
@@ -31,17 +34,17 @@ The commissioning process is composed of the following main stages:
     sends CHIP operational credentials and Thread provisioning data.
 3.  The accessory device joins a CHIP-enabled Thread network.
 
-Bluetooth LE is only used during the commissioning phase. Afterwards, only the
-IPv6 connectivity between the smartphone and the accessory device is needed to
-send operational messages. The IPv6 address of the device is not exchanged
-during the commissioning process and CHIPTool must use DNS Service Discovery
-(DNS-SD) to learn or refresh the address before the controller initiates the
-IPv6-based communication.
+CHIPTool uses both Bluetooth LE and the IPv6 connectivity. Bluetooth LE is used
+only during the commissioning phase. Afterwards, only the IPv6 connectivity
+between the smartphone and the accessory device is needed to send operational
+messages. The IPv6 address of the device is not exchanged during the
+commissioning process and CHIPTool must use DNS Service Discovery (DNS-SD) to
+learn or refresh the address before the controller initiates the IPv6-based
+communication.
 
 Since a typical smartphone does not have a Thread radio built-in, extra effort
-is needed to prepare a fully-fledged testing environment. Refer to the
-[OpenThread Border Router](openthread_border_router_pi.md) article to set up a
-Thread Border Router on a Raspberry Pi.
+is needed to prepare the fully-fledged testing environment that includes a
+Thread Border Router configured on a Raspberry Pi.
 
 The following diagram shows the connectivity between network components required
 to allow communication between devices running the CHIPTool and Lock
@@ -64,7 +67,7 @@ accessory using Android CHIPTool:
         [OpenThread Radio Co-Processor](https://openthread.io/platforms/co-processor)
         firmware. You can replace this DK with another compatible device, such
         as the nRF52840 Dongle.
-    -   One nRF52840 DK is needed for running the lock application. You can
+    -   One nRF52840 DK is needed for running the example application. You can
         replace this DK with another compatible device, such as the nRF5340 DK.
 
 -   Smartphone compatible with Android 8.0 or later
@@ -88,9 +91,11 @@ or the nRF52840 Dongle acting as the
 
 <a name="building-example"></a>
 
-## Building and programming nRF Connect Lock Example Application
+## Building and programming nRF Connect Example Application
 
-See
+Build and program the example application onto your compatible device.
+
+For this guide, see
 [nRF Connect Lock Example Application README](../../examples/lock-app/nrfconnect/README.md)
 to learn how to build and program the example onto an nRF52840 DK.
 
@@ -146,7 +151,8 @@ To prepare the accessory device for commissioning, complete the following steps:
         I: 621 [SVR]https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 
 4.  Open the URL in a web browser to have the commissioning QR code generated.
-5.  Press **Button 4** on the device to start Bluetooth LE advertising.
+5.  Press **Button 4** on the device (or **Button 1** on a Thingy device) to
+    start the Bluetooth LE advertising.
 
 <hr>
 
@@ -194,7 +200,8 @@ Check the IPv6 connectivity with the device using the following steps:
    be it the address or an error message, will be displayed at the bottom of the
    screen.
 
-2. Tap the following buttons to change the lock state:
+2. Tap the following buttons to change the lock state of the nRF Connect Lock
+   Example Application referenced in this guide:
 
     - **ON** and **OFF** buttons lock and unlock the door, respectively.
     - **TOGGLE** changes the lock state to the opposite.

@@ -27,25 +27,25 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
 {
     ReturnErrorOnFailure(IOContext::Init(suite));
 
-    mAdmins.Reset();
+    mFabrics.Reset();
 
-    chip::Transport::AdminPairingInfo * srcNodeAdmin = mAdmins.AssignAdminId(mSrcAdminId, GetSourceNodeId());
-    VerifyOrReturnError(srcNodeAdmin != nullptr, CHIP_ERROR_NO_MEMORY);
+    chip::Transport::FabricInfo * srcNodeFabric = mFabrics.AssignFabricIndex(mSrcFabricIndex, GetSourceNodeId());
+    VerifyOrReturnError(srcNodeFabric != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    chip::Transport::AdminPairingInfo * destNodeAdmin = mAdmins.AssignAdminId(mDestAdminId, GetDestinationNodeId());
-    VerifyOrReturnError(destNodeAdmin != nullptr, CHIP_ERROR_NO_MEMORY);
+    chip::Transport::FabricInfo * destNodeFabric = mFabrics.AssignFabricIndex(mDestFabricIndex, GetDestinationNodeId());
+    VerifyOrReturnError(destNodeFabric != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(
-        mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins, &mMessageCounterManager));
+        mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mFabrics, &mMessageCounterManager));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
     ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer,
-                                                      SecureSession::SessionRole::kInitiator, mSrcAdminId));
+                                                      SecureSession::SessionRole::kInitiator, mSrcFabricIndex));
 
     return mSecureSessionMgr.NewPairing(mPeer, GetSourceNodeId(), &mPairingPeerToLocal, SecureSession::SessionRole::kResponder,
-                                        mDestAdminId);
+                                        mDestFabricIndex);
 }
 
 // Shutdown all layers, finalize operations
@@ -58,13 +58,13 @@ CHIP_ERROR MessagingContext::Shutdown()
 SecureSessionHandle MessagingContext::GetSessionLocalToPeer()
 {
     // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
-    return { GetDestinationNodeId(), GetPeerKeyId(), GetAdminId() };
+    return { GetDestinationNodeId(), GetPeerKeyId(), GetFabricIndex() };
 }
 
 SecureSessionHandle MessagingContext::GetSessionPeerToLocal()
 {
     // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
-    return { GetSourceNodeId(), GetLocalKeyId(), mDestAdminId };
+    return { GetSourceNodeId(), GetLocalKeyId(), mDestFabricIndex };
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)

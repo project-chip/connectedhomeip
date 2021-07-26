@@ -5945,6 +5945,16 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_WakeOnLan_ClusterRevision(ch
 // End of Cluster WakeOnLan
 // Cluster WiFiNetworkDiagnostics
 
+chip::ChipError::StorageType chip_ime_AppendCommand_WiFiNetworkDiagnostics_ResetCounts(chip::Controller::Device * device,
+                                                                                       chip::EndpointId ZCLendpointId,
+                                                                                       chip::GroupId)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(cluster.ResetCounts(nullptr, nullptr));
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Bssid(chip::Controller::Device * device,
                                                                                  chip::EndpointId ZCLendpointId,
                                                                                  chip::GroupId /* ZCLgroupId */)

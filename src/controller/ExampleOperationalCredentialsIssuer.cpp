@@ -142,5 +142,26 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GetRootCACertificate(FabricId fa
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(NodeId * aNodeId)
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        CHIP_ERROR err = DRBG_get_bytes(reinterpret_cast<uint8_t *>(aNodeId), sizeof(*aNodeId));
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        if (IsOperationalNodeId(*aNodeId))
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    // Terrible, universe-ending luck (chances are 1 in 2^280 or so here, if our
+    // DRBG is good).
+    return CHIP_ERROR_INTERNAL;
+}
+
 } // namespace Controller
 } // namespace chip

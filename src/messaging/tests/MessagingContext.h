@@ -21,7 +21,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -65,11 +65,11 @@ public:
     void SetLocalKeyId(uint16_t id) { mLocalKeyId = id; }
     void SetPeerKeyId(uint16_t id) { mPeerKeyId = id; }
 
-    uint16_t GetAdminId() const { return mSrcAdminId; }
-    void SetAdminId(Transport::AdminId id)
+    FabricIndex GetFabricIndex() const { return mSrcFabricIndex; }
+    void SetFabricIndex(FabricIndex id)
     {
-        mSrcAdminId  = id;
-        mDestAdminId = id;
+        mSrcFabricIndex  = id;
+        mDestFabricIndex = id;
     }
 
     SecureSessionMgr & GetSecureSessionManager() { return mSecureSessionMgr; }
@@ -96,9 +96,9 @@ private:
     Optional<Transport::PeerAddress> mPeer;
     SecurePairingUsingTestSecret mPairingPeerToLocal;
     SecurePairingUsingTestSecret mPairingLocalToPeer;
-    Transport::AdminPairingTable mAdmins;
-    Transport::AdminId mSrcAdminId  = 0;
-    Transport::AdminId mDestAdminId = 1;
+    Transport::FabricTable mFabrics;
+    FabricIndex mSrcFabricIndex  = 0;
+    FabricIndex mDestFabricIndex = 1;
     Credentials::OperationalCredentialSet mOperationalCredentialSet;
 };
 

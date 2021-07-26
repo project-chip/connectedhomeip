@@ -475,7 +475,7 @@ class CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}Attribute
 
                 jobject attributeObj = env->NewObject(attributeClass, attributeCtor,
                     {{#chip_attribute_list_entryTypes}}
-                    {{asCamelCased name true}}{{#unless (isLastElement index count)}}, {{/unless}}
+                    {{asCamelCased name true}}{{#not_last}}, {{/not_last}}
                     {{/chip_attribute_list_entryTypes}}
                 );
                 VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create {{asCamelCased name false}}Attribute object"));
@@ -530,7 +530,7 @@ JNI_METHOD(jlong, {{asCamelCased name false}}Cluster, initWithDevice)(JNIEnv * e
 
 {{#chip_server_cluster_commands}}
 {{#if (zcl_command_arguments_count this.id)}}
-JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, {{asCamelCased name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{#chip_server_cluster_command_arguments}}{{asJniBasicType type}} {{asCamelCased label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/chip_server_cluster_command_arguments}})
+JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, {{asCamelCased name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{#chip_server_cluster_command_arguments}}{{asJniBasicType type}} {{asCamelCased label}}{{#not_last}}, {{/not_last}}{{/chip_server_cluster_command_arguments}})
 {{else}}
 JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, {{asCamelCased name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {{/if}}

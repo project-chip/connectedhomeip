@@ -145,7 +145,7 @@ CHIP_ERROR Device::SendCommands(app::CommandSender * commandObj)
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return commandObj->SendCommandRequest(mDeviceId, mAdminId, &mSecureSession);
+    return commandObj->SendCommandRequest(mDeviceId, mFabricIndex, &mSecureSession);
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -158,10 +158,10 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     CHIP_ZERO_AT(serializable);
     CHIP_ZERO_AT(output);
 
-    serializable.mOpsCreds   = mPairing;
-    serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
-    serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
-    serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
+    serializable.mOpsCreds    = mPairing;
+    serializable.mDeviceId    = Encoding::LittleEndian::HostSwap64(mDeviceId);
+    serializable.mDevicePort  = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
+    serializable.mFabricIndex = Encoding::LittleEndian::HostSwap16(mFabricIndex);
 
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
 
@@ -228,9 +228,12 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     mPairing             = serializable.mOpsCreds;
     mDeviceId            = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
     const uint16_t port  = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
-    mAdminId             = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
+    const uint16_t index = Encoding::LittleEndian::HostSwap16(serializable.mFabricIndex);
     mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(serializable.mLocalMessageCounter);
     mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(serializable.mPeerMessageCounter);
+
+    VerifyOrReturnError(CanCastTo<FabricIndex>(index), CHIP_ERROR_INVALID_ARGUMENT);
+    mFabricIndex = static_cast<FabricIndex>(index);
 
     // TODO - Remove the hack that's incrementing message counter while deserializing device
     // This hack was added as a quick workaround for TE3 testing. The commissioning code
@@ -481,7 +484,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
         SuccessOrExit(err);
 
         err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &pairingSession,
-                                          SecureSession::SessionRole::kInitiator, mAdminId);
+                                          SecureSession::SessionRole::kInitiator, mFabricIndex);
         SuccessOrExit(err);
     }
 
@@ -563,7 +566,7 @@ void Device::OnSessionEstablished()
     mCASESession.PeerConnection().SetPeerNodeId(mDeviceId);
 
     CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mCASESession,
-                                                 SecureSession::SessionRole::kInitiator, mAdminId);
+                                                 SecureSession::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));

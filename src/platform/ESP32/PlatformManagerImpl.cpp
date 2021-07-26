@@ -26,6 +26,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <platform/ESP32/ESP32Utils.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
 
@@ -55,34 +56,43 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    CHIP_ERROR err;
+    esp_err_t err;
     wifi_init_config_t cfg;
     uint8_t ap_mac[6];
     wifi_mode_t mode;
 
+    // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
+    Internal::ESP32Utils::RegisterESP32ErrorFormatter();
+
     // Make sure the LwIP core lock has been initialized
-    err = Internal::InitLwIPCoreLock();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::InitLwIPCoreLock());
 
     err = esp_netif_init();
-    SuccessOrExit(err);
+    if (err != ESP_OK)
+    {
+        goto exit;
+    }
 
     // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
     err = esp_event_loop_create_default();
-    SuccessOrExit(err);
+    if (err != ESP_OK)
+    {
+        goto exit;
+    }
 
     esp_netif_create_default_wifi_ap();
     esp_netif_create_default_wifi_sta();
 
     esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-    SuccessOrExit(err);
     esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-    SuccessOrExit(err);
 
     // Initialize the ESP WiFi layer.
     cfg = WIFI_INIT_CONFIG_DEFAULT();
     err = esp_wifi_init(&cfg);
-    SuccessOrExit(err);
+    if (err != ESP_OK)
+    {
+        goto exit;
+    }
 
     esp_wifi_get_mode(&mode);
     if ((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
@@ -91,19 +101,20 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         /* Bit 0 of the first octet of MAC Address should always be 0 */
         ap_mac[0] &= (uint8_t) ~0x01;
         err = esp_wifi_set_mac(WIFI_IF_AP, ap_mac);
-        SuccessOrExit(err);
+        if (err != ESP_OK)
+        {
+            goto exit;
+        }
     }
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
 
-    err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
 
 exit:
-    return err;
+    return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
 }
 
 CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)

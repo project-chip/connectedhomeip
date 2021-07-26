@@ -2960,7 +2960,16 @@
           "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "commands": [],
+          "commands": [
+            {
+              "name": "ResetCounts",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            }
+          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -4715,7 +4724,7 @@
               "outgoing": 1
             },
             {
-              "name": "Stop",
+              "name": "StopMotion",
               "code": 2,
               "mfgCode": null,
               "source": "client",

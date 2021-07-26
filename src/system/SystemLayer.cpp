@@ -61,41 +61,6 @@
 namespace chip {
 namespace System {
 
-namespace {
-
-Clock::MonotonicMilliseconds GetTimestamp(const Callback::Cancelable * timer)
-{
-    Clock::MonotonicMilliseconds timestamp;
-    static_assert(sizeof(timestamp) <= sizeof(timer->mInfo), "mInfo is too small for timestamp");
-    memcpy(&timestamp, &timer->mInfo, sizeof(timestamp));
-    return timestamp;
-}
-
-void SetTimestamp(Callback::Cancelable * timer, Clock::MonotonicMilliseconds timestamp)
-{
-    static_assert(sizeof(timestamp) <= sizeof(timer->mInfo), "mInfo is too small for timestamp");
-    memcpy(&timer->mInfo, &timestamp, sizeof(timestamp));
-}
-
-bool TimerReady(const Clock::MonotonicMilliseconds timestamp, const Callback::Cancelable * timer)
-{
-    return !Timer::IsEarlier(timestamp, GetTimestamp(timer));
-}
-
-int TimerCompare(void * p, const Callback::Cancelable * a, const Callback::Cancelable * b)
-{
-    (void) p;
-
-    Clock::MonotonicMilliseconds timeA = GetTimestamp(a);
-    Clock::MonotonicMilliseconds timeB = GetTimestamp(b);
-
-    return (timeA > timeB) ? 1 : (timeA < timeB) ? -1 : 0;
-}
-
-} // namespace
-
-using namespace ::chip::Callback;
-
 Layer::Layer() : mLayerState(kLayerState_NotInitialized), mPlatformData(nullptr)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -179,54 +144,6 @@ CHIP_ERROR Layer::NewTimer(Timer *& aTimerPtr)
     }
 
     return CHIP_NO_ERROR;
-}
-
-/**
- * @brief
- *   This method starts a one-shot timer.
- *
- *   @note
- *       Only a single timer is allowed to be started with the same @a aComplete and @a aAppState
- *       arguments. If called with @a aComplete and @a aAppState identical to an existing timer,
- *       the currently-running timer will first be cancelled.
- *
- *   @param[in]  aMilliseconds Expiration time in milliseconds.
- *   @param[in]  aCallback     A pointer to the Callback that fires when the timer expires
- *
- *   @return CHIP_NO_ERROR On success.
- *   @return Other Value indicating timer failed to start.
- *
- */
-void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback)
-{
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    if (mDispatchQueue != nullptr)
-    {
-        ChipLogError(chipSystemLayer, "%s is not supported with libdispatch", __PRETTY_FUNCTION__);
-        chipDie();
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-
-    assertChipStackLockedByCurrentThread();
-
-    Cancelable * ca = aCallback->Cancel();
-
-    SetTimestamp(ca, Clock::GetMonotonicMilliseconds() + aMilliseconds);
-
-    mTimerCallbacks.InsertBy(ca, TimerCompare, nullptr);
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (mTimerCallbacks.First() == ca)
-    {
-        // this is the new earliest timer and so the timer needs (re-)starting provided that
-        // the system is not currently processing expired timers, in which case it is left to
-        // HandleExpiredTimers() to re-start the timer.
-        if (!mTimerComplete)
-        {
-            StartPlatformTimer(aMilliseconds);
-        }
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**
@@ -348,26 +265,6 @@ exit:
     return lReturn;
 }
 
-/**
- * @brief
- *   Run any timers that are due based on input current time
- */
-void Layer::DispatchTimerCallbacks(const Clock::MonotonicMilliseconds aCurrentTime)
-{
-    // dispatch TimerCallbacks
-    Cancelable ready;
-
-    mTimerCallbacks.DequeueBy(TimerReady, static_cast<uint64_t>(aCurrentTime), ready);
-
-    while (ready.mNext != &ready)
-    {
-        // one-shot
-        chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromCancelable(ready.mNext);
-        cb->Cancel();
-        cb->mCall(cb->mContext);
-    }
-}
-
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 bool Layer::GetTimeout(struct timeval & aSleepTime)
@@ -399,17 +296,6 @@ bool Layer::GetTimeout(struct timeval & aSleepTime)
         }
     }
 
-    // check for an earlier callback timer, too
-    if (lAwakenTime != kCurrentTime)
-    {
-        Cancelable * ca = mTimerCallbacks.First();
-        if (ca != nullptr && !Timer::IsEarlier(kCurrentTime, GetTimestamp(ca)))
-        {
-            anyTimer    = true;
-            lAwakenTime = GetTimestamp(ca);
-        }
-    }
-
     const Clock::MonotonicMilliseconds kSleepTime = lAwakenTime - kCurrentTime;
     aSleepTime.tv_sec                             = static_cast<time_t>(kSleepTime / 1000);
     aSleepTime.tv_usec                            = static_cast<suseconds_t>((kSleepTime % 1000) * 1000);
@@ -436,8 +322,6 @@ void Layer::HandleTimeout()
             lTimer->HandleComplete();
         }
     }
-
-    DispatchTimerCallbacks(kCurrentTime);
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     this->mHandleSelectThread = PTHREAD_NULL;
@@ -678,8 +562,6 @@ CHIP_ERROR Layer::HandlePlatformTimer()
     VerifyOrExit(this->State() == kLayerState_Initialized, lReturn = CHIP_ERROR_INCORRECT_STATE);
 
     lReturn = Timer::HandleExpiredTimers(*this);
-
-    DispatchTimerCallbacks(Clock::GetMonotonicMilliseconds());
 
     SuccessOrExit(lReturn);
 

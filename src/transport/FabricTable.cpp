@@ -16,13 +16,13 @@
  */
 
 /**
- * @brief Defines a table of admins that have provisioned the device.
+ * @brief Defines a table of fabrics that have provisioned the device.
  */
 
 #include <core/CHIPEncoding.h>
 #include <support/CHIPMem.h>
 #include <support/SafeInt.h>
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 #if CHIP_CRYPTO_HSM
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
@@ -33,7 +33,7 @@ using namespace Crypto;
 
 namespace Transport {
 
-CHIP_ERROR AdminPairingInfo::SetFabricLabel(const uint8_t * fabricLabel)
+CHIP_ERROR FabricInfo::SetFabricLabel(const uint8_t * fabricLabel)
 {
     const char * charFabricLabel = Uint8::to_const_char(fabricLabel);
     size_t stringLength          = strnlen(charFabricLabel, kFabricLabelMaxLengthInBytes);
@@ -43,18 +43,18 @@ CHIP_ERROR AdminPairingInfo::SetFabricLabel(const uint8_t * fabricLabel)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
+CHIP_ERROR FabricInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     char key[KeySize()];
-    ReturnErrorOnFailure(GenerateKey(mAdmin, key, sizeof(key)));
+    ReturnErrorOnFailure(GenerateKey(mFabric, key, sizeof(key)));
 
-    StorableAdminPairingInfo * info = chip::Platform::New<StorableAdminPairingInfo>();
+    StorableFabricInfo * info = chip::Platform::New<StorableFabricInfo>();
     ReturnErrorCodeIf(info == nullptr, CHIP_ERROR_NO_MEMORY);
 
     info->mNodeId   = Encoding::LittleEndian::HostSwap64(mNodeId);
-    info->mAdmin    = Encoding::LittleEndian::HostSwap16(mAdmin);
+    info->mFabric   = Encoding::LittleEndian::HostSwap16(mFabric);
     info->mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
     info->mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
 
@@ -103,7 +103,7 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
         memcpy(info->mNOCCert, mNOCCert, mNOCCertLen);
     }
 
-    err = kvs->SyncSetKeyValue(key, info, sizeof(StorableAdminPairingInfo));
+    err = kvs->SyncSetKeyValue(key, info, sizeof(StorableFabricInfo));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Error occurred calling SyncSetKeyValue: %s", chip::ErrorStr(err));
@@ -117,25 +117,25 @@ exit:
     return err;
 }
 
-CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
+CHIP_ERROR FabricInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     char key[KeySize()];
-    ReturnErrorOnFailure(GenerateKey(mAdmin, key, sizeof(key)));
+    ReturnErrorOnFailure(GenerateKey(mFabric, key, sizeof(key)));
 
-    StorableAdminPairingInfo * info = chip::Platform::New<StorableAdminPairingInfo>();
+    StorableFabricInfo * info = chip::Platform::New<StorableFabricInfo>();
     ReturnErrorCodeIf(info == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    uint16_t infoSize = sizeof(StorableAdminPairingInfo);
+    uint16_t infoSize = sizeof(StorableFabricInfo);
 
-    AdminId id;
+    uint16_t id;
     uint16_t rootCertLen, icaCertLen, nocCertLen;
     size_t stringLength;
 
     SuccessOrExit(err = kvs->SyncGetKeyValue(key, info, infoSize));
 
     mNodeId     = Encoding::LittleEndian::HostSwap64(info->mNodeId);
-    id          = Encoding::LittleEndian::HostSwap16(info->mAdmin);
+    id          = Encoding::LittleEndian::HostSwap16(info->mFabric);
     mFabricId   = Encoding::LittleEndian::HostSwap64(info->mFabricId);
     mVendorId   = Encoding::LittleEndian::HostSwap16(info->mVendorId);
     rootCertLen = Encoding::LittleEndian::HostSwap16(info->mRootCertLen);
@@ -146,7 +146,7 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     memcpy(mFabricLabel, info->mFabricLabel, stringLength);
     mFabricLabel[stringLength] = '\0'; // Set null terminator
 
-    VerifyOrExit(mAdmin == id, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mFabric == id, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (mOperationalKey == nullptr)
     {
@@ -173,7 +173,7 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdminPairingInfo::DeleteFromKVS(PersistentStorageDelegate * kvs, AdminId id)
+CHIP_ERROR FabricInfo::DeleteFromKVS(PersistentStorageDelegate * kvs, FabricIndex id)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -188,21 +188,21 @@ CHIP_ERROR AdminPairingInfo::DeleteFromKVS(PersistentStorageDelegate * kvs, Admi
     return err;
 }
 
-constexpr size_t AdminPairingInfo::KeySize()
+constexpr size_t FabricInfo::KeySize()
 {
-    return sizeof(kAdminTableKeyPrefix) + 2 * sizeof(AdminId);
+    return sizeof(kFabricTableKeyPrefix) + 2 * sizeof(FabricIndex);
 }
 
-CHIP_ERROR AdminPairingInfo::GenerateKey(AdminId id, char * key, size_t len)
+CHIP_ERROR FabricInfo::GenerateKey(FabricIndex id, char * key, size_t len)
 {
     VerifyOrReturnError(len >= KeySize(), CHIP_ERROR_INVALID_ARGUMENT);
-    int keySize = snprintf(key, len, "%s%x", kAdminTableKeyPrefix, id);
+    int keySize = snprintf(key, len, "%s%x", kFabricTableKeyPrefix, id);
     VerifyOrReturnError(keySize > 0, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(len > (size_t) keySize, CHIP_ERROR_INTERNAL);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdminPairingInfo::SetOperationalKey(const P256Keypair & key)
+CHIP_ERROR FabricInfo::SetOperationalKey(const P256Keypair & key)
 {
     P256SerializedKeypair serialized;
     ReturnErrorOnFailure(key.Serialize(serialized));
@@ -219,7 +219,7 @@ CHIP_ERROR AdminPairingInfo::SetOperationalKey(const P256Keypair & key)
     return mOperationalKey->Deserialize(serialized);
 }
 
-void AdminPairingInfo::ReleaseRootCert()
+void FabricInfo::ReleaseRootCert()
 {
     if (mRootCert != nullptr)
     {
@@ -230,7 +230,7 @@ void AdminPairingInfo::ReleaseRootCert()
     mRootCert             = nullptr;
 }
 
-CHIP_ERROR AdminPairingInfo::SetRootCert(const ByteSpan & cert)
+CHIP_ERROR FabricInfo::SetRootCert(const ByteSpan & cert)
 {
     if (cert.size() == 0)
     {
@@ -257,7 +257,7 @@ CHIP_ERROR AdminPairingInfo::SetRootCert(const ByteSpan & cert)
     return CHIP_NO_ERROR;
 }
 
-void AdminPairingInfo::ReleaseICACert()
+void FabricInfo::ReleaseICACert()
 {
     if (mICACert != nullptr)
     {
@@ -267,7 +267,7 @@ void AdminPairingInfo::ReleaseICACert()
     mICACert    = nullptr;
 }
 
-CHIP_ERROR AdminPairingInfo::SetICACert(const ByteSpan & cert)
+CHIP_ERROR FabricInfo::SetICACert(const ByteSpan & cert)
 {
     if (cert.size() == 0)
     {
@@ -293,7 +293,7 @@ CHIP_ERROR AdminPairingInfo::SetICACert(const ByteSpan & cert)
     return CHIP_NO_ERROR;
 }
 
-void AdminPairingInfo::ReleaseNOCCert()
+void FabricInfo::ReleaseNOCCert()
 {
     if (mNOCCert != nullptr)
     {
@@ -303,7 +303,7 @@ void AdminPairingInfo::ReleaseNOCCert()
     mNOCCert    = nullptr;
 }
 
-CHIP_ERROR AdminPairingInfo::SetNOCCert(const ByteSpan & cert)
+CHIP_ERROR FabricInfo::SetNOCCert(const ByteSpan & cert)
 {
     if (cert.size() == 0)
     {
@@ -329,7 +329,7 @@ CHIP_ERROR AdminPairingInfo::SetNOCCert(const ByteSpan & cert)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdminPairingInfo::SetOperationalCertsFromCertArray(const ByteSpan & certArray)
+CHIP_ERROR FabricInfo::SetOperationalCertsFromCertArray(const ByteSpan & certArray)
 {
     if (certArray.size() == 0)
     {
@@ -356,8 +356,13 @@ CHIP_ERROR AdminPairingInfo::SetOperationalCertsFromCertArray(const ByteSpan & c
     return err;
 }
 
+<<<<<<< HEAD:src/transport/AdminPairingTable.cpp
 CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentials, ChipCertificateSet & certificates,
                                             CertificateKeyId & rootKeyId, uint8_t & credentialsIndex)
+=======
+CHIP_ERROR FabricInfo::GetCredentials(OperationalCredentialSet & credentials, ChipCertificateSet & certificates,
+                                      CertificateKeyId & rootKeyId)
+>>>>>>> master:src/transport/FabricTable.cpp
 {
     constexpr uint8_t kMaxNumCertsInOpCreds = 3;
     ReturnErrorOnFailure(certificates.Init(kMaxNumCertsInOpCreds));
@@ -384,13 +389,13 @@ CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentia
     return CHIP_NO_ERROR;
 }
 
-AdminPairingInfo * AdminPairingTable::AssignAdminId(AdminId adminId)
+FabricInfo * FabricTable::AssignFabricIndex(FabricIndex fabricIndex)
 {
     for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
     {
         if (!mStates[i].IsInitialized())
         {
-            mStates[i].SetAdminId(adminId);
+            mStates[i].SetFabricIndex(fabricIndex);
 
             return &mStates[i];
         }
@@ -399,32 +404,32 @@ AdminPairingInfo * AdminPairingTable::AssignAdminId(AdminId adminId)
     return nullptr;
 }
 
-AdminPairingInfo * AdminPairingTable::AssignAdminId(AdminId adminId, NodeId nodeId)
+FabricInfo * FabricTable::AssignFabricIndex(FabricIndex fabricIndex, NodeId nodeId)
 {
-    AdminPairingInfo * admin = AssignAdminId(adminId);
+    FabricInfo * fabric = AssignFabricIndex(fabricIndex);
 
-    if (admin != nullptr)
+    if (fabric != nullptr)
     {
-        admin->SetNodeId(nodeId);
+        fabric->SetNodeId(nodeId);
     }
 
-    return admin;
+    return fabric;
 }
 
-void AdminPairingTable::ReleaseAdminId(AdminId adminId)
+void FabricTable::ReleaseFabricIndex(FabricIndex fabricIndex)
 {
-    AdminPairingInfo * admin = FindAdminWithId(adminId);
-    if (admin != nullptr)
+    FabricInfo * fabric = FindFabricWithIndex(fabricIndex);
+    if (fabric != nullptr)
     {
-        admin->Reset();
+        fabric->Reset();
     }
 }
 
-AdminPairingInfo * AdminPairingTable::FindAdminWithId(AdminId adminId)
+FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex)
 {
     for (auto & state : mStates)
     {
-        if (state.IsInitialized() && state.GetAdminId() == adminId)
+        if (state.IsInitialized() && state.GetFabricIndex() == fabricIndex)
         {
             return &state;
         }
@@ -433,7 +438,7 @@ AdminPairingInfo * AdminPairingTable::FindAdminWithId(AdminId adminId)
     return nullptr;
 }
 
-AdminPairingInfo * AdminPairingTable::FindAdminForNode(FabricId fabricId, NodeId nodeId, uint16_t vendorId)
+FabricInfo * FabricTable::FindFabricForNode(FabricId fabricId, NodeId nodeId, uint16_t vendorId)
 {
     uint32_t index = 0;
     for (auto & state : mStates)
@@ -460,7 +465,7 @@ AdminPairingInfo * AdminPairingTable::FindAdminForNode(FabricId fabricId, NodeId
     return nullptr;
 }
 
-void AdminPairingTable::Reset()
+void FabricTable::Reset()
 {
     for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
     {
@@ -468,92 +473,92 @@ void AdminPairingTable::Reset()
     }
 }
 
-CHIP_ERROR AdminPairingTable::Store(AdminId id)
+CHIP_ERROR FabricTable::Store(FabricIndex id)
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    AdminPairingInfo * admin = nullptr;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    FabricInfo * fabric = nullptr;
 
     VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    admin = FindAdminWithId(id);
-    VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    fabric = FindFabricWithIndex(id);
+    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = admin->StoreIntoKVS(mStorage);
+    err = fabric->StoreIntoKVS(mStorage);
 exit:
     if (err == CHIP_NO_ERROR && mDelegate != nullptr)
     {
-        ChipLogProgress(Discovery, "Admin (%d) persisted to storage. Calling OnAdminPersistedToStorage", id);
-        mDelegate->OnAdminPersistedToStorage(admin);
+        ChipLogProgress(Discovery, "Fabric (%d) persisted to storage. Calling OnFabricPersistedToStorage", id);
+        mDelegate->OnFabricPersistedToStorage(fabric);
     }
     return err;
 }
 
-CHIP_ERROR AdminPairingTable::LoadFromStorage(AdminId id)
+CHIP_ERROR FabricTable::LoadFromStorage(FabricIndex id)
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    AdminPairingInfo * admin = nullptr;
-    bool didCreateAdmin      = false;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    FabricInfo * fabric  = nullptr;
+    bool didCreateFabric = false;
     VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    admin = FindAdminWithId(id);
-    if (admin == nullptr)
+    fabric = FindFabricWithIndex(id);
+    if (fabric == nullptr)
     {
-        admin          = AssignAdminId(id);
-        didCreateAdmin = true;
+        fabric          = AssignFabricIndex(id);
+        didCreateFabric = true;
     }
-    VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    err = admin->FetchFromKVS(mStorage);
+    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    err = fabric->FetchFromKVS(mStorage);
 
 exit:
-    if (err != CHIP_NO_ERROR && didCreateAdmin)
+    if (err != CHIP_NO_ERROR && didCreateFabric)
     {
-        ReleaseAdminId(id);
+        ReleaseFabricIndex(id);
     }
     else if (err == CHIP_NO_ERROR && mDelegate != nullptr)
     {
-        ChipLogProgress(Discovery, "Admin (%d) loaded from storage. Calling OnAdminRetrievedFromStorage", id);
-        mDelegate->OnAdminRetrievedFromStorage(admin);
+        ChipLogProgress(Discovery, "Fabric (%d) loaded from storage. Calling OnFabricRetrievedFromStorage", id);
+        mDelegate->OnFabricRetrievedFromStorage(fabric);
     }
     return err;
 }
 
-CHIP_ERROR AdminPairingTable::Delete(AdminId id)
+CHIP_ERROR FabricTable::Delete(FabricIndex id)
 {
-    AdminPairingInfo * admin = nullptr;
+    FabricInfo * fabric      = nullptr;
     CHIP_ERROR err           = CHIP_NO_ERROR;
-    bool adminIsInitialized  = false;
+    bool fabricIsInitialized = false;
     VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    admin              = FindAdminWithId(id);
-    adminIsInitialized = admin != nullptr && admin->IsInitialized();
-    err                = AdminPairingInfo::DeleteFromKVS(mStorage, id); // Delete from storage regardless
+    fabric              = FindFabricWithIndex(id);
+    fabricIsInitialized = fabric != nullptr && fabric->IsInitialized();
+    err                 = FabricInfo::DeleteFromKVS(mStorage, id); // Delete from storage regardless
 
 exit:
     if (err == CHIP_NO_ERROR)
     {
-        ReleaseAdminId(id);
-        if (mDelegate != nullptr && adminIsInitialized)
+        ReleaseFabricIndex(id);
+        if (mDelegate != nullptr && fabricIsInitialized)
         {
-            ChipLogProgress(Discovery, "Admin (%d) deleted. Calling OnAdminDeletedFromStorage", id);
-            mDelegate->OnAdminDeletedFromStorage(id);
+            ChipLogProgress(Discovery, "Fabric (%d) deleted. Calling OnFabricDeletedFromStorage", id);
+            mDelegate->OnFabricDeletedFromStorage(id);
         }
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdminPairingTable::Init(PersistentStorageDelegate * storage)
+CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mStorage = storage;
-    ChipLogDetail(Discovery, "Init admin pairing table with server storage");
+    ChipLogDetail(Discovery, "Init fabric pairing table with server storage");
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdminPairingTable::SetAdminPairingDelegate(AdminPairingTableDelegate * delegate)
+CHIP_ERROR FabricTable::SetFabricDelegate(FabricTableDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mDelegate = delegate;
-    ChipLogDetail(Discovery, "Set the admin pairing table delegate");
+    ChipLogDetail(Discovery, "Set the fabric pairing table delegate");
     return CHIP_NO_ERROR;
 }
 
