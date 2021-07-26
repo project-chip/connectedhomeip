@@ -42,15 +42,12 @@ ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 
 CHIP_ERROR ConfigurationManagerImpl::_Init()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-#endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-
     CHIP_ERROR err = CHIP_NO_ERROR;
     bool failSafeArmed;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
-    SuccessOrExit(err);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, err);
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (_GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
@@ -59,7 +56,6 @@ CHIP_ERROR ConfigurationManagerImpl::_Init()
         _InitiateFactoryReset();
     }
 
-exit:
     return err;
 }
 
@@ -73,6 +69,7 @@ CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
     {
         err = CHIP_ERROR_INTERNAL;
         ChipLogError(DeviceLayer, "_GetPrimaryWiFiMACAddress failed: %ld", result);
+        return err;
     }
 
     /* Reverse mac address to buf pointer as it is expected by caller */

@@ -33,8 +33,12 @@ will then join the network.
 
 ## Building
 
--   Download
-    [Modustoolbox Software](https://www.cypress.com/products/modustoolbox)
+-   [Modustoolbox Software](https://www.cypress.com/products/modustoolbox)
+
+    Refer to `integrations/docker/images/chip-build-infineon/Dockerfile` or
+    `scripts/examples/gn_p6_example.sh` for downloading the Software and related
+    tools.
+
 -   Install some additional tools (likely already present for Matter
     developers): \$ sudo apt install gcc g++ clang ninja-build python
     python3-venv libssl-dev libavahi-client-dev libglib2.0-dev git cmake
@@ -47,6 +51,10 @@ will then join the network.
 
           $ cd ~/connectedhomeip
           $ ./gn_build.sh enable_p6_builds=true
+
+    Or Using P6 build script
+
+          $ ./scripts/examples/gn_p6_example.sh examples/lock-app/p6
 
 -   To delete generated executable, libraries and object files use:
 
@@ -65,6 +73,11 @@ will then join the network.
 
           $ cd ~/connectedhomeip
           $ python3 out/debug/p6_lock_app/chip-p6-lock-example.flash.py
+
+    Or when using P6 Build script
+
+          $ cd ~/connectedhomeip
+          $ python3 out/lock_app_p6/chip-p6-lock-example.flash.py
 
 <a name="Commissioning and cluster control"></a>
 
