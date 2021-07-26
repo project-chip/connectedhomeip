@@ -40,7 +40,8 @@
 
 namespace chip {
 namespace Transport {
-
+    
+typedef uint16_t FabricIndex;
 static constexpr FabricIndex kUndefinedFabricIndex    = UINT8_MAX;
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
