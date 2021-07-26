@@ -26,23 +26,9 @@
 
 #pragma once
 
-// #include "esp_err.h"
-
 // ==================== Platform Adaptations ====================
 
 #define INET_CONFIG_ERROR_TYPE cy_rslt_t
 #define INET_CONFIG_NO_ERROR CY_RSLT_SUCCESS
 #define INET_CONFIG_ERROR_MIN 1000000
 #define INET_CONFIG_ERROR_MAX 1000999
-
-// ==================== General Configuration Overrides ====================
-
-// NOTE: Values that are mapped to CONFIG_ #defines are settable via the ESP-IDF Kconfig mechanism.
-
-//#ifndef INET_CONFIG_NUM_TCP_ENDPOINTS
-//#define INET_CONFIG_NUM_TCP_ENDPOINTS CONFIG_NUM_TCP_ENDPOINTS
-//#endif // INET_CONFIG_NUM_TCP_ENDPOINTS
-//
-//#ifndef INET_CONFIG_NUM_UDP_ENDPOINTS
-//#define INET_CONFIG_NUM_UDP_ENDPOINTS CONFIG_NUM_UDP_ENDPOINTS
-//#endif // INET_CONFIG_NUM_UDP_ENDPOINTS
