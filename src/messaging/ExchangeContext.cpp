@@ -303,7 +303,7 @@ bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHea
 
         // AND The message's source Node ID matches the peer Node ID associated with the exchange, or the peer Node ID of the
         // exchange is 'any'.
-        && ((mSecureSession.GetPeerNodeId() == kAnyNodeId) ||
+        && ((mSecureSession.GetPeerNodeId() == kPlaceholderNodeId) ||
             (packetHeader.GetSourceNodeId().HasValue() && mSecureSession.GetPeerNodeId() == packetHeader.GetSourceNodeId().Value()))
 
         // AND The message was sent by an initiator and the exchange context is a responder (IsInitiator==false)

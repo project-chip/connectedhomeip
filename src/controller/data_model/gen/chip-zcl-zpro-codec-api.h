@@ -3910,6 +3910,7 @@ chip::System::PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttrib
 | Cluster WiFiNetworkDiagnostics                                      | 0x0036 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ResetCounts                                                       |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Bssid                                                             | 0x0000 |

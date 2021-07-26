@@ -18,7 +18,7 @@
 
 #import "CHIPDevicePairingDelegateBridge.h"
 #import "CHIPDevice_Internal.h"
-#import "CHIPError.h"
+#import "CHIPError_Internal.h"
 #import "CHIPLogging.h"
 #import "CHIPOperationalCredentialsDelegate.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
@@ -441,7 +441,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
             errorCode = self.cppCommissioner->UpdateDevice(deviceID, fabricId);
-            CHIP_LOG_ERROR("Update device address returned: %d", errorCode);
+            CHIP_LOG_ERROR("Update device address returned: %s", chip::ErrorStr(errorCode));
         }
     });
 }
@@ -501,7 +501,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         return NO;
     }
 
-    CHIP_LOG_ERROR("Error(%d): %@, %@", errorCode, [CHIPError errorForCHIPErrorCode:errorCode], logMsg);
+    CHIP_LOG_ERROR("Error(%s): %s", chip::ErrorStr(errorCode), [logMsg UTF8String]);
     if (error) {
         *error = [CHIPError errorForCHIPErrorCode:errorCode];
     }

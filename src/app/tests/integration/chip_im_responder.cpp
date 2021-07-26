@@ -168,11 +168,11 @@ int main(int argc, char * argv[])
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::InteractionModelDelegate mockDelegate;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    const chip::Transport::AdminId gAdminId = 0;
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
+    const chip::FabricIndex gFabricIndex = 0;
+    chip::Transport::FabricTable fabrics;
+    chip::Transport::FabricInfo * fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, chip::kTestDeviceNodeId);
 
-    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     InitializeChip();
 
@@ -180,7 +180,7 @@ int main(int argc, char * argv[])
         chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins,
+    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &fabrics,
                                &gMessageCounterManager);
     SuccessOrExit(err);
 
@@ -196,7 +196,7 @@ int main(int argc, char * argv[])
     InitializeEventLogging(&gExchangeManager);
 
     err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder,
-                                     gAdminId);
+                                     gFabricIndex);
     SuccessOrExit(err);
 
     printf("Listening for IM requests...\n");

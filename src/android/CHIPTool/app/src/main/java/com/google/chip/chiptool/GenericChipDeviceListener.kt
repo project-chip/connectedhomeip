@@ -23,6 +23,10 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
     // No op
   }
 
+  override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
+    // No op
+  }
+
   override fun onNetworkCommissioningComplete(code: Int) {
     // No op
   }
@@ -39,7 +43,7 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
     // No op
   }
 
-  override fun onOpCSRGenerationComplete(errorCode: ByteArray) {
+  override fun onOpCSRGenerationComplete(csr: ByteArray) {
     // No op
   }
 }

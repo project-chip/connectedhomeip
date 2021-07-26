@@ -320,16 +320,16 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
-CHIP_ERROR InteractionModelEngine::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId,
-                                                   SecureSessionHandle * apSecureSession, EventPathParams * apEventPathParamsList,
-                                                   size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
+CHIP_ERROR InteractionModelEngine::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession,
+                                                   EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
+                                                   AttributePathParams * apAttributePathParamsList,
                                                    size_t aAttributePathParamsListSize, EventNumber aEventNumber,
                                                    intptr_t aAppIdentifier)
 {
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     ReturnErrorOnFailure(NewReadClient(&client, aAppIdentifier));
-    err = client->SendReadRequest(aNodeId, aAdminId, apSecureSession, apEventPathParamsList, aEventPathParamsListSize,
+    err = client->SendReadRequest(aNodeId, aFabricIndex, apSecureSession, apEventPathParamsList, aEventPathParamsListSize,
                                   apAttributePathParamsList, aAttributePathParamsListSize, aEventNumber);
     if (err != CHIP_NO_ERROR)
     {

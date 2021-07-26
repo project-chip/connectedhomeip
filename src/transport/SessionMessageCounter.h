@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
 #include <transport/SecureSession.h>

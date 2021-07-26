@@ -16,7 +16,7 @@
  */
 
 /**
- * @brief Defines a table of admins that have provisioned the device.
+ * @brief Defines a table of fabrics that have provisioned the device.
  */
 
 #pragma once
@@ -41,14 +41,14 @@
 namespace chip {
 namespace Transport {
 
-typedef uint16_t AdminId;
-static constexpr AdminId kUndefinedAdminId            = UINT16_MAX;
+typedef uint16_t FabricIndex;
+static constexpr FabricIndex kUndefinedFabricIndex    = UINT16_MAX;
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 // KVS store is sensitive to length of key strings, based on the underlying
 // platform. Keeping them short.
-constexpr char kAdminTableKeyPrefix[] = "CHIPAdmin";
-constexpr char kAdminTableCountKey[]  = "CHIPAdminNextId";
+constexpr char kFabricTableKeyPrefix[] = "Fabric";
+constexpr char kFabricTableCountKey[]  = "NumFabrics";
 
 struct AccessControlList
 {
@@ -56,22 +56,22 @@ struct AccessControlList
 };
 
 /**
- * Defines state of a pairing established by an admin.
- * ACL data can be mutated throughout the lifetime of the admin pairing.
+ * Defines state of a pairing established by a fabric.
+ * ACL data can be mutated throughout the lifetime of the fabric pairing.
  * Node ID is only settable using the device operational credentials.
  *
  * Information contained within the state:
- *   - Admin identification
- *   - Node Id assigned by the admin to the device
+ *   - Fabric identification
+ *   - Node Id assigned by the fabric to the device
  *   - Vendor Id
  *   - Fabric Id
  *   - Device operational credentials
  *   - Access control list
  */
-class DLL_EXPORT AdminPairingInfo
+class DLL_EXPORT FabricInfo
 {
 public:
-    AdminPairingInfo() { Reset(); }
+    FabricInfo() { Reset(); }
 
     // Returns a pointer to a null terminated char array
     const uint8_t * GetFabricLabel() const { return Uint8::from_const_char(mFabricLabel); };
@@ -79,7 +79,7 @@ public:
     // Expects a pointer to a null terminated char array
     CHIP_ERROR SetFabricLabel(const uint8_t * fabricLabel);
 
-    ~AdminPairingInfo()
+    ~FabricInfo()
     {
         if (mOperationalKey != nullptr)
         {
@@ -96,8 +96,8 @@ public:
     FabricId GetFabricId() const { return mFabricId; }
     void SetFabricId(FabricId fabricId) { mFabricId = fabricId; }
 
-    AdminId GetAdminId() const { return mAdmin; }
-    void SetAdminId(AdminId adminId) { mAdmin = adminId; }
+    FabricIndex GetFabricIndex() const { return mFabric; }
+    void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
 
     uint16_t GetVendorId() const { return mVendorId; }
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
@@ -143,7 +143,7 @@ public:
     AccessControlList & GetACL() { return mACL; }
     void SetACL(const AccessControlList & acl) { mACL = acl; }
 
-    bool IsInitialized() const { return (mAdmin != kUndefinedAdminId); }
+    bool IsInitialized() const { return (mFabric != kUndefinedFabricIndex); }
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -151,7 +151,7 @@ public:
     void Reset()
     {
         mNodeId         = kUndefinedNodeId;
-        mAdmin          = kUndefinedAdminId;
+        mFabric         = kUndefinedFabricIndex;
         mFabricId       = kUndefinedFabricId;
         mVendorId       = kUndefinedVendorId;
         mFabricLabel[0] = '\0';
@@ -165,12 +165,12 @@ public:
         ReleaseNOCCert();
     }
 
-    friend class AdminPairingTable;
+    friend class FabricTable;
 
 private:
     NodeId mNodeId                                      = kUndefinedNodeId;
     FabricId mFabricId                                  = kUndefinedFabricId;
-    AdminId mAdmin                                      = kUndefinedAdminId;
+    FabricIndex mFabric                                 = kUndefinedFabricIndex;
     uint16_t mVendorId                                  = kUndefinedVendorId;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
@@ -192,19 +192,19 @@ private:
 
     static constexpr size_t KeySize();
 
-    static CHIP_ERROR GenerateKey(AdminId id, char * key, size_t len);
+    static CHIP_ERROR GenerateKey(FabricIndex id, char * key, size_t len);
 
     CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate * kvs);
     CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
-    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, AdminId id);
+    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, FabricIndex id);
 
     void ReleaseNOCCert();
     void ReleaseICACert();
     void ReleaseRootCert();
 
-    struct StorableAdminPairingInfo
+    struct StorableFabricInfo
     {
-        uint16_t mAdmin;    /* This field is serialized in LittleEndian byte order */
+        uint16_t mFabric;   /* This field is serialized in LittleEndian byte order */
         uint64_t mNodeId;   /* This field is serialized in LittleEndian byte order */
         uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
         uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
@@ -221,41 +221,40 @@ private:
     };
 };
 
-// Once attribute store has persistence implemented, AdminPairingTable shoud be backed using
+// Once attribute store has persistence implemented, FabricTable shoud be backed using
 // attribute store so no need for this Delegate API anymore
-// TODO: Reimplement AdminPairingTable to only have one backing store.
-class DLL_EXPORT AdminPairingTableDelegate
+// TODO: Reimplement FabricTable to only have one backing store.
+class DLL_EXPORT FabricTableDelegate
 {
 public:
-    virtual ~AdminPairingTableDelegate() {}
+    virtual ~FabricTableDelegate() {}
     /**
-     * Gets called when an admin is deleted from KVS store.
+     * Gets called when a fabric is deleted from KVS store.
      **/
-    virtual void OnAdminDeletedFromStorage(AdminId adminId) = 0;
+    virtual void OnFabricDeletedFromStorage(FabricIndex fabricId) = 0;
 
     /**
-     * Gets called when an admin is loaded into Admin Pairing Table from KVS store.
+     * Gets called when a fabric is loaded into Fabric Table from KVS store.
      **/
-    virtual void OnAdminRetrievedFromStorage(AdminPairingInfo * adminInfo) = 0;
+    virtual void OnFabricRetrievedFromStorage(FabricInfo * fabricInfo) = 0;
 
     /**
-     * Gets called when an admin in Admin Pairing Table is persisted to KVS store.
+     * Gets called when a fabric in Fabric Table is persisted to KVS store.
      **/
-    virtual void OnAdminPersistedToStorage(AdminPairingInfo * adminInfo) = 0;
+    virtual void OnFabricPersistedToStorage(FabricInfo * fabricInfo) = 0;
 };
 
 /**
- * Iterates over valid admins within a list
+ * Iterates over valid fabrics within a list
  */
-class ConstAdminIterator
+class ConstFabricIterator
 {
 public:
-    using value_type = AdminPairingInfo;
-    using pointer    = AdminPairingInfo *;
-    using reference  = AdminPairingInfo &;
+    using value_type = FabricInfo;
+    using pointer    = FabricInfo *;
+    using reference  = FabricInfo &;
 
-    ConstAdminIterator(const AdminPairingInfo * start, size_t index, size_t maxSize) :
-        mStart(start), mIndex(index), mMaxSize(maxSize)
+    ConstFabricIterator(const FabricInfo * start, size_t index, size_t maxSize) : mStart(start), mIndex(index), mMaxSize(maxSize)
     {
         if (mIndex >= maxSize)
         {
@@ -266,21 +265,21 @@ public:
             Advance();
         }
     }
-    ConstAdminIterator(const ConstAdminIterator &) = default;
-    ConstAdminIterator & operator=(const ConstAdminIterator &) = default;
+    ConstFabricIterator(const ConstFabricIterator &) = default;
+    ConstFabricIterator & operator=(const ConstFabricIterator &) = default;
 
-    ConstAdminIterator & operator++() { return Advance(); }
-    ConstAdminIterator operator++(int)
+    ConstFabricIterator & operator++() { return Advance(); }
+    ConstFabricIterator operator++(int)
     {
-        ConstAdminIterator other(*this);
+        ConstFabricIterator other(*this);
         Advance();
         return other;
     }
 
-    const AdminPairingInfo & operator*() const { return mStart[mIndex]; }
-    const AdminPairingInfo * operator->() const { return mStart + mIndex; }
+    const FabricInfo & operator*() const { return mStart[mIndex]; }
+    const FabricInfo * operator->() const { return mStart + mIndex; }
 
-    bool operator==(const ConstAdminIterator & other)
+    bool operator==(const ConstFabricIterator & other)
     {
         if (IsAtEnd())
         {
@@ -289,16 +288,16 @@ public:
 
         return (mStart == other.mStart) && (mIndex == other.mIndex) && (mMaxSize == other.mMaxSize);
     }
-    bool operator!=(const ConstAdminIterator & other) { return !(*this == other); }
+    bool operator!=(const ConstFabricIterator & other) { return !(*this == other); }
 
     bool IsAtEnd() const { return (mIndex == mMaxSize); }
 
 private:
-    const AdminPairingInfo * mStart;
+    const FabricInfo * mStart;
     size_t mIndex;
     size_t mMaxSize;
 
-    ConstAdminIterator & Advance()
+    ConstFabricIterator & Advance()
     {
         do
         {
@@ -312,43 +311,42 @@ private:
     }
 };
 
-class DLL_EXPORT AdminPairingTable
+class DLL_EXPORT FabricTable
 {
 public:
-    CHIP_ERROR Store(AdminId id);
-    CHIP_ERROR LoadFromStorage(AdminId id);
-    CHIP_ERROR Delete(AdminId id);
+    CHIP_ERROR Store(FabricIndex id);
+    CHIP_ERROR LoadFromStorage(FabricIndex id);
+    CHIP_ERROR Delete(FabricIndex id);
 
-    AdminPairingInfo * AssignAdminId(AdminId adminId);
+    FabricInfo * AssignFabricIndex(FabricIndex fabricId);
 
-    AdminPairingInfo * AssignAdminId(AdminId adminId, NodeId nodeId);
+    FabricInfo * AssignFabricIndex(FabricIndex fabricId, NodeId nodeId);
 
-    void ReleaseAdminId(AdminId adminId);
+    void ReleaseFabricIndex(FabricIndex fabricId);
 
-    AdminPairingInfo * FindAdminWithId(AdminId adminId);
+    FabricInfo * FindFabricWithIndex(FabricIndex fabricId);
 
-    AdminPairingInfo * FindAdminForNode(FabricId fabricId, NodeId nodeId = kUndefinedNodeId,
-                                        uint16_t vendorId = kUndefinedVendorId);
+    FabricInfo * FindFabricForNode(FabricId fabricId, NodeId nodeId = kUndefinedNodeId, uint16_t vendorId = kUndefinedVendorId);
 
     void Reset();
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage);
-    CHIP_ERROR SetAdminPairingDelegate(AdminPairingTableDelegate * delegate);
+    CHIP_ERROR SetFabricDelegate(FabricTableDelegate * delegate);
 
-    ConstAdminIterator cbegin() const { return ConstAdminIterator(mStates, 0, CHIP_CONFIG_MAX_DEVICE_ADMINS); }
-    ConstAdminIterator cend() const
+    ConstFabricIterator cbegin() const { return ConstFabricIterator(mStates, 0, CHIP_CONFIG_MAX_DEVICE_ADMINS); }
+    ConstFabricIterator cend() const
     {
-        return ConstAdminIterator(mStates, CHIP_CONFIG_MAX_DEVICE_ADMINS, CHIP_CONFIG_MAX_DEVICE_ADMINS);
+        return ConstFabricIterator(mStates, CHIP_CONFIG_MAX_DEVICE_ADMINS, CHIP_CONFIG_MAX_DEVICE_ADMINS);
     }
-    ConstAdminIterator begin() const { return cbegin(); }
-    ConstAdminIterator end() const { return cend(); }
+    ConstFabricIterator begin() const { return cbegin(); }
+    ConstFabricIterator end() const { return cend(); }
 
 private:
-    AdminPairingInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];
+    FabricInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];
     PersistentStorageDelegate * mStorage = nullptr;
 
-    // TODO: Admin Pairing table should be backed by a single backing store (attribute store), remove delegate callbacks #6419
-    AdminPairingTableDelegate * mDelegate = nullptr;
+    // TODO: Fabric table should be backed by a single backing store (attribute store), remove delegate callbacks #6419
+    FabricTableDelegate * mDelegate = nullptr;
 };
 
 } // namespace Transport

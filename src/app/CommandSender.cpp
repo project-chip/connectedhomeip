@@ -34,7 +34,7 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 namespace chip {
 namespace app {
 
-CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * secureSession)
+CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * secureSession)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle commandPacket;
@@ -53,7 +53,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
     if (secureSession == nullptr)
     {
-        mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
+        mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aFabricIndex }, this);
     }
     else
     {

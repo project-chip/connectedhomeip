@@ -52,7 +52,7 @@ constexpr size_t kMaxEchoCount = 3;
 // The CHIP Echo interval time in milliseconds.
 constexpr int32_t gEchoInterval = 1000;
 
-constexpr chip::Transport::AdminId gAdminId = 0;
+constexpr chip::FabricIndex gFabricIndex = 0;
 
 // The EchoClient object.
 chip::Protocols::Echo::EchoClient gEchoClient;
@@ -167,7 +167,7 @@ CHIP_ERROR EstablishSecureSession()
 
     // Attempt to connect to the peer.
     err = gSessionManager.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
-                                     chip::SecureSession::SessionRole::kInitiator, gAdminId);
+                                     chip::SecureSession::SessionRole::kInitiator, gFabricIndex);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -200,8 +200,8 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = nullptr;
+    chip::Transport::FabricTable fabrics;
+    chip::Transport::FabricInfo * fabricInfo = nullptr;
 
     if (argc <= 1)
     {
@@ -228,8 +228,8 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
-    adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
-    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, chip::kTestControllerNodeId);
+    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     if (gUseTCP)
     {
@@ -238,7 +238,7 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &admins,
+        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &fabrics,
                                    &gMessageCounterManager);
         SuccessOrExit(err);
     }
@@ -249,7 +249,7 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins,
+        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &fabrics,
                                    &gMessageCounterManager);
         SuccessOrExit(err);
     }
@@ -265,7 +265,7 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
-    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
+    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gFabricIndex });
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.
