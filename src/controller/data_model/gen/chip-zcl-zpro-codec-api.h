@@ -2400,15 +2400,14 @@ chip::System::PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsL
 
 /**
  * @brief
- *    Encode a Operational Credentials server read command for the supported fabrics attribute into buffer including the APS frame
+ *    Encode a Operational Credentials server read command for the SupportedFabrics attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle
 encodeOperationalCredentialsClusterReadSupportedFabricsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
- *    Encode a Operational Credentials server read command for the commissioned fabrics attribute into buffer including the APS
- * frame
+ *    Encode a Operational Credentials server read command for the CommissionedFabrics attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle
 encodeOperationalCredentialsClusterReadCommissionedFabricsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
