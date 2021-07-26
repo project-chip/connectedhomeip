@@ -59,7 +59,8 @@ CHIP_ERROR WatchableSocket::OnRelease()
     }
 
     // Wake the thread calling select so that it stops selecting on the socket.
-    return mSharedState->Signal();
+    mSharedState->Signal();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WatchableSocket::OnRequestCallbackOnPendingRead()

@@ -185,7 +185,7 @@ CHIP_ERROR Timer::Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    ReturnErrorOnFailure(lLayer.WatchableEvents().Signal());
+    lLayer.WatchableEvents().Signal();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
@@ -220,7 +220,7 @@ CHIP_ERROR Timer::ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState)
     else
     {
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-        err = lLayer.WatchableEvents().Signal();
+        lLayer.WatchableEvents().Signal();
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH

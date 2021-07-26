@@ -32,6 +32,7 @@
 
 #include <core/CHIPError.h>
 #include <support/BitFlags.h>
+#include <support/CodeUtils.h>
 #include <system/SystemError.h>
 
 namespace chip {
@@ -136,14 +137,7 @@ public:
     /**
      * Close the associated file descriptor.
      */
-    CHIP_ERROR Close()
-    {
-        if (close(ReleaseFD()))
-        {
-            return MapErrorPOSIX(errno);
-        }
-        return CHIP_NO_ERROR;
-    }
+    void Close() { VerifyOrDie(close(ReleaseFD()) == 0); }
 
     /**
      * Test whether there is an associated open file descriptor.

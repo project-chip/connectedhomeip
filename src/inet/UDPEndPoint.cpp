@@ -394,7 +394,7 @@ void UDPEndPoint::Close()
 
         if (mSocket.HasFD())
         {
-            (void) mSocket.Close();
+            mSocket.Close();
         }
 
         // Clear any results from select() that indicate pending I/O for the socket.

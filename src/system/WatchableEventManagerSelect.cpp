@@ -59,12 +59,12 @@ CHIP_ERROR WatchableEventManager::Init(Layer & systemLayer)
 
 CHIP_ERROR WatchableEventManager::Shutdown()
 {
-    CHIP_ERROR error = mWakeEvent.Close();
-    mSystemLayer     = nullptr;
-    return error;
+    mWakeEvent.Close();
+    mSystemLayer = nullptr;
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WatchableEventManager::Signal()
+void WatchableEventManager::Signal()
 {
     /*
      * Wake up the I/O thread by writing a single byte to the wake pipe.
@@ -78,7 +78,7 @@ CHIP_ERROR WatchableEventManager::Signal()
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     if (pthread_equal(mSystemLayer->mHandleSelectThread, pthread_self()))
     {
-        return CHIP_NO_ERROR;
+        return;
     }
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
@@ -88,7 +88,6 @@ CHIP_ERROR WatchableEventManager::Signal()
     {
         ChipLogError(chipSystemLayer, "System wake event notify failed: %" CHIP_ERROR_FORMAT, ChipError::FormatError(status));
     }
-    return status;
 }
 
 /**
@@ -135,7 +134,8 @@ CHIP_ERROR WatchableEventManager::Set(int fd, fd_set * fds)
         mMaxFd = fd;
     }
     // Wake the thread calling select so that it starts selecting on the new socket.
-    return Signal();
+    Signal();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WatchableEventManager::Clear(int fd, fd_set * fds)
@@ -146,7 +146,8 @@ CHIP_ERROR WatchableEventManager::Clear(int fd, fd_set * fds)
         MaybeLowerMaxFd();
     }
     // Wake the thread calling select so that it starts selecting on the new socket.
-    return Signal();
+    Signal();
+    return CHIP_NO_ERROR;
 }
 
 void WatchableEventManager::Reset(int fd)

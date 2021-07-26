@@ -43,7 +43,7 @@ class WatchableEventManager
 public:
     CHIP_ERROR Init(System::Layer & systemLayer);
     CHIP_ERROR Shutdown();
-    CHIP_ERROR Signal();
+    void Signal();
 
     void EventLoopBegins() {}
     void PrepareEvents();

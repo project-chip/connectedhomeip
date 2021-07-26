@@ -22,6 +22,7 @@
 
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <support/CodeUtils.h>
+#include <system/SystemError.h>
 #include <system/SystemLayer.h>
 #include <system/WatchableEventManager.h>
 #include <system/WatchableSocket.h>
@@ -35,38 +36,42 @@ void WatchableSocket::OnInit()
     mActiveNext = nullptr;
 }
 
-void WatchableSocket::OnAttach()
+CHIP_ERROR WatchableSocket::OnAttach()
 {
-    evutil_make_socket_nonblocking(mFD);
+    VerifyOrReturnError(evutil_make_socket_nonblocking(mFD) == 0, MapErrorPOSIX(errno));
+    return CHIP_NO_ERROR;
 }
 
-void WatchableSocket::OnRelease()
+CHIP_ERROR WatchableSocket::OnRelease()
 {
-    UpdateWatch(0);
+    CHIP_ERROR status = UpdateWatch(0);
     mSharedState->RemoveFromQueueIfPresent(this);
+    return status;
 }
 
-void WatchableSocket::SetWatch(short eventFlags)
+CHIP_ERROR WatchableSocket::SetWatch(short eventFlags)
 {
     const short oldFlags = mEvent ? event_get_events(mEvent) : 0;
     const short newFlags = static_cast<short>(EV_PERSIST | oldFlags | eventFlags);
     if (oldFlags != newFlags)
     {
-        UpdateWatch(newFlags);
+        return UpdateWatch(newFlags);
     }
+    return CHIP_NO_ERROR;
 }
 
-void WatchableSocket::ClearWatch(short eventFlags)
+CHIP_ERROR WatchableSocket::ClearWatch(short eventFlags)
 {
     const short oldFlags = mEvent ? event_get_events(mEvent) : 0;
     const short newFlags = static_cast<short>(EV_PERSIST | (oldFlags & ~eventFlags));
     if (oldFlags != newFlags)
     {
-        UpdateWatch(newFlags);
+        return UpdateWatch(newFlags);
     }
+    return CHIP_NO_ERROR;
 }
 
-void WatchableSocket::UpdateWatch(short eventFlags)
+CHIP_ERROR WatchableSocket::UpdateWatch(short eventFlags)
 {
     if (mEvent)
     {
@@ -78,8 +83,10 @@ void WatchableSocket::UpdateWatch(short eventFlags)
     {
         event_base * const base = mSharedState->mEventBase;
         mEvent                  = event_new(base, mFD, eventFlags, WatchableEventManager::LibeventCallbackHandler, this);
-        event_add(mEvent, nullptr);
+        VerifyOrReturnError(mEvent != nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(event_add(mEvent, nullptr) == 0, CHIP_ERROR_INTERNAL);
     }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace System

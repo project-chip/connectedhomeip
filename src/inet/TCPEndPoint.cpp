@@ -843,7 +843,7 @@ void TCPEndPoint::EnableReceive()
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     // Wake the thread waiting for I/O so that it can include the socket.
-    (void) SystemLayer().WatchableEvents().Signal();
+    SystemLayer().WatchableEvents().Signal();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
@@ -1670,9 +1670,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
                     ChipLogError(Inet, "SO_LINGER: %d", errno);
             }
 
-            CHIP_ERROR status = mSocket.Close();
-            if (err == CHIP_NO_ERROR)
-                err = status;
+            mSocket.Close();
         }
     }
 

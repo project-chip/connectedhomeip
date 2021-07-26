@@ -352,7 +352,7 @@ CHIP_ERROR RawEndPoint::BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & 
 
 optfail:
     res = chip::System::MapErrorPOSIX(errno);
-    (void) mSocket.Close(); // prefer to return the earlier error.
+    mSocket.Close();
     mAddrType = kIPAddressType_Unknown;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -468,7 +468,7 @@ void RawEndPoint::Close()
 
         if (mSocket.HasFD())
         {
-            (void) mSocket.Close();
+            mSocket.Close();
         }
 
         // Clear any results from select() that indicate pending I/O for the socket.

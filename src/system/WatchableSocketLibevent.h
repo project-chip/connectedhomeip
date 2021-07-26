@@ -39,19 +39,19 @@ class WatchableSocket : public WatchableSocketBasis<WatchableSocket>
 {
 public:
     void OnInit();
-    void OnAttach();
-    void OnRelease();
-    void OnRequestCallbackOnPendingRead() { SetWatch(EV_READ); }
-    void OnRequestCallbackOnPendingWrite() { SetWatch(EV_WRITE); }
-    void OnClearCallbackOnPendingRead() { ClearWatch(EV_READ); }
-    void OnClearCallbackOnPendingWrite() { ClearWatch(EV_WRITE); }
+    CHIP_ERROR OnAttach();
+    CHIP_ERROR OnRelease();
+    CHIP_ERROR OnRequestCallbackOnPendingRead() { return SetWatch(EV_READ); }
+    CHIP_ERROR OnRequestCallbackOnPendingWrite() { return SetWatch(EV_WRITE); }
+    CHIP_ERROR OnClearCallbackOnPendingRead() { return ClearWatch(EV_READ); }
+    CHIP_ERROR OnClearCallbackOnPendingWrite() { return ClearWatch(EV_WRITE); }
 
 private:
     friend class WatchableEventManager;
 
-    void SetWatch(short eventFlags);
-    void ClearWatch(short eventFlags);
-    void UpdateWatch(short eventFlags);
+    CHIP_ERROR SetWatch(short eventFlags);
+    CHIP_ERROR ClearWatch(short eventFlags);
+    CHIP_ERROR UpdateWatch(short eventFlags);
 
     WatchableSocket * mActiveNext; ///< Next element in the list of sockets activated by libevent.
     struct event * mEvent;         ///< libevent state.
