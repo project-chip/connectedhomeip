@@ -79,7 +79,7 @@
 #define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_SERVER
 #define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING
 
-// Use this macro to check if the server side of the On/off cluster is included
+// Use this macro to check if the server side of the On/Off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ON_OFF_SERVER
 #define EMBER_AF_PLUGIN_ON_OFF

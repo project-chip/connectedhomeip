@@ -587,7 +587,7 @@
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 0, Cluster: On/off (server) */                                                                                \
+        /* Endpoint: 0, Cluster: On/Off (server) */                                                                                \
         { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* OnOff */                                                 \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) }, /* ClusterRevision */                                       \
                                                                                                                                    \
@@ -784,7 +784,7 @@
             3,                                                                                                                     \
             ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                            \
             chipFuncArrayOnOffServer                                                                                               \
-        }, /* Endpoint: 0, Cluster: On/off (server) */                                                                             \
+        }, /* Endpoint: 0, Cluster: On/Off (server) */                                                                             \
             { 0x0008,                                                                                                              \
               ZAP_ATTRIBUTE_INDEX(2),                                                                                              \
               2,                                                                                                                   \
@@ -918,7 +918,7 @@
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 0, Cluster: On/off (server) */                                                                                \
+        /* Endpoint: 0, Cluster: On/Off (server) */                                                                                \
         { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Off */                                                         \
             { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On */                                                          \
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Toggle */                                                      \
