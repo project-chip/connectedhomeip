@@ -23415,10 +23415,10 @@ void registerClusterAccountLogin(Commands & commands)
     const char * clusterName = "AccountLogin";
 
     commands_list clusterCommands = {
-        make_unique<AccountLoginGetSetupPIN>(),
-        make_unique<AccountLoginLogin>(),
-        make_unique<DiscoverAccountLoginAttributes>(),
-        make_unique<ReadAccountLoginClusterRevision>(),
+        make_unique<AccountLoginGetSetupPIN>(),         //
+        make_unique<AccountLoginLogin>(),               //
+        make_unique<DiscoverAccountLoginAttributes>(),  //
+        make_unique<ReadAccountLoginClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23428,11 +23428,16 @@ void registerClusterApplicationBasic(Commands & commands)
     const char * clusterName = "ApplicationBasic";
 
     commands_list clusterCommands = {
-        make_unique<ApplicationBasicChangeStatus>(),          make_unique<DiscoverApplicationBasicAttributes>(),
-        make_unique<ReadApplicationBasicVendorName>(),        make_unique<ReadApplicationBasicVendorId>(),
-        make_unique<ReadApplicationBasicApplicationName>(),   make_unique<ReadApplicationBasicProductId>(),
-        make_unique<ReadApplicationBasicApplicationId>(),     make_unique<ReadApplicationBasicCatalogVendorId>(),
-        make_unique<ReadApplicationBasicApplicationStatus>(), make_unique<ReadApplicationBasicClusterRevision>(),
+        make_unique<ApplicationBasicChangeStatus>(),          //
+        make_unique<DiscoverApplicationBasicAttributes>(),    //
+        make_unique<ReadApplicationBasicVendorName>(),        //
+        make_unique<ReadApplicationBasicVendorId>(),          //
+        make_unique<ReadApplicationBasicApplicationName>(),   //
+        make_unique<ReadApplicationBasicProductId>(),         //
+        make_unique<ReadApplicationBasicApplicationId>(),     //
+        make_unique<ReadApplicationBasicCatalogVendorId>(),   //
+        make_unique<ReadApplicationBasicApplicationStatus>(), //
+        make_unique<ReadApplicationBasicClusterRevision>(),   //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23442,12 +23447,12 @@ void registerClusterApplicationLauncher(Commands & commands)
     const char * clusterName = "ApplicationLauncher";
 
     commands_list clusterCommands = {
-        make_unique<ApplicationLauncherLaunchApp>(),
-        make_unique<DiscoverApplicationLauncherAttributes>(),
-        make_unique<ReadApplicationLauncherApplicationLauncherList>(),
-        make_unique<ReadApplicationLauncherCatalogVendorId>(),
-        make_unique<ReadApplicationLauncherApplicationId>(),
-        make_unique<ReadApplicationLauncherClusterRevision>(),
+        make_unique<ApplicationLauncherLaunchApp>(),                   //
+        make_unique<DiscoverApplicationLauncherAttributes>(),          //
+        make_unique<ReadApplicationLauncherApplicationLauncherList>(), //
+        make_unique<ReadApplicationLauncherCatalogVendorId>(),         //
+        make_unique<ReadApplicationLauncherApplicationId>(),           //
+        make_unique<ReadApplicationLauncherClusterRevision>(),         //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23457,9 +23462,12 @@ void registerClusterAudioOutput(Commands & commands)
     const char * clusterName = "AudioOutput";
 
     commands_list clusterCommands = {
-        make_unique<AudioOutputRenameOutput>(),           make_unique<AudioOutputSelectOutput>(),
-        make_unique<DiscoverAudioOutputAttributes>(),     make_unique<ReadAudioOutputAudioOutputList>(),
-        make_unique<ReadAudioOutputCurrentAudioOutput>(), make_unique<ReadAudioOutputClusterRevision>(),
+        make_unique<AudioOutputRenameOutput>(),           //
+        make_unique<AudioOutputSelectOutput>(),           //
+        make_unique<DiscoverAudioOutputAttributes>(),     //
+        make_unique<ReadAudioOutputAudioOutputList>(),    //
+        make_unique<ReadAudioOutputCurrentAudioOutput>(), //
+        make_unique<ReadAudioOutputClusterRevision>(),    //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23469,10 +23477,14 @@ void registerClusterBarrierControl(Commands & commands)
     const char * clusterName = "BarrierControl";
 
     commands_list clusterCommands = {
-        make_unique<BarrierControlBarrierControlGoToPercent>(), make_unique<BarrierControlBarrierControlStop>(),
-        make_unique<DiscoverBarrierControlAttributes>(),        make_unique<ReadBarrierControlBarrierMovingState>(),
-        make_unique<ReadBarrierControlBarrierSafetyStatus>(),   make_unique<ReadBarrierControlBarrierCapabilities>(),
-        make_unique<ReadBarrierControlBarrierPosition>(),       make_unique<ReadBarrierControlClusterRevision>(),
+        make_unique<BarrierControlBarrierControlGoToPercent>(), //
+        make_unique<BarrierControlBarrierControlStop>(),        //
+        make_unique<DiscoverBarrierControlAttributes>(),        //
+        make_unique<ReadBarrierControlBarrierMovingState>(),    //
+        make_unique<ReadBarrierControlBarrierSafetyStatus>(),   //
+        make_unique<ReadBarrierControlBarrierCapabilities>(),   //
+        make_unique<ReadBarrierControlBarrierPosition>(),       //
+        make_unique<ReadBarrierControlClusterRevision>(),       //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23482,30 +23494,30 @@ void registerClusterBasic(Commands & commands)
     const char * clusterName = "Basic";
 
     commands_list clusterCommands = {
-        make_unique<BasicMfgSpecificPing>(),
-        make_unique<DiscoverBasicAttributes>(),
-        make_unique<ReadBasicInteractionModelVersion>(),
-        make_unique<ReadBasicVendorName>(),
-        make_unique<ReadBasicVendorID>(),
-        make_unique<ReadBasicProductName>(),
-        make_unique<ReadBasicProductID>(),
-        make_unique<ReadBasicUserLabel>(),
-        make_unique<WriteBasicUserLabel>(),
-        make_unique<ReadBasicLocation>(),
-        make_unique<WriteBasicLocation>(),
-        make_unique<ReadBasicHardwareVersion>(),
-        make_unique<ReadBasicHardwareVersionString>(),
-        make_unique<ReadBasicSoftwareVersion>(),
-        make_unique<ReadBasicSoftwareVersionString>(),
-        make_unique<ReadBasicManufacturingDate>(),
-        make_unique<ReadBasicPartNumber>(),
-        make_unique<ReadBasicProductURL>(),
-        make_unique<ReadBasicProductLabel>(),
-        make_unique<ReadBasicSerialNumber>(),
-        make_unique<ReadBasicLocalConfigDisabled>(),
-        make_unique<WriteBasicLocalConfigDisabled>(),
-        make_unique<ReadBasicReachable>(),
-        make_unique<ReadBasicClusterRevision>(),
+        make_unique<BasicMfgSpecificPing>(),             //
+        make_unique<DiscoverBasicAttributes>(),          //
+        make_unique<ReadBasicInteractionModelVersion>(), //
+        make_unique<ReadBasicVendorName>(),              //
+        make_unique<ReadBasicVendorID>(),                //
+        make_unique<ReadBasicProductName>(),             //
+        make_unique<ReadBasicProductID>(),               //
+        make_unique<ReadBasicUserLabel>(),               //
+        make_unique<WriteBasicUserLabel>(),              //
+        make_unique<ReadBasicLocation>(),                //
+        make_unique<WriteBasicLocation>(),               //
+        make_unique<ReadBasicHardwareVersion>(),         //
+        make_unique<ReadBasicHardwareVersionString>(),   //
+        make_unique<ReadBasicSoftwareVersion>(),         //
+        make_unique<ReadBasicSoftwareVersionString>(),   //
+        make_unique<ReadBasicManufacturingDate>(),       //
+        make_unique<ReadBasicPartNumber>(),              //
+        make_unique<ReadBasicProductURL>(),              //
+        make_unique<ReadBasicProductLabel>(),            //
+        make_unique<ReadBasicSerialNumber>(),            //
+        make_unique<ReadBasicLocalConfigDisabled>(),     //
+        make_unique<WriteBasicLocalConfigDisabled>(),    //
+        make_unique<ReadBasicReachable>(),               //
+        make_unique<ReadBasicClusterRevision>(),         //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23515,11 +23527,15 @@ void registerClusterBinaryInputBasic(Commands & commands)
     const char * clusterName = "BinaryInputBasic";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverBinaryInputBasicAttributes>(),  make_unique<ReadBinaryInputBasicOutOfService>(),
-        make_unique<WriteBinaryInputBasicOutOfService>(),   make_unique<ReadBinaryInputBasicPresentValue>(),
-        make_unique<WriteBinaryInputBasicPresentValue>(),   make_unique<ReportBinaryInputBasicPresentValue>(),
-        make_unique<ReadBinaryInputBasicStatusFlags>(),     make_unique<ReportBinaryInputBasicStatusFlags>(),
-        make_unique<ReadBinaryInputBasicClusterRevision>(),
+        make_unique<DiscoverBinaryInputBasicAttributes>(),  //
+        make_unique<ReadBinaryInputBasicOutOfService>(),    //
+        make_unique<WriteBinaryInputBasicOutOfService>(),   //
+        make_unique<ReadBinaryInputBasicPresentValue>(),    //
+        make_unique<WriteBinaryInputBasicPresentValue>(),   //
+        make_unique<ReportBinaryInputBasicPresentValue>(),  //
+        make_unique<ReadBinaryInputBasicStatusFlags>(),     //
+        make_unique<ReportBinaryInputBasicStatusFlags>(),   //
+        make_unique<ReadBinaryInputBasicClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23529,10 +23545,10 @@ void registerClusterBinding(Commands & commands)
     const char * clusterName = "Binding";
 
     commands_list clusterCommands = {
-        make_unique<BindingBind>(),
-        make_unique<BindingUnbind>(),
-        make_unique<DiscoverBindingAttributes>(),
-        make_unique<ReadBindingClusterRevision>(),
+        make_unique<BindingBind>(),                //
+        make_unique<BindingUnbind>(),              //
+        make_unique<DiscoverBindingAttributes>(),  //
+        make_unique<ReadBindingClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23542,15 +23558,23 @@ void registerClusterBridgedDeviceBasic(Commands & commands)
     const char * clusterName = "BridgedDeviceBasic";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverBridgedDeviceBasicAttributes>(),    make_unique<ReadBridgedDeviceBasicVendorName>(),
-        make_unique<ReadBridgedDeviceBasicVendorID>(),          make_unique<ReadBridgedDeviceBasicProductName>(),
-        make_unique<ReadBridgedDeviceBasicUserLabel>(),         make_unique<WriteBridgedDeviceBasicUserLabel>(),
-        make_unique<ReadBridgedDeviceBasicHardwareVersion>(),   make_unique<ReadBridgedDeviceBasicHardwareVersionString>(),
-        make_unique<ReadBridgedDeviceBasicSoftwareVersion>(),   make_unique<ReadBridgedDeviceBasicSoftwareVersionString>(),
-        make_unique<ReadBridgedDeviceBasicManufacturingDate>(), make_unique<ReadBridgedDeviceBasicPartNumber>(),
-        make_unique<ReadBridgedDeviceBasicProductURL>(),        make_unique<ReadBridgedDeviceBasicProductLabel>(),
-        make_unique<ReadBridgedDeviceBasicSerialNumber>(),      make_unique<ReadBridgedDeviceBasicReachable>(),
-        make_unique<ReadBridgedDeviceBasicClusterRevision>(),
+        make_unique<DiscoverBridgedDeviceBasicAttributes>(),        //
+        make_unique<ReadBridgedDeviceBasicVendorName>(),            //
+        make_unique<ReadBridgedDeviceBasicVendorID>(),              //
+        make_unique<ReadBridgedDeviceBasicProductName>(),           //
+        make_unique<ReadBridgedDeviceBasicUserLabel>(),             //
+        make_unique<WriteBridgedDeviceBasicUserLabel>(),            //
+        make_unique<ReadBridgedDeviceBasicHardwareVersion>(),       //
+        make_unique<ReadBridgedDeviceBasicHardwareVersionString>(), //
+        make_unique<ReadBridgedDeviceBasicSoftwareVersion>(),       //
+        make_unique<ReadBridgedDeviceBasicSoftwareVersionString>(), //
+        make_unique<ReadBridgedDeviceBasicManufacturingDate>(),     //
+        make_unique<ReadBridgedDeviceBasicPartNumber>(),            //
+        make_unique<ReadBridgedDeviceBasicProductURL>(),            //
+        make_unique<ReadBridgedDeviceBasicProductLabel>(),          //
+        make_unique<ReadBridgedDeviceBasicSerialNumber>(),          //
+        make_unique<ReadBridgedDeviceBasicReachable>(),             //
+        make_unique<ReadBridgedDeviceBasicClusterRevision>(),       //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23560,95 +23584,95 @@ void registerClusterColorControl(Commands & commands)
     const char * clusterName = "ColorControl";
 
     commands_list clusterCommands = {
-        make_unique<ColorControlColorLoopSet>(),
-        make_unique<ColorControlEnhancedMoveHue>(),
-        make_unique<ColorControlEnhancedMoveToHue>(),
-        make_unique<ColorControlEnhancedMoveToHueAndSaturation>(),
-        make_unique<ColorControlEnhancedStepHue>(),
-        make_unique<ColorControlMoveColor>(),
-        make_unique<ColorControlMoveColorTemperature>(),
-        make_unique<ColorControlMoveHue>(),
-        make_unique<ColorControlMoveSaturation>(),
-        make_unique<ColorControlMoveToColor>(),
-        make_unique<ColorControlMoveToColorTemperature>(),
-        make_unique<ColorControlMoveToHue>(),
-        make_unique<ColorControlMoveToHueAndSaturation>(),
-        make_unique<ColorControlMoveToSaturation>(),
-        make_unique<ColorControlStepColor>(),
-        make_unique<ColorControlStepColorTemperature>(),
-        make_unique<ColorControlStepHue>(),
-        make_unique<ColorControlStepSaturation>(),
-        make_unique<ColorControlStopMoveStep>(),
-        make_unique<DiscoverColorControlAttributes>(),
-        make_unique<ReadColorControlCurrentHue>(),
-        make_unique<ReportColorControlCurrentHue>(),
-        make_unique<ReadColorControlCurrentSaturation>(),
-        make_unique<ReportColorControlCurrentSaturation>(),
-        make_unique<ReadColorControlRemainingTime>(),
-        make_unique<ReadColorControlCurrentX>(),
-        make_unique<ReportColorControlCurrentX>(),
-        make_unique<ReadColorControlCurrentY>(),
-        make_unique<ReportColorControlCurrentY>(),
-        make_unique<ReadColorControlDriftCompensation>(),
-        make_unique<ReadColorControlCompensationText>(),
-        make_unique<ReadColorControlColorTemperature>(),
-        make_unique<ReportColorControlColorTemperature>(),
-        make_unique<ReadColorControlColorMode>(),
-        make_unique<ReadColorControlColorControlOptions>(),
-        make_unique<WriteColorControlColorControlOptions>(),
-        make_unique<ReadColorControlNumberOfPrimaries>(),
-        make_unique<ReadColorControlPrimary1X>(),
-        make_unique<ReadColorControlPrimary1Y>(),
-        make_unique<ReadColorControlPrimary1Intensity>(),
-        make_unique<ReadColorControlPrimary2X>(),
-        make_unique<ReadColorControlPrimary2Y>(),
-        make_unique<ReadColorControlPrimary2Intensity>(),
-        make_unique<ReadColorControlPrimary3X>(),
-        make_unique<ReadColorControlPrimary3Y>(),
-        make_unique<ReadColorControlPrimary3Intensity>(),
-        make_unique<ReadColorControlPrimary4X>(),
-        make_unique<ReadColorControlPrimary4Y>(),
-        make_unique<ReadColorControlPrimary4Intensity>(),
-        make_unique<ReadColorControlPrimary5X>(),
-        make_unique<ReadColorControlPrimary5Y>(),
-        make_unique<ReadColorControlPrimary5Intensity>(),
-        make_unique<ReadColorControlPrimary6X>(),
-        make_unique<ReadColorControlPrimary6Y>(),
-        make_unique<ReadColorControlPrimary6Intensity>(),
-        make_unique<ReadColorControlWhitePointX>(),
-        make_unique<WriteColorControlWhitePointX>(),
-        make_unique<ReadColorControlWhitePointY>(),
-        make_unique<WriteColorControlWhitePointY>(),
-        make_unique<ReadColorControlColorPointRX>(),
-        make_unique<WriteColorControlColorPointRX>(),
-        make_unique<ReadColorControlColorPointRY>(),
-        make_unique<WriteColorControlColorPointRY>(),
-        make_unique<ReadColorControlColorPointRIntensity>(),
-        make_unique<WriteColorControlColorPointRIntensity>(),
-        make_unique<ReadColorControlColorPointGX>(),
-        make_unique<WriteColorControlColorPointGX>(),
-        make_unique<ReadColorControlColorPointGY>(),
-        make_unique<WriteColorControlColorPointGY>(),
-        make_unique<ReadColorControlColorPointGIntensity>(),
-        make_unique<WriteColorControlColorPointGIntensity>(),
-        make_unique<ReadColorControlColorPointBX>(),
-        make_unique<WriteColorControlColorPointBX>(),
-        make_unique<ReadColorControlColorPointBY>(),
-        make_unique<WriteColorControlColorPointBY>(),
-        make_unique<ReadColorControlColorPointBIntensity>(),
-        make_unique<WriteColorControlColorPointBIntensity>(),
-        make_unique<ReadColorControlEnhancedCurrentHue>(),
-        make_unique<ReadColorControlEnhancedColorMode>(),
-        make_unique<ReadColorControlColorLoopActive>(),
-        make_unique<ReadColorControlColorLoopDirection>(),
-        make_unique<ReadColorControlColorLoopTime>(),
-        make_unique<ReadColorControlColorCapabilities>(),
-        make_unique<ReadColorControlColorTempPhysicalMin>(),
-        make_unique<ReadColorControlColorTempPhysicalMax>(),
-        make_unique<ReadColorControlCoupleColorTempToLevelMinMireds>(),
-        make_unique<ReadColorControlStartUpColorTemperatureMireds>(),
-        make_unique<WriteColorControlStartUpColorTemperatureMireds>(),
-        make_unique<ReadColorControlClusterRevision>(),
+        make_unique<ColorControlColorLoopSet>(),                        //
+        make_unique<ColorControlEnhancedMoveHue>(),                     //
+        make_unique<ColorControlEnhancedMoveToHue>(),                   //
+        make_unique<ColorControlEnhancedMoveToHueAndSaturation>(),      //
+        make_unique<ColorControlEnhancedStepHue>(),                     //
+        make_unique<ColorControlMoveColor>(),                           //
+        make_unique<ColorControlMoveColorTemperature>(),                //
+        make_unique<ColorControlMoveHue>(),                             //
+        make_unique<ColorControlMoveSaturation>(),                      //
+        make_unique<ColorControlMoveToColor>(),                         //
+        make_unique<ColorControlMoveToColorTemperature>(),              //
+        make_unique<ColorControlMoveToHue>(),                           //
+        make_unique<ColorControlMoveToHueAndSaturation>(),              //
+        make_unique<ColorControlMoveToSaturation>(),                    //
+        make_unique<ColorControlStepColor>(),                           //
+        make_unique<ColorControlStepColorTemperature>(),                //
+        make_unique<ColorControlStepHue>(),                             //
+        make_unique<ColorControlStepSaturation>(),                      //
+        make_unique<ColorControlStopMoveStep>(),                        //
+        make_unique<DiscoverColorControlAttributes>(),                  //
+        make_unique<ReadColorControlCurrentHue>(),                      //
+        make_unique<ReportColorControlCurrentHue>(),                    //
+        make_unique<ReadColorControlCurrentSaturation>(),               //
+        make_unique<ReportColorControlCurrentSaturation>(),             //
+        make_unique<ReadColorControlRemainingTime>(),                   //
+        make_unique<ReadColorControlCurrentX>(),                        //
+        make_unique<ReportColorControlCurrentX>(),                      //
+        make_unique<ReadColorControlCurrentY>(),                        //
+        make_unique<ReportColorControlCurrentY>(),                      //
+        make_unique<ReadColorControlDriftCompensation>(),               //
+        make_unique<ReadColorControlCompensationText>(),                //
+        make_unique<ReadColorControlColorTemperature>(),                //
+        make_unique<ReportColorControlColorTemperature>(),              //
+        make_unique<ReadColorControlColorMode>(),                       //
+        make_unique<ReadColorControlColorControlOptions>(),             //
+        make_unique<WriteColorControlColorControlOptions>(),            //
+        make_unique<ReadColorControlNumberOfPrimaries>(),               //
+        make_unique<ReadColorControlPrimary1X>(),                       //
+        make_unique<ReadColorControlPrimary1Y>(),                       //
+        make_unique<ReadColorControlPrimary1Intensity>(),               //
+        make_unique<ReadColorControlPrimary2X>(),                       //
+        make_unique<ReadColorControlPrimary2Y>(),                       //
+        make_unique<ReadColorControlPrimary2Intensity>(),               //
+        make_unique<ReadColorControlPrimary3X>(),                       //
+        make_unique<ReadColorControlPrimary3Y>(),                       //
+        make_unique<ReadColorControlPrimary3Intensity>(),               //
+        make_unique<ReadColorControlPrimary4X>(),                       //
+        make_unique<ReadColorControlPrimary4Y>(),                       //
+        make_unique<ReadColorControlPrimary4Intensity>(),               //
+        make_unique<ReadColorControlPrimary5X>(),                       //
+        make_unique<ReadColorControlPrimary5Y>(),                       //
+        make_unique<ReadColorControlPrimary5Intensity>(),               //
+        make_unique<ReadColorControlPrimary6X>(),                       //
+        make_unique<ReadColorControlPrimary6Y>(),                       //
+        make_unique<ReadColorControlPrimary6Intensity>(),               //
+        make_unique<ReadColorControlWhitePointX>(),                     //
+        make_unique<WriteColorControlWhitePointX>(),                    //
+        make_unique<ReadColorControlWhitePointY>(),                     //
+        make_unique<WriteColorControlWhitePointY>(),                    //
+        make_unique<ReadColorControlColorPointRX>(),                    //
+        make_unique<WriteColorControlColorPointRX>(),                   //
+        make_unique<ReadColorControlColorPointRY>(),                    //
+        make_unique<WriteColorControlColorPointRY>(),                   //
+        make_unique<ReadColorControlColorPointRIntensity>(),            //
+        make_unique<WriteColorControlColorPointRIntensity>(),           //
+        make_unique<ReadColorControlColorPointGX>(),                    //
+        make_unique<WriteColorControlColorPointGX>(),                   //
+        make_unique<ReadColorControlColorPointGY>(),                    //
+        make_unique<WriteColorControlColorPointGY>(),                   //
+        make_unique<ReadColorControlColorPointGIntensity>(),            //
+        make_unique<WriteColorControlColorPointGIntensity>(),           //
+        make_unique<ReadColorControlColorPointBX>(),                    //
+        make_unique<WriteColorControlColorPointBX>(),                   //
+        make_unique<ReadColorControlColorPointBY>(),                    //
+        make_unique<WriteColorControlColorPointBY>(),                   //
+        make_unique<ReadColorControlColorPointBIntensity>(),            //
+        make_unique<WriteColorControlColorPointBIntensity>(),           //
+        make_unique<ReadColorControlEnhancedCurrentHue>(),              //
+        make_unique<ReadColorControlEnhancedColorMode>(),               //
+        make_unique<ReadColorControlColorLoopActive>(),                 //
+        make_unique<ReadColorControlColorLoopDirection>(),              //
+        make_unique<ReadColorControlColorLoopTime>(),                   //
+        make_unique<ReadColorControlColorCapabilities>(),               //
+        make_unique<ReadColorControlColorTempPhysicalMin>(),            //
+        make_unique<ReadColorControlColorTempPhysicalMax>(),            //
+        make_unique<ReadColorControlCoupleColorTempToLevelMinMireds>(), //
+        make_unique<ReadColorControlStartUpColorTemperatureMireds>(),   //
+        make_unique<WriteColorControlStartUpColorTemperatureMireds>(),  //
+        make_unique<ReadColorControlClusterRevision>(),                 //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23658,12 +23682,12 @@ void registerClusterContentLauncher(Commands & commands)
     const char * clusterName = "ContentLauncher";
 
     commands_list clusterCommands = {
-        make_unique<ContentLauncherLaunchContent>(),
-        make_unique<ContentLauncherLaunchURL>(),
-        make_unique<DiscoverContentLauncherAttributes>(),
-        make_unique<ReadContentLauncherAcceptsHeaderList>(),
-        make_unique<ReadContentLauncherSupportedStreamingTypes>(),
-        make_unique<ReadContentLauncherClusterRevision>(),
+        make_unique<ContentLauncherLaunchContent>(),               //
+        make_unique<ContentLauncherLaunchURL>(),                   //
+        make_unique<DiscoverContentLauncherAttributes>(),          //
+        make_unique<ReadContentLauncherAcceptsHeaderList>(),       //
+        make_unique<ReadContentLauncherSupportedStreamingTypes>(), //
+        make_unique<ReadContentLauncherClusterRevision>(),         //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23673,9 +23697,12 @@ void registerClusterDescriptor(Commands & commands)
     const char * clusterName = "Descriptor";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverDescriptorAttributes>(), make_unique<ReadDescriptorDeviceList>(),
-        make_unique<ReadDescriptorServerList>(),     make_unique<ReadDescriptorClientList>(),
-        make_unique<ReadDescriptorPartsList>(),      make_unique<ReadDescriptorClusterRevision>(),
+        make_unique<DiscoverDescriptorAttributes>(),  //
+        make_unique<ReadDescriptorDeviceList>(),      //
+        make_unique<ReadDescriptorServerList>(),      //
+        make_unique<ReadDescriptorClientList>(),      //
+        make_unique<ReadDescriptorPartsList>(),       //
+        make_unique<ReadDescriptorClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23685,8 +23712,8 @@ void registerClusterDiagnosticLogs(Commands & commands)
     const char * clusterName = "DiagnosticLogs";
 
     commands_list clusterCommands = {
-        make_unique<DiagnosticLogsRetrieveLogsRequest>(),
-        make_unique<DiscoverDiagnosticLogsAttributes>(),
+        make_unique<DiagnosticLogsRetrieveLogsRequest>(), //
+        make_unique<DiscoverDiagnosticLogsAttributes>(),  //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23696,35 +23723,35 @@ void registerClusterDoorLock(Commands & commands)
     const char * clusterName = "DoorLock";
 
     commands_list clusterCommands = {
-        make_unique<DoorLockClearAllPins>(),
-        make_unique<DoorLockClearAllRfids>(),
-        make_unique<DoorLockClearHolidaySchedule>(),
-        make_unique<DoorLockClearPin>(),
-        make_unique<DoorLockClearRfid>(),
-        make_unique<DoorLockClearWeekdaySchedule>(),
-        make_unique<DoorLockClearYeardaySchedule>(),
-        make_unique<DoorLockGetHolidaySchedule>(),
-        make_unique<DoorLockGetLogRecord>(),
-        make_unique<DoorLockGetPin>(),
-        make_unique<DoorLockGetRfid>(),
-        make_unique<DoorLockGetUserType>(),
-        make_unique<DoorLockGetWeekdaySchedule>(),
-        make_unique<DoorLockGetYeardaySchedule>(),
-        make_unique<DoorLockLockDoor>(),
-        make_unique<DoorLockSetHolidaySchedule>(),
-        make_unique<DoorLockSetPin>(),
-        make_unique<DoorLockSetRfid>(),
-        make_unique<DoorLockSetUserType>(),
-        make_unique<DoorLockSetWeekdaySchedule>(),
-        make_unique<DoorLockSetYeardaySchedule>(),
-        make_unique<DoorLockUnlockDoor>(),
-        make_unique<DoorLockUnlockWithTimeout>(),
-        make_unique<DiscoverDoorLockAttributes>(),
-        make_unique<ReadDoorLockLockState>(),
-        make_unique<ReportDoorLockLockState>(),
-        make_unique<ReadDoorLockLockType>(),
-        make_unique<ReadDoorLockActuatorEnabled>(),
-        make_unique<ReadDoorLockClusterRevision>(),
+        make_unique<DoorLockClearAllPins>(),         //
+        make_unique<DoorLockClearAllRfids>(),        //
+        make_unique<DoorLockClearHolidaySchedule>(), //
+        make_unique<DoorLockClearPin>(),             //
+        make_unique<DoorLockClearRfid>(),            //
+        make_unique<DoorLockClearWeekdaySchedule>(), //
+        make_unique<DoorLockClearYeardaySchedule>(), //
+        make_unique<DoorLockGetHolidaySchedule>(),   //
+        make_unique<DoorLockGetLogRecord>(),         //
+        make_unique<DoorLockGetPin>(),               //
+        make_unique<DoorLockGetRfid>(),              //
+        make_unique<DoorLockGetUserType>(),          //
+        make_unique<DoorLockGetWeekdaySchedule>(),   //
+        make_unique<DoorLockGetYeardaySchedule>(),   //
+        make_unique<DoorLockLockDoor>(),             //
+        make_unique<DoorLockSetHolidaySchedule>(),   //
+        make_unique<DoorLockSetPin>(),               //
+        make_unique<DoorLockSetRfid>(),              //
+        make_unique<DoorLockSetUserType>(),          //
+        make_unique<DoorLockSetWeekdaySchedule>(),   //
+        make_unique<DoorLockSetYeardaySchedule>(),   //
+        make_unique<DoorLockUnlockDoor>(),           //
+        make_unique<DoorLockUnlockWithTimeout>(),    //
+        make_unique<DiscoverDoorLockAttributes>(),   //
+        make_unique<ReadDoorLockLockState>(),        //
+        make_unique<ReportDoorLockLockState>(),      //
+        make_unique<ReadDoorLockLockType>(),         //
+        make_unique<ReadDoorLockActuatorEnabled>(),  //
+        make_unique<ReadDoorLockClusterRevision>(),  //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23734,13 +23761,19 @@ void registerClusterElectricalMeasurement(Commands & commands)
     const char * clusterName = "ElectricalMeasurement";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverElectricalMeasurementAttributes>(),   make_unique<ReadElectricalMeasurementMeasurementType>(),
-        make_unique<ReadElectricalMeasurementTotalActivePower>(), make_unique<ReadElectricalMeasurementRmsVoltage>(),
-        make_unique<ReadElectricalMeasurementRmsVoltageMin>(),    make_unique<ReadElectricalMeasurementRmsVoltageMax>(),
-        make_unique<ReadElectricalMeasurementRmsCurrent>(),       make_unique<ReadElectricalMeasurementRmsCurrentMin>(),
-        make_unique<ReadElectricalMeasurementRmsCurrentMax>(),    make_unique<ReadElectricalMeasurementActivePower>(),
-        make_unique<ReadElectricalMeasurementActivePowerMin>(),   make_unique<ReadElectricalMeasurementActivePowerMax>(),
-        make_unique<ReadElectricalMeasurementClusterRevision>(),
+        make_unique<DiscoverElectricalMeasurementAttributes>(),   //
+        make_unique<ReadElectricalMeasurementMeasurementType>(),  //
+        make_unique<ReadElectricalMeasurementTotalActivePower>(), //
+        make_unique<ReadElectricalMeasurementRmsVoltage>(),       //
+        make_unique<ReadElectricalMeasurementRmsVoltageMin>(),    //
+        make_unique<ReadElectricalMeasurementRmsVoltageMax>(),    //
+        make_unique<ReadElectricalMeasurementRmsCurrent>(),       //
+        make_unique<ReadElectricalMeasurementRmsCurrentMin>(),    //
+        make_unique<ReadElectricalMeasurementRmsCurrentMax>(),    //
+        make_unique<ReadElectricalMeasurementActivePower>(),      //
+        make_unique<ReadElectricalMeasurementActivePowerMin>(),   //
+        make_unique<ReadElectricalMeasurementActivePowerMax>(),   //
+        make_unique<ReadElectricalMeasurementClusterRevision>(),  //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23750,10 +23783,14 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands)
     const char * clusterName = "EthernetNetworkDiagnostics";
 
     commands_list clusterCommands = {
-        make_unique<EthernetNetworkDiagnosticsResetCounts>(),       make_unique<DiscoverEthernetNetworkDiagnosticsAttributes>(),
-        make_unique<ReadEthernetNetworkDiagnosticsPacketRxCount>(), make_unique<ReadEthernetNetworkDiagnosticsPacketTxCount>(),
-        make_unique<ReadEthernetNetworkDiagnosticsTxErrCount>(),    make_unique<ReadEthernetNetworkDiagnosticsCollisionCount>(),
-        make_unique<ReadEthernetNetworkDiagnosticsOverrunCount>(),  make_unique<ReadEthernetNetworkDiagnosticsClusterRevision>(),
+        make_unique<EthernetNetworkDiagnosticsResetCounts>(),         //
+        make_unique<DiscoverEthernetNetworkDiagnosticsAttributes>(),  //
+        make_unique<ReadEthernetNetworkDiagnosticsPacketRxCount>(),   //
+        make_unique<ReadEthernetNetworkDiagnosticsPacketTxCount>(),   //
+        make_unique<ReadEthernetNetworkDiagnosticsTxErrCount>(),      //
+        make_unique<ReadEthernetNetworkDiagnosticsCollisionCount>(),  //
+        make_unique<ReadEthernetNetworkDiagnosticsOverrunCount>(),    //
+        make_unique<ReadEthernetNetworkDiagnosticsClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23763,9 +23800,9 @@ void registerClusterFixedLabel(Commands & commands)
     const char * clusterName = "FixedLabel";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverFixedLabelAttributes>(),
-        make_unique<ReadFixedLabelLabelList>(),
-        make_unique<ReadFixedLabelClusterRevision>(),
+        make_unique<DiscoverFixedLabelAttributes>(),  //
+        make_unique<ReadFixedLabelLabelList>(),       //
+        make_unique<ReadFixedLabelClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23775,9 +23812,11 @@ void registerClusterFlowMeasurement(Commands & commands)
     const char * clusterName = "FlowMeasurement";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverFlowMeasurementAttributes>(),   make_unique<ReadFlowMeasurementMeasuredValue>(),
-        make_unique<ReadFlowMeasurementMinMeasuredValue>(), make_unique<ReadFlowMeasurementMaxMeasuredValue>(),
-        make_unique<ReadFlowMeasurementClusterRevision>(),
+        make_unique<DiscoverFlowMeasurementAttributes>(),   //
+        make_unique<ReadFlowMeasurementMeasuredValue>(),    //
+        make_unique<ReadFlowMeasurementMinMeasuredValue>(), //
+        make_unique<ReadFlowMeasurementMaxMeasuredValue>(), //
+        make_unique<ReadFlowMeasurementClusterRevision>(),  //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23787,10 +23826,14 @@ void registerClusterGeneralCommissioning(Commands & commands)
     const char * clusterName = "GeneralCommissioning";
 
     commands_list clusterCommands = {
-        make_unique<GeneralCommissioningArmFailSafe>(),         make_unique<GeneralCommissioningCommissioningComplete>(),
-        make_unique<GeneralCommissioningSetRegulatoryConfig>(), make_unique<DiscoverGeneralCommissioningAttributes>(),
-        make_unique<ReadGeneralCommissioningFabricId>(),        make_unique<ReadGeneralCommissioningBreadcrumb>(),
-        make_unique<WriteGeneralCommissioningBreadcrumb>(),     make_unique<ReadGeneralCommissioningClusterRevision>(),
+        make_unique<GeneralCommissioningArmFailSafe>(),           //
+        make_unique<GeneralCommissioningCommissioningComplete>(), //
+        make_unique<GeneralCommissioningSetRegulatoryConfig>(),   //
+        make_unique<DiscoverGeneralCommissioningAttributes>(),    //
+        make_unique<ReadGeneralCommissioningFabricId>(),          //
+        make_unique<ReadGeneralCommissioningBreadcrumb>(),        //
+        make_unique<WriteGeneralCommissioningBreadcrumb>(),       //
+        make_unique<ReadGeneralCommissioningClusterRevision>(),   //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23800,10 +23843,10 @@ void registerClusterGeneralDiagnostics(Commands & commands)
     const char * clusterName = "GeneralDiagnostics";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverGeneralDiagnosticsAttributes>(),
-        make_unique<ReadGeneralDiagnosticsNetworkInterfaces>(),
-        make_unique<ReadGeneralDiagnosticsRebootCount>(),
-        make_unique<ReadGeneralDiagnosticsClusterRevision>(),
+        make_unique<DiscoverGeneralDiagnosticsAttributes>(),    //
+        make_unique<ReadGeneralDiagnosticsNetworkInterfaces>(), //
+        make_unique<ReadGeneralDiagnosticsRebootCount>(),       //
+        make_unique<ReadGeneralDiagnosticsClusterRevision>(),   //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23813,10 +23856,10 @@ void registerClusterGroupKeyManagement(Commands & commands)
     const char * clusterName = "GroupKeyManagement";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverGroupKeyManagementAttributes>(),
-        make_unique<ReadGroupKeyManagementGroups>(),
-        make_unique<ReadGroupKeyManagementGroupKeys>(),
-        make_unique<ReadGroupKeyManagementClusterRevision>(),
+        make_unique<DiscoverGroupKeyManagementAttributes>(),  //
+        make_unique<ReadGroupKeyManagementGroups>(),          //
+        make_unique<ReadGroupKeyManagementGroupKeys>(),       //
+        make_unique<ReadGroupKeyManagementClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23826,15 +23869,15 @@ void registerClusterGroups(Commands & commands)
     const char * clusterName = "Groups";
 
     commands_list clusterCommands = {
-        make_unique<GroupsAddGroup>(),
-        make_unique<GroupsAddGroupIfIdentifying>(),
-        make_unique<GroupsGetGroupMembership>(),
-        make_unique<GroupsRemoveAllGroups>(),
-        make_unique<GroupsRemoveGroup>(),
-        make_unique<GroupsViewGroup>(),
-        make_unique<DiscoverGroupsAttributes>(),
-        make_unique<ReadGroupsNameSupport>(),
-        make_unique<ReadGroupsClusterRevision>(),
+        make_unique<GroupsAddGroup>(),              //
+        make_unique<GroupsAddGroupIfIdentifying>(), //
+        make_unique<GroupsGetGroupMembership>(),    //
+        make_unique<GroupsRemoveAllGroups>(),       //
+        make_unique<GroupsRemoveGroup>(),           //
+        make_unique<GroupsViewGroup>(),             //
+        make_unique<DiscoverGroupsAttributes>(),    //
+        make_unique<ReadGroupsNameSupport>(),       //
+        make_unique<ReadGroupsClusterRevision>(),   //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23844,9 +23887,12 @@ void registerClusterIdentify(Commands & commands)
     const char * clusterName = "Identify";
 
     commands_list clusterCommands = {
-        make_unique<IdentifyIdentify>(),           make_unique<IdentifyIdentifyQuery>(),
-        make_unique<DiscoverIdentifyAttributes>(), make_unique<ReadIdentifyIdentifyTime>(),
-        make_unique<WriteIdentifyIdentifyTime>(),  make_unique<ReadIdentifyClusterRevision>(),
+        make_unique<IdentifyIdentify>(),            //
+        make_unique<IdentifyIdentifyQuery>(),       //
+        make_unique<DiscoverIdentifyAttributes>(),  //
+        make_unique<ReadIdentifyIdentifyTime>(),    //
+        make_unique<WriteIdentifyIdentifyTime>(),   //
+        make_unique<ReadIdentifyClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23856,9 +23902,9 @@ void registerClusterKeypadInput(Commands & commands)
     const char * clusterName = "KeypadInput";
 
     commands_list clusterCommands = {
-        make_unique<KeypadInputSendKey>(),
-        make_unique<DiscoverKeypadInputAttributes>(),
-        make_unique<ReadKeypadInputClusterRevision>(),
+        make_unique<KeypadInputSendKey>(),             //
+        make_unique<DiscoverKeypadInputAttributes>(),  //
+        make_unique<ReadKeypadInputClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23868,18 +23914,18 @@ void registerClusterLevelControl(Commands & commands)
     const char * clusterName = "LevelControl";
 
     commands_list clusterCommands = {
-        make_unique<LevelControlMove>(),
-        make_unique<LevelControlMoveToLevel>(),
-        make_unique<LevelControlMoveToLevelWithOnOff>(),
-        make_unique<LevelControlMoveWithOnOff>(),
-        make_unique<LevelControlStep>(),
-        make_unique<LevelControlStepWithOnOff>(),
-        make_unique<LevelControlStop>(),
-        make_unique<LevelControlStopWithOnOff>(),
-        make_unique<DiscoverLevelControlAttributes>(),
-        make_unique<ReadLevelControlCurrentLevel>(),
-        make_unique<ReportLevelControlCurrentLevel>(),
-        make_unique<ReadLevelControlClusterRevision>(),
+        make_unique<LevelControlMove>(),                 //
+        make_unique<LevelControlMoveToLevel>(),          //
+        make_unique<LevelControlMoveToLevelWithOnOff>(), //
+        make_unique<LevelControlMoveWithOnOff>(),        //
+        make_unique<LevelControlStep>(),                 //
+        make_unique<LevelControlStepWithOnOff>(),        //
+        make_unique<LevelControlStop>(),                 //
+        make_unique<LevelControlStopWithOnOff>(),        //
+        make_unique<DiscoverLevelControlAttributes>(),   //
+        make_unique<ReadLevelControlCurrentLevel>(),     //
+        make_unique<ReportLevelControlCurrentLevel>(),   //
+        make_unique<ReadLevelControlClusterRevision>(),  //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23889,9 +23935,9 @@ void registerClusterLowPower(Commands & commands)
     const char * clusterName = "LowPower";
 
     commands_list clusterCommands = {
-        make_unique<LowPowerSleep>(),
-        make_unique<DiscoverLowPowerAttributes>(),
-        make_unique<ReadLowPowerClusterRevision>(),
+        make_unique<LowPowerSleep>(),               //
+        make_unique<DiscoverLowPowerAttributes>(),  //
+        make_unique<ReadLowPowerClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23901,10 +23947,14 @@ void registerClusterMediaInput(Commands & commands)
     const char * clusterName = "MediaInput";
 
     commands_list clusterCommands = {
-        make_unique<MediaInputHideInputStatus>(),       make_unique<MediaInputRenameInput>(),
-        make_unique<MediaInputSelectInput>(),           make_unique<MediaInputShowInputStatus>(),
-        make_unique<DiscoverMediaInputAttributes>(),    make_unique<ReadMediaInputMediaInputList>(),
-        make_unique<ReadMediaInputCurrentMediaInput>(), make_unique<ReadMediaInputClusterRevision>(),
+        make_unique<MediaInputHideInputStatus>(),       //
+        make_unique<MediaInputRenameInput>(),           //
+        make_unique<MediaInputSelectInput>(),           //
+        make_unique<MediaInputShowInputStatus>(),       //
+        make_unique<DiscoverMediaInputAttributes>(),    //
+        make_unique<ReadMediaInputMediaInputList>(),    //
+        make_unique<ReadMediaInputCurrentMediaInput>(), //
+        make_unique<ReadMediaInputClusterRevision>(),   //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23914,13 +23964,19 @@ void registerClusterMediaPlayback(Commands & commands)
     const char * clusterName = "MediaPlayback";
 
     commands_list clusterCommands = {
-        make_unique<MediaPlaybackMediaFastForward>(),    make_unique<MediaPlaybackMediaNext>(),
-        make_unique<MediaPlaybackMediaPause>(),          make_unique<MediaPlaybackMediaPlay>(),
-        make_unique<MediaPlaybackMediaPrevious>(),       make_unique<MediaPlaybackMediaRewind>(),
-        make_unique<MediaPlaybackMediaSeek>(),           make_unique<MediaPlaybackMediaSkipBackward>(),
-        make_unique<MediaPlaybackMediaSkipForward>(),    make_unique<MediaPlaybackMediaStartOver>(),
-        make_unique<MediaPlaybackMediaStop>(),           make_unique<DiscoverMediaPlaybackAttributes>(),
-        make_unique<ReadMediaPlaybackClusterRevision>(),
+        make_unique<MediaPlaybackMediaFastForward>(),    //
+        make_unique<MediaPlaybackMediaNext>(),           //
+        make_unique<MediaPlaybackMediaPause>(),          //
+        make_unique<MediaPlaybackMediaPlay>(),           //
+        make_unique<MediaPlaybackMediaPrevious>(),       //
+        make_unique<MediaPlaybackMediaRewind>(),         //
+        make_unique<MediaPlaybackMediaSeek>(),           //
+        make_unique<MediaPlaybackMediaSkipBackward>(),   //
+        make_unique<MediaPlaybackMediaSkipForward>(),    //
+        make_unique<MediaPlaybackMediaStartOver>(),      //
+        make_unique<MediaPlaybackMediaStop>(),           //
+        make_unique<DiscoverMediaPlaybackAttributes>(),  //
+        make_unique<ReadMediaPlaybackClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23930,17 +23986,17 @@ void registerClusterNetworkCommissioning(Commands & commands)
     const char * clusterName = "NetworkCommissioning";
 
     commands_list clusterCommands = {
-        make_unique<NetworkCommissioningAddThreadNetwork>(),
-        make_unique<NetworkCommissioningAddWiFiNetwork>(),
-        make_unique<NetworkCommissioningDisableNetwork>(),
-        make_unique<NetworkCommissioningEnableNetwork>(),
-        make_unique<NetworkCommissioningGetLastNetworkCommissioningResult>(),
-        make_unique<NetworkCommissioningRemoveNetwork>(),
-        make_unique<NetworkCommissioningScanNetworks>(),
-        make_unique<NetworkCommissioningUpdateThreadNetwork>(),
-        make_unique<NetworkCommissioningUpdateWiFiNetwork>(),
-        make_unique<DiscoverNetworkCommissioningAttributes>(),
-        make_unique<ReadNetworkCommissioningClusterRevision>(),
+        make_unique<NetworkCommissioningAddThreadNetwork>(),                  //
+        make_unique<NetworkCommissioningAddWiFiNetwork>(),                    //
+        make_unique<NetworkCommissioningDisableNetwork>(),                    //
+        make_unique<NetworkCommissioningEnableNetwork>(),                     //
+        make_unique<NetworkCommissioningGetLastNetworkCommissioningResult>(), //
+        make_unique<NetworkCommissioningRemoveNetwork>(),                     //
+        make_unique<NetworkCommissioningScanNetworks>(),                      //
+        make_unique<NetworkCommissioningUpdateThreadNetwork>(),               //
+        make_unique<NetworkCommissioningUpdateWiFiNetwork>(),                 //
+        make_unique<DiscoverNetworkCommissioningAttributes>(),                //
+        make_unique<ReadNetworkCommissioningClusterRevision>(),               //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23950,9 +24006,11 @@ void registerClusterOtaSoftwareUpdateProvider(Commands & commands)
     const char * clusterName = "OtaSoftwareUpdateProvider";
 
     commands_list clusterCommands = {
-        make_unique<OtaSoftwareUpdateProviderApplyUpdateRequest>(),  make_unique<OtaSoftwareUpdateProviderNotifyUpdateApplied>(),
-        make_unique<OtaSoftwareUpdateProviderQueryImage>(),          make_unique<DiscoverOtaSoftwareUpdateProviderAttributes>(),
-        make_unique<ReadOtaSoftwareUpdateProviderClusterRevision>(),
+        make_unique<OtaSoftwareUpdateProviderApplyUpdateRequest>(),  //
+        make_unique<OtaSoftwareUpdateProviderNotifyUpdateApplied>(), //
+        make_unique<OtaSoftwareUpdateProviderQueryImage>(),          //
+        make_unique<DiscoverOtaSoftwareUpdateProviderAttributes>(),  //
+        make_unique<ReadOtaSoftwareUpdateProviderClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23962,12 +24020,12 @@ void registerClusterOccupancySensing(Commands & commands)
     const char * clusterName = "OccupancySensing";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverOccupancySensingAttributes>(),
-        make_unique<ReadOccupancySensingOccupancy>(),
-        make_unique<ReportOccupancySensingOccupancy>(),
-        make_unique<ReadOccupancySensingOccupancySensorType>(),
-        make_unique<ReadOccupancySensingOccupancySensorTypeBitmap>(),
-        make_unique<ReadOccupancySensingClusterRevision>(),
+        make_unique<DiscoverOccupancySensingAttributes>(),            //
+        make_unique<ReadOccupancySensingOccupancy>(),                 //
+        make_unique<ReportOccupancySensingOccupancy>(),               //
+        make_unique<ReadOccupancySensingOccupancySensorType>(),       //
+        make_unique<ReadOccupancySensingOccupancySensorTypeBitmap>(), //
+        make_unique<ReadOccupancySensingClusterRevision>(),           //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -23977,24 +24035,24 @@ void registerClusterOnOff(Commands & commands)
     const char * clusterName = "OnOff";
 
     commands_list clusterCommands = {
-        make_unique<OnOffOff>(),
-        make_unique<OnOffOffWithEffect>(),
-        make_unique<OnOffOn>(),
-        make_unique<OnOffOnWithRecallGlobalScene>(),
-        make_unique<OnOffOnWithTimedOff>(),
-        make_unique<OnOffToggle>(),
-        make_unique<DiscoverOnOffAttributes>(),
-        make_unique<ReadOnOffOnOff>(),
-        make_unique<ReportOnOffOnOff>(),
-        make_unique<ReadOnOffGlobalSceneControl>(),
-        make_unique<ReadOnOffOnTime>(),
-        make_unique<WriteOnOffOnTime>(),
-        make_unique<ReadOnOffOffWaitTime>(),
-        make_unique<WriteOnOffOffWaitTime>(),
-        make_unique<ReadOnOffStartUpOnOff>(),
-        make_unique<WriteOnOffStartUpOnOff>(),
-        make_unique<ReadOnOffFeatureMap>(),
-        make_unique<ReadOnOffClusterRevision>(),
+        make_unique<OnOffOff>(),                     //
+        make_unique<OnOffOffWithEffect>(),           //
+        make_unique<OnOffOn>(),                      //
+        make_unique<OnOffOnWithRecallGlobalScene>(), //
+        make_unique<OnOffOnWithTimedOff>(),          //
+        make_unique<OnOffToggle>(),                  //
+        make_unique<DiscoverOnOffAttributes>(),      //
+        make_unique<ReadOnOffOnOff>(),               //
+        make_unique<ReportOnOffOnOff>(),             //
+        make_unique<ReadOnOffGlobalSceneControl>(),  //
+        make_unique<ReadOnOffOnTime>(),              //
+        make_unique<WriteOnOffOnTime>(),             //
+        make_unique<ReadOnOffOffWaitTime>(),         //
+        make_unique<WriteOnOffOffWaitTime>(),        //
+        make_unique<ReadOnOffStartUpOnOff>(),        //
+        make_unique<WriteOnOffStartUpOnOff>(),       //
+        make_unique<ReadOnOffFeatureMap>(),          //
+        make_unique<ReadOnOffClusterRevision>(),     //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24004,17 +24062,17 @@ void registerClusterOperationalCredentials(Commands & commands)
     const char * clusterName = "OperationalCredentials";
 
     commands_list clusterCommands = {
-        make_unique<OperationalCredentialsAddNOC>(),
-        make_unique<OperationalCredentialsAddTrustedRootCertificate>(),
-        make_unique<OperationalCredentialsOpCSRRequest>(),
-        make_unique<OperationalCredentialsRemoveAllFabrics>(),
-        make_unique<OperationalCredentialsRemoveFabric>(),
-        make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(),
-        make_unique<OperationalCredentialsSetFabric>(),
-        make_unique<OperationalCredentialsUpdateFabricLabel>(),
-        make_unique<DiscoverOperationalCredentialsAttributes>(),
-        make_unique<ReadOperationalCredentialsFabricsList>(),
-        make_unique<ReadOperationalCredentialsClusterRevision>(),
+        make_unique<OperationalCredentialsAddNOC>(),                       //
+        make_unique<OperationalCredentialsAddTrustedRootCertificate>(),    //
+        make_unique<OperationalCredentialsOpCSRRequest>(),                 //
+        make_unique<OperationalCredentialsRemoveAllFabrics>(),             //
+        make_unique<OperationalCredentialsRemoveFabric>(),                 //
+        make_unique<OperationalCredentialsRemoveTrustedRootCertificate>(), //
+        make_unique<OperationalCredentialsSetFabric>(),                    //
+        make_unique<OperationalCredentialsUpdateFabricLabel>(),            //
+        make_unique<DiscoverOperationalCredentialsAttributes>(),           //
+        make_unique<ReadOperationalCredentialsFabricsList>(),              //
+        make_unique<ReadOperationalCredentialsClusterRevision>(),          //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24024,9 +24082,12 @@ void registerClusterPressureMeasurement(Commands & commands)
     const char * clusterName = "PressureMeasurement";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverPressureMeasurementAttributes>(),   make_unique<ReadPressureMeasurementMeasuredValue>(),
-        make_unique<ReportPressureMeasurementMeasuredValue>(),  make_unique<ReadPressureMeasurementMinMeasuredValue>(),
-        make_unique<ReadPressureMeasurementMaxMeasuredValue>(), make_unique<ReadPressureMeasurementClusterRevision>(),
+        make_unique<DiscoverPressureMeasurementAttributes>(),   //
+        make_unique<ReadPressureMeasurementMeasuredValue>(),    //
+        make_unique<ReportPressureMeasurementMeasuredValue>(),  //
+        make_unique<ReadPressureMeasurementMinMeasuredValue>(), //
+        make_unique<ReadPressureMeasurementMaxMeasuredValue>(), //
+        make_unique<ReadPressureMeasurementClusterRevision>(),  //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24036,17 +24097,17 @@ void registerClusterPumpConfigurationAndControl(Commands & commands)
     const char * clusterName = "PumpConfigurationAndControl";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverPumpConfigurationAndControlAttributes>(),
-        make_unique<ReadPumpConfigurationAndControlMaxPressure>(),
-        make_unique<ReadPumpConfigurationAndControlMaxSpeed>(),
-        make_unique<ReadPumpConfigurationAndControlMaxFlow>(),
-        make_unique<ReadPumpConfigurationAndControlEffectiveOperationMode>(),
-        make_unique<ReadPumpConfigurationAndControlEffectiveControlMode>(),
-        make_unique<ReadPumpConfigurationAndControlCapacity>(),
-        make_unique<ReportPumpConfigurationAndControlCapacity>(),
-        make_unique<ReadPumpConfigurationAndControlOperationMode>(),
-        make_unique<WritePumpConfigurationAndControlOperationMode>(),
-        make_unique<ReadPumpConfigurationAndControlClusterRevision>(),
+        make_unique<DiscoverPumpConfigurationAndControlAttributes>(),         //
+        make_unique<ReadPumpConfigurationAndControlMaxPressure>(),            //
+        make_unique<ReadPumpConfigurationAndControlMaxSpeed>(),               //
+        make_unique<ReadPumpConfigurationAndControlMaxFlow>(),                //
+        make_unique<ReadPumpConfigurationAndControlEffectiveOperationMode>(), //
+        make_unique<ReadPumpConfigurationAndControlEffectiveControlMode>(),   //
+        make_unique<ReadPumpConfigurationAndControlCapacity>(),               //
+        make_unique<ReportPumpConfigurationAndControlCapacity>(),             //
+        make_unique<ReadPumpConfigurationAndControlOperationMode>(),          //
+        make_unique<WritePumpConfigurationAndControlOperationMode>(),         //
+        make_unique<ReadPumpConfigurationAndControlClusterRevision>(),        //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24056,12 +24117,12 @@ void registerClusterRelativeHumidityMeasurement(Commands & commands)
     const char * clusterName = "RelativeHumidityMeasurement";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverRelativeHumidityMeasurementAttributes>(),
-        make_unique<ReadRelativeHumidityMeasurementMeasuredValue>(),
-        make_unique<ReportRelativeHumidityMeasurementMeasuredValue>(),
-        make_unique<ReadRelativeHumidityMeasurementMinMeasuredValue>(),
-        make_unique<ReadRelativeHumidityMeasurementMaxMeasuredValue>(),
-        make_unique<ReadRelativeHumidityMeasurementClusterRevision>(),
+        make_unique<DiscoverRelativeHumidityMeasurementAttributes>(),   //
+        make_unique<ReadRelativeHumidityMeasurementMeasuredValue>(),    //
+        make_unique<ReportRelativeHumidityMeasurementMeasuredValue>(),  //
+        make_unique<ReadRelativeHumidityMeasurementMinMeasuredValue>(), //
+        make_unique<ReadRelativeHumidityMeasurementMaxMeasuredValue>(), //
+        make_unique<ReadRelativeHumidityMeasurementClusterRevision>(),  //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24071,11 +24132,20 @@ void registerClusterScenes(Commands & commands)
     const char * clusterName = "Scenes";
 
     commands_list clusterCommands = {
-        make_unique<ScenesAddScene>(),         make_unique<ScenesGetSceneMembership>(),  make_unique<ScenesRecallScene>(),
-        make_unique<ScenesRemoveAllScenes>(),  make_unique<ScenesRemoveScene>(),         make_unique<ScenesStoreScene>(),
-        make_unique<ScenesViewScene>(),        make_unique<DiscoverScenesAttributes>(),  make_unique<ReadScenesSceneCount>(),
-        make_unique<ReadScenesCurrentScene>(), make_unique<ReadScenesCurrentGroup>(),    make_unique<ReadScenesSceneValid>(),
-        make_unique<ReadScenesNameSupport>(),  make_unique<ReadScenesClusterRevision>(),
+        make_unique<ScenesAddScene>(),            //
+        make_unique<ScenesGetSceneMembership>(),  //
+        make_unique<ScenesRecallScene>(),         //
+        make_unique<ScenesRemoveAllScenes>(),     //
+        make_unique<ScenesRemoveScene>(),         //
+        make_unique<ScenesStoreScene>(),          //
+        make_unique<ScenesViewScene>(),           //
+        make_unique<DiscoverScenesAttributes>(),  //
+        make_unique<ReadScenesSceneCount>(),      //
+        make_unique<ReadScenesCurrentScene>(),    //
+        make_unique<ReadScenesCurrentGroup>(),    //
+        make_unique<ReadScenesSceneValid>(),      //
+        make_unique<ReadScenesNameSupport>(),     //
+        make_unique<ReadScenesClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24085,10 +24155,10 @@ void registerClusterSoftwareDiagnostics(Commands & commands)
     const char * clusterName = "SoftwareDiagnostics";
 
     commands_list clusterCommands = {
-        make_unique<SoftwareDiagnosticsResetWatermarks>(),
-        make_unique<DiscoverSoftwareDiagnosticsAttributes>(),
-        make_unique<ReadSoftwareDiagnosticsCurrentHeapHighWatermark>(),
-        make_unique<ReadSoftwareDiagnosticsClusterRevision>(),
+        make_unique<SoftwareDiagnosticsResetWatermarks>(),              //
+        make_unique<DiscoverSoftwareDiagnosticsAttributes>(),           //
+        make_unique<ReadSoftwareDiagnosticsCurrentHeapHighWatermark>(), //
+        make_unique<ReadSoftwareDiagnosticsClusterRevision>(),          //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24098,9 +24168,11 @@ void registerClusterSwitch(Commands & commands)
     const char * clusterName = "Switch";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverSwitchAttributes>(),  make_unique<ReadSwitchNumberOfPositions>(),
-        make_unique<ReadSwitchCurrentPosition>(), make_unique<ReportSwitchCurrentPosition>(),
-        make_unique<ReadSwitchClusterRevision>(),
+        make_unique<DiscoverSwitchAttributes>(),    //
+        make_unique<ReadSwitchNumberOfPositions>(), //
+        make_unique<ReadSwitchCurrentPosition>(),   //
+        make_unique<ReportSwitchCurrentPosition>(), //
+        make_unique<ReadSwitchClusterRevision>(),   //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24110,10 +24182,14 @@ void registerClusterTvChannel(Commands & commands)
     const char * clusterName = "TvChannel";
 
     commands_list clusterCommands = {
-        make_unique<TvChannelChangeChannel>(),        make_unique<TvChannelChangeChannelByNumber>(),
-        make_unique<TvChannelSkipChannel>(),          make_unique<DiscoverTvChannelAttributes>(),
-        make_unique<ReadTvChannelTvChannelList>(),    make_unique<ReadTvChannelTvChannelLineup>(),
-        make_unique<ReadTvChannelCurrentTvChannel>(), make_unique<ReadTvChannelClusterRevision>(),
+        make_unique<TvChannelChangeChannel>(),         //
+        make_unique<TvChannelChangeChannelByNumber>(), //
+        make_unique<TvChannelSkipChannel>(),           //
+        make_unique<DiscoverTvChannelAttributes>(),    //
+        make_unique<ReadTvChannelTvChannelList>(),     //
+        make_unique<ReadTvChannelTvChannelLineup>(),   //
+        make_unique<ReadTvChannelCurrentTvChannel>(),  //
+        make_unique<ReadTvChannelClusterRevision>(),   //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24123,10 +24199,10 @@ void registerClusterTargetNavigator(Commands & commands)
     const char * clusterName = "TargetNavigator";
 
     commands_list clusterCommands = {
-        make_unique<TargetNavigatorNavigateTarget>(),
-        make_unique<DiscoverTargetNavigatorAttributes>(),
-        make_unique<ReadTargetNavigatorTargetNavigatorList>(),
-        make_unique<ReadTargetNavigatorClusterRevision>(),
+        make_unique<TargetNavigatorNavigateTarget>(),          //
+        make_unique<DiscoverTargetNavigatorAttributes>(),      //
+        make_unique<ReadTargetNavigatorTargetNavigatorList>(), //
+        make_unique<ReadTargetNavigatorClusterRevision>(),     //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24136,9 +24212,12 @@ void registerClusterTemperatureMeasurement(Commands & commands)
     const char * clusterName = "TemperatureMeasurement";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverTemperatureMeasurementAttributes>(),   make_unique<ReadTemperatureMeasurementMeasuredValue>(),
-        make_unique<ReportTemperatureMeasurementMeasuredValue>(),  make_unique<ReadTemperatureMeasurementMinMeasuredValue>(),
-        make_unique<ReadTemperatureMeasurementMaxMeasuredValue>(), make_unique<ReadTemperatureMeasurementClusterRevision>(),
+        make_unique<DiscoverTemperatureMeasurementAttributes>(),   //
+        make_unique<ReadTemperatureMeasurementMeasuredValue>(),    //
+        make_unique<ReportTemperatureMeasurementMeasuredValue>(),  //
+        make_unique<ReadTemperatureMeasurementMinMeasuredValue>(), //
+        make_unique<ReadTemperatureMeasurementMaxMeasuredValue>(), //
+        make_unique<ReadTemperatureMeasurementClusterRevision>(),  //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24148,56 +24227,56 @@ void registerClusterTestCluster(Commands & commands)
     const char * clusterName = "TestCluster";
 
     commands_list clusterCommands = {
-        make_unique<TestClusterTest>(),
-        make_unique<TestClusterTestAddArguments>(),
-        make_unique<TestClusterTestNotHandled>(),
-        make_unique<TestClusterTestSpecific>(),
-        make_unique<TestClusterTestUnknownCommand>(),
-        make_unique<DiscoverTestClusterAttributes>(),
-        make_unique<ReadTestClusterBoolean>(),
-        make_unique<WriteTestClusterBoolean>(),
-        make_unique<ReadTestClusterBitmap8>(),
-        make_unique<WriteTestClusterBitmap8>(),
-        make_unique<ReadTestClusterBitmap16>(),
-        make_unique<WriteTestClusterBitmap16>(),
-        make_unique<ReadTestClusterBitmap32>(),
-        make_unique<WriteTestClusterBitmap32>(),
-        make_unique<ReadTestClusterBitmap64>(),
-        make_unique<WriteTestClusterBitmap64>(),
-        make_unique<ReadTestClusterInt8u>(),
-        make_unique<WriteTestClusterInt8u>(),
-        make_unique<ReadTestClusterInt16u>(),
-        make_unique<WriteTestClusterInt16u>(),
-        make_unique<ReadTestClusterInt32u>(),
-        make_unique<WriteTestClusterInt32u>(),
-        make_unique<ReadTestClusterInt64u>(),
-        make_unique<WriteTestClusterInt64u>(),
-        make_unique<ReadTestClusterInt8s>(),
-        make_unique<WriteTestClusterInt8s>(),
-        make_unique<ReadTestClusterInt16s>(),
-        make_unique<WriteTestClusterInt16s>(),
-        make_unique<ReadTestClusterInt32s>(),
-        make_unique<WriteTestClusterInt32s>(),
-        make_unique<ReadTestClusterInt64s>(),
-        make_unique<WriteTestClusterInt64s>(),
-        make_unique<ReadTestClusterEnum8>(),
-        make_unique<WriteTestClusterEnum8>(),
-        make_unique<ReadTestClusterEnum16>(),
-        make_unique<WriteTestClusterEnum16>(),
-        make_unique<ReadTestClusterOctetString>(),
-        make_unique<WriteTestClusterOctetString>(),
-        make_unique<ReadTestClusterListInt8u>(),
-        make_unique<ReadTestClusterListOctetString>(),
-        make_unique<ReadTestClusterListStructOctetString>(),
-        make_unique<ReadTestClusterLongOctetString>(),
-        make_unique<WriteTestClusterLongOctetString>(),
-        make_unique<ReadTestClusterCharString>(),
-        make_unique<WriteTestClusterCharString>(),
-        make_unique<ReadTestClusterLongCharString>(),
-        make_unique<WriteTestClusterLongCharString>(),
-        make_unique<ReadTestClusterUnsupported>(),
-        make_unique<WriteTestClusterUnsupported>(),
-        make_unique<ReadTestClusterClusterRevision>(),
+        make_unique<TestClusterTest>(),                      //
+        make_unique<TestClusterTestAddArguments>(),          //
+        make_unique<TestClusterTestNotHandled>(),            //
+        make_unique<TestClusterTestSpecific>(),              //
+        make_unique<TestClusterTestUnknownCommand>(),        //
+        make_unique<DiscoverTestClusterAttributes>(),        //
+        make_unique<ReadTestClusterBoolean>(),               //
+        make_unique<WriteTestClusterBoolean>(),              //
+        make_unique<ReadTestClusterBitmap8>(),               //
+        make_unique<WriteTestClusterBitmap8>(),              //
+        make_unique<ReadTestClusterBitmap16>(),              //
+        make_unique<WriteTestClusterBitmap16>(),             //
+        make_unique<ReadTestClusterBitmap32>(),              //
+        make_unique<WriteTestClusterBitmap32>(),             //
+        make_unique<ReadTestClusterBitmap64>(),              //
+        make_unique<WriteTestClusterBitmap64>(),             //
+        make_unique<ReadTestClusterInt8u>(),                 //
+        make_unique<WriteTestClusterInt8u>(),                //
+        make_unique<ReadTestClusterInt16u>(),                //
+        make_unique<WriteTestClusterInt16u>(),               //
+        make_unique<ReadTestClusterInt32u>(),                //
+        make_unique<WriteTestClusterInt32u>(),               //
+        make_unique<ReadTestClusterInt64u>(),                //
+        make_unique<WriteTestClusterInt64u>(),               //
+        make_unique<ReadTestClusterInt8s>(),                 //
+        make_unique<WriteTestClusterInt8s>(),                //
+        make_unique<ReadTestClusterInt16s>(),                //
+        make_unique<WriteTestClusterInt16s>(),               //
+        make_unique<ReadTestClusterInt32s>(),                //
+        make_unique<WriteTestClusterInt32s>(),               //
+        make_unique<ReadTestClusterInt64s>(),                //
+        make_unique<WriteTestClusterInt64s>(),               //
+        make_unique<ReadTestClusterEnum8>(),                 //
+        make_unique<WriteTestClusterEnum8>(),                //
+        make_unique<ReadTestClusterEnum16>(),                //
+        make_unique<WriteTestClusterEnum16>(),               //
+        make_unique<ReadTestClusterOctetString>(),           //
+        make_unique<WriteTestClusterOctetString>(),          //
+        make_unique<ReadTestClusterListInt8u>(),             //
+        make_unique<ReadTestClusterListOctetString>(),       //
+        make_unique<ReadTestClusterListStructOctetString>(), //
+        make_unique<ReadTestClusterLongOctetString>(),       //
+        make_unique<WriteTestClusterLongOctetString>(),      //
+        make_unique<ReadTestClusterCharString>(),            //
+        make_unique<WriteTestClusterCharString>(),           //
+        make_unique<ReadTestClusterLongCharString>(),        //
+        make_unique<WriteTestClusterLongCharString>(),       //
+        make_unique<ReadTestClusterUnsupported>(),           //
+        make_unique<WriteTestClusterUnsupported>(),          //
+        make_unique<ReadTestClusterClusterRevision>(),       //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24207,27 +24286,27 @@ void registerClusterThermostat(Commands & commands)
     const char * clusterName = "Thermostat";
 
     commands_list clusterCommands = {
-        make_unique<ThermostatClearWeeklySchedule>(),
-        make_unique<ThermostatGetRelayStatusLog>(),
-        make_unique<ThermostatGetWeeklySchedule>(),
-        make_unique<ThermostatSetWeeklySchedule>(),
-        make_unique<ThermostatSetpointRaiseLower>(),
-        make_unique<DiscoverThermostatAttributes>(),
-        make_unique<ReadThermostatLocalTemperature>(),
-        make_unique<ReportThermostatLocalTemperature>(),
-        make_unique<ReadThermostatOccupiedCoolingSetpoint>(),
-        make_unique<WriteThermostatOccupiedCoolingSetpoint>(),
-        make_unique<ReadThermostatOccupiedHeatingSetpoint>(),
-        make_unique<WriteThermostatOccupiedHeatingSetpoint>(),
-        make_unique<ReadThermostatControlSequenceOfOperation>(),
-        make_unique<WriteThermostatControlSequenceOfOperation>(),
-        make_unique<ReadThermostatSystemMode>(),
-        make_unique<WriteThermostatSystemMode>(),
-        make_unique<ReadThermostatStartOfWeek>(),
-        make_unique<ReadThermostatNumberOfWeeklyTransitions>(),
-        make_unique<ReadThermostatNumberOfDailyTransitions>(),
-        make_unique<ReadThermostatFeatureMap>(),
-        make_unique<ReadThermostatClusterRevision>(),
+        make_unique<ThermostatClearWeeklySchedule>(),             //
+        make_unique<ThermostatGetRelayStatusLog>(),               //
+        make_unique<ThermostatGetWeeklySchedule>(),               //
+        make_unique<ThermostatSetWeeklySchedule>(),               //
+        make_unique<ThermostatSetpointRaiseLower>(),              //
+        make_unique<DiscoverThermostatAttributes>(),              //
+        make_unique<ReadThermostatLocalTemperature>(),            //
+        make_unique<ReportThermostatLocalTemperature>(),          //
+        make_unique<ReadThermostatOccupiedCoolingSetpoint>(),     //
+        make_unique<WriteThermostatOccupiedCoolingSetpoint>(),    //
+        make_unique<ReadThermostatOccupiedHeatingSetpoint>(),     //
+        make_unique<WriteThermostatOccupiedHeatingSetpoint>(),    //
+        make_unique<ReadThermostatControlSequenceOfOperation>(),  //
+        make_unique<WriteThermostatControlSequenceOfOperation>(), //
+        make_unique<ReadThermostatSystemMode>(),                  //
+        make_unique<WriteThermostatSystemMode>(),                 //
+        make_unique<ReadThermostatStartOfWeek>(),                 //
+        make_unique<ReadThermostatNumberOfWeeklyTransitions>(),   //
+        make_unique<ReadThermostatNumberOfDailyTransitions>(),    //
+        make_unique<ReadThermostatFeatureMap>(),                  //
+        make_unique<ReadThermostatClusterRevision>(),             //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24237,69 +24316,69 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
     const char * clusterName = "ThreadNetworkDiagnostics";
 
     commands_list clusterCommands = {
-        make_unique<ThreadNetworkDiagnosticsResetCounts>(),
-        make_unique<DiscoverThreadNetworkDiagnosticsAttributes>(),
-        make_unique<ReadThreadNetworkDiagnosticsChannel>(),
-        make_unique<ReadThreadNetworkDiagnosticsRoutingRole>(),
-        make_unique<ReadThreadNetworkDiagnosticsNetworkName>(),
-        make_unique<ReadThreadNetworkDiagnosticsPanId>(),
-        make_unique<ReadThreadNetworkDiagnosticsExtendedPanId>(),
-        make_unique<ReadThreadNetworkDiagnosticsMeshLocalPrefix>(),
-        make_unique<ReadThreadNetworkDiagnosticsOverrunCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsNeighborTableList>(),
-        make_unique<ReadThreadNetworkDiagnosticsRouteTableList>(),
-        make_unique<ReadThreadNetworkDiagnosticsPartitionId>(),
-        make_unique<ReadThreadNetworkDiagnosticsWeighting>(),
-        make_unique<ReadThreadNetworkDiagnosticsDataVersion>(),
-        make_unique<ReadThreadNetworkDiagnosticsStableDataVersion>(),
-        make_unique<ReadThreadNetworkDiagnosticsLeaderRouterId>(),
-        make_unique<ReadThreadNetworkDiagnosticsDetachedRoleCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsChildRoleCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRouterRoleCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsLeaderRoleCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsAttachAttemptCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsPartitionIdChangeCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsParentChangeCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxTotalCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxUnicastCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxBroadcastCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxAckRequestedCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxAckedCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxNoAckRequestedCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxDataCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxDataPollCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxBeaconCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxBeaconRequestCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxOtherCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxRetryCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxErrCcaCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxErrAbortCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsTxErrBusyChannelCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxTotalCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxUnicastCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxBroadcastCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxDataCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxDataPollCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxBeaconCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxBeaconRequestCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxOtherCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxAddressFilteredCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxDuplicatedCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxErrNoFrameCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxErrSecCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxErrFcsCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsRxErrOtherCount>(),
-        make_unique<ReadThreadNetworkDiagnosticsSecurityPolicy>(),
-        make_unique<ReadThreadNetworkDiagnosticsChannelMask>(),
-        make_unique<ReadThreadNetworkDiagnosticsOperationalDatasetComponents>(),
-        make_unique<ReadThreadNetworkDiagnosticsActiveNetworkFaultsList>(),
-        make_unique<ReadThreadNetworkDiagnosticsClusterRevision>(),
+        make_unique<ThreadNetworkDiagnosticsResetCounts>(),                           //
+        make_unique<DiscoverThreadNetworkDiagnosticsAttributes>(),                    //
+        make_unique<ReadThreadNetworkDiagnosticsChannel>(),                           //
+        make_unique<ReadThreadNetworkDiagnosticsRoutingRole>(),                       //
+        make_unique<ReadThreadNetworkDiagnosticsNetworkName>(),                       //
+        make_unique<ReadThreadNetworkDiagnosticsPanId>(),                             //
+        make_unique<ReadThreadNetworkDiagnosticsExtendedPanId>(),                     //
+        make_unique<ReadThreadNetworkDiagnosticsMeshLocalPrefix>(),                   //
+        make_unique<ReadThreadNetworkDiagnosticsOverrunCount>(),                      //
+        make_unique<ReadThreadNetworkDiagnosticsNeighborTableList>(),                 //
+        make_unique<ReadThreadNetworkDiagnosticsRouteTableList>(),                    //
+        make_unique<ReadThreadNetworkDiagnosticsPartitionId>(),                       //
+        make_unique<ReadThreadNetworkDiagnosticsWeighting>(),                         //
+        make_unique<ReadThreadNetworkDiagnosticsDataVersion>(),                       //
+        make_unique<ReadThreadNetworkDiagnosticsStableDataVersion>(),                 //
+        make_unique<ReadThreadNetworkDiagnosticsLeaderRouterId>(),                    //
+        make_unique<ReadThreadNetworkDiagnosticsDetachedRoleCount>(),                 //
+        make_unique<ReadThreadNetworkDiagnosticsChildRoleCount>(),                    //
+        make_unique<ReadThreadNetworkDiagnosticsRouterRoleCount>(),                   //
+        make_unique<ReadThreadNetworkDiagnosticsLeaderRoleCount>(),                   //
+        make_unique<ReadThreadNetworkDiagnosticsAttachAttemptCount>(),                //
+        make_unique<ReadThreadNetworkDiagnosticsPartitionIdChangeCount>(),            //
+        make_unique<ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount>(), //
+        make_unique<ReadThreadNetworkDiagnosticsParentChangeCount>(),                 //
+        make_unique<ReadThreadNetworkDiagnosticsTxTotalCount>(),                      //
+        make_unique<ReadThreadNetworkDiagnosticsTxUnicastCount>(),                    //
+        make_unique<ReadThreadNetworkDiagnosticsTxBroadcastCount>(),                  //
+        make_unique<ReadThreadNetworkDiagnosticsTxAckRequestedCount>(),               //
+        make_unique<ReadThreadNetworkDiagnosticsTxAckedCount>(),                      //
+        make_unique<ReadThreadNetworkDiagnosticsTxNoAckRequestedCount>(),             //
+        make_unique<ReadThreadNetworkDiagnosticsTxDataCount>(),                       //
+        make_unique<ReadThreadNetworkDiagnosticsTxDataPollCount>(),                   //
+        make_unique<ReadThreadNetworkDiagnosticsTxBeaconCount>(),                     //
+        make_unique<ReadThreadNetworkDiagnosticsTxBeaconRequestCount>(),              //
+        make_unique<ReadThreadNetworkDiagnosticsTxOtherCount>(),                      //
+        make_unique<ReadThreadNetworkDiagnosticsTxRetryCount>(),                      //
+        make_unique<ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount>(),       //
+        make_unique<ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount>(),     //
+        make_unique<ReadThreadNetworkDiagnosticsTxErrCcaCount>(),                     //
+        make_unique<ReadThreadNetworkDiagnosticsTxErrAbortCount>(),                   //
+        make_unique<ReadThreadNetworkDiagnosticsTxErrBusyChannelCount>(),             //
+        make_unique<ReadThreadNetworkDiagnosticsRxTotalCount>(),                      //
+        make_unique<ReadThreadNetworkDiagnosticsRxUnicastCount>(),                    //
+        make_unique<ReadThreadNetworkDiagnosticsRxBroadcastCount>(),                  //
+        make_unique<ReadThreadNetworkDiagnosticsRxDataCount>(),                       //
+        make_unique<ReadThreadNetworkDiagnosticsRxDataPollCount>(),                   //
+        make_unique<ReadThreadNetworkDiagnosticsRxBeaconCount>(),                     //
+        make_unique<ReadThreadNetworkDiagnosticsRxBeaconRequestCount>(),              //
+        make_unique<ReadThreadNetworkDiagnosticsRxOtherCount>(),                      //
+        make_unique<ReadThreadNetworkDiagnosticsRxAddressFilteredCount>(),            //
+        make_unique<ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount>(),           //
+        make_unique<ReadThreadNetworkDiagnosticsRxDuplicatedCount>(),                 //
+        make_unique<ReadThreadNetworkDiagnosticsRxErrNoFrameCount>(),                 //
+        make_unique<ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount>(),         //
+        make_unique<ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount>(),          //
+        make_unique<ReadThreadNetworkDiagnosticsRxErrSecCount>(),                     //
+        make_unique<ReadThreadNetworkDiagnosticsRxErrFcsCount>(),                     //
+        make_unique<ReadThreadNetworkDiagnosticsRxErrOtherCount>(),                   //
+        make_unique<ReadThreadNetworkDiagnosticsSecurityPolicy>(),                    //
+        make_unique<ReadThreadNetworkDiagnosticsChannelMask>(),                       //
+        make_unique<ReadThreadNetworkDiagnosticsOperationalDatasetComponents>(),      //
+        make_unique<ReadThreadNetworkDiagnosticsActiveNetworkFaultsList>(),           //
+        make_unique<ReadThreadNetworkDiagnosticsClusterRevision>(),                   //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24309,9 +24388,9 @@ void registerClusterWakeOnLan(Commands & commands)
     const char * clusterName = "WakeOnLan";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverWakeOnLanAttributes>(),
-        make_unique<ReadWakeOnLanWakeOnLanMacAddress>(),
-        make_unique<ReadWakeOnLanClusterRevision>(),
+        make_unique<DiscoverWakeOnLanAttributes>(),      //
+        make_unique<ReadWakeOnLanWakeOnLanMacAddress>(), //
+        make_unique<ReadWakeOnLanClusterRevision>(),     //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24321,10 +24400,14 @@ void registerClusterWiFiNetworkDiagnostics(Commands & commands)
     const char * clusterName = "WiFiNetworkDiagnostics";
 
     commands_list clusterCommands = {
-        make_unique<WiFiNetworkDiagnosticsResetCounts>(),     make_unique<DiscoverWiFiNetworkDiagnosticsAttributes>(),
-        make_unique<ReadWiFiNetworkDiagnosticsBssid>(),       make_unique<ReadWiFiNetworkDiagnosticsSecurityType>(),
-        make_unique<ReadWiFiNetworkDiagnosticsWiFiVersion>(), make_unique<ReadWiFiNetworkDiagnosticsChannelNumber>(),
-        make_unique<ReadWiFiNetworkDiagnosticsRssi>(),        make_unique<ReadWiFiNetworkDiagnosticsClusterRevision>(),
+        make_unique<WiFiNetworkDiagnosticsResetCounts>(),         //
+        make_unique<DiscoverWiFiNetworkDiagnosticsAttributes>(),  //
+        make_unique<ReadWiFiNetworkDiagnosticsBssid>(),           //
+        make_unique<ReadWiFiNetworkDiagnosticsSecurityType>(),    //
+        make_unique<ReadWiFiNetworkDiagnosticsWiFiVersion>(),     //
+        make_unique<ReadWiFiNetworkDiagnosticsChannelNumber>(),   //
+        make_unique<ReadWiFiNetworkDiagnosticsRssi>(),            //
+        make_unique<ReadWiFiNetworkDiagnosticsClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -24334,42 +24417,42 @@ void registerClusterWindowCovering(Commands & commands)
     const char * clusterName = "WindowCovering";
 
     commands_list clusterCommands = {
-        make_unique<WindowCoveringDownOrClose>(),
-        make_unique<WindowCoveringGoToLiftPercentage>(),
-        make_unique<WindowCoveringGoToLiftValue>(),
-        make_unique<WindowCoveringGoToTiltPercentage>(),
-        make_unique<WindowCoveringGoToTiltValue>(),
-        make_unique<WindowCoveringStopMotion>(),
-        make_unique<WindowCoveringUpOrOpen>(),
-        make_unique<DiscoverWindowCoveringAttributes>(),
-        make_unique<ReadWindowCoveringType>(),
-        make_unique<ReadWindowCoveringCurrentPositionLift>(),
-        make_unique<ReadWindowCoveringCurrentPositionTilt>(),
-        make_unique<ReadWindowCoveringConfigStatus>(),
-        make_unique<ReadWindowCoveringCurrentPositionLiftPercentage>(),
-        make_unique<ReportWindowCoveringCurrentPositionLiftPercentage>(),
-        make_unique<ReadWindowCoveringCurrentPositionTiltPercentage>(),
-        make_unique<ReportWindowCoveringCurrentPositionTiltPercentage>(),
-        make_unique<ReadWindowCoveringOperationalStatus>(),
-        make_unique<ReportWindowCoveringOperationalStatus>(),
-        make_unique<ReadWindowCoveringTargetPositionLiftPercent100ths>(),
-        make_unique<ReportWindowCoveringTargetPositionLiftPercent100ths>(),
-        make_unique<ReadWindowCoveringTargetPositionTiltPercent100ths>(),
-        make_unique<ReportWindowCoveringTargetPositionTiltPercent100ths>(),
-        make_unique<ReadWindowCoveringEndProductType>(),
-        make_unique<ReadWindowCoveringCurrentPositionLiftPercent100ths>(),
-        make_unique<ReportWindowCoveringCurrentPositionLiftPercent100ths>(),
-        make_unique<ReadWindowCoveringCurrentPositionTiltPercent100ths>(),
-        make_unique<ReportWindowCoveringCurrentPositionTiltPercent100ths>(),
-        make_unique<ReadWindowCoveringInstalledOpenLimitLift>(),
-        make_unique<ReadWindowCoveringInstalledClosedLimitLift>(),
-        make_unique<ReadWindowCoveringInstalledOpenLimitTilt>(),
-        make_unique<ReadWindowCoveringInstalledClosedLimitTilt>(),
-        make_unique<ReadWindowCoveringMode>(),
-        make_unique<WriteWindowCoveringMode>(),
-        make_unique<ReadWindowCoveringSafetyStatus>(),
-        make_unique<ReportWindowCoveringSafetyStatus>(),
-        make_unique<ReadWindowCoveringClusterRevision>(),
+        make_unique<WindowCoveringDownOrClose>(),                            //
+        make_unique<WindowCoveringGoToLiftPercentage>(),                     //
+        make_unique<WindowCoveringGoToLiftValue>(),                          //
+        make_unique<WindowCoveringGoToTiltPercentage>(),                     //
+        make_unique<WindowCoveringGoToTiltValue>(),                          //
+        make_unique<WindowCoveringStopMotion>(),                             //
+        make_unique<WindowCoveringUpOrOpen>(),                               //
+        make_unique<DiscoverWindowCoveringAttributes>(),                     //
+        make_unique<ReadWindowCoveringType>(),                               //
+        make_unique<ReadWindowCoveringCurrentPositionLift>(),                //
+        make_unique<ReadWindowCoveringCurrentPositionTilt>(),                //
+        make_unique<ReadWindowCoveringConfigStatus>(),                       //
+        make_unique<ReadWindowCoveringCurrentPositionLiftPercentage>(),      //
+        make_unique<ReportWindowCoveringCurrentPositionLiftPercentage>(),    //
+        make_unique<ReadWindowCoveringCurrentPositionTiltPercentage>(),      //
+        make_unique<ReportWindowCoveringCurrentPositionTiltPercentage>(),    //
+        make_unique<ReadWindowCoveringOperationalStatus>(),                  //
+        make_unique<ReportWindowCoveringOperationalStatus>(),                //
+        make_unique<ReadWindowCoveringTargetPositionLiftPercent100ths>(),    //
+        make_unique<ReportWindowCoveringTargetPositionLiftPercent100ths>(),  //
+        make_unique<ReadWindowCoveringTargetPositionTiltPercent100ths>(),    //
+        make_unique<ReportWindowCoveringTargetPositionTiltPercent100ths>(),  //
+        make_unique<ReadWindowCoveringEndProductType>(),                     //
+        make_unique<ReadWindowCoveringCurrentPositionLiftPercent100ths>(),   //
+        make_unique<ReportWindowCoveringCurrentPositionLiftPercent100ths>(), //
+        make_unique<ReadWindowCoveringCurrentPositionTiltPercent100ths>(),   //
+        make_unique<ReportWindowCoveringCurrentPositionTiltPercent100ths>(), //
+        make_unique<ReadWindowCoveringInstalledOpenLimitLift>(),             //
+        make_unique<ReadWindowCoveringInstalledClosedLimitLift>(),           //
+        make_unique<ReadWindowCoveringInstalledOpenLimitTilt>(),             //
+        make_unique<ReadWindowCoveringInstalledClosedLimitTilt>(),           //
+        make_unique<ReadWindowCoveringMode>(),                               //
+        make_unique<WriteWindowCoveringMode>(),                              //
+        make_unique<ReadWindowCoveringSafetyStatus>(),                       //
+        make_unique<ReportWindowCoveringSafetyStatus>(),                     //
+        make_unique<ReadWindowCoveringClusterRevision>(),                    //
     };
 
     commands.Register(clusterName, clusterCommands);
