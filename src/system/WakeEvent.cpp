@@ -135,16 +135,9 @@ CHIP_ERROR WakeEvent::Open(WatchableEventManager & watchState)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WakeEvent::Close()
+void WakeEvent::Close()
 {
-    int res = mFD.Close();
-
-    if (res < 0)
-    {
-        return chip::System::MapErrorPOSIX(errno);
-    }
-
-    return CHIP_NO_ERROR;
+    mFD.Close();
 }
 
 void WakeEvent::Confirm()
