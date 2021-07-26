@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020 Project CHIP Authors
+ *   Copyright (c) 2021 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,16 +19,15 @@
 #pragma once
 
 #include "../common/Command.h"
-#include <controller/CHIPCommissionableNodeController.h>
 
-class DiscoverCommissionersCommand : public Command
+class DiscoverCommissionablesCommand : public Command
 {
 public:
-    DiscoverCommissionersCommand() : Command("commissioners") {}
+    DiscoverCommissionablesCommand() : Command("commissionables") {}
     CHIP_ERROR Run() override;
     uint16_t GetWaitDurationInSeconds() const override { return 3; }
     void Shutdown() override;
 
 private:
-    chip::Controller::CommissionableNodeController mCommissionableNodeController;
+    ChipDeviceCommissioner * mCommissioner;
 };
