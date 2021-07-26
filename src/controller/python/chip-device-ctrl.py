@@ -881,10 +881,11 @@ def echo_alive(message):
     print(message)
     return message
 
-def resolve(fabric_id: int, node_id: int) -> Dict[str, Any]:
+### XMLRPC server is not able to provided large int, better to get string and recast to int
+def resolve(fabric_id: str, node_id: int) -> Dict[str, Any]:
     try:
         __check_supported_os()
-        err = device_manager.devCtrl.ResolveNode(fabric_id, node_id)
+        err = device_manager.devCtrl.ResolveNode(int(fabric_id), node_id)
         if err != 0:
             return __get_response_dict(status=StatusCodeEnum.FAILED, error=f"Failed to resolve node, with error code: {err}")
 
@@ -964,15 +965,24 @@ def __format_zcl_arguments_from_dict(optional_args: dict, command: dict) -> Dict
     return formatted_command_args
     
 
-def zcl_add_network(node_id: int, ssid: str, password: str, endpoint_id: Optional[int] = 1, group_id: Optional[int] = 0, breadcrumb: Optional[int] = 0, timeoutMs: Optional[int] = 1000) -> Dict[str, Any] :
+def zcl_add_network(node_id: int, args: Dict[str, str], endpoint_id: Optional[int] = 1, group_id: Optional[int] = 0, breadcrumb: Optional[int] = 0, timeoutMs: Optional[int] = 1000) -> Dict[str, Any] :
     try:
         __check_supported_os()
-        args = {}
-        args['ssid'] = ssid.encode("utf-8") + b'\x00'
-        args['credentials'] = password.encode("utf-8") + b'\x00'
-        args['breadcrumb'] = breadcrumb
-        args['timeoutMs'] = timeoutMs 
-        err, res = device_manager.devCtrl.ZCLSend("NetworkCommissioning", "AddWiFiNetwork", node_id, endpoint_id, group_id, args, blocking=True)
+        command: str = ""
+        parameters = {}
+        if args.get("ssid") and args.get("password"):
+            parameters['ssid'] = args.get("ssid").encode("utf-8") + b'\x00'
+            parameters['credentials'] = args.get("password").encode("utf-8") + b'\x00'
+            command = "AddWifiNetwork"
+        elif args.get("operationalDataset"):
+            parameters['operationalDataset'] = bytes.fromhex(args.get("operationalDataset"))
+            command = "AddThreadNetwork"
+        else:
+            raise Exception("(ssid and password) or dataset need to be provided")
+        parameters['breadcrumb'] = breadcrumb
+        parameters['timeoutMs'] = timeoutMs
+        err, res = device_manager.devCtrl.ZCLSend("NetworkCommissioning", command, node_id, endpoint_id, group_id,
+                                                  parameters, blocking=True)
         if err != 0:
             return __get_response_dict(status=StatusCodeEnum.FAILED)
         elif res != None:
@@ -983,15 +993,21 @@ def zcl_add_network(node_id: int, ssid: str, password: str, endpoint_id: Optiona
     except Exception as e:
         return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
 
-def zcl_enable_network(node_id: int, ssid:str, endpoint_id: Optional[int] = 1, group_id: Optional[int] = 0, breadcrumb: Optional[int] = 0, timeoutMs: Optional[int] = 1000) -> Dict[str, Any]:
+def zcl_enable_network(node_id: int, args: Dict[str,str], endpoint_id: Optional[int] = 1, group_id: Optional[int] = 0, breadcrumb: Optional[int] = 0, timeoutMs: Optional[int] = 1000) -> Dict[str, Any]:
     try:
         __check_supported_os()
-        args = {}
-        args['networkID'] = ssid.encode("utf-8") + b'\x00'
-        args['breadcrumb'] = breadcrumb
-        args['timeoutMs'] = timeoutMs 
-  
-        err, res = device_manager.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", node_id, endpoint_id, group_id, args, blocking=True)
+        parameters = {}
+        if args.get("ssid"):
+            parameters['networkID'] = args.get("ssid").encode("utf-8") + b'\x00'
+        elif args.get("extpanid"):
+            parameters['networkID'] = bytes.fromhex(args.get("extpanid"))
+        else:
+            raise Exception("ssid or extpanid need to be provided")
+        parameters['breadcrumb'] = breadcrumb
+        parameters['timeoutMs'] = timeoutMs
+
+        err, res = device_manager.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", node_id, endpoint_id,
+                                                  group_id, parameters, blocking=True)
         if err != 0:
             return __get_response_dict(status=StatusCodeEnum.FAILED)
         else:
@@ -1096,7 +1112,6 @@ def start_rpc_server():
         server.register_function(zcl_command)
         server.register_function(zcl_add_network)
         server.register_function(zcl_enable_network)
-        server.register_function(resolve)
         server.register_function(qr_code_parse)
         server.register_function(get_pase_data)
         server.register_function(get_fabric_id)
