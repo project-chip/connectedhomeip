@@ -583,7 +583,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 123
+#define GENERATED_ATTRIBUTE_COUNT 124
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -709,6 +709,9 @@
             { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(1264) }, /* OverrunCount */                                  \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* cluster revision */                              \
                                                                                                                                    \
+            /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                        \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
+                                                                                                                                   \
             /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
             { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1272) }, /* fabrics list */                                 \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* cluster revision */                             \
@@ -771,7 +774,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 19
+#define GENERATED_CLUSTER_COUNT 20
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
@@ -819,33 +822,36 @@
                 0x0037, ZAP_ATTRIBUTE_INDEX(92), 6, 42, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                   \
             {                                                                                                                      \
-                0x003E, ZAP_ATTRIBUTE_INDEX(98), 2, 256, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+                0x003C, ZAP_ATTRIBUTE_INDEX(98), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                     \
+            {                                                                                                                      \
+                0x003E, ZAP_ATTRIBUTE_INDEX(99), 2, 256, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
             {                                                                                                                      \
                 0x0200,                                                                                                            \
-                ZAP_ATTRIBUTE_INDEX(100),                                                                                          \
+                ZAP_ATTRIBUTE_INDEX(101),                                                                                          \
                 8,                                                                                                                 \
                 13,                                                                                                                \
                 ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),         \
                 chipFuncArrayPumpConfigurationAndControlServer                                                                     \
             }, /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                 \
             {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(108), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+                0x0402, ZAP_ATTRIBUTE_INDEX(109), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \
             {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(109), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0402, ZAP_ATTRIBUTE_INDEX(110), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                        \
             {                                                                                                                      \
-                0x0403, ZAP_ATTRIBUTE_INDEX(113), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+                0x0403, ZAP_ATTRIBUTE_INDEX(114), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
             }, /* Endpoint: 1, Cluster: Pressure Measurement (client) */                                                           \
             {                                                                                                                      \
-                0x0403, ZAP_ATTRIBUTE_INDEX(114), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0403, ZAP_ATTRIBUTE_INDEX(115), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Pressure Measurement (server) */                                                           \
             {                                                                                                                      \
-                0x0404, ZAP_ATTRIBUTE_INDEX(118), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+                0x0404, ZAP_ATTRIBUTE_INDEX(119), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
             }, /* Endpoint: 1, Cluster: Flow Measurement (client) */                                                               \
             {                                                                                                                      \
-                0x0404, ZAP_ATTRIBUTE_INDEX(119), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0404, ZAP_ATTRIBUTE_INDEX(120), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Flow Measurement (server) */                                                               \
     }
 
@@ -854,7 +860,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 12, 1592 }, { ZAP_CLUSTER_INDEX(12), 7, 43 },                                                      \
+        { ZAP_CLUSTER_INDEX(0), 13, 1594 }, { ZAP_CLUSTER_INDEX(13), 7, 43 },                                                      \
     }
 
 // Largest attribute size is needed for various buffers
@@ -864,7 +870,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (240)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (1635)
+#define ATTRIBUTE_MAX_SIZE (1637)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)
@@ -908,7 +914,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (53)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (56)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -971,6 +977,11 @@
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                      \
             { 0x0037, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ResetCounts */                                                 \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                        \
+            { 0x003C, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* OpenCommissioningWindow */                                     \
+            { 0x003C, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* OpenBasicCommissioningWindow */                                \
+            { 0x003C, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RevokeCommissioning */                                         \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
             { 0x003E, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* SetFabric */                                                   \

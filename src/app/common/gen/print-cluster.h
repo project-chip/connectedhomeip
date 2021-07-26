@@ -195,6 +195,13 @@
 #define CHIP_PRINTCLUSTER_SWITCH_CLUSTER
 #endif
 
+#if defined(ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER) || defined(ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                      \
+    { ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_ID, 60, "AdministratorCommissioning" },
+#else
+#define CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER
+#endif
+
 #if defined(ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER { ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, 62, "Operational Credentials" },
 #else
@@ -747,6 +754,7 @@
     CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
+    CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \

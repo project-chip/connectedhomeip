@@ -123,6 +123,65 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
+  public static class AdministratorCommissioningCluster extends BaseChipCluster {
+    public AdministratorCommissioningCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void openBasicCommissioningWindow(
+        DefaultClusterCallback callback, int commissioningTimeout) {
+      openBasicCommissioningWindow(chipClusterPtr, callback, commissioningTimeout);
+    }
+
+    public void openCommissioningWindow(
+        DefaultClusterCallback callback,
+        int commissioningTimeout,
+        byte[] pAKEVerifier,
+        int discriminator,
+        long iterations,
+        byte[] salt,
+        int passcodeID) {
+      openCommissioningWindow(
+          chipClusterPtr,
+          callback,
+          commissioningTimeout,
+          pAKEVerifier,
+          discriminator,
+          iterations,
+          salt,
+          passcodeID);
+    }
+
+    public void revokeCommissioning(DefaultClusterCallback callback) {
+      revokeCommissioning(chipClusterPtr, callback);
+    }
+
+    private native void openBasicCommissioningWindow(
+        long chipClusterPtr, DefaultClusterCallback callback, int commissioningTimeout);
+
+    private native void openCommissioningWindow(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int commissioningTimeout,
+        byte[] pAKEVerifier,
+        int discriminator,
+        long iterations,
+        byte[] salt,
+        int passcodeID);
+
+    private native void revokeCommissioning(long chipClusterPtr, DefaultClusterCallback callback);
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
   public static class ApplicationBasicCluster extends BaseChipCluster {
     public ApplicationBasicCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
