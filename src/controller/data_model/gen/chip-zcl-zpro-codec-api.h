@@ -3256,6 +3256,10 @@ chip::System::PacketBufferHandle encodeTestClusterClusterReadClusterRevisionAttr
 | * OccupiedHeatingSetpoint                                           | 0x0012 |
 | * ControlSequenceOfOperation                                        | 0x001B |
 | * SystemMode                                                        | 0x001C |
+| * StartOfWeek                                                       | 0x0020 |
+| * NumberOfWeeklyTransitions                                         | 0x0021 |
+| * NumberOfDailyTransitions                                          | 0x0022 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3339,6 +3343,34 @@ chip::System::PacketBufferHandle encodeThermostatClusterReadSystemModeAttribute(
  */
 chip::System::PacketBufferHandle
 encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t systemMode);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the start of week attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadStartOfWeekAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the number of weekly transitions attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThermostatClusterReadNumberOfWeeklyTransitionsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the number of daily transitions attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadNumberOfDailyTransitionsAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the feature map attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadFeatureMapAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
