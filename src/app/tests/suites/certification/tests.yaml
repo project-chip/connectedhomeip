@@ -42,7 +42,7 @@ Test Plans:
         - name: CASE Session Resumption
       4:
         - name: Commissionable Node Discovery - Commissionee Case
-        - name: Commissionable Node Discovery - Commissioner Case 
+        - name: Commissionable Node Discovery - Commissioner Case
         - name: Operational Discovery - Node
         - name: Operational Discovery - Controller
         - name: Operational Discovery - Thread Node
@@ -81,7 +81,7 @@ Test Plans:
         - name: QR Code Onboarding Payload Verification [DUT - Controller]
         - name: Manual Pairing Code Payload Verification [DUT - Controller]
         - name: NFC Onboarding Payload Verification [DUT - Controller]
-        - name: Concatenation - QR Code Onboarding Payload Verification [DUT - Controller] 
+        - name: Concatenation - QR Code Onboarding Payload Verification [DUT - Controller]
       2:
         - name: Announcement by device verification
         - name: Discovery by commissioner verification
