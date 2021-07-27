@@ -138,6 +138,19 @@
             }
         },
         {
+            "label": "Build Lighting App (Tizen)",
+            "type": "shell",
+            "command": "scripts/examples/gn_tizen_example.sh examples/lighting-app/linux out/lighting_app_tizen 'import(\"//with_tizen.gni\")'",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/out/lighting-app-tizen/"
+                ]
+            }
+        },
+        {
             "label": "Build Minimal MDNS Example",
             "type": "shell",
             "command": "scripts/examples/gn_build_example.sh examples/minimal-mdns out/minimal_mdns 'chip_build_tools=false is_debug=false optimize_for_size=true'",
