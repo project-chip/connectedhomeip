@@ -681,6 +681,19 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
     return err;
 }
 
+Messaging::ExchangeContext * Device::GetNewExchangeContext(Messaging::ExchangeDelegate * delegate)
+{
+    if (mExchangeMgr == nullptr || delegate == nullptr)
+    {
+        return nullptr;
+    }
+
+    bool didLoad = false;
+    LoadSecureSessionParametersIfNeeded(didLoad);
+
+    return mExchangeMgr->NewContext(mSecureSession, delegate);
+}
+
 Device::~Device()
 {
     if (mExchangeMgr)

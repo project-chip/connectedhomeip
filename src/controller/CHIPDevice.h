@@ -376,6 +376,13 @@ public:
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
+    /** @brief Generate a new ExchangeContext on the SecureSession with the option of using a different ExchangeDelegate than this
+     *         class.
+     *
+     * @return Returns a pointer to an ExchangeContext or nullptr if no object can be allocated or is available.
+     **/
+    Messaging::ExchangeContext * GetNewExchangeContext(Messaging::ExchangeDelegate * delegate);
+
     /*
      * This function can be called to establish a secure session with the device.
      *
