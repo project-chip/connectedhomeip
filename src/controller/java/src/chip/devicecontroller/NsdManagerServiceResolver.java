@@ -20,14 +20,27 @@ package chip.devicecontroller;
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
+import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.MulticastLock;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 public class NsdManagerServiceResolver implements ServiceResolver {
-  private final String TAG = NsdManagerServiceResolver.class.getSimpleName();
+  private static final String TAG = NsdManagerServiceResolver.class.getSimpleName();
+  private static final long RESOLVE_SERVICE_TIMEOUT = 30000;
   private final NsdManager nsdManager;
+  private MulticastLock multicastLock;
+  private Handler mainThreadHandler;
 
   public NsdManagerServiceResolver(Context context) {
     this.nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
+    this.mainThreadHandler = new Handler(Looper.getMainLooper());
+
+    this.multicastLock =
+        ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
+            .createMulticastLock("chipMulticastLock");
+    this.multicastLock.setReferenceCounted(true);
   }
 
   @Override
@@ -36,9 +49,25 @@ public class NsdManagerServiceResolver implements ServiceResolver {
       final String serviceType,
       final long callbackHandle,
       final long contextHandle) {
+    multicastLock.acquire();
+
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
     serviceInfo.setServiceName(instanceName);
     serviceInfo.setServiceType(serviceType);
+    Log.d(TAG, "Starting service resolution for '" + instanceName + "'");
+
+    Runnable timeoutRunnable =
+        new Runnable() {
+          @Override
+          public void run() {
+            // Ensure we always release the multicast lock. It's possible that we release the
+            // multicast lock here before ResolveListener returns, but since NsdManager has no API
+            // to cancel service resolution, there's not much we can do here.
+            if (multicastLock.isHeld()) {
+              multicastLock.release();
+            }
+          }
+        };
 
     this.nsdManager.resolveService(
         serviceInfo,
@@ -50,6 +79,11 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                 "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
             ChipDeviceController.handleServiceResolve(
                 instanceName, serviceType, null, 0, callbackHandle, contextHandle);
+
+            if (multicastLock.isHeld()) {
+              multicastLock.release();
+            }
+            mainThreadHandler.removeCallbacks(timeoutRunnable);
           }
 
           @Override
@@ -68,7 +102,13 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                 serviceInfo.getPort(),
                 callbackHandle,
                 contextHandle);
+
+            if (multicastLock.isHeld()) {
+              multicastLock.release();
+            }
+            mainThreadHandler.removeCallbacks(timeoutRunnable);
           }
         });
+    mainThreadHandler.postDelayed(timeoutRunnable, RESOLVE_SERVICE_TIMEOUT);
   }
 }
