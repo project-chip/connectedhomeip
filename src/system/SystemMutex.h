@@ -32,8 +32,6 @@
 
 #include <support/DLLUtil.h>
 
-#if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
@@ -100,9 +98,27 @@ private:
     Mutex & operator=(const Mutex &) = delete;
 };
 
-inline Mutex::Mutex() {}
+class ScopedMutexLock
+{
+public:
+    ScopedMutexLock(Mutex & mutex) : mMutex(mutex) { mutex.Lock(); }
+    ~ScopedMutexLock() { mMutex.Unlock(); }
 
+private:
+    Mutex & mMutex;
+};
+
+inline Mutex::Mutex() {}
 inline Mutex::~Mutex() {}
+
+#if CHIP_SYSTEM_CONFIG_NO_LOCKING
+inline CHIP_ERROR Init(Mutex & aMutex)
+{
+    return CHIP_NO_ERROR;
+}
+inline void Mutex::Lock() {}
+inline void Mutex::Unlock() {}
+#endif // CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 inline void Mutex::Lock()
@@ -144,5 +160,3 @@ inline void Mutex::Unlock(void)
 
 } // namespace System
 } // namespace chip
-
-#endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING

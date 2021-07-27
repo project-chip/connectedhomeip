@@ -81,7 +81,7 @@ DLL_EXPORT bool Object::TryCreate(Layer & aLayer, size_t aOctets)
 void Object::DeferredRelease(Object::ReleaseDeferralErrorTactic aTactic)
 {
     Layer & lSystemLayer = *this->mSystemLayer;
-    CHIP_ERROR lError    = lSystemLayer.PostEvent(*this, chip::System::kEvent_ReleaseObj, 0);
+    CHIP_ERROR lError    = lSystemLayer.WatchableEvents().PostEvent(*this, chip::System::kEvent_ReleaseObj, 0);
 
     if (lError != CHIP_NO_ERROR)
     {

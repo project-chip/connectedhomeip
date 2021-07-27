@@ -254,11 +254,6 @@ public:
     CHIP_ERROR CloseAllBleConnections();
     CHIP_ERROR CloseBleConnection(BLE_CONNECTION_OBJECT connObj);
 
-    CHIP_ERROR ScheduleWork(chip::System::Layer::TimerCompleteFunct aComplete, void * aAppState)
-    {
-        return mSystemLayer->ScheduleWork(aComplete, aAppState);
-    }
-
     /**< Platform interface functions:
 
      *   Calling conventions:

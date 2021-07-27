@@ -469,7 +469,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
         {
             if (sRemainingSystemLayerEventDelay == 0)
             {
-                gSystemLayer.DispatchEvents();
+                gSystemLayer.WatchableEvents().DispatchEvents();
                 sRemainingSystemLayerEventDelay = gNetworkOptions.EventDelay;
             }
             else
@@ -478,7 +478,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
             // TODO: Currently timers are delayed by aSleepTime above. A improved solution would have a mechanism to reduce
             // aSleepTime according to the next timer.
 
-            gSystemLayer.HandlePlatformTimer();
+            gSystemLayer.WatchableEvents().HandlePlatformTimer();
         }
     }
 #if CHIP_TARGET_STYLE_UNIX

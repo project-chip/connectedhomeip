@@ -327,22 +327,16 @@ int main(int argc, char ** args)
 
     BroadcastPacket(&mdnsServer);
 
-    System::Timer * timer = nullptr;
-
-    if (DeviceLayer::SystemLayer.NewTimer(timer) == CHIP_NO_ERROR)
+    CHIP_ERROR err = DeviceLayer::SystemLayer.StartTimer(
+        gOptions.runtimeMs,
+        [](System::Layer *, void *, CHIP_ERROR err) {
+            DeviceLayer::PlatformMgr().StopEventLoopTask();
+            DeviceLayer::PlatformMgr().Shutdown();
+        },
+        nullptr);
+    if (err != CHIP_NO_ERROR)
     {
-        timer->Start(
-            gOptions.runtimeMs,
-            [](System::Layer *, void *, CHIP_ERROR err) {
-                DeviceLayer::PlatformMgr().StopEventLoopTask();
-                DeviceLayer::PlatformMgr().Shutdown();
-            },
-            nullptr);
-    }
-    else
-    {
-
-        printf("Failed to create the shutdown timer. Kill with ^C.\n");
+        printf("Failed to create the shutdown timer. Kill with ^C. %" CHIP_ERROR_FORMAT "\n", ChipError::FormatError(err));
     }
 
     DeviceLayer::PlatformMgr().RunEventLoop();

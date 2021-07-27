@@ -28,6 +28,7 @@
 #include <system/SystemLayer.h>
 
 namespace chip {
+
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
@@ -36,6 +37,7 @@ class ConfigurationManagerImpl;
 class TraitManager;
 class ThreadStackManagerImpl;
 class TimeSyncManager;
+
 namespace Internal {
 class DeviceControlServer;
 class FabricProvisioningServer;
@@ -174,14 +176,7 @@ private:
     friend class Internal::GenericThreadStackManagerImpl_OpenThread_LwIP;
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
-    // Parentheses used to fix clang parsing issue with these declarations
-    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::PostEvent)(::chip::System::Layer & aLayer,
-                                                                       ::chip::System::Object & aTarget,
-                                                                       ::chip::System::EventType aType, uintptr_t aArgument);
-    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::DispatchEvents)(::chip::System::Layer & aLayer);
-    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::DispatchEvent)(::chip::System::Layer & aLayer,
-                                                                           ::chip::System::Event aEvent);
-    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::StartTimer)(::chip::System::Layer & aLayer, uint32_t aMilliseconds);
+    friend class System::PlatformEventing;
 
     /*
      * PostEvent can be called safely on any thread without locking the stack.

@@ -63,7 +63,7 @@ static void ServiceEvents(Layer & aLayer, ::timeval & aSleepTime)
     {
         // TODO: Currently timers are delayed by aSleepTime above. A improved solution would have a mechanism to reduce
         // aSleepTime according to the next timer.
-        aLayer.HandlePlatformTimer();
+        aLayer.WatchableEvents().HandlePlatformTimer();
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
