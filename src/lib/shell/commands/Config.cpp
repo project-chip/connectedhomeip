@@ -96,7 +96,7 @@ static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
     {
         streamer_printf(sout, "PinCode:         ");
     }
-    streamer_printf(sout, "%09u\r\n", setupPinCode);
+    streamer_printf(sout, "%08u\r\n", setupPinCode);
     return CHIP_NO_ERROR;
 }
 
@@ -112,6 +112,28 @@ static CHIP_ERROR ConfigGetSetupDiscriminator(bool printHeader)
     }
     streamer_printf(sout, "%03x\r\n", setupDiscriminator & 0xFFF);
     return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR ConfigSetSetupDiscriminator(char * argv)
+{
+    CHIP_ERROR error;
+    streamer_t * sout           = streamer_get();
+    uint16_t setupDiscriminator = strtoull(argv, NULL, 10);
+
+    VerifyOrReturnError(setupDiscriminator != 0 && setupDiscriminator < 0xFFF, CHIP_ERROR_INVALID_ARGUMENT);
+
+    error = ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
+
+    if (error == CHIP_NO_ERROR)
+    {
+        streamer_printf(sout, "Setup discriminator set to: %d\r\n", setupDiscriminator);
+    }
+    else
+    {
+        streamer_printf(sout, "Setup discriminator setting failed with code: %d\r\n", error);
+    }
+
+    return error;
 }
 
 static CHIP_ERROR ConfigGetFabricId(bool printHeader)
@@ -145,41 +167,53 @@ static CHIP_ERROR PrintAllConfigs()
 
 static CHIP_ERROR ConfigHandler(int argc, char ** argv)
 {
-    if (argc == 0)
+    switch (argc)
     {
+    case 0:
         return PrintAllConfigs();
-    }
-
-    if (strcmp(argv[0], "vendorid") == 0)
-    {
-        return ConfigGetVendorId(false);
-    }
-    else if (strcmp(argv[0], "productid") == 0)
-    {
-        return ConfigGetProductId(false);
-    }
-    else if (strcmp(argv[0], "productrev") == 0)
-    {
-        return ConfigGetProductRevision(false);
-    }
-    else if (strcmp(argv[0], "deviceid") == 0)
-    {
-        return ConfigGetDeviceId(false);
-    }
-    else if (strcmp(argv[0], "pincode") == 0)
-    {
-        return ConfigGetSetupPinCode(false);
-    }
-    else if (strcmp(argv[0], "discriminator") == 0)
-    {
-        return ConfigGetSetupDiscriminator(false);
-    }
-    else if (strcmp(argv[0], "fabricid") == 0)
-    {
-        return ConfigGetFabricId(false);
-    }
-    else
-    {
+    case 1:
+        if (strcmp(argv[0], "vendorid") == 0)
+        {
+            return ConfigGetVendorId(false);
+        }
+        else if (strcmp(argv[0], "productid") == 0)
+        {
+            return ConfigGetProductId(false);
+        }
+        else if (strcmp(argv[0], "productrev") == 0)
+        {
+            return ConfigGetProductRevision(false);
+        }
+        else if (strcmp(argv[0], "deviceid") == 0)
+        {
+            return ConfigGetDeviceId(false);
+        }
+        else if (strcmp(argv[0], "pincode") == 0)
+        {
+            return ConfigGetSetupPinCode(false);
+        }
+        else if (strcmp(argv[0], "discriminator") == 0)
+        {
+            return ConfigGetSetupDiscriminator(false);
+        }
+        else if (strcmp(argv[0], "fabricid") == 0)
+        {
+            return ConfigGetFabricId(false);
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    case 2:
+        if (strcmp(argv[0], "discriminator") == 0)
+        {
+            return ConfigSetSetupDiscriminator(argv[1]);
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
@@ -188,7 +222,8 @@ void RegisterConfigCommands()
 {
 
     static const shell_command_t sDeviceComand = { &ConfigHandler, "config",
-                                                   "Dump device configuration. Usage: config [param_name]" };
+                                                   "Manage device configuration. Usage to dump value: config [param_name] and "
+                                                   "to set some values (discriminator): config [param_name] [param_value]." };
 
     // Register the root `device` command with the top-level shell.
     Engine::Root().RegisterCommands(&sDeviceComand, 1);

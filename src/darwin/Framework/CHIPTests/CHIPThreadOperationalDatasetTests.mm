@@ -46,6 +46,15 @@
     XCTAssertNotNil(dataset);
     NSData * data = [dataset asData];
     XCTAssertNotNil(data);
+
+    CHIPThreadOperationalDataset * reconstructed = [[CHIPThreadOperationalDataset alloc] initWithData:data];
+    XCTAssertNotNil(reconstructed);
+    XCTAssertEqualObjects(reconstructed.networkName, dataset.networkName);
+    XCTAssertEqualObjects(reconstructed.panID, dataset.panID);
+    XCTAssertEqualObjects(reconstructed.masterKey, dataset.masterKey);
+    XCTAssertEqualObjects(reconstructed.PSKc, dataset.PSKc);
+    XCTAssertEqualObjects(reconstructed.extendedPANID, dataset.extendedPANID);
+    XCTAssertEqual(reconstructed.channel, dataset.channel);
 }
 
 - (void)testThreadOperationalDatasetInvalid

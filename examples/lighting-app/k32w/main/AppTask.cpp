@@ -482,7 +482,7 @@ void AppTask::BleHandler(AppEvent * aEvent)
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
-        if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+        if (OpenDefaultPairingWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
         {
             K32W_LOG("Started BLE Advertising!");
         }

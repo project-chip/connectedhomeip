@@ -165,14 +165,14 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 #endif
             ));
 
-    ReturnErrorOnFailure(mAdmins.Init(mStorageDelegate));
+    ReturnErrorOnFailure(mFabrics.Init(mStorageDelegate));
 
-    Transport::AdminPairingInfo * const admin = mAdmins.AssignAdminId(mAdminId, localDeviceId);
-    VerifyOrReturnError(admin != nullptr, CHIP_ERROR_NO_MEMORY);
+    Transport::FabricInfo * const fabric = mFabrics.AssignFabricIndex(mFabricIndex, localDeviceId);
+    VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(mAdmins.LoadFromStorage(mAdminId));
+    ReturnErrorOnFailure(mFabrics.LoadFromStorage(mFabricIndex));
 
-    ReturnErrorOnFailure(mSessionMgr->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins, mMessageCounterManager));
+    ReturnErrorOnFailure(mSessionMgr->Init(localDeviceId, mSystemLayer, mTransportMgr, &mFabrics, mMessageCounterManager));
 
     ReturnErrorOnFailure(mExchangeMgr->Init(mSessionMgr));
 
@@ -206,7 +206,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
 
-    ReturnErrorOnFailure(LoadLocalCredentials(admin));
+    ReturnErrorOnFailure(LoadLocalCredentials(fabric));
 
     ReleaseAllDevices();
 
@@ -250,12 +250,12 @@ void DeviceController::OnLocalNOCGenerated(void * context, const ByteSpan & noc)
 
     DeviceController * controller = static_cast<DeviceController *>(context);
 
-    Transport::AdminPairingInfo * const admin = controller->mAdmins.FindAdminWithId(controller->mAdminId);
+    Transport::FabricInfo * const fabric = controller->mFabrics.FindFabricWithIndex(controller->mFabricIndex);
 
     uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
 
-    VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(chipCert.Alloc(chipCertAllocatedLen), err = CHIP_ERROR_NO_MEMORY);
 
     {
@@ -263,7 +263,7 @@ void DeviceController::OnLocalNOCGenerated(void * context, const ByteSpan & noc)
         err = controller->GenerateOperationalCertificates(noc, chipCertSpan);
         SuccessOrExit(err);
 
-        err = admin->SetOperationalCertsFromCertArray(chipCertSpan);
+        err = fabric->SetOperationalCertsFromCertArray(chipCertSpan);
         SuccessOrExit(err);
     }
 
@@ -274,14 +274,14 @@ exit:
     }
 }
 
-CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::AdminPairingInfo * admin)
+CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::FabricInfo * fabric)
 {
     ChipLogProgress(Controller, "Getting operational keys");
-    Crypto::P256Keypair * keypair = admin->GetOperationalKey();
+    Crypto::P256Keypair * keypair = fabric->GetOperationalKey();
 
     ReturnErrorCodeIf(keypair == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    if (!admin->AreCredentialsAvailable())
+    if (!fabric->AreCredentialsAvailable())
     {
         chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
         uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
@@ -297,7 +297,7 @@ CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::AdminPairingInfo * 
             ReturnErrorOnFailure(mOperationalCredentialsDelegate->GetRootCACertificate(0, rootCertSpan));
             VerifyOrReturnError(CanCastTo<uint32_t>(rootCertSpan.size()), CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(ConvertX509CertToChipCert(rootCertSpan, chipCert.Get(), chipCertAllocatedLen, chipCertLen));
-            ReturnErrorOnFailure(admin->SetRootCert(ByteSpan(chipCert.Get(), chipCertLen)));
+            ReturnErrorOnFailure(fabric->SetRootCert(ByteSpan(chipCert.Get(), chipCertLen)));
         }
 
         // Generate Operational Certificates (NOC and ICAC)
@@ -315,11 +315,11 @@ CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::AdminPairingInfo * 
                 Optional<NodeId>(mLocalDeviceId), 0, ByteSpan(CSR.Get(), csrLength), ByteSpan(), &mLocalNOCCallback));
         }
 
-        ReturnErrorOnFailure(mAdmins.Store(admin->GetAdminId()));
+        ReturnErrorOnFailure(mFabrics.Store(fabric->GetFabricIndex()));
     }
 
     ChipLogProgress(Controller, "Generating credentials");
-    ReturnErrorOnFailure(admin->GetCredentials(mCredentials, mCertificates, mRootKeyId));
+    ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId));
 
     ChipLogProgress(Controller, "Loaded credentials successfully");
     return CHIP_NO_ERROR;
@@ -407,7 +407,7 @@ CHIP_ERROR DeviceController::Shutdown()
         mDefaultIMDelegate = nullptr;
     }
 
-    mAdmins.ReleaseAdminId(mAdminId);
+    mFabrics.ReleaseFabricIndex(mFabricIndex);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     Mdns::Resolver::Instance().SetResolverDelegate(nullptr);
@@ -464,7 +464,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             err = device->Deserialize(deviceInfo);
             VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-            device->Init(GetControllerDeviceInitParams(), mListenPort, mAdminId);
+            device->Init(GetControllerDeviceInitParams(), mListenPort, mFabricIndex);
         }
     }
 
@@ -563,10 +563,10 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
 
 CHIP_ERROR DeviceController::GetFabricId(uint64_t & fabricId)
 {
-    Transport::AdminPairingInfo * admin = mAdmins.FindAdminWithId(mAdminId);
-    VerifyOrReturnError(admin != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
+    VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    fabricId = admin->GetFabricId();
+    fabricId = fabric->GetFabricId();
 
     return CHIP_NO_ERROR;
 }
@@ -897,12 +897,12 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     uint16_t keyID = 0;
 
-    Transport::AdminPairingInfo * admin = mAdmins.FindAdminWithId(mAdminId);
+    Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
 
     VerifyOrExit(IsOperationalNodeId(remoteDeviceId), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = InitializePairedDeviceList();
     SuccessOrExit(err);
@@ -950,7 +950,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     SuccessOrExit(err);
     mPairingSession.MessageDispatch().SetPeerAddress(params.GetPeerAddress());
 
-    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, admin->GetAdminId());
+    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, fabric->GetFabricIndex());
 
     mSystemLayer->StartTimer(kSessionEstablishmentTimeout, OnSessionEstablishmentTimeoutCallback, this);
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
@@ -1028,12 +1028,12 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     testSecurePairingSecret->ToSerializable(device->GetPairing());
 
-    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, mAdminId);
+    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, mFabricIndex);
 
     device->Serialize(serialized);
 
     err = mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(peerAddress), device->GetDeviceId(),
-                                  testSecurePairingSecret, SecureSession::SessionRole::kInitiator, mAdminId);
+                                  testSecurePairingSecret, SecureSession::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1185,7 +1185,7 @@ void DeviceCommissioner::OnSessionEstablished()
 
     CHIP_ERROR err = mSessionMgr->NewPairing(
         Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kInitiator, mAdminId);
+        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1387,11 +1387,11 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    Transport::AdminPairingInfo * admin = mAdmins.FindAdminWithId(mAdminId);
-    VerifyOrReturnError(admin != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
+    VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     uint16_t rootCertLen     = 0;
-    const uint8_t * rootCert = admin->GetTrustedRoot(rootCertLen);
+    const uint8_t * rootCert = fabric->GetTrustedRoot(rootCertLen);
     VerifyOrReturnError(rootCert != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogProgress(Controller, "Sending root certificate to the device");

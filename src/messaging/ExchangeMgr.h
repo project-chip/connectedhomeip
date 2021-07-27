@@ -190,7 +190,7 @@ public:
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
-    Transport::AdminId GetAdminId() { return mAdminId; }
+    FabricIndex GetFabricIndex() { return mFabricIndex; }
 
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
 
@@ -232,7 +232,7 @@ private:
 
     ApplicationExchangeDispatch mDefaultExchangeDispatch;
 
-    Transport::AdminId mAdminId = 0;
+    FabricIndex mFabricIndex = 0;
 
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
 

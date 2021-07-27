@@ -35,6 +35,7 @@ executable("chip-tool") {
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
     "commands/discover/DiscoverCommand.cpp",
+    "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",

@@ -1196,6 +1196,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeControlSequenceOfOperationWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeSystemModeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeSystemModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStartOfWeekWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNumberOfWeeklyTransitionsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeNumberOfDailyTransitionsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -1288,6 +1292,8 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface CHIPWiFiNetworkDiagnostics : CHIPCluster
+
+- (void)resetCounts:(ResponseHandler)responseHandler;
 
 - (void)readAttributeBssidWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeSecurityTypeWithResponseHandler:(ResponseHandler)responseHandler;

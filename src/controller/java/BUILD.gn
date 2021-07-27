@@ -28,6 +28,9 @@ shared_library("jni") {
     "AndroidBleConnectionDelegate.h",
     "AndroidBlePlatformDelegate.cpp",
     "AndroidBlePlatformDelegate.h",
+    "AndroidCallbacks-JNI.cpp",
+    "AndroidCallbacks.cpp",
+    "AndroidCallbacks.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
     "AndroidKeyValueStoreManagerImpl.cpp",
@@ -37,6 +40,8 @@ shared_library("jni") {
     "JniReferences.cpp",
     "JniReferences.h",
     "JniTypeWrappers.h",
+    "MdnsImpl.cpp",
+    "MdnsImpl.h",
     "StackLock.h",
     "gen/CHIPClusters-JNI.cpp",
   ]
@@ -66,8 +71,11 @@ android_library("java") {
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
+    "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/KeyValueStoreManager.java",
+    "src/chip/devicecontroller/NsdManagerServiceResolver.java",
     "src/chip/devicecontroller/PreferencesKeyValueStoreManager.java",
+    "src/chip/devicecontroller/ServiceResolver.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

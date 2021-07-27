@@ -709,6 +709,8 @@ class ChipClusters:
             "WakeOnLan": {
             },
             "WiFiNetworkDiagnostics": {
+                "ResetCounts": {
+                },
             },
             "WindowCovering": {
                 "DownOrClose": {
@@ -1885,6 +1887,22 @@ class ChipClusters:
                     "type": "int",
                     "writable": True,
                 },
+                "StartOfWeek": {
+                    "attributeId": 0x0020,
+                    "type": "int",
+                },
+                "NumberOfWeeklyTransitions": {
+                    "attributeId": 0x0021,
+                    "type": "int",
+                },
+                "NumberOfDailyTransitions": {
+                    "attributeId": 0x0022,
+                    "type": "int",
+                },
+                "FeatureMap": {
+                    "attributeId": 0xFFFC,
+                    "type": "int",
+                },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
                     "type": "int",
@@ -2882,6 +2900,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_ThreadNetworkDiagnostics_ResetCounts(
                 device, ZCLendpoint, ZCLgroupid
         )
+    def ClusterWiFiNetworkDiagnostics_CommandResetCounts(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_WiFiNetworkDiagnostics_ResetCounts(
+                device, ZCLendpoint, ZCLgroupid
+        )
     def ClusterWindowCovering_CommandDownOrClose(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_WindowCovering_DownOrClose(
                 device, ZCLendpoint, ZCLgroupid
@@ -3548,6 +3570,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_SystemMode(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_WriteAttributeSystemMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_Thermostat_SystemMode(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterThermostat_ReadAttributeStartOfWeek(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_StartOfWeek(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeNumberOfWeeklyTransitions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_NumberOfWeeklyTransitions(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeNumberOfDailyTransitions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_NumberOfDailyTransitions(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeFeatureMap(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_FeatureMap(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterThreadNetworkDiagnostics_ReadAttributeChannel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -5163,6 +5193,18 @@ class ChipClusters:
         # Cluster Thermostat WriteAttribute SystemMode
         self._chipLib.chip_ime_WriteAttribute_Thermostat_SystemMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_WriteAttribute_Thermostat_SystemMode.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute StartOfWeek
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_StartOfWeek.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_StartOfWeek.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute NumberOfWeeklyTransitions
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_NumberOfWeeklyTransitions.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_NumberOfWeeklyTransitions.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute NumberOfDailyTransitions
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_NumberOfDailyTransitions.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_NumberOfDailyTransitions.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute FeatureMap
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_FeatureMap.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_FeatureMap.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.restype = ctypes.c_uint32
@@ -5361,6 +5403,9 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_WakeOnLan_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WakeOnLan_ClusterRevision.restype = ctypes.c_uint32
         # Cluster WiFiNetworkDiagnostics
+        # Cluster WiFiNetworkDiagnostics Command ResetCounts
+        self._chipLib.chip_ime_AppendCommand_WiFiNetworkDiagnostics_ResetCounts.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WiFiNetworkDiagnostics_ResetCounts.restype = ctypes.c_uint32
         # Cluster WiFiNetworkDiagnostics ReadAttribute Bssid
         self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Bssid.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WiFiNetworkDiagnostics_Bssid.restype = ctypes.c_uint32
