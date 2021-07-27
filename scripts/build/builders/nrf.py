@@ -75,7 +75,7 @@ class NrfConnectBuilder(Builder):
   def generate(self):
     if not os.path.exists(self.output_dir):
         # NRF does a in-place update  of SDK tools
-        if not self.runner.dry_run:
+        if not self._runner.dry_run:
           if 'ZEPHYR_BASE' not in os.environ:
               raise Exception("NRF builds require ZEPHYR_BASE to be set")
 
