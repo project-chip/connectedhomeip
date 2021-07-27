@@ -42,5 +42,4 @@ chip_test_suite("tests") {
   } else {
     public_deps += [ "${chip_root}/src/lib/mdns/minimal" ]
   }
-
 }
