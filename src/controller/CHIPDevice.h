@@ -82,7 +82,7 @@ struct ControllerDeviceInitParams
     Inet::InetLayer * inetLayer                         = nullptr;
     PersistentStorageDelegate * storageDelegate         = nullptr;
     Credentials::OperationalCredentialSet * credentials = nullptr;
-    uint8_t * credentialsIndex                          = nullptr;
+    uint8_t credentialsIndex                            = 0;
     SessionIDAllocator * idAllocator                    = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
@@ -480,7 +480,7 @@ private:
 
     Credentials::OperationalCredentialSet * mCredentials = nullptr;
     // TODO: Switch to size_t whenever OperationalCredentialSet Class is updated to support more then 255 credentials per controller
-    uint8_t * mCredentialsIndex = nullptr;
+    uint8_t mCredentialsIndex = 0;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 

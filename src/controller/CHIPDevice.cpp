@@ -392,6 +392,8 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
 {
     bool didLoad;
 
+    mDeviceAddress = addr;
+
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
@@ -404,7 +406,6 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
         return CHIP_NO_ERROR;
     }
 
-    mDeviceAddress = addr;
     connectionState->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
@@ -537,7 +538,7 @@ CHIP_ERROR Device::WarmupCASESession()
     mPeerMessageCounter  = 0;
 
     ReturnErrorOnFailure(
-        mCASESession.EstablishSession(mDeviceAddress, mCredentials, *mCredentialsIndex, mDeviceId, keyID, exchange, this));
+        mCASESession.EstablishSession(mDeviceAddress, mCredentials, mCredentialsIndex, mDeviceId, keyID, exchange, this));
 
     mState = ConnectionState::Connecting;
 

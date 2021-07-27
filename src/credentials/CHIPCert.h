@@ -254,10 +254,6 @@ public:
 
     /**
      * @brief Retrieve the Fabric ID of a CHIP certificate.
-     *
-     * @param certId  A reference to the certificate Fabric ID value.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR GetCertFabricId(uint64_t & fabricId) const;
 
@@ -343,8 +339,10 @@ struct ChipCertificateData
 struct ValidationContext
 {
     uint32_t mEffectiveTime;                        /**< Current CHIP Epoch UTC time. */
-    const ChipCertificateData * mTrustAnchor;       /**< Pointer to the Trust Anchor Certificate data structure. */
-    const ChipCertificateData * mSigningCert;       /**< Pointer to the Signing Certificate data structure. */
+    const ChipCertificateData * mTrustAnchor;       /**< Pointer to the Trust Anchor Certificate data structure.
+                                                       This value is set during certificate validation process
+                                                       to indicate to the caller the trust anchor of the
+                                                       validated certificate. */
     BitFlags<KeyUsageFlags> mRequiredKeyUsages;     /**< Key usage extensions that should be present in the
                                                        validated certificate. */
     BitFlags<KeyPurposeFlags> mRequiredKeyPurposes; /**< Extended Key usage extensions that should be present
@@ -508,7 +506,7 @@ public:
     /**
      * @brief Validate CHIP certificate.
      *
-     * @param cert     Pointer to the CHIP certificiate to be validated. The certificate is
+     * @param cert     Pointer to the CHIP certificate to be validated. The certificate is
      *                 required to be in this set, otherwise this function returns error.
      * @param context  Certificate validation context.
      *
@@ -519,20 +517,20 @@ public:
     /**
      * @brief Find and validate CHIP certificate.
      *
-     * @param subjectDN     Subject distinguished name to use as certificate search parameter.
-     * @param subjectKeyId  Subject key identifier to use as certificate search parameter.
-     * @param context       Certificate validation context.
-     * @param cert          A pointer to the valid CHIP certificate that matches search criteria.
+     * @param[in]  subjectDN     Subject distinguished name to use as certificate search parameter.
+     * @param[in]  subjectKeyId  Subject key identifier to use as certificate search parameter.
+     * @param[in]  context       Certificate validation context.
+     * @param[out] certData      A slot to write a pointer to the CHIP certificate data that matches search criteria.
      *
      * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId, ValidationContext & context,
-                             ChipCertificateData *& cert);
+                             const ChipCertificateData ** certData);
 
     /**
      * @brief Verify CHIP certificate signature.
      *
-     * @param cert    Pointer to the CHIP certificiate which signature should be validated.
+     * @param cert    Pointer to the CHIP certificate which signature should be validated.
      * @param caCert  Pointer to the CA certificate of the verified certificate.
      *
      * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
@@ -554,22 +552,22 @@ private:
     /**
      * @brief Find and validate CHIP certificate.
      *
-     * @param subjectDN      Subject distinguished name to use as certificate search parameter.
-     * @param subjectKeyId   Subject key identifier to use as certificate search parameter.
-     * @param context        Certificate validation context.
-     * @param validateFlags  Certificate validation flags.
-     * @param depth          Depth of the current certificate in the certificate validation chain.
-     * @param cert           A pointer to the valid CHIP certificate that matches search criteria.
+     * @param[in]  subjectDN      Subject distinguished name to use as certificate search parameter.
+     * @param[in]  subjectKeyId   Subject key identifier to use as certificate search parameter.
+     * @param[in]  context        Certificate validation context.
+     * @param[in]  validateFlags  Certificate validation flags.
+     * @param[in]  depth          Depth of the current certificate in the certificate validation chain.
+     * @param[out] certData       A slot to write a pointer to the CHIP certificate data that matches search criteria.
      *
      * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId, ValidationContext & context,
-                             BitFlags<CertValidateFlags> validateFlags, uint8_t depth, ChipCertificateData *& cert);
+                             BitFlags<CertValidateFlags> validateFlags, uint8_t depth, const ChipCertificateData ** certData);
 
     /**
      * @brief Validate CHIP certificate.
      *
-     * @param cert           Pointer to the CHIP certificiate to be validated.
+     * @param cert           Pointer to the CHIP certificate to be validated.
      * @param context        Certificate validation context.
      * @param validateFlags  Certificate validation flags.
      * @param depth          Depth of the current certificate in the certificate validation chain.

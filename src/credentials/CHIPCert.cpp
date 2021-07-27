@@ -40,6 +40,7 @@
 #include <protocols/Protocols.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
 #include <support/TimeUtils.h>
 
@@ -289,10 +290,8 @@ CHIP_ERROR ChipCertificateSet::LoadCerts(TLVReader & reader, BitFlags<CertDecode
             err = LoadCert(reader, decodeFlags);
             SuccessOrExit(err);
         }
-        if (err != CHIP_END_OF_TLV)
-        {
-            ExitNow();
-        }
+        err = reader.VerifyEndOfContainer();
+        SuccessOrExit(err);
 
         err = reader.ExitContainer(containerType);
         SuccessOrExit(err);
@@ -359,11 +358,11 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
 }
 
 CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId,
-                                             ValidationContext & context, ChipCertificateData *& cert)
+                                             ValidationContext & context, const ChipCertificateData ** certData)
 {
     context.mTrustAnchor = nullptr;
 
-    return FindValidCert(subjectDN, subjectKeyId, context, context.mValidateFlags, 0, cert);
+    return FindValidCert(subjectDN, subjectKeyId, context, context.mValidateFlags, 0, certData);
 }
 
 CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert)
@@ -385,8 +384,8 @@ CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert,
 CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, ValidationContext & context,
                                             BitFlags<CertValidateFlags> validateFlags, uint8_t depth)
 {
-    CHIP_ERROR err               = CHIP_NO_ERROR;
-    ChipCertificateData * caCert = nullptr;
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    const ChipCertificateData * caCert = nullptr;
     uint8_t certType;
 
     err = cert->mSubjectDN.GetCertType(certType);
@@ -489,7 +488,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
 
     // Search for a valid CA certificate that matches the Issuer DN and Authority Key Id of the current certificate.
     // Fail if no acceptable certificate is found.
-    err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, validateFlags, static_cast<uint8_t>(depth + 1), caCert);
+    err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, validateFlags, static_cast<uint8_t>(depth + 1), &caCert);
     if (err != CHIP_NO_ERROR)
     {
         ExitNow(err = CHIP_ERROR_CA_CERT_NOT_FOUND);
@@ -506,9 +505,11 @@ exit:
 
 CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId,
                                              ValidationContext & context, BitFlags<CertValidateFlags> validateFlags, uint8_t depth,
-                                             ChipCertificateData *& cert)
+                                             const ChipCertificateData ** certData)
 {
     CHIP_ERROR err;
+
+    *certData = nullptr;
 
     // Default error if we don't find any matching cert.
     err = (depth > 0) ? CHIP_ERROR_CA_CERT_NOT_FOUND : CHIP_ERROR_CERT_NOT_FOUND;
@@ -540,12 +541,10 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
         err = ValidateCert(candidateCert, context, validateFlags, depth);
         if (err == CHIP_NO_ERROR)
         {
-            cert = candidateCert;
+            *certData = candidateCert;
             ExitNow();
         }
     }
-
-    cert = nullptr;
 
 exit:
     return err;
@@ -593,7 +592,6 @@ void ValidationContext::Reset()
 {
     mEffectiveTime = 0;
     mTrustAnchor   = nullptr;
-    mSigningCert   = nullptr;
     mRequiredKeyUsages.ClearAll();
     mRequiredKeyPurposes.ClearAll();
     mValidateFlags.ClearAll();
@@ -653,7 +651,7 @@ CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, uint64_t val)
 
     if (IsChip32bitDNAttr(oid))
     {
-        VerifyOrReturnError(val <= UINT32_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(CanCastTo<uint32_t>(val), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     rdn[rdnCount].mAttrOID = oid;
@@ -761,15 +759,15 @@ CHIP_ERROR ChipDN::GetCertFabricId(uint64_t & fabricId) const
 {
     uint8_t rdnCount = RDNCount();
 
-    fabricId = 0;
+    fabricId = UINT64_MAX;
 
     for (uint8_t i = 0; i < rdnCount; i++)
     {
         switch (rdn[i].mAttrOID)
         {
         case kOID_AttributeType_ChipFabricId:
-            // Ensure only one FabricID RDN present, since start value is 0, which is reserved and never seen.
-            VerifyOrReturnError(fabricId == 0, CHIP_ERROR_WRONG_CERT_TYPE);
+            // Ensure only one FabricID RDN present, since start value is UINT64_MAX, which is reserved and never seen.
+            VerifyOrReturnError(fabricId == UINT64_MAX, CHIP_ERROR_WRONG_CERT_TYPE);
 
             fabricId = rdn[i].mChipVal;
             break;
@@ -778,6 +776,7 @@ CHIP_ERROR ChipDN::GetCertFabricId(uint64_t & fabricId) const
         }
     }
 
+    VerifyOrReturnError(fabricId != UINT64_MAX, CHIP_ERROR_WRONG_CERT_TYPE);
     return CHIP_NO_ERROR;
 }
 
