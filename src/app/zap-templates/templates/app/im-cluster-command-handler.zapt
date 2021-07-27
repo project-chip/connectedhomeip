@@ -40,18 +40,12 @@ void Dispatch{{asCamelCased side false}}Command({{#if (isServer side)}}app::Comm
     {
         switch (aCommandId)
         {
-        {{#all_user_cluster_commands}}
-        {{#unless mfgCode}}
-        {{#if (isStrEqual clusterName parent.name)}}
-        {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+        {{#chip_available_cluster_commands}}
         case Clusters::{{asUpperCamelCase parent.name}}::Commands::Ids::{{asUpperCamelCase name}}: {
         {{> im_command_handler_cluster_commands}}
             break;
         }
-        {{/if}}
-        {{/if}}
-        {{/unless}}
-        {{/all_user_cluster_commands}}
+        {{/chip_available_cluster_commands}}
         default: {
             // Unrecognized command ID, error status will apply.
             chip::app::CommandPathParams returnStatusParam = { aEndpointId,
