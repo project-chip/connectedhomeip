@@ -143,8 +143,8 @@ bool Cmd_ValidateCert(int argc, char * argv[])
     bool res       = true;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipCertificateSet certSet;
-    const ChipCertificateData * certToBeValidated;
-    ChipCertificateData * validatedCert;
+    const ChipCertificateData * certToBeValidated = nullptr;
+    const ChipCertificateData * validatedCert     = nullptr;
     ValidationContext context;
     uint8_t certsBuf[kMaxCerts * kMaxCHIPCertLength];
 
@@ -182,7 +182,7 @@ bool Cmd_ValidateCert(int argc, char * argv[])
     res = chip::UnixEpochToChipEpochTime(static_cast<uint32_t>(time(nullptr)), context.mEffectiveTime);
     VerifyTrueOrExit(res);
 
-    err = certSet.FindValidCert(certToBeValidated->mSubjectDN, certToBeValidated->mSubjectKeyId, context, validatedCert);
+    err = certSet.FindValidCert(certToBeValidated->mSubjectDN, certToBeValidated->mSubjectKeyId, context, &validatedCert);
     if (err != CHIP_NO_ERROR)
     {
         fprintf(stderr, "Failed certificate chain validation: %s\n", chip::ErrorStr(err));

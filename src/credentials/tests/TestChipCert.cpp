@@ -347,8 +347,8 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
 
     for (unsigned i = 0; i < sNumValidationTestCases; i++)
     {
-        ChipCertificateData * resultCert    = nullptr;
-        const ValidationTestCase & testCase = sValidationTestCases[i];
+        const ChipCertificateData * resultCert = nullptr;
+        const ValidationTestCase & testCase    = sValidationTestCases[i];
 
         err = certSet.Init(kMaxCertsPerTestCase);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -386,7 +386,7 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[testCase.mSubjectCertIndex].mSubjectKeyId;
 
         // Invoke the FindValidCert() method (the method being tested).
-        err = certSet.FindValidCert(subjectDN, subjectKeyId, validContext, resultCert);
+        err = certSet.FindValidCert(subjectDN, subjectKeyId, validContext, &resultCert);
         NL_TEST_ASSERT(inSuite, err == testCase.mExpectedResult);
 
         // If the test case is expected to be successful...
@@ -978,8 +978,8 @@ static void TestChipCert_VerifyGeneratedCerts(nlTestSuite * inSuite, void * inCo
     const ChipDN & subjectDN              = certSet.GetCertSet()[2].mSubjectDN;
     const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[2].mSubjectKeyId;
 
-    ChipCertificateData * resultCert = nullptr;
-    NL_TEST_ASSERT(inSuite, certSet.FindValidCert(subjectDN, subjectKeyId, validContext, resultCert) == CHIP_NO_ERROR);
+    const ChipCertificateData * resultCert = nullptr;
+    NL_TEST_ASSERT(inSuite, certSet.FindValidCert(subjectDN, subjectKeyId, validContext, &resultCert) == CHIP_NO_ERROR);
 }
 
 static void TestChipCert_X509ToChipArray(nlTestSuite * inSuite, void * inContext)
@@ -1049,8 +1049,8 @@ static void TestChipCert_X509ToChipArray(nlTestSuite * inSuite, void * inContext
     const ChipDN & subjectDN              = certSet.GetCertSet()[0].mSubjectDN;
     const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[0].mSubjectKeyId;
 
-    ChipCertificateData * resultCert = nullptr;
-    NL_TEST_ASSERT(inSuite, certSet.FindValidCert(subjectDN, subjectKeyId, validContext, resultCert) == CHIP_NO_ERROR);
+    const ChipCertificateData * resultCert = nullptr;
+    NL_TEST_ASSERT(inSuite, certSet.FindValidCert(subjectDN, subjectKeyId, validContext, &resultCert) == CHIP_NO_ERROR);
 }
 
 static void TestChipCert_X509ToChipArrayNoICA(nlTestSuite * inSuite, void * inContext)
@@ -1108,8 +1108,8 @@ static void TestChipCert_X509ToChipArrayNoICA(nlTestSuite * inSuite, void * inCo
     const ChipDN & subjectDN              = certSet.GetCertSet()[0].mSubjectDN;
     const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[0].mSubjectKeyId;
 
-    ChipCertificateData * resultCert = nullptr;
-    NL_TEST_ASSERT(inSuite, certSet.FindValidCert(subjectDN, subjectKeyId, validContext, resultCert) == CHIP_NO_ERROR);
+    const ChipCertificateData * resultCert = nullptr;
+    NL_TEST_ASSERT(inSuite, certSet.FindValidCert(subjectDN, subjectKeyId, validContext, &resultCert) == CHIP_NO_ERROR);
 }
 
 static void TestChipCert_X509ToChipArrayErrorScenarios(nlTestSuite * inSuite, void * inContext)
@@ -1243,8 +1243,8 @@ static void TestChipCert_ChipArrayToChipCerts(nlTestSuite * inSuite, void * inCo
     const ChipDN & subjectDN              = certSet.GetCertSet()[0].mSubjectDN;
     const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[0].mSubjectKeyId;
 
-    ChipCertificateData * resultCert = nullptr;
-    NL_TEST_ASSERT(inSuite, certSet.FindValidCert(subjectDN, subjectKeyId, validContext, resultCert) == CHIP_NO_ERROR);
+    const ChipCertificateData * resultCert = nullptr;
+    NL_TEST_ASSERT(inSuite, certSet.FindValidCert(subjectDN, subjectKeyId, validContext, &resultCert) == CHIP_NO_ERROR);
 }
 
 static void TestChipCert_ChipArrayToChipCertsNoICA(nlTestSuite * inSuite, void * inContext)
@@ -1307,8 +1307,8 @@ static void TestChipCert_ChipArrayToChipCertsNoICA(nlTestSuite * inSuite, void *
     const ChipDN & subjectDN              = certSet.GetCertSet()[0].mSubjectDN;
     const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[0].mSubjectKeyId;
 
-    ChipCertificateData * resultCert = nullptr;
-    NL_TEST_ASSERT(inSuite, certSet.FindValidCert(subjectDN, subjectKeyId, validContext, resultCert) == CHIP_NO_ERROR);
+    const ChipCertificateData * resultCert = nullptr;
+    NL_TEST_ASSERT(inSuite, certSet.FindValidCert(subjectDN, subjectKeyId, validContext, &resultCert) == CHIP_NO_ERROR);
 }
 
 static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)

@@ -1725,7 +1725,7 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
         err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        err = GetTestCertPubkey(certType, certPubkey, certPubkeyLen);
+        err = GetTestCertPubkey(certType, &certPubkey, certPubkeyLen);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = ExtractPubkeyFromX509Cert(cert, publicKey);

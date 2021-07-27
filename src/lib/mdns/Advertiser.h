@@ -107,6 +107,7 @@ public:
     static constexpr uint8_t kTxtMaxNumber     = 2;
     static constexpr uint8_t kTxtMaxKeySize    = MaxStringLength("CRI", "CRA"); // possible keys
     static constexpr uint8_t kTxtMaxValueSize  = std::max({ kTxtRetryIntervalIdleMaxLength, kTxtRetryIntervalActiveMaxLength });
+    static constexpr size_t kTxtTotalKeySize   = TotalStringLength("CRI", "CRA"); // possible keys
     static constexpr size_t kTxtTotalValueSize = kTxtRetryIntervalIdleMaxLength + kTxtRetryIntervalActiveMaxLength;
 
     OperationalAdvertisingParameters & SetPeerId(const PeerId & peerId)
@@ -143,6 +144,7 @@ public:
         std::max({ kKeyDiscriminatorMaxLength, kKeyVendorProductMaxLength, kKeyAdditionalPairingMaxLength,
                    kKeyCommissioningModeMaxLength, kKeyDeviceTypeMaxLength, kKeyDeviceNameMaxLength, kKeyRotatingIdMaxLength,
                    kKeyPairingInstructionMaxLength, kKeyPairingHintMaxLength });
+    static constexpr size_t kTxtTotalKeySize   = TotalStringLength("D", "VP", "CM", "DT", "DN", "RI", "PI", "PH"); // possible keys
     static constexpr size_t kTxtTotalValueSize = kKeyDiscriminatorMaxLength + kKeyVendorProductMaxLength +
         kKeyAdditionalPairingMaxLength + kKeyCommissioningModeMaxLength + kKeyDeviceTypeMaxLength + kKeyDeviceNameMaxLength +
         kKeyRotatingIdMaxLength + kKeyPairingInstructionMaxLength + kKeyPairingHintMaxLength;
