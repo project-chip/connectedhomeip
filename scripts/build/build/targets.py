@@ -11,6 +11,7 @@ class Platform(IntEnum):
   QPG = auto()
   ESP32 = auto()
   EFR32 = auto()
+  NRF = auto()
 
   @property
   def ArgName(self):
@@ -39,6 +40,10 @@ class Board(IntEnum):
   # EFR32 platform
   BRD4161A = auto()
 
+  # NRF platform
+  NRF52840 = auto()
+  NRF5340 = auto()
+
   @property
   def ArgName(self):
     return self.name.lower()
@@ -57,6 +62,7 @@ class Application(IntEnum):
   LIGHT = auto()
   LOCK = auto()
   WINDOW_COVERING = auto()
+  SHELL = auto()
 
   @property
   def ArgName(self):

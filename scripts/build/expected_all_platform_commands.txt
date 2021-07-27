@@ -28,6 +28,36 @@ gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--ar
 # Generating efr32-brd4161a-window_covering
 gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window_covering
 
+# Generating nrf-nrf52840-light
+bash -c '[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-light -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect'
+
+# Generating nrf-nrf52840-lock
+bash -c '[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-lock -b nrf52840dk_nrf52840 {root}/examples/lock-app/nrfconnect'
+
+# Generating nrf-nrf52840-shell
+bash -c '[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
+
+# Generating nrf-nrf5340-light
+bash -c '[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-light -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect'
+
+# Generating nrf-nrf5340-lock
+bash -c '[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-lock -b nrf5340dk_nrf5340_cpuapp {root}/examples/lock-app/nrfconnect'
+
+# Generating nrf-nrf5340-shell
+bash -c '[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
+
 # Generating linux-native-all_clusters
 gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux {out}/linux-native-all_clusters
 
@@ -81,5 +111,53 @@ gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--
 
 # Building efr32-brd4161a-window_covering
 ninja -C {out}/efr32-brd4161a-window_covering
+
+# Generating nrf-nrf52840-light
+bash -c '[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-light -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect'
+
+# Building nrf-nrf52840-light
+ninja -C {out}/nrf-nrf52840-light
+
+# Generating nrf-nrf52840-lock
+bash -c '[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-lock -b nrf52840dk_nrf52840 {root}/examples/lock-app/nrfconnect'
+
+# Building nrf-nrf52840-lock
+ninja -C {out}/nrf-nrf52840-lock
+
+# Generating nrf-nrf52840-shell
+bash -c '[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
+
+# Building nrf-nrf52840-shell
+ninja -C {out}/nrf-nrf52840-shell
+
+# Generating nrf-nrf5340-light
+bash -c '[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-light -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect'
+
+# Building nrf-nrf5340-light
+ninja -C {out}/nrf-nrf5340-light
+
+# Generating nrf-nrf5340-lock
+bash -c '[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-lock -b nrf5340dk_nrf5340_cpuapp {root}/examples/lock-app/nrfconnect'
+
+# Building nrf-nrf5340-lock
+ninja -C {out}/nrf-nrf5340-lock
+
+# Generating nrf-nrf5340-shell
+bash -c '[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
+
+# Building nrf-nrf5340-shell
+ninja -C {out}/nrf-nrf5340-shell
 
 

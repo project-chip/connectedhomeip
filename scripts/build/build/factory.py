@@ -7,6 +7,7 @@ from builders.linux import LinuxBuilder
 from builders.qpg import QpgBuilder
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
+from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 
 from .targets import Application, Board, Platform
 
@@ -68,6 +69,7 @@ _MATCHERS = {
     Platform.ESP32: Matcher(Esp32Builder),
     Platform.QPG: Matcher(QpgBuilder),
     Platform.EFR32: Matcher(Efr32Builder),
+    Platform.NRF: Matcher(NrfConnectBuilder),
 }
 
 # Matrix of what can be compiled and what build options are required
@@ -92,6 +94,12 @@ _MATCHERS[Platform.EFR32].AcceptApplication(Application.LOCK, app=Efr32App.LOCK)
 _MATCHERS[Platform.EFR32].AcceptApplication(
     Application.WINDOW_COVERING, app=Efr32App.WINDOW_COVERING)
 
+
+_MATCHERS[Platform.NRF].AcceptBoard(Board.NRF5340, board=NrfBoard.NRF5340)
+_MATCHERS[Platform.NRF].AcceptBoard(Board.NRF52840, board=NrfBoard.NRF52840)
+_MATCHERS[Platform.NRF].AcceptApplication(Application.LOCK, app=NrfApp.LOCK)
+_MATCHERS[Platform.NRF].AcceptApplication(Application.LIGHT, app=NrfApp.LIGHT)
+_MATCHERS[Platform.NRF].AcceptApplication(Application.SHELL, app=NrfApp.SHELL)
 
 class BuilderFactory:
   """Creates application builders."""
