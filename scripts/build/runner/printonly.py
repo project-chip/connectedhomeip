@@ -18,6 +18,7 @@ import shlex
 class PrintOnlyRunner:
   def __init__(self, output_file):
     self.output_file = output_file
+    self.dry_run = True
 
   def Run(self, cmd, cwd=None, title=None):
     if title:

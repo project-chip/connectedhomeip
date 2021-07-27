@@ -50,6 +50,9 @@ class LogPipe(threading.Thread):
 
 class ShellRunner:
 
+  def __init__(self):
+    self.dry_run = False
+
   def Run(self, cmd, cwd=None, title=None):
     outpipe = LogPipe(logging.INFO)
     errpipe = LogPipe(logging.WARN)

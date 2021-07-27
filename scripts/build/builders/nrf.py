@@ -75,16 +75,17 @@ class NrfConnectBuilder(Builder):
   def generate(self):
     if not os.path.exists(self.output_dir):
         # NRF does a in-place update  of SDK tools
-        if 'ZEPHYR_BASE' not in os.environ:
-            raise Exception("NRF builds require ZEPHYR_BASE to be set")
+        if not self.runner.dry_run:
+          if 'ZEPHYR_BASE' not in os.environ:
+              raise Exception("NRF builds require ZEPHYR_BASE to be set")
 
-        zephyr_base = os.environ['ZEPHYR_BASE']
-        nrfconnect_sdk = os.path.dirname(zephyr_base)
+          zephyr_base = os.environ['ZEPHYR_BASE']
+          nrfconnect_sdk = os.path.dirname(zephyr_base)
 
-        # NRF builds will both try to change .west/config in nrfconnect and 
-        # overall perform a git fetch on that location
-        if not os.access(nrfconnect_sdk, os.W_OK):
-            raise Exception("Directory %s not writable. NRFConnect builds require updates to this directory." % nrfconnect_sdk)
+          # NRF builds will both try to change .west/config in nrfconnect and 
+          # overall perform a git fetch on that location
+          if not os.access(nrfconnect_sdk, os.W_OK):
+              raise Exception("Directory %s not writable. NRFConnect builds require updates to this directory." % nrfconnect_sdk)
 
         # NOTE: update_ncs is available but SHOULD NOT be needed on docker builds.
         # We are specifically NOT adding to below:
