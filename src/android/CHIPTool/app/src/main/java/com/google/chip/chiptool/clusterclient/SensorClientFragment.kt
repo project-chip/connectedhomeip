@@ -29,8 +29,8 @@ private typealias ReadCallback = ChipClusters.IntegerAttributeCallback
 class SensorClientFragment : Fragment() {
   private val scope = CoroutineScope(Dispatchers.Main + Job())
 
-  // Timer to send periodic sensor read requests
-  private var sensorWatchTimer: Timer? = null
+  // Job for sending periodic sensor read requests
+  private var sensorWatchJob: Job? = null
 
   // History of sensor values
   private val sensorData = LineGraphSeries<DataPoint>()
@@ -106,22 +106,21 @@ class SensorClientFragment : Fragment() {
   }
 
   private fun watchSensorButtonChecked() {
-    sensorWatchTimer = Timer("SensorWatchTimer", false).apply {
-      schedule(REFRESH_PERIOD_MS, REFRESH_PERIOD_MS) {
-        scope.launch {
-          try {
-            readSensorCluster(clusterNameSpinner.selectedItem.toString(), true)
-          } catch (ex: Exception) {
-            showMessage(R.string.sensor_client_read_error_text, ex.toString())
-          }
+    sensorWatchJob = scope.launch {
+      while (isActive) {
+        try {
+          readSensorCluster(clusterNameSpinner.selectedItem.toString(), true)
+        } catch (ex: Exception) {
+          showMessage(R.string.sensor_client_read_error_text, ex.toString())
         }
+        delay(REFRESH_PERIOD_MS)
       }
     }
   }
 
   private fun watchSensorButtonUnchecked() {
-    sensorWatchTimer?.cancel()
-    sensorWatchTimer = null
+    sensorWatchJob?.cancel()
+    sensorWatchJob = null
   }
 
   private suspend fun readSensorCluster(clusterName: String, addToGraph: Boolean) {
@@ -204,4 +203,3 @@ class SensorClientFragment : Fragment() {
     fun newInstance(): SensorClientFragment = SensorClientFragment()
   }
 }
-
