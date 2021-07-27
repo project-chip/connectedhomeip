@@ -348,7 +348,7 @@ public:
         else if (i == 2)
         {
             app::Mdns::AdvertiseCommissionableNode();
-            OpenDefaultPairingWindow(ResetFabrics::kYes, PairingWindowAdvertisement::kMdns);
+            OpenDefaultPairingWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
         }
     }
 

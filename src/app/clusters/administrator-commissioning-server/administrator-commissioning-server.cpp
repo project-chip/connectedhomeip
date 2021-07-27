@@ -21,15 +21,9 @@
  ***************************************************************************/
 
 #include <app/CommandHandler.h>
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <support/CodeUtils.h>
-#include <support/ScopedBuffer.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -39,7 +33,22 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(app
                                                                              uint16_t Discriminator, uint32_t Iterations,
                                                                              ByteSpan Salt, uint16_t PasscodeID)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    PASEVerifier verifier;
+    ChipLogProgress(Zcl, "Received command to open commissioning window");
+    VerifyOrExit(!IsPairingWindowOpen(), status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(sizeof(verifier) == PAKEVerifier.size(), status = EMBER_ZCL_STATUS_FAILURE);
+    memcpy(&verifier[0][0], PAKEVerifier.data(), PAKEVerifier.size());
+    VerifyOrExit(OpenPairingWindowUsingVerifier(CommissioningTimeout, Discriminator, verifier, Iterations, Salt, PasscodeID) ==
+                     CHIP_NO_ERROR,
+                 status = EMBER_ZCL_STATUS_FAILURE);
+    ChipLogProgress(Zcl, "Commissioning window is now open");
+
+exit:
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Failed to open commissioning window. Status %d", status);
+    }
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
@@ -47,14 +56,27 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(app
 bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(app::CommandHandler * commandObj,
                                                                                   uint16_t CommissioningTimeout)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    ChipLogProgress(Zcl, "Received command to open basic commissioning window");
+    VerifyOrExit(!IsPairingWindowOpen(), status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(OpenDefaultPairingWindow(ResetFabrics::kNo, CommissioningTimeout) == CHIP_NO_ERROR,
+                 status = EMBER_ZCL_STATUS_FAILURE);
+    ChipLogProgress(Zcl, "Commissioning window is now open");
+
+exit:
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Failed to open commissioning window. Status %d", status);
+    }
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
 bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(app::CommandHandler * commandObj)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
+    ChipLogProgress(Zcl, "Received command to close commissioning window");
+    ClosePairingWindow();
+    ChipLogProgress(Zcl, "Commissioning window is now closed");
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }

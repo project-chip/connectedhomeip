@@ -247,6 +247,7 @@ private:
 DeviceDiscriminatorCache gDeviceDiscriminatorCache;
 FabricTable gFabrics;
 FabricIndex gNextAvailableFabricIndex = 0;
+bool gPairingWindowOpen               = false;
 
 class ServerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
 {
@@ -261,11 +262,14 @@ public:
         {
             mDelegate->OnPairingWindowOpened();
         }
+        gPairingWindowOpen = true;
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR StopAdvertisement() const override
     {
         gDeviceDiscriminatorCache.RestoreDiscriminator();
+
+        gPairingWindowOpen = false;
 
         if (isBLE)
         {
@@ -303,29 +307,6 @@ CASEServer gCASEServer;
 Messaging::ExchangeManager gExchangeMgr;
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
-static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVerifier & verifier)
-{
-    RendezvousParameters params;
-
-    ReturnErrorOnFailure(gDeviceDiscriminatorCache.UpdateDiscriminator(discriminator));
-
-#if CONFIG_NETWORK_LAYER_BLE
-    params.SetPASEVerifier(verifier)
-        .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
-        .SetPeerAddress(Transport::PeerAddress::BLE())
-        .SetAdvertisementDelegate(&gAdvDelegate);
-#else
-    params.SetPASEVerifier(verifier);
-#endif // CONFIG_NETWORK_LAYER_BLE
-
-    FabricIndex fabricIndex = gNextAvailableFabricIndex;
-    FabricInfo * fabricInfo = gFabrics.AssignFabricIndex(fabricIndex);
-    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NO_MEMORY);
-    gNextAvailableFabricIndex++;
-
-    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, fabricInfo);
-}
-
 class ServerCallback : public ExchangeDelegate
 {
 public:
@@ -345,52 +326,7 @@ public:
         ChipLogProgress(AppServer, "Packet received from Node 0x" ChipLogFormatX64 ": %u bytes",
                         ChipLogValueX64(packetHeader.GetSourceNodeId().Value()), buffer->DataLength());
 
-        // TODO: This code is temporary, and must be updated to use the Cluster API.
-        // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
-        if (payloadHeader.HasProtocol(chip::Protocols::ServiceProvisioning::Id))
-        {
-            uint32_t timeout;
-            uint16_t discriminator;
-            PASEVerifier verifier;
-
-            ChipLogProgress(AppServer, "Received service provisioning message. Treating it as OpenPairingWindow request");
-            chip::System::PacketBufferTLVReader reader;
-            reader.Init(std::move(buffer));
-            reader.ImplicitProfileId = chip::Protocols::ServiceProvisioning::Id.ToTLVProfileId();
-
-            SuccessOrExit(reader.Next(kTLVType_UnsignedInteger, TLV::ProfileTag(reader.ImplicitProfileId, 1)));
-            SuccessOrExit(reader.Get(timeout));
-
-            err = reader.Next(kTLVType_UnsignedInteger, TLV::ProfileTag(reader.ImplicitProfileId, 2));
-            if (err == CHIP_NO_ERROR)
-            {
-                SuccessOrExit(reader.Get(discriminator));
-
-                err = reader.Next(kTLVType_ByteString, TLV::ProfileTag(reader.ImplicitProfileId, 3));
-                if (err == CHIP_NO_ERROR)
-                {
-                    SuccessOrExit(reader.GetBytes(reinterpret_cast<uint8_t *>(verifier), sizeof(verifier)));
-                }
-            }
-
-            ChipLogProgress(AppServer, "Pairing Window timeout %" PRIu32 " seconds", timeout);
-
-            if (err != CHIP_NO_ERROR)
-            {
-                SuccessOrExit(err = OpenDefaultPairingWindow(ResetFabrics::kNo));
-            }
-            else
-            {
-                ChipLogProgress(AppServer, "Pairing Window discriminator %d", discriminator);
-                err = OpenPairingWindowUsingVerifier(discriminator, verifier);
-                SuccessOrExit(err);
-            }
-            ChipLogProgress(AppServer, "Opened the pairing window");
-        }
-        else
-        {
-            HandleDataModelMessage(exchangeContext, std::move(buffer));
-        }
+        HandleDataModelMessage(exchangeContext, std::move(buffer));
 
     exit:
         return err;
@@ -423,9 +359,15 @@ chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDC
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
+void HandlePairingWindowTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+{
+    ClosePairingWindow();
+}
+
 } // namespace
 
-CHIP_ERROR OpenDefaultPairingWindow(ResetFabrics resetFabrics, chip::PairingWindowAdvertisement advertisementMode)
+CHIP_ERROR OpenDefaultPairingWindow(ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds,
+                                    chip::PairingWindowAdvertisement advertisementMode)
 {
     // TODO(cecille): If this is re-called when the window is already open, what should happen?
     gDeviceDiscriminatorCache.RestoreDiscriminator();
@@ -460,7 +402,65 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetFabrics resetFabrics, chip::PairingWind
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableFabricIndex++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, fabricInfo);
+    ReturnErrorOnFailure(gRendezvousServer.WaitForPairing(
+        std::move(params), kSpake2p_Iteration_Count,
+        ByteSpan(reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), 0,
+        &gExchangeMgr, &gTransports, &gSessions, fabricInfo));
+
+    if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
+    {
+        ReturnErrorOnFailure(
+            DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t commissioningTimeoutSeconds, uint16_t discriminator, PASEVerifier & verifier,
+                                          uint32_t iterations, ByteSpan salt, uint16_t passcodeID)
+{
+    RendezvousParameters params;
+
+    ReturnErrorOnFailure(gDeviceDiscriminatorCache.UpdateDiscriminator(discriminator));
+
+#if CONFIG_NETWORK_LAYER_BLE
+    params.SetPASEVerifier(verifier)
+        .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
+        .SetPeerAddress(Transport::PeerAddress::BLE())
+        .SetAdvertisementDelegate(&gAdvDelegate);
+#else
+    params.SetPASEVerifier(verifier);
+#endif // CONFIG_NETWORK_LAYER_BLE
+
+    FabricIndex fabricIndex = gNextAvailableFabricIndex;
+    FabricInfo * fabricInfo = gFabrics.AssignFabricIndex(fabricIndex);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NO_MEMORY);
+    gNextAvailableFabricIndex++;
+
+    ReturnErrorOnFailure(gRendezvousServer.WaitForPairing(std::move(params), iterations, salt, passcodeID, &gExchangeMgr,
+                                                          &gTransports, &gSessions, fabricInfo));
+
+    if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
+    {
+        ReturnErrorOnFailure(
+            DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, nullptr));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void ClosePairingWindow()
+{
+    if (gPairingWindowOpen)
+    {
+        ChipLogProgress(AppServer, "Closing pairing window");
+        gRendezvousServer.Cleanup();
+    }
+}
+
+bool IsPairingWindowOpen()
+{
+    return gPairingWindowOpen;
 }
 
 // The function will initialize datamodel handler and then start the server
