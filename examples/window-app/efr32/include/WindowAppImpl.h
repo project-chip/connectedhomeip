@@ -75,7 +75,7 @@ protected:
     };
 
     WindowApp::Timer * CreateTimer(const char * name, uint32_t timeoutInMs, WindowApp::Timer::Callback callback,
-                                           void * context) override;
+                                   void * context) override;
     WindowApp::Button * CreateButton(WindowApp::Button::Id id, const char * name) override;
     void ProcessEvents();
     void DispatchEvent(const WindowApp::Event & event) override;

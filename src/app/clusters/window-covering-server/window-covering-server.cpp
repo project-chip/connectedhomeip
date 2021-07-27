@@ -54,7 +54,6 @@
 
 using namespace chip::app::Clusters;
 
-
 #define WC_PERCENT100THS_MAX 10000
 
 //------------------------------------------------------------------------------
