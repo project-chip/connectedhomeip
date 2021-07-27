@@ -105,7 +105,7 @@ WindowCover::WindowCover() {}
 
 void WindowCover::TypeSet(EmberAfWcType type)
 {
-    writeAttribute(mEndPoint, ZCL_WC_TYPE_ATTRIBUTE_ID, (uint8_t *) &type, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_TYPE_ATTRIBUTE_ID, static_cast<uint8_t *>&type, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfWcType WindowCover::TypeGet(void)
