@@ -15,23 +15,20 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Shared header for encoding and decoding Base38
- */
-
 #pragma once
 
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
+#include "Base38.h"
 
-#include <stdint.h>
+#include <support/Span.h>
+
+#include <stddef.h>
 
 namespace chip {
 
-static const char kCodes[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
-                               'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '-', '.' };
-static const uint8_t kBase38CharactersNeededInNBytesChunk[] = { 2, 4, 5 };
-static const uint8_t kRadix                                 = ArraySize(kCodes);
+// out_buf is null-terminated on success
+CHIP_ERROR base38Encode(ByteSpan in_buf, MutableCharSpan & out_buf);
+
+// returns size needed to store encoded string given number of input bytes
+size_t base38EncodedLength(size_t num_bytes);
 
 } // namespace chip
