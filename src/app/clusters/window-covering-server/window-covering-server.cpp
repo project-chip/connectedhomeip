@@ -144,7 +144,7 @@ void WindowCover::OperationalStatusSet(WindowCover::OperationalStatus status)
     uint8_t global = OperationalStateToValue(status.global);
     uint8_t lift   = OperationalStateToValue(status.lift);
     uint8_t tilt   = OperationalStateToValue(status.tilt);
-    uint8_t value  = (global && 0x03) | ((lift && 0x03) >> 2) | ((tilt && 0x03) >> 4);
+    uint8_t value  = (global & 0x03) | ((lift & 0x03) >> 2) | ((tilt & 0x03) >> 4);
     writeAttribute(mEndPoint, ZCL_WC_OPERATIONAL_STATUS_ATTRIBUTE_ID, &value, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
