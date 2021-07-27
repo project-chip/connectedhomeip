@@ -69,7 +69,7 @@ exit:
     }
 }
 
-bool emberAfTvChannelClusterChangeChannelCallback(chip::app::CommandHandler * command, uint8_t * match)
+bool emberAfTvChannelClusterChangeChannelCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command, uint8_t * match)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string matchString(reinterpret_cast<char *>(match));
@@ -80,8 +80,8 @@ bool emberAfTvChannelClusterChangeChannelCallback(chip::app::CommandHandler * co
     return true;
 }
 
-bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::CommandHandler * command, uint16_t majorNumber,
-                                                          uint16_t minorNumber)
+bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
+                                                          uint16_t majorNumber, uint16_t minorNumber)
 {
     bool success         = tvChannelClusterChangeChannelByNumber(majorNumber, minorNumber);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -89,7 +89,7 @@ bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::CommandHand
     return true;
 }
 
-bool emberAfTvChannelClusterSkipChannelCallback(chip::app::CommandHandler * command, uint16_t count)
+bool emberAfTvChannelClusterSkipChannelCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command, uint16_t count)
 {
     bool success         = tvChannelClusterSkipChannel(count);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;

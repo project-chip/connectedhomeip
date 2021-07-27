@@ -49,7 +49,7 @@ exit:
     }
 }
 
-bool emberAfKeypadInputClusterSendKeyCallback(chip::app::CommandHandler * command, uint8_t keyCode)
+bool emberAfKeypadInputClusterSendKeyCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command, uint8_t keyCode)
 {
     EmberAfKeypadInputStatus status = keypadInputClusterSendKey(static_cast<EmberAfKeypadInputCecKeyCode>(keyCode));
     sendResponse(command, status);

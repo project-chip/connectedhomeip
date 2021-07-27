@@ -51,7 +51,8 @@ exit:
     }
 }
 
-bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::app::CommandHandler * command, uint8_t target, uint8_t * data)
+bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
+                                                         uint8_t target, uint8_t * data)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string dataString(reinterpret_cast<char *>(data));

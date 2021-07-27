@@ -18,7 +18,7 @@
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
-bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(chip::app::CommandHandler * commandObj)
+bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
 {
     // TODO: Implement the ResetCounts in the platform layer.
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
