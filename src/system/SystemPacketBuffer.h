@@ -130,6 +130,21 @@ struct pbuf
  *          @ref chip::chipTLVReader
  *          @ref chip::chipTLVWriter
  *
+ * ### PacketBuffer format
+ *
+ * <pre>
+ *           ┌────────────────────────────────────┐
+ *           │       ┌────────────────────┐       │
+ *           │       │                    │◁──────┴───────▷│
+ *  ┏━━━━━━━━┿━━━━━━━┿━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┓
+ *  ┃ pbuf len payload ┃ reserve          ┃ data           ┃ unused                  ┃
+ *  ┗━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ *  │                  │← ReservedSize() →│← DataLength() →│← AvailableDataLength() →│
+ *  │                  │                  │← MaxDataLength() → · · · · · · · · · · ·→│
+ *  │                  │                  Start()                                    │
+ *  │← kStructureSize →│← AllocSize() → · · · · · · · · · · · · · · · · · · · · · · →│
+ * </pre>
+ *
  */
 class DLL_EXPORT PacketBuffer : private pbuf
 {

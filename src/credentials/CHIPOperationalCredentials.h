@@ -186,7 +186,7 @@ public:
      *
      * @param trustedRootId     Reference to the Trusted Root ID for the Certificate Set to be used
      *                          for validation
-     * @param cert              Pointer to the CHIP certificiate to be validated. The certificate is
+     * @param cert              Pointer to the CHIP certificate to be validated. The certificate is
      *                          required to be in this set, otherwise this function returns error.
      * @param context           Certificate validation context.
      *
@@ -197,17 +197,18 @@ public:
     /**
      * @brief Find and validate CHIP certificate.
      *
-     * @param trustedRootId     Reference to the Trusted Root ID for the Certificate Set to be used
-     *                          for validation
-     * @param subjectDN         Subject distinguished name to use as certificate search parameter.
-     * @param subjectKeyId      Subject key identifier to use as certificate search parameter.
-     * @param context           Certificate validation context.
-     * @param cert              A pointer to the valid CHIP certificate that matches search criteria.
+     * @param[in]  trustedRootId Reference to the Trusted Root ID for the Certificate Set to be used
+     *                           for validation.
+     * @param[in]  subjectDN     Subject distinguished name to use as certificate search parameter.
+     * @param[in]  subjectKeyId  Subject key identifier to use as certificate search parameter.
+     * @param[in]  context       Certificate validation context.
+     * @param[out] certData      A slot to write a pointer to the CHIP certificate data that matches search criteria.
      *
      * @return Returns a CHIP_ERROR if no valid certificate could be found
      **/
     CHIP_ERROR FindValidCert(const CertificateKeyId & trustedRootId, const ChipDN & subjectDN,
-                             const CertificateKeyId & subjectKeyId, ValidationContext & context, ChipCertificateData *& cert);
+                             const CertificateKeyId & subjectKeyId, ValidationContext & context,
+                             const ChipCertificateData ** certData);
 
     /**
      * @brief A function to sign a msg using ECDSA and the respective device credentials keypair.

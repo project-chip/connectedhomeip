@@ -2737,7 +2737,6 @@ void TestCHIPTLVWriterErrorHandling(nlTestSuite * inSuite)
 
     // CloseContainer() for non-container
     err = writer.CloseContainer(writer2);
-    printf("%s\n", ErrorStr(err));
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // OpenContainer() failure

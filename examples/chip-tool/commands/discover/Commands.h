@@ -19,6 +19,7 @@
 #pragma once
 
 #include "DiscoverCommand.h"
+#include "DiscoverCommissionablesCommand.h"
 #include "DiscoverCommissionersCommand.h"
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <mdns/Resolver.h>
@@ -93,6 +94,7 @@ void registerCommandsDiscover(Commands & commands)
     commands_list clusterCommands = {
         make_unique<Resolve>(),
         make_unique<Update>(),
+        make_unique<DiscoverCommissionablesCommand>(),
         make_unique<DiscoverCommissionersCommand>(),
     };
 

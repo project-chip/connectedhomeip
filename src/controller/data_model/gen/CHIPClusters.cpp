@@ -10126,6 +10126,54 @@ CHIP_ERROR ThermostatCluster::WriteAttributeSystemMode(Callback::Cancelable * on
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+CHIP_ERROR ThermostatCluster::ReadAttributeStartOfWeek(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0020;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR ThermostatCluster::ReadAttributeNumberOfWeeklyTransitions(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0021;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR ThermostatCluster::ReadAttributeNumberOfDailyTransitions(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0022;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR ThermostatCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0xFFFC;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
 CHIP_ERROR ThermostatCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback)
 {

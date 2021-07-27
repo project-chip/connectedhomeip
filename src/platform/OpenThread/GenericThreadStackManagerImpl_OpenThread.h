@@ -182,25 +182,28 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
     // Thread supports both operational and commissionable discovery, so buffers sizes must be worst case.
-    static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber = Mdns::CommissionAdvertisingParameters::kTxtMaxNumber;
-    static constexpr uint8_t kMaxDnsServiceTxtValueSize     = Mdns::CommissionAdvertisingParameters::kTxtMaxValueSize;
-    // TODO: Switch to max(commissionable TXT key size, operational TXT key size) after optimizing memory usage
-    static constexpr uint8_t kMaxDnsServiceTxtKeySize = Mdns::OperationalAdvertisingParameters::kTxtMaxKeySize;
+    static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber =
+        std::max(Mdns::CommissionAdvertisingParameters::kTxtMaxNumber, Mdns::OperationalAdvertisingParameters::kTxtMaxNumber);
+    static constexpr size_t kTotalDnsServiceTxtValueSize = std::max(Mdns::CommissionAdvertisingParameters::kTxtTotalValueSize,
+                                                                    Mdns::OperationalAdvertisingParameters::kTxtTotalValueSize);
+    static constexpr size_t kTotalDnsServiceTxtKeySize =
+        std::max(Mdns::CommissionAdvertisingParameters::kTxtTotalKeySize, Mdns::OperationalAdvertisingParameters::kTxtTotalKeySize);
 #else
     // Thread only supports operational discovery.
     static constexpr uint8_t kMaxDnsServiceTxtEntriesNumber = Mdns::OperationalAdvertisingParameters::kTxtMaxNumber;
-    static constexpr uint8_t kMaxDnsServiceTxtValueSize     = Mdns::OperationalAdvertisingParameters::kTxtMaxValueSize;
-    static constexpr uint8_t kMaxDnsServiceTxtKeySize       = Mdns::OperationalAdvertisingParameters::kTxtMaxKeySize;
+    static constexpr size_t kTotalDnsServiceTxtValueSize    = Mdns::OperationalAdvertisingParameters::kTxtTotalValueSize;
+    static constexpr size_t kTotalDnsServiceTxtKeySize      = Mdns::OperationalAdvertisingParameters::kTxtTotalKeySize;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
+    static constexpr size_t kTotalDnsServiceTxtBufferSize =
+        kTotalDnsServiceTxtKeySize + kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtValueSize;
 
     DnsBrowseCallback mDnsBrowseCallback;
     DnsResolveCallback mDnsResolveCallback;
 
     struct DnsServiceTxtEntries
     {
+        uint8_t mBuffer[kTotalDnsServiceTxtBufferSize];
         chip::Mdns::TextEntry mTxtEntries[kMaxDnsServiceTxtEntriesNumber];
-        uint8_t mTxtValueBuffers[kMaxDnsServiceTxtEntriesNumber][kMaxDnsServiceTxtValueSize];
-        char mTxtKeyBuffers[kMaxDnsServiceTxtEntriesNumber][kMaxDnsServiceTxtKeySize + 1];
     };
 
     struct DnsResult
