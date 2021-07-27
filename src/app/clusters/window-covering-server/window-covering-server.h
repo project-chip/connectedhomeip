@@ -169,7 +169,7 @@ public:
     static WindowCover & Instance();
     static constexpr uint8_t mEndPoint = 1;
 
-    bool hasFeature(Feature feat) { return (mFeatures & (uint8_t) feat) > 0; }
+    bool hasFeature(Feature feat) { return (mFeatures & static_cast<uint8_t>(feat)) > 0; }
 
     LiftActuator & Lift() { return mLift; }
     TiltActuator & Tilt() { return mTilt; }
@@ -211,7 +211,7 @@ private:
 
     WindowCover();
 
-    uint8_t mFeatures = ((uint8_t) Feature::Lift | (uint8_t) Feature::Tilt | (uint8_t) Feature::PositionAware);
+    uint8_t mFeatures = (static_cast<uint8_t>(Feature::Lift) | static_cast<uint8_t>(Feature::Tilt) | static_cast<uint8_t>(Feature::PositionAware));
     LiftActuator mLift;
     TiltActuator mTilt;
 };
