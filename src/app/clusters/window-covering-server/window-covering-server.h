@@ -211,7 +211,8 @@ private:
 
     WindowCover();
 
-    uint8_t mFeatures = (static_cast<uint8_t>(Feature::Lift) | static_cast<uint8_t>(Feature::Tilt) | static_cast<uint8_t>(Feature::PositionAware));
+    uint8_t mFeatures =
+        (static_cast<uint8_t>(Feature::Lift) | static_cast<uint8_t>(Feature::Tilt) | static_cast<uint8_t>(Feature::PositionAware));
     LiftActuator mLift;
     TiltActuator mTilt;
 };
