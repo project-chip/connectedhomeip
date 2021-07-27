@@ -40,8 +40,6 @@ using namespace Logging;
 
 namespace {
 
-Messaging::ExchangeContext * gExchangeCtx = nullptr;
-
 class SendArguments
 {
 public:
@@ -110,7 +108,6 @@ public:
         streamer_printf(sout, "Response received: len=%u time=%.3fms\n", buffer->DataLength(),
                         static_cast<double>(transitTime) / 1000);
 
-        gExchangeCtx = nullptr;
         return CHIP_NO_ERROR;
     }
 
@@ -118,8 +115,6 @@ public:
     {
         streamer_t * sout = streamer_get();
         streamer_printf(sout, "No response received\n");
-
-        gExchangeCtx = nullptr;
     }
 } gMockAppDelegate;
 
@@ -131,17 +126,9 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     System::PacketBufferHandle payloadBuf;
     uint32_t payloadSize = gSendArguments.GetPayloadSize();
 
-    // Discard any existing exchange context. Effectively we can only have one exchange with
-    // a single node at any one time.
-    if (gExchangeCtx != nullptr)
-    {
-        gExchangeCtx->Abort();
-        gExchangeCtx = nullptr;
-    }
-
     // Create a new exchange context.
-    gExchangeCtx = gExchangeManager.NewContext({ kTestDeviceNodeId, 0, gFabricIndex }, &gMockAppDelegate);
-    VerifyOrExit(gExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    auto * ec = gExchangeManager.NewContext({ kTestDeviceNodeId, 0, gFabricIndex }, &gMockAppDelegate);
+    VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     payloadBuf = MessagePacketBuffer::New(payloadSize);
     VerifyOrExit(!payloadBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -158,7 +145,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
         sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
     }
 
-    gExchangeCtx->SetResponseTimeout(kResponseTimeOut);
+    ec->SetResponseTimeout(kResponseTimeOut);
     sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse);
 
     gSendArguments.SetLastSendTime(System::Clock::GetMonotonicMilliseconds());
@@ -166,18 +153,16 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     streamer_printf(stream, "\nSend CHIP message with payload size: %d bytes to Node: %" PRIu64 "\n", payloadSize,
                     kTestDeviceNodeId);
 
-    err = gExchangeCtx->SendMessage(Protocols::Id(VendorId::Common, gSendArguments.GetProtocolId()),
-                                    gSendArguments.GetMessageType(), std::move(payloadBuf), sendFlags);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        gExchangeCtx->Abort();
-        gExchangeCtx = nullptr;
-    }
+    err = ec->SendMessage(Protocols::Id(VendorId::Common, gSendArguments.GetProtocolId()), gSendArguments.GetMessageType(),
+                          std::move(payloadBuf), sendFlags);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        if (ec != nullptr)
+        {
+            ec->Close();
+        }
         streamer_printf(stream, "Send CHIP message failed, err: %s\n", ErrorStr(err));
     }
 

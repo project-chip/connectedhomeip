@@ -270,7 +270,10 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     // Ensure the retransmit table is empty right now
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
-    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    // Ensure the exchange stays open after we send (unlike the
+    // CheckCloseExchangeAndResendApplicationMessage case), by claiming to
+    // expect a response.
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kExpectResponse);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Ensure the message was dropped, and was added to retransmit table
@@ -297,7 +300,6 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
-    rm->ClearRetransTable(rc);
     exchange->Close();
 }
 
@@ -337,7 +339,6 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    exchange->Close();
 
     // Ensure the message was dropped, and was added to retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 1);
@@ -362,8 +363,6 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 3);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
-
-    rm->ClearRetransTable(rc);
 }
 
 void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
@@ -415,10 +414,6 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
 
     // Ensure the retransmit table is empty, as we did not provide a message to retain
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
-
-    exchange->Close();
-
-    rm->ClearRetransTable(rc);
 }
 
 void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void * inContext)
@@ -462,7 +457,6 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    exchange->Close();
 
     // Ensure the message was dropped, and was added to retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
@@ -484,8 +478,6 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
 
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    rm->ClearRetransTable(rc);
 }
 
 void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext)
@@ -533,7 +525,6 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    exchange->Close();
 
     // Ensure the message was sent
     // The ack was dropped, and message was added to the retransmit table
@@ -556,8 +547,6 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
-
-    mockReceiver.CloseExchangeIfNeeded();
 }
 
 void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuite, void * inContext)
@@ -612,7 +601,6 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    exchange->Close();
 
     // Ensure the message was dropped, and was added to retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
@@ -635,7 +623,6 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    rm->ClearRetransTable(rc);
     ctx.Shutdown();
 
     // This test didn't use the global test context because the session establishment messages
@@ -694,8 +681,6 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    exchange->Close();
-
     // Ensure the message was sent
     // The ack was dropped, and message was added to the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
@@ -752,14 +737,14 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     // We send a message, have it get received by the peer, then an ack is
-    // returned, then a reply is returned.  We need to keep both exchanges alive
-    // for that (so we can send the response from the receiver and so the
-    // initial sender exchange can get it).
+    // returned, then a reply is returned.  We need to keep the receiver
+    // exchange alive until it does the message send (so we can send the
+    // response from the receiver and so the initial sender exchange can get
+    // it).
     gLoopback.mSentMessageCount    = 0;
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
     mockReceiver.mRetainExchange   = true;
-    mockSender.mRetainExchange     = true;
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -795,20 +780,13 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
-    // Make sure we don't leave retransmits sitting around.
-    receiverRc->GetReliableMessageMgr()->ClearRetransTable(receiverRc);
-    mockReceiver.mExchange->Close();
 
-    // Ensure the response was sent.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
+    // Ensure the response and its ack was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
     // Ensure that we have received that response.
     NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);
-
-    // Make sure we don't leave retransmits sitting around.
-    rm->ClearRetransTable(exchange->GetReliableMessageContext());
-    exchange->Close();
 
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -917,27 +895,25 @@ void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
     // And that we are not expecting an ack.
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
-    // Send the final response.
+    // Send the final response.  At this point we don't need to keep the
+    // exchanges alive anymore.
+    mockReceiver.mRetainExchange = false;
+    mockSender.mRetainExchange   = false;
+
     buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
-    // Make sure we don't leave retransmits sitting around.
-    receiverRc->GetReliableMessageMgr()->ClearRetransTable(receiverRc);
-    mockReceiver.mExchange->Close();
+    err = mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // Ensure the response was sent.
-    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
+    // Ensure the response and its ack was sent.
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
 
     // Ensure that we have received that response and it did not have a piggyback
     // ack.
     NL_TEST_ASSERT(inSuite, mockSender.IsOnMessageReceivedCalled);
     NL_TEST_ASSERT(inSuite, !mockSender.mReceivedPiggybackAck);
-
-    // Make sure we don't leave retransmits sitting around.
-    rm->ClearRetransTable(exchange->GetReliableMessageContext());
-    exchange->Close();
 
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -985,6 +961,7 @@ void CheckSendUnsolicitedStandaloneAckMessage(nlTestSuite * inSuite, void * inCo
     // Purposefully sending a standalone ack that requests an ack!
     err = exchange->SendMessage(SecureChannel::MsgType::StandaloneAck, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    // Needs a manual close, because SendMessage does not close for standalone acks.
     exchange->Close();
 
     // Ensure the message and its ack were sent.
@@ -1012,6 +989,7 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, rc->SendStandaloneAckMessage() == CHIP_NO_ERROR);
 
+    // Need manual close because standalone acks don't close exchanges.
     exchange->Close();
 }
 
@@ -1095,7 +1073,6 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
-    mockReceiver.mExchange->Close();
 
     // Ensure the response was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -1119,7 +1096,6 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    exchange->Close();
 
     // Ensure the message was sent (and the ack for it was also sent).
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
