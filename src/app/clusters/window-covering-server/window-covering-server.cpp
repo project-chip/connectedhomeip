@@ -111,7 +111,7 @@ void WindowCover::TypeSet(EmberAfWcType type)
 EmberAfWcType WindowCover::TypeGet(void)
 {
     EmberAfWcType type;
-    readAttribute(mEndPoint, ZCL_WC_TYPE_ATTRIBUTE_ID, (uint8_t *) &type, sizeof(uint8_t));
+    readAttribute(mEndPoint, ZCL_WC_TYPE_ATTRIBUTE_ID, static_cast<uint8_t *> &type, sizeof(uint8_t));
     return type;
 }
 
@@ -162,13 +162,13 @@ const WindowCover::OperationalStatus WindowCover::OperationalStatusGet(void)
 
 void WindowCover::EndProductTypeSet(EmberAfWcEndProductType type)
 {
-    writeAttribute(mEndPoint, ZCL_WC_END_PRODUCT_TYPE_ATTRIBUTE_ID, (uint8_t *) &type, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_END_PRODUCT_TYPE_ATTRIBUTE_ID, static_cast<uint8_t *> &type, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfWcEndProductType WindowCover::EndProductTypeGet(void)
 {
     EmberAfWcEndProductType type;
-    readAttribute(mEndPoint, ZCL_WC_END_PRODUCT_TYPE_ATTRIBUTE_ID, (uint8_t *) &type, sizeof(uint8_t));
+    readAttribute(mEndPoint, ZCL_WC_END_PRODUCT_TYPE_ATTRIBUTE_ID, static_cast<uint8_t *> &type, sizeof(uint8_t));
     return type;
 }
 
@@ -199,7 +199,7 @@ void WindowCover::SafetyStatusSet(WindowCover::SafetyStatus status)
         (status.stopInput ? 0x0080 : 0);
     value |= (uint16_t)(status.motorJammed ? 0x0100 : 0) | (uint16_t)(status.hardwareFailure ? 0x0200 : 0) |
         (uint16_t)(status.manualOperation ? 0x0400 : 0);
-    writeAttribute(mEndPoint, ZCL_WC_OPERATIONAL_STATUS_ATTRIBUTE_ID, (uint8_t *) &value, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_OPERATIONAL_STATUS_ATTRIBUTE_ID, static_cast<uint8_t *> &value, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 const WindowCover::SafetyStatus WindowCover::SafetyStatusGet(void)
@@ -207,7 +207,7 @@ const WindowCover::SafetyStatus WindowCover::SafetyStatusGet(void)
     uint16_t value = 0;
     WindowCover::SafetyStatus status;
 
-    readAttribute(mEndPoint, ZCL_WC_OPERATIONAL_STATUS_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(uint16_t));
+    readAttribute(mEndPoint, ZCL_WC_OPERATIONAL_STATUS_ATTRIBUTE_ID, static_cast<uint8_t *> &value, sizeof(uint16_t));
     status.remoteLockout       = (value & 0x0001) ? 1 : 0;
     status.tamperDetection     = (value & 0x0002) ? 1 : 0;
     status.failedCommunication = (value & 0x0004) ? 1 : 0;
@@ -334,25 +334,25 @@ uint16_t WindowCover::Actuator<ActuatorImpl>::Percent100thsToValue(uint16_t perc
 
 void WindowCover::LiftActuator::OpenLimitSet(uint16_t limit)
 {
-    writeAttribute(mEndPoint, ZCL_WC_INSTALLED_OPEN_LIMIT_LIFT_ATTRIBUTE_ID, (uint8_t *) &limit, ZCL_INT16U_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_INSTALLED_OPEN_LIMIT_LIFT_ATTRIBUTE_ID, static_cast<uint8_t *> &limit, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 uint16_t WindowCover::LiftActuator::OpenLimitGet(void)
 {
     uint16_t limit = 0;
-    readAttribute(mEndPoint, ZCL_WC_INSTALLED_OPEN_LIMIT_LIFT_ATTRIBUTE_ID, (uint8_t *) &limit, sizeof(uint16_t));
+    readAttribute(mEndPoint, ZCL_WC_INSTALLED_OPEN_LIMIT_LIFT_ATTRIBUTE_ID, static_cast<uint8_t *> &limit, sizeof(uint16_t));
     return limit;
 }
 
 void WindowCover::LiftActuator::ClosedLimitSet(uint16_t limit)
 {
-    writeAttribute(mEndPoint, ZCL_WC_INSTALLED_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID, (uint8_t *) &limit, ZCL_INT16U_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_INSTALLED_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID, static_cast<uint8_t *> &limit, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 uint16_t WindowCover::LiftActuator::ClosedLimitGet(void)
 {
     uint16_t limit = 0;
-    readAttribute(mEndPoint, ZCL_WC_INSTALLED_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID, (uint8_t *) &limit, sizeof(uint16_t));
+    readAttribute(mEndPoint, ZCL_WC_INSTALLED_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID, static_cast<uint8_t *> &limit, sizeof(uint16_t));
     return limit;
 }
 
@@ -361,9 +361,9 @@ void WindowCover::LiftActuator::PositionSet(uint16_t percent100ths)
     uint8_t percent = static_cast<uint8_t>(percent100ths / 100);
     uint16_t value  = Percent100thsToValue(percent100ths);
 
-    writeAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_LIFT_ATTRIBUTE_ID, (uint8_t *) &value, ZCL_INT16U_ATTRIBUTE_TYPE);
-    writeAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID, (uint8_t *) &percent, ZCL_INT8U_ATTRIBUTE_TYPE);
-    writeAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, (uint8_t *) &percent100ths,
+    writeAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_LIFT_ATTRIBUTE_ID, static_cast<uint8_t *> &value, ZCL_INT16U_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID, static_cast<uint8_t *> &percent, ZCL_INT8U_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, static_cast<uint8_t *> &percent100ths,
                    ZCL_INT16U_ATTRIBUTE_TYPE);
     emberAfWindowCoveringClusterPrint("LiftActuator::PositionSet(%u%%)", percent100ths / 100);
 }
@@ -371,7 +371,7 @@ void WindowCover::LiftActuator::PositionSet(uint16_t percent100ths)
 uint16_t WindowCover::LiftActuator::PositionGet()
 {
     uint16_t percent100ths = 0;
-    readAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, (uint8_t *) &percent100ths,
+    readAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, static_cast<uint8_t *> &percent100ths,
                   sizeof(uint16_t));
     return percent100ths;
 }
@@ -379,27 +379,27 @@ uint16_t WindowCover::LiftActuator::PositionGet()
 void WindowCover::LiftActuator::TargetSet(uint16_t percent100ths)
 {
     emberAfWindowCoveringClusterPrint("LiftActuator::TargetSet(%u%%)", percent100ths / 100);
-    writeAttribute(mEndPoint, ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, (uint8_t *) &percent100ths,
+    writeAttribute(mEndPoint, ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, static_cast<uint8_t *>&percent100ths,
                    ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 uint16_t WindowCover::LiftActuator::TargetGet()
 {
     uint16_t percent100ths = 0;
-    readAttribute(mEndPoint, ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, (uint8_t *) &percent100ths, sizeof(uint16_t));
+    readAttribute(mEndPoint, ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, static_cast<uint8_t *> &percent100ths, sizeof(uint16_t));
     return percent100ths;
 }
 
 void WindowCover::LiftActuator::NumberOfActuationsIncrement()
 {
     uint16_t count = static_cast<uint16_t>(NumberOfActuationsGet() + 1);
-    writeAttribute(mEndPoint, ZCL_WC_NUMBER_OF_ACTUATIONS_LIFT_ATTRIBUTE_ID, (uint8_t *) &count, ZCL_INT16U_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_NUMBER_OF_ACTUATIONS_LIFT_ATTRIBUTE_ID, static_cast<uint8_t *> &count, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 uint16_t WindowCover::LiftActuator::NumberOfActuationsGet(void)
 {
     uint16_t count = 0;
-    readAttribute(mEndPoint, ZCL_WC_NUMBER_OF_ACTUATIONS_LIFT_ATTRIBUTE_ID, (uint8_t *) &count, sizeof(uint16_t));
+    readAttribute(mEndPoint, ZCL_WC_NUMBER_OF_ACTUATIONS_LIFT_ATTRIBUTE_ID, static_cast<uint8_t *> &count, sizeof(uint16_t));
     return count;
 }
 
@@ -409,25 +409,25 @@ uint16_t WindowCover::LiftActuator::NumberOfActuationsGet(void)
 
 void WindowCover::TiltActuator::OpenLimitSet(uint16_t limit)
 {
-    writeAttribute(mEndPoint, ZCL_WC_INSTALLED_OPEN_LIMIT_TILT_ATTRIBUTE_ID, (uint8_t *) &limit, ZCL_INT16U_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_INSTALLED_OPEN_LIMIT_TILT_ATTRIBUTE_ID, static_cast<uint8_t *> &limit, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 uint16_t WindowCover::TiltActuator::OpenLimitGet(void)
 {
     uint16_t limit = 0;
-    readAttribute(mEndPoint, ZCL_WC_INSTALLED_OPEN_LIMIT_TILT_ATTRIBUTE_ID, (uint8_t *) &limit, sizeof(uint16_t));
+    readAttribute(mEndPoint, ZCL_WC_INSTALLED_OPEN_LIMIT_TILT_ATTRIBUTE_ID, static_cast<uint8_t *> &limit, sizeof(uint16_t));
     return limit;
 }
 
 void WindowCover::TiltActuator::ClosedLimitSet(uint16_t limit)
 {
-    writeAttribute(mEndPoint, ZCL_WC_INSTALLED_CLOSED_LIMIT_TILT_ATTRIBUTE_ID, (uint8_t *) &limit, ZCL_INT16U_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_INSTALLED_CLOSED_LIMIT_TILT_ATTRIBUTE_ID, static_cast<uint8_t *> &limit, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 uint16_t WindowCover::TiltActuator::ClosedLimitGet(void)
 {
     uint16_t limit = 0;
-    readAttribute(mEndPoint, ZCL_WC_INSTALLED_CLOSED_LIMIT_TILT_ATTRIBUTE_ID, (uint8_t *) &limit, sizeof(uint16_t));
+    readAttribute(mEndPoint, ZCL_WC_INSTALLED_CLOSED_LIMIT_TILT_ATTRIBUTE_ID, static_cast<uint8_t *> &limit, sizeof(uint16_t));
     return limit;
 }
 
@@ -436,9 +436,9 @@ void WindowCover::TiltActuator::PositionSet(uint16_t percent100ths)
     uint8_t percent = static_cast<uint8_t>(percent100ths / 100);
     uint16_t value  = Percent100thsToValue(percent100ths);
 
-    writeAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_TILT_ATTRIBUTE_ID, (uint8_t *) &value, ZCL_INT16U_ATTRIBUTE_TYPE);
-    writeAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID, (uint8_t *) &percent, ZCL_INT8U_ATTRIBUTE_TYPE);
-    writeAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, (uint8_t *) &percent100ths,
+    writeAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_TILT_ATTRIBUTE_ID,  static_cast<uint8_t *> &value, ZCL_INT16U_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID, static_cast<uint8_t *> &percent, ZCL_INT8U_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, static_cast<uint8_t *> &percent100ths,
                    ZCL_INT16U_ATTRIBUTE_TYPE);
     emberAfWindowCoveringClusterPrint("TiltActuator::PositionSet(%u%%)", percent100ths / 100);
 }
@@ -446,7 +446,7 @@ void WindowCover::TiltActuator::PositionSet(uint16_t percent100ths)
 uint16_t WindowCover::TiltActuator::PositionGet()
 {
     uint16_t percent100ths = 0;
-    readAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, (uint8_t *) &percent100ths,
+    readAttribute(mEndPoint, ZCL_WC_CURRENT_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, static_cast<uint8_t *> &percent100ths,
                   sizeof(uint16_t));
     return percent100ths;
 }
@@ -454,27 +454,27 @@ uint16_t WindowCover::TiltActuator::PositionGet()
 void WindowCover::TiltActuator::TargetSet(uint16_t percent100ths)
 {
     emberAfWindowCoveringClusterPrint("Actuator::TargetSet(+%u%%)", percent100ths / 100);
-    writeAttribute(mEndPoint, ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, (uint8_t *) &percent100ths,
+    writeAttribute(mEndPoint, ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, static_cast<uint8_t *> &percent100ths,
                    ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 uint16_t WindowCover::TiltActuator::TargetGet()
 {
     uint16_t percent100ths = 0;
-    readAttribute(mEndPoint, ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, (uint8_t *) &percent100ths, sizeof(uint16_t));
+    readAttribute(mEndPoint, ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, static_cast<uint8_t *> &percent100ths, sizeof(uint16_t));
     return percent100ths;
 }
 
 void WindowCover::TiltActuator::NumberOfActuationsIncrement()
 {
     uint16_t count = static_cast<uint16_t>(NumberOfActuationsGet() + 1);
-    writeAttribute(mEndPoint, ZCL_WC_NUMBER_OF_ACTUATIONS_TILT_ATTRIBUTE_ID, (uint8_t *) &count, ZCL_INT16U_ATTRIBUTE_TYPE);
+    writeAttribute(mEndPoint, ZCL_WC_NUMBER_OF_ACTUATIONS_TILT_ATTRIBUTE_ID, static_cast<uint8_t *> &count, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 uint16_t WindowCover::TiltActuator::NumberOfActuationsGet(void)
 {
     uint16_t count = 0;
-    readAttribute(mEndPoint, ZCL_WC_NUMBER_OF_ACTUATIONS_TILT_ATTRIBUTE_ID, (uint8_t *) &count, sizeof(uint16_t));
+    readAttribute(mEndPoint, ZCL_WC_NUMBER_OF_ACTUATIONS_TILT_ATTRIBUTE_ID, static_cast<uint8_t *> &count, sizeof(uint16_t));
     return count;
 }
 
