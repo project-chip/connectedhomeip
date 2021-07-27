@@ -46,7 +46,6 @@ target_sources(app PRIVATE
                ${PUMPC_COMMON}/gen/callback-stub.cpp
                ${PUMPC_COMMON}/gen/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
                ${CHIP_ROOT}/src/app/server/DataModelHandler.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp

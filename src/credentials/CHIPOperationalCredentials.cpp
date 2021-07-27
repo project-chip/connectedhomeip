@@ -191,14 +191,14 @@ CHIP_ERROR OperationalCredentialSet::ValidateCert(const CertificateKeyId & trust
 
 CHIP_ERROR OperationalCredentialSet::FindValidCert(const CertificateKeyId & trustedRootId, const ChipDN & subjectDN,
                                                    const CertificateKeyId & subjectKeyId, ValidationContext & context,
-                                                   ChipCertificateData *& cert)
+                                                   const ChipCertificateData ** certData)
 {
     ChipCertificateSet * chipCertificateSet;
 
     chipCertificateSet = FindCertSet(trustedRootId);
     VerifyOrReturnError(chipCertificateSet != nullptr, CHIP_ERROR_CERT_NOT_FOUND);
 
-    return chipCertificateSet->FindValidCert(subjectDN, subjectKeyId, context, cert);
+    return chipCertificateSet->FindValidCert(subjectDN, subjectKeyId, context, certData);
 }
 
 CHIP_ERROR OperationalCredentialSet::SignMsg(const CertificateKeyId & trustedRootId, const uint8_t * msg, const size_t msg_length,

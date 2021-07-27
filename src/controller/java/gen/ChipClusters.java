@@ -4845,6 +4845,22 @@ public class ChipClusters {
       writeSystemModeAttribute(chipClusterPtr, callback, value);
     }
 
+    public void readStartOfWeekAttribute(IntegerAttributeCallback callback) {
+      readStartOfWeekAttribute(chipClusterPtr, callback);
+    }
+
+    public void readNumberOfWeeklyTransitionsAttribute(IntegerAttributeCallback callback) {
+      readNumberOfWeeklyTransitionsAttribute(chipClusterPtr, callback);
+    }
+
+    public void readNumberOfDailyTransitionsAttribute(IntegerAttributeCallback callback) {
+      readNumberOfDailyTransitionsAttribute(chipClusterPtr, callback);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -4875,6 +4891,18 @@ public class ChipClusters {
 
     private native void writeSystemModeAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readStartOfWeekAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readNumberOfWeeklyTransitionsAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readNumberOfDailyTransitionsAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

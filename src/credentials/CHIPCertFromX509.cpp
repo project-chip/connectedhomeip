@@ -393,7 +393,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 uint32_t keyUsageBits;
                 err = reader.GetBitString(keyUsageBits);
                 SuccessOrExit(err);
-                VerifyOrExit(keyUsageBits <= UINT16_MAX, err = ASN1_ERROR_INVALID_ENCODING);
+                VerifyOrExit(CanCastTo<uint16_t>(keyUsageBits), err = ASN1_ERROR_INVALID_ENCODING);
 
                 // Check that only supported flags are set.
                 BitFlags<KeyUsageFlags> keyUsageFlags(static_cast<uint16_t>(keyUsageBits));
@@ -435,8 +435,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                     {
                         ASN1_GET_INTEGER(pathLenConstraint);
 
-                        VerifyOrExit(pathLenConstraint <= UINT8_MAX, err = ASN1_ERROR_INVALID_ENCODING);
-                        VerifyOrExit(pathLenConstraint >= 0, err = ASN1_ERROR_INVALID_ENCODING);
+                        VerifyOrExit(CanCastTo<uint8_t>(pathLenConstraint), err = ASN1_ERROR_INVALID_ENCODING);
 
                         // pathLenConstraint is present only when cA is TRUE
                         VerifyOrExit(isCA, err = ASN1_ERROR_INVALID_ENCODING);

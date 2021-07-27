@@ -5234,6 +5234,50 @@ chip::ChipError::StorageType chip_ime_WriteAttribute_Thermostat_SystemMode(chip:
     return ChipError::AsInteger(
         cluster.WriteAttributeSystemMode(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value));
 }
+chip::ChipError::StorageType chip_ime_ReadAttribute_Thermostat_StartOfWeek(chip::Controller::Device * device,
+                                                                           chip::EndpointId ZCLendpointId,
+                                                                           chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(
+        cluster.ReadAttributeStartOfWeek(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_Thermostat_NumberOfWeeklyTransitions(chip::Controller::Device * device,
+                                                                                         chip::EndpointId ZCLendpointId,
+                                                                                         chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(
+        cluster.ReadAttributeNumberOfWeeklyTransitions(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_Thermostat_NumberOfDailyTransitions(chip::Controller::Device * device,
+                                                                                        chip::EndpointId ZCLendpointId,
+                                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(
+        cluster.ReadAttributeNumberOfDailyTransitions(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_Thermostat_FeatureMap(chip::Controller::Device * device,
+                                                                          chip::EndpointId ZCLendpointId,
+                                                                          chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(
+        cluster.ReadAttributeFeatureMap(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_Thermostat_ClusterRevision(chip::Controller::Device * device,
                                                                                chip::EndpointId ZCLendpointId,
                                                                                chip::GroupId /* ZCLgroupId */)

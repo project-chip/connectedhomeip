@@ -29,6 +29,7 @@
 #include <platform/internal/BLEManager.h>
 
 #include "FreeRTOS.h"
+#include "rail.h"
 #include "sl_bt_api.h"
 #include "sl_bt_stack_config.h"
 #include "sl_bt_stack_init.h"
@@ -37,7 +38,6 @@
 #include <platform/EFR32/freertos_bluetooth.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-
 using namespace ::chip;
 using namespace ::chip::Ble;
 
@@ -117,6 +117,10 @@ BLEManagerImpl BLEManagerImpl::sInstance;
  ******************************************************************************/
 extern "C" sl_status_t initialize_bluetooth()
 {
+#if !defined(SL_CATALOG_KERNEL_PRESENT)
+    NVIC_ClearPendingIRQ(PendSV_IRQn);
+    NVIC_EnableIRQ(PendSV_IRQn);
+#endif
     sl_status_t ret = sl_bt_init_stack(&config);
     sl_bt_init_classes(bt_class_table);
     sl_bt_init_multiprotocol();
@@ -131,7 +135,7 @@ static void initBleConfig(void)
     config.bluetooth.max_advertisers   = BLE_MAX_ADVERTISERS;
     config.bluetooth.max_periodic_sync = BLE_CONFIG_MAX_PERIODIC_ADVERTISING_SYNC;
     config.bluetooth.max_buffer_memory = BLE_MAX_BUFFER_SIZE;
-    config.gattdb                      = &bg_gattdb_data; /* Pointer to GATT database */
+    config.gattdb                      = &gattdb; /* Pointer to GATT database */
     config.scheduler_callback          = BluetoothLLCallback;
     config.stack_schedule_callback     = BluetoothUpdate;
     config.max_timers                  = BLE_CONFIG_MAX_SOFTWARE_TIMERS;
@@ -236,10 +240,15 @@ void BLEManagerImpl::bluetoothStackEventHandler(void * p_arg)
             switch (SL_BT_MSG_ID(bluetooth_evt->header))
             {
             case sl_bt_evt_system_boot_id: {
-                ChipLogProgress(DeviceLayer, "Bluetooth stack booted: v%d.%d.%d-b%d\n", bluetooth_evt->data.evt_system_boot.major,
+                ChipLogProgress(DeviceLayer, "Bluetooth stack booted: v%d.%d.%d-b%d", bluetooth_evt->data.evt_system_boot.major,
                                 bluetooth_evt->data.evt_system_boot.minor, bluetooth_evt->data.evt_system_boot.patch,
                                 bluetooth_evt->data.evt_system_boot.build);
                 sInstance.HandleBootEvent();
+
+                RAIL_Version_t railVer;
+                RAIL_GetVersion(&railVer, true);
+                ChipLogProgress(DeviceLayer, "RAIL version:, v%d.%d.%d-b%d", railVer.major, railVer.minor, railVer.rev,
+                                railVer.build);
             }
             break;
 
@@ -741,6 +750,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     err = MapBLEError(ret);
     SuccessOrExit(err);
 
+    sl_bt_advertiser_set_configuration(advertising_set_handle, 1);
     ret = sl_bt_advertiser_start(advertising_set_handle, sl_bt_advertiser_user_data, connectableAdv);
 
     if (SL_STATUS_OK == ret)

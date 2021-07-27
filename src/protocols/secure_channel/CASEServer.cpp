@@ -43,19 +43,16 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     mExchangeManager = exchangeManager;
     mIDAllocator     = idAllocator;
 
+    Cleanup();
+
     ReturnErrorOnFailure(GetSession().MessageDispatch().Init(transportMgr));
 
-    ExchangeDelegate * delegate = this;
-    ReturnErrorOnFailure(
-        mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1, delegate));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
     ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    Cleanup();
 
     // TODO - Use PK of the root CA for the initiator to figure out the fabric.
     mFabricIndex = ec->GetSecureSession().GetFabricIndex();
@@ -91,17 +88,32 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     ChipLogProgress(Inet, "CASE Server received SigmaR1 message. Starting handshake. EC %p", ec);
-    ReturnErrorOnFailure(InitCASEHandshake(ec));
+    CHIP_ERROR err = InitCASEHandshake(ec);
+    SuccessOrExit(err);
 
-    GetSession().OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));
-
-    return CHIP_NO_ERROR;
     // TODO - Enable multiple concurrent CASE session establishment
+    // https://github.com/project-chip/connectedhomeip/issues/8342
+    ChipLogProgress(Inet, "CASE Server disabling CASE session setups");
+    mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1);
+
+    err = GetSession().OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        Cleanup();
+    }
+    return err;
 }
 
 void CASEServer::Cleanup()
 {
     // Let's re-register for CASE SigmaR1 message, so that the next CASE session setup request can be processed.
+    // https://github.com/project-chip/connectedhomeip/issues/8342
+    ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
+    mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1, this);
+
     mFabricIndex = Transport::kUndefinedFabricIndex;
     mCredentials.Release();
     mCertificates.Release();

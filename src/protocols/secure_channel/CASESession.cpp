@@ -1121,7 +1121,7 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR3(const ByteSpan & ipk, MutableByteSp
 
 CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID)
 {
-    ChipCertificateData * resultCert = nullptr;
+    const ChipCertificateData * resultCert = nullptr;
 
     ChipCertificateSet certSet;
     // Certificate set can contain up to 3 certs (NOC, ICA cert, and Root CA cert)
@@ -1146,7 +1146,7 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const ByteSpan & respon
         const ChipDN & subjectDN              = certSet.GetCertSet()[0].mSubjectDN;
         const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[0].mSubjectKeyId;
 
-        ReturnErrorOnFailure(mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, resultCert));
+        ReturnErrorOnFailure(mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, &resultCert));
 
         // Now that we have verified that this is a valid cert, try to get the
         // peer's operational identity from it.

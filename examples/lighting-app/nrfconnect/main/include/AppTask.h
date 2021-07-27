@@ -56,7 +56,7 @@ private:
     static void LightingActionEventHandler(AppEvent * aEvent);
     static void StartBLEAdvertisementHandler(AppEvent * aEvent);
 
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static void ButtonEventHandler(uint32_t button_state, uint32_t has_changed);
     static void TimerEventHandler(k_timer * timer);
