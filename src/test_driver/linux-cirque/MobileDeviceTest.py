@@ -79,7 +79,7 @@ class TestPythonController(CHIPVirtualHome):
                    if device['type'] == 'MobileDevice']
 
         for server in server_ids:
-            self.execute_device_cmd(server, "CHIPCirqueDaemon.py run {} --thread".format(
+            self.execute_device_cmd(server, "CHIPCirqueDaemon.py -- run {} --thread".format(
                 os.path.join(CHIP_REPO, "out/debug/standalone/chip-lighting-app")))
 
         self.reset_thread_devices(server_ids)

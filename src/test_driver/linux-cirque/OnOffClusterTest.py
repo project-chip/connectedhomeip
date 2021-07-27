@@ -81,7 +81,7 @@ class TestOnOffCluster(CHIPVirtualHome):
         tool_device_id = tool_ids[0]
 
         for device_id in server_ids:
-            self.execute_device_cmd(device_id, "CHIPCirqueDaemon.py run {} --thread".format(
+            self.execute_device_cmd(device_id, "CHIPCirqueDaemon.py -- run {} --thread".format(
                 os.path.join(CHIP_REPO, "out/debug/standalone/chip-lighting-app")))
             server_ip_address.add(self.get_device_thread_ip(device_id))
 

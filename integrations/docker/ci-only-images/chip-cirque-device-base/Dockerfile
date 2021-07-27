@@ -32,7 +32,8 @@ RUN apt-get update \
   && mkdir -p /etc/wpa_supplicant \
   && echo "ctrl_interface=/run/wpa_supplicant" >> /etc/wpa_supplicant/wpa_supplicant.conf \
   && echo "update_config=1" >> /etc/wpa_supplicant/wpa_supplicant.conf \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && pip3 install click
 
 COPY CHIPCirqueDaemon.py /bin/CHIPCirqueDaemon.py
 
@@ -40,6 +41,6 @@ WORKDIR /
 
 ENTRYPOINT service dbus start && \
            service avahi-daemon start && \
-           /bin/CHIPCirqueDaemon.py server otbr-agent
+           /bin/CHIPCirqueDaemon.py --server otbr-agent
 
 EXPOSE 80

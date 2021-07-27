@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
-"""
-Copyright (c) 2020 Project CHIP Authors
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import sys
 import subprocess
 import logging
+import click
+from dataclasses import dataclass
+from enum import Enum
 from multiprocessing.connection import Listener, Client
 
 log = logging.getLogger()
@@ -30,17 +32,36 @@ sh.setFormatter(
 log.addHandler(sh)
 
 
+class CommandStatus(Enum):
+    """Enum class for passing status code of execute CirqueDaemon command, not CHIP error codes."""
+    SUCCESS = 0
+    FAILURE = 1
+    UNKNOWN_COMMAND = 2
+    INVALID_ARGUMENT = 3
+
+
+@dataclass
+class CommandResponse:
+    """Class for holding status of running CirqueDaemon commands."""
+    status_code: CommandStatus
+    error_message: str = ""
+
+
 class ShellCommand:
     def __init__(self, args=None):
         self._args = args
 
     def __call__(self):
         if not self._args:
-            return [1, "Cannot spwan background process"]
+            return CommandResponse(CommandStatus.INVALID_ARGUMENT, "Cannot spwan background process")
         log.info("Will run command: {}".format(self._args))
-        subprocess.Popen(
-            self._args, stdout=sys.stdout, stderr=sys.stderr)
-        return [0, ""]
+        try:
+            # As the command will be execued in background, we won't return the exit code of the program.
+            subprocess.Popen(
+                self._args, stdout=sys.stdout, stderr=sys.stderr)
+            return CommandResponse(CommandStatus.SUCCESS)
+        except Exception as ex:
+            return CommandResponse(CommandStatus.FAILURE, "Failed to run command: {}".format(ex))
 
 
 class InvalidCommand:
@@ -48,10 +69,10 @@ class InvalidCommand:
         self._args = args
 
     def __call__(self):
-        return [1, "Invalid command"]
+        return CommandResponse(CommandStatus.FAILURE, "invalid command")
 
 
-address = "/tmp/cirque-helper.socket"
+SERVER_ADDRESS = "/tmp/cirque-helper.socket"
 
 
 def CommandFactory(args):
@@ -72,7 +93,8 @@ def ServerMain(args):
         cmd = extraOptions.get(extraOption, InvalidCommand())
         cmd()
 
-    with Listener(address) as listener:
+    with Listener(SERVER_ADDRESS) as listener:
+        log.info("Server running on {}".format(SERVER_ADDRESS))
         while True:
             with listener.accept() as conn:
                 log.info("Received connection")
@@ -83,19 +105,23 @@ def ServerMain(args):
 def ClientMain(args):
     if len(args) == 0:
         sys.exit(1)
-    with Client(address) as conn:
+    with Client(SERVER_ADDRESS) as conn:
         conn.send(args)
         res = conn.recv()
         print(res)
-        if not res:
-            sys.exit(0)
-        sys.exit(res[0])
+        if res.status_code != CommandStatus.SUCCESS:
+            sys.exit(1)
 
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        exit(1)
-    elif sys.argv[1] == "server":
-        ServerMain(sys.argv[2:])
+@click.command()
+@click.option('--server', is_flag=True)
+@click.argument('command', nargs=-1)
+def main(server, command):
+    if server:
+        ServerMain(command)
     else:
-        ClientMain(sys.argv[1:])
+        ClientMain(command)
+
+
+if __name__ == '__main__':
+    main()
