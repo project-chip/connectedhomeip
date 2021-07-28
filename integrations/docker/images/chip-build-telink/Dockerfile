@@ -31,7 +31,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -y \
     libsdl2-dev \
     && pip3 install --user -U west \
     && pip3 install pyelftools \
-    && west init ${ZEPHYR_PROJECT_DIR} \
+    && west init --mr=zephyr-v2.5.0 ${ZEPHYR_PROJECT_DIR} \
     && cd ${ZEPHYR_PROJECT_DIR} && west update && west zephyr-export \
     && python3 -m pip install -U pip \
     && pip3 install --user -r ${ZEPHYR_PROJECT_DIR}/zephyr/scripts/requirements.txt
