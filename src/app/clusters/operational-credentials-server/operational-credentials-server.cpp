@@ -342,26 +342,22 @@ CHIP_ERROR SendNOCResponse(chip::app::Command * commandObj, EmberAfNodeOperation
     }
     // TODO: Change DebugText to CHAR_STRING once strings are supported in command/response fields
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(2), debug_text));
-    ReturnErrorOnFailure(commandObj->FinishCommand());
-
-    return CHIP_NO_ERROR;
+    return commandObj->FinishCommand();
 }
 
 EmberAfNodeOperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
 {
-    EmberAfNodeOperationalCertStatus status = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NOC;
-
     if (err == CHIP_NO_ERROR)
     {
-        status = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;
     }
     else if (err == CHIP_ERROR_INVALID_PUBLIC_KEY)
     {
-        status = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_PUBLIC_KEY;
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_PUBLIC_KEY;
     }
     else if (err == CHIP_ERROR_INVALID_FABRIC_ID || err == CHIP_ERROR_WRONG_NODE_ID)
     {
-        status = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NODE_OP_ID;
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NODE_OP_ID;
     }
     else if (err == CHIP_ERROR_CA_CERT_NOT_FOUND || err == CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED ||
              err == CHIP_ERROR_CERT_PATH_TOO_LONG || err == CHIP_ERROR_CERT_USAGE_NOT_ALLOWED || err == CHIP_ERROR_CERT_EXPIRED ||
@@ -369,14 +365,14 @@ EmberAfNodeOperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
              err == CHIP_ERROR_UNSUPPORTED_ELLIPTIC_CURVE || err == CHIP_ERROR_CERT_LOAD_FAILED ||
              err == CHIP_ERROR_CERT_NOT_TRUSTED || err == CHIP_ERROR_WRONG_CERT_SUBJECT)
     {
-        status = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NOC;
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NOC;
     }
     else if (err == CHIP_ERROR_NO_MEMORY)
     {
-        status = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_TABLE_FULL;
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_TABLE_FULL;
     }
 
-    return status;
+    return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NOC;
 }
 
 } // namespace

@@ -1369,7 +1369,7 @@ CHIP_ERROR DeviceCommissioner::ConvertFromNodeOperationalCertStatus(uint8_t err)
         return CHIP_ERROR_INVALID_ARGUMENT;
     case EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_FABRIC_INDEX:
         return CHIP_ERROR_INVALID_FABRIC_ID;
-    };
+    }
 
     return CHIP_ERROR_CERT_LOAD_FAILED;
 }
