@@ -112,7 +112,6 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}
   def build(self):
     logging.info('Compiling NrfConnect at %s', self.output_dir)
 
-    self.generate()
     self._Execute(['ninja', '-C', self.output_dir], title='Building ' + self.identifier)
 
   def outputs(self):

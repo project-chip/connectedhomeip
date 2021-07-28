@@ -100,7 +100,6 @@ class Esp32Builder(Builder):
   def build(self):
     logging.info('Compiling Esp32 at %s', self.output_dir)
 
-    self.generate()
     self._IdfEnvExecute(
         "ninja -C '%s'" % self.output_dir, title='Building ' + self.identifier)
 
