@@ -25,6 +25,7 @@
 #pragma once
 
 // ==================== Platform Adaptations ====================
+#define CHIP_CONFIG_ERROR_CLASS 1
 
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 0
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
