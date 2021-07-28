@@ -3063,7 +3063,7 @@ void TestCHIPTLVReaderTruncatedReads(nlTestSuite * inSuite)
     writer.Init(buf, sizeof(buf));
     writer.ImplicitProfileId = TestProfile_2;
 
-    err = writer.Put(AnonymousTag, double{12.5});
+    err = writer.Put(AnonymousTag, double{ 12.5 });
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Test reading values from the buffer
