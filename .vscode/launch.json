@@ -84,6 +84,46 @@
                 }
             ]
         },
+        {
+            "name": "ThermostatApp (Linux)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/debug/standalone/thermostat-app",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "Build thermostat App (Linux)",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Chip-Tool (Linux)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/debug/standalone/chip-tool",
+            "args": ["thermostat","set-weekly-schedule","1","47","1","0x54","1"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "Build thermostat App (Linux)",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
 
         {
             "name": "Debug Mbed CY8CPROTO_062_4343W",
