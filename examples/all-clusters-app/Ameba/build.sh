@@ -21,21 +21,21 @@
 #
 # This file can also be used as an executable
 
-CURR_PATH=`test -d ${0%/*} && cd ${0%/*}; pwd`
-CHIP_PATH=${CURR_PATH}/../../..
-AMEBA_PATH=${CHIP_PATH}/../ambd_sdk_with_chip_non_NDA
-AMEBA_LP_PATH=${AMEBA_PATH}/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
-AMEBA_HP_PATH=${AMEBA_PATH}/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
-AMEBA_CHIP_MAIN=${AMEBA_HP_PATH}/asdk/make/chip_main
+CURR_PATH=`test -d "${0%/*}" && cd "${0%/*}"; pwd`
+CHIP_PATH=$CURR_PATH/../../..
+AMEBA_PATH=$CHIP_PATH/../ambd_sdk_with_chip_non_NDA
+AMEBA_LP_PATH=$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
+AMEBA_HP_PATH=$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+AMEBA_CHIP_MAIN=$AMEBA_HP_PATH/asdk/make/chip_main
 
-cd ${CHIP_PATH}
+cd "$CHIP_PATH"
 source scripts/activate.sh
 
-cd ${AMEBA_LP_PATH}
+cd "$AMEBA_LP_PATH"
 make clean
 make all
 
-cd ${AMEBA_HP_PATH}
+cd "$AMEBA_HP_PATH"
 make clean
 make -C asdk lib_all
 make all
