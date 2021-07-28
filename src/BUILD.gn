@@ -79,7 +79,8 @@ if (chip_build_tests) {
       deps += [ "${chip_root}/src/ble/tests" ]
     }
 
-    if (current_os != "zephyr" && chip_device_platform != "esp32" && chip_device_platform != "ameba") {
+    if (current_os != "zephyr" && chip_device_platform != "esp32" &&
+        chip_device_platform != "ameba") {
       deps += [ "${chip_root}/src/lib/shell/tests" ]
     }
 
