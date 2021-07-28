@@ -6,8 +6,7 @@ Follow https://cloud.google.com/sdk/docs/install.
 
 #### Local testing
 
-In order to test locally, comment out the `machineType` entry in 
-the build yaml.
+In order to test locally, comment out the `machineType` entry in the build yaml.
 
 ```
 # Once only setup:
