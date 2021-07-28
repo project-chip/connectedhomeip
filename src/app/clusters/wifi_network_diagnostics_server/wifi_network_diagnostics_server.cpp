@@ -16,12 +16,36 @@
  */
 
 #include <app/CommandHandler.h>
+#include <app/common/gen/attributes/Accessors.h>
 #include <app/util/af.h>
+
+using namespace chip::app::Clusters;
 
 bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
 {
-    // TODO: Implement the ResetCounts in the platform layer.
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = WiFiNetworkDiagnostics::Attributes::SetBeaconLostCount(endpoint, 0);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset BeaconLostCount attribute"));
+
+    status = WiFiNetworkDiagnostics::Attributes::SetBeaconRxCount(endpoint, 0);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset BeaconRxCount attribute"));
+
+    status = WiFiNetworkDiagnostics::Attributes::SetPacketMulticastRxCount(endpoint, 0);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketMulticastRxCount attribute"));
+
+    status = WiFiNetworkDiagnostics::Attributes::SetPacketMulticastTxCount(endpoint, 0);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketMulticastTxCount attribute"));
+
+    status = WiFiNetworkDiagnostics::Attributes::SetPacketUnicastRxCount(endpoint, 0);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketUnicastRxCount attribute"));
+
+    status = WiFiNetworkDiagnostics::Attributes::SetPacketUnicastTxCount(endpoint, 0);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketUnicastTxCount attribute"));
+
+    status = WiFiNetworkDiagnostics::Attributes::SetOverrunCount(endpoint, 0);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset OverrunCount attribute"));
+
+exit:
     emberAfSendImmediateDefaultResponse(status);
+
     return true;
 }
