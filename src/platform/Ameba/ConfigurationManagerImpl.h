@@ -24,9 +24,9 @@
 
 #pragma once
 
+#include <platform/Ameba/AmebaConfig.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-#include <platform/Ameba/AmebaConfig.h>
 
 namespace chip {
 namespace DeviceLayer {

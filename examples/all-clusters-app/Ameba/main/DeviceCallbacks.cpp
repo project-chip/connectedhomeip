@@ -25,11 +25,11 @@
 #include "DeviceCallbacks.h"
 
 #include "CHIPDeviceManager.h"
-#include <app/util/af.h>
+#include <app/Command.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/cluster-id.h>
-#include <app/Command.h>
 #include <app/server/Mdns.h>
+#include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <lib/mdns/Advertiser.h>
@@ -51,14 +51,14 @@ constexpr uint32_t kIdentifyTimerDelayMS = 250;
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
-    //TODO
+    // TODO
 }
 
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                                   uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
     printf("[%s] PostAttributeChangeCallback - Cluster ID: 0x%04x, EndPoint ID: 0x%02x, Attribute ID: 0x%04x\r\n", TAG, clusterId,
-                  endpointId, attributeId);
+           endpointId, attributeId);
 
     switch (clusterId)
     {
@@ -82,7 +82,7 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState, Error error)
 
 void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, printf ("[%s] Unhandled Attribute ID: '0x%04x", TAG, attributeId));
+    VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, printf("[%s] Unhandled Attribute ID: '0x%04x", TAG, attributeId));
     VerifyOrExit(endpointId == 1, printf("[%s] Unexpected EndPoint ID: `0x%02x'", TAG, endpointId));
 
     // timerCount represents the number of callback executions before we stop the timer.

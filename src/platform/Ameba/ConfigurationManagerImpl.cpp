@@ -24,8 +24,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/ConfigurationManager.h>
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/ConfigurationManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -81,20 +81,20 @@ void ConfigurationManagerImpl::_InitiateFactoryReset()
 CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
                                                                 uint32_t & value)
 {
-    //TODO
+    // TODO
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
                                                                  uint32_t value)
 {
-    //TODO
+    // TODO
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
-    //TODO
+    // TODO
     ChipLogProgress(DeviceLayer, "System restarting");
 }
 
