@@ -45,7 +45,7 @@ declare_args() {
   # Enable wifi support.
   chip_enable_wifi =
       chip_device_platform == "linux" || chip_device_platform == "esp32" ||
-      chip_device_platform == "mbed"  || chip_device_platform == "ameba"
+      chip_device_platform == "mbed" || chip_device_platform == "ameba"
 
   # Enable ble support.
   if (chip_device_platform == "fake") {
