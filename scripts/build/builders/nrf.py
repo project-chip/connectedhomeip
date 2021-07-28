@@ -86,18 +86,18 @@ class NrfConnectBuilder(Builder):
           # overall perform a git fetch on that location
           if not os.access(nrfconnect_sdk, os.W_OK):
               raise Exception("Directory %s not writable. NRFConnect builds require updates to this directory." % nrfconnect_sdk)
+          
+          # validate the the ZEPHYR_BASE is up to date (generally the case in docker images)
+          try:
+            self._Execute(['python3', 'scripts/setup/nrfconnect/update_ncs.py', '--check'])
+          except Exception as e:
+            logging.exception('Failed to validate ZEPHYR_BASE status')
+            logging.error('To update $ZEPHYR_BASE run: python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow')
 
-        # NOTE: update_ncs is available but SHOULD NOT be needed on docker builds.
-        # We are specifically NOT adding to below:
-        #
-        #   python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow
-        #
-        # ZEPHYR_BASE is assumed already updated to the correct version
-        #
-        # TODO: can this 'correct version' be checked by the build script?
+            raise Exception('ZEPHYR_BASE validation failed')
 
         cmd = '''
-[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh";
+source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
 west build --cmake-only -d {outdir} -b {board} {sourcedir}
         '''.format(
