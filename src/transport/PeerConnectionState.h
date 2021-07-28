@@ -68,6 +68,7 @@ public:
     uint16_t GetPeerKeyID() const { return mPeerKeyID; }
     void SetPeerKeyID(uint16_t id) { mPeerKeyID = id; }
 
+    // TODO: Rename KeyID to SessionID
     uint16_t GetLocalKeyID() const { return mLocalKeyID; }
     void SetLocalKeyID(uint16_t id) { mLocalKeyID = id; }
 

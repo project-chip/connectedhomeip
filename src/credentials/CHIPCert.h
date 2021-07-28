@@ -252,6 +252,11 @@ public:
      **/
     CHIP_ERROR GetCertChipId(uint64_t & certId) const;
 
+    /**
+     * @brief Retrieve the Fabric ID of a CHIP certificate.
+     **/
+    CHIP_ERROR GetCertFabricId(uint64_t & fabricId) const;
+
     bool IsEqual(const ChipDN & other) const;
 
     /**
@@ -462,6 +467,8 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR LoadCerts(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags);
+
+    CHIP_ERROR ReleaseLastCert();
 
     /**
      * @brief Find certificate in the set.

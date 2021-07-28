@@ -83,6 +83,7 @@ struct ControllerDeviceInitParams
     Inet::InetLayer * inetLayer                         = nullptr;
     PersistentStorageDelegate * storageDelegate         = nullptr;
     Credentials::OperationalCredentialSet * credentials = nullptr;
+    uint8_t credentialsIndex                            = 0;
     SessionIDAllocator * idAllocator                    = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
@@ -180,15 +181,16 @@ public:
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, FabricIndex fabric)
     {
-        mTransportMgr    = params.transportMgr;
-        mSessionManager  = params.sessionMgr;
-        mExchangeMgr     = params.exchangeMgr;
-        mInetLayer       = params.inetLayer;
-        mListenPort      = listenPort;
-        mFabricIndex     = fabric;
-        mStorageDelegate = params.storageDelegate;
-        mCredentials     = params.credentials;
-        mIDAllocator     = params.idAllocator;
+        mTransportMgr     = params.transportMgr;
+        mSessionManager   = params.sessionMgr;
+        mExchangeMgr      = params.exchangeMgr;
+        mInetLayer        = params.inetLayer;
+        mListenPort       = listenPort;
+        mFabricIndex      = fabric;
+        mStorageDelegate  = params.storageDelegate;
+        mCredentials      = params.credentials;
+        mCredentialsIndex = params.credentialsIndex;
+        mIDAllocator      = params.idAllocator;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -481,6 +483,8 @@ private:
     CASESession mCASESession;
 
     Credentials::OperationalCredentialSet * mCredentials = nullptr;
+    // TODO: Switch to size_t whenever OperationalCredentialSet Class is updated to support more then 255 credentials per controller
+    uint8_t mCredentialsIndex = 0;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
