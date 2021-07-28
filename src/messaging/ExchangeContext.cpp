@@ -433,8 +433,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         MessageHandled();
     });
 
-    ReturnErrorOnFailure(mDispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, msgFlags,
-                                                      GetReliableMessageContext()));
+    ReturnErrorOnFailure(mDispatch->OnMessageReceived(packetHeader.GetFlags(), payloadHeader, packetHeader.GetMessageId(),
+                                                      peerAddress, msgFlags, GetReliableMessageContext()));
 
     if (IsAckPending() && !mDelegate)
     {
