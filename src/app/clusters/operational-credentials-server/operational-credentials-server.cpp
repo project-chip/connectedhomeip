@@ -24,6 +24,7 @@
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
+#include <app/common/gen/attributes/Accessors.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/common/gen/enums.h>
@@ -79,13 +80,6 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
                                     0,    // read length
                                     true, // write ?
                                     index + 1);
-}
-
-EmberAfStatus writeCommissionedFabricsAttribute(uint8_t numberCommissionedFabrics)
-{
-
-    return emberAfWriteServerAttribute(0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_COMMISSIONED_FABRICS_ATTRIBUTE_ID,
-                                       &numberCommissionedFabrics, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel, uint8_t index)
@@ -153,7 +147,8 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
-    if (err == CHIP_NO_ERROR && writeCommissionedFabricsAttribute(fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+    if (err == CHIP_NO_ERROR &&
+        app::Clusters::OperationalCredentials::Attributes::SetCommissionedFabrics(0, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabrics count %" PRIu8 " in commissioned fabrics",
                        fabricIndex);
