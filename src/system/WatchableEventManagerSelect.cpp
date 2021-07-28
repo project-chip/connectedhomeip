@@ -45,7 +45,7 @@ void HandleMdnsTimeout();
 namespace chip {
 namespace System {
 
-void WatchableEventManager::Init(Layer & systemLayer)
+CHIP_ERROR WatchableEventManager::Init(Layer & systemLayer)
 {
     mSystemLayer = &systemLayer;
     mMaxFd       = -1;
@@ -54,13 +54,14 @@ void WatchableEventManager::Init(Layer & systemLayer)
     FD_ZERO(&mRequest.mErrorSet);
 
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
-    mWakeEvent.Open(*this);
+    return mWakeEvent.Open(*this);
 }
 
-void WatchableEventManager::Shutdown()
+CHIP_ERROR WatchableEventManager::Shutdown()
 {
     mWakeEvent.Close();
     mSystemLayer = nullptr;
+    return CHIP_NO_ERROR;
 }
 
 void WatchableEventManager::Signal()
@@ -125,7 +126,7 @@ bool WatchableEventManager::HasAny(int fd)
     return FD_ISSET(fd, &mRequest.mReadSet) || FD_ISSET(fd, &mRequest.mWriteSet) || FD_ISSET(fd, &mRequest.mErrorSet);
 }
 
-void WatchableEventManager::Set(int fd, fd_set * fds)
+CHIP_ERROR WatchableEventManager::Set(int fd, fd_set * fds)
 {
     FD_SET(fd, fds);
     if (fd > mMaxFd)
@@ -134,9 +135,10 @@ void WatchableEventManager::Set(int fd, fd_set * fds)
     }
     // Wake the thread calling select so that it starts selecting on the new socket.
     Signal();
+    return CHIP_NO_ERROR;
 }
 
-void WatchableEventManager::Clear(int fd, fd_set * fds)
+CHIP_ERROR WatchableEventManager::Clear(int fd, fd_set * fds)
 {
     FD_CLR(fd, fds);
     if (fd == mMaxFd)
@@ -145,6 +147,7 @@ void WatchableEventManager::Clear(int fd, fd_set * fds)
     }
     // Wake the thread calling select so that it starts selecting on the new socket.
     Signal();
+    return CHIP_NO_ERROR;
 }
 
 void WatchableEventManager::Reset(int fd)

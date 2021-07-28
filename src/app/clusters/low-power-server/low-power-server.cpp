@@ -27,7 +27,7 @@
 
 bool lowPowerClusterSleep();
 
-bool emberAfLowPowerClusterSleepCallback(chip::app::CommandHandler * command)
+bool emberAfLowPowerClusterSleepCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command)
 {
     bool success         = lowPowerClusterSleep();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;

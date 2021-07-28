@@ -46,7 +46,7 @@ class WakeEvent
 {
 public:
     CHIP_ERROR Open(WatchableEventManager & watchState); /**< Initialize the pipeline */
-    CHIP_ERROR Close();                                  /**< Close both ends of the pipeline. */
+    void Close();                                        /**< Close both ends of the pipeline. */
 
     CHIP_ERROR Notify(); /**< Set the event. */
     void Confirm();      /**< Clear the event. */

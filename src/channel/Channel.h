@@ -107,6 +107,13 @@ public:
         return *this;
     }
 
+    uint8_t GetOperationalCredentialSetIndex() const { return mCaseParameters.mOperationalCredentialSetIndex; }
+    ChannelBuilder & SetOperationalCredentialSetIndex(uint8_t operationalCredentialSetIndex)
+    {
+        mCaseParameters.mOperationalCredentialSetIndex = operationalCredentialSetIndex;
+        return *this;
+    }
+
     Optional<Inet::IPAddress> GetForcePeerAddress() const { return mForcePeerAddr; }
     ChannelBuilder & SetForcePeerAddress(Inet::IPAddress peerAddr)
     {
@@ -121,6 +128,7 @@ private:
     {
         uint16_t mPeerKeyId;
         Credentials::OperationalCredentialSet * mOperationalCredentialSet;
+        uint8_t mOperationalCredentialSetIndex;
     } mCaseParameters;
 
     Optional<Inet::IPAddress> mForcePeerAddr;

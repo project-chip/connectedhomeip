@@ -310,6 +310,17 @@ exit:
     return err;
 }
 
+CHIP_ERROR ChipCertificateSet::ReleaseLastCert()
+{
+    ChipCertificateData * lastCert = (mCertCount > 0) ? &mCerts[mCertCount - 1] : nullptr;
+    VerifyOrReturnError(lastCert != nullptr, CHIP_ERROR_INTERNAL);
+
+    lastCert->~ChipCertificateData();
+    --mCertCount;
+
+    return CHIP_NO_ERROR;
+}
+
 const ChipCertificateData * ChipCertificateSet::FindCert(const CertificateKeyId & subjectKeyId) const
 {
     for (uint8_t i = 0; i < mCertCount; i++)
@@ -741,6 +752,31 @@ CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
         }
     }
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ChipDN::GetCertFabricId(uint64_t & fabricId) const
+{
+    uint8_t rdnCount = RDNCount();
+
+    fabricId = UINT64_MAX;
+
+    for (uint8_t i = 0; i < rdnCount; i++)
+    {
+        switch (rdn[i].mAttrOID)
+        {
+        case kOID_AttributeType_ChipFabricId:
+            // Ensure only one FabricID RDN present, since start value is UINT64_MAX, which is reserved and never seen.
+            VerifyOrReturnError(fabricId == UINT64_MAX, CHIP_ERROR_WRONG_CERT_TYPE);
+
+            fabricId = rdn[i].mChipVal;
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(fabricId != UINT64_MAX, CHIP_ERROR_WRONG_CERT_TYPE);
     return CHIP_NO_ERROR;
 }
 

@@ -1,4 +1,4 @@
-/**
+/*
  *
  *    Copyright (c) 2021 Project CHIP Authors
  *
@@ -15,13 +15,20 @@
  *    limitations under the License.
  */
 
-#include <app/CommandHandler.h>
-#include <app/util/af.h>
+#pragma once
 
-bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
-{
-    // TODO: Implement the ResetCounts in the platform layer.
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
-}
+#include "Base38.h"
+
+#include <support/Span.h>
+
+#include <stddef.h>
+
+namespace chip {
+
+// out_buf is null-terminated on success
+CHIP_ERROR base38Encode(ByteSpan in_buf, MutableCharSpan & out_buf);
+
+// returns size needed to store encoded string given number of input bytes
+size_t base38EncodedLength(size_t num_bytes);
+
+} // namespace chip

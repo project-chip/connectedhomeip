@@ -363,5 +363,24 @@ P256Keypair * OperationalCredentialSet::GetNodeKeypairAt(const CertificateKeyId 
     return nullptr;
 }
 
+const ChipCertificateData * OperationalCredentialSet::GetRootCertificate(const CertificateKeyId & trustedRootId) const
+{
+    for (size_t certChainIdx = 0; certChainIdx < mOpCredCount; certChainIdx++)
+    {
+        ChipCertificateSet * certSet = &mOpCreds[certChainIdx];
+
+        for (size_t ipkIdx = 0; ipkIdx < certSet->GetCertCount(); ipkIdx++)
+        {
+            const ChipCertificateData * cert = &certSet->GetCertSet()[ipkIdx];
+            if (cert->mCertFlags.Has(CertFlags::kIsTrustAnchor) && cert->mAuthKeyId.data_equal(trustedRootId))
+            {
+                return cert;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
 } // namespace Credentials
 } // namespace chip

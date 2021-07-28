@@ -39,13 +39,13 @@ class WatchableSocket : public WatchableSocketBasis<WatchableSocket>
 {
 public:
     void OnInit() { mAttachedNext = nullptr; }
-    void OnAttach();
-    void OnClose();
+    CHIP_ERROR OnAttach();
+    CHIP_ERROR OnRelease();
 
-    void OnRequestCallbackOnPendingRead();
-    void OnRequestCallbackOnPendingWrite();
-    void OnClearCallbackOnPendingRead();
-    void OnClearCallbackOnPendingWrite();
+    CHIP_ERROR OnRequestCallbackOnPendingRead();
+    CHIP_ERROR OnRequestCallbackOnPendingWrite();
+    CHIP_ERROR OnClearCallbackOnPendingRead();
+    CHIP_ERROR OnClearCallbackOnPendingWrite();
 
     void SetPendingIO(SocketEvents events) { mPendingIO = events; }
     void SetFDs(int & nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds);

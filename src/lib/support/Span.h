@@ -200,4 +200,6 @@ using MutableByteSpan = Span<uint8_t>;
 template <size_t N>
 using FixedByteSpan = FixedSpan<const uint8_t, N>;
 
+using MutableCharSpan = Span<char>;
+
 } // namespace chip
