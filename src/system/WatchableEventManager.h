@@ -41,9 +41,9 @@ class Layer;
  *
  * It MUST provide at least three methods:
  *
- * - void Init(System::Layer & systemLayer) -- called from System::Layer::Init()
- * - void Shutdown()                        -- called from System::Layer::Shutdown()
- * - void Signal()                          -- called to indicate that event monitoring may need to be refreshed or resumed.
+ * - CHIP_ERROR Init(System::Layer & systemLayer) -- called from System::Layer::Init()
+ * - CHIP_ERROR Shutdown()                        -- called from System::Layer::Shutdown()
+ * - void Signal()                                -- called to indicate that event monitoring may need to be refreshed or resumed.
  *
  * Other contents depend on the contract between socket-event implementation and platform layer implementation.
  * For POSIX-like platforms, WatchableEventManager provides a set of functions called from the event loop:

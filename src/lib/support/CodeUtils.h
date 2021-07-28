@@ -532,6 +532,30 @@ inline void chipDie(void)
 #define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)                                                                     \
     nlABORT_ACTION(aCondition, ChipLogDetail(aModule, aMessage, ##__VA_ARGS__))
 
+/**
+ *  @def LogErrorOnFailure(expr)
+ *
+ *  @brief
+ *    Logs a message if the expression returns something different than CHIP_NO_ERROR.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnLogErrorOnFailure(channel->SendMsg(msg));
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ */
+#define LogErrorOnFailure(expr)                                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (__err != CHIP_NO_ERROR)                                                                                                \
+        {                                                                                                                          \
+            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                                        \
+        }                                                                                                                          \
+    } while (false)
+
 #if (__cplusplus >= 201103L)
 
 #ifndef __FINAL
