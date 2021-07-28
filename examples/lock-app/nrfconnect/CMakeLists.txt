@@ -34,6 +34,12 @@ if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
     list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-bt_private_addresses.conf)
 endif()
 
+option(BUILD_WITH_DFU "Build target with Device Firmware Upgrade support" OFF)
+if(BUILD_WITH_DFU)
+    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-dfu_support.conf)
+    set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static.yml)
+endif()
+
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
@@ -95,5 +101,9 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp)
+
+if(BUILD_WITH_DFU)
+    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
+endif()
 
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
