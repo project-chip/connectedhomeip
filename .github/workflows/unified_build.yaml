@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build example - QPG
+name: Unified builds
 
 on:
     push:
@@ -21,32 +21,26 @@ on:
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
-
+  
 jobs:
-    qpg:
-        name: QPG
-        timeout-minutes: 60
-
-        env:
-            BUILD_TYPE: gn_qpg
+    execute:
+        name: Build examples
+        timeout-minutes: 120
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:latest
+            image: connectedhomeip/chip-build-vscode:latest
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
+
         steps:
             - name: Checkout
               uses: actions/checkout@v2
               with:
                   submodules: true
-#             - name: Initialize CodeQL
-#               uses: github/codeql-action/init@v1
-#               with:
-#                   languages: "cpp"
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -58,18 +52,23 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build example QPG6100 Lock App
-              timeout-minutes: 5
-              run: scripts/examples/gn_build_example.sh
-                   examples/lock-app/qpg out/lock_app_debug qpg_target_ic=\"qpg6100\"
-            - name: Build example QPG6100 Lighting App
-              timeout-minutes: 5
-              run: scripts/examples/gn_build_example.sh
-                   examples/lighting-app/qpg out/lighting_app_debug qpg_target_ic=\"qpg6100\"
-            - name: Build example QPG6100 persistent-storage
-              timeout-minutes: 5
-              run: scripts/examples/gn_build_example.sh
-                   examples/persistent-storage/qpg out/persistent-storage_app_debug qpg_target_ic=\"qpg6100\"
+            - name: ESP32
+              run: |
+                ./scripts/run_in_build_env.sh \
+                ./scripts/build/build_examples.py --platform esp32 build \
+                   --copy-artifacts-to /tmp/output_binaries/
+            - name: EFR32
+              run: |
+                ./scripts/run_in_build_env.sh \
+                ./scripts/build/build_examples.py --platform efr32 build
+            - name: NRF
+              run: |
+                ./scripts/run_in_build_env.sh \
+                ./scripts/build/build_examples.py --platform nrf build
+            - name: QPG
+              run: |
+                ./scripts/run_in_build_env.sh \
+                ./scripts/build/build_examples.py --platform qpg build
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -78,16 +77,10 @@ jobs:
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Uploading Binaries
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v1
               with:
                   name:
-                      ${{ env.BUILD_TYPE }}-example-build-${{
+                      unified-example-build-${{
                       steps.outsuffix.outputs.value }}
-                  path: |
-                      out/lighting_app_debug/chip-qpg6100-lighting-example.out
-                      out/lighting_app_debug/chip-qpg6100-lighting-example.out.map
-            - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
-#             - name: Perform CodeQL Analysis
-#               if: ${{ github.event_name == 'push' }}
-#               uses: github/codeql-action/analyze@v1
+                  path: /tmp/output_binaries/
+              
