@@ -72,9 +72,17 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
 
 int ChipLinuxAppInit(int argc, char ** argv)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                   = CHIP_NO_ERROR;
+    chip::RendezvousInformationFlags rendezvousFlags = chip::RendezvousInformationFlag::kBLE;
+
+#ifdef CONFIG_RENDEZVOUS_MODE
+    rendezvousFlags = static_cast<chip::RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+#endif
 
     err = chip::Platform::MemoryInit();
+    SuccessOrExit(err);
+
+    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
     err = ParseArguments(argc, argv);
@@ -84,11 +92,8 @@ int ChipLinuxAppInit(int argc, char ** argv)
     SuccessOrExit(err);
 
     ConfigurationMgr().LogDeviceConfig();
-#ifdef CONFIG_RENDEZVOUS_MODE
-    PrintOnboardingCodes(static_cast<chip::RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE));
-#else
-    PrintOnboardingCodes(chip::RendezvousInformationFlag::kBLE);
-#endif
+
+    PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
 
 #if defined(PW_RPC_ENABLED)
     chip::rpc::Init();
