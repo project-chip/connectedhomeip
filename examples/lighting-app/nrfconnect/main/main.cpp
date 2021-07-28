@@ -41,7 +41,7 @@ int main(void)
     chip::rpc::Init();
 #endif
 
-    int ret = 0;
+    int ret        = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #ifdef CONFIG_USB

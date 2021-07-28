@@ -32,7 +32,7 @@ using namespace ::chip::DeviceLayer;
 
 int main()
 {
-    int ret = 0;
+    int ret        = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = chip::Platform::MemoryInit();
