@@ -82,9 +82,9 @@ device and the CHIP controller, where the controller has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the CHIP device. The data payload is encoded within a QR code, printed to
-the UART console, and shared using an NFC tag. For security reasons, you must
-start NFC tag emulation manually after powering up the device by pressing
-**Button 4**.
+the UART console, and shared using an NFC tag. NFC tag emulation starts
+automatically when Bluetooth LE advertising is started and stays enabled until
+Bluetooth LE advertising timeout expires.
 
 #### Thread provisioning
 

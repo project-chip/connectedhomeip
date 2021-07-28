@@ -108,8 +108,6 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
-    CHIP_ERROR err;
-
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
@@ -118,8 +116,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
     InitRandomStaticAddress();
-    err = bt_enable(NULL);
-    VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
+    int err = bt_enable(NULL);
+    VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
     memset(&mConnCallbacks, 0, sizeof(mConnCallbacks));
     mConnCallbacks.connected    = HandleConnect;
@@ -128,13 +126,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     bt_conn_cb_register(&mConnCallbacks);
 
     // Initialize the CHIP BleLayer.
-    err = BleLayer::Init(this, this, &SystemLayer);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(BleLayer::Init(this, this, &SystemLayer));
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::DriveBLEState(intptr_t arg)
@@ -205,8 +201,7 @@ struct BLEManagerImpl::ServiceData
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    CHIP_ERROR err;
-
+    int err                       = 0;
     const char * deviceName       = bt_get_name();
     const uint8_t advFlags        = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
     const bool isAdvertisingRerun = mFlags.Has(Flags::kAdvertising);
@@ -229,8 +224,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     // Initialize service data
     static_assert(sizeof(serviceData) == 9, "Size of BLE advertisement data changed! Was that intentional?");
     chip::Encoding::LittleEndian::Put16(serviceData.uuid, UUID16_CHIPoBLEService.val);
-    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(serviceData.deviceIdInfo);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(ConfigurationMgr().GetBLEDeviceIdentificationInfo(serviceData.deviceIdInfo));
 
     if (!isAdvertisingRerun)
     {
@@ -240,16 +234,16 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         // Generate new private BLE address
         bt_le_oob bleOobInfo;
         err = bt_le_oob_get_local(advParams.id, &bleOobInfo);
-        VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
+        VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 #endif // CONFIG_BT_PRIVACY
     }
 
     // Restart advertising
     err = bt_le_adv_stop();
-    VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
+    VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
     err = bt_le_adv_start(&advParams, ad, ARRAY_SIZE(ad), nullptr, 0u);
-    VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
+    VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
     // Transition to the Advertising state...
     if (!mFlags.Has(Flags::kAdvertising))
@@ -281,16 +275,13 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         }
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = bt_le_adv_stop();
-    VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
+    int err = bt_le_adv_stop();
+    VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
     // Transition to the not Advertising state...
     if (mFlags.Has(Flags::kAdvertising))
@@ -315,16 +306,14 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         SystemLayer.CancelTimer(HandleBLEAdvertisementIntervalChange, this);
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(val != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(val != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (val != mServiceMode)
     {
@@ -332,15 +321,13 @@ CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
@@ -350,8 +337,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
@@ -604,7 +590,7 @@ uint16_t BLEManagerImpl::_NumConnections(void)
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (ConnId %02" PRIx16 ")", bt_conn_index(conId));
-    return bt_conn_disconnect(conId, BT_HCI_ERR_REMOTE_USER_TERM_CONN) == CHIP_NO_ERROR;
+    return bt_conn_disconnect(conId, BT_HCI_ERR_REMOTE_USER_TERM_CONN) == 0;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -628,6 +614,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                                     PacketBufferHandle pBuf)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
+    int status                     = 0;
     uint8_t index                  = bt_conn_index(conId);
     bt_gatt_notify_params * params = &mNotifyParams[index];
 
@@ -642,8 +629,8 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     params->func      = HandleTXCompleted;
     params->user_data = nullptr;
 
-    err = bt_gatt_notify_cb(conId, params);
-    VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
+    status = bt_gatt_notify_cb(conId, params);
+    VerifyOrExit(status == 0, err = MapErrorZephyr(status));
 
 exit:
     if (err != CHIP_NO_ERROR)

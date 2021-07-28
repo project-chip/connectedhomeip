@@ -92,7 +92,7 @@ exit:
     }
 }
 
-bool emberAfMediaPlaybackClusterMediaPlayCallback(chip::app::CommandHandler * command)
+bool emberAfMediaPlaybackClusterMediaPlayCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command)
 {
     EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_PLAY, 0);
     storeNewPlaybackState(emberAfCurrentEndpoint(), EMBER_ZCL_MEDIA_PLAYBACK_STATE_PLAYING);
@@ -100,7 +100,7 @@ bool emberAfMediaPlaybackClusterMediaPlayCallback(chip::app::CommandHandler * co
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaPauseCallback(chip::app::CommandHandler * command)
+bool emberAfMediaPlaybackClusterMediaPauseCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command)
 {
     EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_PAUSE, 0);
     storeNewPlaybackState(emberAfCurrentEndpoint(), EMBER_ZCL_MEDIA_PLAYBACK_STATE_PAUSED);
@@ -108,7 +108,7 @@ bool emberAfMediaPlaybackClusterMediaPauseCallback(chip::app::CommandHandler * c
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaStopCallback(chip::app::CommandHandler * command)
+bool emberAfMediaPlaybackClusterMediaStopCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command)
 {
     EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_STOP, 0);
     storeNewPlaybackState(emberAfCurrentEndpoint(), EMBER_ZCL_MEDIA_PLAYBACK_STATE_NOT_PLAYING);
@@ -116,28 +116,29 @@ bool emberAfMediaPlaybackClusterMediaStopCallback(chip::app::CommandHandler * co
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaFastForwardCallback(chip::app::CommandHandler * command)
+bool emberAfMediaPlaybackClusterMediaFastForwardCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command)
 {
     EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_FAST_FORWARD, 0);
     sendResponse(command, "MediaFastForward", ZCL_MEDIA_FAST_FORWARD_RESPONSE_COMMAND_ID, status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaPreviousCallback(chip::app::CommandHandler * command)
+bool emberAfMediaPlaybackClusterMediaPreviousCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command)
 {
     EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_PREVIOUS, 0);
     sendResponse(command, "MediaPrevious", ZCL_MEDIA_PREVIOUS_RESPONSE_COMMAND_ID, status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaRewindCallback(chip::app::CommandHandler * command)
+bool emberAfMediaPlaybackClusterMediaRewindCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command)
 {
     EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_REWIND, 0);
     sendResponse(command, "MediaRewind", ZCL_MEDIA_REWIND_RESPONSE_COMMAND_ID, status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(chip::app::CommandHandler * command, uint64_t deltaPositionMilliseconds)
+bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
+                                                          uint64_t deltaPositionMilliseconds)
 {
     EmberAfMediaPlaybackStatus status =
         mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD, deltaPositionMilliseconds);
@@ -145,7 +146,8 @@ bool emberAfMediaPlaybackClusterMediaSkipBackwardCallback(chip::app::CommandHand
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(chip::app::CommandHandler * command, uint64_t deltaPositionMilliseconds)
+bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
+                                                         uint64_t deltaPositionMilliseconds)
 {
     EmberAfMediaPlaybackStatus status =
         mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD, deltaPositionMilliseconds);
@@ -153,7 +155,8 @@ bool emberAfMediaPlaybackClusterMediaSkipForwardCallback(chip::app::CommandHandl
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaSeekCallback(chip::app::CommandHandler * command, uint64_t positionMilliseconds)
+bool emberAfMediaPlaybackClusterMediaSeekCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
+                                                  uint64_t positionMilliseconds)
 {
     EmberAfMediaPlaybackStatus status =
         mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds);
@@ -161,13 +164,13 @@ bool emberAfMediaPlaybackClusterMediaSeekCallback(chip::app::CommandHandler * co
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaNextCallback(chip::app::CommandHandler * command)
+bool emberAfMediaPlaybackClusterMediaNextCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command)
 {
     EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_NEXT, 0);
     sendResponse(command, "MediaNext", ZCL_MEDIA_NEXT_RESPONSE_COMMAND_ID, status);
     return true;
 }
-bool emberAfMediaPlaybackClusterMediaStartOverCallback(chip::app::CommandHandler * command)
+bool emberAfMediaPlaybackClusterMediaStartOverCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command)
 {
     EmberAfMediaPlaybackStatus status = mediaPlaybackClusterSendMediaPlaybackRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0);
     sendResponse(command, "MediaStartOver", ZCL_MEDIA_START_OVER_RESPONSE_COMMAND_ID, status);

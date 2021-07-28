@@ -344,6 +344,7 @@ protected:
     Credentials::ChipCertificateSet mCertificates;
     Credentials::OperationalCredentialSet mCredentials;
     Credentials::CertificateKeyId mRootKeyId;
+    uint8_t mCredentialsIndex;
 
     SessionIDAllocator mIDAllocator;
 

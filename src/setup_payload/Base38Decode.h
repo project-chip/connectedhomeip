@@ -1,4 +1,4 @@
-/**
+/*
  *
  *    Copyright (c) 2021 Project CHIP Authors
  *
@@ -15,13 +15,15 @@
  *    limitations under the License.
  */
 
-#include <app/CommandHandler.h>
-#include <app/util/af.h>
+#pragma once
 
-bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
-{
-    // TODO: Implement the ResetCounts in the platform layer.
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
-}
+#include "Base38.h"
+
+#include <string>
+#include <vector>
+
+namespace chip {
+
+CHIP_ERROR base38Decode(std::string base38, std::vector<uint8_t> & out);
+
+} // namespace chip

@@ -103,7 +103,7 @@ void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, A
     }
 }
 
-bool emberAfIdentifyClusterIdentifyCallback(chip::app::CommandHandler * commandObj, uint16_t time)
+bool emberAfIdentifyClusterIdentifyCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint16_t time)
 {
     EmberStatus sendStatus = EMBER_SUCCESS;
     // This Identify callback writes the new attribute, which will trigger the
@@ -120,7 +120,7 @@ bool emberAfIdentifyClusterIdentifyCallback(chip::app::CommandHandler * commandO
     return true;
 }
 
-bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::CommandHandler * commandObj)
+bool emberAfIdentifyClusterIdentifyQueryCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
 {
     EmberAfStatus status;
     EmberStatus sendStatus = EMBER_SUCCESS;

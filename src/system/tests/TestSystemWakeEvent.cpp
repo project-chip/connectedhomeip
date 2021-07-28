@@ -66,7 +66,7 @@ struct TestContext
 
     TestContext()
     {
-        mWatchableEvents.Init(mSystemLayer);
+        (void) mWatchableEvents.Init(mSystemLayer);
         mWakeEvent.Open(mWatchableEvents);
     }
     ~TestContext() { mWakeEvent.Close(); }
