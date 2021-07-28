@@ -514,7 +514,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     VerifyOrExit(timerHandle != kMaxConnections, err = CHIP_ERROR_NO_MEMORY);
 
     // start timer for light notification confirmation. Long delay for spake2 indication
-    sl_bt_system_set_soft_timer(TIMER_S_2_TIMERTICK(10), timerHandle, true);
+    sl_bt_system_set_soft_timer(TIMER_S_2_TIMERTICK(6), timerHandle, true);
 
     ret = sl_bt_gatt_server_send_notification(conId, cId, (data->DataLength()), data->Start());
     err = MapBLEError(ret);
