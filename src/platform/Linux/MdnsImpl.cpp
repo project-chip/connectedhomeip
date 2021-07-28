@@ -163,11 +163,17 @@ AvahiWatch * Poller::WatchNew(int fd, AvahiWatchEvent event, AvahiWatchCallback 
     VerifyOrDie(callback != nullptr && fd >= 0);
 
     auto watch = std::make_unique<AvahiWatch>();
-    watch->mSocket.Init(*mWatchableEvents)
-        .Attach(fd)
-        .SetCallback(AvahiWatchCallbackTrampoline, reinterpret_cast<intptr_t>(watch.get()))
-        .RequestCallbackOnPendingRead(event & AVAHI_WATCH_IN)
-        .RequestCallbackOnPendingWrite(event & AVAHI_WATCH_OUT);
+    watch->mSocket.Init(*mWatchableEvents);
+    LogErrorOnFailure(watch->mSocket.Attach(fd));
+    watch->mSocket.SetCallback(AvahiWatchCallbackTrampoline, reinterpret_cast<intptr_t>(watch.get()));
+    if (event & AVAHI_WATCH_IN)
+    {
+        LogErrorOnFailure(watch->mSocket.RequestCallbackOnPendingRead());
+    }
+    if (event & AVAHI_WATCH_OUT)
+    {
+        LogErrorOnFailure(watch->mSocket.RequestCallbackOnPendingWrite());
+    }
     watch->mCallback = callback;
     watch->mContext  = context;
     watch->mPoller   = this;
@@ -180,19 +186,19 @@ void Poller::WatchUpdate(AvahiWatch * watch, AvahiWatchEvent event)
 {
     if (event & AVAHI_WATCH_IN)
     {
-        watch->mSocket.RequestCallbackOnPendingRead();
+        LogErrorOnFailure(watch->mSocket.RequestCallbackOnPendingRead());
     }
     else
     {
-        watch->mSocket.ClearCallbackOnPendingRead();
+        LogErrorOnFailure(watch->mSocket.ClearCallbackOnPendingRead());
     }
     if (event & AVAHI_WATCH_OUT)
     {
-        watch->mSocket.RequestCallbackOnPendingWrite();
+        LogErrorOnFailure(watch->mSocket.RequestCallbackOnPendingWrite());
     }
     else
     {
-        watch->mSocket.ClearCallbackOnPendingWrite();
+        LogErrorOnFailure(watch->mSocket.ClearCallbackOnPendingWrite());
     }
 }
 
@@ -486,7 +492,7 @@ exit:
     }
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Avahi publish service failed: %d", static_cast<int>(error));
+        ChipLogError(DeviceLayer, "Avahi publish service failed: %" CHIP_ERROR_FORMAT, ChipError::FormatError(error));
     }
 
     return error;

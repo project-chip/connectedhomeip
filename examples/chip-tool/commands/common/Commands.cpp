@@ -38,11 +38,13 @@ void Commands::Register(const char * clusterName, commands_list commandsList)
     }
 }
 
-int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
+int Commands::Run(int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Controller::CommissionerInitParams initParams;
     Command * command = nullptr;
+    NodeId localId;
+    NodeId remoteId;
 
     err = chip::Platform::MemoryInit();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err)));
@@ -56,6 +58,11 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
+    localId  = mStorage.GetLocalNodeId();
+    remoteId = mStorage.GetRemoteNodeId();
+
+    ChipLogProgress(Controller, "Read local id 0x" ChipLogFormatX64 ", remote id 0x" ChipLogFormatX64, ChipLogValueX64(localId),
+                    ChipLogValueX64(remoteId));
 
     initParams.storageDelegate = &mStorage;
 

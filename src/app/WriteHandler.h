@@ -83,7 +83,6 @@ public:
                                       const Protocols::InteractionModel::ProtocolCode aProtocolCode);
 
 private:
-    friend class TestWriteInteraction;
     enum class State
     {
         Uninitialized = 0,      // The handler has not been initialized
@@ -100,13 +99,11 @@ private:
     void MoveToState(const State aTargetState);
     void ClearState();
     const char * GetStateStr() const;
-    void ClearExistingExchangeContext();
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
     WriteResponse::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;
-    State mState;
+    State mState = State::Uninitialized;
 };
 } // namespace app
 } // namespace chip

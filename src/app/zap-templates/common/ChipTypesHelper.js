@@ -44,14 +44,7 @@ function asBasicType(type)
   }
 }
 
-const signedTypes = [ 'INT8S', 'INT16S', 'INT32S', 'INT64S' ];
-function isSigned(type)
-{
-  return signedTypes.includes(type);
-}
-
 //
 // Module exports
 //
 exports.asBasicType = asBasicType;
-exports.isSigned    = isSigned;

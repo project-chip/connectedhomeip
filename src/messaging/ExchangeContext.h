@@ -31,6 +31,8 @@
 #include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
+#include <support/ReferenceCountedHandle.h>
+#include <support/TypeTraits.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -41,6 +43,7 @@ namespace Messaging {
 class ExchangeManager;
 class ExchangeContext;
 class ExchangeMessageDispatch;
+using ExchangeHandle = ReferenceCountedHandle<ExchangeContext>;
 
 class ExchangeContextDeletor
 {
@@ -77,6 +80,12 @@ public:
     /**
      *  Send a CHIP message on this exchange.
      *
+     *  If SendMessage returns success and the message was not expecting a
+     *  response, the exchange will close itself before returning, unless the
+     *  message being sent is a standalone ack.  If SendMessage returns failure,
+     *  the caller is responsible for deciding what to do (e.g. closing the
+     *  exchange, trying to re-establish a secure session, etc).
+     *
      *  @param[in]    protocolId    The protocol identifier of the CHIP message to be sent.
      *
      *  @param[in]    msgType       The message type of the corresponding protocol.
@@ -104,10 +113,15 @@ public:
     CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload,
                            const SendFlags & sendFlags = SendFlags(SendMessageFlags::kNone))
     {
-        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(msgType),
-                           std::move(msgPayload), sendFlags);
+        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(msgType), std::move(msgPayload),
+                           sendFlags);
     }
+
+    /**
+     * A notification that we will have SendMessage called on us in the future
+     * (and should stay open until that happens).
+     */
+    void WillSendMessage() { mFlags.Set(Flags::kFlagWillSendMessage); }
 
     /**
      *  Handle a received CHIP message on this exchange.
@@ -140,14 +154,14 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
+    ExchangeACL * GetExchangeACL(Transport::FabricTable & table)
     {
         if (mExchangeACL == nullptr)
         {
-            Transport::AdminPairingInfo * admin = table.FindAdminWithId(mSecureSession.GetAdminId());
-            if (admin != nullptr)
+            Transport::FabricInfo * fabric = table.FindFabricWithIndex(mSecureSession.GetFabricIndex());
+            if (fabric != nullptr)
             {
-                mExchangeACL = chip::Platform::New<CASEExchangeACL>(admin);
+                mExchangeACL = chip::Platform::New<CASEExchangeACL>(fabric);
             }
         }
 
@@ -169,7 +183,7 @@ public:
     void SetResponseTimeout(Timeout timeout);
 
 private:
-    Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
+    Timeout mResponseTimeout       = 0; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
     ExchangeACL * mExchangeACL     = nullptr;
@@ -187,6 +201,13 @@ private:
      *  @return Returns 'true' if response expected, else 'false'.
      */
     bool IsResponseExpected() const;
+
+    /**
+     * Determine whether we are expecting our consumer to send a message on
+     * this exchange (i.e. WillSendMessage was called and the message has not
+     * yet been sent).
+     */
+    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
     /**
      *  Track whether we are now expecting a response to a message sent via this exchange (because that
@@ -229,6 +250,12 @@ private:
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
 
     void DoClose(bool clearRetransTable);
+
+    /**
+     * We have handled an application-level message in some way and should
+     * re-evaluate out state to see whether we should still be open.
+     */
+    void MessageHandled();
 };
 
 } // namespace Messaging

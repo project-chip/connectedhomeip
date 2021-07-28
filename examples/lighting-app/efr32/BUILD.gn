@@ -83,7 +83,6 @@ efr32_executable("lighting_app") {
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
-    "${examples_plat_dir}/Service.cpp",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.c",
     "src/AppTask.cpp",
@@ -174,8 +173,8 @@ group("efr32") {
   deps = [ ":lighting_app" ]
   if (chip_enable_pw_rpc) {
     deps += [
-      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app.install",
-      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app_wheel",
+      "${chip_root}/examples/common/pigweed/rpc_console/py:chip_rpc.install",
+      "${chip_root}/examples/common/pigweed/rpc_console/py:chip_rpc_wheel",
     ]
   }
 }

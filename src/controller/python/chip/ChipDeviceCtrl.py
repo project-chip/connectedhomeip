@@ -110,10 +110,14 @@ class ChipDeviceController(object):
         def HandleAddressUpdateComplete(nodeid, err):
             if err != 0:
                 print("Failed to update node address: {}".format(err))
+                # Failed update address, don't wait for HandleCommissioningComplete
+                self.state = DCState.IDLEHandleCommissioningComplete
+                self._ChipStack.callbackRes = err
+                self._ChipStack.completeEvent.set()
             else:
                 print("Node address has been updated")
-            # Wait for HandleCommissioningComplete before setting
-            # self._ChipStack.callbackRes; we're not done until that happens.
+                # Wait for HandleCommissioningComplete before setting
+                # self._ChipStack.callbackRes; we're not done until that happens.
 
         def HandleCommissioningComplete(nodeid, err):
             if err != 0:
@@ -175,6 +179,11 @@ class ChipDeviceController(object):
     def CloseBLEConnection(self):
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceCommissioner_CloseBleConnection(self.devCtrl)
+        )
+
+    def CloseSession(self, nodeid):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_CloseSession(self.devCtrl, nodeid)
         )
 
     def ConnectIP(self, ipaddr, setupPinCode, nodeid):
@@ -272,8 +281,7 @@ class ChipDeviceController(object):
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         im.ClearCommandStatus(im.PLACEHOLDER_COMMAND_HANDLE)
-        self._Cluster.SendCommand(
-            device, cluster, command, endpoint, groupid, args, True)
+        self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args, True)
         if blocking:
             # We only send 1 command by this function, so index is always 0
             return im.WaitCommandIndexStatus(im.PLACEHOLDER_COMMAND_HANDLE, 1)
@@ -289,8 +297,9 @@ class ChipDeviceController(object):
             raise self._ChipStack.ErrorToException(res)
 
         # We are not using IM for Attributes.
-        res = self._Cluster.ReadAttribute(
-            device, cluster, attribute, endpoint, groupid, False)
+        res = self._Cluster.ReadAttribute(device, cluster, attribute, endpoint, groupid, False)
+        if blocking:
+            return im.GetAttributeReadResponse(im.DEFAULT_ATTRIBUTEREAD_APPID)
 
     def ZCLWriteAttribute(self, cluster, attribute, nodeid, endpoint, groupid, value, blocking=True):
         device = c_void_p(None)
@@ -391,6 +400,9 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [c_void_p, c_char_p, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectIP.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_CloseSession.argtypes = [c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_CloseSession.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
                 c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]

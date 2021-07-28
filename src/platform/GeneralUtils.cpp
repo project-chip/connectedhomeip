@@ -115,18 +115,18 @@ bool FormatDeviceLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (err < CHIP_DEVICE_ERROR_MIN || err > CHIP_DEVICE_ERROR_MAX)
+    if (!ChipError::IsPart(ChipError::SdkPart::kDevice, err))
     {
         return false;
     }
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    switch (err)
+    switch (ChipError::AsInteger(err))
     {
-    case CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND:
+    case ChipError::AsInteger(CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND):
         desc = "Config not found";
         break;
-    case CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED:
+    case ChipError::AsInteger(CHIP_DEVICE_ERROR_NOT_SERVICE_PROVISIONED):
         desc = "Not service provisioned";
         break;
     }

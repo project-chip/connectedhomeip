@@ -163,10 +163,10 @@ namespace {
 
 CertFormat DetectCertFormat(uint8_t * cert, uint32_t certLen)
 {
-    static const uint8_t chipRawPrefix[]   = { 0xD5, 0x00, 0x00, 0x08, 0x00, 0x01, 0x00 };
-    static const char * chipB64Prefix      = "1QAACAAB";
-    static const uint32_t chipB64PrefixLen = sizeof(chipB64Prefix) - 1;
-    static const char * pemMarker          = "-----BEGIN CERTIFICATE-----";
+    static const uint8_t chipRawPrefix[] = { 0x15, 0x30, 0x01 };
+    static const char * chipB64Prefix    = "FTABC";
+    static const size_t chipB64PrefixLen = strlen(chipB64Prefix);
+    static const char * pemMarker        = "-----BEGIN CERTIFICATE-----";
 
     if (certLen > sizeof(chipRawPrefix) && memcmp(cert, chipRawPrefix, sizeof(chipRawPrefix)) == 0)
     {
@@ -216,8 +216,10 @@ bool SetCertTimeField(ASN1_TIME * asn1Time, const struct tm & value)
     char timeStr[16];
 
     // Encode the time as a string in the form YYYYMMDDHHMMSSZ.
-    snprintf(timeStr, sizeof(timeStr), "%04d%02d%02d%02d%02d%02dZ", static_cast<uint16_t>(value.tm_year + 1900) % 9999,
-             static_cast<uint8_t>(value.tm_mon) % kMonthsPerYear + 1, static_cast<uint8_t>(value.tm_mday) % kMaxDaysPerMonth,
+    snprintf(timeStr, sizeof(timeStr), "%04d%02d%02d%02d%02d%02dZ",
+             (value.tm_year == kX509NoWellDefinedExpirationDateYear) ? kX509NoWellDefinedExpirationDateYear
+                                                                     : (static_cast<uint16_t>(value.tm_year + 1900) % 9999),
+             static_cast<uint8_t>(value.tm_mon) % kMonthsPerYear + 1, static_cast<uint8_t>(value.tm_mday) % (kMaxDaysPerMonth + 1),
              static_cast<uint8_t>(value.tm_hour) % kHoursPerDay, static_cast<uint8_t>(value.tm_min) % kMinutesPerHour,
              static_cast<uint8_t>(value.tm_sec) % kSecondsPerMinute);
 
@@ -250,17 +252,31 @@ bool SetValidityTime(X509 * cert, const struct tm & validFrom, uint32_t validDay
     // Note that this computation is done in local time, despite the fact that the certificate validity times are
     // UTC.  This is because the standard posix time functions do not make it easy to convert a struct tm containing
     // UTC to a time_t value without manipulating the TZ environment variable.
-    validTo = validFrom;
-    validTo.tm_mday += validDays;
-    validTo.tm_sec -= 1; // Ensure validity period is exactly a multiple of a day.
-    validTo.tm_isdst = -1;
-    validToTime      = mktime(&validTo);
-    if (validToTime == static_cast<time_t>(-1))
+    if (validDays == kCertValidDays_NoWellDefinedExpiration)
     {
-        fprintf(stderr, "mktime() failed\n");
-        ExitNow(res = false);
+        validTo.tm_year  = kX509NoWellDefinedExpirationDateYear;
+        validTo.tm_mon   = kMonthsPerYear - 1;
+        validTo.tm_mday  = kMaxDaysPerMonth;
+        validTo.tm_hour  = kHoursPerDay - 1;
+        validTo.tm_min   = kMinutesPerHour - 1;
+        validTo.tm_sec   = kSecondsPerMinute - 1;
+        validTo.tm_isdst = -1;
     }
-    localtime_r(&validToTime, &validTo);
+    else
+    {
+        validTo = validFrom;
+        validTo.tm_mday += validDays;
+        validTo.tm_sec -= 1; // Ensure validity period is exactly a multiple of a day.
+        validTo.tm_isdst = -1;
+        validToTime      = mktime(&validTo);
+
+        if (validToTime == static_cast<time_t>(-1))
+        {
+            fprintf(stderr, "mktime() failed\n");
+            ExitNow(res = false);
+        }
+        localtime_r(&validToTime, &validTo);
+    }
 
     // Set the certificate's notBefore date.
     res = SetCertTimeField(X509_get_notBefore(cert), validFrom);

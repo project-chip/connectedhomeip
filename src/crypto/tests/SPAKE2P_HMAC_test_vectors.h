@@ -16,11 +16,10 @@
  */
 
 /**
- * @file - This file contains hmac test vectors.
+ * @file - This file contains SPAKE2P HMAC test vectors.
  */
 
-#ifndef _SPAKE2P_FE_HMAC_TEST_VECTORS_H_
-#define _SPAKE2P_FE_HMAC_TEST_VECTORS_H_
+#pragma once
 
 namespace chip {
 namespace Crypto {
@@ -131,5 +130,3 @@ static const struct spake2p_hmac_tv * hmac_tvs[] = { &chiptest_be68c22260b3_test
 
 } // namespace Crypto
 } // namespace chip
-
-#endif

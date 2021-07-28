@@ -75,6 +75,11 @@ void appError(int err)
         ;
 }
 
+void appError(CHIP_ERROR error)
+{
+    appError(static_cast<int>(chip::ChipError::AsInteger(error)));
+}
+
 // ================================================================================
 // FreeRTOS Callbacks
 // ================================================================================
@@ -91,13 +96,8 @@ extern "C" void vApplicationIdleHook(void)
 // ================================================================================
 int main(void)
 {
-    int ret = CHIP_CONFIG_CORE_ERROR_MAX;
-
     init_efrPlatform();
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
-
-    // Initialize mbedtls threading support on EFR32
-    THREADING_setup();
 
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-lock-example starting");
@@ -109,7 +109,7 @@ int main(void)
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
-    ret = PlatformMgr().InitChipStack();
+    CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
         EFR32_LOG("PlatformMgr().InitChipStack() failed");

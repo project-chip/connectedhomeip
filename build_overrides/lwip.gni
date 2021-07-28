@@ -12,7 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
+
 declare_args() {
   # Root directory for lwIP.
   lwip_root = "//third_party/lwip"
 }
+
+lwip_remove_configs = [ "${build_root}/config/compiler:warnings_default" ]
+lwip_add_configs = [ "${build_root}/config/compiler:warnings_third_party" ]

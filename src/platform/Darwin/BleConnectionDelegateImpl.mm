@@ -159,7 +159,7 @@ namespace DeviceLayer {
                 NSData * serviceData = [servicesData objectForKey:serviceUUID];
 
                 NSUInteger length = [serviceData length];
-                if (length == 7) {
+                if (length >= 7) {
                     const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
                     uint8_t opCode = bytes[0];
                     uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;

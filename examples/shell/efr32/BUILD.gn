@@ -58,7 +58,6 @@ efr32_executable("shell_app") {
   output_name = "chip-efr32-shell-example.out"
 
   sources = [
-    "${examples_plat_dir}/Service.cpp",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.c",
     "src/main.cpp",

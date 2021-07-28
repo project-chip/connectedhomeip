@@ -48,6 +48,7 @@
 #include <support/ErrorStr.h>
 #include <support/PersistentStorageMacros.h>
 #include <support/SafeInt.h>
+#include <support/TypeTraits.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/MessageCounter.h>
@@ -59,11 +60,11 @@ using namespace chip::Callback;
 
 namespace chip {
 namespace Controller {
-CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle && buffer)
+CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, Messaging::SendFlags sendFlags,
+                               System::PacketBufferHandle && buffer)
 {
     System::PacketBufferHandle resend;
     bool loadedSecureSession = false;
-    Messaging::SendFlags sendFlags;
 
     VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -144,7 +145,7 @@ CHIP_ERROR Device::SendCommands(app::CommandSender * commandObj)
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return commandObj->SendCommandRequest(mDeviceId, mAdminId, &mSecureSession);
+    return commandObj->SendCommandRequest(mDeviceId, mFabricIndex, &mSecureSession);
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -157,10 +158,10 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     CHIP_ZERO_AT(serializable);
     CHIP_ZERO_AT(output);
 
-    serializable.mOpsCreds   = mPairing;
-    serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
-    serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
-    serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
+    serializable.mOpsCreds    = mPairing;
+    serializable.mDeviceId    = Encoding::LittleEndian::HostSwap64(mDeviceId);
+    serializable.mDevicePort  = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
+    serializable.mFabricIndex = Encoding::LittleEndian::HostSwap16(mFabricIndex);
 
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
 
@@ -184,9 +185,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 
     serializable.mDeviceOperationalCertProvisioned = (mDeviceOperationalCertProvisioned) ? 1 : 0;
 
-    static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
-                  "The underlying type of Transport::Type is not uint8_t.");
-    serializable.mDeviceTransport = static_cast<uint8_t>(mDeviceAddress.GetTransportType());
+    serializable.mDeviceTransport = to_underlying(mDeviceAddress.GetTransportType());
 
     ReturnErrorOnFailure(Inet::GetInterfaceName(mDeviceAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
                                                 sizeof(serializable.mInterfaceName)));
@@ -229,9 +228,12 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     mPairing             = serializable.mOpsCreds;
     mDeviceId            = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
     const uint16_t port  = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
-    mAdminId             = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
+    const uint16_t index = Encoding::LittleEndian::HostSwap16(serializable.mFabricIndex);
     mLocalMessageCounter = Encoding::LittleEndian::HostSwap32(serializable.mLocalMessageCounter);
     mPeerMessageCounter  = Encoding::LittleEndian::HostSwap32(serializable.mPeerMessageCounter);
+
+    VerifyOrReturnError(CanCastTo<FabricIndex>(index), CHIP_ERROR_INVALID_ARGUMENT);
+    mFabricIndex = static_cast<FabricIndex>(index);
 
     // TODO - Remove the hack that's incrementing message counter while deserializing device
     // This hack was added as a quick workaround for TE3 testing. The commissioning code
@@ -255,7 +257,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         UNLOCK_TCPIP_CORE();
 #endif
-        VerifyOrReturnError(CHIP_NO_ERROR == inetErr, CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(inetErr);
     }
 
     static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
@@ -290,7 +292,7 @@ CHIP_ERROR Device::Persist()
                           error = mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed to persist device %" CHIP_ERROR_FORMAT, error);
+            ChipLogError(Controller, "Failed to persist device %" CHIP_ERROR_FORMAT, ChipError::FormatError(error));
         }
     }
     return error;
@@ -307,7 +309,7 @@ void Device::OnNewConnection(SecureSessionHandle session)
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
     VerifyOrReturn(connectionState != nullptr);
     MessageCounter & localCounter = connectionState->GetSessionMessageCounter().GetLocalMessageCounter();
-    if (localCounter.SetCounter(mLocalMessageCounter))
+    if (localCounter.SetCounter(mLocalMessageCounter) != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Unable to restore local counter to %" PRIu32, mLocalMessageCounter);
     }
@@ -337,14 +339,10 @@ CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, cons
             HandleDataModelMessage(exchange, std::move(msgBuf));
         }
     }
-    exchange->Close();
     return CHIP_NO_ERROR;
 }
 
-void Device::OnResponseTimeout(Messaging::ExchangeContext * ec)
-{
-    ec->Close();
-}
+void Device::OnResponseTimeout(Messaging::ExchangeContext * ec) {}
 
 CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
 {
@@ -374,7 +372,8 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     System::PacketBufferHandle outBuffer;
     ReturnErrorOnFailure(writer.Finalize(&outBuffer));
 
-    ReturnErrorOnFailure(SendMessage(Protocols::ServiceProvisioning::MsgType::ServiceProvisioningRequest, std::move(outBuffer)));
+    ReturnErrorOnFailure(SendMessage(Protocols::ServiceProvisioning::MsgType::ServiceProvisioningRequest,
+                                     Messaging::SendMessageFlags::kNone, std::move(outBuffer)));
 
     setupPayload.version               = 0;
     setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
@@ -382,9 +381,19 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR Device::CloseSession()
+{
+    ReturnErrorCodeIf(mState != ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    mSessionManager->ExpirePairing(mSecureSession);
+    mState = ConnectionState::NotConnected;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
 {
     bool didLoad;
+
+    mDeviceAddress = addr;
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 
@@ -398,7 +407,6 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
         return CHIP_NO_ERROR;
     }
 
-    mDeviceAddress = addr;
     connectionState->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
@@ -478,7 +486,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
         SuccessOrExit(err);
 
         err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &pairingSession,
-                                          SecureSession::SessionRole::kInitiator, mAdminId);
+                                          SecureSession::SessionRole::kInitiator, mFabricIndex);
         SuccessOrExit(err);
     }
 
@@ -486,7 +494,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "LoadSecureSessionParameters returning error %" CHIP_ERROR_FORMAT, err);
+        ChipLogError(Controller, "LoadSecureSessionParameters returning error %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
     }
     return err;
 }
@@ -510,12 +518,7 @@ void Device::OperationalCertProvisioned()
     mDeviceOperationalCertProvisioned = true;
 
     Persist();
-
-    if (mState == ConnectionState::SecureConnected)
-    {
-        mSessionManager->ExpirePairing(mSecureSession);
-        mState = ConnectionState::NotConnected;
-    }
+    CloseSession();
 }
 
 CHIP_ERROR Device::WarmupCASESession()
@@ -535,7 +538,8 @@ CHIP_ERROR Device::WarmupCASESession()
     mLocalMessageCounter = 0;
     mPeerMessageCounter  = 0;
 
-    ReturnErrorOnFailure(mCASESession.EstablishSession(mDeviceAddress, mCredentials, mDeviceId, keyID, exchange, this));
+    ReturnErrorOnFailure(
+        mCASESession.EstablishSession(mDeviceAddress, mCredentials, mCredentialsIndex, mDeviceId, keyID, exchange, this));
 
     mState = ConnectionState::Connecting;
 
@@ -564,7 +568,7 @@ void Device::OnSessionEstablished()
     mCASESession.PeerConnection().SetPeerNodeId(mDeviceId);
 
     CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mCASESession,
-                                                 SecureSession::SessionRole::kInitiator, mAdminId);
+                                                 SecureSession::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));
@@ -626,7 +630,7 @@ void Device::CancelResponseHandler(uint8_t seqNum)
     mCallbacksMgr.CancelResponseCallback(mDeviceId, seqNum);
 }
 
-void Device::AddIMResponseHandler(app::Command * commandObj, Callback::Cancelable * onSuccessCallback,
+void Device::AddIMResponseHandler(app::CommandSender * commandObj, Callback::Cancelable * onSuccessCallback,
                                   Callback::Cancelable * onFailureCallback)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
@@ -638,7 +642,7 @@ void Device::AddIMResponseHandler(app::Command * commandObj, Callback::Cancelabl
                                       onFailureCallback);
 }
 
-void Device::CancelIMResponseHandler(app::Command * commandObj)
+void Device::CancelIMResponseHandler(app::CommandSender * commandObj)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
     // there are only one active command transaction on one command sender object. This is a bit tricky, we try to assume that

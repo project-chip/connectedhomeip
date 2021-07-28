@@ -18,13 +18,18 @@
 
 #include "PairingCommand.h"
 #include "platform/PlatformManager.h"
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <support/logging/CHIPLogging.h>
+
+#include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 
 using namespace ::chip;
 
-constexpr uint64_t kBreadcrumb                = 0;
-constexpr uint32_t kTimeoutMs                 = 6000;
-constexpr uint8_t kTemporaryThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
+constexpr uint64_t kBreadcrumb = 0;
+constexpr uint32_t kTimeoutMs  = 6000;
 
 CHIP_ERROR PairingCommand::Run()
 {
@@ -32,6 +37,23 @@ CHIP_ERROR PairingCommand::Run()
 
     GetExecContext()->commissioner->RegisterDeviceAddressUpdateDelegate(this);
     GetExecContext()->commissioner->RegisterPairingDelegate(this);
+
+#if CONFIG_PAIR_WITH_RANDOM_ID
+    // Generate a random remote id so we don't end up reusing the same node id
+    // for different nodes.
+    //
+    // TODO: Ideally we'd just ask for an operational cert for the commissionnee
+    // and get the node from that, but the APIs are not set up that way yet.
+    NodeId randomId;
+    if (Controller::ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(&randomId) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Generated random node id: 0x" ChipLogFormatX64, ChipLogValueX64(randomId));
+        if (GetExecContext()->storage->SetRemoteNodeId(randomId) == CHIP_NO_ERROR)
+        {
+            GetExecContext()->remoteId = randomId;
+        }
+    }
+#endif // CONFIG_PAIR_WITH_RANDOM_ID
 
     err = RunInternal(GetExecContext()->remoteId);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init Failure! PairDevice: %s", ErrorStr(err)));
@@ -56,6 +78,12 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::Bypass:
         err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;
+    case PairingMode::QRCode:
+        err = PairWithQRCode(remoteId);
+        break;
+    case PairingMode::ManualCode:
+        err = PairWithManualCode(remoteId);
+        break;
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
         break;
@@ -69,6 +97,33 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     }
 
     return err;
+}
+
+CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
+{
+    SetupPayload payload;
+    ReturnErrorOnFailure(QRCodeSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
+    return PairWithCode(remoteId, payload);
+}
+
+CHIP_ERROR PairingCommand::PairWithManualCode(NodeId remoteId)
+{
+    SetupPayload payload;
+    ReturnErrorOnFailure(ManualSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
+    return PairWithCode(remoteId, payload);
+}
+
+CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId, SetupPayload payload)
+{
+    chip::RendezvousInformationFlags rendezvousInformation = payload.rendezvousInformation;
+    ReturnErrorCodeIf(rendezvousInformation != RendezvousInformationFlag::kBLE, CHIP_ERROR_INVALID_ARGUMENT);
+
+    RendezvousParameters params = RendezvousParameters()
+                                      .SetSetupPINCode(payload.setUpPINCode)
+                                      .SetDiscriminator(payload.discriminator)
+                                      .SetPeerAddress(PeerAddress::BLE());
+
+    return GetExecContext()->commissioner->PairDevice(remoteId, params);
 }
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
@@ -222,6 +277,26 @@ CHIP_ERROR PairingCommand::AddWiFiNetwork()
     return mCluster.AddWiFiNetwork(successCallback, failureCallback, mSSID, mPassword, kBreadcrumb, kTimeoutMs);
 }
 
+chip::ByteSpan PairingCommand::GetThreadNetworkId()
+{
+    // For Thread devices the networkId is the extendedPanId and it is
+    // part of the dataset defined by OpenThread
+
+    Thread::OperationalDataset dataset;
+
+    if (dataset.Init(mOperationalDataset) != CHIP_NO_ERROR)
+    {
+        return ByteSpan();
+    }
+
+    if (dataset.GetExtendedPanId(mExtendedPanId) != CHIP_NO_ERROR)
+    {
+        return ByteSpan();
+    }
+
+    return ByteSpan(mExtendedPanId);
+}
+
 CHIP_ERROR PairingCommand::EnableNetwork()
 {
     Callback::Cancelable * successCallback = mOnEnableNetworkCallback->Cancel();
@@ -234,7 +309,12 @@ CHIP_ERROR PairingCommand::EnableNetwork()
     }
     else
     {
-        networkId = ByteSpan(kTemporaryThreadNetworkId, sizeof(kTemporaryThreadNetworkId));
+        networkId = GetThreadNetworkId();
+    }
+
+    if (networkId.empty())
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     return mCluster.EnableNetwork(successCallback, failureCallback, networkId, kBreadcrumb, kTimeoutMs);

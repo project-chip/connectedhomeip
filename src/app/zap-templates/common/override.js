@@ -46,6 +46,8 @@ function atomicType(arg)
   case 'octet_string':
   case 'long_octet_string':
     return 'chip::ByteSpan';
+  case 'eui64':
+    return 'chip::node_id';
   default:
     throw 'not overriding';
   }

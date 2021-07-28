@@ -19,8 +19,7 @@
  * @file - This file contains PKCS7 test vectors.
  */
 
-#ifndef _X509_PKCS7_EXTRACTION_H_
-#define _X509_PKCS7_EXTRACTION_H_
+#pragma once
 
 #include <cstdint>
 
@@ -144,5 +143,3 @@ static const uint8_t certificate_blob_root[] = {
 
 } // namespace Crypto
 } // namespace chip
-
-#endif

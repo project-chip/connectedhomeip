@@ -25,10 +25,12 @@
 #include "AndroidBleApplicationDelegate.h"
 #include "AndroidBleConnectionDelegate.h"
 #include "AndroidBlePlatformDelegate.h"
+#include "AndroidCallbacks.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include "CHIPJNIError.h"
 #include "JniReferences.h"
 #include "JniTypeWrappers.h"
+#include "MdnsImpl.h"
 #include "StackLock.h"
 
 #include <app/chip-zcl-zpro-codec.h>
@@ -151,7 +153,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     ChipLogProgress(Controller, "Java class references loaded.");
 
     // Initialize the CHIP System Layer.
-    err = sSystemLayer.Init(NULL);
+    err = sSystemLayer.Init();
     SuccessOrExit(err);
 
     // Initialize the CHIP Inet layer.
@@ -206,7 +208,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     if (sIOThread != PTHREAD_NULL)
     {
         sShutdown = true;
-        sSystemLayer.WakeIOThread();
+        sSystemLayer.WatchableEvents().Signal();
 
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         pthread_join(sIOThread, NULL);
@@ -259,6 +261,22 @@ JNI_METHOD(void, setKeyValueStoreManager)(JNIEnv * env, jclass self, jobject man
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeWithObject(manager);
+}
+
+JNI_METHOD(void, setServiceResolver)(JNIEnv * env, jclass self, jobject resolver)
+{
+    using namespace chip::Mdns;
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    InitializeWithObject(resolver);
+}
+
+JNI_METHOD(void, handleServiceResolve)
+(JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring address, jint port, jlong callbackHandle,
+ jlong contextHandle)
+{
+    using namespace chip::Mdns;
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    HandleResolve(instanceName, serviceType, address, port, callbackHandle, contextHandle);
 }
 
 JNI_METHOD(void, pairDevice)
@@ -333,8 +351,18 @@ JNI_METHOD(jlong, getDevicePointer)(JNIEnv * env, jobject self, jlong handle, jl
 
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
 
-    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
+    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a Java handle");
     return reinterpret_cast<jlong>(chipDevice);
+}
+
+JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jlong callbackHandle)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
+    VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallback handle is nullptr"));
+    wrapper->Controller()->GetConnectedDevice(nodeId, &connectedDeviceCallback->mOnSuccess, &connectedDeviceCallback->mOnFailure);
 }
 
 JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
@@ -421,25 +449,16 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
     return env->NewStringUTF(addrStr);
 }
 
-JNI_METHOD(void, updateAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port)
+JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong fabricId, jlong deviceId)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    Device * chipDevice = nullptr;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
 
-    GetCHIPDevice(env, handle, deviceId, &chipDevice);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    CHIP_ERROR err = wrapper->Controller()->UpdateDevice(static_cast<chip::NodeId>(deviceId), static_cast<uint64_t>(fabricId));
 
-    Inet::IPAddress ipAddress = {};
-    JniUtfString addressAccessor(env, address);
-    VerifyOrExit(Inet::IPAddress::FromString(addressAccessor.c_str(), ipAddress), err = CHIP_ERROR_INVALID_ADDRESS);
-    VerifyOrExit(CanCastTo<uint16_t>(port), err = CHIP_ERROR_INVALID_ADDRESS);
-
-    err = chipDevice->UpdateAddress(Transport::PeerAddress::UDP(ipAddress, port));
-
-exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to update address");
+        ChipLogError(Controller, "Failed to update device");
         ThrowError(env, err);
     }
 }
@@ -467,7 +486,9 @@ JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong de
         }
         else
         {
-            err = chipDevice->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, std::move(buffer));
+            // We don't install a response handler, so aren't waiting for a response
+            err = chipDevice->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, Messaging::SendMessageFlags::kNone,
+                                          std::move(buffer));
         }
     }
 
@@ -630,7 +651,7 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "OpenPairingWindow failed: %d", err);
+        ChipLogError(Controller, "OpenPairingWindow failed: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
         return false;
     }
 
@@ -1080,15 +1101,15 @@ void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName)
     else
     {
         const char * errStr;
-        switch (cbErr)
+        switch (ChipError::AsInteger(cbErr))
         {
-        case CHIP_JNI_ERROR_TYPE_NOT_FOUND:
+        case ChipError::AsInteger(CHIP_JNI_ERROR_TYPE_NOT_FOUND):
             errStr = "JNI type not found";
             break;
-        case CHIP_JNI_ERROR_METHOD_NOT_FOUND:
+        case ChipError::AsInteger(CHIP_JNI_ERROR_METHOD_NOT_FOUND):
             errStr = "JNI method not found";
             break;
-        case CHIP_JNI_ERROR_FIELD_NOT_FOUND:
+        case ChipError::AsInteger(CHIP_JNI_ERROR_FIELD_NOT_FOUND):
             errStr = "JNI field not found";
             break;
         default:
@@ -1122,18 +1143,18 @@ CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
     constructor = env->GetMethodID(sChipDeviceControllerExceptionCls, "<init>", "(ILjava/lang/String;)V");
     VerifyOrExit(constructor != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    switch (inErr)
+    switch (ChipError::AsInteger(inErr))
     {
-    case CHIP_JNI_ERROR_TYPE_NOT_FOUND:
+    case ChipError::AsInteger(CHIP_JNI_ERROR_TYPE_NOT_FOUND):
         errStr = "CHIP Device Controller Error: JNI type not found";
         break;
-    case CHIP_JNI_ERROR_METHOD_NOT_FOUND:
+    case ChipError::AsInteger(CHIP_JNI_ERROR_METHOD_NOT_FOUND):
         errStr = "CHIP Device Controller Error: JNI method not found";
         break;
-    case CHIP_JNI_ERROR_FIELD_NOT_FOUND:
+    case ChipError::AsInteger(CHIP_JNI_ERROR_FIELD_NOT_FOUND):
         errStr = "CHIP Device Controller Error: JNI field not found";
         break;
-    case CHIP_JNI_ERROR_DEVICE_NOT_FOUND:
+    case ChipError::AsInteger(CHIP_JNI_ERROR_DEVICE_NOT_FOUND):
         errStr = "CHIP Device Controller Error: Device not found";
         break;
     default:

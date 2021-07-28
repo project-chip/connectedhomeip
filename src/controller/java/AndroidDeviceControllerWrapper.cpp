@@ -151,6 +151,17 @@ void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
     CallJavaMethod("onPairingDeleted", static_cast<jint>(error));
 }
 
+void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
+{
+    StackUnlockGuard unlockGuard(mStackLock);
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jmethodID onCommissioningCompleteMethod;
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningComplete", "(JI)V",
+                                                             &onCommissioningCompleteMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %d", err));
+    env->CallVoidMethod(mJavaObjectRef, onCommissioningCompleteMethod, static_cast<jlong>(deviceId), error);
+}
+
 // TODO Refactor this API to match latest spec, so that GenerateNodeOperationalCertificate receives the full CSR Elements data
 // payload.
 CHIP_ERROR
@@ -164,7 +175,7 @@ AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const Optiona
                                                   "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %d", err);
+        ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
         return err;
     }
 
@@ -197,11 +208,11 @@ AndroidDeviceControllerWrapper::GenerateNodeOperationalCertificate(const Optiona
 
     onNOCGenerated->mCall(onNOCGenerated->mContext, ByteSpan(noc.Get(), nocLen));
 
-    jbyteArray argument;
+    jbyteArray javaCsr;
     JniReferences::GetInstance().GetEnvForCurrentThread()->ExceptionClear();
     JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csr.data(), csr.size(),
-                                               argument);
-    JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, argument);
+                                               javaCsr);
+    JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, javaCsr);
     return generateCert;
 }
 

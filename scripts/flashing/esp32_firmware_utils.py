@@ -227,7 +227,7 @@ ESP32_OPTIONS = {
         },
         'bootloader_offset': {
             'help': 'Bootloader offset',
-            'default': None,
+            'default': '0x1000',
             'argparse': {
                 'metavar': 'OFFSET'
             },

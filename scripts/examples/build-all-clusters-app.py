@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import shutil
 import subprocess
 import logging
 import coloredlogs
@@ -24,7 +25,7 @@ class IDFExecutor:
     self.run_cmd = os.path.join(self.chip_root, "scripts", "run_in_build_env.sh")
     logging.info("Executing via: %s" % self.run_cmd)
 
-  
+
   def execute(self, command):
     os.chdir(self.chip_root)
     subprocess.call([self.run_cmd, 'source "%s/export.sh"; cd %s; idf.py %s' % (idf_path, ROOT, command)])
@@ -41,8 +42,13 @@ def main():
   parser.add_argument(
       '--clear-config',
       default=None,
-      choices=['m5stack', 'devkit'],
+      choices=['m5stack', 'devkit', 'curr', 'default'],
   )
+  parser.add_argument(
+      '--generate-flash-script',
+      action='store_true',
+  )
+
   args = parser.parse_args()
 
   # Ensures somewhat pretty logging of what is going on
@@ -54,21 +60,36 @@ def main():
   e = IDFExecutor()
 
   if args.clear_config:
+    old_default_sdkconfig = None
+    clear_curr = args.clear_config != 'curr'
     logging.info('Building a clear configuration')
-    sdkconfig = 'sdkconfig_%s.defaults' % args.clear_config
 
-    curr_sdkconfig = os.path.join(ROOT, 'sdkconfig')
-    if os.path.exists(curr_sdkconfig):
-      os.remove(curr_sdkconfig)
+    if args.clear_config == "m5stack" or args.clear_config == "devkit":
+      desired_sdkconfig_name = 'sdkconfig_%s.defaults' % args.clear_config
+      logging.info('Using default' + desired_sdkconfig_name)
+      desired_sdkconfig = os.path.join(ROOT, desired_sdkconfig_name)
+      default_sdkconfig = os.path.join(ROOT, 'sdkconfig.defaults')
+      old_default_sdkconfig = os.path.join(ROOT, 'sdkconfig.defaults.old')
+      shutil.copy(default_sdkconfig, old_default_sdkconfig)
+      shutil.copy(desired_sdkconfig, default_sdkconfig)
 
-    e.execute('-D SDKCONFIG_DEFAULTS="{sdkname}" build'.format(
-      sdkname=sdkconfig
-    ))
+    if clear_curr:
+      logging.info('Clearing current config')
+      sdkconfig = os.path.join(ROOT, 'sdkconfig')
+      os.remove(sdkconfig)
 
+    e.execute('menuconfig')
+
+    if old_default_sdkconfig is not None:
+      shutil.move(old_default_sdkconfig, default_sdkconfig)
 
   logging.info('Compiling')
+
   e.execute('build')
 
+  logging.info('Generating flash script')
+  if args.generate_flash_script:
+    e.execute('flashing_script')
 
 if __name__ == '__main__':
   # execute only if run as a script

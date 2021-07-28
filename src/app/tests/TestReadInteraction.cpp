@@ -23,6 +23,8 @@
  */
 
 #include <app/InteractionModelEngine.h>
+#include <app/MessageDef/EventDataElement.h>
+#include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <core/CHIPTLVDebug.hpp>
@@ -30,26 +32,130 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <messaging/tests/MessagingContext.h>
+#include <nlunit-test.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/SystemTimer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
+#include <type_traits>
 
-#include <nlunit-test.h>
+namespace {
+chip::TransportMgrBase gTransportManager;
+chip::Test::LoopbackTransport gLoopback;
+chip::secure_channel::MessageCounterManager gMessageCounterManager;
+uint8_t gDebugEventBuffer[128];
+uint8_t gInfoEventBuffer[128];
+uint8_t gCritEventBuffer[128];
+chip::app::CircularEventBuffer gCircularEventBuffer[3];
+chip::NodeId kTestNodeId           = 1;
+chip::ClusterId kTestClusterId     = 6;
+chip::EndpointId kTestEndpointId   = 1;
+chip::EventId kTestEventIdDebug    = 1;
+chip::EventId kTestEventIdCritical = 2;
+uint64_t kTestEventTag             = 1;
+using TestContext                  = chip::Test::MessagingContext;
+TestContext sContext;
+
+void InitializeEventLogging(chip::Messaging::ExchangeManager & aExchangeManager)
+{
+    chip::app::LogStorageResources logStorageResources[] = {
+        { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Debug },
+        { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Info },
+        { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
+    };
+
+    chip::app::EventManagement::CreateEventManagement(&aExchangeManager, ArraySize(logStorageResources), gCircularEventBuffer,
+                                                      logStorageResources);
+}
+
+class TestEventGenerator : public chip::app::EventLoggingDelegate
+{
+public:
+    CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        err            = aWriter.Put(kTestEventTag, mStatus);
+        return err;
+    }
+
+    void SetStatus(int32_t aStatus) { mStatus = aStatus; }
+
+private:
+    int32_t mStatus;
+};
+
+void GenerateEvents(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::EventNumber eid1, eid2;
+    chip::app::EventSchema schema1 = { kTestNodeId, kTestEndpointId, kTestClusterId, kTestEventIdDebug,
+                                       chip::app::PriorityLevel::Info };
+    chip::app::EventSchema schema2 = { kTestNodeId, kTestEndpointId, kTestClusterId, kTestEventIdCritical,
+                                       chip::app::PriorityLevel::Critical };
+    chip::app::EventOptions options1;
+    chip::app::EventOptions options2;
+    TestEventGenerator testEventGenerator;
+
+    options1.mpEventSchema               = &schema1;
+    options2.mpEventSchema               = &schema2;
+    chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
+    testEventGenerator.SetStatus(0);
+    err = logMgmt.LogEvent(&testEventGenerator, options1, eid1);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    testEventGenerator.SetStatus(1);
+    err = logMgmt.LogEvent(&testEventGenerator, options2, eid2);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+}
+
+class MockInteractionModelApp : public chip::app::InteractionModelDelegate
+{
+public:
+    CHIP_ERROR EventStreamReceived(const chip::Messaging::ExchangeContext * apExchangeContext,
+                                   chip::TLV::TLVReader * apEventListReader) override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVReader reader;
+        int numDataElementIndex = 0;
+        reader.Init(*apEventListReader);
+        while (CHIP_NO_ERROR == (err = reader.Next()))
+        {
+            uint8_t priorityLevel = 0;
+            chip::app::EventDataElement::Parser event;
+            ReturnErrorOnFailure(event.Init(reader));
+            ReturnErrorOnFailure(event.GetPriorityLevel(&priorityLevel));
+            if (numDataElementIndex == 0)
+            {
+                VerifyOrReturnError(priorityLevel == static_cast<uint8_t>(chip::app::PriorityLevel::Critical),
+                                    CHIP_ERROR_INCORRECT_STATE);
+            }
+            else if (numDataElementIndex == 1)
+            {
+                VerifyOrReturnError(priorityLevel == static_cast<uint8_t>(chip::app::PriorityLevel::Info),
+                                    CHIP_ERROR_INCORRECT_STATE);
+            }
+            ++numDataElementIndex;
+        }
+        if (CHIP_END_OF_TLV == err)
+        {
+            mGotEventResponse = true;
+            err               = CHIP_NO_ERROR;
+        }
+        return err;
+    }
+
+    bool mGotEventResponse = false;
+};
+} // namespace
 
 namespace chip {
-System::Layer gSystemLayer;
-SecureSessionMgr gSessionManager;
-Messaging::ExchangeManager gExchangeManager;
-TransportMgr<Transport::UDP> gTransportManager;
-const Transport::AdminId gAdminId = 0;
-secure_channel::MessageCounterManager gMessageCounterManager;
-
 namespace app {
 class TestReadInteraction
 {
@@ -62,6 +168,7 @@ public:
     static void TestReadClientGenerateTwoEventPathList(nlTestSuite * apSuite, void * apContext);
     static void TestReadClientInvalidReport(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext);
+    static void TestReadEventRoundtrip(nlTestSuite * apSuite, void * apContext);
 
 private:
     static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
@@ -145,20 +252,20 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
 
 void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadClient readClient;
     EventNumber eventNumber = 0;
 
     chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
+    err                            = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /* apSecureSession */, nullptr /*apEventPathParamsList*/,
+    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
+    err = readClient.SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session, nullptr /*apEventPathParamsList*/,
                                      0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
                                      0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateReportData(apSuite, apContext, buf);
 
@@ -170,15 +277,18 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
 
 void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadHandler readHandler;
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     ReadRequest::Builder readRequestBuilder;
     chip::app::InteractionModelDelegate delegate;
-    err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &delegate);
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
     readHandler.Init(nullptr);
 
     GenerateReportData(apSuite, apContext, reportDatabuf);
@@ -211,11 +321,14 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
 
     err = readHandler.OnReadRequest(nullptr, std::move(readRequestbuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    engine->Shutdown();
 }
 
 void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadClient readClient;
     chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle msgBuf;
@@ -227,7 +340,7 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
     err = request.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
+    err = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     AttributePathParams attributePathParams[2];
@@ -240,7 +353,8 @@ void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * 
 
 void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadClient readClient;
     chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle msgBuf;
@@ -249,7 +363,7 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     NL_TEST_ASSERT(apSuite, !msgBuf.IsNull());
     writer.Init(std::move(msgBuf));
-    err = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
+    err = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = request.Init(&writer);
@@ -264,20 +378,21 @@ void TestReadInteraction::TestReadClientGenerateInvalidAttributePathList(nlTestS
 
 void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadClient readClient;
     chip::app::InteractionModelDelegate delegate;
     EventNumber eventNumber = 0;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
+    err                            = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /* apSecureSession */, nullptr /*apEventPathParamsList*/,
+    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
+    err = readClient.SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session, nullptr /*apEventPathParamsList*/,
                                      0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
                                      0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/);
 
@@ -289,7 +404,8 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
 
 void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadHandler readHandler;
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -297,7 +413,8 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     ReadRequest::Builder readRequestBuilder;
     chip::app::InteractionModelDelegate delegate;
 
-    err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &delegate);
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     readHandler.Init(nullptr);
 
@@ -327,11 +444,13 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
 
     err = readHandler.OnReadRequest(nullptr, std::move(readRequestbuf));
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+    engine->Shutdown();
 }
 
 void TestReadInteraction::TestReadClientGenerateOneEventPathList(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadClient readClient;
     chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle msgBuf;
@@ -344,7 +463,7 @@ void TestReadInteraction::TestReadClientGenerateOneEventPathList(nlTestSuite * a
     err = request.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
+    err = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     chip::app::EventPathParams eventPathParams[2];
@@ -379,7 +498,8 @@ void TestReadInteraction::TestReadClientGenerateOneEventPathList(nlTestSuite * a
 
 void TestReadInteraction::TestReadClientGenerateTwoEventPathList(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadClient readClient;
     chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle msgBuf;
@@ -392,7 +512,7 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPathList(nlTestSuite * a
     err = request.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.Init(&gExchangeManager, &delegate, 0 /* application identifier */);
+    err = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     chip::app::EventPathParams eventPathParams[2];
@@ -429,35 +549,53 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPathList(nlTestSuite * a
 #endif
 }
 
+void TestReadInteraction::TestReadEventRoundtrip(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    GenerateEvents(apSuite, apContext);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+
+    chip::app::EventPathParams eventPathParams[2];
+    eventPathParams[0].mNodeId     = kTestNodeId;
+    eventPathParams[0].mEndpointId = kTestEndpointId;
+    eventPathParams[0].mClusterId  = kTestClusterId;
+    eventPathParams[0].mEventId    = kTestEventIdDebug;
+
+    eventPathParams[1].mNodeId     = kTestNodeId;
+    eventPathParams[1].mEndpointId = kTestEndpointId;
+    eventPathParams[1].mClusterId  = kTestClusterId;
+    eventPathParams[1].mEventId    = kTestEventIdCritical;
+
+    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(),
+                                                                            &session, eventPathParams, 2, nullptr, 1, 0);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
+
+    // By now we should have closed all exchanges and sent all pending acks, so
+    // there should be no queued-up things in the retransmit table.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    engine->Shutdown();
+}
+
 } // namespace app
 } // namespace chip
 
 namespace {
-
-void InitializeChip(nlTestSuite * apSuite)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(chip::gAdminId, chip::kTestDeviceNodeId);
-
-    NL_TEST_ASSERT(apSuite, adminInfo != nullptr);
-
-    err = chip::Platform::MemoryInit();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    chip::gSystemLayer.Init(nullptr);
-
-    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins,
-                                     &chip::gMessageCounterManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = chip::gExchangeManager.Init(&chip::gSessionManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = chip::gMessageCounterManager.Init(&chip::gExchangeManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-}
 
 /**
  *   Test Suite. It lists all the test functions.
@@ -466,6 +604,7 @@ void InitializeChip(nlTestSuite * apSuite)
 // clang-format off
 const nlTest sTests[] =
 {
+    NL_TEST_DEF("TestReadEventRoundtrip", chip::app::TestReadInteraction::TestReadEventRoundtrip),
     NL_TEST_DEF("CheckReadClient", chip::app::TestReadInteraction::TestReadClient),
     NL_TEST_DEF("CheckReadHandler", chip::app::TestReadInteraction::TestReadHandler),
     NL_TEST_DEF("TestReadClientGenerateAttributePathList", chip::app::TestReadInteraction::TestReadClientGenerateAttributePathList),
@@ -478,25 +617,58 @@ const nlTest sTests[] =
 };
 // clang-format on
 
+int Initialize(void * aContext);
+int Finalize(void * aContext);
+
+// clang-format off
+nlTestSuite sSuite =
+{
+        "TestReadInteraction",
+        &sTests[0],
+        Initialize,
+        Finalize
+};
+// clang-format on
+
+int Initialize(void * aContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    // Initialize System memory and resources
+    err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        return FAILURE;
+    }
+
+    gTransportManager.Init(&gLoopback);
+
+    auto * ctx = static_cast<TestContext *>(aContext);
+    err        = ctx->Init(&sSuite, &gTransportManager);
+    if (err != CHIP_NO_ERROR)
+    {
+        return FAILURE;
+    }
+
+    InitializeEventLogging(ctx->GetExchangeManager());
+    gTransportManager.SetSecureSessionMgr(&ctx->GetSecureSessionManager());
+    return SUCCESS;
+}
+
+int Finalize(void * aContext)
+{
+    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    chip::Platform::MemoryShutdown();
+    chip::app::EventManagement::DestroyEventManagement();
+    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+}
+
 } // namespace
 
 int TestReadInteraction()
 {
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "TestReadInteraction",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
+    nlTestRunner(&sSuite, &sContext);
 
-    InitializeChip(&theSuite);
-
-    nlTestRunner(&theSuite, nullptr);
-
-    return (nlTestRunnerStats(&theSuite));
+    return (nlTestRunnerStats(&sSuite));
 }
 
 CHIP_REGISTER_TEST_SUITE(TestReadInteraction)

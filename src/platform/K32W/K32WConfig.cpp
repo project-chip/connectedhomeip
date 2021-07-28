@@ -411,7 +411,7 @@ CHIP_ERROR K32WConfig::MapPdmStatus(PDM_teStatus pdmStatus)
         err = CHIP_NO_ERROR;
         break;
     default:
-        err = CHIP_CONFIG_CORE_ERROR_MIN + pdmStatus;
+        err = ChipError::Encapsulate(ChipError::Range::kPlatform, pdmStatus);
         break;
     }
 
@@ -420,7 +420,7 @@ CHIP_ERROR K32WConfig::MapPdmStatus(PDM_teStatus pdmStatus)
 
 CHIP_ERROR K32WConfig::MapPdmInitStatus(int pdmStatus)
 {
-    return (pdmStatus == 0) ? CHIP_NO_ERROR : CHIP_CONFIG_CORE_ERROR_MIN + pdmStatus;
+    return (pdmStatus == 0) ? CHIP_NO_ERROR : ChipError::Encapsulate(ChipError::Range::kPlatform, pdmStatus);
 }
 
 bool K32WConfig::ValidConfigKey(Key key)

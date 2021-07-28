@@ -47,7 +47,7 @@ jobs:
                 OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
                 ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
             - name: Bootstrap
-              timeout-minutes: 15
+              timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
@@ -58,11 +58,11 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Run iOS Build Debug
-              timeout-minutes: 20
+              timeout-minutes: 30
               working-directory: src/darwin/Framework
               run: xcodebuild -target "CHIP" -sdk iphoneos
             - name: Run iOS Build Release
-              timeout-minutes: 20
+              timeout-minutes: 30
               working-directory: src/darwin/Framework
               run: xcodebuild -target "CHIP" -sdk iphoneos -configuration Release
             - name: Clean Build
@@ -72,7 +72,7 @@ jobs:
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
             - name: Run macOS Build
-              timeout-minutes: 20
+              timeout-minutes: 30
               # Enable -Werror by hand here, because the Xcode config can't
               # enable it for various reasons.  Keep whatever Xcode settings
               # for OTHER_CFLAGS exist by using ${inherited}.

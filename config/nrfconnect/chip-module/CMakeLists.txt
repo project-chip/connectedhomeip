@@ -99,9 +99,11 @@ if (CONFIG_POSIX_API)
 endif()
 
 if (CONFIG_NORDIC_SECURITY_BACKEND)
-    # TODO: Remove when the missing dependency is fixed in nRF Connect SDK
-    zephyr_include_directories(${ZEPHYR_BASE}/../nrfxlib/crypto/nrf_cc310_platform/include)
-
+    zephyr_include_directories($<TARGET_PROPERTY:mbedtls_external,INTERFACE_INCLUDE_DIRECTORIES>)
+    zephyr_include_directories($<TARGET_PROPERTY:mbedcrypto_includes,INTERFACE_INCLUDE_DIRECTORIES>)
+    if(TARGET platform_cc3xx)
+        zephyr_include_directories($<TARGET_PROPERTY:platform_cc3xx,INTERFACE_INCLUDE_DIRECTORIES>)
+    endif()
     list(APPEND CHIP_CFLAGS -DMBEDTLS_CONFIG_FILE=<nrf-config.h>)
 endif()
 

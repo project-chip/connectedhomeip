@@ -58,7 +58,6 @@ exit:
 
 void ShutdownChip(void)
 {
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     chip::DeviceLayer::PlatformMgr().Shutdown();
     gMessageCounterManager.Shutdown();
     gExchangeManager.Shutdown();

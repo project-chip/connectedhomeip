@@ -55,7 +55,7 @@ public:
 
     pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_LockingState & response)
     {
-        response.locked = BoltLockMgr().IsUnlocked();
+        response.locked = !BoltLockMgr().IsUnlocked();
         return pw::OkStatus();
     }
 };

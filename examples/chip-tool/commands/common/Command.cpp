@@ -413,7 +413,7 @@ void Command::WaitForResponse(uint16_t seconds)
 
 #else // CONFIG_USE_SEPARATE_EVENTLOOP
 
-static void OnResponseTimeout(chip::System::Layer *, void *, chip::System::Error)
+static void OnResponseTimeout(chip::System::Layer *, void *, CHIP_ERROR)
 {
     ChipLogError(chipTool, "No response from device");
 

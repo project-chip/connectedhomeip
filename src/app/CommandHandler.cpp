@@ -28,6 +28,7 @@
 #include "InteractionModelEngine.h"
 
 #include <protocols/secure_channel/Constants.h>
+#include <support/TypeTraits.h>
 
 using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 
@@ -71,7 +72,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     MoveToState(CommandState::Sending);
 
 exit:
-    Shutdown();
+    ShutdownInternal();
     ChipLogFunctError(err);
     return err;
 }
@@ -146,8 +147,7 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams & aCommandPathP
     statusElementBuilder =
         mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusElementBuilder();
     statusElementBuilder
-        .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(),
-                             Protocols::InteractionModel::ToUint16(aProtocolCode))
+        .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), chip::to_underlying(aProtocolCode))
         .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);

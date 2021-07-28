@@ -45,6 +45,10 @@ source_set("commands") {
     sources += [ "NFC.cpp" ]
   }
 
+  if (chip_mdns != "none" && chip_device_platform != "none") {
+    sources += [ "Dns.cpp" ]
+  }
+
   public_deps = [ "${chip_root}/src/lib/shell:shell_core" ]
 
   if (chip_device_platform != "none") {

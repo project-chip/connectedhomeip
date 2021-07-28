@@ -50,7 +50,7 @@ void Engine::ForEachCommand(shell_command_iterator_t * on_command, void * arg)
     {
         for (unsigned j = 0; j < _commandSetSize[i]; j++)
         {
-            if (on_command(&_commandSet[i][j], arg))
+            if (on_command(&_commandSet[i][j], arg) != CHIP_NO_ERROR)
             {
                 return;
             }
@@ -110,6 +110,9 @@ void Engine::RegisterDefaultCommands()
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC
     RegisterNFCCommands();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    RegisterDnsCommands();
 #endif
 }
 

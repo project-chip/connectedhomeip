@@ -114,6 +114,7 @@ template("k32w_sdk") {
     ]
 
     defines = [
+      "gPWR_CpuClk_48MHz=1",
       "gMainThreadPriority_c=6",
       "CPU_K32W061HN",
       "CPU_JN518X",
@@ -155,6 +156,7 @@ template("k32w_sdk") {
       "SUPPORT_FOR_BLE=1",
       "gEnableBleInactivityTimeNotify=1",
       "DUAL_MODE_APP=1",
+      "gMainThreadStackSize_c=3096",
 
       #TODO: move OT defines in an OT specific GN file
       "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
@@ -174,11 +176,10 @@ template("k32w_sdk") {
     if (chip_with_se05x == 1) {
       defines += [
         "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
-        "gMainThreadStackSize_c=14048",
+        "CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE=9216",
       ]
-    } else {
-      defines += [ "gMainThreadStackSize_c=6024" ]
     }
+
     if (chip_with_OM15082 == 1) {
       defines += [
         "gKBD_KeysCount_c=4",

@@ -55,7 +55,7 @@ public:
     }
 
 protected:
-    Mdns::DiscoveredNodeData * GetDiscoveredNodes() override { return mDiscoveredCommissioners; }
+    DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mDiscoveredCommissioners); }
 
 private:
     Mdns::DiscoveredNodeData mDiscoveredCommissioners[CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES];

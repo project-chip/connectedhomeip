@@ -350,7 +350,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 ASN1_PARSE_ENTER_SEQUENCE
                 {
                     err = reader.Next();
-                    VerifyOrExit(err == CHIP_NO_ERROR, err = ASN1_ERROR_INVALID_ENCODING);
+                    SuccessOrExit(err);
 
                     // keyIdentifier [0] IMPLICIT KeyIdentifier,
                     // KeyIdentifier ::= OCTET STRING
@@ -393,7 +393,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 uint32_t keyUsageBits;
                 err = reader.GetBitString(keyUsageBits);
                 SuccessOrExit(err);
-                VerifyOrExit(keyUsageBits <= UINT16_MAX, err = ASN1_ERROR_INVALID_ENCODING);
+                VerifyOrExit(CanCastTo<uint16_t>(keyUsageBits), err = ASN1_ERROR_INVALID_ENCODING);
 
                 // Check that only supported flags are set.
                 BitFlags<KeyUsageFlags> keyUsageFlags(static_cast<uint16_t>(keyUsageBits));
@@ -435,8 +435,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                     {
                         ASN1_GET_INTEGER(pathLenConstraint);
 
-                        VerifyOrExit(pathLenConstraint <= UINT8_MAX, err = ASN1_ERROR_INVALID_ENCODING);
-                        VerifyOrExit(pathLenConstraint >= 0, err = ASN1_ERROR_INVALID_ENCODING);
+                        VerifyOrExit(CanCastTo<uint8_t>(pathLenConstraint), err = ASN1_ERROR_INVALID_ENCODING);
 
                         // pathLenConstraint is present only when cA is TRUE
                         VerifyOrExit(isCA, err = ASN1_ERROR_INVALID_ENCODING);
@@ -717,8 +716,7 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, uint8_t
 
     writer.Init(chipCertBuf, chipCertBufSize);
 
-    ReturnErrorOnFailure(ConvertCertificate(
-        reader, writer, ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate), issuer, subject, fabric));
+    ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, issuer, subject, fabric));
 
     ReturnErrorOnFailure(writer.Finalize());
 
@@ -797,10 +795,7 @@ CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & no
             ReturnErrorOnFailure(reader.Next());
         }
         VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-        uint64_t tag = reader.GetTag();
-        VerifyOrReturnError(tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate) ||
-                                tag == AnonymousTag,
-                            CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+        VerifyOrReturnError(reader.GetTag() == AnonymousTag, CHIP_ERROR_INVALID_TLV_TAG);
 
         ReturnErrorOnFailure(reader.EnterContainer(nocContainerType));
         ReturnErrorOnFailure(reader.ExitContainer(nocContainerType));
@@ -822,10 +817,7 @@ CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & no
             ReturnErrorOnFailure(err);
         }
         VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-        uint64_t tag = reader.GetTag();
-        VerifyOrReturnError(tag == ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate) ||
-                                tag == AnonymousTag,
-                            CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+        VerifyOrReturnError(reader.GetTag() == AnonymousTag, CHIP_ERROR_INVALID_TLV_TAG);
 
         ReturnErrorOnFailure(reader.EnterContainer(icacContainerType));
         ReturnErrorOnFailure(reader.ExitContainer(icacContainerType));

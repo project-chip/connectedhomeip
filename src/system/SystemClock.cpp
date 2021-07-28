@@ -43,6 +43,7 @@
 #include "SystemLayerPrivate.h"
 
 #include <support/CodeUtils.h>
+#include <support/TimeUtils.h>
 #include <system/SystemError.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
@@ -63,7 +64,7 @@
 namespace chip {
 namespace System {
 namespace Platform {
-namespace Layer {
+namespace Clock {
 
 // -------------------- Default Get/SetClock Functions for POSIX Systems --------------------
 
@@ -84,39 +85,28 @@ namespace Layer {
 #endif
 #endif // HAVE_CLOCK_GETTIME
 
-uint64_t GetClock_Monotonic()
+uint64_t GetMonotonicMicroseconds()
 {
 #if HAVE_CLOCK_GETTIME
     struct timespec ts;
     int res = clock_gettime(MONOTONIC_CLOCK_ID, &ts);
     VerifyOrDie(res == 0);
-    return (static_cast<uint64_t>(ts.tv_sec) * UINT64_C(1000000)) + (static_cast<uint64_t>(ts.tv_nsec) / 1000);
+    return (static_cast<uint64_t>(ts.tv_sec) * kMicrosecondsPerSecond) +
+        (static_cast<uint64_t>(ts.tv_nsec) / kNanosecondsPerMicrosecond);
 #else  // HAVE_CLOCK_GETTIME
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
     VerifyOrDie(res == 0);
-    return (tv.tv_sec * UINT64_C(1000000)) + tv.tv_usec;
+    return (tv.tv_sec * kMicrosecondsPerSecond) + tv.tv_usec;
 #endif // HAVE_CLOCK_GETTIME
 }
 
-uint64_t GetClock_MonotonicMS()
+uint64_t GetMonotonicMilliseconds()
 {
-    return GetClock_Monotonic() / 1000;
+    return GetMonotonicMicroseconds() / kMicrosecondsPerMillisecond;
 }
 
-uint64_t GetClock_MonotonicHiRes()
-{
-#if HAVE_CLOCK_GETTIME && defined(MONOTONIC_RAW_CLOCK_ID)
-    struct timespec ts;
-    int res = clock_gettime(MONOTONIC_RAW_CLOCK_ID, &ts);
-    VerifyOrDie(res == 0);
-    return (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
-#else  // HAVE_CLOCK_GETTIME
-    return GetClock_Monotonic();
-#endif // HAVE_CLOCK_GETTIME
-}
-
-CHIP_ERROR GetClock_RealTime(uint64_t & curTime)
+CHIP_ERROR GetUnixTimeMicroseconds(uint64_t & curTime)
 {
 #if HAVE_CLOCK_GETTIME
     struct timespec ts;
@@ -129,7 +119,8 @@ CHIP_ERROR GetClock_RealTime(uint64_t & curTime)
     {
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    curTime = (static_cast<uint64_t>(ts.tv_sec) * UINT64_C(1000000)) + (static_cast<uint64_t>(ts.tv_nsec) / 1000);
+    curTime = (static_cast<uint64_t>(ts.tv_sec) * kMicrosecondsPerSecond) +
+        (static_cast<uint64_t>(ts.tv_nsec) / kNanosecondsPerMicrosecond);
     return CHIP_NO_ERROR;
 #else  // HAVE_CLOCK_GETTIME
     struct timeval tv;
@@ -142,26 +133,19 @@ CHIP_ERROR GetClock_RealTime(uint64_t & curTime)
     {
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    curTime = (tv.tv_sec * UINT64_C(1000000)) + tv.tv_usec;
+    curTime = (tv.tv_sec * kMicrosecondsPerSecond) + tv.tv_usec;
     return CHIP_NO_ERROR;
 #endif // HAVE_CLOCK_GETTIME
 }
 
-CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTime)
-{
-    CHIP_ERROR err = GetClock_RealTime(curTime);
-    curTime        = curTime / 1000;
-    return err;
-}
-
 #if HAVE_CLOCK_SETTIME || HAVE_SETTIMEOFDAY
 
-CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR SetUnixTimeMicroseconds(uint64_t newCurTime)
 {
 #if HAVE_CLOCK_SETTIME
     struct timespec ts;
-    ts.tv_sec  = static_cast<time_t>(newCurTime / UINT64_C(1000000));
-    ts.tv_nsec = static_cast<long>(newCurTime % UINT64_C(1000000)) * 1000;
+    ts.tv_sec  = static_cast<time_t>(newCurTime / kMicrosecondsPerSecond);
+    ts.tv_nsec = static_cast<long>(newCurTime % kMicrosecondsPerSecond) * kNanosecondsPerMicrosecond;
     int res    = clock_settime(CLOCK_REALTIME, &ts);
     if (res != 0)
     {
@@ -170,8 +154,8 @@ CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
     return CHIP_NO_ERROR;
 #else  // HAVE_CLOCK_SETTIME
     struct timeval tv;
-    tv.tv_sec  = static_cast<time_t>(newCurTime / UINT64_C(1000000));
-    tv.tv_usec = static_cast<long>(newCurTime % UINT64_C(1000000));
+    tv.tv_sec  = static_cast<time_t>(newCurTime / kMicrosecondsPerSecond);
+    tv.tv_usec = static_cast<long>(newCurTime % kMicrosecondsPerSecond);
     int res    = settimeofday(&tv, NULL);
     if (res != 0)
     {
@@ -183,7 +167,7 @@ CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
 
 #else // !HAVE_CLOCK_SETTTIME
 
-CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR SetUnixTimeMicroseconds(uint64_t newCurTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -196,12 +180,12 @@ CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
-uint64_t GetClock_Monotonic(void)
+uint64_t GetMonotonicMicroseconds(void)
 {
-    return GetClock_MonotonicMS();
+    return GetMonotonicMilliseconds() * kMicrosecondsPerMillisecond;
 }
 
-uint64_t GetClock_MonotonicMS(void)
+uint64_t GetMonotonicMilliseconds(void)
 {
     static volatile uint64_t overflow        = 0;
     static volatile u32_t lastSample         = 0;
@@ -241,29 +225,19 @@ uint64_t GetClock_MonotonicMS(void)
     return static_cast<uint64_t>(overflowSample | static_cast<uint64_t>(sample));
 }
 
-uint64_t GetClock_MonotonicHiRes(void)
-{
-    return GetClock_MonotonicMS();
-}
-
-CHIP_ERROR GetClock_RealTime(uint64_t & curTime)
+CHIP_ERROR GetUnixTimeMicroseconds(uint64_t & curTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTime)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR SetUnixTimeMicroseconds(uint64_t newCurTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
-} // namespace Layer
+} // namespace Clock
 } // namespace Platform
 } // namespace System
 } // namespace chip

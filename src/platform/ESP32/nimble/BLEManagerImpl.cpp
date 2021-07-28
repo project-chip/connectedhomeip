@@ -94,10 +94,6 @@ const ble_uuid128_t UUID_CHIPoBLEChar_TX   = {
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
-BLEManagerImpl::BLEManagerImpl() :
-    mAdvertiseTimerCallback(HandleAdvertisementTimer, this), mFastAdvertiseTimerCallback(HandleFastAdvertisementTimer, this)
-{}
-
 const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
     { .type = BLE_GATT_SVC_TYPE_PRIMARY,
       .uuid = (ble_uuid_t *) (&ShortUUID_CHIPoBLEService),
@@ -173,9 +169,9 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     if (val)
     {
-        mAdvertiseStartTime = System::Timer::GetCurrentEpoch();
-        SystemLayer.StartTimer(kAdvertiseTimeout, &mAdvertiseTimerCallback);
-        SystemLayer.StartTimer(kFastAdvertiseTimeout, &mFastAdvertiseTimerCallback);
+        mAdvertiseStartTime = System::Clock::GetMonotonicMilliseconds();
+        ReturnErrorOnFailure(SystemLayer.StartTimer(kAdvertiseTimeout, HandleAdvertisementTimer, this));
+        ReturnErrorOnFailure(SystemLayer.StartTimer(kFastAdvertiseTimeout, HandleFastAdvertisementTimer, this));
     }
 
     mFlags.Set(Flags::kFastAdvertisingEnabled, val);
@@ -187,14 +183,14 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::HandleAdvertisementTimer(void * context)
+void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError)
 {
     static_cast<BLEManagerImpl *>(context)->HandleAdvertisementTimer();
 }
 
 void BLEManagerImpl::HandleAdvertisementTimer()
 {
-    uint64_t currentTimestamp = System::Timer::GetCurrentEpoch();
+    uint64_t currentTimestamp = System::Clock::GetMonotonicMilliseconds();
 
     if (currentTimestamp - mAdvertiseStartTime >= kAdvertiseTimeout)
     {
@@ -203,14 +199,14 @@ void BLEManagerImpl::HandleAdvertisementTimer()
     }
 }
 
-void BLEManagerImpl::HandleFastAdvertisementTimer(void * context)
+void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError)
 {
     static_cast<BLEManagerImpl *>(context)->HandleFastAdvertisementTimer();
 }
 
 void BLEManagerImpl::HandleFastAdvertisementTimer()
 {
-    uint64_t currentTimestamp = System::Timer::GetCurrentEpoch();
+    uint64_t currentTimestamp = System::Clock::GetMonotonicMilliseconds();
 
     if (currentTimestamp - mAdvertiseStartTime >= kFastAdvertiseTimeout)
     {
@@ -452,7 +448,7 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
     case ESP_ERR_INVALID_ARG:
         return CHIP_ERROR_INVALID_ARGUMENT;
     default:
-        return CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + static_cast<CHIP_ERROR>(bleErr);
+        return ChipError::Encapsulate(ChipError::Range::kPlatform, CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + bleErr);
     }
 }
 void BLEManagerImpl::DriveBLEState(void)
@@ -1025,13 +1021,13 @@ exit:
     // Schedule DriveBLEState() to run.
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
-    return err;
+    return ChipError::AsInteger(err);
 }
 
 int BLEManagerImpl::gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg)
 {
     struct ble_gatt_char_context param;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    int err = 0;
 
     memset(&param, 0, sizeof(struct ble_gatt_char_context));
 

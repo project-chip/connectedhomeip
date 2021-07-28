@@ -22,6 +22,7 @@
 #include <support/BufferWriter.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
 
 #include <app/common/gen/ids/Attributes.h>
 #include <app/common/gen/ids/Clusters.h>
@@ -88,6 +89,7 @@ using namespace chip::Encoding::LittleEndian;
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
+| OccupancySensing                                                    | 0x0406 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PressureMeasurement                                                 | 0x0403 |
@@ -288,6 +290,8 @@ PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uin
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ApplicationLauncherList                                           | 0x0000 |
+| * CatalogVendorId                                                   | 0x0001 |
+| * ApplicationId                                                     | 0x0002 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -313,6 +317,32 @@ PacketBufferHandle encodeApplicationLauncherClusterReadApplicationLauncherListAt
 }
 
 /*
+ * Attribute CatalogVendorId
+ */
+PacketBufferHandle encodeApplicationLauncherClusterReadCatalogVendorIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationLauncherCatalogVendorId", ApplicationLauncher::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ApplicationLauncher::Attributes::Ids::CatalogVendorId);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ApplicationId
+ */
+PacketBufferHandle encodeApplicationLauncherClusterReadApplicationIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadApplicationLauncherApplicationId", ApplicationLauncher::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(ApplicationLauncher::Attributes::Ids::ApplicationId);
+    COMMAND_FOOTER();
+}
+
+/*
  * Attribute ClusterRevision
  */
 PacketBufferHandle encodeApplicationLauncherClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
@@ -334,6 +364,7 @@ PacketBufferHandle encodeApplicationLauncherClusterReadClusterRevisionAttribute(
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * AudioOutputList                                                   | 0x0000 |
+| * CurrentAudioOutput                                                | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -354,6 +385,19 @@ PacketBufferHandle encodeAudioOutputClusterReadAudioOutputListAttribute(uint8_t 
         .Put8(seqNum)
         .Put32(Globals::Commands::Ids::ReadAttributes)
         .Put32(AudioOutput::Attributes::Ids::AudioOutputList);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CurrentAudioOutput
+ */
+PacketBufferHandle encodeAudioOutputClusterReadCurrentAudioOutputAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadAudioOutputCurrentAudioOutput", AudioOutput::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(AudioOutput::Attributes::Ids::CurrentAudioOutput);
     COMMAND_FOOTER();
 }
 
@@ -1201,6 +1245,11 @@ PacketBufferHandle encodeBridgedDeviceBasicClusterReadClusterRevisionAttribute(u
 | Cluster ColorControl                                                | 0x0300 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ColorLoopSet                                                      |   0x44 |
+| * EnhancedMoveHue                                                   |   0x41 |
+| * EnhancedMoveToHue                                                 |   0x40 |
+| * EnhancedMoveToHueAndSaturation                                    |   0x43 |
+| * EnhancedStepHue                                                   |   0x42 |
 | * MoveColor                                                         |   0x08 |
 | * MoveColorTemperature                                              |   0x4B |
 | * MoveHue                                                           |   0x01 |
@@ -3295,6 +3344,7 @@ PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribute(uint8_t seq
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MediaInputList                                                    | 0x0000 |
+| * CurrentMediaInput                                                 | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3315,6 +3365,19 @@ PacketBufferHandle encodeMediaInputClusterReadMediaInputListAttribute(uint8_t se
         .Put8(seqNum)
         .Put32(Globals::Commands::Ids::ReadAttributes)
         .Put32(MediaInput::Attributes::Ids::MediaInputList);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CurrentMediaInput
+ */
+PacketBufferHandle encodeMediaInputClusterReadCurrentMediaInputAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadMediaInputCurrentMediaInput", MediaInput::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(MediaInput::Attributes::Ids::CurrentMediaInput);
     COMMAND_FOOTER();
 }
 
@@ -3443,11 +3506,101 @@ PacketBufferHandle encodeOtaSoftwareUpdateProviderClusterReadClusterRevisionAttr
 }
 
 /*----------------------------------------------------------------------------*\
+| Cluster OccupancySensing                                            | 0x0406 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Occupancy                                                         | 0x0000 |
+| * OccupancySensorType                                               | 0x0001 |
+| * OccupancySensorTypeBitmap                                         | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeOccupancySensingClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverOccupancySensingAttributes", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Occupancy
+ */
+PacketBufferHandle encodeOccupancySensingClusterReadOccupancyAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOccupancySensingOccupancy", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OccupancySensing::Attributes::Ids::Occupancy);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOccupancySensingClusterConfigureOccupancyAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                            uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportOccupancySensingOccupancy", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put32(OccupancySensing::Attributes::Ids::Occupancy)
+        .Put8(24)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OccupancySensorType
+ */
+PacketBufferHandle encodeOccupancySensingClusterReadOccupancySensorTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOccupancySensingOccupancySensorType", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OccupancySensing::Attributes::Ids::OccupancySensorType);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OccupancySensorTypeBitmap
+ */
+PacketBufferHandle encodeOccupancySensingClusterReadOccupancySensorTypeBitmapAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOccupancySensingOccupancySensorTypeBitmap", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OccupancySensing::Attributes::Ids::OccupancySensorTypeBitmap);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeOccupancySensingClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOccupancySensingClusterRevision", OccupancySensing::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Globals::Attributes::Ids::ClusterRevision);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Off                                                               |   0x00 |
+| * OffWithEffect                                                     |   0x40 |
 | * On                                                                |   0x01 |
+| * OnWithRecallGlobalScene                                           |   0x41 |
+| * OnWithTimedOff                                                    |   0x42 |
 | * Toggle                                                            |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -4466,6 +4619,8 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 | * ListOctetString                                                   | 0x001B |
 | * ListStructOctetString                                             | 0x001C |
 | * LongOctetString                                                   | 0x001D |
+| * CharString                                                        | 0x001E |
+| * LongCharString                                                    | 0x001F |
 | * Unsupported                                                       | 0x00FF |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -4960,6 +5115,74 @@ PacketBufferHandle encodeTestClusterClusterWriteLongOctetStringAttribute(uint8_t
 }
 
 /*
+ * Attribute CharString
+ */
+PacketBufferHandle encodeTestClusterClusterReadCharStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTestClusterCharString", TestCluster::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(TestCluster::Attributes::Ids::CharString);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeTestClusterClusterWriteCharStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                    chip::ByteSpan charString)
+{
+    COMMAND_HEADER("WriteTestClusterCharString", TestCluster::Id);
+    size_t charStringStrLen = charString.size();
+    if (!CanCastTo<uint8_t>(charStringStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, charStringStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::WriteAttributes)
+        .Put32(TestCluster::Attributes::Ids::CharString)
+        .Put8(66)
+        .Put(static_cast<uint8_t>(charStringStrLen))
+        .Put(charString.data(), charStringStrLen);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute LongCharString
+ */
+PacketBufferHandle encodeTestClusterClusterReadLongCharStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTestClusterLongCharString", TestCluster::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(TestCluster::Attributes::Ids::LongCharString);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeTestClusterClusterWriteLongCharStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                        chip::ByteSpan longCharString)
+{
+    COMMAND_HEADER("WriteTestClusterLongCharString", TestCluster::Id);
+    size_t longCharStringStrLen = longCharString.size();
+    if (!CanCastTo<uint16_t>(longCharStringStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, longCharStringStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::WriteAttributes)
+        .Put32(TestCluster::Attributes::Ids::LongCharString)
+        .Put8(68)
+        .Put16(static_cast<uint16_t>(longCharStringStrLen))
+        .Put(longCharString.data(), longCharStringStrLen);
+    COMMAND_FOOTER();
+}
+
+/*
  * Attribute Unsupported
  */
 PacketBufferHandle encodeTestClusterClusterReadUnsupportedAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
@@ -5014,6 +5237,10 @@ PacketBufferHandle encodeTestClusterClusterReadClusterRevisionAttribute(uint8_t 
 | * OccupiedHeatingSetpoint                                           | 0x0012 |
 | * ControlSequenceOfOperation                                        | 0x001B |
 | * SystemMode                                                        | 0x001C |
+| * StartOfWeek                                                       | 0x0020 |
+| * NumberOfWeeklyTransitions                                         | 0x0021 |
+| * NumberOfDailyTransitions                                          | 0x0022 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -5155,6 +5382,58 @@ PacketBufferHandle encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNu
         .Put32(Thermostat::Attributes::Ids::SystemMode)
         .Put8(48)
         .Put8(static_cast<uint8_t>(systemMode));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute StartOfWeek
+ */
+PacketBufferHandle encodeThermostatClusterReadStartOfWeekAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThermostatStartOfWeek", Thermostat::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Thermostat::Attributes::Ids::StartOfWeek);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute NumberOfWeeklyTransitions
+ */
+PacketBufferHandle encodeThermostatClusterReadNumberOfWeeklyTransitionsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThermostatNumberOfWeeklyTransitions", Thermostat::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Thermostat::Attributes::Ids::NumberOfWeeklyTransitions);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute NumberOfDailyTransitions
+ */
+PacketBufferHandle encodeThermostatClusterReadNumberOfDailyTransitionsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThermostatNumberOfDailyTransitions", Thermostat::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Thermostat::Attributes::Ids::NumberOfDailyTransitions);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute FeatureMap
+ */
+PacketBufferHandle encodeThermostatClusterReadFeatureMapAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThermostatFeatureMap", Thermostat::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Globals::Attributes::Ids::FeatureMap);
     COMMAND_FOOTER();
 }
 
@@ -6112,6 +6391,7 @@ PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t se
 | Cluster WiFiNetworkDiagnostics                                      | 0x0036 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ResetCounts                                                       |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Bssid                                                             | 0x0000 |

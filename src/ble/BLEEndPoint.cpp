@@ -1428,7 +1428,7 @@ bool BLEEndPoint::SendIndication(PacketBufferHandle && buf)
 CHIP_ERROR BLEEndPoint::StartConnectTimer()
 {
     const CHIP_ERROR timerErr = mBle->mSystemLayer->StartTimer(BLE_CONNECT_TIMEOUT_MS, HandleConnectTimeout, this);
-    VerifyOrReturnError(timerErr == CHIP_NO_ERROR, BLE_ERROR_START_TIMER_FAILED);
+    ReturnErrorOnFailure(timerErr);
     mTimerStateFlags.Set(TimerStateFlag::kConnectTimerRunning);
 
     return CHIP_NO_ERROR;
@@ -1437,7 +1437,7 @@ CHIP_ERROR BLEEndPoint::StartConnectTimer()
 CHIP_ERROR BLEEndPoint::StartReceiveConnectionTimer()
 {
     const CHIP_ERROR timerErr = mBle->mSystemLayer->StartTimer(BLE_CONNECT_TIMEOUT_MS, HandleReceiveConnectionTimeout, this);
-    VerifyOrReturnError(timerErr == CHIP_NO_ERROR, BLE_ERROR_START_TIMER_FAILED);
+    ReturnErrorOnFailure(timerErr);
     mTimerStateFlags.Set(TimerStateFlag::kReceiveConnectionTimerRunning);
 
     return CHIP_NO_ERROR;
@@ -1448,7 +1448,7 @@ CHIP_ERROR BLEEndPoint::StartAckReceivedTimer()
     if (!mTimerStateFlags.Has(TimerStateFlag::kAckReceivedTimerRunning))
     {
         const CHIP_ERROR timerErr = mBle->mSystemLayer->StartTimer(BTP_ACK_RECEIVED_TIMEOUT_MS, HandleAckReceivedTimeout, this);
-        VerifyOrReturnError(timerErr == CHIP_NO_ERROR, BLE_ERROR_START_TIMER_FAILED);
+        ReturnErrorOnFailure(timerErr);
 
         mTimerStateFlags.Set(TimerStateFlag::kAckReceivedTimerRunning);
     }
@@ -1473,7 +1473,7 @@ CHIP_ERROR BLEEndPoint::StartSendAckTimer()
     {
         ChipLogDebugBleEndPoint(Ble, "starting new SendAckTimer");
         const CHIP_ERROR timerErr = mBle->mSystemLayer->StartTimer(BTP_ACK_SEND_TIMEOUT_MS, HandleSendAckTimeout, this);
-        VerifyOrReturnError(timerErr == CHIP_NO_ERROR, BLE_ERROR_START_TIMER_FAILED);
+        ReturnErrorOnFailure(timerErr);
 
         mTimerStateFlags.Set(TimerStateFlag::kSendAckTimerRunning);
     }
@@ -1484,7 +1484,7 @@ CHIP_ERROR BLEEndPoint::StartSendAckTimer()
 CHIP_ERROR BLEEndPoint::StartUnsubscribeTimer()
 {
     const CHIP_ERROR timerErr = mBle->mSystemLayer->StartTimer(BLE_UNSUBSCRIBE_TIMEOUT_MS, HandleUnsubscribeTimeout, this);
-    VerifyOrReturnError(timerErr == CHIP_NO_ERROR, BLE_ERROR_START_TIMER_FAILED);
+    ReturnErrorOnFailure(timerErr);
     mTimerStateFlags.Set(TimerStateFlag::kUnsubscribeTimerRunning);
 
     return CHIP_NO_ERROR;

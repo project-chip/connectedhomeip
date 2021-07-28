@@ -17,14 +17,11 @@
 
 #pragma once
 
+#include <lib/core/NodeId.h>
+
 namespace chip {
 
-/// Convenience types to make it clear what different number types mean
-using NodeId   = uint64_t;
 using FabricId = uint64_t;
-
-constexpr NodeId kUndefinedNodeId = 0ULL;
-constexpr NodeId kAnyNodeId       = 0xFFFFFFFFFFFFFFFFULL;
 
 constexpr FabricId kUndefinedFabricId = 0ULL;
 constexpr uint16_t kUndefinedVendorId = 0U;
@@ -42,7 +39,7 @@ public:
         return *this;
     }
 
-    NodeId GetFabricId() const { return mFabricId; }
+    FabricId GetFabricId() const { return mFabricId; }
     PeerId & SetFabricId(FabricId id)
     {
         mFabricId = id;

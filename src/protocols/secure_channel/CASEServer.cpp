@@ -30,24 +30,23 @@ using namespace ::chip::Credentials;
 namespace chip {
 
 CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                                     SecureSessionMgr * sessionMgr, Transport::AdminPairingTable * admins,
+                                                     SecureSessionMgr * sessionMgr, Transport::FabricTable * fabrics,
                                                      SessionIDAllocator * idAllocator)
 {
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sessionMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(admins != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mSessionMgr      = sessionMgr;
-    mAdmins          = admins;
+    mFabrics         = fabrics;
     mExchangeManager = exchangeManager;
     mIDAllocator     = idAllocator;
 
-    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transportMgr));
+    Cleanup();
 
-    ExchangeDelegate * delegate = this;
-    ReturnErrorOnFailure(
-        mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1, delegate));
+    ReturnErrorOnFailure(GetSession().MessageDispatch().Init(transportMgr));
+
     return CHIP_NO_ERROR;
 }
 
@@ -55,33 +54,32 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
     ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    Cleanup();
+    // TODO - Use PK of the root CA for the initiator to figure out the fabric.
+    mFabricIndex = ec->GetSecureSession().GetFabricIndex();
 
-    // TODO - Use PK of the root CA for the initiator to figure out the admin.
-    mAdminId = ec->GetSecureSession().GetAdminId();
+    // TODO - Use section [4.368] and definition of `Destination Identifier` to find fabric ID for CASE SigmaR1 message
+    //    ReturnErrorCodeIf(mFabricIndex == Transport::kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
+    mFabricIndex = 0;
 
-    // TODO - Use section [4.368] and definition of `Destination Identifier` to find admin ID for CASE SigmaR1 message
-    //    ReturnErrorCodeIf(mAdminId == Transport::kUndefinedAdminId, CHIP_ERROR_INVALID_ARGUMENT);
-    mAdminId = 0;
+    Transport::FabricInfo * fabric = mFabrics->FindFabricWithIndex(mFabricIndex);
 
-    Transport::AdminPairingInfo * admin = mAdmins->FindAdminWithId(mAdminId);
-
-    if (admin == nullptr)
+    if (fabric == nullptr)
     {
-        ReturnErrorOnFailure(mAdmins->LoadFromStorage(mAdminId));
-        admin = mAdmins->FindAdminWithId(mAdminId);
+        ReturnErrorOnFailure(mFabrics->LoadFromStorage(mFabricIndex));
+        fabric = mFabrics->FindFabricWithIndex(mFabricIndex);
     }
-    ReturnErrorCodeIf(admin == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(admin->GetCredentials(mCredentials, mCertificates, mRootKeyId));
+    uint8_t credentialsIndex;
+    ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId, credentialsIndex));
 
     ReturnErrorOnFailure(mIDAllocator->Allocate(mSessionKeyId));
 
-    // Setup CASE state machine using the credentials for the current admin.
-    ReturnErrorOnFailure(mPairingSession.ListenForSessionEstablishment(&mCredentials, mSessionKeyId, this));
+    // Setup CASE state machine using the credentials for the current fabric.
+    ReturnErrorOnFailure(GetSession().ListenForSessionEstablishment(&mCredentials, mSessionKeyId, this));
 
     // Hand over the exchange context to the CASE session.
-    ec->SetDelegate(&mPairingSession);
+    ec->SetDelegate(&GetSession());
 
     return CHIP_NO_ERROR;
 }
@@ -90,21 +88,36 @@ CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const 
                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
     ChipLogProgress(Inet, "CASE Server received SigmaR1 message. Starting handshake. EC %p", ec);
-    ReturnErrorOnFailure(InitCASEHandshake(ec));
+    CHIP_ERROR err = InitCASEHandshake(ec);
+    SuccessOrExit(err);
 
-    mPairingSession.OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));
-
-    return CHIP_NO_ERROR;
     // TODO - Enable multiple concurrent CASE session establishment
+    // https://github.com/project-chip/connectedhomeip/issues/8342
+    ChipLogProgress(Inet, "CASE Server disabling CASE session setups");
+    mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1);
+
+    err = GetSession().OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        Cleanup();
+    }
+    return err;
 }
 
 void CASEServer::Cleanup()
 {
     // Let's re-register for CASE SigmaR1 message, so that the next CASE session setup request can be processed.
-    mAdminId = Transport::kUndefinedAdminId;
+    // https://github.com/project-chip/connectedhomeip/issues/8342
+    ChipLogProgress(Inet, "CASE Server enabling CASE session setups");
+    mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1, this);
+
+    mFabricIndex = Transport::kUndefinedFabricIndex;
     mCredentials.Release();
     mCertificates.Release();
-    mPairingSession.Clear();
+    GetSession().Clear();
 }
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
@@ -117,11 +130,11 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 void CASEServer::OnSessionEstablished()
 {
     ChipLogProgress(Inet, "CASE Session established. Setting up the secure channel.");
-    mSessionMgr->ExpireAllPairings(mPairingSession.PeerConnection().GetPeerNodeId(), mAdminId);
+    mSessionMgr->ExpireAllPairings(GetSession().PeerConnection().GetPeerNodeId(), mFabricIndex);
 
     CHIP_ERROR err = mSessionMgr->NewPairing(
-        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kResponder, mAdminId);
+        Optional<Transport::PeerAddress>::Value(GetSession().PeerConnection().GetPeerAddress()),
+        GetSession().PeerConnection().GetPeerNodeId(), &GetSession(), SecureSession::SessionRole::kResponder, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed in setting up secure channel: err %s", ErrorStr(err));

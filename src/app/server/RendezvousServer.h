@@ -30,7 +30,7 @@ class RendezvousServer : public SessionEstablishmentDelegate
 {
 public:
     CHIP_ERROR WaitForPairing(const RendezvousParameters & params, Messaging::ExchangeManager * exchangeManager,
-                              TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, Transport::AdminPairingInfo * admin);
+                              TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, Transport::FabricInfo * fabric);
 
     CHIP_ERROR Init(AppDelegate * delegate, PersistentStorageDelegate * storage, SessionIDAllocator * idAllocator)
     {
@@ -62,7 +62,7 @@ private:
     PASESession mPairingSession;
     SecureSessionMgr * mSessionMgr = nullptr;
 
-    Transport::AdminPairingInfo * mAdmin = nullptr;
+    Transport::FabricInfo * mFabric = nullptr;
 
     SessionIDAllocator * mIDAllocator = nullptr;
 

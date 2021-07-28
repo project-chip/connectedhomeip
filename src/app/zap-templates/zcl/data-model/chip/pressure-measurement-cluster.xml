@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <name>Pressure Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements.</description>
+    <code>0x0403</code>
+    <define>PRESSURE_MEASUREMENT_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" tickFrequency="half" init="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <attribute side="server" code="0x0000" define="PRESSURE_MEASURED_VALUE" type="INT16S" writable="false" reportable="true" default="0x0000" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0001" define="PRESSURE_MIN_MEASURED_VALUE" type="INT16S" writable="false" optional="false">min measured value</attribute>
+    <attribute side="server" code="0x0002" define="PRESSURE_MAX_MEASURED_VALUE" type="INT16S" writable="false" optional="false">max measured value</attribute>
+    <attribute side="server" code="0x0003" define="PRESSURE_TOLERANCE" type="INT16U" min="0x0000" max="0x0800" writable="false" reportable="true" optional="true" default="0">tolerance</attribute>
+    <attribute side="server" code="0x0010" define="PRESSURE_SCALED_VALUE" type="INT16S" writable="false" reportable="true" optional="true" default="0">scaled value</attribute>
+    <attribute side="server" code="0x0011" define="PRESSURE_MIN_SCALED_VALUE" type="INT16S" writable="false" optional="true" default="0">min scaled value</attribute>
+    <attribute side="server" code="0x0012" define="PRESSURE_MAX_SCALED_VALUE" type="INT16S" writable="false" optional="true" default="0">max scaled value</attribute>
+    <attribute side="server" code="0x0013" define="PRESSURE_SCALED_TOLERANCE" type="INT16U" min="0x0000" max="0x0800" writable="false" reportable="true" optional="true" default="0">scaled tolerance</attribute>
+    <attribute side="server" code="0x0014" define="PRESSURE_SCALE" type="INT8S" writable="false" optional="true" default="0">scale</attribute>
+  </cluster>
+
+</configurator>

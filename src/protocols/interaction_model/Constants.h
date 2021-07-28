@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include <protocols/Protocols.h>
 
 /**
@@ -72,24 +74,24 @@ enum class ProtocolCode : uint16_t
     UnsupportedEndpoint    = 0x7f,
     InvalidAction          = 0x80,
     UnsupportedCommand     = 0x81,
-    Reserved82             = 0x82,
-    Reserved83             = 0x83,
-    Reserved84             = 0x84,
+    Deprecated82           = 0x82,
+    Deprecated83           = 0x83,
+    Deprecated84           = 0x84,
     InvalidCommand         = 0x85,
     UnsupportedAttribute   = 0x86,
     InvalidValue           = 0x87,
     UnsupportedWrite       = 0x88,
     ResourceExhausted      = 0x89,
-    Reserved8a             = 0x8a,
+    Deprecated8a           = 0x8a,
     NotFound               = 0x8b,
     UnreportableAttribute  = 0x8c,
     InvalidDataType        = 0x8d,
-    Reserved8e             = 0x8e,
+    Deprecated8e           = 0x8e,
     UnsupportedRead        = 0x8f,
-    Reserved90             = 0x90,
-    Reserved91             = 0x91,
-    Reserved92             = 0x92,
-    Reserved93             = 0x93,
+    Deprecated90           = 0x90,
+    Deprecated91           = 0x91,
+    Reserved92             = 0x92, // ProtocolCode 0x92 does not have any comments in the spec.
+    Deprecated93           = 0x93,
     Timeout                = 0x94,
     Reserved95             = 0x95,
     Reserved96             = 0x96,
@@ -99,20 +101,14 @@ enum class ProtocolCode : uint16_t
     Reserved9a             = 0x9a,
     ConstraintError        = 0x9b,
     Busy                   = 0x9c,
-    Reservedc0             = 0xc0,
-    Reservedc1             = 0xc1,
-    Reservedc2             = 0xc2,
+    Deprecatedc0           = 0xc0,
+    Deprecatedc1           = 0xc1,
+    Deprecatedc2           = 0xc2,
     UnsupportedCluster     = 0xc3,
-    Reservedc4             = 0xc4,
+    Deprecatedc4           = 0xc4,
     NoUpstreamSubscription = 0xc5,
     InvalidArgument        = 0xc6,
 };
-
-inline uint16_t ToUint16(ProtocolCode aProtocolCode)
-{
-    static_assert(std::is_same<uint16_t, std::underlying_type_t<ProtocolCode>>::value, "Cast might not be right");
-    return static_cast<uint16_t>(aProtocolCode);
-}
 } // namespace InteractionModel
 
 template <>

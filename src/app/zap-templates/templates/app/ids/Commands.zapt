@@ -12,7 +12,7 @@ namespace Globals {
 namespace Commands {
 namespace Ids {
 {{#zcl_global_commands}}
-static constexpr CommandId {{asUpperCamelCase label}} = {{asHex code 2}};
+static constexpr CommandId {{asUpperCamelCase label}} = {{asMEI manufacturerCode code}};
 {{/zcl_global_commands}}
 } // namespace Ids
 } // namespace Commands
@@ -26,7 +26,7 @@ namespace {{asCamelCased parent.label false}} {
 namespace Commands {
 namespace Ids {
 {{/first}}
-static constexpr CommandId {{asUpperCamelCase label}} = {{asHex code 2}};
+static constexpr CommandId {{asUpperCamelCase label}} = {{asMEI manufacturerCode code}};
 {{#last}}
 } // namespace Ids
 } // namespace Commands

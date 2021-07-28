@@ -480,7 +480,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
         {
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
-        emberAfCopyString(dest, src, static_cast<uint8_t>(bufferSize - 1));
+        emberAfCopyString(dest, src, bufferSize - 1);
     }
     else if (emberAfIsLongStringAttributeType(attributeType))
     {
@@ -488,7 +488,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
         {
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
-        emberAfCopyLongString(dest, src, static_cast<uint16_t>(bufferSize - 2));
+        emberAfCopyLongString(dest, src, bufferSize - 2);
     }
     else if (emberAfIsThisDataTypeAListType(attributeType))
     {

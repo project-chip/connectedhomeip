@@ -173,6 +173,9 @@ int RemoveDeviceEndpoint(Device * dev)
             EndpointId ep   = emberAfClearDynamicEndpoint(index);
             gDevices[index] = NULL;
             ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)", dev->GetName(), ep, index);
+            // Silence complaints about unused ep when progress logging
+            // disabled.
+            UNUSED_VAR(ep);
             return index;
         }
         index++;

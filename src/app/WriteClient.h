@@ -59,7 +59,7 @@ public:
      *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
-    CHIP_ERROR SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession);
+    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession);
 
     CHIP_ERROR PrepareAttribute(const AttributePathParams & attributePathParams);
     CHIP_ERROR FinishAttribute();
@@ -114,6 +114,12 @@ private:
     void ClearExistingExchangeContext();
     const char * GetStateStr() const;
     void ClearState();
+
+    /**
+     * Internal shutdown method that we use when we know what's going on with
+     * our exchange and don't need to manually close it.
+     */
+    void ShutdownInternal();
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;

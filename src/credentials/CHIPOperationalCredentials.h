@@ -28,6 +28,9 @@
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/DLLUtil.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 
 #include <algorithm>
 #include <map>
@@ -66,7 +69,11 @@ struct NodeCredentialMap
 struct NodeKeypairMap
 {
     CertificateKeyId trustedRootId;
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+    P256KeypairHSM keypair;
+#else
     P256Keypair keypair;
+#endif
 };
 
 /**
@@ -179,7 +186,7 @@ public:
      *
      * @param trustedRootId     Reference to the Trusted Root ID for the Certificate Set to be used
      *                          for validation
-     * @param cert              Pointer to the CHIP certificiate to be validated. The certificate is
+     * @param cert              Pointer to the CHIP certificate to be validated. The certificate is
      *                          required to be in this set, otherwise this function returns error.
      * @param context           Certificate validation context.
      *
@@ -190,17 +197,18 @@ public:
     /**
      * @brief Find and validate CHIP certificate.
      *
-     * @param trustedRootId     Reference to the Trusted Root ID for the Certificate Set to be used
-     *                          for validation
-     * @param subjectDN         Subject distinguished name to use as certificate search parameter.
-     * @param subjectKeyId      Subject key identifier to use as certificate search parameter.
-     * @param context           Certificate validation context.
-     * @param cert              A pointer to the valid CHIP certificate that matches search criteria.
+     * @param[in]  trustedRootId Reference to the Trusted Root ID for the Certificate Set to be used
+     *                           for validation.
+     * @param[in]  subjectDN     Subject distinguished name to use as certificate search parameter.
+     * @param[in]  subjectKeyId  Subject key identifier to use as certificate search parameter.
+     * @param[in]  context       Certificate validation context.
+     * @param[out] certData      A slot to write a pointer to the CHIP certificate data that matches search criteria.
      *
      * @return Returns a CHIP_ERROR if no valid certificate could be found
      **/
     CHIP_ERROR FindValidCert(const CertificateKeyId & trustedRootId, const ChipDN & subjectDN,
-                             const CertificateKeyId & subjectKeyId, ValidationContext & context, ChipCertificateData *& cert);
+                             const CertificateKeyId & subjectKeyId, ValidationContext & context,
+                             const ChipCertificateData ** certData);
 
     /**
      * @brief A function to sign a msg using ECDSA and the respective device credentials keypair.
@@ -216,7 +224,7 @@ public:
                        P256ECDSASignature & out_signature);
 
     /**
-     * @return A pointer to device credentials (in x509 format).
+     * @return A pointer to device credentials (in chip format).
      **/
     const uint8_t * GetDevOpCred(const CertificateKeyId & trustedRootId) const
     {
@@ -252,8 +260,11 @@ public:
 
     CHIP_ERROR SetDevOpCredKeypair(const CertificateKeyId & trustedRootId, P256Keypair * newKeypair);
 
+    const ChipCertificateData * GetRootCertificate(const CertificateKeyId & trustedRootId) const;
+
 private:
-    ChipCertificateSet * mOpCreds;     /**< Pointer to an array of certificate data. */
+    ChipCertificateSet * mOpCreds; /**< Pointer to an array of certificate data. */
+    // TODO: switch mOpCredCount var type to size_t in order to allow more than 255 credentials per controller.
     uint8_t mOpCredCount;              /**< Number of certificates in mOpCreds
                                         array. We maintain the invariant that all
                                         the slots at indices less than
@@ -268,6 +279,7 @@ private:
     NodeKeypairMap mDeviceOpCredKeypair[kOperationalCredentialsMax];
     uint8_t mDeviceOpCredKeypairCount;
 
+    // TODO: Remove TrustedRootId indexing - Replace it with size_t index.
     const NodeCredential * GetNodeCredentialAt(const CertificateKeyId & trustedRootId) const;
     P256Keypair * GetNodeKeypairAt(const CertificateKeyId & trustedRootId);
 };

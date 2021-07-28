@@ -19,9 +19,9 @@
 #include "RpcService.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "gdm_wifi_service.h"
 #include "nvs_flash.h"
 #include "pw_rpc/server.h"
+#include "wifi_service.h"
 
 #include "lwip/err.h"
 #include "lwip/sockets.h"
@@ -56,7 +56,7 @@ void UdpReceiver(void * pvParameters)
     while (1)
     {
         // Start the udp server after the wifi is connectd.
-        chip::rpc::GDMWifiBase::Instance().BlockUntilWifiConnected();
+        chip::rpc::Wifi::Instance().BlockUntilWifiConnected();
         ESP_LOGI(TAG, "UDP server starting");
 
         portno = 8765;
@@ -121,7 +121,7 @@ void UdpReceiver(void * pvParameters)
 
 void RegisterServices(pw::rpc::Server & server)
 {
-    server.RegisterService(chip::rpc::GDMWifiBase::Instance());
+    server.RegisterService(chip::rpc::Wifi::Instance());
 }
 
 void RunRpcService(void *)
@@ -144,7 +144,7 @@ extern "C" void app_main()
     }
     ESP_ERROR_CHECK(ret);
 
-    ESP_LOGI(TAG, "Wifi Init: %s", pw_StatusString(chip::rpc::GDMWifiBase::Instance().Init()));
+    ESP_LOGI(TAG, "Wifi Init: %s", pw_StatusString(chip::rpc::Wifi::Instance().Init()));
     ESP_LOGI(TAG, "----------- chip-esp32-ipv6-example starting -----------");
 
     xTaskCreate(RunRpcService, "RPC", kRpcStackSizeBytes / sizeof(StackType_t), nullptr, kRpcTaskPriority, &rpcTaskHandle);

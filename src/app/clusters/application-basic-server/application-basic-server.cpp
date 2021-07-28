@@ -22,14 +22,15 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/enums.h>
 #include <app/util/af.h>
 #include <string>
 
 bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatus status, chip::EndpointId endpoint);
 
-bool emberAfApplicationBasicClusterChangeStatusCallback(chip::app::Command * commandObj, uint8_t newApplicationStatus)
+bool emberAfApplicationBasicClusterChangeStatusCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                        uint8_t newApplicationStatus)
 {
     bool success = applicationBasicClusterChangeApplicationStatus(static_cast<EmberAfApplicationBasicStatus>(newApplicationStatus),
                                                                   emberAfCurrentEndpoint());

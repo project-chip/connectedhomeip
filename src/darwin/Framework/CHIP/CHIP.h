@@ -25,6 +25,7 @@
 #import <CHIP/CHIPPersistentStorageDelegate.h>
 #import <CHIP/CHIPQRCodeSetupPayloadParser.h>
 #import <CHIP/CHIPSetupPayload.h>
+#import <CHIP/CHIPThreadOperationalDataset.h>
 
 #import <Foundation/Foundation.h>
 //! Project version number for CHIP.

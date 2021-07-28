@@ -64,6 +64,7 @@ menu "Demo"
 endmenu
 
 menu "PW RPC Debug channel"
+depends on ENABLE_PW_RPC
     config EXAMPLE_UART_PORT_NUM
         int "UART port number"
         range 0 2 if IDF_TARGET_ESP32

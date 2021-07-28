@@ -33,7 +33,7 @@
 #include <support/UnitTestRegistration.h>
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
-#include <system/SystemSockets.h>
+#include <system/WatchableSocket.h>
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
@@ -42,6 +42,17 @@
 using namespace chip::System;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+namespace chip {
+namespace System {
+class WakeEventTest
+{
+public:
+    static int GetReadFD(const WakeEvent & wakeEvent) { return wakeEvent.GetReadFD(); }
+};
+} // namespace System
+} // namespace chip
+
 namespace {
 
 struct TestContext
@@ -55,7 +66,7 @@ struct TestContext
 
     TestContext()
     {
-        mWatchableEvents.Init(mSystemLayer);
+        (void) mWatchableEvents.Init(mSystemLayer);
         mWakeEvent.Open(mWatchableEvents);
     }
     ~TestContext() { mWakeEvent.Close(); }
@@ -65,15 +76,15 @@ struct TestContext
         FD_ZERO(&mReadSet);
         FD_ZERO(&mWriteSet);
         FD_ZERO(&mErrorSet);
-        FD_SET(mWakeEvent.GetNotifFD(), &mReadSet);
-        return select(mWakeEvent.GetNotifFD() + 1, &mReadSet, &mWriteSet, &mErrorSet, &timeout);
+        FD_SET(WakeEventTest::GetReadFD(mWakeEvent), &mReadSet);
+        return select(WakeEventTest::GetReadFD(mWakeEvent) + 1, &mReadSet, &mWriteSet, &mErrorSet, &timeout);
     }
 };
 
 void TestOpen(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
-    NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.GetNotifFD() >= 0);
+    NL_TEST_ASSERT(inSuite, WakeEventTest::GetReadFD(lContext.mWakeEvent) >= 0);
     NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 0);
 }
 
@@ -85,11 +96,11 @@ void TestNotify(nlTestSuite * inSuite, void * aContext)
     // Check that select() succeeds after Notify() has been called
     lContext.mWakeEvent.Notify();
     NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 1);
-    NL_TEST_ASSERT(inSuite, FD_ISSET(lContext.mWakeEvent.GetNotifFD(), &lContext.mReadSet));
+    NL_TEST_ASSERT(inSuite, FD_ISSET(WakeEventTest::GetReadFD(lContext.mWakeEvent), &lContext.mReadSet));
 
     // ...and state of the event is not cleared automatically
     NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 1);
-    NL_TEST_ASSERT(inSuite, FD_ISSET(lContext.mWakeEvent.GetNotifFD(), &lContext.mReadSet));
+    NL_TEST_ASSERT(inSuite, FD_ISSET(WakeEventTest::GetReadFD(lContext.mWakeEvent), &lContext.mReadSet));
 }
 
 void TestConfirm(nlTestSuite * inSuite, void * aContext)
@@ -99,7 +110,7 @@ void TestConfirm(nlTestSuite * inSuite, void * aContext)
     // Check that select() succeeds after Notify() has been called
     lContext.mWakeEvent.Notify();
     NL_TEST_ASSERT(inSuite, lContext.SelectWakeEvent() == 1);
-    NL_TEST_ASSERT(inSuite, FD_ISSET(lContext.mWakeEvent.GetNotifFD(), &lContext.mReadSet));
+    NL_TEST_ASSERT(inSuite, FD_ISSET(WakeEventTest::GetReadFD(lContext.mWakeEvent), &lContext.mReadSet));
 
     // Check that Confirm() clears state of the event
     lContext.mWakeEvent.Confirm();
@@ -136,7 +147,7 @@ void TestClose(nlTestSuite * inSuite, void * aContext)
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     lContext.mWakeEvent.Close();
 
-    const auto notifFD = lContext.mWakeEvent.GetNotifFD();
+    const auto notifFD = WakeEventTest::GetReadFD(lContext.mWakeEvent);
 
     // Check that Close() has cleaned up itself and reopen is possible
     NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.Open(lContext.mWatchableEvents) == CHIP_NO_ERROR);

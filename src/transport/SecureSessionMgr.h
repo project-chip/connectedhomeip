@@ -33,7 +33,7 @@
 #include <protocols/secure_channel/Constants.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/PairingSession.h>
 #include <transport/PeerConnections.h>
@@ -221,10 +221,10 @@ public:
      *   peer node.
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
-                          SecureSession::SessionRole direction, Transport::AdminId admin);
+                          SecureSession::SessionRole direction, FabricIndex fabric);
 
     void ExpirePairing(SecureSessionHandle session);
-    void ExpireAllPairings(NodeId peerNodeId, Transport::AdminId admin);
+    void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
 
     /**
      * @brief
@@ -239,11 +239,11 @@ public:
      * @param localNodeId           Node id for the current node
      * @param systemLayer           System, layer to use
      * @param transportMgr          Transport to use
-     * @param admins                A table of device administrators
+     * @param fabrics                A table of device administrators
      * @param messageCounterManager The message counter manager
      */
     CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                    Transport::AdminPairingTable * admins, Transport::MessageCounterManagerInterface * messageCounterManager);
+                    Transport::FabricTable * fabrics, Transport::MessageCounterManagerInterface * messageCounterManager);
 
     /**
      * @brief
@@ -261,14 +261,6 @@ public:
     void SetLocalNodeId(NodeId nodeId) { mLocalNodeId = nodeId; }
 
     NodeId GetLocalNodeId() { return mLocalNodeId; }
-
-    /**
-     * @brief
-     *   Return the transport type of current connection to the node with id peerNodeId.
-     *   'Transport::Type::kUndefined' will be returned if the connection to the specified
-     *   peer node does not exist.
-     */
-    Transport::Type GetTransportType(NodeId peerNodeId);
 
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
 
@@ -304,7 +296,7 @@ private:
 
     SecureSessionMgrDelegate * mCB                                     = nullptr;
     TransportMgrBase * mTransportMgr                                   = nullptr;
-    Transport::AdminPairingTable * mAdmins                             = nullptr;
+    Transport::FabricTable * mFabrics                                  = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;

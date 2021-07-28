@@ -26,7 +26,7 @@ BoltLockManager BoltLockManager::sLock;
 
 TimerHandle_t sLockTimer;
 
-int BoltLockManager::Init()
+CHIP_ERROR BoltLockManager::Init()
 {
     // Create FreeRTOS sw timer for lock timer.
     sLockTimer = xTimerCreate("lockTmr",        // Just a text name, not used by the RTOS kernel
@@ -39,7 +39,7 @@ int BoltLockManager::Init()
     if (sLockTimer == NULL)
     {
         ESP_LOGE(TAG, "sLockTimer timer create failed");
-        return CHIP_CONFIG_CORE_ERROR_MAX;
+        return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
     mState              = kState_LockingCompleted;

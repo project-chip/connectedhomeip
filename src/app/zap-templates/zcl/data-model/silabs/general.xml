@@ -389,7 +389,7 @@ limitations under the License.
     <attribute side="server" code="0x0003" define="SCENE_VALID" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">scene valid</attribute>
     <attribute side="server" code="0x0004" define="SCENE_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">name support</attribute>
     <!-- NAME_SUPPORT -->
-    <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="IEEE_ADDRESS" writable="false" optional="true">last configured by</attribute>
+    <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="EUI64" writable="false" optional="true">last configured by</attribute>
     <command source="client" code="0x00" name="AddScene" optional="false" cli="zcl scenes add">
       <description>
         Add a scene to the scene table. Extension field sets are supported, and are inputed as arrays of the form [[cluster ID] [length] [value0...n] ...]
@@ -492,33 +492,6 @@ limitations under the License.
       <arg name="groupId" type="INT16U"/>
       <arg name="sceneCount" type="INT8U" arrayLength="true" presentIf="status==0"/>
       <arg name="sceneList" type="INT8U" array="true" presentIf="status==0"/>
-    </command>
-  </cluster>
-  <cluster>
-    <name>On/off</name>
-    <domain>General</domain>
-    <description>Attributes and commands for switching devices between 'On' and 'Off' states.</description>
-    <code>0x0006</code>
-    <define>ON_OFF_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="ON_OFF" type="BOOLEAN" min="0x00" max="0x01" writable="false" reportable="true" default="0x00" optional="false">on/off</attribute>
-    <attribute side="server" code="0x4003" define="START_UP_ON_OFF" type="ENUM8" min="0x00" max="0xFF" writable="true" optional="true" introducedIn="l&amp;o-1.0-15-0014-04">start up on off</attribute>
-    <command source="client" code="0x00" name="Off" optional="false" cli="zcl on-off off">
-      <description>
-        Command description for Off
-      </description>
-    </command>
-    <command source="client" code="0x01" name="On" optional="false" cli="zcl on-off on">
-      <description>
-        Command description for On
-      </description>
-    </command>
-    <command source="client" code="0x02" name="Toggle" optional="false" cli="zcl on-off toggle">
-      <description>
-        Command description for Toggle
-      </description>
     </command>
   </cluster>
   <cluster>

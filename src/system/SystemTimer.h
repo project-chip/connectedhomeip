@@ -59,15 +59,7 @@ class DLL_EXPORT Timer : public Object
     friend class Layer;
 
 public:
-    /**
-     *  Represents an epoch in the local system timescale, usually the POSIX timescale.
-     *
-     *  The units are dependent on the context. If used with values returned by GetCurrentEpoch, the units are milliseconds.
-     */
-    typedef uint64_t Epoch;
-
-    static Epoch GetCurrentEpoch();
-    static bool IsEarlierEpoch(const Epoch & first, const Epoch & second);
+    static bool IsEarlier(const Clock::MonotonicMilliseconds & first, const Clock::MonotonicMilliseconds & second);
 
     typedef void (*OnCompleteFunct)(Layer * aLayer, void * aAppState, CHIP_ERROR aError);
     OnCompleteFunct OnComplete;
@@ -80,7 +72,7 @@ public:
 private:
     static ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
 
-    Epoch mAwakenEpoch;
+    Clock::MonotonicMilliseconds mAwakenTime;
 
     void HandleComplete();
 

@@ -99,7 +99,6 @@ public:
     CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && buffer) override
     {
-        ec->Close();
         return CHIP_NO_ERROR;
     }
 
@@ -361,7 +360,7 @@ int TestSecurePairing_Teardown(void * inContext);
 // clang-format off
 static nlTestSuite sSuite =
 {
-    "Test-CHIP-SecurePairing",
+    "Test-CHIP-SecurePairing-PASE",
     &sTests[0],
     TestSecurePairing_Setup,
     TestSecurePairing_Teardown,
@@ -389,11 +388,11 @@ int TestSecurePairing_Setup(void * inContext)
     if (err != CHIP_NO_ERROR)
         return FAILURE;
 
-    ctx.SetSourceNodeId(kAnyNodeId);
-    ctx.SetDestinationNodeId(kAnyNodeId);
+    ctx.SetSourceNodeId(kPlaceholderNodeId);
+    ctx.SetDestinationNodeId(kPlaceholderNodeId);
     ctx.SetLocalKeyId(0);
     ctx.SetPeerKeyId(0);
-    ctx.SetAdminId(kUndefinedAdminId);
+    ctx.SetFabricIndex(kUndefinedFabricIndex);
 
     gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());
 

@@ -65,15 +65,10 @@ public:
 
 protected:
     void * At(size_t index) { return static_cast<uint8_t *>(mElements) + mElementSize * index; }
-    size_t IndexOf(void * element)
-    {
-        std::ptrdiff_t diff = static_cast<uint8_t *>(element) - static_cast<uint8_t *>(mElements);
-        assert(diff >= 0);
-        assert(static_cast<size_t>(diff) % mElementSize == 0);
-        auto index = static_cast<size_t>(diff) / mElementSize;
-        assert(index < Capacity());
-        return index;
-    }
+    size_t IndexOf(void * element);
+
+    using Lambda = bool (*)(void *, void *);
+    bool ForEachActiveObjectInner(void * context, Lambda lambda);
 
 private:
     void * mElements;
@@ -119,33 +114,35 @@ public:
      * @brief
      *   Run a functor for each active object in the pool
      *
-     *  @param     f    The functor of type `bool (*)(T*)`, return false to break the iteration
-     *  @return    bool Returns false if broke during iteration
+     *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
+     *  @return    bool     Returns false if broke during iteration
      *
      * caution
      *   this function is not thread-safe, make sure all usage of the
      *   pool is protected by a lock, or else avoid using this function
      */
-    template <typename F>
-    bool ForEachActiveObject(F f)
+    template <typename Function>
+    bool ForEachActiveObject(Function && function)
     {
-        for (size_t word = 0; word * kBitChunkSize < Capacity(); ++word)
-        {
-            auto & usage = mUsage[word];
-            auto value   = usage.load(std::memory_order_relaxed);
-            for (size_t offset = 0; offset < kBitChunkSize && offset + word * kBitChunkSize < Capacity(); ++offset)
-            {
-                if ((value & (kBit1 << offset)) != 0)
-                {
-                    if (!f(static_cast<T *>(At(word * kBitChunkSize + offset))))
-                        return false;
-                }
-            }
-        }
-        return true;
+        LambdaProxy<Function> proxy(std::forward<Function>(function));
+        return ForEachActiveObjectInner(&proxy, &LambdaProxy<Function>::Call);
     }
 
 private:
+    template <typename Function>
+    class LambdaProxy
+    {
+    public:
+        LambdaProxy(Function && function) : mFunction(std::move(function)) {}
+        static bool Call(void * context, void * target)
+        {
+            return static_cast<LambdaProxy *>(context)->mFunction(static_cast<T *>(target));
+        }
+
+    private:
+        Function mFunction;
+    };
+
     std::atomic<tBitChunkType> mUsage[(N + kBitChunkSize - 1) / kBitChunkSize];
     alignas(alignof(T)) uint8_t mMemory[N * sizeof(T)];
 };

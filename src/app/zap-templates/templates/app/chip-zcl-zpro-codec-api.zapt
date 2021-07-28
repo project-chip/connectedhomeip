@@ -27,7 +27,7 @@ chip::System::PacketBufferHandle encode{{asCamelCased name false}}ClusterDiscove
  */
 chip::System::PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterRead{{asCamelCased name false}}Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
-{{#if (isWritableAttribute)}}
+{{#if isWritableAttribute}}
 /**
  * @brief
  *    Encode a {{parent.name}} server write command for the {{name}} attribute into buffer including the APS frame
@@ -35,7 +35,7 @@ chip::System::PacketBufferHandle encode{{asCamelCased parent.name false}}Cluster
 chip::System::PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, {{chipType}} {{asCamelCased name}});
 
 {{/if}}
-{{#if (isReportableAttribute)}}
+{{#if isReportableAttribute}}
 /**
  * @brief
  *    Encode a {{parent.name}} server configure report command for the {{name}} attribute into buffer including the APS frame

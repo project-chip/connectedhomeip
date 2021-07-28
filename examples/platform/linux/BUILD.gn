@@ -26,6 +26,10 @@ source_set("app-main") {
   sources = [
     "AppMain.cpp",
     "AppMain.h",
+    "CommissioneeShellCommands.cpp",
+    "CommissioneeShellCommands.h",
+    "ControllerShellCommands.cpp",
+    "ControllerShellCommands.h",
     "Options.cpp",
     "Options.h",
   ]

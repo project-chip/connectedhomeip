@@ -30,6 +30,7 @@
 namespace chip {
 namespace Shell {
 namespace {
+const shell * sShellInstance;
 
 int streamer_zephyr_init(streamer_t * streamer)
 {
@@ -46,13 +47,14 @@ ssize_t streamer_zephyr_read(streamer_t * streamer, char * buffer, size_t length
 ssize_t streamer_zephyr_write(streamer_t * streamer, const char * buffer, size_t length)
 {
     ARG_UNUSED(streamer);
-    for (size_t i = 0; i < length; ++i)
-        // TODO: Don't assume that UART backend is used.
-        shell_fprintf(shell_backend_uart_get_ptr(), SHELL_NORMAL, "%c", buffer[i]);
+
+    if (sShellInstance)
+        shell_fprintf(sShellInstance, SHELL_NORMAL, "%.*s", length, buffer);
+
     return length;
 }
 
-static streamer_t streamer_zephyr = {
+streamer_t sStreamer = {
     .init_cb  = streamer_zephyr_init,
     .read_cb  = streamer_zephyr_read,
     .write_cb = streamer_zephyr_write,
@@ -61,7 +63,12 @@ static streamer_t streamer_zephyr = {
 
 streamer_t * streamer_get(void)
 {
-    return &streamer_zephyr;
+    return &sStreamer;
+}
+
+void streamer_set_shell(const shell * shellInstance)
+{
+    sShellInstance = shellInstance;
 }
 
 } // namespace Shell

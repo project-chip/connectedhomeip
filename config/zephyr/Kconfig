@@ -86,6 +86,13 @@ config CHIP_ENABLE_DNSSD_SRP
 	help
 	  Enables DNS-SD SRP client support
 
+config CHIP_ENABLE_DNS_CLIENT
+	bool "Enable support for DNS client"
+	default y
+	imply OPENTHREAD_DNS_CLIENT
+	help
+	  Enables DNS client support used for resolving and browsing services.
+
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"
 	default y

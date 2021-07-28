@@ -943,6 +943,10 @@ typedef struct
     uint8_t currentPositionLiftPercentageValue;
     bool hasCurrentPositionTiltPercentageValue;
     uint8_t currentPositionTiltPercentageValue;
+    bool hasTargetPositionLiftPercent100thsValue;
+    uint16_t targetPositionLiftPercent100thsValue;
+    bool hasTargetPositionTiltPercent100thsValue;
+    uint16_t targetPositionTiltPercent100thsValue;
 #endif
 } EmberAfSceneTableEntry;
 

@@ -35,12 +35,12 @@ public:
     CHIP_ERROR ReadAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_attributes}}
-    {{#if (isWritableAttribute)}}
+    {{#if isWritableAttribute}}
     CHIP_ERROR WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value);
     {{/if}}
     {{/chip_server_cluster_attributes}}
     {{#chip_server_cluster_attributes}}
-    {{#if (isReportableAttribute)}}
+    {{#if isReportableAttribute}}
     CHIP_ERROR ConfigureAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}});
     CHIP_ERROR ReportAttribute{{asCamelCased name false}}(Callback::Cancelable * onReportCallback);
     {{/if}}

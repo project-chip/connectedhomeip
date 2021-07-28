@@ -23,6 +23,8 @@
 
 #include "AppEvent.h"
 
+#include <core/CHIPError.h>
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/timers.h" // provides FreeRTOS timer support
 
@@ -45,7 +47,7 @@ public:
         kState_UnlockingCompleted,
     } State;
 
-    int Init();
+    CHIP_ERROR Init();
     bool IsUnlocked();
     void EnableAutoRelock(bool aOn);
     void SetAutoLockDuration(uint32_t aDurationInSecs);

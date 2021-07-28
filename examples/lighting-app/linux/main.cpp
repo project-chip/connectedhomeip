@@ -88,8 +88,13 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 
 int main(int argc, char * argv[])
 {
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    if (ChipLinuxAppInit(argc, argv) != 0)
+    {
+        return -1;
+    }
+
     LightingMgr().Init();
     ChipLinuxAppMainLoop();
+
     return 0;
 }

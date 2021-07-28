@@ -22,7 +22,8 @@ menu "Demo"
 
     choice
         prompt "Device Type"
-        default DEVICE_TYPE_ESP32_DEVKITC
+        default DEVICE_TYPE_ESP32_DEVKITC if IDF_TARGET_ESP32
+        default DEVICE_TYPE_ESP32_C3_DEVKITM if IDF_TARGET_ESP32C3
         help
             Specifies the type of ESP32 device.
 

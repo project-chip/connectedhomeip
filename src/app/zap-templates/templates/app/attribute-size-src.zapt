@@ -61,7 +61,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     switch (clusterId)
     {
  {{#chip_server_clusters}}
- {{#if (chip_has_list_attributes)}}
+ {{#if (chip_server_has_list_attributes)}}
     case {{asHex code 4}}: // {{name}} Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -152,7 +152,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     switch (clusterId)
     {
 {{#chip_server_clusters}}
-{{#if (chip_has_list_attributes)}}
+{{#if (chip_server_has_list_attributes)}}
     case {{asHex code 4}}: // {{name}} Cluster
         switch (attributeId)
         {

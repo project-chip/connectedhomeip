@@ -20,28 +20,48 @@ set -e
 
 declare -i iterations=20
 declare -i background_pid=0
+declare test_case_wrapper=()
+
+usage() {
+    echo "test_suites.sh [-a APPLICATION] [-i ITERATIONS] [-h] [-s CASE_NAME] [-w COMMAND]"
+    echo "  -a APPLICATION: runs chip-tool against 'chip-<APPLICATION>-app' (default: all-clusters)"
+    echo "  -i ITERATIONS: number of iterations to run (default: $iterations)"
+    echo "  -h: this help message"
+    echo "  -s CASE_NAME: runs single test case name (e.g. Test_TC_OO_2_2"
+    echo "                for Test_TC_OO_2_2.yaml) (by default, all are run)"
+    echo "  -w COMMAND: prefix all instantiations with a command (e.g. valgrind) (default: '')"
+    echo ""
+    exit 0
+}
 
 # read shell arguments
-# - a for application
-# - i for number of iterations you want to have
-while getopts a:i: flag; do
+while getopts a:i:hs:w: flag; do
     case "$flag" in
         a) application=$OPTARG ;;
         i) iterations=$OPTARG ;;
+        h) usage ;;
+        s) single_case=$OPTARG ;;
+        w) test_case_wrapper=("$OPTARG") ;;
     esac
 done
 
-echo "Running tests for application: $application, with iterations set to: $iterations"
-
 if [[ $application == "tv" ]]; then
-    declare -a test_array="($(find src/app/tests/suites -type f -name "TV_*.yaml" -exec basename {} .yaml \;))"
+    declare test_filenames="${single_case-TV_*}.yaml"
     cp examples/tv-app/linux/include/endpoint-configuration/chip_tv_config.ini /tmp/chip_tv_config.ini
 # in case there's no application argument
 # always default to all-cluters app
 else
     application="all-clusters"
-    declare -a test_array="($(find src/app/tests/suites -type f -name "Test*.yaml" -exec basename {} .yaml \;))"
+    declare test_filenames="${single_case-Test*}.yaml"
 fi
+declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -exec basename {} .yaml \;))"
+
+if [[ $iterations == 0 ]]; then
+    echo "Invalid iteration count: '$1'"
+    exit 1
+fi
+
+echo "Running tests for application: $application, with iterations set to: $iterations"
 
 cleanup() {
     if [[ $background_pid != 0 ]]; then
@@ -50,11 +70,6 @@ cleanup() {
     fi
 }
 trap cleanup EXIT
-
-if [[ $iterations == 0 ]]; then
-    echo "Invalid iteration count: '$1'"
-    exit 1
-fi
 
 echo "Found tests:"
 for i in "${test_array[@]}"; do
@@ -94,7 +109,7 @@ for j in "${iter_array[@]}"; do
         touch /tmp/"$application"-log
         rm -rf /tmp/pid
         (
-            stdbuf -o0 out/debug/standalone/chip-"$application"-app &
+            stdbuf -o0 "${test_case_wrapper[@]}" out/debug/standalone/chip-"$application"-app &
             echo $! >&3
         ) 3>/tmp/pid | tee /tmp/"$application"-log &
         while ! grep -q "Server Listening" /tmp/"$application"-log; do
@@ -106,13 +121,13 @@ for j in "${iter_array[@]}"; do
         # the data is there yet.
         background_pid="$(</tmp/pid)"
         echo "          * Pairing to device"
-        out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 11097
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 5540
         echo "          * Starting test run: $i"
-        out/debug/standalone/chip-tool tests "$i"
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i"
         # Prevent cleanup trying to kill a process we already killed.
         temp_background_pid=$background_pid
         background_pid=0
-        kill -9 "$temp_background_pid" || true
+        kill -9 "$temp_background_pid"
         echo "  ===== Test complete: $i"
     done
     echo " ===== Iteration $j completed"

@@ -67,7 +67,6 @@ public:
                                  System::PacketBufferHandle && buffer) override
     {
         IsOnMessageReceivedCalled = true;
-        ec->Close();
         return CHIP_NO_ERROR;
     }
 
@@ -85,11 +84,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnResponseTimeout(ExchangeContext * ec) override
-    {
-        IsOnResponseTimeoutCalled = true;
-        ec->Close();
-    }
+    void OnResponseTimeout(ExchangeContext * ec) override { IsOnResponseTimeoutCalled = true; }
 
     bool IsOnResponseTimeoutCalled = false;
 };
@@ -138,8 +133,8 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
                            SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !receiveDelegate.IsOnMessageReceivedCalled);
-
     ec1->Close();
+
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -208,12 +203,13 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
                      SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
+    ec1 = ctx.NewExchangeToPeer(&mockSolicitedAppDelegate);
+
     // send a good packet
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
-    ec1->Close();
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }

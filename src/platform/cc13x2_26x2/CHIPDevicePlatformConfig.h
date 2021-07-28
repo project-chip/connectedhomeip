@@ -39,6 +39,8 @@
 
 // ========== CHIP Platform Configuration =========
 
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (5120)
+
 #define BLEMANAGER_EVENT_HANDLER_STACK_SIZE (4096)
 #define BLEMANAGER_EVENT_HANDLER_PRIORITY (2)
 

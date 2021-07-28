@@ -19,7 +19,9 @@ on:
 
 concurrency:
     group: ${{ github.workflow }}
-    cancel-in-progress: true
+    # Don't cancel an already-running bloat check just because it took more
+    # than 5 minutes to run and our cron job is trying to schedule a new one.
+    cancel-in-progress: false
   
 jobs:
     pull_request_update:

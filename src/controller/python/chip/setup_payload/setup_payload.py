@@ -62,9 +62,9 @@ class SetupPayload:
 
         return self
 
-    def PrintOnboardingCodes(self, passcode, vendorId, productId, discriminator, customFlow, capabilities):
+    def PrintOnboardingCodes(self, passcode, vendorId, productId, discriminator, customFlow, capabilities, version):
         self.Clear()
-        err = self.chipLib.pychip_SetupPayload_PrintOnboardingCodes(passcode, vendorId, productId, discriminator, customFlow, capabilities)
+        err = self.chipLib.pychip_SetupPayload_PrintOnboardingCodes(passcode, vendorId, productId, discriminator, customFlow, capabilities, version)
 
         if err != 0:
             raise ChipStackError(err)
@@ -104,4 +104,4 @@ class SetupPayload:
                    [c_char_p, SetupPayload.AttributeVisitor, SetupPayload.VendorAttributeVisitor])
         setter.Set("pychip_SetupPayload_PrintOnboardingCodes",
                    c_int32,
-                   [c_uint32, c_uint16, c_uint16, c_uint16, uint8_t, uint8_t])
+                   [c_uint32, c_uint16, c_uint16, c_uint16, uint8_t, uint8_t, uint8_t])

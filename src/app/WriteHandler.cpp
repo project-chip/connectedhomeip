@@ -21,6 +21,7 @@
 #include <app/MessageDef/EventPath.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
+#include <support/TypeTraits.h>
 
 namespace chip {
 namespace app {
@@ -28,8 +29,6 @@ CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
 {
     VerifyOrReturnError(apDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeCtx = nullptr;
-    mpDelegate    = apDelegate;
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -49,18 +48,8 @@ void WriteHandler::Shutdown()
 {
     VerifyOrReturn(mState != State::Uninitialized);
     mMessageWriter.Reset();
-    ClearExistingExchangeContext();
-    mpDelegate = nullptr;
+    mpExchangeCtx = nullptr;
     ClearState();
-}
-
-void WriteHandler::ClearExistingExchangeContext()
-{
-    if (mpExchangeCtx != nullptr)
-    {
-        mpExchangeCtx->Close();
-        mpExchangeCtx = nullptr;
-    }
 }
 
 CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
@@ -257,8 +246,7 @@ CHIP_ERROR WriteHandler::AddAttributeStatusCode(const AttributePathParams & aAtt
 
     statusElementBuilder = attributeStatusElement.CreateStatusElementBuilder();
     statusElementBuilder
-        .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(),
-                             Protocols::InteractionModel::ToUint16(aProtocolCode))
+        .EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), chip::to_underlying(aProtocolCode))
         .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);

@@ -497,7 +497,7 @@ bool HandleNonOptionArgs(const char * aProgram, int argc, char * argv[])
 
 static void PrintReceivedStats(const TransferStats & aStats)
 {
-    printf("%u/%u received\n", aStats.mReceive.mActual, aStats.mReceive.mExpected);
+    printf("%" PRIu32 "/%" PRIu32 "received\n", aStats.mReceive.mActual, aStats.mReceive.mExpected);
 }
 
 static bool HandleDataReceived(const PacketBufferHandle & aBuffer, bool aCheckBuffer, uint8_t aFirstValue)
@@ -891,8 +891,8 @@ void DriveSend()
 
             sTestState.mStats.mTransmit.mActual += lSendSize;
 
-            printf("%u/%u transmitted to %s\n", sTestState.mStats.mTransmit.mActual, sTestState.mStats.mTransmit.mExpected,
-                   sDestinationString);
+            printf("%" PRIu32 "/%" PRIu32 "transmitted to %s\n", sTestState.mStats.mTransmit.mActual,
+                   sTestState.mStats.mTransmit.mExpected, sDestinationString);
         }
     }
 
@@ -937,6 +937,7 @@ static void StartTest()
 
     // Allocate the endpoints for sending or receiving.
 
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
     if (gOptFlags & kOptFlagUseRawIP)
     {
         lStatus = gInet.NewRawEndPoint(lIPVersion, lIPProtocol, &sRawIPEndPoint);
@@ -948,7 +949,9 @@ static void StartTest()
             INET_FAIL_ERROR(lStatus, "RawEndPoint::BindInterface failed");
         }
     }
-    else if (gOptFlags & kOptFlagUseUDPIP)
+    else
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
+        if (gOptFlags & kOptFlagUseUDPIP)
     {
         lStatus = gInet.NewUDPEndPoint(&sUDPIPEndPoint);
         INET_FAIL_ERROR(lStatus, "InetLayer::NewUDPEndPoint failed");
@@ -962,6 +965,7 @@ static void StartTest()
 
     if (Common::IsReceiver())
     {
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
         if (gOptFlags & kOptFlagUseRawIP)
         {
             lStatus = sRawIPEndPoint->Bind(lIPAddressType, lAddress);
@@ -976,7 +980,9 @@ static void StartTest()
             lStatus = sRawIPEndPoint->Listen(HandleRawMessageReceived, HandleRawReceiveError);
             INET_FAIL_ERROR(lStatus, "RawEndPoint::Listen failed");
         }
-        else if (gOptFlags & kOptFlagUseUDPIP)
+        else
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
+            if (gOptFlags & kOptFlagUseUDPIP)
         {
             lStatus = sUDPIPEndPoint->Bind(lIPAddressType, IPAddress::Any, kUDPPort);
             INET_FAIL_ERROR(lStatus, "UDPEndPoint::Bind failed");

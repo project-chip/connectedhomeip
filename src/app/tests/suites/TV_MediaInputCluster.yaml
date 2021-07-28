@@ -36,6 +36,12 @@ tests:
               - name: "index"
                 value: 1
 
+    - label: "Read current input list"
+      command: "readAttribute"
+      attribute: "current media input"
+      response:
+          value: 1
+
     - label: "Hide Input Status Command"
       command: "HideInputStatus"
 

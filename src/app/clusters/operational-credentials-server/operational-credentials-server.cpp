@@ -20,7 +20,7 @@
  * @brief Implementation for the Operational Credentials Cluster
  ***************************************************************************/
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
@@ -37,7 +37,7 @@
 #include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
 #include <support/logging/CHIPLogging.h>
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -45,12 +45,12 @@ using namespace ::chip::Transport;
 
 /*
  * Temporary flow for fabric management until addOptCert + fabric index are implemented:
- * 1) When Commissioner pairs with CHIP device, store device nodeId in Admin Pairing table as NodeId
- *    and store commissioner nodeId in Admin Pairing table as FabricId (This is temporary until AddOptCert is implemented and
+ * 1) When Commissioner pairs with CHIP device, store device nodeId in Fabric table as NodeId
+ *    and store commissioner nodeId in Fabric table as FabricId (This is temporary until AddOptCert is implemented and
  * Fabrics are implemented correctely) 2) When pairing is complete, commissioner calls SetFabric to set the vendorId on the newly
- * created fabric. The corresponding fabric is found by looking in admin pairing table and finding a fabric that has the matching
+ * created fabric. The corresponding fabric is found by looking in fabric table and finding a fabric that has the matching
  * commissioner node ID as fabricId + device nodeId as nodeId and an uninitialized vendorId. 3) RemoveFabric uses the passed in
- * fabricId, nodeId, vendorID to find matching entry and remove it from admin pairing table. Once fabricIndex is implemented, it
+ * fabricId, nodeId, vendorID to find matching entry and remove it from fabric table. Once fabricIndex is implemented, it
  * should use that instead.
  */
 
@@ -95,32 +95,32 @@ EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, c
     }
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                   "OpCreds: Writing admin into attribute store at index %d: fabricId 0x" ChipLogFormatX64
+                   "OpCreds: Writing fabric into attribute store at index %d: fabricId 0x" ChipLogFormatX64
                    ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
                    index, ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
     status = writeFabricAttribute((uint8_t *) &fabricDescriptor, index);
     return status;
 }
 
-CHIP_ERROR writeAdminsIntoFabricsListAttribute()
+CHIP_ERROR writeFabricsIntoFabricsListAttribute()
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to writeAdminsIntoFabricsListAttribute");
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Call to writeFabricsIntoFabricsListAttribute");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Loop through admins
+    // Loop through fabrics
     int32_t fabricIndex = 0;
-    for (auto & pairing : GetGlobalAdminPairingTable())
+    for (auto & pairing : GetGlobalFabricTable())
     {
         NodeId nodeId               = pairing.GetNodeId();
         uint64_t fabricId           = pairing.GetFabricId();
         uint16_t vendorId           = pairing.GetVendorId();
         const uint8_t * fabricLabel = pairing.GetFabricLabel();
 
-        // Skip over uninitialized admins
+        // Skip over uninitialized fabrics
         if (nodeId == kUndefinedNodeId || fabricId == kUndefinedFabricId || vendorId == kUndefinedVendorId)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                           "OpCreds: Skipping over unitialized admin with fabricId 0x" ChipLogFormatX64
+                           "OpCreds: Skipping over unitialized fabric with fabricId 0x" ChipLogFormatX64
                            ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
                            ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
             continue;
@@ -128,7 +128,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
         else if (writeFabric(fabricId, nodeId, vendorId, fabricLabel, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                           "OpCreds: Failed to write admin with fabricId 0x" ChipLogFormatX64 " in fabrics list",
+                           "OpCreds: Failed to write fabric with fabricId 0x" ChipLogFormatX64 " in fabrics list",
                            ChipLogValueX64(fabricId));
             err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
             break;
@@ -137,10 +137,10 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
     }
 
     // Store the count of fabrics we just stored
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Stored %" PRIu32 " admins in fabrics list attribute.", fabricIndex);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Stored %" PRIu32 " fabrics in fabrics list attribute.", fabricIndex);
     if (writeFabricAttribute((uint8_t *) &fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write admin count %" PRIu32 " in fabrics list", fabricIndex);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabric count %" PRIu32 " in fabrics list", fabricIndex);
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
@@ -149,96 +149,98 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
 
 /*
  * Look at "Temporary flow for fabric management" comment above for current fabric management flow.
- * To retrieve the current admin, we retrieve the emberAfCurrentCommand()->source which should be set
+ * To retrieve the current fabric, we retrieve the emberAfCurrentCommand()->source which should be set
  * to the commissioner node Id, which we are temporarily using as the fabricId.
  * We should also figure out how to retrieve the device nodeId and vendorId if we can so that we use multiple
- * fields to find the current admin. Once addOptCert and fabric index are implemented, remove all this and use fabricIndex.
+ * fields to find the current fabric. Once addOptCert and fabric index are implemented, remove all this and use fabricIndex.
  */
 
-static AdminPairingInfo * retrieveCurrentAdmin()
+static FabricInfo * retrieveCurrentFabric()
 {
     uint64_t fabricId = emberAfCurrentCommand()->SourceNodeId();
-    // TODO: Figure out how to get device node id so we can do FindAdminForNode(fabricId, nodeId)...
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding admin with fabricId 0x" ChipLogFormatX64 ".", ChipLogValueX64(fabricId));
-    return GetGlobalAdminPairingTable().FindAdminForNode(fabricId);
+    // TODO: Figure out how to get device node id so we can do FindFabricForNode(fabricId, nodeId)...
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricId 0x" ChipLogFormatX64 ".",
+                   ChipLogValueX64(fabricId));
+    return GetGlobalFabricTable().FindFabricForNode(fabricId);
 }
 
-// TODO: The code currently has two sources of truths for admins, the pairing table + the attributes. There should only be one,
-// the attributes list. Currently the attributes are not persisted so we are keeping the admin pairing table to have the
+// TODO: The code currently has two sources of truths for fabrics, the pairing table + the attributes. There should only be one,
+// the attributes list. Currently the attributes are not persisted so we are keeping the fabric table to have the
 // fabrics/admrins be persisted. Once attributes are persisted, there should only be one sorce of truth, the attributes list and
 // only that should be modifed to perosst/read/write fabrics.
-// TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove adminPairingTable
+// TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove fabricPairingTable
 // logic.
-class OpCredsAdminPairingTableDelegate : public AdminPairingTableDelegate
+class OpCredsFabricTableDelegate : public FabricTableDelegate
 {
 
     // Gets called when a fabric is deleted from KVS store
-    void OnAdminDeletedFromStorage(AdminId adminId) override
+    void OnFabricDeletedFromStorage(FabricIndex fabricId) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Admin 0x%" PRIX16 " was deleted from admin storage.", adminId);
-        writeAdminsIntoFabricsListAttribute();
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%" PRIX16 " was deleted from fabric storage.", fabricId);
+        writeFabricsIntoFabricsListAttribute();
     }
 
-    // Gets called when a fabric is loaded into the AdminPairingTable from KVS store.
-    void OnAdminRetrievedFromStorage(AdminPairingInfo * admin) override
+    // Gets called when a fabric is loaded into the FabricTable from KVS store.
+    void OnFabricRetrievedFromStorage(FabricInfo * fabric) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Admin 0x%" PRIX16 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
+                       "OpCreds: Fabric 0x%" PRIX16 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       admin->GetAdminId(), ChipLogValueX64(admin->GetFabricId()), ChipLogValueX64(admin->GetNodeId()),
-                       admin->GetVendorId());
-        writeAdminsIntoFabricsListAttribute();
+                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
+                       fabric->GetVendorId());
+        writeFabricsIntoFabricsListAttribute();
     }
 
-    // Gets called when a fabric in AdminPairingTable is persisted to KVS store.
-    void OnAdminPersistedToStorage(AdminPairingInfo * admin) override
+    // Gets called when a fabric in FabricTable is persisted to KVS store.
+    void OnFabricPersistedToStorage(FabricInfo * fabric) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Admin %" PRIX16 " was persisted to storage. FabricId %0x" ChipLogFormatX64
+                       "OpCreds: Fabric %" PRIX16 " was persisted to storage. FabricId %0x" ChipLogFormatX64
                        ", NodeId %0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       admin->GetAdminId(), ChipLogValueX64(admin->GetFabricId()), ChipLogValueX64(admin->GetNodeId()),
-                       admin->GetVendorId());
-        writeAdminsIntoFabricsListAttribute();
+                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
+                       fabric->GetVendorId());
+        writeFabricsIntoFabricsListAttribute();
     }
 };
 
-OpCredsAdminPairingTableDelegate gAdminDelegate;
+OpCredsFabricTableDelegate gFabricDelegate;
 
 void emberAfPluginOperationalCredentialsServerInitCallback(void)
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster by writing fabrics list from admin pairing table.");
-    GetGlobalAdminPairingTable().SetAdminPairingDelegate(&gAdminDelegate);
-    writeAdminsIntoFabricsListAttribute();
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.");
+    GetGlobalFabricTable().SetFabricDelegate(&gFabricDelegate);
+    writeFabricsIntoFabricsListAttribute();
 }
 
 // TODO: Use FabricIndex as a parameter instead of fabricId/nodeId/vendorId once AddOptCert + FabricIndex are implemented
-bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command * commandObj, chip::FabricId fabricId,
-                                                              chip::NodeId nodeId, uint16_t vendorId)
+bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                              chip::FabricId fabricId, chip::NodeId nodeId, uint16_t vendorId)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    AdminPairingInfo * admin;
-    AdminId adminId;
+    FabricInfo * fabric;
+    FabricIndex fabricIndex;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Fetch matching admin
-    admin = GetGlobalAdminPairingTable().FindAdminForNode(fabricId, nodeId, vendorId);
-    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_SUCCESS); // Admin has already been removed
+    // Fetch matching fabric
+    fabric = GetGlobalFabricTable().FindFabricForNode(fabricId, nodeId, vendorId);
+    VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_SUCCESS); // Fabric has already been removed
 
-    // Delete admin
-    adminId = admin->GetAdminId();
-    err     = GetGlobalAdminPairingTable().Delete(adminId);
+    // Delete fabric
+    fabricIndex = fabric->GetFabricIndex();
+    err         = GetGlobalFabricTable().Delete(fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
-    writeAdminsIntoFabricsListAttribute();
+    writeFabricsIntoFabricsListAttribute();
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
 // TODO: remove SetFabric once AddOptCert + FabricIndex are implemented
-bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * commandObj, uint16_t VendorId)
+bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                           uint16_t VendorId)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: SetFabric with vendorId %" PRIX16, VendorId);
 
@@ -246,14 +248,14 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
     EmberStatus sendStatus = EMBER_SUCCESS;
     CHIP_ERROR err         = CHIP_NO_ERROR;
 
-    // Fetch current admin
-    AdminPairingInfo * admin = retrieveCurrentAdmin();
-    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+    // Fetch current fabric
+    FabricInfo * fabric = retrieveCurrentFabric();
+    VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
     // Store vendorId
-    admin->SetVendorId(VendorId);
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: vendorId is now set %" PRIX16, admin->GetVendorId());
-    err = GetGlobalAdminPairingTable().Store(admin->GetAdminId());
+    fabric->SetVendorId(VendorId);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: vendorId is now set %" PRIX16, fabric->GetVendorId());
+    err = GetGlobalFabricTable().Store(fabric->GetFabricIndex());
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
     // Return FabricId - we are temporarily using commissioner nodeId (retrieved via emberAfCurrentCommand()->SourceNodeId()) as
@@ -289,7 +291,8 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, uint8_t * Label)
+bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::EndpointId endpoint,
+                                                                   chip::app::CommandHandler * commandObj, uint8_t * Label)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
 
@@ -297,19 +300,19 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Co
     CHIP_ERROR err;
 
     // Fetch current fabric
-    AdminPairingInfo * admin = retrieveCurrentAdmin();
-    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+    FabricInfo * fabric = retrieveCurrentFabric();
+    VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
     // Set Label on fabric
-    err = admin->SetFabricLabel(Label);
+    err = fabric->SetFabricLabel(Label);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
     // Persist updated fabric
-    err = GetGlobalAdminPairingTable().Store(admin->GetAdminId());
+    err = GetGlobalFabricTable().Store(fabric->GetFabricIndex());
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
-    writeAdminsIntoFabricsListAttribute();
+    writeFabricsIntoFabricsListAttribute();
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
@@ -317,12 +320,12 @@ exit:
 namespace {
 void DoRemoveAllFabrics(intptr_t)
 {
-    OpenDefaultPairingWindow(ResetAdmins::kYes);
+    OpenDefaultPairingWindow(ResetFabrics::kYes);
 }
 } // namespace
 
 // Up for discussion in Multi-Admin TT: chip-spec:#2891
-bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::Command * commandObj)
+bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Remove all Fabrics");
     PlatformMgr().ScheduleWork(DoRemoveAllFabrics, 0);
@@ -330,19 +333,19 @@ bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::Com
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOCArray,
-                                                           chip::ByteSpan IPKValue, chip::NodeId CaseAdminNode,
-                                                           uint16_t AdminVendorId)
+bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                           chip::ByteSpan NOCArray, chip::ByteSpan IPKValue,
+                                                           chip::NodeId CaseAdminNode, uint16_t AdminVendorId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added an Op Cert");
 
-    AdminPairingInfo * admin = retrieveCurrentAdmin();
-    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+    FabricInfo * fabric = retrieveCurrentFabric();
+    VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
-    VerifyOrExit(admin->SetOperationalCertsFromCertArray(NOCArray) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(GetGlobalAdminPairingTable().Store(admin->GetAdminId()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(fabric->SetOperationalCertsFromCertArray(NOCArray) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(GetGlobalFabricTable().Store(fabric->GetFabricIndex()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
     // We have a new operational identity and should start advertising it.  We
     // can't just wait until we get network configuration commands, because we
@@ -360,7 +363,8 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::Command * commandObj, chip::ByteSpan CSRNonce)
+bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                              chip::ByteSpan CSRNonce)
 {
     EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
     EmberStatus sendStatus = EMBER_SUCCESS;
@@ -376,20 +380,20 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::Command
 
     TLV::TLVWriter * writer = nullptr;
 
-    // Fetch current admin
-    AdminPairingInfo * admin = retrieveCurrentAdmin();
-    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+    // Fetch current fabric
+    FabricInfo * fabric = retrieveCurrentFabric();
+    VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
     VerifyOrExit(csr.Alloc(Crypto::kMAX_CSR_Length), status = EMBER_ZCL_STATUS_FAILURE);
 
-    if (admin->GetOperationalKey() == nullptr)
+    if (fabric->GetOperationalKey() == nullptr)
     {
         Crypto::P256Keypair keypair;
         keypair.Initialize();
-        VerifyOrExit(admin->SetOperationalKey(keypair) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+        VerifyOrExit(fabric->SetOperationalKey(keypair) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
     }
 
-    err = admin->GetOperationalKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
+    err = fabric->GetOperationalKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: NewCertificateSigningRequest returned %d", err);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(csrLength < UINT8_MAX, status = EMBER_ZCL_STATUS_FAILURE);
@@ -424,27 +428,28 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterUpdateOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOC,
-                                                              chip::ByteSpan ICACertificate)
+bool emberAfOperationalCredentialsClusterUpdateOpCertCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                              chip::ByteSpan NOC, chip::ByteSpan ICACertificate)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(chip::app::Command * commandObj,
+bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(chip::EndpointId endpoint,
+                                                                           chip::app::CommandHandler * commandObj,
                                                                            chip::ByteSpan RootCertificate)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
 
-    // Fetch current admin
-    AdminPairingInfo * admin = retrieveCurrentAdmin();
-    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(admin->SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    // Fetch current fabric
+    FabricInfo * fabric = retrieveCurrentFabric();
+    VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(fabric->SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
-    VerifyOrExit(GetGlobalAdminPairingTable().Store(admin->GetAdminId()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(GetGlobalFabricTable().Store(fabric->GetFabricIndex()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
     emberAfSendImmediateDefaultResponse(status);
@@ -456,7 +461,8 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(chip::app::Command * commandObj,
+bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(chip::EndpointId endpoint,
+                                                                              chip::app::CommandHandler * commandObj,
                                                                               chip::ByteSpan TrustedRootIdentifier)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;

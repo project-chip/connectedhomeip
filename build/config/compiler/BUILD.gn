@@ -161,9 +161,27 @@ config("disabled_warnings") {
   }
 }
 
+config("warnings_common") {
+  cflags = [ "-Wall" ]
+
+  ldflags = []
+  if (treat_warnings_as_errors) {
+    cflags += [ "-Werror" ]
+    ldflags += [ "-Werror" ]
+  }
+
+  if (current_os != "mac" && current_os != "ios") {
+    ldflags += [ "-Wl,--fatal-warnings" ]
+  }
+
+  if (current_os != "mac" && current_os != "ios" && current_os != "linux" &&
+      current_os != "win") {
+    cflags += [ "-Wstack-usage=8192" ]
+  }
+}
+
 config("strict_warnings") {
   cflags = [
-    "-Wall",
     "-Wextra",
     "-Wshadow",
     "-Wunreachable-code",
@@ -172,11 +190,6 @@ config("strict_warnings") {
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
   ldflags = []
-
-  if (treat_warnings_as_errors) {
-    cflags += [ "-Werror" ]
-    ldflags += [ "-Werror" ]
-  }
 
   if (is_clang) {
     cflags += [
@@ -193,18 +206,27 @@ config("strict_warnings") {
 
 config("warnings_default") {
   configs = [
+    ":warnings_common",
     ":strict_warnings",
     ":disabled_warnings",
   ]
+}
 
-  if (current_os != "mac" && current_os != "ios") {
-    ldflags = [ "-Wl,--fatal-warnings" ]
-  }
+config("disabled_warnings_third_party") {
+  cflags = [
+    "-Wno-unused",
+    "-Wno-format",
+    "-Wno-maybe-uninitialized",
+    "-Wno-address",
+  ]
+}
 
-  if (current_os != "mac" && current_os != "ios" && current_os != "linux" &&
-      current_os != "win") {
-    cflags = [ "-Wstack-usage=8192" ]
-  }
+config("warnings_third_party") {
+  configs = [
+    ":warnings_common",
+    ":disabled_warnings",
+    ":disabled_warnings_third_party",
+  ]
 }
 
 config("symbols_default") {

@@ -2,22 +2,18 @@
 
 ## Introduction
 
-CHIPCryptoPALHsm_SE05X.cpp file provides the integration of secure element
+CHIPCryptoPALHsm*SE05X*\*.cpp file provides the integration of secure element
 (SE05x) in crypto layer of CHIP stack. By enabling the required directives in
 CHIPCryptoPALHsm_config.h header file, required crypto operations can be
 performed using SE05x. By default, the secure element is enabled only for PAKE
-(Verifier role) operations.
+(Verifier/Prover role) operations and HKDF.
 
-Following table shows the operations supported by secure element.
+Following are the list operations supported by secure element.
 
-+-------------------------+-----------+----------------+---------------------------------+------------+----------------------------+
-| Operation | Software | Default config | Note | Re-entrant | Directive to
-enabled in | | | fallback | value | | | CHIPCryptoPALHsm_config.h |
-+-------------------------+-----------+----------------+---------------------------------+------------+----------------------------+
-| SPAKE Verifier | No | Enabled | - | No | ENABLE_HSM_SPAKE_VERIFIER |
-+-------------------------+-----------+----------------+---------------------------------+------------+----------------------------+
-| SPAKE Prover | No | Enabled | - | No | ENABLE_HSM_SPAKE_PROVER |
-+-------------------------+-----------+----------------+---------------------------------+------------+----------------------------+
+    1. PAKE
+    2. ECC KEY - P256 (Disabled by default)
+    3. PBKDF (Disabled by default)
+    4. HKDF
 
 ## Build
 
@@ -25,7 +21,7 @@ enabled in | | | fallback | value | | | CHIPCryptoPALHsm_config.h |
     layer,
 
 ```
-smcom=\"t1oi2c\" chip_with_se05x=1
+chip_with_se05x=1 host = "host_k32w"
 ```
 
 ## Known Limitations:

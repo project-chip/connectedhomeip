@@ -1,0 +1,41 @@
+{{>header}}
+
+/**
+ *  @file
+ *    This file contains declarations for accessors around clusters attributes.
+ */
+
+#pragma once
+
+#include <app/util/af-types.h>
+#include <lib/support/Span.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+{{#zcl_clusters}}
+{{#zcl_attributes_server}}
+{{#if (hasSpecificAttributes)}}
+{{#first}}
+namespace {{asUpperCamelCase parent.label}} {
+namespace Attributes {
+{{/first}}
+{{#if clusterRef}}
+{{#if (canHaveSimpleAccessors type)}}
+EmberAfStatus Get{{asUpperCamelCase label}}(chip::EndpointId endpoint, {{asUnderlyingZclType type}} * {{asLowerCamelCase label}}); // {{type}} {{isArray}}
+EmberAfStatus Set{{asUpperCamelCase label}}(chip::EndpointId endpoint, {{asUnderlyingZclType type}} {{asLowerCamelCase label}});
+{{/if}}
+{{/if}}
+{{#last}}
+} // namespace Attributes
+} // {{asUpperCamelCase parent.label}}
+
+{{/last}}
+{{/if}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
+
+} // Clusters
+} // app
+} // chip

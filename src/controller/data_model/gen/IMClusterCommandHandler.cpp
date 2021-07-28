@@ -40,7 +40,8 @@ namespace clusters {
 
 namespace AccountLogin {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -110,8 +111,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfAccountLoginClusterGetSetupPINResponseCallback(apCommandObj, const_cast<uint8_t *>(setupPIN));
+                wasHandled = emberAfAccountLoginClusterGetSetupPINResponseCallback(aEndpointId, apCommandObj,
+                                                                                   const_cast<uint8_t *>(setupPIN));
             }
             break;
         }
@@ -141,7 +142,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -149,7 +155,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace ApplicationLauncher {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -223,9 +230,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled =
-                    emberAfApplicationLauncherClusterLaunchAppResponseCallback(apCommandObj, status, const_cast<uint8_t *>(data));
+                wasHandled = emberAfApplicationLauncherClusterLaunchAppResponseCallback(aEndpointId, apCommandObj, status,
+                                                                                        const_cast<uint8_t *>(data));
             }
             break;
         }
@@ -255,7 +261,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -263,7 +274,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace ContentLauncher {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -337,9 +349,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfContentLauncherClusterLaunchContentResponseCallback(apCommandObj, const_cast<uint8_t *>(data),
-                                                                                        contentLaunchStatus);
+                wasHandled = emberAfContentLauncherClusterLaunchContentResponseCallback(
+                    aEndpointId, apCommandObj, const_cast<uint8_t *>(data), contentLaunchStatus);
             }
             break;
         }
@@ -402,9 +413,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfContentLauncherClusterLaunchURLResponseCallback(apCommandObj, const_cast<uint8_t *>(data),
-                                                                                    contentLaunchStatus);
+                wasHandled = emberAfContentLauncherClusterLaunchURLResponseCallback(
+                    aEndpointId, apCommandObj, const_cast<uint8_t *>(data), contentLaunchStatus);
             }
             break;
         }
@@ -434,7 +444,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -442,7 +457,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace DoorLock {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -511,8 +527,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterClearAllPinsResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterClearAllPinsResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -570,8 +585,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterClearAllRfidsResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterClearAllRfidsResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -629,8 +643,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterClearHolidayScheduleResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterClearHolidayScheduleResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -688,8 +701,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterClearPinResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterClearPinResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -747,8 +759,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterClearRfidResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterClearRfidResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -806,8 +817,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -865,8 +875,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterClearYeardayScheduleResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterClearYeardayScheduleResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -940,9 +949,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
                 wasHandled = emberAfDoorLockClusterGetHolidayScheduleResponseCallback(
-                    apCommandObj, scheduleId, status, localStartTime, localEndTime, operatingModeDuringHoliday);
+                    aEndpointId, apCommandObj, scheduleId, status, localStartTime, localEndTime, operatingModeDuringHoliday);
             }
             break;
         }
@@ -1025,9 +1033,9 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 7 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterGetLogRecordResponseCallback(
-                    apCommandObj, logEntryId, timestamp, eventType, source, eventIdOrAlarmCode, userId, const_cast<uint8_t *>(pin));
+                wasHandled = emberAfDoorLockClusterGetLogRecordResponseCallback(aEndpointId, apCommandObj, logEntryId, timestamp,
+                                                                                eventType, source, eventIdOrAlarmCode, userId,
+                                                                                const_cast<uint8_t *>(pin));
             }
             break;
         }
@@ -1098,8 +1106,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterGetPinResponseCallback(apCommandObj, userId, userStatus, userType,
+                wasHandled = emberAfDoorLockClusterGetPinResponseCallback(aEndpointId, apCommandObj, userId, userStatus, userType,
                                                                           const_cast<uint8_t *>(pin));
             }
             break;
@@ -1171,8 +1178,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterGetRfidResponseCallback(apCommandObj, userId, userStatus, userType,
+                wasHandled = emberAfDoorLockClusterGetRfidResponseCallback(aEndpointId, apCommandObj, userId, userStatus, userType,
                                                                            const_cast<uint8_t *>(rfid));
             }
             break;
@@ -1235,8 +1241,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterGetUserTypeResponseCallback(apCommandObj, userId, userType);
+                wasHandled = emberAfDoorLockClusterGetUserTypeResponseCallback(aEndpointId, apCommandObj, userId, userType);
             }
             break;
         }
@@ -1322,9 +1327,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 8 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
                 wasHandled = emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(
-                    apCommandObj, scheduleId, userId, status, daysMask, startHour, startMinute, endHour, endMinute);
+                    aEndpointId, apCommandObj, scheduleId, userId, status, daysMask, startHour, startMinute, endHour, endMinute);
             }
             break;
         }
@@ -1398,9 +1402,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterGetYeardayScheduleResponseCallback(apCommandObj, scheduleId, userId, status,
-                                                                                      localStartTime, localEndTime);
+                wasHandled = emberAfDoorLockClusterGetYeardayScheduleResponseCallback(aEndpointId, apCommandObj, scheduleId, userId,
+                                                                                      status, localStartTime, localEndTime);
             }
             break;
         }
@@ -1458,8 +1461,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterLockDoorResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterLockDoorResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -1517,8 +1519,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterSetHolidayScheduleResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterSetHolidayScheduleResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -1576,8 +1577,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterSetPinResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterSetPinResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -1635,8 +1635,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterSetRfidResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterSetRfidResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -1694,8 +1693,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterSetUserTypeResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterSetUserTypeResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -1753,8 +1751,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -1812,8 +1809,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterSetYeardayScheduleResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterSetYeardayScheduleResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -1871,8 +1867,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterUnlockDoorResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterUnlockDoorResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -1930,8 +1925,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(apCommandObj, status);
+                wasHandled = emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -1961,7 +1955,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -1969,7 +1968,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace GeneralCommissioning {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2043,8 +2043,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(apCommandObj, errorCode,
+                wasHandled = emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(aEndpointId, apCommandObj, errorCode,
                                                                                            const_cast<uint8_t *>(debugText));
             }
             break;
@@ -2108,9 +2107,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
                 wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(
-                    apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -2173,9 +2171,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
                 wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(
-                    apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -2205,7 +2202,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -2213,7 +2215,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace Groups {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2286,8 +2289,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfGroupsClusterAddGroupResponseCallback(apCommandObj, status, groupId);
+                wasHandled = emberAfGroupsClusterAddGroupResponseCallback(aEndpointId, apCommandObj, status, groupId);
             }
             break;
         }
@@ -2354,8 +2356,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfGroupsClusterGetGroupMembershipResponseCallback(apCommandObj, capacity, groupCount, groupList);
+                wasHandled = emberAfGroupsClusterGetGroupMembershipResponseCallback(aEndpointId, apCommandObj, capacity, groupCount,
+                                                                                    groupList);
             }
             break;
         }
@@ -2417,8 +2419,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfGroupsClusterRemoveGroupResponseCallback(apCommandObj, status, groupId);
+                wasHandled = emberAfGroupsClusterRemoveGroupResponseCallback(aEndpointId, apCommandObj, status, groupId);
             }
             break;
         }
@@ -2485,9 +2486,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled =
-                    emberAfGroupsClusterViewGroupResponseCallback(apCommandObj, status, groupId, const_cast<uint8_t *>(groupName));
+                wasHandled = emberAfGroupsClusterViewGroupResponseCallback(aEndpointId, apCommandObj, status, groupId,
+                                                                           const_cast<uint8_t *>(groupName));
             }
             break;
         }
@@ -2517,7 +2517,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -2525,7 +2530,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace Identify {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2594,8 +2600,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(apCommandObj, timeout);
+                wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(aEndpointId, apCommandObj, timeout);
             }
             break;
         }
@@ -2625,7 +2630,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -2633,7 +2643,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace KeypadInput {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2702,8 +2713,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfKeypadInputClusterSendKeyResponseCallback(apCommandObj, status);
+                wasHandled = emberAfKeypadInputClusterSendKeyResponseCallback(aEndpointId, apCommandObj, status);
             }
             break;
         }
@@ -2733,7 +2743,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -2741,7 +2756,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace MediaPlayback {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2810,8 +2826,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(apCommandObj, mediaPlaybackStatus);
+                wasHandled =
+                    emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(aEndpointId, apCommandObj, mediaPlaybackStatus);
             }
             break;
         }
@@ -2869,8 +2885,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfMediaPlaybackClusterMediaNextResponseCallback(apCommandObj, mediaPlaybackStatus);
+                wasHandled = emberAfMediaPlaybackClusterMediaNextResponseCallback(aEndpointId, apCommandObj, mediaPlaybackStatus);
             }
             break;
         }
@@ -2928,8 +2943,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfMediaPlaybackClusterMediaPauseResponseCallback(apCommandObj, mediaPlaybackStatus);
+                wasHandled = emberAfMediaPlaybackClusterMediaPauseResponseCallback(aEndpointId, apCommandObj, mediaPlaybackStatus);
             }
             break;
         }
@@ -2987,8 +3001,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfMediaPlaybackClusterMediaPlayResponseCallback(apCommandObj, mediaPlaybackStatus);
+                wasHandled = emberAfMediaPlaybackClusterMediaPlayResponseCallback(aEndpointId, apCommandObj, mediaPlaybackStatus);
             }
             break;
         }
@@ -3046,8 +3059,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfMediaPlaybackClusterMediaPreviousResponseCallback(apCommandObj, mediaPlaybackStatus);
+                wasHandled =
+                    emberAfMediaPlaybackClusterMediaPreviousResponseCallback(aEndpointId, apCommandObj, mediaPlaybackStatus);
             }
             break;
         }
@@ -3105,8 +3118,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfMediaPlaybackClusterMediaRewindResponseCallback(apCommandObj, mediaPlaybackStatus);
+                wasHandled = emberAfMediaPlaybackClusterMediaRewindResponseCallback(aEndpointId, apCommandObj, mediaPlaybackStatus);
             }
             break;
         }
@@ -3164,8 +3176,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfMediaPlaybackClusterMediaSeekResponseCallback(apCommandObj, mediaPlaybackStatus);
+                wasHandled = emberAfMediaPlaybackClusterMediaSeekResponseCallback(aEndpointId, apCommandObj, mediaPlaybackStatus);
             }
             break;
         }
@@ -3223,8 +3234,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(apCommandObj, mediaPlaybackStatus);
+                wasHandled =
+                    emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(aEndpointId, apCommandObj, mediaPlaybackStatus);
             }
             break;
         }
@@ -3282,8 +3293,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(apCommandObj, mediaPlaybackStatus);
+                wasHandled =
+                    emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(aEndpointId, apCommandObj, mediaPlaybackStatus);
             }
             break;
         }
@@ -3341,8 +3352,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfMediaPlaybackClusterMediaStartOverResponseCallback(apCommandObj, mediaPlaybackStatus);
+                wasHandled =
+                    emberAfMediaPlaybackClusterMediaStartOverResponseCallback(aEndpointId, apCommandObj, mediaPlaybackStatus);
             }
             break;
         }
@@ -3400,8 +3411,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfMediaPlaybackClusterMediaStopResponseCallback(apCommandObj, mediaPlaybackStatus);
+                wasHandled = emberAfMediaPlaybackClusterMediaStopResponseCallback(aEndpointId, apCommandObj, mediaPlaybackStatus);
             }
             break;
         }
@@ -3431,7 +3441,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -3439,7 +3454,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace NetworkCommissioning {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -3513,9 +3529,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(apCommandObj, errorCode,
-                                                                                                const_cast<uint8_t *>(debugText));
+                wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(
+                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -3578,8 +3593,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(apCommandObj, errorCode,
+                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(aEndpointId, apCommandObj, errorCode,
                                                                                               const_cast<uint8_t *>(debugText));
             }
             break;
@@ -3643,8 +3657,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(apCommandObj, errorCode,
+                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(aEndpointId, apCommandObj, errorCode,
                                                                                               const_cast<uint8_t *>(debugText));
             }
             break;
@@ -3708,8 +3721,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(apCommandObj, errorCode,
+                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(aEndpointId, apCommandObj, errorCode,
                                                                                              const_cast<uint8_t *>(debugText));
             }
             break;
@@ -3773,8 +3785,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(apCommandObj, errorCode,
+                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(aEndpointId, apCommandObj, errorCode,
                                                                                              const_cast<uint8_t *>(debugText));
             }
             break;
@@ -3848,9 +3859,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
                 wasHandled = emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
-                    apCommandObj, errorCode, const_cast<uint8_t *>(debugText), wifiScanResults, threadScanResults);
+                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText), wifiScanResults, threadScanResults);
             }
             break;
         }
@@ -3913,9 +3923,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
                 wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(
-                    apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
+                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -3978,9 +3987,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(apCommandObj, errorCode,
-                                                                                                 const_cast<uint8_t *>(debugText));
+                wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(
+                    aEndpointId, apCommandObj, errorCode, const_cast<uint8_t *>(debugText));
             }
             break;
         }
@@ -4010,7 +4018,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -4018,7 +4031,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace OtaSoftwareUpdateProvider {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4091,9 +4105,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(apCommandObj, action,
-                                                                                                       delayedActionTime);
+                wasHandled = emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(aEndpointId, apCommandObj,
+                                                                                                       action, delayedActionTime);
             }
             break;
         }
@@ -4182,10 +4195,9 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 7 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
                 wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
-                    apCommandObj, status, delayedActionTime, const_cast<uint8_t *>(imageURI), softwareVersion, updateToken,
-                    userConsentNeeded, metadataForRequestor);
+                    aEndpointId, apCommandObj, status, delayedActionTime, const_cast<uint8_t *>(imageURI), softwareVersion,
+                    updateToken, userConsentNeeded, metadataForRequestor);
             }
             break;
         }
@@ -4216,7 +4228,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -4224,7 +4241,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace OperationalCredentials {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4331,9 +4349,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 6 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfOperationalCredentialsClusterOpCSRResponseCallback(apCommandObj, CSR, CSRNonce, VendorReserved1,
-                                                                                       VendorReserved2, VendorReserved3, Signature);
+                wasHandled = emberAfOperationalCredentialsClusterOpCSRResponseCallback(
+                    aEndpointId, apCommandObj, CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature);
             }
             break;
         }
@@ -4400,9 +4417,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfOperationalCredentialsClusterOpCertResponseCallback(apCommandObj, StatusCode, FabricIndex,
-                                                                                        const_cast<uint8_t *>(DebugText));
+                wasHandled = emberAfOperationalCredentialsClusterOpCertResponseCallback(
+                    aEndpointId, apCommandObj, StatusCode, FabricIndex, const_cast<uint8_t *>(DebugText));
             }
             break;
         }
@@ -4460,8 +4476,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfOperationalCredentialsClusterSetFabricResponseCallback(apCommandObj, FabricId);
+                wasHandled = emberAfOperationalCredentialsClusterSetFabricResponseCallback(aEndpointId, apCommandObj, FabricId);
             }
             break;
         }
@@ -4491,7 +4506,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -4499,7 +4519,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace Scenes {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4576,8 +4597,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfScenesClusterAddSceneResponseCallback(apCommandObj, status, groupId, sceneId);
+                wasHandled = emberAfScenesClusterAddSceneResponseCallback(aEndpointId, apCommandObj, status, groupId, sceneId);
             }
             break;
         }
@@ -4652,9 +4672,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfScenesClusterGetSceneMembershipResponseCallback(apCommandObj, status, capacity, groupId,
-                                                                                    sceneCount, sceneList);
+                wasHandled = emberAfScenesClusterGetSceneMembershipResponseCallback(aEndpointId, apCommandObj, status, capacity,
+                                                                                    groupId, sceneCount, sceneList);
             }
             break;
         }
@@ -4716,8 +4735,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfScenesClusterRemoveAllScenesResponseCallback(apCommandObj, status, groupId);
+                wasHandled = emberAfScenesClusterRemoveAllScenesResponseCallback(aEndpointId, apCommandObj, status, groupId);
             }
             break;
         }
@@ -4783,8 +4801,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfScenesClusterRemoveSceneResponseCallback(apCommandObj, status, groupId, sceneId);
+                wasHandled = emberAfScenesClusterRemoveSceneResponseCallback(aEndpointId, apCommandObj, status, groupId, sceneId);
             }
             break;
         }
@@ -4850,8 +4867,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfScenesClusterStoreSceneResponseCallback(apCommandObj, status, groupId, sceneId);
+                wasHandled = emberAfScenesClusterStoreSceneResponseCallback(aEndpointId, apCommandObj, status, groupId, sceneId);
             }
             break;
         }
@@ -4931,9 +4947,9 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 6 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfScenesClusterViewSceneResponseCallback(apCommandObj, status, groupId, sceneId, transitionTime,
-                                                                           const_cast<uint8_t *>(sceneName), extensionFieldSets);
+                wasHandled = emberAfScenesClusterViewSceneResponseCallback(aEndpointId, apCommandObj, status, groupId, sceneId,
+                                                                           transitionTime, const_cast<uint8_t *>(sceneName),
+                                                                           extensionFieldSets);
             }
             break;
         }
@@ -4963,7 +4979,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -4971,7 +4992,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace TvChannel {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -5045,8 +5067,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfTvChannelClusterChangeChannelResponseCallback(apCommandObj, ChannelMatch, ErrorType);
+                wasHandled =
+                    emberAfTvChannelClusterChangeChannelResponseCallback(aEndpointId, apCommandObj, ChannelMatch, ErrorType);
             }
             break;
         }
@@ -5076,7 +5098,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -5084,7 +5111,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace TargetNavigator {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -5158,9 +5186,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled =
-                    emberAfTargetNavigatorClusterNavigateTargetResponseCallback(apCommandObj, status, const_cast<uint8_t *>(data));
+                wasHandled = emberAfTargetNavigatorClusterNavigateTargetResponseCallback(aEndpointId, apCommandObj, status,
+                                                                                         const_cast<uint8_t *>(data));
             }
             break;
         }
@@ -5190,7 +5217,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -5198,7 +5230,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace TestCluster {
 
-void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -5267,8 +5300,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfTestClusterClusterTestSpecificResponseCallback(apCommandObj, returnValue);
+                wasHandled = emberAfTestClusterClusterTestSpecificResponseCallback(aEndpointId, apCommandObj, returnValue);
             }
             break;
         }
@@ -5298,7 +5330,12 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
     }
 }
 
@@ -5307,7 +5344,33 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
 } // namespace clusters
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
+                                  chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
+{
+    ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16, aClusterId,
+                  aCommandId, aEndPointId);
+    Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
+    TLV::TLVType dataTlvType;
+    SuccessOrExit(aReader.EnterContainer(dataTlvType));
+    switch (aClusterId)
+    {
+    default:
+        // Unrecognized cluster ID, error status will apply.
+        chip::app::CommandPathParams returnStatusParam = { aEndPointId,
+                                                           0, // GroupId
+                                                           aClusterId, aCommandId,
+                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
+        ChipLogError(Zcl, "Unknown cluster %" PRIx32, aClusterId);
+        break;
+    }
+exit:
+    Compatibility::ResetEmberAfObjects();
+    aReader.ExitContainer(dataTlvType);
+}
+
+void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                          chip::TLV::TLVReader & aReader, CommandSender * apCommandObj)
 {
     ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16, aClusterId,
                   aCommandId, aEndPointId);

@@ -111,7 +111,8 @@ public:
     // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
     bool CheckEventClean(EventManagement & aEventManager);
 
-    // Move to the next dirty priority where last schedule event number is larger than current self vended event number
+    // Move to the next dirty priority from critical high priority to debug low priority, where last schedule event number
+    // is larger than current self vended event number
     void MoveToNextScheduledDirtyPriority();
 
 private:
@@ -128,10 +129,8 @@ private:
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
-    CHIP_ERROR AbortExistingExchangeContext();
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
 
     // Don't need the response for report data if true
     bool mSuppressResponse = false;

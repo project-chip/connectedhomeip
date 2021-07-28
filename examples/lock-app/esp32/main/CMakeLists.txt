@@ -70,7 +70,8 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/on-off-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
-                     PRIV_REQUIRES bt chip QRCode tft spidriver screen-framework)
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/diagnostic-logs-server"
+                     PRIV_REQUIRES bt chip QRCode)
 
 idf_component_get_property(chip_lib chip COMPONENT_LIB)
 
@@ -110,11 +111,11 @@ pw_proto_library(button_service
 
 pw_proto_library(locking_service
   SOURCES
-    ${CHIP_ROOT}/examples/lock-app/esp32/main/locking_service.proto
+    ${CHIP_ROOT}/examples/lock-app/lock-common/locking_service/locking_service.proto
   PREFIX
     locking_service
   STRIP_PREFIX
-    ${CHIP_ROOT}/examples/lock-app/esp32/main
+    ${CHIP_ROOT}/examples/lock-app/lock-common/locking_service
   DEPS
     pw_protobuf.common_protos
 )
@@ -151,7 +152,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/on-off-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
-                      PRIV_REQUIRES chip QRCode tft spidriver bt screen-framework)
+                      PRIV_REQUIRES chip QRCode bt)
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")

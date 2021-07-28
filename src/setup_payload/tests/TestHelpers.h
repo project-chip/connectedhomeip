@@ -17,7 +17,8 @@
 
 #include <bitset>
 
-#include <setup_payload/Base38.cpp>
+#include <setup_payload/Base38Decode.cpp>
+#include <setup_payload/Base38Encode.cpp>
 #include <setup_payload/QRCodeSetupPayloadGenerator.cpp>
 #include <setup_payload/QRCodeSetupPayloadParser.cpp>
 #include <setup_payload/SetupPayload.cpp>

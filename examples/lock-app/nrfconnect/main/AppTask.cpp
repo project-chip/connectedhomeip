@@ -20,7 +20,6 @@
 #include "AppConfig.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
-#include "Service.h"
 #include "ThreadUtil.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -58,8 +57,6 @@
 
 LOG_MODULE_DECLARE(app);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
-
-constexpr uint32_t kPublishServicePeriodUs = 5000000;
 
 static LEDWidget sStatusLED;
 static LEDWidget sLockLED;
@@ -126,15 +123,14 @@ int AppTask::Init()
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 
 #ifdef CONFIG_CHIP_NFC_COMMISSIONING
-    PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
+    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 #endif
     return 0;
 }
 
 int AppTask::StartApp()
 {
-    int ret                            = Init();
-    uint64_t mLastPublishServiceTimeUS = 0;
+    int ret = Init();
 
     if (ret)
     {
@@ -205,15 +201,6 @@ int AppTask::StartApp()
         sLockLED.Animate();
         sUnusedLED.Animate();
         sUnusedLED_1.Animate();
-
-        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
-        uint64_t nextChangeTimeUS = mLastPublishServiceTimeUS + kPublishServicePeriodUs;
-
-        if (nowUS > nextChangeTimeUS)
-        {
-            PublishService();
-            mLastPublishServiceTimeUS = nowUS;
-        }
     }
 }
 
@@ -423,24 +410,13 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
         return;
     }
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-    if (NFCMgr().IsTagEmulationStarted())
-    {
-        LOG_INF("NFC Tag emulation is already started");
-    }
-    else
-    {
-        ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-    }
-#endif
-
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         LOG_INF("BLE Advertisement is already enabled");
         return;
     }
 
-    if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+    if (OpenDefaultPairingWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
     {
         LOG_INF("Enabled BLE Advertisement");
     }
@@ -451,9 +427,23 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
 }
 
 #ifdef CONFIG_CHIP_NFC_COMMISSIONING
-void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
+void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
 {
-    if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+    if (event->Type != DeviceEventType::kCHIPoBLEAdvertisingChange)
+        return;
+
+    if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+    {
+        if (NFCMgr().IsTagEmulationStarted())
+        {
+            LOG_INF("NFC Tag emulation is already started");
+        }
+        else
+        {
+            ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+        }
+    }
+    else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
     {
         NFCMgr().StopTagEmulation();
     }

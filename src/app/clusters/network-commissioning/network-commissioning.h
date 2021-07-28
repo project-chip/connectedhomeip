@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/enums.h>
 #include <lib/core/CHIPCore.h>
 #include <platform/internal/DeviceNetworkProvisioning.h>
@@ -27,12 +27,13 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace NetworkCommissioning {
-EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan operationalDataset,
-                                                                           uint64_t breadcrumb, uint32_t timeoutMs);
-EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan ssid,
+EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::CommandHandler *, EndpointId,
+                                                                           ByteSpan operationalDataset, uint64_t breadcrumb,
+                                                                           uint32_t timeoutMs);
+EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::CommandHandler *, EndpointId, ByteSpan ssid,
                                                                          ByteSpan credentials, uint64_t breadcrumb,
                                                                          uint32_t timeoutMs);
-EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan networkID,
+EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::CommandHandler *, EndpointId, ByteSpan networkID,
                                                                         uint64_t breadcrumb, uint32_t timeoutMs);
 } // namespace NetworkCommissioning
 

@@ -162,8 +162,8 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @def ReturnErrorOnFailure(expr)
  *
  *  @brief
- *    Returns the error code if the expression returns something different
- *    than CHIP_NO_ERROR.
+ *    Returns the error code if the expression returns an error. For a CHIP_ERROR expression, this means any value other
+ *    than CHIP_NO_ERROR. For an integer expression, this means non-zero.
  *
  *  Example usage:
  *
@@ -171,14 +171,40 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *    ReturnErrorOnFailure(channel->SendMsg(msg));
  *  @endcode
  *
- *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ *  @param[in]  expr        An expression to be tested.
  */
 #define ReturnErrorOnFailure(expr)                                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
+        {                                                                                                                          \
+            return __err;                                                                                                          \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def ReturnLogErrorOnFailure(expr)
+ *
+ *  @brief
+ *    Returns the error code if the expression returns something different
+ *    than CHIP_NO_ERROR.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnLogErrorOnFailure(channel->SendMsg(msg));
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ */
+#define ReturnLogErrorOnFailure(expr)                                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
         CHIP_ERROR __err = (expr);                                                                                                 \
         if (__err != CHIP_NO_ERROR)                                                                                                \
         {                                                                                                                          \
+            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                                        \
             return __err;                                                                                                          \
         }                                                                                                                          \
     } while (false)
@@ -187,7 +213,8 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @def ReturnOnFailure(expr)
  *
  *  @brief
- *    Returns if the expression returns something different than CHIP_NO_ERROR
+ *    Returns if the expression returns an error. For a CHIP_ERROR expression, this means any value other
+ *    than CHIP_NO_ERROR. For an integer expression, this means non-zero.
  *
  *  Example usage:
  *
@@ -195,13 +222,13 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *    ReturnOnFailure(channel->SendMsg(msg));
  *  @endcode
  *
- *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ *  @param[in]  expr        An expression to be tested.
  */
 #define ReturnOnFailure(expr)                                                                                                      \
     do                                                                                                                             \
     {                                                                                                                              \
-        CHIP_ERROR __err = (expr);                                                                                                 \
-        if (__err != CHIP_NO_ERROR)                                                                                                \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
         {                                                                                                                          \
             return;                                                                                                                \
         }                                                                                                                          \
@@ -251,6 +278,31 @@ constexpr inline const _T & max(const _T & a, const _T & b)
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
+            return code;                                                                                                           \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def VerifyOrReturnLogError(expr, code)
+ *
+ *  @brief
+ *    Returns and print a specified error code if expression evaluates to false
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    VerifyOrReturnLogError(param != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+ *  @endcode
+ *
+ *  @param[in]  expr        A Boolean expression to be evaluated.
+ *  @param[in]  code        A value to return if @a expr is false.
+ */
+#define VerifyOrReturnLogError(expr, code)                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expr))                                                                                                               \
+        {                                                                                                                          \
+            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(code), __FILE__, __LINE__);                                         \
             return code;                                                                                                           \
         }                                                                                                                          \
     } while (false)
@@ -309,7 +361,7 @@ constexpr inline const _T & max(const _T & a, const _T & b)
  *  @param[in]  aStatus     A scalar status to be evaluated against zero (0).
  *
  */
-#define SuccessOrExit(aStatus) nlEXPECT((aStatus) == CHIP_NO_ERROR, exit)
+#define SuccessOrExit(aStatus) nlEXPECT(::chip::ChipError::IsSuccess((aStatus)), exit)
 
 /**
  *  @def VerifyOrExit(aCondition, anAction)
@@ -479,6 +531,30 @@ inline void chipDie(void)
  */
 #define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)                                                                     \
     nlABORT_ACTION(aCondition, ChipLogDetail(aModule, aMessage, ##__VA_ARGS__))
+
+/**
+ *  @def LogErrorOnFailure(expr)
+ *
+ *  @brief
+ *    Logs a message if the expression returns something different than CHIP_NO_ERROR.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnLogErrorOnFailure(channel->SendMsg(msg));
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ */
+#define LogErrorOnFailure(expr)                                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (__err != CHIP_NO_ERROR)                                                                                                \
+        {                                                                                                                          \
+            ChipLogError(NotSpecified, "%s at %s:%d", ErrorStr(__err), __FILE__, __LINE__);                                        \
+        }                                                                                                                          \
+    } while (false)
 
 #if (__cplusplus >= 201103L)
 

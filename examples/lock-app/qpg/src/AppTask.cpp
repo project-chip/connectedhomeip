@@ -61,7 +61,7 @@ static bool sHaveServiceConnectivity = false;
 
 AppTask AppTask::sAppTask;
 
-int AppTask::StartAppTask()
+CHIP_ERROR AppTask::StartAppTask()
 {
     sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
@@ -79,7 +79,7 @@ int AppTask::StartAppTask()
     return CHIP_NO_ERROR;
 }
 
-int AppTask::Init()
+CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -110,13 +110,12 @@ int AppTask::Init()
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
-    int err;
     AppEvent event;
 
-    err = sAppTask.Init();
+    CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "AppTask.Init() failed");
+        ChipLogError(NotSpecified, "AppTask.Init() failed: %" CHIP_ERROR_FORMAT, chip::ChipError::FormatError(err));
         // appError(err);
     }
 
@@ -186,7 +185,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     bool initiated = false;
     BoltLockManager::Action_t action;
     int32_t actor;
-    int err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Lock)
     {
@@ -343,7 +342,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
                 if (!ConnectivityMgr().IsThreadProvisioned())
                 {
                     // Enable BLE advertisements and pairing window
-                    if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+                    if (OpenDefaultPairingWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
                     {
                         ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
                     }

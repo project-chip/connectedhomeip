@@ -380,7 +380,7 @@ CHIP_ERROR DumpASN1(ASN1Reader & asn1Parser, const char * prefix, const char * i
                     err = asn1Parser.ExitConstructedType();
                     if (err != CHIP_NO_ERROR)
                     {
-                        printf("ASN1Reader::ExitConstructedType() failed: %ld\n", (long) err);
+                        printf("ASN1Reader::ExitConstructedType() failed: %" CHIP_ERROR_FORMAT "\n", ChipError::FormatError(err));
                         return err;
                     }
                     nestLevel--;
@@ -389,7 +389,7 @@ CHIP_ERROR DumpASN1(ASN1Reader & asn1Parser, const char * prefix, const char * i
                 else
                     break;
             }
-            printf("ASN1Reader::Next() failed: %ld\n", (long) err);
+            printf("ASN1Reader::Next() failed: %" CHIP_ERROR_FORMAT "\n", ChipError::FormatError(err));
             return err;
         }
         if (prefix != nullptr)
@@ -477,7 +477,7 @@ CHIP_ERROR DumpASN1(ASN1Reader & asn1Parser, const char * prefix, const char * i
             err = asn1Parser.EnterConstructedType();
             if (err != CHIP_NO_ERROR)
             {
-                printf("ASN1Reader::EnterConstructedType() failed: %ld\n", (long) err);
+                printf("ASN1Reader::EnterConstructedType() failed: %" CHIP_ERROR_FORMAT "\n", ChipError::FormatError(err));
                 return err;
             }
             nestLevel++;

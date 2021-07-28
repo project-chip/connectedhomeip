@@ -10,7 +10,7 @@ namespace Clusters {
 
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase label}} {
-static constexpr ClusterId Id = {{asHex code 4}};
+static constexpr ClusterId Id = {{asMEI manufacturerCode code}};
 } // namespace {{asUpperCamelCase label}} {
 {{/zcl_clusters}}
 

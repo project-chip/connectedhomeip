@@ -19,8 +19,7 @@
  * @file - This file contains point r/w test vectors.
  */
 
-#ifndef _SPAKE2P_POINT_RW_TEST_VECTORS_H_
-#define _SPAKE2P_POINT_RW_TEST_VECTORS_H_
+#pragma once
 
 namespace chip {
 namespace Crypto {
@@ -140,5 +139,3 @@ static const struct spake2p_point_rw_tv * point_rw_tvs[] = {
 
 } // namespace Crypto
 } // namespace chip
-
-#endif

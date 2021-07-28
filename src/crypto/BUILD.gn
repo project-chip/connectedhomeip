@@ -88,6 +88,7 @@ static_library("crypto") {
   if (chip_with_se05x == 1) {
     sources += [
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_HKDF.cpp",
+      "hsm/nxp/CHIPCryptoPALHsm_SE05X_HMAC.cpp",
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_P256.cpp",
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_PBKDF.cpp",
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_Spake2p.cpp",

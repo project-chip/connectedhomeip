@@ -53,3 +53,5 @@ if(CONFIG_OPENTHREAD_FTD)
 elseif(CONFIG_OPENTHREAD_MTD)
     target_link_libraries(app INTERFACE openthread-cli-mtd)
 endif()
+
+include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)

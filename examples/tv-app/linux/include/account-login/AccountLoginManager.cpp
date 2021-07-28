@@ -43,15 +43,13 @@ bool AccountLoginManager::isUserLoggedIn(string requestTempAccountIdentifier, st
         bool found = accounts[requestTempAccountIdentifier] == requestSetupPin;
         if (!found)
         {
-            ChipLogError(Zcl, "User is not logged in, failed to match request setup pin. Error:%s",
-                         chip::ErrorStr(EMBER_ZCL_STATUS_NOT_AUTHORIZED));
+            ChipLogError(Zcl, "User is not logged in, failed to match request setup pin.");
         }
         return found;
     }
     else
     {
-        ChipLogError(Zcl, "User is not logged in, failed to find temp account identifier. Error:%s",
-                     chip::ErrorStr(EMBER_ZCL_STATUS_NOT_AUTHORIZED));
+        ChipLogError(Zcl, "User is not logged in, failed to find temp account identifier.");
         return false;
     }
 }

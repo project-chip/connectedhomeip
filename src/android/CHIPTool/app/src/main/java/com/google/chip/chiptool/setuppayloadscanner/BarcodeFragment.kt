@@ -133,18 +133,8 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
                 }
                 return@post
             }
-            val deviceInfo = CHIPDeviceInfo(
-                payload.version,
-                payload.vendorId,
-                payload.productId,
-                payload.discriminator,
-                payload.setupPinCode,
-                payload.optionalQRCodeInfo.mapValues { (_, info) ->
-                    QrCodeInfo(info.tag, info.type, info.data, info.int32)
-                }
-            )
             FragmentUtil.getHost(this, Callback::class.java)
-                ?.onCHIPDeviceInfoReceived(deviceInfo)
+                ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
         }
     }
 
