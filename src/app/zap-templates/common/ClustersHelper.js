@@ -16,12 +16,14 @@
  */
 
 // Import helpers from zap core
-const zapPath       = '../../../../third_party/zap/repo/src-electron/';
-const queryConfig   = require(zapPath + 'db/query-config.js')
-const queryEndpoint = require(zapPath + 'db/query-endpoint.js')
-const templateUtil  = require(zapPath + 'generator/template-util.js')
-const zclHelper     = require(zapPath + 'generator/helper-zcl.js')
-const zclQuery      = require(zapPath + 'db/query-zcl.js')
+const zapPath           = '../../../../third_party/zap/repo/src-electron/';
+const queryCommand      = require(zapPath + 'db/query-command.js');
+const queryConfig       = require(zapPath + 'db/query-config.js');
+const queryEndpoint     = require(zapPath + 'db/query-endpoint.js');
+const queryEndpointType = require(zapPath + 'db/query-endpoint-type.js');
+const templateUtil      = require(zapPath + 'generator/template-util.js');
+const zclHelper         = require(zapPath + 'generator/helper-zcl.js');
+const zclQuery          = require(zapPath + 'db/query-zcl.js');
 
 const { Deferred }    = require('./Deferred.js');
 const ListHelper      = require('./ListHelper.js');
@@ -78,15 +80,15 @@ function loadStructs(packageId)
 function loadClusters()
 {
   const { db, sessionId } = this.global;
-  return queryEndpoint.selectEndPointTypeIds(db, sessionId)
-      .then(endpointTypes => zclQuery.selectAllClustersDetailsFromEndpointTypes(db, endpointTypes))
+  return queryEndpointType.selectEndpointTypeIds(db, sessionId)
+      .then(endpointTypes => queryEndpointType.selectAllClustersDetailsFromEndpointTypes(db, endpointTypes))
       .then(clusters => clusters.filter(cluster => cluster.enabled == 1));
 }
 
 function loadCommandArguments(command, packageId)
 {
   const { db, sessionId } = this.global;
-  return zclQuery.selectCommandArgumentsByCommandId(db, command.id, packageId).then(commandArguments => {
+  return queryCommand.selectCommandArgumentsByCommandId(db, command.id, packageId).then(commandArguments => {
     command.arguments = commandArguments;
     return command;
   });
@@ -95,9 +97,10 @@ function loadCommandArguments(command, packageId)
 function loadCommands(packageId)
 {
   const { db, sessionId } = this.global;
-  return queryEndpoint.selectEndPointTypeIds(db, sessionId)
-      .then(endpointTypes => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(db, endpointTypes))
-      .then(endpointTypesAndClusters => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(db, endpointTypesAndClusters))
+  return queryEndpointType.selectEndpointTypeIds(db, sessionId)
+      .then(endpointTypes => queryEndpointType.selectClustersAndEndpointDetailsFromEndpointTypes(db, endpointTypes))
+      .then(endpointTypesAndClusters => queryCommand.selectCommandDetailsFromAllEndpointTypesAndClusters(
+                db, endpointTypesAndClusters, true))
       .then(commands => Promise.all(commands.map(command => loadCommandArguments.call(this, command, packageId))));
 }
 
@@ -106,7 +109,7 @@ function loadAttributes(packageId)
   // The 'server' side is enforced here, because the list of attributes is used to generate client global
   // commands to retrieve server side attributes.
   const { db, sessionId } = this.global;
-  return queryEndpoint.selectEndPointTypeIds(db, sessionId)
+  return queryEndpointType.selectEndpointTypeIds(db, sessionId)
       .then(endpointTypes => Promise.all(
                 endpointTypes.map(({ endpointTypeId }) => queryEndpoint.selectEndpointClusters(db, endpointTypeId))))
       .then(clusters => clusters.flat())

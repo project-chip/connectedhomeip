@@ -19,7 +19,7 @@
 const zapPath      = '../../../../third_party/zap/repo/src-electron/';
 const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
-const queryZcl     = require(zapPath + 'db/query-zcl.js')
+const queryCommand = require(zapPath + 'db/query-command.js')
 
 const ChipTypesHelper = require('../../../../src/app/zap-templates/common/ChipTypesHelper.js');
 const StringHelper    = require('../../../../src/app/zap-templates/common/StringHelper.js');
@@ -176,7 +176,7 @@ function convertAttributeCallbackTypeToJavaName(cType)
 function omitCommaForFirstNonStatusCommand(id, index)
 {
   let promise = templateUtil.ensureZclPackageId(this)
-                    .then((pkgId) => { return queryZcl.selectCommandArgumentsByCommandId(this.global.db, id, pkgId) })
+                    .then((pkgId) => { return queryCommand.selectCommandArgumentsByCommandId(this.global.db, id, pkgId) })
                     .catch(err => console.log(err))
                     .then((result) => {
                       // Currently, we omit array types, so don't count it as a valid non-status command.
