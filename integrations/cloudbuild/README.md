@@ -13,8 +13,8 @@ the build yaml.
 # Once only setup:
 gcloud components install cloud-build-local
 
-# Build via
-cloud-build-local --config=build-all.yaml --dryrun=false $CHECKOUT_PATH
+# Build using this command from the checkout root
+cloud-build-local --config integrations/cloudbuild/build-all.yaml --dryrun=false `pwd`
 ```
 
 You can pass in optional argument of `--write-workspace=$HOME/tmp/testws` to
