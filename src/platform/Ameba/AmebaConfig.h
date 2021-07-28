@@ -30,7 +30,7 @@ class AmebaConfig
 {
 public:
     struct Key;
- 
+
     // Maximum length of an NVS key name, as specified in the ESP-IDF documentation.
     static constexpr size_t kMaxConfigKeyNameLength = 15;
 
