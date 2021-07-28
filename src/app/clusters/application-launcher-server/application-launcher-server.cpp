@@ -32,7 +32,8 @@
 
 ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data);
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::CommandHandler * commandObj, uint8_t *, uint8_t *)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                        uint8_t *, uint8_t *)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
@@ -66,8 +67,9 @@ EmberAfApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId
     return application;
 }
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::CommandHandler * command, uint8_t * requestData,
-                                                        uint16_t requestApplicationCatalogVendorId, uint8_t * requestApplicationId)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
+                                                        uint8_t * requestData, uint16_t requestApplicationCatalogVendorId,
+                                                        uint8_t * requestApplicationId)
 {
     EmberAfApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
     // TODO: Char is not null terminated, verify this code once #7963 gets merged.

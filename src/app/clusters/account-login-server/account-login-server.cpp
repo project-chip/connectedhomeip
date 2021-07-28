@@ -48,7 +48,8 @@ exit:
     }
 }
 
-bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::CommandHandler * command, uint8_t * tempAccountIdentifier)
+bool emberAfAccountLoginClusterGetSetupPINCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
+                                                   uint8_t * tempAccountIdentifier)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));
@@ -57,8 +58,8 @@ bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::CommandHandler * c
     return true;
 }
 
-bool emberAfAccountLoginClusterLoginCallback(chip::app::CommandHandler * command, uint8_t * tempAccountIdentifier,
-                                             uint8_t * tempSetupPin)
+bool emberAfAccountLoginClusterLoginCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
+                                             uint8_t * tempAccountIdentifier, uint8_t * tempSetupPin)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));
