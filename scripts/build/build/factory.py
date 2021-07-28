@@ -41,8 +41,8 @@ class Matcher():
   def AcceptBoard(self, __board_key: Board, **kargs):
     self.board_arguments[__board_key] = kargs
 
-  def Create(self, __board_key: Board, __app_key: Application, repo_path: str,
-             **kargs):
+  def Create(self, runner, __board_key: Board, __app_key: Application,
+             repo_path: str, **kargs):
     """Creates a new builder for the given board/app. """
     if not __board_key in self.board_arguments:
       return None
@@ -59,7 +59,7 @@ class Matcher():
     kargs.update(self.board_arguments[__board_key])
     kargs.update(extra_app_args)
 
-    return self.builder_class(repo_path, **kargs)
+    return self.builder_class(repo_path, runner=runner, **kargs)
 
 
 # Builds a list of acceptable application/board combination for every platform
@@ -96,7 +96,8 @@ _MATCHERS[Platform.EFR32].AcceptApplication(
 class BuilderFactory:
   """Creates application builders."""
 
-  def __init__(self, repository_path: str, output_prefix: str):
+  def __init__(self, runner, repository_path: str, output_prefix: str):
+    self.runner = runner
     self.repository_path = repository_path
     self.output_prefix = output_prefix
 
@@ -108,7 +109,11 @@ class BuilderFactory:
 
     output_directory = os.path.join(self.output_prefix, identifier)
     builder = _MATCHERS[platform].Create(
-        board, app, self.repository_path, output_dir=output_directory)
+        self.runner,
+        board,
+        app,
+        self.repository_path,
+        output_dir=output_directory)
 
     if builder:
       builder.identifier = identifier

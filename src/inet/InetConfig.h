@@ -88,40 +88,6 @@
 #endif // INET_CONFIG_MAX_IP_AND_UDP_HEADER_SIZE
 
 /**
- *  @def INET_CONFIG_ERROR_MIN
- *
- *  @brief
- *    This defines the base or minimum InetLayer error number range.
- *
- */
-#ifndef INET_CONFIG_ERROR_MIN
-#define INET_CONFIG_ERROR_MIN                               1000
-#endif // INET_CONFIG_ERROR_MIN
-
-/**
- *  @def INET_CONFIG_ERROR_MAX
- *
- *  @brief
- *    This defines the top or maximum InetLayer error number range.
- *
- */
-#ifndef INET_CONFIG_ERROR_MAX
-#define INET_CONFIG_ERROR_MAX                               1999
-#endif // INET_CONFIG_ERROR_MAX
-
-/**
- *  @def INET_CONFIG_ERROR
- *
- *  @brief
- *    This defines a mapping function for InetLayer errors that allows
- *    mapping such errors into a platform- or system-specific range.
- *
- */
-#ifndef INET_CONFIG_ERROR
-#define INET_CONFIG_ERROR(e)                                (INET_CONFIG_ERROR_MIN + (e))
-#endif // _INET_CONFIG_ERROR
-
-/**
  *  @def INET_CONFIG_WILL_OVERRIDE_OS_ERROR_FUNCS
  *
  *  @brief

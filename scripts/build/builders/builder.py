@@ -5,8 +5,6 @@ import os
 import shutil
 from abc import ABC, abstractmethod
 
-from shellrunner import ShellRunner
-
 
 class Builder(ABC):
   """Generic builder base class for CHIP.
@@ -16,10 +14,11 @@ class Builder(ABC):
 
   """
 
-  def __init__(self, root, output_dir='out'):
+  def __init__(self, root, runner, output_dir='out'):
     self.root = os.path.abspath(root)
-    self._runner = ShellRunner()
+    self._runner = runner
     self.output_dir = output_dir
+    self.identifier = None
 
   @abstractmethod
   def generate(self):
@@ -40,8 +39,8 @@ class Builder(ABC):
     """
     raise NotImplementedError()
 
-  def _Execute(self, cmdarray, **args):
-    self._runner.Run(cmdarray, **args)
+  def _Execute(self, cmdarray, cwd=None, title=None):
+    self._runner.Run(cmdarray, cwd=cwd, title=title)
 
   def CopyArtifacts(self, target_dir: str):
     for target_name, source_name in self.outputs().items():

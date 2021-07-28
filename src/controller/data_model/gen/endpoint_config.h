@@ -414,7 +414,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (232)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (233)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -517,6 +517,9 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Thread Network Diagnostics (client) */                                                        \
             { 0x0035, 0x00, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* ResetCounts */                                                 \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: WiFi Network Diagnostics (client) */                                                          \
+            { 0x0036, 0x00, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* ResetCounts */                                                 \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Ethernet Network Diagnostics (client) */                                                      \
             { 0x0037, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* ResetCounts */                                                 \

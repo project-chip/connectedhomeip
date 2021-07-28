@@ -820,7 +820,7 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
 
     while (messageLen)
     {
-        CHECK_MESSAGE_LENGTH(2);
+        CHECK_MESSAGE_LENGTH(4);
         AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
         ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 

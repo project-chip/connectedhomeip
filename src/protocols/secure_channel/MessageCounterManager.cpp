@@ -53,6 +53,7 @@ void MessageCounterManager::Shutdown()
     if (mExchangeMgr != nullptr)
     {
         mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq);
+        mExchangeMgr->CloseAllContextsForDelegate(this);
         mExchangeMgr = nullptr;
     }
 }
@@ -112,8 +113,6 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
     {
         ChipLogError(SecureChannel, "Timed out! Failed to clear message counter synchronization status.");
     }
-
-    exchangeContext->Close();
 }
 
 CHIP_ERROR MessageCounterManager::AddToReceiveTable(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,

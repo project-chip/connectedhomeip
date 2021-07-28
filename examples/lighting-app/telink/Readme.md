@@ -155,13 +155,13 @@ following states:
 1. Pair with device
 
     ```
-    ${CHIP_TOOL_DIR}/chip-tool pairing bypass ${IP_ADDRESS_OF_CHIP_DEVICE} 11097
+    ${CHIP_TOOL_DIR}/chip-tool pairing bypass ${IP_ADDRESS_OF_CHIP_DEVICE} 5540
     ```
 
     here:
 
     - `${IP_ADDRESS_OF_CHIP_DEVICE}` is IPv6 address of CHIP device
-    - **11097** is standart CHIP TCP port
+    - **5540** is the standard CHIP TCP port
 
 1. Switch on the light:
 

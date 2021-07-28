@@ -92,7 +92,7 @@ constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
     }
 
 
-#define GET_CLUSTER_RESPONSE_CALLBACKS(name)                                                                                               \
+#define GET_CLUSTER_RESPONSE_CALLBACKS(name)                                                                                       \
     Callback::Cancelable * onSuccessCallback = nullptr;                                                                            \
     Callback::Cancelable * onFailureCallback = nullptr;                                                                            \
     NodeId sourceIdentifier                  = reinterpret_cast<NodeId>(commandObj);                                               \
@@ -837,7 +837,7 @@ void {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAtt
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_responses}}
-bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(chip::app::Command * commandObj{{#chip_server_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_server_cluster_response_arguments}})
+bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(chip::app::CommandSender * commandObj{{#chip_server_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_server_cluster_response_arguments}})
 {
     ChipLogProgress(Zcl, "{{asCamelCased name false}}:");
     {{#chip_server_cluster_response_arguments}}
@@ -890,7 +890,7 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
 
     while (messageLen)
     {
-        CHECK_MESSAGE_LENGTH(2);
+        CHECK_MESSAGE_LENGTH(4);
         AttributeId attributeId = chip::Encoding::LittleEndian::Read32(message); // attribId
         ChipLogProgress(Zcl, "  attributeId: 0x%08x", attributeId);
 

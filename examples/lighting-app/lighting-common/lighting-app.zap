@@ -572,7 +572,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "on/off",
+              "name": "OnOff",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -1600,7 +1600,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             }
           ],
@@ -1670,7 +1670,16 @@
           "define": "THREAD_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "commands": [],
+          "commands": [
+            {
+              "name": "ResetCounts",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -2622,7 +2631,16 @@
           "define": "WIFI_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "client",
           "enabled": 0,
-          "commands": [],
+          "commands": [
+            {
+              "name": "ResetCounts",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "cluster revision",
@@ -3667,7 +3685,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "on/off",
+              "name": "OnOff",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -3682,7 +3700,7 @@
               "reportableChange": 0
             },
             {
-              "name": "global scene control",
+              "name": "GlobalSceneControl",
               "code": 16384,
               "mfgCode": null,
               "side": "server",
@@ -3697,7 +3715,7 @@
               "reportableChange": 0
             },
             {
-              "name": "on time",
+              "name": "OnTime",
               "code": 16385,
               "mfgCode": null,
               "side": "server",
@@ -3712,7 +3730,7 @@
               "reportableChange": 0
             },
             {
-              "name": "off wait time",
+              "name": "OffWaitTime",
               "code": 16386,
               "mfgCode": null,
               "side": "server",
@@ -3727,7 +3745,7 @@
               "reportableChange": 0
             },
             {
-              "name": "start up on off",
+              "name": "StartUpOnOff",
               "code": 16387,
               "mfgCode": null,
               "side": "server",

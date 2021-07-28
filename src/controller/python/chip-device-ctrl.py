@@ -195,6 +195,7 @@ class DeviceMgrCmd(Cmd):
 
         "connect",
         "close-ble",
+        "close-session",
         "resolve",
         "zcl",
         "zclread",
@@ -326,8 +327,9 @@ class DeviceMgrCmd(Cmd):
         setup-payload generate [options]
 
         Options:
-          -v   Vendor ID
-          -p   Product ID
+          -vr  Version        
+          -vi  Vendor ID
+          -pi  Product ID
           -cf  Custom Flow [Standard = 0, UserActionRequired = 1, Custom = 2]
           -dc  Discovery Capabilities [SoftAP = 1 | BLE = 2 | OnNetwork = 4]
           -dv  Discriminator Value
@@ -344,15 +346,16 @@ class DeviceMgrCmd(Cmd):
 
             if arglist[0] == "generate":
                 parser = argparse.ArgumentParser()
-                parser.add_argument("-v", type=int, default=0, dest='vendorId')
-                parser.add_argument("-p", type=int, default=0, dest='productId')
+                parser.add_argument("-vr", type=int, default=0, dest='version')
+                parser.add_argument("-pi", type=int, default=0, dest='productId')
+                parser.add_argument("-vi", type=int, default=0, dest='vendorId')                
                 parser.add_argument('-cf', type=int, default=0, dest='customFlow')
                 parser.add_argument("-dc", type=int, default=0, dest='capabilities')
                 parser.add_argument("-dv", type=int, default=0, dest='discriminator')
                 parser.add_argument("-ps", type=int, dest='passcode')                
                 args = parser.parse_args(arglist[1:])
 
-                SetupPayload().PrintOnboardingCodes(args.passcode, args.vendorId, args.productId, args.discriminator, args.customFlow, args.capabilities)
+                SetupPayload().PrintOnboardingCodes(args.passcode, args.vendorId, args.productId, args.discriminator, args.customFlow, args.capabilities, args.version)
 
             if arglist[0] == "parse-manual":
                 SetupPayload().ParseManualPairingCode(arglist[1]).Print()
@@ -445,18 +448,10 @@ class DeviceMgrCmd(Cmd):
             print("Waiting for device responses...")
             strlen = 100;
             addrStrStorage = ctypes.create_string_buffer(strlen)
-            count = 0
             # If this device is on the network and we're looking specifically for 1 device,
             # expect a quick response.
-            maxWaitTime = 1
-            ok = False
-            while count < maxWaitTime:
-                ok = self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen)
-                if ok:
-                    break
-                time.sleep(0.2)
-                count = count + 0.2
-            if ok:
+            if self.wait_for_one_discovered_device():
+                self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen)
                 addrStr = addrStrStorage.value.decode('utf-8')
                 print("Connecting to device at " + addrStr)
                 pincode = ctypes.c_uint32(int(setupPayload.attributes['SetUpPINCode']))
@@ -527,6 +522,23 @@ class DeviceMgrCmd(Cmd):
             print(str(ex))
             return
 
+    def do_closesession(self, line):
+        """
+        close-session <nodeid>
+
+        Close any session associated with a given node ID.
+        """
+        try:
+            parser = argparse.ArgumentParser()
+            parser.add_argument('nodeid', type=int, help='Peer node ID')
+            args = parser.parse_args(shlex.split(line))
+
+            self.devCtrl.CloseSession(args.nodeid)
+        except exceptions.ChipStackException as ex:
+            print(str(ex))
+        except:
+            self.do_help("close-session")
+
     def do_resolve(self, line):
         """
         resolve <fabricid> <nodeid>
@@ -558,6 +570,7 @@ class DeviceMgrCmd(Cmd):
         while (not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen) and count < maxWaitTime):
             time.sleep(0.2)
             count = count + 0.2
+        return count < maxWaitTime
 
     def wait_for_many_discovered_devices(self):
         # Discovery happens through mdns, which means we need to wait for responses to come back.
@@ -708,8 +721,10 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 5:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                self.devCtrl.ZCLReadAttribute(args[0], args[1], int(
+                res = self.devCtrl.ZCLReadAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]))
+                if res != None:
+                    print(repr(res))
             else:
                 self.do_help("zclread")
         except exceptions.ChipStackException as ex:

@@ -839,7 +839,8 @@ void TestDaysSinceEpochConversion()
                     CalendarDateToDaysSinceUnixEpoch(year, month, dayOfMonth, calculatedDaysSinceEpoch);
 
                     if (calculatedDaysSinceEpoch != daysSinceEpoch)
-                        printf("%04u/%02u/%02u %u %u\n", year, month, dayOfMonth, daysSinceEpoch, calculatedDaysSinceEpoch);
+                        printf("%04u/%02u/%02u %" PRIu32 " %" PRIu32 "\n", year, month, dayOfMonth, daysSinceEpoch,
+                               calculatedDaysSinceEpoch);
 
                     TestAssert(calculatedDaysSinceEpoch == daysSinceEpoch,
                                "CalendarDateToDaysSinceUnixEpoch() returned unexpected value");

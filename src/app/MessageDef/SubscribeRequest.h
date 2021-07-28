@@ -38,8 +38,8 @@ enum
     kCsTag_EventPathList             = 1,
     kCsTag_AttributeDataVersionList  = 2,
     kCsTag_EventNumber               = 3,
-    kCsTag_MinInterval               = 4,
-    kCsTag_MaxInterval               = 5,
+    kCsTag_MinIntervalSeconds        = 4,
+    kCsTag_MaxIntervalSeconds        = 5,
     kCsTag_KeepExistingSubscriptions = 6,
     kCsTag_IsProxy                   = 7,
 };
@@ -99,7 +99,7 @@ public:
     CHIP_ERROR GetEventNumber(uint64_t * const apEventNumber) const;
 
     /**
-     *  @brief Get Min Interval. Next() must be called before accessing them.
+     *  @brief Get MinIntervalSeconds. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
@@ -107,7 +107,7 @@ public:
     CHIP_ERROR GetMinIntervalSeconds(uint16_t * const apMinIntervalSeconds) const;
 
     /**
-     *  @brief Get Max Interval. Next() must be called before accessing them.
+     *  @brief Get MaxIntervalSeconds. Next() must be called before accessing them.
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */

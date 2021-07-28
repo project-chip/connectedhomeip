@@ -75,7 +75,7 @@ int Application_Init(void)
     return 0;
 }
 
-int CHIP_Init(void)
+CHIP_ERROR CHIP_Init(void)
 {
     CHIP_ERROR ret = chip::Platform::MemoryInit();
     if (ret != CHIP_NO_ERROR)
@@ -141,6 +141,7 @@ exit:
 int main(void)
 {
     int result;
+    CHIP_ERROR error;
 
     /* Initialize Qorvo stack */
     result = qvCHIP_init();
@@ -150,8 +151,8 @@ int main(void)
     }
 
     /* Initialize CHIP stack */
-    result = CHIP_Init();
-    if (result != CHIP_NO_ERROR)
+    error = CHIP_Init();
+    if (error != CHIP_NO_ERROR)
     {
         goto exit;
     }

@@ -111,14 +111,6 @@
 
 // clang-format off
 
-#ifndef CHIP_SYSTEM_CONFIG_USE_IO_THREAD
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-#define CHIP_SYSTEM_CONFIG_USE_IO_THREAD 1
-#else
-#define CHIP_SYSTEM_CONFIG_USE_IO_THREAD 0
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
-
 /**
  *  @def CHIP_SYSTEM_CONFIG_TRANSFER_INETLAYER_PROJECT_CONFIGURATION
  *
@@ -427,21 +419,6 @@ struct LwIPEvent;
 #endif /* _CHIP_SYSTEM_CONFIG_LWIP_EVENT */
 
 #endif /* CHIP_SYSTEM_CONFIG_USE_LWIP */
-
-
-/**
- *  @def CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
- *
- *  @brief
- *      This defines whether (1) or not (0) your platform will provide the following platform-specific functions:
- *      - chip::System::Platform::WillInit
- *      - chip::System::Platform::WillShutdown
- *      - chip::System::Platform::DidInit
- *      - chip::System::Platform::DidShutdown
- */
-#ifndef CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS 0
-#endif /* CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS */
 
 /**
  *  @def CHIP_SYSTEM_CONFIG_NUM_TIMERS

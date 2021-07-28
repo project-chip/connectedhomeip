@@ -1427,6 +1427,12 @@ public:
     CHIP_ERROR ReadAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeSystemMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeStartOfWeek(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeNumberOfWeeklyTransitions(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeNumberOfDailyTransitions(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeOccupiedCoolingSetpoint(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, int16_t value);
@@ -1558,6 +1564,9 @@ public:
     WiFiNetworkDiagnosticsCluster() : ClusterBase(kWiFiNetworkDiagnosticsClusterId) {}
     ~WiFiNetworkDiagnosticsCluster() {}
 
+    // Cluster Commands
+    CHIP_ERROR ResetCounts(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeBssid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -1566,6 +1575,9 @@ public:
     CHIP_ERROR ReadAttributeChannelNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeRssi(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kResetCountsCommandId = 0x00;
 };
 
 class DLL_EXPORT WindowCoveringCluster : public ClusterBase

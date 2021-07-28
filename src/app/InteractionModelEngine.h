@@ -122,7 +122,7 @@ public:
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession,
+    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession,
                                EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
                                AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
                                EventNumber aEventNumber, intptr_t aAppIdentifier = 0);
@@ -203,7 +203,9 @@ private:
 };
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::TLV::TLVReader & aReader, Command * apCommandObj);
+                                  chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj);
+void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                          chip::TLV::TLVReader & aReader, CommandSender * apCommandObj);
 
 /**
  *  Check whether the given cluster exists on the given endpoint and supports the given command.

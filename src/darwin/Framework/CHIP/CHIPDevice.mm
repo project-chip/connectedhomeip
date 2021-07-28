@@ -16,8 +16,8 @@
  */
 
 #import "CHIPDevice_Internal.h"
+#import "CHIPError_Internal.h"
 #import "CHIPLogging.h"
-#import <CHIP/CHIPError.h>
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
 
@@ -71,7 +71,7 @@
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, Open Pairing Window failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
@@ -117,7 +117,7 @@
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, Open Pairing Window failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        CHIP_LOG_ERROR("Error(%s): Open Pairing Window failed", chip::ErrorStr(err));
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }

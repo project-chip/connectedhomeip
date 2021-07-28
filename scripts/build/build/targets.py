@@ -2,10 +2,10 @@ import logging
 import os
 import shutil
 
-from enum import Enum, auto
+from enum import IntEnum, auto
 
 
-class Platform(Enum):
+class Platform(IntEnum):
   """Represents a supported build platform for compilation."""
   LINUX = auto()
   QPG = auto()
@@ -24,7 +24,7 @@ class Platform(Enum):
     raise KeyError()
 
 
-class Board(Enum):
+class Board(IntEnum):
   """Represents Specific boards within a platform."""
   # Host builds
   NATIVE = auto()
@@ -51,7 +51,7 @@ class Board(Enum):
     raise KeyError()
 
 
-class Application(Enum):
+class Application(IntEnum):
   """Example applications that can be built."""
   ALL_CLUSTERS = auto()
   LIGHT = auto()

@@ -27,7 +27,7 @@ usage() {
     echo "  -a APPLICATION: runs chip-tool against 'chip-<APPLICATION>-app' (default: all-clusters)"
     echo "  -i ITERATIONS: number of iterations to run (default: $iterations)"
     echo "  -h: this help message"
-    echo "  -s CASE_NAME: runs single test case name (e.g. TC_OO_2_2"
+    echo "  -s CASE_NAME: runs single test case name (e.g. Test_TC_OO_2_2"
     echo "                for Test_TC_OO_2_2.yaml) (by default, all are run)"
     echo "  -w COMMAND: prefix all instantiations with a command (e.g. valgrind) (default: '')"
     echo ""
@@ -46,16 +46,15 @@ while getopts a:i:hs:w: flag; do
 done
 
 if [[ $application == "tv" ]]; then
-    declare test_filenames="TV_${single_case-*}.yaml"
-    declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -exec basename {} .yaml \;))"
+    declare test_filenames="${single_case-TV_*}.yaml"
     cp examples/tv-app/linux/include/endpoint-configuration/chip_tv_config.ini /tmp/chip_tv_config.ini
 # in case there's no application argument
 # always default to all-cluters app
 else
     application="all-clusters"
-    declare test_filenames="Test_${single_case-*}.yaml"
-    declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -exec basename {} .yaml \;))"
+    declare test_filenames="${single_case-Test*}.yaml"
 fi
+declare -a test_array="($(find src/app/tests/suites -type f -name "$test_filenames" -exec basename {} .yaml \;))"
 
 if [[ $iterations == 0 ]]; then
     echo "Invalid iteration count: '$1'"
@@ -122,7 +121,7 @@ for j in "${iter_array[@]}"; do
         # the data is there yet.
         background_pid="$(</tmp/pid)"
         echo "          * Pairing to device"
-        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 11097
+        "${test_case_wrapper[@]}" out/debug/standalone/chip-tool pairing onnetwork 0 20202021 3840 ::1 5540
         echo "          * Starting test run: $i"
         "${test_case_wrapper[@]}" out/debug/standalone/chip-tool tests "$i"
         # Prevent cleanup trying to kill a process we already killed.

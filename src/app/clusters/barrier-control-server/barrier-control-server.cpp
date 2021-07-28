@@ -39,7 +39,7 @@
  ******************************************************************************/
 
 #include "barrier-control-server.h"
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/attributes/Accessors.h>
 #include <app/common/gen/ids/Clusters.h>
@@ -296,7 +296,7 @@ static void sendDefaultResponse(EmberAfStatus status)
     }
 }
 
-bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(chip::app::Command * commandObj, uint8_t percentOpen)
+bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(chip::app::CommandHandler * commandObj, uint8_t percentOpen)
 {
     EndpointId endpoint  = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -338,7 +338,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(chip::app::Co
     return true;
 }
 
-bool emberAfBarrierControlClusterBarrierControlStopCallback(chip::app::Command * commandObj)
+bool emberAfBarrierControlClusterBarrierControlStopCallback(chip::app::CommandHandler * commandObj)
 {
     EndpointId endpoint = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
     emberAfDeactivateServerTick(endpoint, BarrierControl::Id);

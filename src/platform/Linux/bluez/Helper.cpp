@@ -442,7 +442,7 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
         errStr = strerror(errno);
         ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", errStr, __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
-        SuccessOrExit(false);
+        goto exit;
     }
 
     g_variant_dict_init(&options, aOptions);
@@ -455,7 +455,7 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
     {
         ChipLogError(DeviceLayer, "FAIL: no MTU in options in %s", __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed");
-        SuccessOrExit(false);
+        goto exit;
     }
 
     channel = g_io_channel_unix_new(fds[0]);
@@ -519,7 +519,7 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
         errStr = strerror(errno);
         ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", errStr, __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
-        SuccessOrExit(false);
+        goto exit;
     }
     channel = g_io_channel_unix_new(fds[0]);
     g_io_channel_set_encoding(channel, nullptr, nullptr);

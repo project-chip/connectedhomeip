@@ -317,6 +317,11 @@ function asUpperCamelCase(label)
   return str.replace(/[\.:]/g, '');
 }
 
+function asMEI(prefix, suffix)
+{
+  return cHelper.asHex((prefix << 16) + suffix, 8);
+}
+
 //
 // Module exports
 //
@@ -329,3 +334,4 @@ exports.asTypeLiteralSuffix               = asTypeLiteralSuffix;
 exports.asLowerCamelCase                  = asLowerCamelCase;
 exports.asUpperCamelCase                  = asUpperCamelCase;
 exports.hasSpecificAttributes             = hasSpecificAttributes;
+exports.asMEI                             = asMEI;

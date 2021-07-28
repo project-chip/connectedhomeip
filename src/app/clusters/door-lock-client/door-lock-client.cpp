@@ -22,19 +22,19 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 
 using namespace chip;
 
-bool emberAfDoorLockClusterLockDoorResponseCallback(chip::app::Command * commandObj, uint8_t status)
+bool emberAfDoorLockClusterLockDoorResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status)
 {
     emberAfDoorLockClusterPrintln("RX: LockDoorResponse 0x%x", status);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
-bool emberAfDoorLockClusterUnlockDoorResponseCallback(chip::app::Command * commandObj, uint8_t status)
+bool emberAfDoorLockClusterUnlockDoorResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status)
 {
     emberAfDoorLockClusterPrintln("RX: UnlockDoorResponse 0x%x", status);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);

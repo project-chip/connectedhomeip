@@ -155,7 +155,7 @@ void ProcessShellLine(intptr_t args)
     {
         CHIP_ERROR retval = Engine::Root().ExecCommand(argc, argv);
 
-        if (retval)
+        if (retval != CHIP_NO_ERROR)
         {
             char errorStr[160];
             bool errorStrFound = FormatCHIPError(errorStr, sizeof(errorStr), retval);

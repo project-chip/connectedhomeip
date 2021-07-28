@@ -344,5 +344,5 @@ uart:~$ matter dns resolve <fabric-id> <node-id>
 Resolving ...
 DNS resolve for 000000014A77CBB3-0000000000BC5C01 succeeded:
    IP address: fd08:b65e:db8e:f9c7:8052:1a8e:4dd4:e1f3
-   Port: 11097
+   Port: 5540
 ```

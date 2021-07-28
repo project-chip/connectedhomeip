@@ -58,11 +58,16 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
 void WriteClient::Shutdown()
 {
     VerifyOrReturn(mState != State::Uninitialized);
+    ClearExistingExchangeContext();
+    ShutdownInternal();
+}
+
+void WriteClient::ShutdownInternal()
+{
     mMessageWriter.Reset();
 
-    ClearExistingExchangeContext();
-
     mpExchangeMgr         = nullptr;
+    mpExchangeCtx         = nullptr;
     mpDelegate            = nullptr;
     mAttributeStatusIndex = 0;
     ClearState();
@@ -240,7 +245,7 @@ void WriteClient::ClearState()
     MoveToState(State::Uninitialized);
 }
 
-CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession)
+CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle packet;
@@ -259,7 +264,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, Transport::AdminId aAdm
     // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
     if (apSecureSession == nullptr)
     {
-        mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
+        mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aFabricIndex }, this);
     }
     else
     {
@@ -294,9 +299,6 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     VerifyOrDie(apExchangeContext == mpExchangeCtx);
 
-    // We are done with this exchange, and it will be closing itself.
-    mpExchangeCtx = nullptr;
-
     // Verify that the message is an Write Response.
     // If not, close the exchange and free the payload.
     if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteResponse))
@@ -318,7 +320,7 @@ exit:
             mpDelegate->WriteResponseProcessed(this);
         }
     }
-    Shutdown();
+    ShutdownInternal();
     return err;
 }
 
@@ -331,7 +333,7 @@ void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
     {
         mpDelegate->WriteResponseError(this, CHIP_ERROR_TIMEOUT);
     }
-    Shutdown();
+    ShutdownInternal();
 }
 
 CHIP_ERROR WriteClient::ProcessAttributeStatusElement(AttributeStatusElement::Parser & aAttributeStatusElement)

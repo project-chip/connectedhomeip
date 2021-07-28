@@ -486,7 +486,7 @@ exit:
     }
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Avahi publish service failed: %d", static_cast<int>(error));
+        ChipLogError(DeviceLayer, "Avahi publish service failed: %" CHIP_ERROR_FORMAT, ChipError::FormatError(error));
     }
 
     return error;

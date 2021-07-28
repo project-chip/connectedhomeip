@@ -28,6 +28,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <core/CHIPConfig.h>
+#include <inttypes.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <support/Base64.h>

@@ -334,8 +334,10 @@ struct ChipCertificateData
 struct ValidationContext
 {
     uint32_t mEffectiveTime;                        /**< Current CHIP Epoch UTC time. */
-    const ChipCertificateData * mTrustAnchor;       /**< Pointer to the Trust Anchor Certificate data structure. */
-    const ChipCertificateData * mSigningCert;       /**< Pointer to the Signing Certificate data structure. */
+    const ChipCertificateData * mTrustAnchor;       /**< Pointer to the Trust Anchor Certificate data structure.
+                                                       This value is set during certificate validation process
+                                                       to indicate to the caller the trust anchor of the
+                                                       validated certificate. */
     BitFlags<KeyUsageFlags> mRequiredKeyUsages;     /**< Key usage extensions that should be present in the
                                                        validated certificate. */
     BitFlags<KeyPurposeFlags> mRequiredKeyPurposes; /**< Extended Key usage extensions that should be present
@@ -366,9 +368,6 @@ public:
         aOther.mCerts        = nullptr;
         mCertCount           = aOther.mCertCount;
         mMaxCerts            = aOther.mMaxCerts;
-        mDecodeBuf           = aOther.mDecodeBuf;
-        aOther.mDecodeBuf    = nullptr;
-        mDecodeBufSize       = aOther.mDecodeBufSize;
         mMemoryAllocInternal = aOther.mMemoryAllocInternal;
 
         return *this;
@@ -380,11 +379,10 @@ public:
      *        allocated internally using chip::Platform::MemoryAlloc() and freed with chip::Platform::MemoryFree().
      *
      * @param maxCertsArraySize  Maximum number of CHIP certificates to be loaded to the set.
-     * @param decodeBufSize      Size of the buffer that should be allocated to perform CHIP certificate decoding.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Init(uint8_t maxCertsArraySize, uint16_t decodeBufSize);
+    CHIP_ERROR Init(uint8_t maxCertsArraySize);
 
     /**
      * @brief Initialize ChipCertificateSet.
@@ -393,12 +391,10 @@ public:
      *
      * @param certsArray      A pointer to the array of the ChipCertificateData structures.
      * @param certsArraySize  Number of ChipCertificateData entries in the array.
-     * @param decodeBuf       Buffer to use for temporary storage of intermediate processing results.
-     * @param decodeBufSize   Size of decoding buffer.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Init(ChipCertificateData * certsArray, uint8_t certsArraySize, uint8_t * decodeBuf, uint16_t decodeBufSize);
+    CHIP_ERROR Init(ChipCertificateData * certsArray, uint8_t certsArraySize);
 
     /**
      * @brief Release resources allocated by this class.
@@ -503,7 +499,7 @@ public:
     /**
      * @brief Validate CHIP certificate.
      *
-     * @param cert     Pointer to the CHIP certificiate to be validated. The certificate is
+     * @param cert     Pointer to the CHIP certificate to be validated. The certificate is
      *                 required to be in this set, otherwise this function returns error.
      * @param context  Certificate validation context.
      *
@@ -514,20 +510,20 @@ public:
     /**
      * @brief Find and validate CHIP certificate.
      *
-     * @param subjectDN     Subject distinguished name to use as certificate search parameter.
-     * @param subjectKeyId  Subject key identifier to use as certificate search parameter.
-     * @param context       Certificate validation context.
-     * @param cert          A pointer to the valid CHIP certificate that matches search criteria.
+     * @param[in]  subjectDN     Subject distinguished name to use as certificate search parameter.
+     * @param[in]  subjectKeyId  Subject key identifier to use as certificate search parameter.
+     * @param[in]  context       Certificate validation context.
+     * @param[out] certData      A slot to write a pointer to the CHIP certificate data that matches search criteria.
      *
      * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId, ValidationContext & context,
-                             ChipCertificateData *& cert);
+                             const ChipCertificateData ** certData);
 
     /**
      * @brief Verify CHIP certificate signature.
      *
-     * @param cert    Pointer to the CHIP certificiate which signature should be validated.
+     * @param cert    Pointer to the CHIP certificate which signature should be validated.
      * @param caCert  Pointer to the CA certificate of the verified certificate.
      *
      * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
@@ -544,29 +540,27 @@ private:
                                      had their constructor called, or have had
                                      their destructor called since then. */
     uint8_t mMaxCerts;            /**< Length of mCerts array. */
-    uint8_t * mDecodeBuf;         /**< Certificate decode buffer. */
-    uint16_t mDecodeBufSize;      /**< Certificate decode buffer size. */
     bool mMemoryAllocInternal;    /**< Indicates whether temporary memory buffers are allocated internally. */
 
     /**
      * @brief Find and validate CHIP certificate.
      *
-     * @param subjectDN      Subject distinguished name to use as certificate search parameter.
-     * @param subjectKeyId   Subject key identifier to use as certificate search parameter.
-     * @param context        Certificate validation context.
-     * @param validateFlags  Certificate validation flags.
-     * @param depth          Depth of the current certificate in the certificate validation chain.
-     * @param cert           A pointer to the valid CHIP certificate that matches search criteria.
+     * @param[in]  subjectDN      Subject distinguished name to use as certificate search parameter.
+     * @param[in]  subjectKeyId   Subject key identifier to use as certificate search parameter.
+     * @param[in]  context        Certificate validation context.
+     * @param[in]  validateFlags  Certificate validation flags.
+     * @param[in]  depth          Depth of the current certificate in the certificate validation chain.
+     * @param[out] certData       A slot to write a pointer to the CHIP certificate data that matches search criteria.
      *
      * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId, ValidationContext & context,
-                             BitFlags<CertValidateFlags> validateFlags, uint8_t depth, ChipCertificateData *& cert);
+                             BitFlags<CertValidateFlags> validateFlags, uint8_t depth, const ChipCertificateData ** certData);
 
     /**
      * @brief Validate CHIP certificate.
      *
-     * @param cert           Pointer to the CHIP certificiate to be validated.
+     * @param cert           Pointer to the CHIP certificate to be validated.
      * @param context        Certificate validation context.
      * @param validateFlags  Certificate validation flags.
      * @param depth          Depth of the current certificate in the certificate validation chain.
@@ -820,18 +814,6 @@ inline bool IsChipDNAttr(chip::ASN1::OID oid)
  * @retval  #CHIP_NO_ERROR  If the integer value was successfully converted.
  */
 CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint16_t rawIntLen);
-
-/**
- * @brief Convert a raw integer in big-endian form to an ASN.1 DER encoded integer.
- *
- * @param rawInt        P256 integer in raw form.
- * @param derInt        Buffer to store converted ASN.1 DER encoded integer.
- * @param derIntBufSize The size of the buffer to store ASN.1 DER encoded integer.
- * @param derIntLen     The length of the ASN.1 DER encoded integer.
- *
- * @retval  #CHIP_NO_ERROR  If the integer value was successfully converted.
- */
-CHIP_ERROR ConvertIntegerRawToDER(P256IntegerSpan rawInt, uint8_t * derInt, const uint16_t derIntBufSize, uint16_t & derIntLen);
 
 /**
  * @brief Convert a raw CHIP signature to an ASN.1 DER encoded signature structure.

@@ -49,7 +49,7 @@ DEVICE_CONFIG = {
     }
 }
 
-CHIP_PORT = 11097
+CHIP_PORT = 5540
 
 CIRQUE_URL = "http://localhost:5000"
 
@@ -101,62 +101,6 @@ class TestPythonController(CHIPVirtualHome):
                 self.get_device_pretty_id(device_id)))
             self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["LightingManager::InitiateAction(ON_ACTION)", "LightingManager::InitiateAction(OFF_ACTION)", "No Cluster 0x6 on Endpoint 0xe9"]),
                             "Datamodel test failed: cannot find matching string from device {}".format(device_id))
-
-        # Check if the device response proper Basic Cluster values to controller.
-        # Note: the TLV Type for string attributes is 0x0c, which is byte_string, this is fixed by #8167, modification for this case is required.
-        baseFmt = "CHIP:ZCL:   ClusterId: {cluster}\n" \
-            "CHIP:ZCL:   attributeId: {attr}\n" \
-            "CHIP:ZCL:   status: Success                (0x0000)\n" \
-            "CHIP:ZCL:   attribute TLV Type: {attr_tlv_type}\n"
-        fmtString = baseFmt + "CHIP:ZCL:   value: {attr_value}\n"
-        fmtNumeric = baseFmt + "CHIP:ZCL:   attributeValue: {attr_value}\n"
-
-        for device_id in server_ids:
-            matchContent = []
-            matchContent += fmtString.format(cluster='0x0028',
-                                             attr='0x0001',
-                                             attr_tlv_type='0x0c',
-                                             attr_value='TEST_VENDOR').split("\n")
-            matchContent += fmtNumeric.format(cluster='0x0028',
-                                              attr='0x0002',
-                                              attr_tlv_type='0x04',
-                                              attr_value='9050').split("\n")
-            matchContent += fmtString.format(cluster='0x0028',
-                                             attr='0x0003',
-                                             attr_tlv_type='0x0c',
-                                             attr_value='TEST_PRODUCT').split("\n")
-            matchContent += fmtNumeric.format(cluster='0x0028',
-                                              attr='0x0004',
-                                              attr_tlv_type='0x04',
-                                              attr_value='65279').split("\n")
-            matchContent += fmtString.format(cluster='0x0028',
-                                             attr='0x0005',
-                                             attr_tlv_type='0x0c',
-                                             attr_value='').split("\n")
-            matchContent += fmtString.format(cluster='0x0028',
-                                             attr='0x0006',
-                                             attr_tlv_type='0x0c',
-                                             attr_value='').split("\n")
-            matchContent += fmtNumeric.format(cluster='0x0028',
-                                              attr='0x0007',
-                                              attr_tlv_type='0x04',
-                                              attr_value='1').split("\n")
-            matchContent += fmtString.format(cluster='0x0028',
-                                             attr='0x0008',
-                                             attr_tlv_type='0x0c',
-                                             attr_value='TEST_VERSION').split("\n")
-            matchContent += fmtNumeric.format(cluster='0x0028',
-                                              attr='0x0009',
-                                              attr_tlv_type='0x04',
-                                              attr_value='1').split("\n")
-            matchContent += fmtString.format(cluster='0x0028',
-                                             attr='0x000a',
-                                             attr_tlv_type='0x0c',
-                                             attr_value='prerelease').split("\n")
-
-            self.assertTrue(self.sequenceMatch(ret['output'],
-                                               matchContent),
-                            "Attribute reading response was not found {}".format(device_id))
 
 
 if __name__ == "__main__":

@@ -281,7 +281,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     EnqueueEvtHdrMsg(BLEManagerIMPL_CHIPOBLE_CLOSE_CONN_EVT, (void *) pMsg);
 
-    return CHIP_NO_ERROR;
+    return false;
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const

@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 
-bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::Command * commandObj, uint8_t intent,
+bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(chip::app::CommandHandler * commandObj, uint8_t intent,
                                                              uint8_t requestedProtocol, chip::ByteSpan transferFileDesignator)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;

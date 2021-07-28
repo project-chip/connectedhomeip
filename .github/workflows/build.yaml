@@ -30,11 +30,9 @@ jobs:
 
         strategy:
             matrix:
-                type: [gcc_debug, gcc_release, clang, mbedtls, clang_experimental, no_detail_logging, no_progress_logging]
+                type: [gcc_debug, gcc_release, clang, mbedtls]
         env:
             BUILD_TYPE: ${{ matrix.type }}
-            DETAIL_LOGGING: ${{ matrix.type != 'no_detail_logging' && matrix.type != 'no_progress_logging' }}
-            PROGRESS_LOGGING: ${{ matrix.type != 'no_progress_logging' }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -61,7 +59,7 @@ jobs:
               with:
                   submodules: true
             - name: Initialize CodeQL
-              if: ${{ github.event_name == 'push' && (matrix.type == 'gcc_release' || matrix.type == 'clang' || matrix.type == 'mbedtls') }}
+              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' && (matrix.type == 'gcc_release' || matrix.type == 'clang' || matrix.type == 'mbedtls') }}
               uses: github/codeql-action/init@v1
               with:
                   languages: "cpp"
@@ -84,10 +82,10 @@ jobs:
                      "gcc_release") GN_ARGS='is_debug=false';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
-                     *) ;;
+                      *) echo >&2 "Unrecognized build type: ${BUILD_TYPE}"; exit 1;;
                   esac
 
-                  scripts/build/gn_gen.sh --args="$GN_ARGS chip_detail_logging=${DETAIL_LOGGING} chip_progress_logging=${PROGRESS_LOGGING}"
+                  scripts/build/gn_gen.sh --args="$GN_ARGS"
             - name: Run Build
               timeout-minutes: 10
               run: scripts/build/gn_build.sh
@@ -109,8 +107,22 @@ jobs:
             # - name: Remove nrfxlib binaries for CodeQL Analysis
             #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
             - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' && (matrix.type == 'gcc_release' || matrix.type == 'clang' || matrix.type == 'mbedtls') }}
+              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' && (matrix.type == 'gcc_release' || matrix.type == 'clang' || matrix.type == 'mbedtls') }}
               uses: github/codeql-action/analyze@v1
+            - name: Setup Build Without Detail Logging
+              if: ${{ matrix.type == 'gcc_debug' }}
+              run: scripts/build/gn_gen.sh --args="chip_detail_logging=false"
+            - name: Run Build Without Detail Logging
+              if: ${{ matrix.type == 'gcc_debug' }}
+              timeout-minutes: 10
+              run: scripts/build/gn_build.sh
+            - name: Setup Build Without Progress Logging
+              if: ${{ matrix.type == 'gcc_debug' }}
+              run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false"
+            - name: Run Build Without Progress Logging
+              if: ${{ matrix.type == 'gcc_debug' }}
+              timeout-minutes: 10
+              run: scripts/build/gn_build.sh
     build_darwin:
         name: Build on Darwin
         timeout-minutes: 60

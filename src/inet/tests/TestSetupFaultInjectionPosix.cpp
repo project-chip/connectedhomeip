@@ -116,15 +116,15 @@ static void PostInjectionCallbackFn(nl::FaultInjection::Manager * aManager, nl::
     uint16_t numargs = aFaultRecord->mNumArguments;
     uint16_t i;
 
-    printf("***** Injecting fault %s_%s, instance number: %u; reboot: %s", aManager->GetName(), aManager->GetFaultNames()[aId],
-           aFaultRecord->mNumTimesChecked, aFaultRecord->mReboot ? "yes" : "no");
+    printf("***** Injecting fault %s_%s, instance number: %" PRIu32 "; reboot: %s", aManager->GetName(),
+           aManager->GetFaultNames()[aId], aFaultRecord->mNumTimesChecked, aFaultRecord->mReboot ? "yes" : "no");
     if (numargs)
     {
         printf(" with %u args:", numargs);
 
         for (i = 0; i < numargs; i++)
         {
-            printf(" %d", aFaultRecord->mArguments[i]);
+            printf(" %" PRIi32, aFaultRecord->mArguments[i]);
         }
     }
 
@@ -138,8 +138,8 @@ static bool PrintFaultInjectionMaxArgCbFn(nl::FaultInjection::Manager & mgr, nl:
 
     if (gFaultInjectionOptions.PrintFaultCounters && aFaultRecord->mNumArguments)
     {
-        printf("FI_instance_params: %s_%s_s%u maxArg: %u;\n", mgr.GetName(), faultName, aFaultRecord->mNumTimesChecked,
-               aFaultRecord->mArguments[0]);
+        printf("FI_instance_params: %s_%s_s%" PRIu32 " maxArg: %" PRIi32 ";\n", mgr.GetName(), faultName,
+               aFaultRecord->mNumTimesChecked, aFaultRecord->mArguments[0]);
     }
 
     return false;

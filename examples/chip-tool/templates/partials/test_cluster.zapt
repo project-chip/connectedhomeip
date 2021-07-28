@@ -158,7 +158,7 @@ class {{filename}}: public TestCommand
           if ({{asCamelCased name true}}.size() < {{expectedConstraints.minLength}})
           {
             ChipLogError(chipTool, "Error: {{asCamelCased name true}} is too short. Min size is {{expectedConstraints.minLength}} but got '%zu'", {{asCamelCased name true}}.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
           }
         {{/if}}
@@ -167,7 +167,7 @@ class {{filename}}: public TestCommand
           if ({{asCamelCased name true}}.size() > {{expectedConstraints.maxLength}})
           {
             ChipLogError(chipTool, "Error: {{asCamelCased name true}} is too long. Max size is {{expectedConstraints.maxLength}} but got '%zu'", {{asCamelCased name true}}.size());
-            runner->SetCommandExitStatus(false);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
           }
         {{/if}}

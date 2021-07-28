@@ -22,7 +22,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/cluster-id.h>
@@ -32,14 +32,14 @@
 
 ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data);
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * commandObj, uint8_t *, uint8_t *)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::CommandHandler * commandObj, uint8_t *, uint8_t *)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-void sendResponse(chip::app::Command * command, ApplicationLauncherResponse response)
+void sendResponse(chip::app::CommandHandler * command, ApplicationLauncherResponse response)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_APPLICATION_LAUNCHER_CLUSTER_ID,
@@ -66,7 +66,7 @@ EmberAfApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId
     return application;
 }
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * command, uint8_t * requestData,
+bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::CommandHandler * command, uint8_t * requestData,
                                                         uint16_t requestApplicationCatalogVendorId, uint8_t * requestApplicationId)
 {
     EmberAfApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);

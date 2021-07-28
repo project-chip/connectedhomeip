@@ -25,7 +25,10 @@
 #include <support/BufferReader.h>
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
+#include <support/Span.h>
 
+using chip::ByteSpan;
+using chip::MutableByteSpan;
 using chip::Encoding::BufferWriter;
 using chip::Encoding::LittleEndian::Reader;
 
@@ -35,6 +38,12 @@ constexpr uint8_t kIntegerTag         = 0x02u;
 constexpr uint8_t kSeqTag             = 0x30u;
 constexpr size_t kMinSequenceOverhead = 1 /* tag */ + 1 /* length */ + 1 /* actual data or second length byte*/;
 
+/**
+ * @brief Utility to read a length field after a tag in a DER-encoded stream.
+ * @param[in] reader Reader instance from which the input will be read
+ * @param[out] length Length of the following element read from the stream
+ * @return CHIP_ERROR_INVALID_ARGUMENT or CHIP_ERROR_BUFFER_TOO_SMALL on error, CHIP_NO_ERROR otherwise
+ */
 CHIP_ERROR ReadDerLength(Reader & reader, uint8_t & length)
 {
     length = 0;
@@ -64,7 +73,14 @@ CHIP_ERROR ReadDerLength(Reader & reader, uint8_t & length)
     }
 }
 
-CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, uint8_t * raw_integer_out, size_t raw_integer_length)
+/**
+ * @brief Utility to convert DER-encoded INTEGER into a raw integer buffer in big-endian order
+ *        with leading zeroes if the output buffer is larger than needed.
+ * @param[in] reader Reader instance from which the input will be read
+ * @param[out] raw_integer_out Buffer to receive the DER-encoded integer
+ * @return CHIP_ERROR_INVALID_ARGUMENT or CHIP_ERROR_BUFFER_TOO_SMALL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, MutableByteSpan raw_integer_out)
 {
     uint8_t cur_byte = 0;
 
@@ -78,13 +94,13 @@ CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, uint8_t * raw_integer_
     ReturnErrorOnFailure(ReadDerLength(reader, integer_len));
 
     // Clear the destination buffer, so we can blit the unsigned value into place
-    memset(raw_integer_out, 0, raw_integer_length);
+    memset(raw_integer_out.data(), 0, raw_integer_out.size());
 
     // Check for pseudo-zero to mark unsigned value
     // This means we have too large an integer (should be at most 1 byte too large), it's invalid
-    ReturnErrorCodeIf(integer_len > (raw_integer_length + 1), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(integer_len > (raw_integer_out.size() + 1), CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (integer_len == (raw_integer_length + 1u))
+    if (integer_len == (raw_integer_out.size() + 1u))
     {
         // Means we had a 0x00 byte stuffed due to MSB being high in original integer
         ReturnErrorOnFailure(reader.Read8(&cur_byte).StatusCode());
@@ -97,20 +113,20 @@ CHIP_ERROR ReadDerUnsignedIntegerIntoRaw(Reader & reader, uint8_t * raw_integer_
     // We now have the rest of the tag that is a "minimal length" unsigned integer.
     // Blit it at the correct offset, since the order we use is MSB first for
     // both ASN.1 and EC curve raw points.
-    size_t offset = raw_integer_length - integer_len;
-    return reader.ReadBytes(&raw_integer_out[offset], integer_len).StatusCode();
+    size_t offset = raw_integer_out.size() - integer_len;
+    return reader.ReadBytes(raw_integer_out.data() + offset, integer_len).StatusCode();
 }
 
-size_t EmitDerIntegerFromRaw(const uint8_t * raw_integer, size_t raw_integer_length_bytes, uint8_t * out_der_integer,
-                             size_t out_der_integer_size)
+CHIP_ERROR ConvertIntegerRawToDerInternal(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer,
+                                          bool include_tag_and_length)
 {
-    if ((raw_integer == nullptr) || (raw_integer_length_bytes == 0))
+    if (!IsSpanUsable(raw_integer) || !IsSpanUsable(out_der_integer))
     {
-        return 0;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    Reader reader(raw_integer, static_cast<uint16_t>(raw_integer_length_bytes));
-    BufferWriter writer(out_der_integer, static_cast<uint16_t>(out_der_integer_size));
+    Reader reader(raw_integer);
+    BufferWriter writer(out_der_integer);
 
     bool needs_leading_zero_byte = false;
 
@@ -127,32 +143,35 @@ size_t EmitDerIntegerFromRaw(const uint8_t * raw_integer, size_t raw_integer_len
         needs_leading_zero_byte = true;
     }
 
-    // The + 1 is to account for the last consummed byte of the loop to skip leading zeros
+    // The + 1 is to account for the last consumed byte of the loop to skip leading zeros
     size_t length = reader.Remaining() + 1 + (needs_leading_zero_byte ? 1 : 0);
 
     if (length > 127)
     {
         // We do not support length over more than 1 bytes.
-        return 0;
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // Put INTEGER tag
-    writer.Put(kIntegerTag);
+    if (include_tag_and_length)
+    {
+        // Put INTEGER tag
+        writer.Put(kIntegerTag);
 
-    // Put length over 1 byte (i.e. MSB clear)
-    writer.Put(static_cast<uint8_t>(length));
+        // Put length over 1 byte (i.e. MSB clear)
+        writer.Put(static_cast<uint8_t>(length));
+    }
 
-    // If leading zero or no more bytes remaining, must ensure we start we at least a zero byte
+    // If leading zero or no more bytes remaining, must ensure we start with at least a zero byte
     if (needs_leading_zero_byte)
     {
         writer.Put(static_cast<uint8_t>(0u));
     }
 
-    // Put first consummed byte from last read iteration of leading zero suppression
+    // Put first consumed byte from last read iteration of leading zero suppression
     writer.Put(cur_byte);
 
     // Fill the rest from the input in order
-    while ((reader.Remaining() > 0) && (reader.Read8(&cur_byte).StatusCode() == CHIP_NO_ERROR))
+    while (reader.Read8(&cur_byte).StatusCode() == CHIP_NO_ERROR)
     {
         // Emit all other bytes as-is
         writer.Put(cur_byte);
@@ -161,11 +180,12 @@ size_t EmitDerIntegerFromRaw(const uint8_t * raw_integer, size_t raw_integer_len
     size_t actually_written = 0;
     if (!writer.Fit(actually_written))
     {
-        // Somehow it was too big, return 0 for error.
-        return 0;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    return actually_written;
+    out_der_integer = out_der_integer.SubSpan(0, actually_written);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace
@@ -452,13 +472,14 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitImpl()
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::Hash(const uint8_t * in, size_t in_len)
 {
-    ReturnErrorOnFailure(sha256_hash_ctx.AddData(in, in_len));
+    ReturnErrorOnFailure(sha256_hash_ctx.AddData(ByteSpan{ in, in_len }));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::HashFinalize(uint8_t * out)
 {
-    ReturnErrorOnFailure(sha256_hash_ctx.Finish(out));
+    MutableByteSpan out_span(out, kSHA256_Hash_Length);
+    ReturnErrorOnFailure(sha256_hash_ctx.Finish(out_span));
     return CHIP_NO_ERROR;
 }
 
@@ -473,41 +494,53 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::KDF(const uint8_t * ikm, const size_t 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const uint8_t * raw_sig, size_t raw_sig_length, uint8_t * out_asn1_sig,
-                                   size_t out_asn1_sig_length, size_t & out_asn1_sig_actual_length)
+CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer)
+{
+    return ConvertIntegerRawToDerInternal(raw_integer, out_der_integer, /* include_tag_and_length = */ false);
+}
+
+CHIP_ERROR ConvertIntegerRawToDer(const ByteSpan & raw_integer, MutableByteSpan & out_der_integer)
+{
+    return ConvertIntegerRawToDerInternal(raw_integer, out_der_integer, /* include_tag_and_length = */ true);
+}
+
+CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const ByteSpan & raw_sig, MutableByteSpan & out_asn1_sig)
 {
     VerifyOrReturnError(fe_length_bytes > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(raw_sig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(raw_sig_length == (2u * fe_length_bytes), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_asn1_sig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_asn1_sig_length >= (raw_sig_length + kMax_ECDSA_X9Dot62_Asn1_Overhead), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(raw_sig.size() == (2u * fe_length_bytes), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_asn1_sig.size() >= (raw_sig.size() + kMax_ECDSA_X9Dot62_Asn1_Overhead), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Write both R an S integers past the overhead, we will shift them back later if we only needed 2 size bytes.
-    uint8_t * cursor = &out_asn1_sig[kMinSequenceOverhead];
-    size_t remaining = out_asn1_sig_length - kMinSequenceOverhead;
+    uint8_t * cursor = out_asn1_sig.data() + kMinSequenceOverhead;
+    size_t remaining = out_asn1_sig.size() - kMinSequenceOverhead;
 
     size_t integers_length = 0;
 
     // Write R (first `fe_length_bytes` block of raw signature)
-    size_t integer_length = EmitDerIntegerFromRaw(&raw_sig[0], fe_length_bytes, cursor, remaining);
-    VerifyOrReturnError(integer_length != 0, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(integer_length < remaining, CHIP_ERROR_INTERNAL);
-    remaining -= integer_length;
-    integers_length += integer_length;
-    cursor += integer_length;
+    {
+        MutableByteSpan out_der_integer(cursor, remaining);
+        ReturnErrorOnFailure(ConvertIntegerRawToDer(raw_sig.SubSpan(0, fe_length_bytes), out_der_integer));
+        VerifyOrReturnError(out_der_integer.size() <= remaining, CHIP_ERROR_INTERNAL);
+
+        integers_length += out_der_integer.size();
+        remaining -= out_der_integer.size();
+        cursor += out_der_integer.size();
+    }
 
     // Write S (second `fe_length_bytes` block of raw signature)
-    integer_length = EmitDerIntegerFromRaw(&raw_sig[fe_length_bytes], fe_length_bytes, cursor, remaining);
-    VerifyOrReturnError(integer_length != 0, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(integer_length <= remaining, CHIP_ERROR_INTERNAL);
-    integers_length += integer_length;
+    {
+        MutableByteSpan out_der_integer(cursor, remaining);
+        ReturnErrorOnFailure(ConvertIntegerRawToDer(raw_sig.SubSpan(fe_length_bytes, fe_length_bytes), out_der_integer));
+        VerifyOrReturnError(out_der_integer.size() <= remaining, CHIP_ERROR_INTERNAL);
+        integers_length += out_der_integer.size();
+    }
 
     // We only support outputs that would use 1 or 2 bytes of DER length after the SEQUENCE tag
     VerifyOrReturnError(integers_length <= UINT8_MAX, CHIP_ERROR_INVALID_ARGUMENT);
 
     // We now know the length of both variable sized integers in the sequence, so we
     // can write the tag and length.
-    BufferWriter writer(out_asn1_sig, static_cast<uint16_t>(out_asn1_sig_length));
+    BufferWriter writer(out_asn1_sig);
 
     // Put SEQUENCE tag
     writer.Put(kSeqTag);
@@ -528,28 +561,24 @@ CHIP_ERROR EcdsaRawSignatureToAsn1(size_t fe_length_bytes, const uint8_t * raw_s
     // Put the contents of the integers previously serialized in the buffer.
     // The writer.Put is memmove-safe, so the shifting will happen from the read
     // of the same buffer where the write is taking place.
-    writer.Put(&out_asn1_sig[kMinSequenceOverhead], integers_length);
+    writer.Put(out_asn1_sig.data() + kMinSequenceOverhead, integers_length);
 
     size_t actually_written = 0;
     VerifyOrReturnError(writer.Fit(actually_written), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    out_asn1_sig_actual_length = actually_written;
+    out_asn1_sig = out_asn1_sig.SubSpan(0, actually_written);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const uint8_t * asn1_sig, size_t asn1_sig_length, uint8_t * out_raw_sig,
-                                   size_t out_raw_sig_length)
+CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1_sig, MutableByteSpan & out_raw_sig)
 {
     VerifyOrReturnError(fe_length_bytes > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(asn1_sig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    VerifyOrReturnError(asn1_sig_length > kMinSequenceOverhead, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(asn1_sig.size() > kMinSequenceOverhead, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Output raw signature is <r,s> both of which are of fe_length_bytes (see SEC1).
-    VerifyOrReturnError(out_raw_sig_length >= (2u * fe_length_bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(out_raw_sig != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_raw_sig.size() >= (2u * fe_length_bytes), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    chip::Encoding::LittleEndian::Reader reader(asn1_sig, static_cast<uint16_t>(asn1_sig_length));
+    Reader reader(asn1_sig);
 
     // Make sure we have a starting Sequence
     uint8_t tag = 0;
@@ -564,15 +593,17 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const uint8_t * asn1_
     VerifyOrReturnError(tag_len == reader.Remaining(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Can now clear raw signature integers r,s one by one
-    uint8_t * raw_cursor = out_raw_sig;
+    uint8_t * raw_cursor = out_raw_sig.data();
 
     // Read R
-    ReturnErrorOnFailure(ReadDerUnsignedIntegerIntoRaw(reader, raw_cursor, fe_length_bytes));
+    ReturnErrorOnFailure(ReadDerUnsignedIntegerIntoRaw(reader, MutableByteSpan{ raw_cursor, fe_length_bytes }));
 
     raw_cursor += fe_length_bytes;
 
     // Read S
-    ReturnErrorOnFailure(ReadDerUnsignedIntegerIntoRaw(reader, raw_cursor, fe_length_bytes));
+    ReturnErrorOnFailure(ReadDerUnsignedIntegerIntoRaw(reader, MutableByteSpan{ raw_cursor, fe_length_bytes }));
+
+    out_raw_sig = out_raw_sig.SubSpan(0, (2u * fe_length_bytes));
 
     return CHIP_NO_ERROR;
 }

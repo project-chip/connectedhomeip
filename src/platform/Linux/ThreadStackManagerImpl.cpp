@@ -398,7 +398,7 @@ bool ThreadStackManagerImpl::_HaveMeshConnectivity()
     // This API is Weave legacy and should be removed.
 
     ChipLogError(DeviceLayer, "HaveMeshConnectivity has confusing behavior and shouldn't be called");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return false;
 }
 
 void ThreadStackManagerImpl::_OnMessageLayerActivityChanged(bool messageLayerIsActive)

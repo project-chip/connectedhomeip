@@ -88,7 +88,6 @@ public:
             return;
         }
 
-        mLayer->StartTimer(0, &mGreedyTimer);
         mNumTimersHandled++;
     }
     static void GreedyTimer(void * p)
@@ -127,7 +126,6 @@ void HandleTimer10Success(Layer * inetLayer, void * aState, CHIP_ERROR aError)
 static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
 {
     uint32_t timeout_overflow_0ms = 652835029;
-    uint32_t timeout_overflow_1ms = 1958505088;
     uint32_t timeout_10ms         = 10;
 
     TestContext & lContext = *static_cast<TestContext *>(aContext);
@@ -136,8 +134,6 @@ static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
     sOverflowTestDone = false;
 
     lSys.StartTimer(timeout_overflow_0ms, HandleTimerFailed, aContext);
-    chip::Callback::Callback<> cb(TimerFailed, aContext);
-    lSys.StartTimer(timeout_overflow_1ms, &cb);
     lSys.StartTimer(timeout_10ms, HandleTimer10Success, aContext);
 
     while (!sOverflowTestDone)
@@ -175,7 +171,6 @@ static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
     struct timeval sleepTime;
 
     lSys.StartTimer(0, HandleGreedyTimer, aContext);
-    lSys.StartTimer(0, &lContext.mGreedyTimer);
 
     sleepTime.tv_sec  = 0;
     sleepTime.tv_usec = 1000; // 1 ms tick
@@ -217,19 +212,15 @@ static Layer sLayer;
 static int TestSetup(void * aContext)
 {
     TestContext & lContext = *reinterpret_cast<TestContext *>(aContext);
-    void * lLayerContext   = nullptr;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
     static sys_mbox_t * sLwIPEventQueue = NULL;
 
     sys_mbox_new(sLwIPEventQueue, 100);
-    lLayerContext = &sLwIPEventQueue;
     tcpip_init(NULL, NULL);
-#endif
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR <= 2 && LWIP_VERSION_MINOR < 1
 
-    sLayer.Init(lLayerContext);
+    sLayer.Init();
 
     lContext.mLayer     = &sLayer;
     lContext.mTestSuite = &kTheSuite;

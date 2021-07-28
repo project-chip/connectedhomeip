@@ -22,7 +22,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/cluster-id.h>
@@ -32,7 +32,7 @@
 
 TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std::string data);
 
-void sendResponse(chip::app::Command * command, TargetNavigatorResponse response)
+void sendResponse(chip::app::CommandHandler * command, TargetNavigatorResponse response)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TARGET_NAVIGATOR_CLUSTER_ID,
@@ -51,7 +51,7 @@ exit:
     }
 }
 
-bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::app::Command * command, uint8_t target, uint8_t * data)
+bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::app::CommandHandler * command, uint8_t target, uint8_t * data)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string dataString(reinterpret_cast<char *>(data));

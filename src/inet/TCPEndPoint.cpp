@@ -301,6 +301,12 @@ CHIP_ERROR TCPEndPoint::Listen(uint16_t backlog)
 
     if (listen(mSocket.GetFD(), backlog) != 0)
         res = chip::System::MapErrorPOSIX(errno);
+    else
+    {
+        // Enable non-blocking mode for the socket.
+        int flags = fcntl(mSocket.GetFD(), F_GETFL, 0);
+        fcntl(mSocket.GetFD(), F_SETFL, flags | O_NONBLOCK);
+    }
 
     // Wait for ability to read on this endpoint.
     mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
@@ -384,7 +390,11 @@ CHIP_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
         // Ensure that TCP timers are started
         if (res == CHIP_NO_ERROR)
         {
-            res = start_tcp_timers();
+            err_t error = start_tcp_timers();
+            if (error != ERR_OK)
+            {
+                res = chip::System::MapErrorLwIP(error);
+            }
         }
 
         if (res == CHIP_NO_ERROR)
@@ -829,10 +839,10 @@ void TCPEndPoint::EnableReceive()
 
     DriveReceiving();
 
-#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     // Wake the thread waiting for I/O so that it can include the socket.
-    SystemLayer().WakeIOThread();
-#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+    SystemLayer().WatchableEvents().Signal();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
 /**
@@ -2179,7 +2189,8 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, 
 
         // Post callback to HandleConnectComplete.
         conErr = chip::System::MapErrorLwIP(lwipErr);
-        if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPConnectComplete, (uintptr_t) conErr) != CHIP_NO_ERROR)
+        if (lSystemLayer.PostEvent(*ep, kInetEvent_TCPConnectComplete, static_cast<uintptr_t>(ChipError::AsInteger(conErr))) !=
+            CHIP_NO_ERROR)
             res = ERR_ABRT;
     }
     else
@@ -2221,7 +2232,11 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
         // Ensure that TCP timers have been started
         if (err == CHIP_NO_ERROR)
         {
-            err = start_tcp_timers();
+            err_t error = start_tcp_timers();
+            if (error != ERR_OK)
+            {
+                err = chip::System::MapErrorLwIP(error);
+            }
         }
 
         // If successful in allocating an end point...
@@ -2250,7 +2265,7 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
 
         // Otherwise, there was an error accepting the connection, so post a callback to the HandleError function.
         else
-            lSystemLayer.PostEvent(*listenEP, kInetEvent_TCPError, (uintptr_t) err);
+            lSystemLayer.PostEvent(*listenEP, kInetEvent_TCPError, static_cast<uintptr_t>(ChipError::AsInteger(err)));
     }
     else
         err = CHIP_ERROR_CONNECTION_ABORTED;
@@ -2327,7 +2342,7 @@ void TCPEndPoint::LwIPHandleError(void * arg, err_t lwipErr)
 
         // Post callback to HandleError.
         CHIP_ERROR err = chip::System::MapErrorLwIP(lwipErr);
-        lSystemLayer.PostEvent(*ep, kInetEvent_TCPError, (uintptr_t) err);
+        lSystemLayer.PostEvent(*ep, kInetEvent_TCPError, static_cast<uintptr_t>(ChipError::AsInteger(err)));
     }
 }
 
@@ -2464,11 +2479,17 @@ void TCPEndPoint::HandlePendingIO()
         // The socket being writable indicates the connection has completed (successfully or otherwise).
         if (mSocket.HasPendingWrite())
         {
+#if !__MBED__
             // Get the connection result from the socket.
             int osConRes;
             socklen_t optLen = sizeof(osConRes);
             if (getsockopt(mSocket.GetFD(), SOL_SOCKET, SO_ERROR, &osConRes, &optLen) != 0)
                 osConRes = errno;
+#else
+            // On Mbed OS, connect blocks and never returns EINPROGRESS
+            // The socket option SO_ERROR is not available.
+            int osConRes = 0;
+#endif
             CHIP_ERROR conRes = chip::System::MapErrorPOSIX(osConRes);
 
             // Process the connection result.
@@ -2646,7 +2667,16 @@ void TCPEndPoint::HandleIncomingConnection()
     // Accept the new connection.
     int conSocket = accept(mSocket.GetFD(), &sa.any, &saLen);
     if (conSocket == -1)
-        err = chip::System::MapErrorPOSIX(errno);
+    {
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+        {
+            return;
+        }
+        else
+        {
+            err = chip::System::MapErrorPOSIX(errno);
+        }
+    }
 
     // If there's no callback available, fail with an error.
     if (err == CHIP_NO_ERROR && OnConnectionReceived == nullptr)

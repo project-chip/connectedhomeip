@@ -65,8 +65,8 @@ jobs:
                   path: ${{ env.GITHUB_CACHE_PATH }}
                   key: ${{ runner.os }}-cirque-${{ steps.cirque-key.outputs.val }}
 
-            - name: Bootstrap
-              timeout-minutes: 10
+            - name: Cirque Bootstrap
+              timeout-minutes: 15
               run: |
                   integrations/docker/images/chip-build-cirque/run.sh \
                     --env GITHUB_ACTION_RUN=1 \

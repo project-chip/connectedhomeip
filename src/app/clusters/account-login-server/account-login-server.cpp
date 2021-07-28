@@ -21,7 +21,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/util/af.h>
@@ -30,7 +30,7 @@
 bool accountLoginClusterIsUserLoggedIn(std::string requestTempAccountIdentifier, std::string requestSetupPin);
 std::string accountLoginClusterGetSetupPin(std::string requestTempAccountIdentifier, chip::EndpointId endpoint);
 
-void sendResponse(chip::app::Command * command, const char * responseSetupPin)
+void sendResponse(chip::app::CommandHandler * command, const char * responseSetupPin)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     chip::app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_ACCOUNT_LOGIN_CLUSTER_ID,
@@ -48,7 +48,7 @@ exit:
     }
 }
 
-bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::Command * command, uint8_t * tempAccountIdentifier)
+bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::CommandHandler * command, uint8_t * tempAccountIdentifier)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));
@@ -57,7 +57,8 @@ bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::Command * command,
     return true;
 }
 
-bool emberAfAccountLoginClusterLoginCallback(chip::app::Command * command, uint8_t * tempAccountIdentifier, uint8_t * tempSetupPin)
+bool emberAfAccountLoginClusterLoginCallback(chip::app::CommandHandler * command, uint8_t * tempAccountIdentifier,
+                                             uint8_t * tempSetupPin)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));

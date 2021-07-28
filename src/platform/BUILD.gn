@@ -177,6 +177,8 @@ if (chip_device_platform != "none") {
     }
   }
 } else {
+  chip_device_config_enable_mdns = chip_mdns != "none"
+
   buildconfig_header("platform_buildconfig") {
     header = "CHIPDeviceBuildConfig.h"
     header_dir = "platform"
@@ -187,7 +189,10 @@ if (chip_device_platform != "none") {
     ]
 
     if (current_os == "android") {
-      defines += [ "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"" ]
+      defines += [
+        "CHIP_DEVICE_CONFIG_ENABLE_MDNS=${chip_device_config_enable_mdns}",
+        "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"",
+      ]
     }
   }
 }

@@ -49,7 +49,7 @@ constexpr size_t kTotalFailureCommandMessageCount = 1;
 constexpr size_t kMaxReadMessageCount             = 3;
 constexpr size_t kMaxWriteMessageCount            = 3;
 constexpr int32_t gMessageIntervalSeconds         = 1;
-constexpr chip::Transport::AdminId gAdminId       = 0;
+constexpr chip::FabricIndex gFabricIndex          = 0;
 
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::Inet::IPAddress gDestAddr;
@@ -125,7 +125,7 @@ CHIP_ERROR SendCommandRequest(chip::app::CommandSender * commandSender)
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gAdminId);
+    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex);
     SuccessOrExit(err);
 
 exit:
@@ -162,7 +162,7 @@ CHIP_ERROR SendBadCommandRequest(chip::app::CommandSender * commandSender)
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gAdminId);
+    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex);
     SuccessOrExit(err);
 
 exit:
@@ -197,7 +197,7 @@ CHIP_ERROR SendReadRequest()
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, nullptr,
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr,
                                                                             eventPathParams, 2, &attributePathParams, 1, number);
     SuccessOrExit(err);
 
@@ -235,7 +235,7 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClient * apWriteClient)
 
     SuccessOrExit(err = writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), true));
     SuccessOrExit(err = apWriteClient->FinishAttribute());
-    SuccessOrExit(err = apWriteClient->SendWriteRequest(chip::kTestDeviceNodeId, gAdminId, nullptr));
+    SuccessOrExit(err = apWriteClient->SendWriteRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr));
 
     gWriteCount++;
 
@@ -258,7 +258,7 @@ CHIP_ERROR EstablishSecureSession()
     err = gSessionManager.NewPairing(chip::Optional<chip::Transport::PeerAddress>::Value(
                                          chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
                                      chip::kTestDeviceNodeId, testSecurePairingSecret, chip::SecureSession::SessionRole::kInitiator,
-                                     gAdminId);
+                                     gFabricIndex);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -443,7 +443,7 @@ public:
     }
     CHIP_ERROR ReportError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
-        printf("ReportError with err %" CHIP_ERROR_FORMAT, aError);
+        printf("ReportError with err %" CHIP_ERROR_FORMAT, chip::ChipError::FormatError(aError));
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * apCommandSender,
@@ -482,7 +482,7 @@ public:
 
     CHIP_ERROR CommandResponseError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override
     {
-        printf("CommandResponseError happens with %d", aError);
+        printf("CommandResponseError happens with %" CHIP_ERROR_FORMAT, chip::ChipError::FormatError(aError));
         return aError;
     }
 };
@@ -499,7 +499,13 @@ bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCom
 }
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
+                                  chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
+{
+    // Nothing todo.
+}
+
+void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                          chip::TLV::TLVReader & aReader, CommandSender * apCommandObj)
 {
     if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndpointId)
     {
@@ -545,9 +551,9 @@ int main(int argc, char * argv[])
     std::mutex mutex;
     std::unique_lock<std::mutex> lock(mutex);
     MockInteractionModelApp mockDelegate;
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
-    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    chip::Transport::FabricTable fabrics;
+    chip::Transport::FabricInfo * fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, chip::kTestControllerNodeId);
+    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     if (argc <= 1)
     {
@@ -568,7 +574,7 @@ int main(int argc, char * argv[])
                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins,
+    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &fabrics,
                                &gMessageCounterManager);
     SuccessOrExit(err);
 

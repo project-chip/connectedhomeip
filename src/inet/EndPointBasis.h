@@ -35,7 +35,7 @@
 #include <support/DLLUtil.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <system/SystemSockets.h>
+#include <system/WatchableSocket.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK

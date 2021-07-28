@@ -161,7 +161,7 @@ namespace ASN1 {
 
 // clang-format on
 
-bool FormatASN1Error(char * buf, uint16_t bufSize, int32_t err);
+bool FormatASN1Error(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
 } // namespace ASN1
 } // namespace chip

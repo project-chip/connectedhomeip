@@ -40,7 +40,8 @@ void TestCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device *
 
 void TestCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
 {
-    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %" CHIP_ERROR_FORMAT, deviceId, error);
+    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %" CHIP_ERROR_FORMAT, deviceId,
+                 chip::ChipError::FormatError(error));
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
     command->SetCommandExitStatus(error);

@@ -75,6 +75,16 @@ public:
      *   This function is the protocol callback to invoke when the timeout for the receipt
      *   of a response message has expired.
      *
+     *   After calling this method an exchange will close itself unless one of
+     *   two things happens:
+     *
+     *   1) A call to SendMessage on the exchange with the kExpectResponse flag
+     *      set.
+     *   2) A call to WillSendMessage on the exchange.
+     *
+     *   Consumers that don't do one of those things MUST NOT retain a pointer
+     *   to the exchange.
+     *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
     virtual void OnResponseTimeout(ExchangeContext * ec) = 0;

@@ -40,7 +40,8 @@ namespace clusters {
 
 namespace BarrierControl {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -146,7 +147,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -158,7 +160,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace Basic {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -199,7 +202,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -211,7 +215,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace Binding {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -394,7 +399,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -406,7 +412,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace ColorControl {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -1873,7 +1880,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -1885,7 +1893,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace DiagnosticLogs {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -1997,7 +2006,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -2009,7 +2019,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace DoorLock {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -3408,7 +3419,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -3420,7 +3432,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace EthernetNetworkDiagnostics {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -3468,7 +3481,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -3480,7 +3494,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace GeneralCommissioning {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -3668,7 +3683,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -3680,7 +3696,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace Groups {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4038,7 +4055,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -4050,7 +4068,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace IasZone {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4154,7 +4173,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -4166,7 +4186,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace Identify {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4272,7 +4293,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -4284,7 +4306,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace LevelControl {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4806,7 +4829,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -4818,7 +4842,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace LowPower {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4865,7 +4890,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -4877,7 +4903,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace NetworkCommissioning {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -5558,7 +5585,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -5570,7 +5598,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace OtaSoftwareUpdateProvider {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -5844,7 +5873,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -5856,7 +5886,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace OnOff {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -5915,7 +5946,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -5927,7 +5959,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace OperationalCredentials {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -6426,7 +6459,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -6438,7 +6472,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 namespace Scenes {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -6931,7 +6966,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -6941,9 +6977,71 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 } // namespace Scenes
 
+namespace SoftwareDiagnostics {
+
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
+{
+    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+    // Any error value TLVUnpackError means we have received an illegal value.
+    // The following variables are used for all commands to save code size.
+    CHIP_ERROR TLVError          = CHIP_NO_ERROR;
+    CHIP_ERROR TLVUnpackError    = CHIP_NO_ERROR;
+    uint32_t validArgumentCount  = 0;
+    uint32_t expectArgumentCount = 0;
+    uint32_t currentDecodeTagId  = 0;
+    bool wasHandled              = false;
+    {
+        switch (aCommandId)
+        {
+        case Clusters::SoftwareDiagnostics::Commands::Ids::ResetWatermarks: {
+
+            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+            wasHandled = emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(apCommandObj);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            chip::app::CommandPathParams returnStatusParam = { aEndpointId,
+                                                               0, // GroupId
+                                                               Clusters::SoftwareDiagnostics::Id, aCommandId,
+                                                               (chip::app::CommandPathFlags::kEndpointIdValid) };
+            apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
+                                        Protocols::SecureChannel::Id,
+                                        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::SoftwareDiagnostics::Id);
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
+    {
+        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
+                                                           0, // GroupId
+                                                           Clusters::SoftwareDiagnostics::Id, aCommandId,
+                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
+        ChipLogProgress(Zcl,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
+                        ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
+    }
+}
+
+} // namespace SoftwareDiagnostics
+
 namespace TestCluster {
 
-void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -7002,7 +7100,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         ChipLogProgress(Zcl,
                         "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
                         ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
-                        validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
         // A command with no arguments would never write currentDecodeTagId.  If
         // progress logging is also disabled, it would look unused.  Silence that
         // warning.
@@ -7012,10 +7111,133 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 } // namespace TestCluster
 
+namespace ThreadNetworkDiagnostics {
+
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
+{
+    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+    // Any error value TLVUnpackError means we have received an illegal value.
+    // The following variables are used for all commands to save code size.
+    CHIP_ERROR TLVError          = CHIP_NO_ERROR;
+    CHIP_ERROR TLVUnpackError    = CHIP_NO_ERROR;
+    uint32_t validArgumentCount  = 0;
+    uint32_t expectArgumentCount = 0;
+    uint32_t currentDecodeTagId  = 0;
+    bool wasHandled              = false;
+    {
+        switch (aCommandId)
+        {
+        case Clusters::ThreadNetworkDiagnostics::Commands::Ids::ResetCounts: {
+
+            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+            wasHandled = emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(apCommandObj);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            chip::app::CommandPathParams returnStatusParam = { aEndpointId,
+                                                               0, // GroupId
+                                                               Clusters::ThreadNetworkDiagnostics::Id, aCommandId,
+                                                               (chip::app::CommandPathFlags::kEndpointIdValid) };
+            apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
+                                        Protocols::SecureChannel::Id,
+                                        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId,
+                         Clusters::ThreadNetworkDiagnostics::Id);
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
+    {
+        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
+                                                           0, // GroupId
+                                                           Clusters::ThreadNetworkDiagnostics::Id, aCommandId,
+                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
+        ChipLogProgress(Zcl,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
+                        ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
+    }
+}
+
+} // namespace ThreadNetworkDiagnostics
+
+namespace WiFiNetworkDiagnostics {
+
+void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
+                           TLV::TLVReader & aDataTlv)
+{
+    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+    // Any error value TLVUnpackError means we have received an illegal value.
+    // The following variables are used for all commands to save code size.
+    CHIP_ERROR TLVError          = CHIP_NO_ERROR;
+    CHIP_ERROR TLVUnpackError    = CHIP_NO_ERROR;
+    uint32_t validArgumentCount  = 0;
+    uint32_t expectArgumentCount = 0;
+    uint32_t currentDecodeTagId  = 0;
+    bool wasHandled              = false;
+    {
+        switch (aCommandId)
+        {
+        case Clusters::WiFiNetworkDiagnostics::Commands::Ids::ResetCounts: {
+
+            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+            wasHandled = emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(apCommandObj);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            chip::app::CommandPathParams returnStatusParam = { aEndpointId,
+                                                               0, // GroupId
+                                                               Clusters::WiFiNetworkDiagnostics::Id, aCommandId,
+                                                               (chip::app::CommandPathFlags::kEndpointIdValid) };
+            apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
+                                        Protocols::SecureChannel::Id,
+                                        Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command %" PRIx32 " for cluster %" PRIx32, aCommandId, Clusters::WiFiNetworkDiagnostics::Id);
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
+    {
+        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
+                                                           0, // GroupId
+                                                           Clusters::WiFiNetworkDiagnostics::Id, aCommandId,
+                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
+        ChipLogProgress(Zcl,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
+                        ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
+                        validArgumentCount, expectArgumentCount, ChipError::FormatError(TLVError),
+                        ChipError::FormatError(TLVUnpackError), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
+    }
+}
+
+} // namespace WiFiNetworkDiagnostics
+
 } // namespace clusters
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
+                                  chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
     ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16, aClusterId,
                   aCommandId, aEndPointId);
@@ -7078,9 +7300,44 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     case Clusters::Scenes::Id:
         clusters::Scenes::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
+    case Clusters::SoftwareDiagnostics::Id:
+        clusters::SoftwareDiagnostics::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        break;
     case Clusters::TestCluster::Id:
         clusters::TestCluster::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
+    case Clusters::ThreadNetworkDiagnostics::Id:
+        clusters::ThreadNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        break;
+    case Clusters::WiFiNetworkDiagnostics::Id:
+        clusters::WiFiNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        break;
+    default:
+        // Unrecognized cluster ID, error status will apply.
+        chip::app::CommandPathParams returnStatusParam = { aEndPointId,
+                                                           0, // GroupId
+                                                           aClusterId, aCommandId,
+                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
+        ChipLogError(Zcl, "Unknown cluster %" PRIx32, aClusterId);
+        break;
+    }
+exit:
+    Compatibility::ResetEmberAfObjects();
+    aReader.ExitContainer(dataTlvType);
+}
+
+void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                          chip::TLV::TLVReader & aReader, CommandSender * apCommandObj)
+{
+    ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16, aClusterId,
+                  aCommandId, aEndPointId);
+    Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
+    TLV::TLVType dataTlvType;
+    SuccessOrExit(aReader.EnterContainer(dataTlvType));
+    switch (aClusterId)
+    {
     default:
         // Unrecognized cluster ID, error status will apply.
         chip::app::CommandPathParams returnStatusParam = { aEndPointId,

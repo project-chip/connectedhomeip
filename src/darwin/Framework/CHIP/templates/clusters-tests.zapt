@@ -6,9 +6,6 @@
 // module headers
 #import <CHIP/CHIP.h>
 
-// additional includes
-#import "CHIPError.h"
-
 // system dependencies
 #import <XCTest/XCTest.h>
 
@@ -17,8 +14,8 @@ const uint16_t kTimeoutInSeconds = 3;
 const uint64_t kDeviceId = 1;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
-const uint16_t kRemotePort = 11097;
-const uint16_t kLocalPort = 11098;
+const uint16_t kRemotePort = 5540;
+const uint16_t kLocalPort = 5541;
 NSString * kAddress = @"::1";
 
 CHIPDevice * GetPairedDevice(uint64_t deviceId)
@@ -137,7 +134,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-{{>test_cluster tests="TestCluster, Test_TC_OO_1_1, Test_TC_OO_2_1, Test_TC_OO_2_2, Test_TC_DM_1_1, Test_TC_DM_3_1"}}
+{{>test_cluster tests="TestCluster, Test_TC_OO_1_1, Test_TC_OO_2_1, Test_TC_OO_2_2, Test_TC_DM_1_1, Test_TC_DM_3_1, Test_TC_WNCV_1_1, Test_TC_WNCV_2_1"}}
 
 {{#chip_client_clusters}}
 {{#unless (isStrEqual "Test Cluster" name)}}

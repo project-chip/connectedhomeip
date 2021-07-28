@@ -30,7 +30,7 @@ public:
     using CommandsVector = ::std::vector<std::unique_ptr<Command>>;
 
     void Register(const char * clusterName, commands_list commandsList);
-    int Run(NodeId localId, NodeId remoteId, int argc, char ** argv);
+    int Run(int argc, char ** argv);
 
 private:
     // *ranCommand will be set to the command we ran if we get as far as running

@@ -10209,6 +10209,54 @@ CHIP_ERROR ThermostatCluster::WriteAttributeSystemMode(Callback::Cancelable * on
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+CHIP_ERROR ThermostatCluster::ReadAttributeStartOfWeek(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0020;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR ThermostatCluster::ReadAttributeNumberOfWeeklyTransitions(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0021;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR ThermostatCluster::ReadAttributeNumberOfDailyTransitions(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0022;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR ThermostatCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0xFFFC;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
 CHIP_ERROR ThermostatCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback)
 {
@@ -11034,6 +11082,45 @@ CHIP_ERROR WakeOnLanCluster::ReadAttributeClusterRevision(Callback::Cancelable *
 }
 
 // WiFiNetworkDiagnostics Cluster Commands
+CHIP_ERROR WiFiNetworkDiagnosticsCluster::ResetCounts(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kResetCountsCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    // Command takes no arguments.
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
 // WiFiNetworkDiagnostics Cluster Attributes
 CHIP_ERROR WiFiNetworkDiagnosticsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback)

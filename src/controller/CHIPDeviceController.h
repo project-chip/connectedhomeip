@@ -42,9 +42,10 @@
 #include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
@@ -65,9 +66,10 @@ namespace chip {
 
 namespace Controller {
 
-constexpr uint16_t kNumMaxActiveDevices    = 64;
-constexpr uint16_t kNumMaxPairedDevices    = 128;
-constexpr uint32_t kAttestationNonceLength = 32;
+using namespace chip::Protocols::UserDirectedCommissioning;
+
+constexpr uint16_t kNumMaxActiveDevices = 64;
+constexpr uint16_t kNumMaxPairedDevices = 128;
 
 // Raw functions for cluster callbacks
 typedef void (*BasicSuccessCallback)(void * context, uint16_t val);
@@ -334,8 +336,8 @@ protected:
 
     void PersistNextKeyId();
 
-    Transport::AdminId mAdminId = 0;
-    Transport::AdminPairingTable mAdmins;
+    FabricIndex mFabricIndex = 0;
+    Transport::FabricTable mFabrics;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
@@ -343,7 +345,6 @@ protected:
     Credentials::OperationalCredentialSet mCredentials;
     Credentials::CertificateKeyId mRootKeyId;
 
-    uint8_t mAttestationNonce[kAttestationNonceLength];
     Crypto::P256PublicKey mRemoteManufacturerPubkey;
 
     SessionIDAllocator mIDAllocator;
@@ -374,7 +375,7 @@ private:
 
     void ReleaseAllDevices();
 
-    CHIP_ERROR LoadLocalCredentials(Transport::AdminPairingInfo * admin);
+    CHIP_ERROR LoadLocalCredentials(Transport::FabricInfo * fabric);
 
     static void OnLocalNOCGenerated(void * context, const ByteSpan & noc);
     Callback::Callback<NOCGenerated> mLocalNOCCallback;
@@ -407,12 +408,24 @@ public:
  *   required to provide write access to the persistent storage, where the paired device information
  *   will be stored.
  */
-class DLL_EXPORT DeviceCommissioner : public DeviceController, public SessionEstablishmentDelegate
+class DLL_EXPORT DeviceCommissioner : public DeviceController,
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+                                      public Protocols::UserDirectedCommissioning::InstanceNameResolver,
+                                      public Protocols::UserDirectedCommissioning::UserConfirmationProvider,
+#endif
+                                      public SessionEstablishmentDelegate
 
 {
 public:
     DeviceCommissioner();
     ~DeviceCommissioner() {}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    /**
+     * Set port for User Directed Commissioning
+     */
+    CHIP_ERROR SetUdcListenPort(uint16_t listenPort);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     /**
      * Commissioner-specific initialization, includes parameters such as the pairing delegate.
@@ -524,8 +537,46 @@ public:
 
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
-
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    /**
+     * @brief
+     *   Called when a UDC message is received specifying the given instanceName
+     * This method indicates that UDC Server needs the Commissionable Node corresponding to
+     * the given instance name to be found. UDC Server will wait for OnCommissionableNodeFound.
+     *
+     * @param instanceName DNS-SD instance name for the client requesting commissioning
+     *
+     */
+    void FindCommissionableNode(char * instanceName) override;
+
+    /**
+     * @brief
+     *   Called when a UDC message has been received and corresponding nodeData has been found.
+     * It is expected that the implementer will prompt the user to confirm their intention to
+     * commission the given node, and provide the setup code to allow commissioning to proceed.
+     *
+     * @param nodeData DNS-SD node information for the client requesting commissioning
+     *
+     */
+    void OnUserDirectedCommissioningRequest(const Mdns::DiscoveredNodeData & nodeData) override;
+
+    /**
+     * @brief
+     *   Overrides method from AbstractMdnsDiscoveryController
+     *
+     * @param nodeData DNS-SD node information
+     *
+     */
+    void OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData) override;
+
+    /**
+     * @brief
+     *   Return the UDC Server instance
+     *
+     */
+    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
@@ -560,6 +611,13 @@ private:
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
 
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
+    UserDirectedCommissioningServer * mUdcServer = nullptr;
+    // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
+    DeviceTransportMgr * mUdcTransportMgr = nullptr;
+    uint16_t mUdcListenPort               = CHIP_PORT + 1;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void PersistDeviceList();
 

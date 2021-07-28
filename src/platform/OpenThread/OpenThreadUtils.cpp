@@ -38,7 +38,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Map an OpenThread error into the OpenChip error space.
+ * Map an OpenThread error into the CHIP error space.
  */
 CHIP_ERROR MapOpenThreadError(otError otErr)
 {
@@ -47,7 +47,7 @@ CHIP_ERROR MapOpenThreadError(otError otErr)
 }
 
 /**
- * Given an OpenChip error value that represents an OpenThread error, returns a
+ * Given an CHIP error value that represents an OpenThread error, returns a
  * human-readable NULL-terminated C string describing the error.
  *
  * @param[in] buf                   Buffer into which the error string will be placed.

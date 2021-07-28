@@ -31,6 +31,7 @@
 #include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
+#include <support/ReferenceCountedHandle.h>
 #include <support/TypeTraits.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
@@ -42,6 +43,7 @@ namespace Messaging {
 class ExchangeManager;
 class ExchangeContext;
 class ExchangeMessageDispatch;
+using ExchangeHandle = ReferenceCountedHandle<ExchangeContext>;
 
 class ExchangeContextDeletor
 {
@@ -146,14 +148,14 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
+    ExchangeACL * GetExchangeACL(Transport::FabricTable & table)
     {
         if (mExchangeACL == nullptr)
         {
-            Transport::AdminPairingInfo * admin = table.FindAdminWithId(mSecureSession.GetAdminId());
-            if (admin != nullptr)
+            Transport::FabricInfo * fabric = table.FindFabricWithIndex(mSecureSession.GetFabricIndex());
+            if (fabric != nullptr)
             {
-                mExchangeACL = chip::Platform::New<CASEExchangeACL>(admin);
+                mExchangeACL = chip::Platform::New<CASEExchangeACL>(fabric);
             }
         }
 

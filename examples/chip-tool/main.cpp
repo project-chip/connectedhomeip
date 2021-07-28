@@ -25,8 +25,6 @@
 #include "commands/reporting/Commands.h"
 #include "commands/tests/Commands.h"
 
-#include <protocols/secure_channel/PASESession.h>
-
 // ================================================================================
 // Main Code
 // ================================================================================
@@ -40,5 +38,5 @@ int main(int argc, char * argv[])
     registerCommandsTests(commands);
     registerClusters(commands);
 
-    return commands.Run(chip::kTestControllerNodeId, chip::kTestDeviceNodeId, argc, argv);
+    return commands.Run(argc, argv);
 }

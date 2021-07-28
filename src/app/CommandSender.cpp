@@ -34,7 +34,7 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 namespace chip {
 namespace app {
 
-CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * secureSession)
+CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * secureSession)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle commandPacket;
@@ -53,7 +53,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
     if (secureSession == nullptr)
     {
-        mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
+        mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aFabricIndex }, this);
     }
     else
     {
@@ -92,10 +92,6 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
 exit:
     ChipLogFunctError(err);
 
-    // Null out mpExchangeCtx, so our Shutdown() call below won't try to abort
-    // it and fail to send an ack for the message we just received.
-    mpExchangeCtx = nullptr;
-
     if (mpDelegate != nullptr)
     {
         if (err != CHIP_NO_ERROR)
@@ -108,7 +104,7 @@ exit:
         }
     }
 
-    Shutdown();
+    ShutdownInternal();
     return err;
 }
 
@@ -122,7 +118,7 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
         mpDelegate->CommandResponseError(this, CHIP_ERROR_TIMEOUT);
     }
 
-    Shutdown();
+    ShutdownInternal();
 }
 
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
@@ -167,7 +163,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         err = aCommandElement.GetData(&commandDataReader);
         SuccessOrExit(err);
         // TODO(#4503): Should call callbacks of cluster that sends the command.
-        DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);
+        DispatchSingleClusterResponseCommand(clusterId, commandId, endpointId, commandDataReader, this);
     }
 
 exit:

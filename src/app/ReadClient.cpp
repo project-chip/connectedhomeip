@@ -52,7 +52,13 @@ exit:
 void ReadClient::Shutdown()
 {
     AbortExistingExchangeContext();
+    ShutdownInternal();
+}
+
+void ReadClient::ShutdownInternal()
+{
     mpExchangeMgr = nullptr;
+    mpExchangeCtx = nullptr;
     mpDelegate    = nullptr;
     MoveToState(ClientState::Uninitialized);
 }
@@ -80,7 +86,7 @@ void ReadClient::MoveToState(const ClientState aTargetState)
                   GetStateStr());
 }
 
-CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * apSecureSession,
+CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession,
                                        EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
                                        AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
                                        EventNumber aEventNumber)
@@ -134,7 +140,7 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
     }
     else
     {
-        mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
+        mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aFabricIndex }, this);
     }
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
@@ -229,9 +235,6 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 exit:
     ChipLogFunctError(err);
 
-    // Null out mpExchangeCtx, so our Shutdown() call below won't try to abort
-    // it and fail to send an ack for the message we just received.
-    mpExchangeCtx = nullptr;
     MoveToState(ClientState::Initialized);
 
     if (mpDelegate != nullptr)
@@ -247,7 +250,7 @@ exit:
     }
 
     // TODO(#7521): Should close it after checking moreChunkedMessages flag is not set.
-    Shutdown();
+    ShutdownInternal();
 
     return err;
 }
@@ -351,7 +354,7 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
     {
         mpDelegate->ReportError(this, CHIP_ERROR_TIMEOUT);
     }
-    Shutdown();
+    ShutdownInternal();
 }
 
 CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader)

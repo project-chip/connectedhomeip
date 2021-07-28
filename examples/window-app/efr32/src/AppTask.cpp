@@ -92,9 +92,8 @@ CHIP_ERROR AppTask::Start()
 void AppTask::Main(void * pvParameter)
 {
     AppTask & app = AppTask::sInstance;
-    int err;
 
-    err = app.Init();
+    CHIP_ERROR err = app.Init();
     if (err != CHIP_NO_ERROR)
     {
         appError(err);
@@ -169,10 +168,8 @@ void AppTask::Main(void * pvParameter)
     }
 }
 
-int AppTask::Init()
+CHIP_ERROR AppTask::Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Init ZCL Data Model
     InitServer();
 
@@ -193,9 +190,11 @@ int AppTask::Init()
 
 // Print setup info on LCD if available
 #ifdef DISPLAY_ENABLED
-    if (!GetQRCode(mQRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
+    CHIP_ERROR err = GetQRCode(mQRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    if (err != CHIP_NO_ERROR)
     {
         EFR32_LOG("Getting QR code failed!");
+        return err;
     }
 #else
     PrintQRCode(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
@@ -204,7 +203,7 @@ int AppTask::Init()
     // Force LCD refresh
     mLastThreadProvisioned = !ConnectivityMgr().IsThreadProvisioned();
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void AppTask::PostEvent(const AppEvent & event)

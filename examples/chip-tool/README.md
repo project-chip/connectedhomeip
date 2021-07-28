@@ -41,7 +41,7 @@ choose the pairing mode.
 The command below pair a device with the provided IP address and port of the
 server to talk to.
 
-    $ chip-tool pairing bypass 192.168.0.30 11097
+    $ chip-tool pairing bypass 192.168.0.30 5540
 
 #### Pair a device over BLE
 

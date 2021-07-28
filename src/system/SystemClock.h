@@ -51,7 +51,7 @@ namespace Clock {
  *
  * @note
  *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
- *   Layer should call System::Layer::GetMonotonicMicroseconds().
+ *   Layer should call System::Clock::GetMonotonicMicroseconds().
  *
  * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
  */
@@ -69,7 +69,7 @@ extern uint64_t GetMonotonicMicroseconds();
  *
  * @note
  *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
- *   Layer should call System::Layer::GetMonotonicMilliseconds().
+ *   Layer should call System::Clock::GetMonotonicMilliseconds().
  *
  * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
  */
@@ -94,7 +94,7 @@ extern uint64_t GetMonotonicMilliseconds();
  *
  * @note
  *   This function is reserved for internal use by the CHIP System Layer.  Users of the CHIP System
- *   Layer should call System::Layer::GetUnixTimeMicroseconds().
+ *   Layer should call System::Clock::GetUnixTimeMicroseconds().
  *
  * @param[out] curTime                  The current time, expressed as Unix time scaled to microseconds.
  *
