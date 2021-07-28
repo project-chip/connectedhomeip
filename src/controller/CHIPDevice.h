@@ -382,15 +382,11 @@ public:
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
-    CHIP_ERROR SetNOC(ByteSpan noc)
-    {
-        VerifyOrReturnError(noc.size() <= sizeof(mNOC), CHIP_ERROR_INVALID_ARGUMENT);
-        memcpy(mNOC, noc.data(), noc.size());
-        mNOCLength = noc.size();
-        return CHIP_NO_ERROR;
-    }
+    MutableByteSpan GetMutableNOCChain() { return MutableByteSpan(mNOCChainBuffer, sizeof(mNOCChainBuffer)); }
 
-    ByteSpan GetNOC() const { return ByteSpan(mNOC, mNOCLength); }
+    CHIP_ERROR ReduceNOCChainBufferSize(size_t new_size);
+
+    ByteSpan GetNOCChain() const { return ByteSpan(mNOCChainBuffer, mNOCChainBufferSize); }
 
     /*
      * This function can be called to establish a secure session with the device.
@@ -500,8 +496,9 @@ private:
 
     uint8_t mCSRNonce[kOpCSRNonceLength];
 
-    uint8_t mNOC[Credentials::kMaxDERCertLength];
-    size_t mNOCLength = 0;
+    // The chain can contain ICAC and OpCert
+    uint8_t mNOCChainBuffer[Credentials::kMaxCHIPCertLength * 2];
+    size_t mNOCChainBufferSize = 0;
 
     SessionIDAllocator * mIDAllocator = nullptr;
 

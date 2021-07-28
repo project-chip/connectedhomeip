@@ -4962,8 +4962,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
-                           chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3, chip::ByteSpan Signature)
+    static void CallbackFn(void * context, chip::ByteSpan NOCSRElements, chip::ByteSpan AttestationSignature)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4971,12 +4970,8 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPOperationalCredentialsClusterOpCSRResponseCallback * cppCallback = nullptr;
-        jbyteArray CSRArr;
-        jbyteArray CSRNonceArr;
-        jbyteArray VendorReserved1Arr;
-        jbyteArray VendorReserved2Arr;
-        jbyteArray VendorReserved3Arr;
-        jbyteArray SignatureArr;
+        jbyteArray NOCSRElementsArr;
+        jbyteArray AttestationSignatureArr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4986,52 +4981,25 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B[B[B[B[B[B)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B[B)V", &javaMethod);
         SuccessOrExit(err);
 
-        CSRArr = env->NewByteArray(CSR.size());
-        VerifyOrExit(CSRArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        NOCSRElementsArr = env->NewByteArray(NOCSRElements.size());
+        VerifyOrExit(NOCSRElementsArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
         env->ExceptionClear();
-        env->SetByteArrayRegion(CSRArr, 0, CSR.size(), reinterpret_cast<const jbyte *>(CSR.data()));
+        env->SetByteArrayRegion(NOCSRElementsArr, 0, NOCSRElements.size(), reinterpret_cast<const jbyte *>(NOCSRElements.data()));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        CSRNonceArr = env->NewByteArray(CSRNonce.size());
-        VerifyOrExit(CSRNonceArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        AttestationSignatureArr = env->NewByteArray(AttestationSignature.size());
+        VerifyOrExit(AttestationSignatureArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
         env->ExceptionClear();
-        env->SetByteArrayRegion(CSRNonceArr, 0, CSRNonce.size(), reinterpret_cast<const jbyte *>(CSRNonce.data()));
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VendorReserved1Arr = env->NewByteArray(VendorReserved1.size());
-        VerifyOrExit(VendorReserved1Arr != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        env->ExceptionClear();
-        env->SetByteArrayRegion(VendorReserved1Arr, 0, VendorReserved1.size(),
-                                reinterpret_cast<const jbyte *>(VendorReserved1.data()));
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VendorReserved2Arr = env->NewByteArray(VendorReserved2.size());
-        VerifyOrExit(VendorReserved2Arr != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        env->ExceptionClear();
-        env->SetByteArrayRegion(VendorReserved2Arr, 0, VendorReserved2.size(),
-                                reinterpret_cast<const jbyte *>(VendorReserved2.data()));
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VendorReserved3Arr = env->NewByteArray(VendorReserved3.size());
-        VerifyOrExit(VendorReserved3Arr != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        env->ExceptionClear();
-        env->SetByteArrayRegion(VendorReserved3Arr, 0, VendorReserved3.size(),
-                                reinterpret_cast<const jbyte *>(VendorReserved3.data()));
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        SignatureArr = env->NewByteArray(Signature.size());
-        VerifyOrExit(SignatureArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        env->ExceptionClear();
-        env->SetByteArrayRegion(SignatureArr, 0, Signature.size(), reinterpret_cast<const jbyte *>(Signature.data()));
+        env->SetByteArrayRegion(AttestationSignatureArr, 0, AttestationSignature.size(),
+                                reinterpret_cast<const jbyte *>(AttestationSignature.data()));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, CSRArr, CSRNonceArr, VendorReserved1Arr, VendorReserved2Arr,
-                            VendorReserved3Arr, SignatureArr);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, NOCSRElementsArr, AttestationSignatureArr);
 
-        env->DeleteLocalRef(CSRArr);
-        env->DeleteLocalRef(CSRNonceArr);
-        env->DeleteLocalRef(VendorReserved1Arr);
-        env->DeleteLocalRef(VendorReserved2Arr);
-        env->DeleteLocalRef(VendorReserved3Arr);
-        env->DeleteLocalRef(SignatureArr);
+        env->DeleteLocalRef(NOCSRElementsArr);
+        env->DeleteLocalRef(AttestationSignatureArr);
 
     exit:
         if (err != CHIP_NO_ERROR)

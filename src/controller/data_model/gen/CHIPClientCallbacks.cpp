@@ -2807,23 +2807,17 @@ bool emberAfOperationalCredentialsClusterNOCResponseCallback(chip::EndpointId en
 }
 
 bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                               chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
-                                                               chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
-                                                               chip::ByteSpan VendorReserved3, chip::ByteSpan Signature)
+                                                               chip::ByteSpan NOCSRElements, chip::ByteSpan AttestationSignature)
 {
     ChipLogProgress(Zcl, "OpCSRResponse:");
-    ChipLogProgress(Zcl, "  CSR: %zu", CSR.size());
-    ChipLogProgress(Zcl, "  CSRNonce: %zu", CSRNonce.size());
-    ChipLogProgress(Zcl, "  VendorReserved1: %zu", VendorReserved1.size());
-    ChipLogProgress(Zcl, "  VendorReserved2: %zu", VendorReserved2.size());
-    ChipLogProgress(Zcl, "  VendorReserved3: %zu", VendorReserved3.size());
-    ChipLogProgress(Zcl, "  Signature: %zu", Signature.size());
+    ChipLogProgress(Zcl, "  NOCSRElements: %zu", NOCSRElements.size());
+    ChipLogProgress(Zcl, "  AttestationSignature: %zu", AttestationSignature.size());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCSRResponseCallback");
 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> * cb =
         Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature);
+    cb->mCall(cb->mContext, NOCSRElements, AttestationSignature);
     return true;
 }
 

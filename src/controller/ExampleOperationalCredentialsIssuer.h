@@ -43,12 +43,9 @@ class DLL_EXPORT ExampleOperationalCredentialsIssuer : public OperationalCredent
 public:
     virtual ~ExampleOperationalCredentialsIssuer() {}
 
-    CHIP_ERROR GenerateNodeOperationalCertificate(const Optional<NodeId> & nodeId, FabricId fabricId, const ByteSpan & csr,
-                                                  const ByteSpan & DAC, Callback::Callback<NOCGenerated> * onNOCGenerated) override;
-
-    CHIP_ERROR GetIntermediateCACertificate(FabricId fabricId, MutableByteSpan & outCert) override;
-
-    CHIP_ERROR GetRootCACertificate(FabricId fabricId, MutableByteSpan & outCert) override;
+    CHIP_ERROR GenerateNOCChain(const Optional<NodeId> & nodeId, FabricId fabricId, const ByteSpan & csrElements,
+                                const ByteSpan & attestationSignature, const ByteSpan & DAC, const ByteSpan & PAI,
+                                const ByteSpan & PAA, Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
     /**
      * @brief Initialize the issuer with the keypair in the storage.
@@ -89,7 +86,8 @@ private:
     // By default, let's set validity to 10 years
     uint32_t mValidity = 365 * 24 * 60 * 60 * 10;
 
-    NodeId mNextAvailableNodeId = 1;
+    NodeId mNextAvailableNodeId          = 1;
+    PersistentStorageDelegate * mStorage = nullptr;
 };
 
 } // namespace Controller
