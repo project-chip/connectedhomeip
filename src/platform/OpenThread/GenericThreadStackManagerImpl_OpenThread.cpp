@@ -1429,7 +1429,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsBrowse(const
     char fullServiceName[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
     snprintf(fullServiceName, sizeof(fullServiceName), "%s.%s", aServiceName, SrpClient::kDefaultDomainName);
 
-    error = otDnsClientBrowse(mOTInst, fullServiceName, OnDnsBrowseResult, aContext, defaultConfig);
+    error = MapOpenThreadError(otDnsClientBrowse(mOTInst, fullServiceName, OnDnsBrowseResult, aContext, defaultConfig));
 
 exit:
 
@@ -1503,7 +1503,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsResolve(cons
     char fullServiceName[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
     snprintf(fullServiceName, sizeof(fullServiceName), "%s.%s", aServiceName, SrpClient::kDefaultDomainName);
 
-    error = otDnsClientResolveService(mOTInst, aInstanceName, fullServiceName, OnDnsResolveResult, aContext, defaultConfig);
+    error = MapOpenThreadError(
+        otDnsClientResolveService(mOTInst, aInstanceName, fullServiceName, OnDnsResolveResult, aContext, defaultConfig));
 
 exit:
 
