@@ -22,8 +22,8 @@
 #include "LightingManager.h"
 
 #include <app/chip-zcl-zpro-codec.h>
-#include <app/common/gen/attributes/Accessors.h>
 #include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attributes/Accessors.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/util/af-types.h>
@@ -88,14 +88,14 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
             XyColor_t xy;
             if (attributeId == ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID)
             {
-                xy.x = *static_cast<uint16_t*>(static_cast<void*>(value));
+                xy.x = *static_cast<uint16_t *>(static_cast<void *>(value));
                 // get Y from cluster value storage
                 EmberAfStatus status = ColorControl::Attributes::GetCurrentY(endpoint, &xy.y);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
             }
             if (attributeId == ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID)
             {
-                xy.y = *static_cast<uint16_t*>(static_cast<void*>(value));
+                xy.y = *static_cast<uint16_t *>(static_cast<void *>(value));
                 // get X from cluster value storage
                 EmberAfStatus status = ColorControl::Attributes::GetCurrentX(endpoint, &xy.x);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);
