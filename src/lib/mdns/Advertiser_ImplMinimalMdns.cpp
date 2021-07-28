@@ -141,9 +141,6 @@ private:
 
     FullQName GetCommisioningTextEntries(const CommissionAdvertisingParameters & params);
 
-    int FindOperationalAllocator(const FullQName & qname) const;
-    int FindEmptyOperationalAllocator() const;
-
     // Max number of records for operational = PTR, SRV, TXT, A, AAAA, no subtypes.
     static constexpr size_t kMaxOperationalRecords  = 5;
     static constexpr size_t kMaxOperationalNetworks = 5;
@@ -152,6 +149,9 @@ private:
     static constexpr size_t kMaxCommissionRecords = 11;
     QueryResponderAllocator<kMaxCommissionRecords> mQueryResponderAllocatorCommissionable;
     QueryResponderAllocator<kMaxCommissionRecords> mQueryResponderAllocatorCommissioner;
+
+    QueryResponderAllocator<kMaxOperationalRecords> * FindOperationalAllocator(const FullQName & qname);
+    QueryResponderAllocator<kMaxOperationalRecords> * FindEmptyOperationalAllocator();
 
     ResponseSender mResponseSender;
     uint32_t mCommissionInstanceName1;
@@ -225,28 +225,29 @@ CHIP_ERROR AdvertiserMinMdns::StopPublishDevice()
     return CHIP_NO_ERROR;
 }
 
-int AdvertiserMinMdns::FindOperationalAllocator(const FullQName & qname) const
+QueryResponderAllocator<AdvertiserMinMdns::kMaxOperationalRecords> *
+AdvertiserMinMdns::FindOperationalAllocator(const FullQName & qname)
 {
-    for (size_t i = 0; i < kMaxOperationalNetworks; ++i)
+    for (auto & allocator : mQueryResponderAllocatorOperational)
     {
-        if (mQueryResponderAllocatorOperational[i].GetResponder(QType::SRV, qname) != nullptr)
+        if (allocator.GetResponder(QType::SRV, qname) != nullptr)
         {
-            return i;
+            return &allocator;
         }
     }
-    return -1;
+    return nullptr;
 }
 
-int AdvertiserMinMdns::FindEmptyOperationalAllocator() const
+QueryResponderAllocator<AdvertiserMinMdns::kMaxOperationalRecords> * AdvertiserMinMdns::FindEmptyOperationalAllocator()
 {
-    for (size_t i = 0; i < kMaxOperationalNetworks; ++i)
+    for (auto & allocator : mQueryResponderAllocatorOperational)
     {
-        if (mQueryResponderAllocatorOperational[i].IsEmpty())
+        if (allocator.IsEmpty())
         {
-            return i;
+            return &allocator;
         }
     }
-    return -1;
+    return nullptr;
 }
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
@@ -259,15 +260,15 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     char nameCheckStorage[kMaxOperationalServiceNameSize + 4 * sizeof(QNamePart)];
     FullQName nameCheck =
         FlatAllocatedQName::Build(nameCheckStorage, nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain);
-    int idx = FindOperationalAllocator(nameCheck);
-    if (idx >= 0)
+    QueryResponderAllocator<AdvertiserMinMdns::kMaxOperationalRecords> * operationalAllocator = FindOperationalAllocator(nameCheck);
+    if (operationalAllocator != nullptr)
     {
-        mQueryResponderAllocatorOperational[idx].Clear();
+        operationalAllocator->Clear();
     }
     else
     {
-        idx = FindEmptyOperationalAllocator();
-        if (idx < 0)
+        operationalAllocator = FindEmptyOperationalAllocator();
+        if (operationalAllocator == nullptr)
         {
             ChipLogError(Discovery, "Failed to find an open operational allocator");
             return CHIP_ERROR_NO_MEMORY;
@@ -275,12 +276,12 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     }
 
     FullQName operationalServiceName =
-        mQueryResponderAllocatorOperational[idx].AllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
-    FullQName operationalServerName = mQueryResponderAllocatorOperational[idx].AllocateQName(nameBuffer, kOperationalServiceName,
-                                                                                             kOperationalProtocol, kLocalDomain);
+        operationalAllocator->AllocateQName(kOperationalServiceName, kOperationalProtocol, kLocalDomain);
+    FullQName operationalServerName =
+        operationalAllocator->AllocateQName(nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain);
 
     ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
-    FullQName serverName = mQueryResponderAllocatorOperational[idx].AllocateQName(nameBuffer, kLocalDomain);
+    FullQName serverName = operationalAllocator->AllocateQName(nameBuffer, kLocalDomain);
 
     if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
     {
@@ -288,8 +289,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!mQueryResponderAllocatorOperational[idx]
-             .AddResponder<PtrResponder>(operationalServiceName, operationalServerName)
+    if (!operationalAllocator->AddResponder<PtrResponder>(operationalServiceName, operationalServerName)
              .SetReportAdditional(operationalServerName)
              .SetReportInServiceListing(true)
              .IsValid())
@@ -298,16 +298,14 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!mQueryResponderAllocatorOperational[idx]
-             .AddResponder<SrvResponder>(SrvResourceRecord(operationalServerName, serverName, params.GetPort()))
+    if (!operationalAllocator->AddResponder<SrvResponder>(SrvResourceRecord(operationalServerName, serverName, params.GetPort()))
              .SetReportAdditional(serverName)
              .IsValid())
     {
         ChipLogError(Discovery, "Failed to add SRV record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
     }
-    if (!mQueryResponderAllocatorOperational[idx]
-             .AddResponder<TxtResponder>(TxtResourceRecord(operationalServerName, mEmptyTextEntries))
+    if (!operationalAllocator->AddResponder<TxtResponder>(TxtResourceRecord(operationalServerName, mEmptyTextEntries))
              .SetReportAdditional(serverName)
              .IsValid())
     {
@@ -315,7 +313,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!mQueryResponderAllocatorOperational[idx].AddResponder<IPv6Responder>(serverName).IsValid())
+    if (!operationalAllocator->AddResponder<IPv6Responder>(serverName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add IPv6 mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
@@ -323,7 +321,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
     if (params.IsIPv4Enabled())
     {
-        if (!mQueryResponderAllocatorOperational[idx].AddResponder<IPv4Responder>(serverName).IsValid())
+        if (!operationalAllocator->AddResponder<IPv4Responder>(serverName).IsValid())
         {
             ChipLogError(Discovery, "Failed to add IPv4 mDNS responder");
             return CHIP_ERROR_NO_MEMORY;
@@ -702,9 +700,9 @@ void AdvertiserMinMdns::AdvertiseRecords()
         QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
         queryData.SetIsBootAdvertising(true);
 
-        for (size_t i = 0; i < kMaxOperationalNetworks; ++i)
+        for (auto & allocator : mQueryResponderAllocatorOperational)
         {
-            mQueryResponderAllocatorOperational[i].GetQueryResponder()->ClearBroadcastThrottle();
+            allocator.GetQueryResponder()->ClearBroadcastThrottle();
         }
         mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
         mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
@@ -717,9 +715,9 @@ void AdvertiserMinMdns::AdvertiseRecords()
     }
 
     // Once all automatic broadcasts are done, allow immediate replies once.
-    for (size_t i = 0; i < kMaxOperationalNetworks; ++i)
+    for (auto & allocator : mQueryResponderAllocatorOperational)
     {
-        mQueryResponderAllocatorOperational[i].GetQueryResponder()->ClearBroadcastThrottle();
+        allocator.GetQueryResponder()->ClearBroadcastThrottle();
     }
     mQueryResponderAllocatorCommissionable.GetQueryResponder()->ClearBroadcastThrottle();
     mQueryResponderAllocatorCommissioner.GetQueryResponder()->ClearBroadcastThrottle();
