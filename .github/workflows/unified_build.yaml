@@ -55,20 +55,19 @@ jobs:
             - name: ESP32
               run: |
                 ./scripts/run_in_build_env.sh \
-                ./scripts/build/build_examples.py --platform esp32 build \
-                   --copy-artifacts-to /tmp/output_binaries/
+                "./scripts/build/build_examples.py --platform esp32 build --copy-artifacts-to /tmp/output_binaries/"
             - name: EFR32
               run: |
                 ./scripts/run_in_build_env.sh \
-                ./scripts/build/build_examples.py --platform efr32 build
+                "./scripts/build/build_examples.py --platform efr32 build"
             - name: NRF
               run: |
                 ./scripts/run_in_build_env.sh \
-                ./scripts/build/build_examples.py --platform nrf build
+                "./scripts/build/build_examples.py --platform nrf build"
             - name: QPG
               run: |
                 ./scripts/run_in_build_env.sh \
-                ./scripts/build/build_examples.py --platform qpg build
+                "./scripts/build/build_examples.py --platform qpg build"
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
