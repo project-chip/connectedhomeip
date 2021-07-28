@@ -25,7 +25,6 @@
 
 #pragma once
 
-
 // ==================== Platform Adaptations ====================
 
 #define INET_CONFIG_ERROR_TYPE int32_t

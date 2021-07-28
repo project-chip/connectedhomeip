@@ -7,28 +7,29 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 
-extern "C"{ void * __dso_handle = 0 ;}
+extern "C" {
+void * __dso_handle = 0;
+}
 
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-namespace
+namespace {
+void SetupPretendDevices(void)
 {
-    void SetupPretendDevices(void)
-    {
-        //TODO
-    }
+    // TODO
+}
 
-    class AppCallbacks : public AppDelegate
-    {
-    public:
-        void OnReceiveError() override { };
-        void OnRendezvousStarted() override {  };
-        void OnRendezvousStopped() override {};
-        void OnPairingWindowOpened() override { };
-        void OnPairingWindowClosed() override { };
-    };
+class AppCallbacks : public AppDelegate
+{
+public:
+    void OnReceiveError() override{};
+    void OnRendezvousStarted() override{};
+    void OnRendezvousStopped() override{};
+    void OnPairingWindowOpened() override{};
+    void OnPairingWindowClosed() override{};
+};
 
 } // namespace
 
@@ -39,9 +40,7 @@ extern "C" void ChipTest(void)
     printf("In ChipTest()\r\n");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-
-    CHIPDeviceManager &deviceMgr = CHIPDeviceManager::GetInstance();
-
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     err = deviceMgr.Init(&EchoCallbacks);
 
@@ -59,8 +58,8 @@ extern "C" void ChipTest(void)
     AppCallbacks callbacks;
     InitServer(&callbacks);
 
-    while(true)
-        vTaskDelay( pdMS_TO_TICKS(50) );
+    while (true)
+        vTaskDelay(pdMS_TO_TICKS(50));
 }
 
 bool lowPowerClusterSleep()
