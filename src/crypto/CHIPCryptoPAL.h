@@ -170,6 +170,12 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    virtual CHIP_ERROR ECDSA_validate_attestation_data(const ByteSpan & attestationElements, const ByteSpan & attestationChallenge,
+                                                       const Sig & out_signature) const
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
 template <size_t Cap>
@@ -230,6 +236,9 @@ public:
     CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, size_t hash_length,
                                              const P256ECDSASignature & signature) const override;
 
+    CHIP_ERROR ECDSA_validate_attestation_data(const ByteSpan & attestationElements, const ByteSpan & attestationChallenge,
+                                               const P256ECDSASignature & out_signature) const override;
+
 private:
     uint8_t bytes[kP256_PublicKey_Length];
 };
@@ -267,6 +276,17 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, Sig & out_signature) = 0;
+
+    /**
+     * @brief A function to sign an attestation data blob using ECDSA
+     * @param attestationElements Span of the AttestationElements to be signed
+     * @param attestationChallenge Span of the AttestationChallenge to be signed
+     * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
+     * in raw <r,s> point form (see SEC1).
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR ECDSA_sign_attestation_data(const ByteSpan & attestationElements, const ByteSpan & attestationChallenge,
+                                                   Sig & out_signature) = 0;
 
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
@@ -339,6 +359,17 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) override;
+
+    /**
+     * @brief A function to sign an attestation data blob using ECDSA
+     * @param attestationElements Span of the AttestationElements to be signed
+     * @param attestationChallenge Span of the AttestationChallenge to be signed
+     * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
+     * in raw <r,s> point form (see SEC1).
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR ECDSA_sign_attestation_data(const ByteSpan & attestationElements, const ByteSpan & attestationChallenge,
+                                           P256ECDSASignature & out_signature) override;
 
     /**
      * @brief A function to derive a shared secret using ECDH
@@ -1128,6 +1159,16 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen);
 
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey);
+
+CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaration, const ByteSpan & attestationNonce,
+                                        uint32_t timestamp, const ByteSpan & firmwareInfo, const ByteSpan & vendorReserved5,
+                                        const ByteSpan & vendorReserved6, const ByteSpan & vendorReserved7,
+                                        const ByteSpan & vendorReserved8, MutableByteSpan & attestationElements);
+
+CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, ByteSpan & certificationDeclaration,
+                                          ByteSpan & attestationNonce, uint32_t & timestamp, ByteSpan & firmwareInfo,
+                                          ByteSpan & vendorReserved5, ByteSpan & vendorReserved6, ByteSpan & vendorReserved7,
+                                          ByteSpan & vendorReserved8);
 
 } // namespace Crypto
 } // namespace chip

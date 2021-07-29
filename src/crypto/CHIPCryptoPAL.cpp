@@ -21,6 +21,7 @@
  */
 
 #include "CHIPCryptoPAL.h"
+#include <core/CHIPTLV.h>
 #include <string.h>
 #include <support/BufferReader.h>
 #include <support/BufferWriter.h>
@@ -605,6 +606,186 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1
 
     out_raw_sig = out_raw_sig.SubSpan(0, (2u * fe_length_bytes));
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR P256Keypair::ECDSA_sign_attestation_data(const ByteSpan & attestationElements, const ByteSpan & attestationChallenge,
+                                                    P256ECDSASignature & out_signature)
+{
+    Hash_SHA256_stream hashStream;
+    uint8_t md[kSHA256_Hash_Length];
+    MutableByteSpan messageDigestSpan(md);
+
+    ReturnErrorOnFailure(hashStream.Begin());
+    ReturnErrorOnFailure(hashStream.AddData(attestationElements));
+    ReturnErrorOnFailure(hashStream.AddData(attestationChallenge));
+    ReturnErrorOnFailure(hashStream.Finish(messageDigestSpan));
+
+    ReturnErrorOnFailure(ECDSA_sign_hash(messageDigestSpan.data(), messageDigestSpan.size(), out_signature));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR P256PublicKey::ECDSA_validate_attestation_data(const ByteSpan & attestationElements,
+                                                          const ByteSpan & attestationChallenge,
+                                                          const P256ECDSASignature & out_signature) const
+{
+    Hash_SHA256_stream hashStream;
+    uint8_t md[kSHA256_Hash_Length];
+    MutableByteSpan messageDigestSpan(md);
+
+    ReturnErrorOnFailure(hashStream.Begin());
+    ReturnErrorOnFailure(hashStream.AddData(attestationElements));
+    ReturnErrorOnFailure(hashStream.AddData(attestationChallenge));
+    ReturnErrorOnFailure(hashStream.Finish(messageDigestSpan));
+
+    ReturnErrorOnFailure(ECDSA_validate_hash_signature(messageDigestSpan.data(), messageDigestSpan.size(), out_signature));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaration, const ByteSpan & attestationNonce,
+                                        uint32_t timestamp, const ByteSpan & firmwareInfo, const ByteSpan & vendorReserved5,
+                                        const ByteSpan & vendorReserved6, const ByteSpan & vendorReserved7,
+                                        const ByteSpan & vendorReserved8, MutableByteSpan & attestationElements)
+{
+    TLV::TLVWriter tlvWriter;
+    TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
+
+    tlvWriter.Init(attestationElements.data(), static_cast<uint32_t>(attestationElements.size()));
+    outerContainerType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), certificationDeclaration));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), attestationNonce));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), timestamp));
+    if (!firmwareInfo.empty())
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(4), firmwareInfo));
+    }
+    if (!vendorReserved5.empty())
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(5), vendorReserved5));
+    }
+    if (!vendorReserved6.empty())
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(6), vendorReserved6));
+    }
+    if (!vendorReserved7.empty())
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(7), vendorReserved7));
+    }
+    if (!vendorReserved8.empty())
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(8), vendorReserved8));
+    }
+    ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.Finalize());
+    attestationElements = attestationElements.SubSpan(0, tlvWriter.GetLengthWritten());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, ByteSpan & certificationDeclaration,
+                                          ByteSpan & attestationNonce, uint32_t & timestamp, ByteSpan & firmwareInfo,
+                                          ByteSpan & vendorReserved5, ByteSpan & vendorReserved6, ByteSpan & vendorReserved7,
+                                          ByteSpan & vendorReserved8)
+{
+    ByteSpan * element_array[] = { &certificationDeclaration, &attestationNonce, nullptr,          &firmwareInfo,
+                                   &vendorReserved5,          &vendorReserved6,  &vendorReserved7, &vendorReserved8 };
+
+    uint32_t validArgumentCount = 0;
+    uint32_t currentDecodeTagId = 0;
+    CHIP_ERROR TLVError         = CHIP_NO_ERROR;
+    CHIP_ERROR TLVUnpackError   = CHIP_NO_ERROR;
+    bool argExists[9];
+    TLV::TLVReader tlvReader;
+    TLV::TLVType containerType = TLV::kTLVType_Structure;
+
+    tlvReader.Init(attestationElements.data(), static_cast<uint32_t>(attestationElements.size()));
+    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
+
+    memset(argExists, 0, sizeof argExists);
+
+    for (size_t i = 0; i < sizeof(element_array) / sizeof(*element_array); ++i)
+    {
+        if (element_array[i] != nullptr)
+        {
+            *element_array[i] = ByteSpan();
+        }
+    }
+
+    while ((TLVError = tlvReader.Next()) == CHIP_NO_ERROR)
+    {
+        // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+        // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+        if (!TLV::IsContextTag(tlvReader.GetTag()))
+        {
+            continue;
+        }
+        currentDecodeTagId = TLV::TagNumFromTag(tlvReader.GetTag());
+        if (currentDecodeTagId < 9 && currentDecodeTagId > 0)
+        {
+            if (argExists[currentDecodeTagId])
+            {
+                // Duplicate TLV tag
+                TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                break;
+            }
+            else
+            {
+                argExists[currentDecodeTagId] = true;
+                validArgumentCount++;
+            }
+        }
+        switch (currentDecodeTagId)
+        {
+        case 1:
+        case 2:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8: {
+            const uint8_t * data = nullptr;
+            TLVUnpackError       = tlvReader.GetDataPtr(data);
+            if (element_array[currentDecodeTagId - 1] != nullptr)
+            {
+                *element_array[currentDecodeTagId - 1] = ByteSpan(data, tlvReader.GetLength());
+            }
+        }
+        break;
+        case 3: {
+            TLVUnpackError = tlvReader.Get(timestamp);
+        }
+        default:
+            // Unsupported tag, ignore it.
+            break;
+        }
+        if (CHIP_NO_ERROR != TLVUnpackError)
+        {
+            break;
+        }
+    }
+
+    if (CHIP_END_OF_TLV == TLVError)
+    {
+        // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+        TLVError = CHIP_NO_ERROR;
+    }
+
+    if (CHIP_NO_ERROR != TLVError)
+    {
+        return TLVError;
+    }
+    if (CHIP_NO_ERROR != TLVUnpackError)
+    {
+        return TLVUnpackError;
+    }
+    if (validArgumentCount > 8)
+    {
+        return CHIP_ERROR_INVALID_TLV_ELEMENT;
+    }
     return CHIP_NO_ERROR;
 }
 

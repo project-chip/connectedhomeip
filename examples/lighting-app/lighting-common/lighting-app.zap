@@ -2906,6 +2906,14 @@
           "commands": [
             {
               "name": "SetFabric",
+              "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "AttestationRequest",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -2915,14 +2923,6 @@
             {
               "name": "CertChainRequest",
               "code": 2,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "AttestationRequest",
-              "code": 12,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -3013,6 +3013,14 @@
           "commands": [
             {
               "name": "SetFabricResponse",
+              "code": 13,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "AttestationResponse",
               "code": 1,
               "mfgCode": null,
               "source": "server",
@@ -3022,14 +3030,6 @@
             {
               "name": "CertChainResponse",
               "code": 3,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "AttestationResponse",
-              "code": 13,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,

@@ -279,6 +279,7 @@ JNI_METHOD(void, handleServiceResolve)
     HandleResolve(instanceName, serviceType, address, port, callbackHandle, contextHandle);
 }
 
+// TODO: add attestationNonce parameter
 JNI_METHOD(void, pairDevice)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode, jbyteArray csrNonce)
 {

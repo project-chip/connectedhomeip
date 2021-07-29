@@ -14270,13 +14270,13 @@ private:
 | Commands:                                                           |        |
 | * AddOpCert                                                         |   0x06 |
 | * AddTrustedRootCertificate                                         |   0xA1 |
-| * AttestationRequest                                                |   0x0C |
+| * AttestationRequest                                                |   0x00 |
 | * CertChainRequest                                                  |   0x02 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
 | * RemoveFabric                                                      |   0x0A |
 | * RemoveTrustedRootCertificate                                      |   0xA2 |
-| * SetFabric                                                         |   0x00 |
+| * SetFabric                                                         |   0x0C |
 | * UpdateFabricLabel                                                 |   0x09 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -14379,7 +14379,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x0C) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
@@ -14587,7 +14587,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x0C) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);

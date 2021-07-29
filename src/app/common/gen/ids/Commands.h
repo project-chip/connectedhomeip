@@ -335,8 +335,8 @@ static constexpr CommandId ReachableChanged = 0x00000003;
 namespace OperationalCredentials {
 namespace Commands {
 namespace Ids {
-static constexpr CommandId SetFabric                    = 0x00000000;
-static constexpr CommandId SetFabricResponse            = 0x00000001;
+static constexpr CommandId AttestationRequest           = 0x00000000;
+static constexpr CommandId AttestationResponse          = 0x00000001;
 static constexpr CommandId CertChainRequest             = 0x00000002;
 static constexpr CommandId CertChainResponse            = 0x00000003;
 static constexpr CommandId OpCSRRequest                 = 0x00000004;
@@ -346,8 +346,8 @@ static constexpr CommandId OpCertResponse               = 0x00000008;
 static constexpr CommandId UpdateFabricLabel            = 0x00000009;
 static constexpr CommandId RemoveFabric                 = 0x0000000A;
 static constexpr CommandId RemoveAllFabrics             = 0x0000000B;
-static constexpr CommandId AttestationRequest           = 0x0000000C;
-static constexpr CommandId AttestationResponse          = 0x0000000D;
+static constexpr CommandId SetFabric                    = 0x0000000C;
+static constexpr CommandId SetFabricResponse            = 0x0000000D;
 static constexpr CommandId AddTrustedRootCertificate    = 0x000000A1;
 static constexpr CommandId RemoveTrustedRootCertificate = 0x000000A2;
 } // namespace Ids

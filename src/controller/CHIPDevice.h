@@ -60,8 +60,9 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
-constexpr size_t kMaxBlePendingPackets = 1;
-constexpr uint32_t kOpCSRNonceLength   = 32;
+constexpr size_t kMaxBlePendingPackets     = 1;
+constexpr uint32_t kOpCSRNonceLength       = 32;
+constexpr uint32_t kAttestationNonceLength = 32;
 
 using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
@@ -376,6 +377,23 @@ public:
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
+    CHIP_ERROR SetAttestationNonce(ByteSpan attestationNonce)
+    {
+        VerifyOrReturnError(attestationNonce.size() == sizeof(mAttestationNonce), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mAttestationNonce, attestationNonce.data(), attestationNonce.size());
+        return CHIP_NO_ERROR;
+    }
+
+    ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)); }
+
+    bool AreCredentialsAvailable() const { return (mDAC != nullptr && mDACLen != 0); }
+
+    ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
+    ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
+
+    CHIP_ERROR SetDAC(const ByteSpan & dac);
+    CHIP_ERROR SetPAI(const ByteSpan & pai);
+
     /*
      * This function can be called to establish a secure session with the device.
      *
@@ -468,6 +486,9 @@ private:
 
     CHIP_ERROR WarmupCASESession();
 
+    void ReleaseDAC();
+    void ReleasePAI();
+
     uint16_t mListenPort;
 
     FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
@@ -481,6 +502,12 @@ private:
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
     uint8_t mCSRNonce[kOpCSRNonceLength];
+    uint8_t mAttestationNonce[kAttestationNonceLength];
+
+    uint8_t * mDAC   = nullptr;
+    uint16_t mDACLen = 0;
+    uint8_t * mPAI   = nullptr;
+    uint16_t mPAILen = 0;
 
     SessionIDAllocator * mIDAllocator = nullptr;
 

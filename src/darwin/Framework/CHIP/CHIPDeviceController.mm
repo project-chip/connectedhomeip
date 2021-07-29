@@ -211,6 +211,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     return [NSNumber numberWithUnsignedLongLong:_localDeviceId];
 }
 
+// TODO: add attestationNonce parameter
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode

@@ -1105,13 +1105,13 @@ public:
 private:
     static constexpr CommandId kAddOpCertCommandId                    = 0x06;
     static constexpr CommandId kAddTrustedRootCertificateCommandId    = 0xA1;
-    static constexpr CommandId kAttestationRequestCommandId           = 0x0C;
+    static constexpr CommandId kAttestationRequestCommandId           = 0x00;
     static constexpr CommandId kCertChainRequestCommandId             = 0x02;
     static constexpr CommandId kOpCSRRequestCommandId                 = 0x04;
     static constexpr CommandId kRemoveAllFabricsCommandId             = 0x0B;
     static constexpr CommandId kRemoveFabricCommandId                 = 0x0A;
     static constexpr CommandId kRemoveTrustedRootCertificateCommandId = 0xA2;
-    static constexpr CommandId kSetFabricCommandId                    = 0x00;
+    static constexpr CommandId kSetFabricCommandId                    = 0x0C;
     static constexpr CommandId kUpdateFabricLabelCommandId            = 0x09;
 };
 

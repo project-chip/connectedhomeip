@@ -15737,13 +15737,15 @@ bool emberAfBridgedDeviceBasicClusterLeaveCallback(chip::app::CommandSender * co
  */
 bool emberAfBridgedDeviceBasicClusterReachableChangedCallback(chip::app::CommandSender * commandObj);
 /**
- * @brief  Cluster SetFabric Command callback (from client)
+ * @brief  Cluster AttestationRequest Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::CommandHandler * commandObj, uint16_t VendorId);
+bool emberAfOperationalCredentialsClusterAttestationRequestCallback(chip::app::CommandHandler * commandObj,
+                                                                    chip::ByteSpan AttestationNonce);
 /**
- * @brief  Cluster SetFabricResponse Command callback (from server)
+ * @brief  Cluster AttestationResponse Command callback (from server)
  */
-bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::CommandSender * commandObj, chip::FabricId FabricId);
+bool emberAfOperationalCredentialsClusterAttestationResponseCallback(chip::app::CommandSender * commandObj,
+                                                                     chip::ByteSpan AttestationElements, chip::ByteSpan Signature);
 /**
  * @brief  Cluster CertChainRequest Command callback (from client)
  */
@@ -15789,15 +15791,13 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command
  */
 bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::CommandHandler * commandObj);
 /**
- * @brief  Cluster AttestationRequest Command callback (from client)
+ * @brief  Cluster SetFabric Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterAttestationRequestCallback(chip::app::CommandHandler * commandObj,
-                                                                    chip::ByteSpan AttestationNonce);
+bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::CommandHandler * commandObj, uint16_t VendorId);
 /**
- * @brief  Cluster AttestationResponse Command callback (from server)
+ * @brief  Cluster SetFabricResponse Command callback (from server)
  */
-bool emberAfOperationalCredentialsClusterAttestationResponseCallback(chip::app::CommandSender * commandObj,
-                                                                     chip::ByteSpan AttestationElements, chip::ByteSpan Signature);
+bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::CommandSender * commandObj, chip::FabricId FabricId);
 /**
  * @brief  Cluster AddTrustedRootCertificate Command callback (from client)
  */

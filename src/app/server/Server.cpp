@@ -661,8 +661,3 @@ FabricTable & GetGlobalFabricTable()
 {
     return gFabrics;
 }
-
-SecureSessionMgr & GetGlobalSecureSessionMgr()
-{
-    return gSessions;
-}

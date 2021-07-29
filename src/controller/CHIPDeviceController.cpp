@@ -80,8 +80,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "dac_chain.h"
-
 using namespace chip::Inet;
 using namespace chip::System;
 using namespace chip::Transport;
@@ -843,12 +841,12 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     mUdcTransportMgr = chip::Platform::New<DeviceTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mInetLayer)
                                                     .SetAddressType(Inet::kIPAddressType_IPv6)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort((uint16_t) (mUdcListenPort))
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
                                                 Transport::UdpListenParameters(mInetLayer)
                                                     .SetAddressType(Inet::kIPAddressType_IPv4)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort((uint16_t) (mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
 #if CONFIG_NETWORK_LAYER_BLE
                                                     ,
@@ -948,6 +946,18 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         uint8_t mCSRNonce[kOpCSRNonceLength];
         Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
         ReturnErrorOnFailure(device->SetCSRNonce(ByteSpan(mCSRNonce)));
+    }
+
+    // If the AttestationNonce is passed in, using that else using a random one..
+    if (params.HasAttestationNonce())
+    {
+        ReturnErrorOnFailure(device->SetAttestationNonce(params.GetAttestationNonce().Value()));
+    }
+    else
+    {
+        uint8_t mAttestationNonce[kAttestationNonceLength];
+        Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
+        ReturnErrorOnFailure(device->SetAttestationNonce(ByteSpan(mAttestationNonce)));
     }
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
@@ -1211,7 +1221,7 @@ void DeviceCommissioner::OnSessionEstablished()
 
     if (sendOperationalCertsImmediately)
     {
-        err = SendCertificateChainRequestCommand(device, CertificateChainType::kDAC);
+        err = SendCertificateChainRequestCommand(device, CertificateChainType::kPAI);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Ble, "Failed in sending Certificate Chain request command to the device: err %s", ErrorStr(err));
@@ -1271,19 +1281,19 @@ void DeviceCommissioner::OnCertificateChainResponse(void * context, ByteSpan cer
 
 CHIP_ERROR DeviceCommissioner::ProcessCertificateChain(const ByteSpan & certificate)
 {
-#if 0
-	//ml --overriden by refactoring 
-    Transport::AdminPairingInfo * admin = mAdmins.FindAdminWithId(mAdminId);
-    VerifyOrReturnError(admin != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDeviceBeingPaired < kNumMaxActiveDevices, CHIP_ERROR_INCORRECT_STATE);
+
+    Device * device = &mActiveDevices[mDeviceBeingPaired];
 
     switch (mCertificateChainBeingRequested)
     {
     case CertificateChainType::kDAC: {
-        admin->SetDeviceDAC(certificate);
+        device->SetDAC(certificate);
         break;
     }
     case CertificateChainType::kPAI: {
-        admin->SetDevicePAI(certificate);
+        device->SetPAI(certificate);
         break;
     }
     case CertificateChainType::kUnknown:
@@ -1292,33 +1302,41 @@ CHIP_ERROR DeviceCommissioner::ProcessCertificateChain(const ByteSpan & certific
     }
     }
 
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mDeviceBeingPaired < kNumMaxActiveDevices, CHIP_ERROR_INCORRECT_STATE);
-
-    Device * device = &mActiveDevices[mDeviceBeingPaired];
-
-    if (admin->AreDeviceCredentialsAvailable())
+    if (device->AreCredentialsAvailable())
     {
         // Step c
         // TODO: see if vid matches
 
-        // Step b/d
-        uint16_t paiLen;
-        const uint8_t * pai = admin->GetDevicePAI(paiLen);
-        uint16_t dacLen;
-        const uint8_t * dac = admin->GetDeviceDAC(dacLen);
+        // Step b
+        const ByteSpan pai = device->GetPAI();
+        const ByteSpan dac = device->GetDAC();
+        (void) dac;
 
-        ReturnErrorOnFailure(ValidateCertificateChain(paa_certificate, sizeof(paa_certificate), pai, paiLen, dac, dacLen));
+        if (!pai.empty())
+        {
+            // TODO: if PAI exists, use its AKID to find PAA
+            // TODO: add PAA lookup method (delegate API)
+        }
+        else
+        {
+            // TODO: if PAI doesn't exist, use DAC's AKID to find PAA
+            // TODO: add PAA lookup method (delegate API)
+        }
 
-        // Extract Manufacturer Certificate Public Key
-        ReturnErrorOnFailure(ExtractPubkeyFromX509Cert(ByteSpan(dac, dacLen), mRemoteManufacturerPubkey));
+        // TODO: re-enable the method call below (after introducing a set of delegate APIs for interacting with DAC/PAI
+        // certificates)
+        // ReturnErrorOnFailure(
+        //    ValidateCertificateChain(paa_certificate, sizeof(paa_certificate), pai.data(), pai.size(), dac.data(), dac.size()));
+
+        // TODO: Extract Manufacturer Certificate Public Key
+        // ReturnErrorOnFailure(ExtractPubkeyFromX509Cert(dac, mRemoteManufacturerPubkey));
 
         ChipLogProgress(Controller, "Sending Attestation Request to the device.");
         ReturnErrorOnFailure(SendAttestationRequestCommand(device));
     }
     else
     {
-        CHIP_ERROR err = SendCertificateChainRequestCommand(device, CertificateChainType::kPAI);
+        CHIP_ERROR err = SendCertificateChainRequestCommand(device, CertificateChainType::kDAC);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Failed in sending Certificate Chain request command to the device: err %s", ErrorStr(err));
@@ -1326,16 +1344,12 @@ CHIP_ERROR DeviceCommissioner::ProcessCertificateChain(const ByteSpan & certific
             return err;
         }
     }
-#endif
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(Device * device)
 {
-#if 0
-    // ml --rewritten on new code
-    
     ChipLogDetail(Controller, "Sending Attestation request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OperationalCredentialsCluster cluster;
@@ -1343,12 +1357,9 @@ CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(Device * device)
 
     Callback::Cancelable * successCallback = mAttestationResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnAttestationFailureCallback.Cancel();
-    ReturnErrorOnFailure(Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce)));
 
-    ReturnErrorOnFailure(
-        cluster.AttestationRequest(successCallback, failureCallback, ByteSpan(mAttestationNonce, sizeof(mAttestationNonce))));
+    ReturnErrorOnFailure(cluster.AttestationRequest(successCallback, failureCallback, device->GetAttestationNonce()));
     ChipLogDetail(Controller, "Sent Attestation request, waiting for the Attestation Information");
-#endif
     return CHIP_NO_ERROR;
 }
 
@@ -1370,13 +1381,7 @@ void DeviceCommissioner::OnAttestationResponse(void * context, chip::ByteSpan at
     commissioner->mAttestationResponseCallback.Cancel();
     commissioner->mOnAttestationFailureCallback.Cancel();
 
-    if (commissioner->ValidateAttestationInfo(attestationElements, signature) != CHIP_NO_ERROR)
-    {
-        // Handle error, and notify session failure to the commissioner application.
-        ChipLogError(Controller, "Failed to validate the Attestation Information");
-        // TODO: Map error status to correct error code
-        commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
-    }
+    commissioner->HandleAttestationResult(commissioner->ValidateAttestationInfo(attestationElements, signature));
 }
 
 CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(chip::ByteSpan attestationElements, chip::ByteSpan signature)
@@ -1388,142 +1393,86 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(chip::ByteSpan attestatio
 
     ByteSpan certDeclaration;
     ByteSpan attestationNonce;
-    ByteSpan timestamp;
+    uint32_t timestamp;
     ByteSpan firmwareInfo;
     ByteSpan vendorReserved1;
     ByteSpan vendorReserved2;
     ByteSpan vendorReserved3;
     ByteSpan vendorReserved4;
 
-    ByteSpan * element_array[] = { &certDeclaration, &attestationNonce, &timestamp,       &firmwareInfo,
-                                   &vendorReserved1, &vendorReserved2,  &vendorReserved3, &vendorReserved4 };
+    ReturnErrorOnFailure(DeconstructAttestationElements(attestationElements, certDeclaration, attestationNonce, timestamp,
+                                                        firmwareInfo, vendorReserved1, vendorReserved2, vendorReserved3,
+                                                        vendorReserved4));
 
-    System::PacketBufferTLVWriter tlvWriter;
-    TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
-    System::PacketBufferHandle attestationElementsTbs;
-
-    TLV::TLVReader tlvReader;
-    TLV::TLVType containerType = TLV::kTLVType_Structure;
-    int i                      = 0;
-
-    tlvReader.Init(attestationElements.data(), static_cast<uint32_t>(attestationElements.size()));
-    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
-    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
-    do
-    {
-        if (!TLV::IsContextTag(tlvReader.GetTag()))
-        {
-            continue;
-        }
-        const uint8_t * data = nullptr;
-        ReturnErrorOnFailure(tlvReader.GetDataPtr(data));
-        *element_array[i++] = ByteSpan(data, tlvReader.GetLength());
-    } while (tlvReader.Next() == CHIP_NO_ERROR);
-
-    // ml -- to be modified later
     // Step f
+    // Verify that Nonce matches with what we sent
+    VerifyOrReturnError(device->GetAttestationNonce().data_equal(attestationNonce), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Step e
     // Retrieve attestation challenge
     PeerConnectionState * state = mSessionMgr->GetPeerConnectionState(
         { mPairingSession.PeerConnection().GetPeerNodeId(), mPairingSession.GetPeerKeyId(), mFabricIndex });
     VerifyOrReturnError(state != nullptr, CHIP_ERROR_NOT_CONNECTED);
     ByteSpan attestationChallenge = state->GetSecureSession().GetAttestationChallenge();
+    (void) attestationChallenge;
 
-    // Create attestation-elements-tbs
-    attestationElementsTbs = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    VerifyOrReturnError(!attestationElementsTbs.IsNull(), CHIP_ERROR_NO_MEMORY);
-
-    tlvWriter.Init(std::move(attestationElementsTbs));
-    outerContainerType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(0), attestationElements));
-    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), attestationChallenge));
-    ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
-    ReturnErrorOnFailure(tlvWriter.Finalize(&attestationElementsTbs));
-
-    // Step e
+    // Step d
     P256ECDSASignature deviceSignature;
     ReturnErrorOnFailure(deviceSignature.SetLength(signature.size()));
     memcpy(deviceSignature, signature.data(), signature.size());
-    ReturnErrorOnFailure(mRemoteManufacturerPubkey.ECDSA_validate_msg_signature(
-        attestationElementsTbs->Start(), attestationElementsTbs->DataLength(), deviceSignature));
+    // TODO: re-enable the method call below (after introducing a set of delegate APIs for interacting with DAC/PAI
+    // certificates)
+    // ReturnErrorOnFailure(
+    //    mRemoteManufacturerPubkey.ECDSA_validate_attestation_data(attestationElements, attestationChallenge, deviceSignature));
 
-#if 0
-    // ml to be added later
-    // Step g
-    VerifyOrReturnError(sizeof(mAttestationNonce) == attestationNonce.size(), CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(memcmp(mAttestationNonce, attestationNonce.data(), sizeof(mAttestationNonce)) == 0, CHIP_ERROR_INTERNAL);
-#endif
+    // Step g/h
+    // TODO: retrieve pubkey from CSA to validate CertDeclaration
+    ReturnErrorOnFailure(ValidateCertificationDeclaration(certDeclaration, firmwareInfo));
 
-    // Step h/i
-    ReturnErrorOnFailure(ValidateCertificateDeclaration(certDeclaration, mRemoteManufacturerPubkey, firmwareInfo));
-
-    ChipLogProgress(Controller, "Sending Trusted Root Certificate to the device.");
-    ReturnErrorOnFailure(SendTrustedRootCertificate(device));
+    if (!firmwareInfo.empty())
+    {
+        // TODO: Step i: The Firmware Information, if present, SHALL match an entry in the Distributed Compliance Ledger for the
+        // specific device
+    }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::ValidateCertificateDeclaration(chip::ByteSpan certDeclaration, Crypto::P256PublicKey pubkey,
-                                                              chip::ByteSpan firmwareInfo)
+void DeviceCommissioner::HandleAttestationResult(CHIP_ERROR err)
 {
-    P256ECDSASignature signature;
-    ByteSpan certDeclarationTbs;
-    ByteSpan certDeclarationSignature;
-
-    const uint8_t * data = nullptr;
-    TLV::TLVReader tlvReader;
-    TLV::TLVType containerType = TLV::kTLVType_Structure;
-    tlvReader.Init(certDeclaration.data(), static_cast<uint32_t>(certDeclaration.size()));
-    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
-    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
-    ReturnErrorOnFailure(tlvReader.Next());
-    ReturnErrorOnFailure(tlvReader.GetDataPtr(data));
-    certDeclarationTbs = ByteSpan(data, tlvReader.GetLength());
-    ReturnErrorOnFailure(tlvReader.Next());
-    VerifyOrReturnError(TLV::IsContextTag(tlvReader.GetTag()) == true, CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(tlvReader.GetDataPtr(data));
-    certDeclarationSignature = ByteSpan(data, tlvReader.GetLength());
-    ReturnErrorOnFailure(signature.SetLength(certDeclarationSignature.size()));
-    memcpy(signature, certDeclarationSignature.data(), certDeclarationSignature.size());
-
-    ReturnErrorOnFailure(pubkey.ECDSA_validate_msg_signature(certDeclarationTbs.data(), certDeclarationTbs.size(), signature));
-
-    uint16_t vendor_id;
-    uint16_t product_id;
-    uint16_t server_category_id;
-    uint16_t client_category_id;
-    uint16_t security_level;
-    uint16_t security_information;
-    uint16_t version_number;
-
-    uint16_t * element_array[] = { &vendor_id,      &product_id,           &server_category_id, &client_category_id,
-                                   &security_level, &security_information, &version_number };
-
-    int i         = 0;
-    containerType = TLV::kTLVType_Structure;
-    tlvReader.Init(certDeclarationTbs.data(), static_cast<uint32_t>(certDeclarationTbs.size()));
-    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
-    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
-    do
+    // TODO: Override this method (Some commissioners may continue the flow despite attestation failing)
+    if (err == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(tlvReader.GetTag()))
+        VerifyOrReturn(mState == State::Initialized);
+        VerifyOrReturn(mDeviceBeingPaired < kNumMaxActiveDevices);
+
+        Device * device = &mActiveDevices[mDeviceBeingPaired];
+
+        ChipLogProgress(Controller, "Sending Trusted Root Certificate to the device.");
+        CHIP_ERROR error = SendTrustedRootCertificate(device);
+        if (error != CHIP_NO_ERROR)
         {
-            continue;
+            ChipLogError(Controller, "Failed in sending 'add trusted root' command to the device: err %s", ErrorStr(error));
+            OnSessionEstablishmentError(error);
+            return;
         }
-        ReturnErrorOnFailure(tlvReader.Get(*element_array[i++]));
-    } while (tlvReader.Next() == CHIP_NO_ERROR);
+    }
+    else
+    {
+        // Handle error, and notify session failure to the commissioner application.
+        ChipLogError(Controller, "Failed to validate the Attestation Information");
+        // TODO: Map error status to correct error code
+        OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
+    }
+}
 
-    uint16_t cd_version_number;
-
-    containerType = TLV::kTLVType_Structure;
-    tlvReader.Init(firmwareInfo.data(), static_cast<uint32_t>(firmwareInfo.size()));
-    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
-    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
-    ReturnErrorOnFailure(tlvReader.Next());
-    ReturnErrorOnFailure(tlvReader.Get(cd_version_number));
-
-    VerifyOrReturnError(version_number == cd_version_number, CHIP_ERROR_VERSION_MISMATCH);
-
+CHIP_ERROR DeviceCommissioner::ValidateCertificationDeclaration(chip::ByteSpan certDeclaration, chip::ByteSpan firmwareInfo)
+{
+    // TODO: Parse certDeclaration.
+    // TODO: Validate certDeclaration signature.
+    // TODO: Retrieve version_number field from certDeclaration
+    // TODO: Retrieve version_number field from firmwareInfo
+    // TODO: Match certDeclaration:version_number with firmwareInfo:version_number
     return CHIP_NO_ERROR;
 }
 

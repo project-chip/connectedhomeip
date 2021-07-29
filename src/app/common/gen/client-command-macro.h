@@ -2211,25 +2211,28 @@
                                                                                                                                    \
                                                                     ZCL_REACHABLE_CHANGED_COMMAND_ID, "", );
 
-/** @brief Command description for SetFabric
+/** @brief Command description for AttestationRequest
  *
- * Command: SetFabric
- * @param VendorId INT16U
+ * Command: AttestationRequest
+ * @param AttestationNonce OCTET_STRING
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterSetFabric(VendorId) emberAfFillExternalBuffer(mask,                                                          \
+    CredentialsClusterAttestationRequest(AttestationNonce)                                                                         \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                                    ZCL_SET_FABRIC_COMMAND_ID, "u", VendorId);
+                                  ZCL_ATTESTATION_REQUEST_COMMAND_ID, "u", AttestationNonce);
 
-/** @brief Command description for SetFabricResponse
+/** @brief Command description for AttestationResponse
  *
- * Command: SetFabricResponse
- * @param FabricId FABRIC_ID
+ * Command: AttestationResponse
+ * @param AttestationElements OCTET_STRING
+ * @param Signature OCTET_STRING
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterSetFabricResponse(FabricId) emberAfFillExternalBuffer(mask,                                                  \
+    CredentialsClusterAttestationResponse(AttestationElements, Signature)                                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                                            ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "u", FabricId);
+                                  ZCL_ATTESTATION_RESPONSE_COMMAND_ID, "uu", AttestationElements, Signature);
 
 /** @brief Command description for CertChainRequest
  *
@@ -2339,28 +2342,25 @@
                                                                                                                                    \
                                                                    ZCL_REMOVE_ALL_FABRICS_COMMAND_ID, "", );
 
-/** @brief Command description for AttestationRequest
+/** @brief Command description for SetFabric
  *
- * Command: AttestationRequest
- * @param AttestationNonce OCTET_STRING
+ * Command: SetFabric
+ * @param VendorId INT16U
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterAttestationRequest(AttestationNonce)                                                                         \
-        emberAfFillExternalBuffer(mask,                                                                                            \
+    CredentialsClusterSetFabric(VendorId) emberAfFillExternalBuffer(mask,                                                          \
                                                                                                                                    \
-                                  ZCL_ATTESTATION_REQUEST_COMMAND_ID, "u", AttestationNonce);
+                                                                    ZCL_SET_FABRIC_COMMAND_ID, "u", VendorId);
 
-/** @brief Command description for AttestationResponse
+/** @brief Command description for SetFabricResponse
  *
- * Command: AttestationResponse
- * @param AttestationElements OCTET_STRING
- * @param Signature OCTET_STRING
+ * Command: SetFabricResponse
+ * @param FabricId FABRIC_ID
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterAttestationResponse(AttestationElements, Signature)                                                          \
-        emberAfFillExternalBuffer(mask,                                                                                            \
+    CredentialsClusterSetFabricResponse(FabricId) emberAfFillExternalBuffer(mask,                                                  \
                                                                                                                                    \
-                                  ZCL_ATTESTATION_RESPONSE_COMMAND_ID, "uu", AttestationElements, Signature);
+                                                                            ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "u", FabricId);
 
 /** @brief Command description for AddTrustedRootCertificate
  *

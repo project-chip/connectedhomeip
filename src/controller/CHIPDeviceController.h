@@ -715,8 +715,9 @@ private:
 
     CHIP_ERROR ValidateAttestationInfo(chip::ByteSpan attestationElements, chip::ByteSpan signature);
 
-    CHIP_ERROR ValidateCertificateDeclaration(chip::ByteSpan certDeclaration, Crypto::P256PublicKey pubkey,
-                                              chip::ByteSpan firmwareInfo);
+    void HandleAttestationResult(CHIP_ERROR err);
+
+    CHIP_ERROR ValidateCertificationDeclaration(chip::ByteSpan certDeclaration, chip::ByteSpan firmwareInfo);
 
     // Cluster callbacks for advancing commissioning flows
     Callback::Callback<BasicSuccessCallback> mSuccess;

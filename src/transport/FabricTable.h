@@ -122,11 +122,6 @@ public:
         return (mRootCert != nullptr && mNOCCert != nullptr && mRootCertLen != 0 && mNOCCertLen != 0);
     }
 
-    bool AreDeviceCredentialsAvailable() const
-    {
-        return (mDeviceDAC != nullptr && mDevicePAI != nullptr && mDeviceDACLen != 0 && mDevicePAILen != 0);
-    }
-
     CHIP_ERROR GetCredentials(Credentials::OperationalCredentialSet & credentials, Credentials::ChipCertificateSet & certSet,
                               Credentials::CertificateKeyId & rootKeyId);
 
@@ -142,20 +137,6 @@ public:
     CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert);
     CHIP_ERROR SetICACert(const chip::ByteSpan & cert);
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
-
-    const uint8_t * GetDeviceDAC(uint16_t & size)
-    {
-        size = mDeviceDACLen;
-        return mDeviceDAC;
-    }
-    const uint8_t * GetDevicePAI(uint16_t & size)
-    {
-        size = mDevicePAILen;
-        return mDevicePAI;
-    }
-
-    CHIP_ERROR SetDeviceDAC(const chip::ByteSpan & dac);
-    CHIP_ERROR SetDevicePAI(const chip::ByteSpan & pai);
 
     const AccessControlList & GetACL() const { return mACL; }
     AccessControlList & GetACL() { return mACL; }
@@ -207,11 +188,6 @@ private:
     uint16_t mICACertLen           = 0;
     uint8_t * mNOCCert             = nullptr;
     uint16_t mNOCCertLen           = 0;
-
-    uint8_t * mDeviceDAC   = nullptr;
-    uint16_t mDeviceDACLen = 0;
-    uint8_t * mDevicePAI   = nullptr;
-    uint16_t mDevicePAILen = 0;
 
     static constexpr size_t KeySize();
 

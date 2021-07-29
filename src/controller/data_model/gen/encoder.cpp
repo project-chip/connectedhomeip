@@ -3769,13 +3769,13 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 | Commands:                                                           |        |
 | * AddOpCert                                                         |   0x06 |
 | * AddTrustedRootCertificate                                         |   0xA1 |
-| * AttestationRequest                                                |   0x0C |
+| * AttestationRequest                                                |   0x00 |
 | * CertChainRequest                                                  |   0x02 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
 | * RemoveFabric                                                      |   0x0A |
 | * RemoveTrustedRootCertificate                                      |   0xA2 |
-| * SetFabric                                                         |   0x00 |
+| * SetFabric                                                         |   0x0C |
 | * UpdateFabricLabel                                                 |   0x09 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
