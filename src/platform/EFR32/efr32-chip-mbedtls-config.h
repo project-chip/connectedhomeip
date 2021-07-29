@@ -34,7 +34,6 @@
 
 #include "em_device.h"
 #include "em_se.h"
-#include "sl_malloc.h"
 
 #define SL_CATALOG_FREERTOS_KERNEL_PRESENT
 
@@ -116,9 +115,6 @@
 #define MBEDTLS_ECP_WINDOW_SIZE 2       /**< Maximum window size used */
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
 #define MBEDTLS_ENTROPY_MAX_SOURCES 2   /**< Maximum number of sources supported */
-
-#define MBEDTLS_PLATFORM_STD_CALLOC sl_calloc /**< Default allocator to use, can be undefined */
-#define MBEDTLS_PLATFORM_STD_FREE sl_free     /**< Default free to use, can be undefined */
 
 #if OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maxium fragment length in bytes */
