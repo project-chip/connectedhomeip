@@ -23,7 +23,6 @@ arm_platform_config = "${p6_sdk_build_root}/p6_arm.gni"
 mbedtls_target = "${p6_sdk_build_root}:p6_build"
 
 chip_device_platform = "p6"
-treat_warnings_as_errors = false
 
 lwip_platform = "p6"
 

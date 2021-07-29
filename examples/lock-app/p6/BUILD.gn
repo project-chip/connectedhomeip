@@ -28,7 +28,9 @@ examples_plat_dir = "${chip_root}/examples/platform/p6"
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
-  setupPinCode = 73141520
+
+  # PIN code for PASE session establishment.
+  setup_pin_code = 12345678
 }
 
 p6_sdk_sources("lock_app_sdk_sources") {
@@ -41,7 +43,7 @@ p6_sdk_sources("lock_app_sdk_sources") {
   defines = [
     "BOARD_ID=${p6_board}",
     "P6_LOG_ENABLED=1",
-    "CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setup_pin_code}",
   ]
 
   sources = [ "${p6_project_dir}/include/CHIPProjectConfig.h" ]
@@ -60,16 +62,10 @@ p6_executable("lock_app") {
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
   ]
 
   include_dirs += [
     "include",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
     "${examples_plat_dir}",
     "${p6_project_dir}/include",
   ]

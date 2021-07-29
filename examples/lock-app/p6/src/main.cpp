@@ -34,9 +34,8 @@
 #include <AppTask.h>
 
 #include "AppConfig.h"
-#include "DataModelHandler.h"
-#include "Server.h"
 #include "init_p6Platform.h"
+#include <app/server/Server.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
