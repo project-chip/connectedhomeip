@@ -199,8 +199,8 @@ tests:
           command"
       command: "readAttribute"
       attribute: "current saturation"
-#      response:
-#          value: 90
+    #      response:
+    #          value: 90
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
