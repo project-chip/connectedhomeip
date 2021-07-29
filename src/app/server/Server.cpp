@@ -404,8 +404,8 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetFabrics resetFabrics, uint16_t commissi
 
     ReturnErrorOnFailure(gRendezvousServer.WaitForPairing(
         std::move(params), kSpake2p_Iteration_Count,
-        ByteSpan(reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), 0,
-        &gExchangeMgr, &gTransports, &gSessions, fabricInfo));
+        ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), 0, &gExchangeMgr,
+        &gTransports, &gSessions, fabricInfo));
 
     if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
     {

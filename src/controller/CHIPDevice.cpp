@@ -368,7 +368,7 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption optio
     {
         bool randomSetupPIN = (option == PairingWindowOption::kTokenWithRandomPIN);
         PASEVerifier verifier;
-        ByteSpan salt(reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
+        ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
         ReturnErrorOnFailure(
             PASESession::GeneratePASEVerifier(verifier, kSpake2p_Iteration_Count, salt, randomSetupPIN, setupPayload.setUpPINCode));
 
