@@ -7688,9 +7688,9 @@ CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
 }
 
 // OperationalCredentials Cluster Commands
-CHIP_ERROR OperationalCredentialsCluster::AddOpCert(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, chip::ByteSpan nOCArray,
-                                                    chip::ByteSpan iPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId)
+CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 chip::ByteSpan nOCArray, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode,
+                                                 uint16_t adminVendorId)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -7703,7 +7703,7 @@ CHIP_ERROR OperationalCredentialsCluster::AddOpCert(Callback::Cancelable * onSuc
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddOpCertCommandId,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddNOCCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));

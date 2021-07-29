@@ -5901,7 +5901,7 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
     {
         switch (aCommandId)
         {
-        case Clusters::OperationalCredentials::Commands::Ids::AddOpCert: {
+        case Clusters::OperationalCredentials::Commands::Ids::AddNOC: {
             expectArgumentCount = 4;
             chip::ByteSpan NOCArray;
             chip::ByteSpan IPKValue;
@@ -5973,8 +5973,8 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterAddOpCertCallback(aEndpointId, apCommandObj, NOCArray, IPKValue,
-                                                                                   CaseAdminNode, AdminVendorId);
+                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(aEndpointId, apCommandObj, NOCArray, IPKValue,
+                                                                                CaseAdminNode, AdminVendorId);
             }
             break;
         }
