@@ -2,7 +2,7 @@
 
 Follow https://cloud.google.com/sdk/docs/install.
 
-### Running a build
+### Running builds
 
 #### Local testing
 
