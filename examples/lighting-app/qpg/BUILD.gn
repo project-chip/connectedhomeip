@@ -12,73 +12,75 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-import("//build_overrides/build.gni") import("//build_overrides/chip.gni") import("//build_overrides/openthread.gni")
-    import("//build_overrides/qpg_sdk.gni")
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
+import("//build_overrides/qpg_sdk.gni")
 
-        import("${build_root}/config/defaults.gni") import("${qpg_sdk_build_root}/qpg_executable.gni")
-            import("${qpg_sdk_build_root}/qpg_sdk.gni")
+import("${build_root}/config/defaults.gni")
+import("${qpg_sdk_build_root}/qpg_executable.gni")
+import("${qpg_sdk_build_root}/qpg_sdk.gni")
+assert(current_os == "freertos")
 
-                assert(current_os == "freertos")
+qpg_project_dir = "${chip_root}/examples/lighting-app/qpg"
+examples_plat_dir = "${chip_root}/examples/platform/qpg"
 
-                    qpg_project_dir = "${chip_root}/examples/lighting-app/qpg" examples_plat_dir =
-                        "${chip_root}/examples/platform/qpg"
+qpg_sdk("sdk") {
+  sources = [
+    "${examples_plat_dir}/app/include/Service.h",
+    "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
+  ]
 
-    qpg_sdk("sdk"){ sources =
-                        [
-                            "${examples_plat_dir}/app/include/Service.h",
-                            "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
-                        ]
+  include_dirs = [
+    "${chip_root}/src/platform/qpg",
+    "${examples_plat_dir}/project_include",
+  ]
+}
 
-                    include_dirs =
-                        [
-                            "${chip_root}/src/platform/qpg",
-                            "${examples_plat_dir}/project_include",
-                        ] }
+qpg_executable("lighting_app") {
+  output_name = "chip-${qpg_target_ic}-lighting-example.out"
 
-qpg_executable("lighting_app"){ output_name = "chip-${qpg_target_ic}-lighting-example.out"
+  sources = [
+    "${chip_root}/examples/lighting-app/lighting-common/color_format/color_format.cpp",
+    "${examples_plat_dir}/app/main.cpp",
+    "src/AppTask.cpp",
+    "src/LightingManager.cpp",
+    "src/ZclCallbacks.cpp",
+  ]
 
-                                sources =
-                                    [
-                                        "${examples_plat_dir}/app/main.cpp",
-                                        "${chip_root}/examples/lighting-app/lighting-common/color_format/color_format.cpp",
-                                        "src/AppTask.cpp",
-                                        "src/LightingManager.cpp",
-                                        "src/ZclCallbacks.cpp",
-                                    ]
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/lighting-app/lighting-common/",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+    "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+  ]
 
-                                deps =
-                                    [
-                                        ":sdk",
-                                        "${chip_root}/examples/lighting-app/lighting-common/",
-                                        "${chip_root}/src/lib",
-                                        "${chip_root}/src/setup_payload",
-                                        "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-                                        "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-                                        "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-                                        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-                                    ]
+  cflags = [ "-Wconversion" ]
 
-                                cflags = ["-Wconversion"]
+  include_dirs = [
+    "${qpg_project_dir}/include/",
+    "${examples_plat_dir}",
+    "${examples_plat_dir}/app/include",
+    "${chip_root}/examples/lighting-app/lighting-common/color_format",
+  ]
 
-                                include_dirs =
-                                    [
-                                        "${qpg_project_dir}/include/",
-                                        "${examples_plat_dir}",
-                                        "${examples_plat_dir}/app/include",
-                                        "${chip_root}/examples/lighting-app/lighting-common/color_format",
-                                    ]
+  ldscript = "${qpg_sdk_root}/${qpg_target_ic}/ldscripts/chip-${qpg_target_ic}-example.ld"
 
-                                ldscript = "${qpg_sdk_root}/${qpg_target_ic}/ldscripts/chip-${qpg_target_ic}-example.ld"
+  inputs = [ ldscript ]
 
-                                inputs = [ldscript]
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 
-                                ldflags = ["-T" + rebase_path(ldscript, root_build_dir)]
+  output_dir = root_out_dir
+}
 
-                                output_dir = root_out_dir }
+group("qpg") {
+  deps = [ ":lighting_app" ]
+}
 
-group("qpg"){ deps = [":lighting_app"] }
-
-group("default")
-{
-    deps = [":qpg"]
+group("default") {
+  deps = [ ":qpg" ]
 }
