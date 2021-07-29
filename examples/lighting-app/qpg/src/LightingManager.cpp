@@ -21,8 +21,6 @@
 #include "qvCHIP.h"
 #include <support/logging/CHIPLogging.h>
 
-#include <math.h>
-
 // initialization values for Blue in XY color space
 #define BLUE_XY                                                                                                                    \
     {                                                                                                                              \
@@ -39,111 +37,6 @@
 #define DEFAULT_LEVEL (64)
 
 LightingManager LightingManager::sLight;
-
-RgbColor_t LightingManager::HsvToRgb(HsvColor_t hsv)
-{
-    RgbColor_t rgb;
-
-    uint16_t i       = hsv.h / 60;
-    uint16_t rgb_max = hsv.v;
-    uint16_t rgb_min = (uint16_t)(rgb_max * (100 - hsv.s)) / 100;
-    uint16_t diff    = hsv.h % 60;
-    uint16_t rgb_adj = (uint16_t)((rgb_max - rgb_min) * diff) / 60;
-
-    switch (i)
-    {
-    case 0:
-        rgb.r = (uint8_t) rgb_max;
-        rgb.g = (uint8_t)(rgb_min + rgb_adj);
-        rgb.b = (uint8_t) rgb_min;
-        break;
-    case 1:
-        rgb.r = (uint8_t)(rgb_max - rgb_adj);
-        rgb.g = (uint8_t) rgb_max;
-        rgb.b = (uint8_t) rgb_min;
-        break;
-    case 2:
-        rgb.r = (uint8_t) rgb_min;
-        rgb.g = (uint8_t) rgb_max;
-        rgb.b = (uint8_t)(rgb_min + rgb_adj);
-        break;
-    case 3:
-        rgb.r = (uint8_t) rgb_min;
-        rgb.g = (uint8_t)(rgb_max - rgb_adj);
-        rgb.b = (uint8_t) rgb_max;
-        break;
-    case 4:
-        rgb.r = (uint8_t)(rgb_min + rgb_adj);
-        rgb.g = (uint8_t) rgb_min;
-        rgb.b = (uint8_t) rgb_max;
-        break;
-    default:
-        rgb.r = (uint8_t) rgb_max;
-        rgb.g = (uint8_t) rgb_min;
-        rgb.b = (uint8_t)(rgb_max - rgb_adj);
-        break;
-    }
-
-    return rgb;
-}
-
-RgbColor_t LightingManager::XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
-{
-    // convert xyY color space to RGB
-
-    // https://www.easyrgb.com/en/math.php
-    // https://en.wikipedia.org/wiki/SRGB
-    // refer https://en.wikipedia.org/wiki/CIE_1931_color_space#CIE_xy_chromaticity_diagram_and_the_CIE_xyY_color_space
-
-    // The currentX/currentY attribute contains the current value of the normalized chromaticity value of x/y.
-    // The value of x/y shall be related to the currentX/currentY attribute by the relationship
-    // x = currentX/65536
-    // y = currentY/65536
-    // z = 1-x-y
-
-    RgbColor_t rgb;
-
-    float x, y, z;
-    float X, Y, Z;
-    float r, g, b;
-
-    x = ((float) currentX) / 65535.0f;
-    y = ((float) currentY) / 65535.0f;
-
-    z = 1.0f - x - y;
-
-    // Calculate XYZ values
-
-    // Y - given brightness in 0 - 1 range
-    Y = ((float) Level) / 254.0f;
-
-    X = (Y / y) * x;
-    Z = (Y / y) * z;
-
-    // X, Y and Z input refer to a D65/2° standard illuminant.
-    // sR, sG and sB (standard RGB) output range = 0 ÷ 255
-    // convert XYZ to RGB - CIE XYZ to sRGB
-    r = (X * 3.2410f) - (Y * 1.5374f) - (Z * 0.4986f);
-    g = -(X * 0.9692f) + (Y * 1.8760f) + (Z * 0.0416f);
-    b = (X * 0.0556f) - (Y * 0.2040f) + (Z * 1.0570f);
-
-    // apply gamma 2.2 correction
-    r = r <= 0.00304f ? 12.92f * r : (1.055f) * pow(r, (1.0f / 2.4f)) - 0.055f;
-    g = g <= 0.00304f ? 12.92f * g : (1.055f) * pow(g, (1.0f / 2.4f)) - 0.055f;
-    b = b <= 0.00304f ? 12.92f * b : (1.055f) * pow(b, (1.0f / 2.4f)) - 0.055f;
-
-    // Round off
-    r = r < 0 ? 0 : (r > 1 ? 1 : r);
-    g = g < 0 ? 0 : (g > 1 ? 1 : g);
-    b = b < 0 ? 0 : (b > 1 ? 1 : b);
-
-    // these rgb values are in  the range of 0 to 1, convert to limit of HW specific LED
-    rgb.r = (uint8_t)(r * 255);
-    rgb.g = (uint8_t)(g * 255);
-    rgb.b = (uint8_t)(b * 255);
-
-    return rgb;
-}
 
 CHIP_ERROR LightingManager::Init()
 {
