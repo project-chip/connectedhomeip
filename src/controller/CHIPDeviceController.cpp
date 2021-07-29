@@ -172,7 +172,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 
     ReturnErrorOnFailure(mFabrics.LoadFromStorage(mFabricIndex));
 
-    ReturnErrorOnFailure(mSessionMgr->Init(localDeviceId, mSystemLayer, mTransportMgr, &mFabrics, mMessageCounterManager));
+    ReturnErrorOnFailure(mSessionMgr->Init(mSystemLayer, mTransportMgr, &mFabrics, mMessageCounterManager));
 
     ReturnErrorOnFailure(mExchangeMgr->Init(mSessionMgr));
 
