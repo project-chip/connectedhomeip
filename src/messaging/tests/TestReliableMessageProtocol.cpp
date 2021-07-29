@@ -452,6 +452,7 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
 
+    // We are sending a malicious packet, doesn't expect an ack
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     // Test that the message was actually sent (and not dropped)
@@ -459,6 +460,7 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
     // Test that the message was dropped by the receiver
     NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
 
 void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void * inContext)
