@@ -18,7 +18,7 @@
 
 set -e
 
-declare -i iterations=20
+declare -i iterations=2
 declare -i background_pid=0
 declare test_case_wrapper=()
 
