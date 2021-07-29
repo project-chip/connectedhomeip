@@ -36,7 +36,6 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate)
     // Error if already initialized.
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     mpExchangeCtx              = nullptr;
-    mpDelegate                 = apDelegate;
     mSuppressResponse          = true;
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
@@ -52,23 +51,11 @@ void ReadHandler::Shutdown()
 {
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpAttributeClusterInfoList);
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpEventClusterInfoList);
-    AbortExistingExchangeContext();
+    mpExchangeCtx = nullptr;
     MoveToState(HandlerState::Uninitialized);
-    mpDelegate                 = nullptr;
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
-}
-
-CHIP_ERROR ReadHandler::AbortExistingExchangeContext()
-{
-    if (mpExchangeCtx != nullptr)
-    {
-        mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
-    }
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ReadHandler::OnReadRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
@@ -82,8 +69,6 @@ CHIP_ERROR ReadHandler::OnReadRequest(Messaging::ExchangeContext * apExchangeCon
     if (err != CHIP_NO_ERROR)
     {
         ChipLogFunctError(err);
-        // Keep Shutdown() from double-closing our exchange.
-        mpExchangeCtx = nullptr;
         Shutdown();
     }
 
@@ -96,6 +81,12 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload));
+
+    if (err != CHIP_NO_ERROR)
+    {
+        mpExchangeCtx->Close();
+    }
+
 exit:
     ChipLogFunctError(err);
     Shutdown();

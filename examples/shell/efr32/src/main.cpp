@@ -114,9 +114,6 @@ int main(void)
     MemMonitoring::startHeapMonitoring();
 #endif
 
-    // Initialize mbedtls threading support on EFR32
-    THREADING_setup();
-
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-shell-example starting");
     EFR32_LOG("==================================================");

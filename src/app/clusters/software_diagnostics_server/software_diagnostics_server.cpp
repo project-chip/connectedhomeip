@@ -18,7 +18,7 @@
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
-bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(chip::app::CommandHandler * commandObj)
+bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
 {
     // TODO: Implement the ResetWatermarks in the platform layer.
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;

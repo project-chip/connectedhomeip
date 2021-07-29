@@ -321,7 +321,7 @@ CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::FabricInfo * fabric
     }
 
     ChipLogProgress(Controller, "Generating credentials");
-    ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId));
+    ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId, mCredentialsIndex));
 
     ChipLogProgress(Controller, "Loaded credentials successfully");
     return CHIP_NO_ERROR;
@@ -798,13 +798,14 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
     return ControllerDeviceInitParams{
-        .transportMgr    = mTransportMgr,
-        .sessionMgr      = mSessionMgr,
-        .exchangeMgr     = mExchangeMgr,
-        .inetLayer       = mInetLayer,
-        .storageDelegate = mStorageDelegate,
-        .credentials     = &mCredentials,
-        .idAllocator     = &mIDAllocator,
+        .transportMgr     = mTransportMgr,
+        .sessionMgr       = mSessionMgr,
+        .exchangeMgr      = mExchangeMgr,
+        .inetLayer        = mInetLayer,
+        .storageDelegate  = mStorageDelegate,
+        .credentials      = &mCredentials,
+        .credentialsIndex = mCredentialsIndex,
+        .idAllocator      = &mIDAllocator,
     };
 }
 

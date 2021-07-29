@@ -122,8 +122,19 @@ public:
         return (mRootCert != nullptr && mNOCCert != nullptr && mRootCertLen != 0 && mNOCCertLen != 0);
     }
 
+    /**
+     * @brief
+     *   Retrieve the credentials corresponding to the device being commissioned in form of OperationalCredentialSet.
+     *
+     * @param credentials Credential Set object containing  the device's certificate set and keypair.
+     * @param certSet Set of Root [+ ICA] certificates corresponding to the device's credential set.
+     * @param rootKeyId Trusted Root Id corresponding to the device's credential set.
+     * @param credentialsIndex Index for the retrieved credentials corresponding to this device's credential set.
+     *
+     * @return CHIP_ERROR
+     */
     CHIP_ERROR GetCredentials(Credentials::OperationalCredentialSet & credentials, Credentials::ChipCertificateSet & certSet,
-                              Credentials::CertificateKeyId & rootKeyId);
+                              Credentials::CertificateKeyId & rootKeyId, uint8_t & credentialsIndex);
 
     const uint8_t * GetTrustedRoot(uint16_t & size)
     {

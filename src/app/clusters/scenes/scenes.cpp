@@ -216,19 +216,22 @@ void emAfPluginScenesServerPrintInfo(void)
     }
 }
 
-bool emberAfScenesClusterAddSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId,
-                                          uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets)
+bool emberAfScenesClusterAddSceneCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, GroupId groupId,
+                                          uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+                                          uint8_t * extensionFieldSets)
 {
     return emberAfPluginScenesServerParseAddScene(commandObj, emberAfCurrentCommand(), groupId, sceneId, transitionTime, sceneName,
                                                   extensionFieldSets);
 }
 
-bool emberAfScenesClusterViewSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId)
+bool emberAfScenesClusterViewSceneCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, GroupId groupId,
+                                           uint8_t sceneId)
 {
     return emberAfPluginScenesServerParseViewScene(commandObj, emberAfCurrentCommand(), groupId, sceneId);
 }
 
-bool emberAfScenesClusterRemoveSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId)
+bool emberAfScenesClusterRemoveSceneCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, GroupId groupId,
+                                             uint8_t sceneId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -283,7 +286,7 @@ exit:
     return true;
 }
 
-bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::CommandHandler * commandObj, GroupId groupId)
+bool emberAfScenesClusterRemoveAllScenesCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, GroupId groupId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -332,7 +335,8 @@ exit:
     return true;
 }
 
-bool emberAfScenesClusterStoreSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId)
+bool emberAfScenesClusterStoreSceneCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, GroupId groupId,
+                                            uint8_t sceneId)
 {
     EmberAfStatus status;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -364,8 +368,8 @@ exit:
     return true;
 }
 
-bool emberAfScenesClusterRecallSceneCallback(chip::app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId,
-                                             uint16_t transitionTime)
+bool emberAfScenesClusterRecallSceneCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, GroupId groupId,
+                                             uint8_t sceneId, uint16_t transitionTime)
 {
     // NOTE: TransitionTime field in the RecallScene command is currently
     // ignored. Per Zigbee Alliance ZCL 7 (07-5123-07):
@@ -398,7 +402,8 @@ bool emberAfScenesClusterRecallSceneCallback(chip::app::CommandHandler * command
     return true;
 }
 
-bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::CommandHandler * commandObj, GroupId groupId)
+bool emberAfScenesClusterGetSceneMembershipCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                    GroupId groupId)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;

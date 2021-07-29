@@ -32,18 +32,19 @@
 namespace chip {
 namespace System {
 
-void WatchableSocket::OnAttach()
+CHIP_ERROR WatchableSocket::OnAttach()
 {
     mSharedState->Reset(mFD);
 
-    VerifyOrDie(mAttachedNext == nullptr);
+    VerifyOrReturnError(mAttachedNext == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mAttachedNext                  = mSharedState->mAttachedSockets;
     mSharedState->mAttachedSockets = this;
+    return CHIP_NO_ERROR;
 }
 
-void WatchableSocket::OnClose()
+CHIP_ERROR WatchableSocket::OnRelease()
 {
-    VerifyOrDie(mFD >= 0);
+    VerifyOrReturnError(mFD >= 0, CHIP_ERROR_INCORRECT_STATE);
     mSharedState->Reset(mFD);
 
     WatchableSocket ** pp = &mSharedState->mAttachedSockets;
@@ -57,30 +58,29 @@ void WatchableSocket::OnClose()
         pp = &(*pp)->mAttachedNext;
     }
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     // Wake the thread calling select so that it stops selecting on the socket.
     mSharedState->Signal();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    return CHIP_NO_ERROR;
 }
 
-void WatchableSocket::OnRequestCallbackOnPendingRead()
+CHIP_ERROR WatchableSocket::OnRequestCallbackOnPendingRead()
 {
-    mSharedState->Set(mFD, &mSharedState->mRequest.mReadSet);
+    return mSharedState->Set(mFD, &mSharedState->mRequest.mReadSet);
 }
 
-void WatchableSocket::OnRequestCallbackOnPendingWrite()
+CHIP_ERROR WatchableSocket::OnRequestCallbackOnPendingWrite()
 {
-    mSharedState->Set(mFD, &mSharedState->mRequest.mWriteSet);
+    return mSharedState->Set(mFD, &mSharedState->mRequest.mWriteSet);
 }
 
-void WatchableSocket::OnClearCallbackOnPendingRead()
+CHIP_ERROR WatchableSocket::OnClearCallbackOnPendingRead()
 {
-    mSharedState->Clear(mFD, &mSharedState->mRequest.mReadSet);
+    return mSharedState->Clear(mFD, &mSharedState->mRequest.mReadSet);
 }
 
-void WatchableSocket::OnClearCallbackOnPendingWrite()
+CHIP_ERROR WatchableSocket::OnClearCallbackOnPendingWrite()
 {
-    mSharedState->Clear(mFD, &mSharedState->mRequest.mWriteSet);
+    return mSharedState->Clear(mFD, &mSharedState->mRequest.mWriteSet);
 }
 
 /**

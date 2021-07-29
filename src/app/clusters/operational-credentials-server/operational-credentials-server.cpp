@@ -220,8 +220,8 @@ void emberAfPluginOperationalCredentialsServerInitCallback(void)
 }
 
 // TODO: Use FabricIndex as a parameter instead of fabricId/nodeId/vendorId once AddOptCert + FabricIndex are implemented
-bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::CommandHandler * commandObj, chip::FabricId fabricId,
-                                                              chip::NodeId nodeId, uint16_t vendorId)
+bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                              chip::FabricId fabricId, chip::NodeId nodeId, uint16_t vendorId)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
@@ -246,7 +246,8 @@ exit:
 }
 
 // TODO: remove SetFabric once AddOptCert + FabricIndex are implemented
-bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::CommandHandler * commandObj, uint16_t VendorId)
+bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                           uint16_t VendorId)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: SetFabric with vendorId %" PRIX16, VendorId);
 
@@ -297,7 +298,8 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::CommandHandler * commandObj, uint8_t * Label)
+bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::EndpointId endpoint,
+                                                                   chip::app::CommandHandler * commandObj, uint8_t * Label)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
 
@@ -330,7 +332,7 @@ void DoRemoveAllFabrics(intptr_t)
 } // namespace
 
 // Up for discussion in Multi-Admin TT: chip-spec:#2891
-bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::CommandHandler * commandObj)
+bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Remove all Fabrics");
     PlatformMgr().ScheduleWork(DoRemoveAllFabrics, 0);
@@ -338,9 +340,9 @@ bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::Com
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::CommandHandler * commandObj, chip::ByteSpan NOCArray,
-                                                           chip::ByteSpan IPKValue, chip::NodeId CaseAdminNode,
-                                                           uint16_t AdminVendorId)
+bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                           chip::ByteSpan NOCArray, chip::ByteSpan IPKValue,
+                                                           chip::NodeId CaseAdminNode, uint16_t AdminVendorId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -368,7 +370,8 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterCertChainRequestCallback(chip::app::CommandHandler * commandObj, uint16_t certChainType)
+bool emberAfOperationalCredentialsClusterCertChainRequestCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                                  uint16_t certChainType)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -414,7 +417,8 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAttestationRequestCallback(chip::app::CommandHandler * commandObj,
+bool emberAfOperationalCredentialsClusterAttestationRequestCallback(chip::EndpointId endpoint,
+                                                                    chip::app::CommandHandler * commandObj,
                                                                     chip::ByteSpan attestationNonce)
 {
     EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
@@ -473,7 +477,8 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::CommandHandler * commandObj, chip::ByteSpan CSRNonce)
+bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                              chip::ByteSpan CSRNonce)
 {
     EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
     EmberStatus sendStatus = EMBER_SUCCESS;
@@ -537,15 +542,16 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterUpdateOpCertCallback(chip::app::CommandHandler * commandObj, chip::ByteSpan NOC,
-                                                              chip::ByteSpan ICACertificate)
+bool emberAfOperationalCredentialsClusterUpdateOpCertCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                              chip::ByteSpan NOC, chip::ByteSpan ICACertificate)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(chip::app::CommandHandler * commandObj,
+bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(chip::EndpointId endpoint,
+                                                                           chip::app::CommandHandler * commandObj,
                                                                            chip::ByteSpan RootCertificate)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
@@ -569,7 +575,8 @@ exit:
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(chip::app::CommandHandler * commandObj,
+bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(chip::EndpointId endpoint,
+                                                                              chip::app::CommandHandler * commandObj,
                                                                               chip::ByteSpan TrustedRootIdentifier)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;

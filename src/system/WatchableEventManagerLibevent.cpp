@@ -61,7 +61,7 @@ void TimeoutCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
 
 } // anonymous namespace
 
-void WatchableEventManager::Init(System::Layer & systemLayer)
+CHIP_ERROR WatchableEventManager::Init(System::Layer & systemLayer)
 {
 #if CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
     static bool enabled_event_debug_mode = false;
@@ -76,6 +76,7 @@ void WatchableEventManager::Init(System::Layer & systemLayer)
     mTimeoutEvent  = evtimer_new(mEventBase, TimeoutCallbackHandler, event_self_cbarg());
     mActiveSockets = nullptr;
     mSystemLayer   = &systemLayer;
+    return CHIP_NO_ERROR;
 }
 
 void WatchableEventManager::PrepareEvents()
@@ -117,13 +118,14 @@ void WatchableEventManager::HandleEvents()
     }
 }
 
-void WatchableEventManager::Shutdown()
+CHIP_ERROR WatchableEventManager::Shutdown()
 {
     event_base_loopbreak(mEventBase);
     event_free(mTimeoutEvent);
     mTimeoutEvent = nullptr;
     event_base_free(mEventBase);
     mEventBase = nullptr;
+    return CHIP_NO_ERROR;
 }
 
 void WatchableEventManager::Signal()

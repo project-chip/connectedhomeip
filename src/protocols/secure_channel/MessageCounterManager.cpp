@@ -208,6 +208,10 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle sess
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        if (exchangeContext != nullptr)
+        {
+            exchangeContext->Close();
+        }
         state->GetSessionMessageCounter().GetPeerMessageCounter().SyncFailed();
         ChipLogError(SecureChannel, "Failed to send message counter synchronization request with error:%s", ErrorStr(err));
     }
