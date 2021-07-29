@@ -37,13 +37,14 @@ An example RPC command:
 """
 
 import argparse
+from collections import namedtuple
 import logging
 import sys
 from typing import Any, BinaryIO
 import socket
 from inspect import cleandoc
 import serial  # type: ignore
-
+import re
 import pw_cli.log
 from pw_console.console_app import embed
 from pw_console.__main__ import create_temp_log_file
@@ -149,9 +150,27 @@ class SocketClientImpl:
 def write_to_output(data: bytes,
                     unused_output: BinaryIO = sys.stdout.buffer,):
     log_line = data
-
+    RegexStruct = namedtuple('RegexStruct', 'platform type regex match_num')
+    LEVEL_MAPPING = {"I": logging.INFO, "W": logging.WARNING,
+                     "E": logging.ERROR, "F": logging.FATAL, "V": logging.DEBUG, "D": logging.DEBUG}
+    ESP_CHIP_REGEX = r"(?P<level>[IWEFV]) \((?P<time>\d+)\) (?P<mod>chip\[[a-zA-Z]+\]):\s(?P<msg>.*)"
+    ESP_APP_REGEX = r"(?P<level>[IWEFVD]) \((?P<time>\d+)\) (?P<mod>[a-z\-_A-Z]+):\s(?P<msg>.*)"
+    LogRegexes = [RegexStruct("ESP", "CHIP", re.compile(ESP_CHIP_REGEX), 4),
+                  RegexStruct("ESP", "APP", re.compile(ESP_APP_REGEX), 4)
+                  ]
     for line in log_line.decode(errors="surrogateescape").splitlines():
-        _DEVICE_LOG.info(line)
+        fields = {'level': logging.INFO, "time": "",
+                  "mod": "", "type": "", "msg": line}
+        for log_regex in LogRegexes:
+            match = log_regex.regex.search(line)
+            if match and len(match.groups()) == log_regex.match_num:
+                fields['type'] = log_regex.type
+                fields.update(match.groupdict())
+                if "level" in match.groupdict():
+                    fields["level"] = LEVEL_MAPPING[fields["level"]]
+                break
+        _DEVICE_LOG.log(fields["level"], fields["msg"], extra={'extra_metadata_fields': {
+                        "time": fields["time"], "type": fields["type"], "mod": fields["mod"]}})
 
 
 def console(device: str, baudrate: int,

@@ -217,6 +217,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_linux_lighting_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # Build the Linux thermostat app example.
+    enable_linux_thermostat_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
     # Build the cc13x2x7_26x2x7 lock app example.
     enable_cc13x2x7_26x2x7_lock_app_build = enable_ti_simplelink_builds
 
@@ -321,6 +325,13 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
+  if (enable_linux_thermostat_app_build) {
+    group("linux_thermostat_app") {
+      deps =
+          [ "${chip_root}/examples/thermostat/linux(${standalone_toolchain})" ]
+    }
+  }
+
   if (enable_linux_tv_app_build) {
     group("linux_tv_app") {
       deps = [ "${chip_root}/examples/tv-app/linux(${standalone_toolchain})" ]
@@ -417,6 +428,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
     if (enable_linux_all_clusters_app_build) {
       deps += [ ":linux_all_clusters_app" ]
+    }
+    if (enable_linux_thermostat_app_build) {
+      deps += [ ":linux_thermostat_app" ]
     }
     if (enable_linux_tv_app_build) {
       deps += [ ":linux_tv_app" ]

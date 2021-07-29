@@ -837,7 +837,7 @@ void {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAtt
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_responses}}
-bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(chip::app::CommandSender * commandObj{{#chip_server_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_server_cluster_response_arguments}})
+bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj{{#chip_server_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_server_cluster_response_arguments}})
 {
     ChipLogProgress(Zcl, "{{asCamelCased name false}}:");
     {{#chip_server_cluster_response_arguments}}

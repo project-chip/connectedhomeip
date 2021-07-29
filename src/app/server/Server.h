@@ -20,7 +20,7 @@
 #include <app/server/AppDelegate.h>
 #include <inet/InetConfig.h>
 #include <messaging/ExchangeMgr.h>
-#include <transport/AdminPairingTable.h>
+#include <transport/FabricTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/BLE.h>
@@ -53,11 +53,11 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress com
 
 CHIP_ERROR AddTestPairing();
 
-chip::Transport::AdminPairingTable & GetGlobalAdminPairingTable();
+chip::Transport::FabricTable & GetGlobalFabricTable();
 
 namespace chip {
 
-enum class ResetAdmins
+enum class ResetFabrics
 {
     kYes,
     kNo,
@@ -74,5 +74,5 @@ enum class PairingWindowAdvertisement
 /**
  * Open the pairing window using default configured parameters.
  */
-CHIP_ERROR OpenDefaultPairingWindow(chip::ResetAdmins resetAdmins,
+CHIP_ERROR OpenDefaultPairingWindow(chip::ResetFabrics resetFabrics,
                                     chip::PairingWindowAdvertisement advertisementMode = chip::PairingWindowAdvertisement::kBle);

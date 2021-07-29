@@ -39,7 +39,7 @@ public:
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                             SecureSessionMgr * sessionMgr, Transport::AdminPairingTable * admins,
+                                             SecureSessionMgr * sessionMgr, Transport::FabricTable * fabrics,
                                              SessionIDAllocator * idAllocator);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
@@ -53,10 +53,10 @@ public:
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * reliableMessageManager,
                                                             SecureSessionMgr * sessionMgr) override
     {
-        return mPairingSession.GetMessageDispatch(reliableMessageManager, sessionMgr);
+        return GetSession().GetMessageDispatch(reliableMessageManager, sessionMgr);
     }
 
-    CASESession & GetSession() { return mPairingSession; }
+    virtual CASESession & GetSession() { return mPairingSession; }
 
 private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
@@ -65,9 +65,9 @@ private:
     uint16_t mSessionKeyId         = 0;
     SecureSessionMgr * mSessionMgr = nullptr;
 
-    Transport::AdminId mAdminId = Transport::kUndefinedAdminId;
+    FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
 
-    Transport::AdminPairingTable * mAdmins = nullptr;
+    Transport::FabricTable * mFabrics = nullptr;
     Credentials::ChipCertificateSet mCertificates;
     Credentials::OperationalCredentialSet mCredentials;
     Credentials::CertificateKeyId mRootKeyId;

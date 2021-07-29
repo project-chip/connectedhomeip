@@ -425,7 +425,7 @@ CHIP_ERROR RawEndPoint::Listen(IPEndPointBasis::OnMessageReceivedFunct onMessage
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Wait for ability to read on this endpoint.
     mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
-    mSocket.RequestCallbackOnPendingRead();
+    ReturnErrorOnFailure(mSocket.RequestCallbackOnPendingRead());
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return CHIP_NO_ERROR;

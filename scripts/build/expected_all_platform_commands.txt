@@ -28,58 +28,76 @@ gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--ar
 # Generating efr32-brd4161a-window_covering
 gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window_covering
 
-# Generating linux-native-all_clusters
-gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux {out}/linux-native-all_clusters
+# Generating nrf-nrf52840-light
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-light -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect'
+
+# Generating nrf-nrf52840-lock
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-lock -b nrf52840dk_nrf52840 {root}/examples/lock-app/nrfconnect'
+
+# Generating nrf-nrf52840-shell
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
+
+# Generating nrf-nrf5340-light
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-light -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect'
+
+# Generating nrf-nrf5340-lock
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-lock -b nrf5340dk_nrf5340_cpuapp {root}/examples/lock-app/nrfconnect'
+
+# Generating nrf-nrf5340-shell
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
 
 # Building linux-native-all_clusters
 ninja -C {out}/linux-native-all_clusters
 
-# Generating qpg-qpg6100-lock
-gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
-
 # Building qpg-qpg6100-lock
 ninja -C {out}/qpg-qpg6100-lock
-
-# Generating esp32-m5stack-all_clusters
-cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_m5stack.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all_clusters reconfigure'
-cd -
 
 # Building esp32-m5stack-all_clusters
 bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-m5stack-all_clusters'"'"''
 
-# Generating esp32-devkitc-all_clusters
-cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-devkitc-all_clusters reconfigure'
-cd -
-
 # Building esp32-devkitc-all_clusters
 bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-all_clusters'"'"''
-
-# Generating esp32-devkitc-lock
-cd "{root}"
-bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock reconfigure'
-cd -
 
 # Building esp32-devkitc-lock
 bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-lock'"'"''
 
-# Generating efr32-brd4161a-light
-gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light
-
 # Building efr32-brd4161a-light
 ninja -C {out}/efr32-brd4161a-light
-
-# Generating efr32-brd4161a-lock
-gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-lock
 
 # Building efr32-brd4161a-lock
 ninja -C {out}/efr32-brd4161a-lock
 
-# Generating efr32-brd4161a-window_covering
-gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window_covering
-
 # Building efr32-brd4161a-window_covering
 ninja -C {out}/efr32-brd4161a-window_covering
+
+# Building nrf-nrf52840-light
+ninja -C {out}/nrf-nrf52840-light
+
+# Building nrf-nrf52840-lock
+ninja -C {out}/nrf-nrf52840-lock
+
+# Building nrf-nrf52840-shell
+ninja -C {out}/nrf-nrf52840-shell
+
+# Building nrf-nrf5340-light
+ninja -C {out}/nrf-nrf5340-light
+
+# Building nrf-nrf5340-lock
+ninja -C {out}/nrf-nrf5340-lock
+
+# Building nrf-nrf5340-shell
+ninja -C {out}/nrf-nrf5340-shell
 
 

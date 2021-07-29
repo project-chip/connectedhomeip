@@ -36,6 +36,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
+#include <messaging/Flags.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
@@ -82,6 +83,7 @@ struct ControllerDeviceInitParams
     Inet::InetLayer * inetLayer                         = nullptr;
     PersistentStorageDelegate * storageDelegate         = nullptr;
     Credentials::OperationalCredentialSet * credentials = nullptr;
+    uint8_t credentialsIndex                            = 0;
     SessionIDAllocator * idAllocator                    = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
@@ -124,19 +126,22 @@ public:
      *
      * @param[in] protocolId  The protocol identifier of the CHIP message to be sent.
      * @param[in] msgType     The message type of the message to be sent.  Must be a valid message type for protocolId.
+     * @param [in] sendFlags  SendMessageFlags::kExpectResponse or SendMessageFlags::kNone
      * @param[in] message     The message payload to be sent.
      *
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle && message);
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, Messaging::SendFlags sendFlags,
+                           System::PacketBufferHandle && message);
 
     /**
      * A strongly-message-typed version of SendMessage.
      */
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && message)
+    CHIP_ERROR SendMessage(MessageType msgType, Messaging::SendFlags sendFlags, System::PacketBufferHandle && message)
     {
-        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(msgType), std::move(message));
+        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(msgType), sendFlags,
+                           std::move(message));
     }
 
     CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
@@ -172,19 +177,20 @@ public:
      *
      * @param[in] params       Wrapper object for transport manager etc.
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
-     * @param[in] admin        Local administrator that's initializing this device object
+     * @param[in] fabric        Local administrator that's initializing this device object
      */
-    void Init(ControllerDeviceInitParams params, uint16_t listenPort, Transport::AdminId admin)
+    void Init(ControllerDeviceInitParams params, uint16_t listenPort, FabricIndex fabric)
     {
-        mTransportMgr    = params.transportMgr;
-        mSessionManager  = params.sessionMgr;
-        mExchangeMgr     = params.exchangeMgr;
-        mInetLayer       = params.inetLayer;
-        mListenPort      = listenPort;
-        mAdminId         = admin;
-        mStorageDelegate = params.storageDelegate;
-        mCredentials     = params.credentials;
-        mIDAllocator     = params.idAllocator;
+        mTransportMgr     = params.transportMgr;
+        mSessionManager   = params.sessionMgr;
+        mExchangeMgr      = params.exchangeMgr;
+        mInetLayer        = params.inetLayer;
+        mListenPort       = listenPort;
+        mFabricIndex      = fabric;
+        mStorageDelegate  = params.storageDelegate;
+        mCredentials      = params.credentials;
+        mCredentialsIndex = params.credentialsIndex;
+        mIDAllocator      = params.idAllocator;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -205,12 +211,12 @@ public:
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
      * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
-     * @param[in] admin        Local administrator that's initializing this device object
+     * @param[in] fabric        Local administrator that's initializing this device object
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, NodeId deviceId, const Transport::PeerAddress & peerAddress,
-              Transport::AdminId admin)
+              FabricIndex fabric)
     {
-        Init(params, mListenPort, admin);
+        Init(params, mListenPort, fabric);
         mDeviceId = deviceId;
         mState    = ConnectionState::Connecting;
 
@@ -470,13 +476,15 @@ private:
 
     uint16_t mListenPort;
 
-    Transport::AdminId mAdminId = Transport::kUndefinedAdminId;
+    FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
 
     bool mDeviceOperationalCertProvisioned = false;
 
     CASESession mCASESession;
 
     Credentials::OperationalCredentialSet * mCredentials = nullptr;
+    // TODO: Switch to size_t whenever OperationalCredentialSet Class is updated to support more then 255 credentials per controller
+    uint8_t mCredentialsIndex = 0;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
@@ -534,8 +542,8 @@ typedef struct SerializableDevice
     PASESessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort; /* This field is serialized in LittleEndian byte order */
-    uint16_t mAdminId;    /* This field is serialized in LittleEndian byte order */
+    uint16_t mDevicePort;  /* This field is serialized in LittleEndian byte order */
+    uint16_t mFabricIndex; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceTransport;
     uint8_t mDeviceOperationalCertProvisioned;
     uint8_t mInterfaceName[kMaxInterfaceName];

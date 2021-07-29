@@ -5237,6 +5237,10 @@ PacketBufferHandle encodeTestClusterClusterReadClusterRevisionAttribute(uint8_t 
 | * OccupiedHeatingSetpoint                                           | 0x0012 |
 | * ControlSequenceOfOperation                                        | 0x001B |
 | * SystemMode                                                        | 0x001C |
+| * StartOfWeek                                                       | 0x0020 |
+| * NumberOfWeeklyTransitions                                         | 0x0021 |
+| * NumberOfDailyTransitions                                          | 0x0022 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -5378,6 +5382,58 @@ PacketBufferHandle encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNu
         .Put32(Thermostat::Attributes::Ids::SystemMode)
         .Put8(48)
         .Put8(static_cast<uint8_t>(systemMode));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute StartOfWeek
+ */
+PacketBufferHandle encodeThermostatClusterReadStartOfWeekAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThermostatStartOfWeek", Thermostat::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Thermostat::Attributes::Ids::StartOfWeek);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute NumberOfWeeklyTransitions
+ */
+PacketBufferHandle encodeThermostatClusterReadNumberOfWeeklyTransitionsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThermostatNumberOfWeeklyTransitions", Thermostat::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Thermostat::Attributes::Ids::NumberOfWeeklyTransitions);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute NumberOfDailyTransitions
+ */
+PacketBufferHandle encodeThermostatClusterReadNumberOfDailyTransitionsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThermostatNumberOfDailyTransitions", Thermostat::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Thermostat::Attributes::Ids::NumberOfDailyTransitions);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute FeatureMap
+ */
+PacketBufferHandle encodeThermostatClusterReadFeatureMapAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThermostatFeatureMap", Thermostat::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Globals::Attributes::Ids::FeatureMap);
     COMMAND_FOOTER();
 }
 
@@ -6335,6 +6391,7 @@ PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t se
 | Cluster WiFiNetworkDiagnostics                                      | 0x0036 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ResetCounts                                                       |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Bssid                                                             | 0x0000 |

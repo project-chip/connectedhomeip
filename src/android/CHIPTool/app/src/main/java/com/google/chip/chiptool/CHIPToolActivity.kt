@@ -40,6 +40,7 @@ import chip.devicecontroller.PreferencesKeyValueStoreManager
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
+import com.google.chip.chiptool.clusterclient.SensorClientFragment
 
 class CHIPToolActivity :
     AppCompatActivity(),
@@ -112,6 +113,10 @@ class CHIPToolActivity :
 
   override fun handleOnOffClicked() {
     showFragment(OnOffClientFragment.newInstance())
+  }
+
+  override fun handleSensorClicked() {
+    showFragment(SensorClientFragment.newInstance())
   }
 
   override fun handleAttestationTestClicked() {

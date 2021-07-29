@@ -50,7 +50,7 @@
     if (_chipQRCodeSetupPayloadParser) {
         CHIP_ERROR chipError = _chipQRCodeSetupPayloadParser->populatePayload(cPlusPluspayload);
 
-        if (chipError == 0) {
+        if (chipError == CHIP_NO_ERROR) {
             payload = [[CHIPSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
         } else if (error) {
             *error = [CHIPError errorForCHIPErrorCode:chipError];

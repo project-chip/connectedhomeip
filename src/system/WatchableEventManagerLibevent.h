@@ -37,8 +37,8 @@ class WatchableEventManager
 {
 public:
     WatchableEventManager() : mActiveSockets(nullptr), mSystemLayer(nullptr), mEventBase(nullptr), mTimeoutEvent(nullptr) {}
-    void Init(Layer & systemLayer);
-    void Shutdown();
+    CHIP_ERROR Init(Layer & systemLayer);
+    CHIP_ERROR Shutdown();
     void Signal();
 
     void EventLoopBegins() {}

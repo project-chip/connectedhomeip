@@ -146,13 +146,13 @@ void emberAfPluginTestClusterServerInitCallback(void)
     }
 }
 
-bool emberAfTestClusterClusterTestCallback(chip::app::CommandHandler *)
+bool emberAfTestClusterClusterTestCallback(chip::EndpointId endpoint, chip::app::CommandHandler *)
 {
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
-bool emberAfTestClusterClusterTestSpecificCallback(chip::app::CommandHandler * apCommandObj)
+bool emberAfTestClusterClusterTestSpecificCallback(chip::EndpointId endpoint, chip::app::CommandHandler * apCommandObj)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t returnValue = 7;
@@ -176,7 +176,7 @@ exit:
     return true;
 }
 
-bool emberAfTestClusterClusterTestNotHandledCallback(chip::app::CommandHandler *)
+bool emberAfTestClusterClusterTestNotHandledCallback(chip::EndpointId endpoint, chip::app::CommandHandler *)
 {
     return false;
 }

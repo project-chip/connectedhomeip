@@ -80,6 +80,12 @@ public:
     /**
      *  Send a CHIP message on this exchange.
      *
+     *  If SendMessage returns success and the message was not expecting a
+     *  response, the exchange will close itself before returning, unless the
+     *  message being sent is a standalone ack.  If SendMessage returns failure,
+     *  the caller is responsible for deciding what to do (e.g. closing the
+     *  exchange, trying to re-establish a secure session, etc).
+     *
      *  @param[in]    protocolId    The protocol identifier of the CHIP message to be sent.
      *
      *  @param[in]    msgType       The message type of the corresponding protocol.
@@ -148,14 +154,14 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
+    ExchangeACL * GetExchangeACL(Transport::FabricTable & table)
     {
         if (mExchangeACL == nullptr)
         {
-            Transport::AdminPairingInfo * admin = table.FindAdminWithId(mSecureSession.GetAdminId());
-            if (admin != nullptr)
+            Transport::FabricInfo * fabric = table.FindFabricWithIndex(mSecureSession.GetFabricIndex());
+            if (fabric != nullptr)
             {
-                mExchangeACL = chip::Platform::New<CASEExchangeACL>(admin);
+                mExchangeACL = chip::Platform::New<CASEExchangeACL>(fabric);
             }
         }
 
@@ -177,7 +183,7 @@ public:
     void SetResponseTimeout(Timeout timeout);
 
 private:
-    Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
+    Timeout mResponseTimeout       = 0; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
     ExchangeACL * mExchangeACL     = nullptr;

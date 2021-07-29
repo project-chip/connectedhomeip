@@ -61,6 +61,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     uint8_t ap_mac[6];
     wifi_mode_t mode;
 
+    // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
+    Internal::ESP32Utils::RegisterESP32ErrorFormatter();
+
     // Make sure the LwIP core lock has been initialized
     ReturnErrorOnFailure(Internal::InitLwIPCoreLock());
 
