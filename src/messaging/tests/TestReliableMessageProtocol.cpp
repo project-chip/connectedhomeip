@@ -452,18 +452,13 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
 
-    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     // Test that the message was actually sent (and not dropped)
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
     // Test that the message was dropped by the receiver
     NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
-
-    // Since peer dropped the message, we might have pending acks. Let's clear the table
-    rm->ClearRetransTable(rc);
-
-    exchange->Close();
 }
 
 void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void * inContext)
