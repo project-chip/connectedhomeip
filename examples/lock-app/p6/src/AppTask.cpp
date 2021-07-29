@@ -20,10 +20,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "ButtonHandler.h"
-#include "DataModelHandler.h"
 #include "LEDWidget.h"
-#include "OnboardingCodesUtil.h"
-#include "Server.h"
 #include "qrcodegen.h"
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>

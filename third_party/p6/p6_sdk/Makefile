@@ -133,11 +133,24 @@ endif
 # Select softfp or hardfp floating point. Default is softfp.
 VFP_SELECT=
 
+COMMON_WARNING_FLAGS = -Wall -Werror=all \
+        -Wno-error=unused-function \
+        -Wno-error=unused-but-set-variable \
+        -Wno-error=unused-variable \
+        -Wno-error=deprecated-declarations \
+        -Wextra \
+        -Wno-unused-parameter -Wno-sign-compare \
+        -Wno-shadow \
+        -Wno-maybe-uninitialized \
+        -Wno-incompatible-pointer-types \
+        -Wno-type-limits \
+        -Wno-conversion
+
 # Additional / custom C compiler flags.
 #
 # NOTE: Includes and defines should use the INCLUDES and DEFINES variable
 # above.
-CFLAGS=
+CFLAGS=$(COMMON_WARNING_FLAGS)
 
 # Additional / custom C++ compiler flags.
 #

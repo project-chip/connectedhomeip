@@ -55,7 +55,7 @@
 #define LWIP_TCPIP_CORE_LOCKING 1
 #define TCP_QUEUE_OOSEQ 0
 #define ARP_QUEUEING (0)
-#define LWIP_TCP_KEEPALIVE (1)
+#define LWIP_TCP_KEEPALIVE (0)
 
 #define LWIP_SOCKET 1
 #define LWIP_NETCONN (1)
