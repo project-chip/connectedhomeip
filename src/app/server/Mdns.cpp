@@ -174,7 +174,7 @@ CHIP_ERROR Advertise(bool commissionableNode)
         ChipLogError(Discovery, "Setup discriminator not known. Using a default.");
         value = 840;
     }
-    advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscrimininator(value);
+    advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscriminator(value);
 
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceTypeEnabled() &&
         DeviceLayer::ConfigurationMgr().GetDeviceType(value) == CHIP_NO_ERROR)
