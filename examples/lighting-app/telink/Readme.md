@@ -17,9 +17,11 @@
     here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay
     attention that OUTPUT_DIR should conatins ABSOLUTE path to output dir**
 
-1. Run build script:
+1. Run build script to build the example, with <application> replaced with the
+   build application and <board> with target name of the board you own, for
+   example `tlsr9518adk80d`:
     ```
-    cd /root/chip/scripts/examples && ./telink_example.sh
+    cd /root/chip/scripts/examples && ./telink_example.sh <application> <board>
     ```
 1. Exit docker container and collect build artifacts. Firmware binary would be
    located in
