@@ -28,7 +28,7 @@ LOG_MODULE_DECLARE(app);
 
 LightingManager LightingManager::sLight;
 
-int LightingManager::Init(const char * pwmDeviceName, uint32_t pwmChannel)
+CHIP_ERROR LightingManager::Init(const char * pwmDeviceName, uint32_t pwmChannel)
 {
     // We use a gpioPin instead of a LEDWidget here because we want to use PWM
     // and other features instead of just on/off.
@@ -41,11 +41,11 @@ int LightingManager::Init(const char * pwmDeviceName, uint32_t pwmChannel)
     if (!mPwmDevice)
     {
         LOG_ERR("Cannot find PWM device %s", log_strdup(pwmDeviceName));
-        return -ENODEV;
+        return ::chip::System::MapErrorZephyr(-ENODEV);
     }
 
     Set(false);
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 void LightingManager::SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB)
