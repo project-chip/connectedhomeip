@@ -3032,6 +3032,20 @@ bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::EndpointI
     return true;
 }
 
+bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                               uint8_t returnValue)
+{
+    ChipLogProgress(Zcl, "TestAddArgumentsResponse:");
+    ChipLogProgress(Zcl, "  returnValue: %" PRIu8 "", returnValue);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterTestAddArgumentsResponseCallback");
+
+    Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, returnValue);
+    return true;
+}
+
 bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                            uint8_t returnValue)
 {

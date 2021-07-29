@@ -684,6 +684,14 @@ static void OnTargetNavigatorClusterNavigateTargetResponse(void * context, uint8
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
+static void OnTestClusterClusterTestAddArgumentsResponse(void * context, uint8_t returnValue)
+{
+    ChipLogProgress(chipTool, "TestClusterClusterTestAddArgumentsResponse");
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
 static void OnTestClusterClusterTestSpecificResponse(void * context, uint8_t returnValue)
 {
     ChipLogProgress(chipTool, "TestClusterClusterTestSpecificResponse");
@@ -17013,6 +17021,7 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Test                                                              |   0x00 |
+| * TestAddArguments                                                  |   0x04 |
 | * TestNotHandled                                                    |   0x01 |
 | * TestSpecific                                                      |   0x02 |
 | * TestUnknownCommand                                                |   0x03 |
@@ -17071,6 +17080,43 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command TestAddArguments
+ */
+class TestClusterTestAddArguments : public ModelCommand
+{
+public:
+    TestClusterTestAddArguments() : ModelCommand("test-add-arguments")
+    {
+        AddArgument("Arg1", 0, UINT8_MAX, &mArg1);
+        AddArgument("Arg2", 0, UINT8_MAX, &mArg2);
+        ModelCommand::AddArguments();
+    }
+    ~TestClusterTestAddArguments()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x04) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.TestAddArguments(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mArg1, mArg2);
+    }
+
+private:
+    chip::Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback>(
+            OnTestClusterClusterTestAddArgumentsResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mArg1;
+    uint8_t mArg2;
 };
 
 /*
@@ -24103,6 +24149,7 @@ void registerClusterTestCluster(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<TestClusterTest>(),
+        make_unique<TestClusterTestAddArguments>(),
         make_unique<TestClusterTestNotHandled>(),
         make_unique<TestClusterTestSpecific>(),
         make_unique<TestClusterTestUnknownCommand>(),

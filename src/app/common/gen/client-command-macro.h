@@ -4643,6 +4643,17 @@
                                                                                                                                    \
                                                              ZCL_TEST_NOT_HANDLED_COMMAND_ID, "", );
 
+/** @brief Command description for TestAddArgumentsResponse
+ *
+ * Command: TestAddArgumentsResponse
+ * @param returnValue INT8U
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestAddArgumentsResponse(returnValue)                                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_TEST_ADD_ARGUMENTS_RESPONSE_COMMAND_ID, "u", returnValue);
+
 /** @brief Command description for TestSpecific
  *
  * Command: TestSpecific
@@ -4660,6 +4671,17 @@
     ClusterClusterTestUnknownCommand() emberAfFillExternalBuffer(mask,                                                             \
                                                                                                                                    \
                                                                  ZCL_TEST_UNKNOWN_COMMAND_COMMAND_ID, "", );
+
+/** @brief Command description for TestAddArguments
+ *
+ * Command: TestAddArguments
+ * @param arg1 INT8U
+ * @param arg2 INT8U
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestAddArguments(arg1, arg2) emberAfFillExternalBuffer(mask,                                                     \
+                                                                                                                                   \
+                                                                         ZCL_TEST_ADD_ARGUMENTS_COMMAND_ID, "uu", arg1, arg2);
 
 /** @brief Command description for GetLastMessage
  *
