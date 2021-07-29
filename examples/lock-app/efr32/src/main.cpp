@@ -28,6 +28,7 @@
 #include <FreeRTOS.h>
 #include <mbedtls/threading.h>
 
+#include "heap_4_silabs.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <support/CHIPMem.h>

@@ -25,7 +25,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <FreeRTOS.h>
+#include "heap_4_silabs.h"
 #include <mbedtls/threading.h>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -105,7 +105,7 @@ extern "C" void vApplicationIdleHook(void)
 int main(void)
 {
     init_efrPlatform();
-    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+    mbedtls_platform_set_calloc_free(pvPortCalloc, vPortFree);
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();

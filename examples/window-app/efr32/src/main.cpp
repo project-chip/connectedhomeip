@@ -23,6 +23,7 @@
 #include <app/server/Server.h>
 #include <init_efrPlatform.h>
 #include <mbedtls/threading.h>
+#include "heap_4_silabs.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <support/CHIPMem.h>
@@ -85,7 +86,7 @@ int main(void)
     chip::rpc::Init();
 #endif
 
-    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+    mbedtls_platform_set_calloc_free(pvPortCalloc, vPortFree);
 
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-window-cover-example starting");
