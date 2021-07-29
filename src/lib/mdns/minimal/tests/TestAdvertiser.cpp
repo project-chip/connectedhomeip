@@ -90,7 +90,9 @@ CHIP_ERROR SendQuery(FullQName qname)
 void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
 {
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
+    mdnsAdvertiser.StopPublishDevice();
     server.SetTestSuite(inSuite);
+    server.Reset();
 
     // Start a single operational advertiser
     ChipLogProgress(Discovery, "Testing single operational advertiser");

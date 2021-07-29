@@ -24,6 +24,10 @@
 namespace mdns {
 namespace Minimal {
 
+namespace test {
+class CheckOnlyServer;
+}
+
 class TxtResourceRecord : public ResourceRecord
 {
 public:
@@ -67,6 +71,7 @@ protected:
     }
 
 private:
+    friend class test::CheckOnlyServer;
     const char * const * mEntries;
     const size_t mEntryCount;
 };
