@@ -47,7 +47,7 @@ public:
                               EncryptedPacketBufferHandle & out) override;
     CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const override;
 
-    CHIP_ERROR OnMessageReceived(const Header::Flags & headerFlags, const PayloadHeader & payloadHeader, uint32_t messageId,
+    CHIP_ERROR OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
                                  const Transport::PeerAddress & peerAddress, Messaging::MessageFlags msgFlags,
                                  Messaging::ReliableMessageContext * reliableMessageContext) override;
 
@@ -63,8 +63,6 @@ protected:
         // If the underlying transport is UDP.
         return (mPeerAddress.GetTransportType() == Transport::Type::kUdp);
     }
-
-    bool IsEncryptionRequired() const override { return false; }
 
 private:
     TransportMgrBase * mTransportMgr = nullptr;

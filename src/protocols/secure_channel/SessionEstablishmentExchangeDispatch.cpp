@@ -47,15 +47,13 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(SecureSessi
     return mTransportMgr->SendMessage(mPeerAddress, preparedMessage.CastToWritable());
 }
 
-CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const Header::Flags & headerFlags,
-                                                                   const PayloadHeader & payloadHeader, uint32_t messageId,
+CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
                                                                    const Transport::PeerAddress & peerAddress,
                                                                    Messaging::MessageFlags msgFlags,
                                                                    ReliableMessageContext * reliableMessageContext)
 {
     mPeerAddress = peerAddress;
-    return ExchangeMessageDispatch::OnMessageReceived(headerFlags, payloadHeader, messageId, peerAddress, msgFlags,
-                                                      reliableMessageContext);
+    return ExchangeMessageDispatch::OnMessageReceived(payloadHeader, messageId, peerAddress, msgFlags, reliableMessageContext);
 }
 
 bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)
