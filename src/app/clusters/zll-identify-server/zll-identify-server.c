@@ -62,6 +62,8 @@
 #include "hal/hal.h"
 #endif
 
+using namespace chip;
+
 typedef struct
 {
     bool active;
@@ -149,7 +151,7 @@ void emberAfPluginZllIdentifyServerTriggerEffectEndpointEventHandler(uint8_t end
     }
 }
 
-bool emberAfIdentifyClusterTriggerEffectCallback(chip::app::CommandHandler * commandObj, uint8_t effectId, uint8_t effectVariant)
+bool emberAfIdentifyClusterTriggerEffectCallback(app::CommandHandler * commandObj, uint8_t effectId, uint8_t effectVariant)
 {
     uint8_t endpoint             = emberAfCurrentEndpoint();
     EmAfZllIdentifyState * state = getZllIdentifyState(endpoint);

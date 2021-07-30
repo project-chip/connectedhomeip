@@ -31,6 +31,7 @@
 #include "ota-provider-delegate.h"
 #include "ota-provider.h"
 
+using namespace chip;
 using chip::app::clusters::OTAProviderDelegate;
 
 namespace {
@@ -40,13 +41,13 @@ constexpr size_t kUpdateTokenParamLength = 32;  // The expected length of the Up
 
 OTAProviderDelegate * gDelegateTable[EMBER_AF_OTA_PROVIDER_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
 
-OTAProviderDelegate * GetDelegate(chip::EndpointId endpoint)
+OTAProviderDelegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_OTA_PROVIDER_CLUSTER_ID);
     return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
 }
 
-bool SendStatusIfDelegateNull(chip::EndpointId endpoint)
+bool SendStatusIfDelegateNull(EndpointId endpoint)
 {
     if (GetDelegate(endpoint) == nullptr)
     {
@@ -67,9 +68,8 @@ bool SendStatusIfDelegateNull(chip::EndpointId endpoint)
  * @param newVersion The SoftwareVersion value of the new Software Image that the client is ready to apply.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(chip::EndpointId endpoint,
-                                                                       chip::app::CommandHandler * commandObj,
-                                                                       chip::ByteSpan updateToken, uint32_t newVersion)
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(EndpointId endpoint, app::CommandHandler * commandObj,
+                                                                       ByteSpan updateToken, uint32_t newVersion)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
@@ -105,9 +105,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(chip::End
  *                       OTA Requestor's Basic Information Cluster.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::EndpointId endpoint,
-                                                                        chip::app::CommandHandler * commandObj,
-                                                                        chip::ByteSpan updateToken, uint32_t currentVersion)
+bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(EndpointId endpoint, app::CommandHandler * commandObj,
+                                                                        ByteSpan updateToken, uint32_t currentVersion)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
@@ -151,12 +150,12 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::En
  * @param metadataForProvider Optional, max 512 octets. A TLV-encoded Vendor-specific payload.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(EndpointId endpoint, app::CommandHandler * commandObj,
                                                                uint16_t vendorId, uint16_t productId, uint16_t imageType,
                                                                uint16_t hardwareVersion, uint32_t currentVersion,
                                                                /* TODO(#8605): change this to list */ uint8_t protocolsSupported,
                                                                uint8_t * location, uint8_t clientCanConsent,
-                                                               chip::ByteSpan metadataForProvider)
+                                                               ByteSpan metadataForProvider)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
     OTAProviderDelegate * delegate = GetDelegate(endpoint);
@@ -181,7 +180,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(chip::EndpointId 
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    chip::ByteSpan locationSpan(location, locationLen);
+    ByteSpan locationSpan(location, locationLen);
 
     status = delegate->HandleQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
                                         locationSpan, clientCanConsent, metadataForProvider);
@@ -197,7 +196,7 @@ namespace chip {
 namespace app {
 namespace clusters {
 
-void OTAProvider::SetDelegate(chip::EndpointId endpoint, OTAProviderDelegate * delegate)
+void OTAProvider::SetDelegate(EndpointId endpoint, OTAProviderDelegate * delegate)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_OTA_PROVIDER_CLUSTER_ID);
     if (ep != 0xFFFF)

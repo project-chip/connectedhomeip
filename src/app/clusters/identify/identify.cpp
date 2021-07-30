@@ -103,7 +103,7 @@ void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, A
     }
 }
 
-bool emberAfIdentifyClusterIdentifyCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint16_t time)
+bool emberAfIdentifyClusterIdentifyCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint16_t time)
 {
     EmberStatus sendStatus = EMBER_SUCCESS;
     // This Identify callback writes the new attribute, which will trigger the
@@ -120,7 +120,7 @@ bool emberAfIdentifyClusterIdentifyCallback(chip::EndpointId endpoint, chip::app
     return true;
 }
 
-bool emberAfIdentifyClusterIdentifyQueryCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+bool emberAfIdentifyClusterIdentifyQueryCallback(EndpointId endpoint, app::CommandHandler * commandObj)
 {
     EmberAfStatus status;
     EmberStatus sendStatus = EMBER_SUCCESS;
@@ -157,8 +157,7 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(chip::EndpointId endpoint, chip
     emberAfIdentifyClusterPrintln("Identifying for %d more seconds", identifyTime);
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_IDENTIFY_CLUSTER_ID,
-                                             ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID,
-                                             (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                             ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
 
         VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
