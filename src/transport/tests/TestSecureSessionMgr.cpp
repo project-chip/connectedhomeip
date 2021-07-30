@@ -124,7 +124,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::FabricTable fabrics;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -153,7 +153,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::FabricTable fabrics;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -251,7 +251,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::FabricTable fabrics;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -333,7 +333,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::FabricTable fabrics;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;

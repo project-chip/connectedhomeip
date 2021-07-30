@@ -27,9 +27,11 @@
 #include <cstdint>
 
 #include <core/CHIPError.h>
+#include <setup_payload/SetupPayload.h>
 
 struct LinuxDeviceOptions
 {
+    chip::SetupPayload payload;
     uint32_t mBleDevice = 0;
 
     static LinuxDeviceOptions & GetInstance();

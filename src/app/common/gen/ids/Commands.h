@@ -339,8 +339,8 @@ static constexpr CommandId SetFabric                    = 0x00000000;
 static constexpr CommandId SetFabricResponse            = 0x00000001;
 static constexpr CommandId OpCSRRequest                 = 0x00000004;
 static constexpr CommandId OpCSRResponse                = 0x00000005;
-static constexpr CommandId AddOpCert                    = 0x00000006;
-static constexpr CommandId OpCertResponse               = 0x00000008;
+static constexpr CommandId AddNOC                       = 0x00000006;
+static constexpr CommandId NOCResponse                  = 0x00000008;
 static constexpr CommandId UpdateFabricLabel            = 0x00000009;
 static constexpr CommandId RemoveFabric                 = 0x0000000A;
 static constexpr CommandId RemoveAllFabrics             = 0x0000000B;
@@ -650,11 +650,13 @@ static constexpr CommandId Login               = 0x00000001;
 namespace TestCluster {
 namespace Commands {
 namespace Ids {
-static constexpr CommandId Test                 = 0x00000000;
-static constexpr CommandId TestSpecificResponse = 0x00000000;
-static constexpr CommandId TestNotHandled       = 0x00000001;
-static constexpr CommandId TestSpecific         = 0x00000002;
-static constexpr CommandId TestUnknownCommand   = 0x00000003;
+static constexpr CommandId Test                     = 0x00000000;
+static constexpr CommandId TestSpecificResponse     = 0x00000000;
+static constexpr CommandId TestNotHandled           = 0x00000001;
+static constexpr CommandId TestAddArgumentsResponse = 0x00000001;
+static constexpr CommandId TestSpecific             = 0x00000002;
+static constexpr CommandId TestUnknownCommand       = 0x00000003;
+static constexpr CommandId TestAddArguments         = 0x00000004;
 } // namespace Ids
 } // namespace Commands
 } // namespace TestCluster

@@ -2790,6 +2790,22 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::End
     return true;
 }
 
+bool emberAfOperationalCredentialsClusterNOCResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                             uint8_t StatusCode, uint8_t FabricIndex, chip::ByteSpan DebugText)
+{
+    ChipLogProgress(Zcl, "NOCResponse:");
+    ChipLogProgress(Zcl, "  StatusCode: %" PRIu8 "", StatusCode);
+    ChipLogProgress(Zcl, "  FabricIndex: %" PRIu8 "", FabricIndex);
+    ChipLogProgress(Zcl, "  DebugText: %zu", DebugText.size());
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterNOCResponseCallback");
+
+    Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterNOCResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, StatusCode, FabricIndex, DebugText);
+    return true;
+}
+
 bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                                chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
                                                                chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
@@ -2808,23 +2824,6 @@ bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::EndpointId 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> * cb =
         Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature);
-    return true;
-}
-
-bool emberAfOperationalCredentialsClusterOpCertResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText)
-{
-    ChipLogProgress(Zcl, "OpCertResponse:");
-    ChipLogProgress(Zcl, "  StatusCode: %" PRIu8 "", StatusCode);
-    ChipLogProgress(Zcl, "  FabricIndex: %" PRIu64 "", FabricIndex);
-    // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-    // ChipLogProgress(Zcl, "  DebugText: %.*s", DebugText.size(), DebugText.data());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCertResponseCallback");
-
-    Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> * cb =
-        Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, StatusCode, FabricIndex, DebugText);
     return true;
 }
 
@@ -3030,6 +3029,20 @@ bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::EndpointI
     Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback> * cb =
         Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, data);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                               uint8_t returnValue)
+{
+    ChipLogProgress(Zcl, "TestAddArgumentsResponse:");
+    ChipLogProgress(Zcl, "  returnValue: %" PRIu8 "", returnValue);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterTestAddArgumentsResponseCallback");
+
+    Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, returnValue);
     return true;
 }
 

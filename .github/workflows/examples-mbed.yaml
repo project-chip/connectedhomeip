@@ -17,6 +17,7 @@ name: Build example - Mbed OS
 on:
     push:
     pull_request:
+    workflow_dispatch:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -37,6 +38,7 @@ jobs:
             EXAMPLE_PROFILE: release
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: connectedhomeip/chip-build-mbed-os:latest
