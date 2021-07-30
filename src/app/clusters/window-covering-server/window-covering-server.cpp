@@ -129,8 +129,7 @@ const WindowCover::OperationalStatus WindowCover::OperationalStatusGet(void)
 
 void WindowCover::EndProductTypeSet(EmberAfWcEndProductType type)
 {
-    std::underlying_type<EmberAfWcType>::type value = static_cast<std::underlying_type<EmberAfWcEndProductType>::type>(type);
-    WindowCovering::Attributes::SetEndProductType(mEndPoint, value);
+    WindowCovering::Attributes::SetEndProductType(mEndPoint, to_underlying(value));
 }
 
 EmberAfWcEndProductType WindowCover::EndProductTypeGet(void)
