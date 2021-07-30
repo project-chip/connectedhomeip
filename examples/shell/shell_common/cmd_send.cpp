@@ -98,8 +98,8 @@ private:
 class MockAppDelegate : public Messaging::ExchangeDelegate
 {
 public:
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
     {
         uint32_t respTime    = System::Clock::GetMonotonicMilliseconds();
         uint32_t transitTime = respTime - gSendArguments.GetLastSendTime();
