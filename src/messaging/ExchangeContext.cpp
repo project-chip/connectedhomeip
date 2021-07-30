@@ -308,7 +308,7 @@ bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHea
         // AND The message was received from the peer node associated with the exchange
         && (mSecureSession == session)
 
-        // This check should be already implied by the equality of session check, 
+        // This check should be already implied by the equality of session check,
         // It should be removed after we have implemented the temporary node id for PASE and CASE sessions
         && (IsEncryptionRequired() == packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
 
