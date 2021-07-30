@@ -24,6 +24,7 @@
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
+#include <app/common/gen/attributes/Accessors.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/common/gen/enums.h>
@@ -81,7 +82,7 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
                                     index + 1);
 }
 
-EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel, int32_t index)
+EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel, uint8_t index)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -99,7 +100,7 @@ EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, c
                    "OpCreds: Writing fabric into attribute store at index %d: fabricId 0x" ChipLogFormatX64
                    ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
                    index, ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
-    status = writeFabricAttribute((uint8_t *) &fabricDescriptor, index);
+    status = writeFabricAttribute((uint8_t *) &fabricDescriptor, static_cast<int32_t>(index));
     return status;
 }
 
@@ -109,7 +110,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Loop through fabrics
-    int32_t fabricIndex = 0;
+    uint8_t fabricIndex = 0;
     for (auto & pairing : GetGlobalFabricTable())
     {
         NodeId nodeId               = pairing.GetNodeId();
@@ -121,7 +122,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
         if (nodeId == kUndefinedNodeId || fabricId == kUndefinedFabricId || vendorId == kUndefinedVendorId)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                           "OpCreds: Skipping over unitialized fabric with fabricId 0x" ChipLogFormatX64
+                           "OpCreds: Skipping over uninitialized fabric with fabricId 0x" ChipLogFormatX64
                            ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
                            ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
             continue;
@@ -138,10 +139,19 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     }
 
     // Store the count of fabrics we just stored
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Stored %" PRIu32 " fabrics in fabrics list attribute.", fabricIndex);
-    if (writeFabricAttribute((uint8_t *) &fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Stored %" PRIu8 " fabrics in fabrics list attribute.", fabricIndex);
+    uint16_t u16Index = fabricIndex;
+    if (writeFabricAttribute(reinterpret_cast<uint8_t *>(&u16Index)) != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabric count %" PRIu32 " in fabrics list", fabricIndex);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabric count %" PRIu8 " in fabrics list", fabricIndex);
+        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
+
+    if (err == CHIP_NO_ERROR &&
+        app::Clusters::OperationalCredentials::Attributes::SetCommissionedFabrics(0, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabrics count %" PRIu8 " in commissioned fabrics",
+                       fabricIndex);
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
