@@ -49,8 +49,8 @@ public:
 
 private:
     // Inherited from ExchangeContext
-    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PacketHeader & packetHeader,
-                                 const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
+                                 chip::System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     /**

@@ -140,8 +140,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
                                       Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
 }
 
-CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -151,13 +150,13 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
     }
     else
     {
-        err = OnUnknownMsgType(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+        err = OnUnknownMsgType(apExchangeContext, aPayloadHeader, std::move(aPayload));
     }
     return err;
 }
 
-CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                         const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                         System::PacketBufferHandle && aPayload)
 {
     ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
     Shutdown();

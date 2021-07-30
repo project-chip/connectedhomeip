@@ -1185,8 +1185,8 @@ CHIP_ERROR CASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
     return err;
 }
 
-CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const PacketHeader & packetHeader,
-                                                const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                                System::PacketBufferHandle & msg)
 {
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1214,10 +1214,10 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader,
-                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
+CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                          System::PacketBufferHandle && msg)
 {
-    CHIP_ERROR err = ValidateReceivedMessage(ec, packetHeader, payloadHeader, msg);
+    CHIP_ERROR err = ValidateReceivedMessage(ec, payloadHeader, msg);
     SuccessOrExit(err);
 
     SetPeerAddress(mMessageDispatch.GetPeerAddress());

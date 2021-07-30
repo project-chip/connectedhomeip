@@ -144,27 +144,26 @@ public:
 
 private:
     friend class reporting::Engine;
-    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                      System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                 System::PacketBufferHandle && aPayload);
     void OnResponseTimeout(Messaging::ExchangeContext * ec);
 
     /**
      * Called when Interaction Model receives a Read Request message.  Errors processing
      * the Read Request are handled entirely within this function.
      */
-    CHIP_ERROR OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
      * the Write Request are handled entirely within this function.
      */
-    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                              const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                              System::PacketBufferHandle && aPayload);
 
     /**
      *  Retrieve a ReadClient that the SDK consumer can use to send do a read.  If the call succeeds, the consumer

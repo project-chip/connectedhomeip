@@ -45,8 +45,8 @@ public:
     void OnSessionEstablished() override;
 
     //// ExchangeDelegate Implementation ////
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * reliableMessageManager,
                                                             SecureSessionMgr * sessionMgr) override
