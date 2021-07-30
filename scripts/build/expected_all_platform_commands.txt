@@ -1,5 +1,8 @@
-# Generating linux-native-all_clusters
-gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux {out}/linux-native-all_clusters
+# Generating {real_platform}-native-all_clusters
+gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux {out}/{real_platform}-native-all_clusters
+
+# Generating {real_platform}-native-chip_tool
+gn gen --check --fail-on-unused-args --root=/TEST/BUILD/ROOT/examples/chip-tool /OUTPUT/DIR/{real_platform}-native-chip_tool
 
 # Generating qpg-qpg6100-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
@@ -58,8 +61,11 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
 
-# Building linux-native-all_clusters
-ninja -C {out}/linux-native-all_clusters
+# Building {real_platform}-native-all_clusters
+ninja -C {out}/{real_platform}-native-all_clusters
+
+# Building {real_platform}-native-chip_tool
+ninja -C {out}/{real_platform}-native-chip_tool
 
 # Building qpg-qpg6100-lock
 ninja -C {out}/qpg-qpg6100-lock
@@ -99,5 +105,6 @@ ninja -C {out}/nrf-nrf5340-lock
 
 # Building nrf-nrf5340-shell
 ninja -C {out}/nrf-nrf5340-shell
+
 
 

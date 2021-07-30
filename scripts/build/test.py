@@ -23,6 +23,8 @@ import subprocess
 import sys
 import time
 
+from builders.host import ConcretePlatformName
+
 from typing import List
 
 SCRIPT_ROOT = os.path.dirname(__file__)
@@ -30,7 +32,7 @@ SCRIPT_ROOT = os.path.dirname(__file__)
 def build_expected_output(root: str, out: str) -> List[str]:
   with open(os.path.join(SCRIPT_ROOT, 'expected_all_platform_commands.txt'), 'rt') as f:
     for l in f.readlines():
-      yield l.replace("{root}", root).replace("{out}", out)
+      yield l.replace("{root}", root).replace("{out}", out).replace('{real_platform}', ConcretePlatformName())
 
 
 def build_actual_output(root: str, out: str) -> List[str]:
