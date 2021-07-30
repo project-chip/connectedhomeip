@@ -569,7 +569,8 @@ Clusters.getAttributesByClusterName = function(name)
 //
 // Helpers: Get by Cluster Side
 //
-const kSideFilter = (side, item) => side == (item.clusterSide || item.side);
+const kSideFilter = (side, item) => item.source ? ((item.source == side && item.outgoing) || (item.source != side && item.incoming))
+                                                : item.side == side;
 
 Clusters.getCommandsByClusterSide = function(side)
 {
