@@ -18,12 +18,12 @@ static_library("bdx") {
   output_name = "libBdx"
 
   sources = [
-    "TransferFacilitator.cpp",
-    "TransferFacilitator.h",
     "BdxMessages.cpp",
     "BdxMessages.h",
     "BdxTransferSession.cpp",
     "BdxTransferSession.h",
+    "TransferFacilitator.cpp",
+    "TransferFacilitator.h",
   ]
 
   cflags = [ "-Wconversion" ]
