@@ -118,10 +118,10 @@ struct DiscoveryFilter
 {
     DiscoveryFilterType type;
     uint16_t code;
-    char * instanceName;
+    const char * instanceName;
     DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
     DiscoveryFilter(DiscoveryFilterType newType, uint16_t newCode) : type(newType), code(newCode) {}
-    DiscoveryFilter(DiscoveryFilterType newType, char * newInstanceName) : type(newType), instanceName(newInstanceName) {}
+    DiscoveryFilter(DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName) {}
 };
 enum class DiscoveryType
 {

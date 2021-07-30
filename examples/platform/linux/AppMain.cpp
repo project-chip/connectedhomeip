@@ -189,6 +189,12 @@ CHIP_ERROR InitCommissioner()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ShutdownCommissioner()
+{
+    gCommissioner.Shutdown();
+    return CHIP_NO_ERROR;
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 void ChipLinuxAppMainLoop()
@@ -209,6 +215,11 @@ void ChipLinuxAppMainLoop()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    ShutdownCommissioner();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
 #endif

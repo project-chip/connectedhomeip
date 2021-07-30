@@ -197,7 +197,7 @@ public:
     {
         if (deviceName.HasValue())
         {
-            chip::Platform::CopyString(mDeviceName, sizeof(mDeviceName), deviceName.Value());
+            Platform::CopyString(mDeviceName, sizeof(mDeviceName), deviceName.Value());
             mDeviceNameHasValue = true;
         }
         else
@@ -215,7 +215,7 @@ public:
     {
         if (rotatingId.HasValue())
         {
-            chip::Platform::CopyString(mRotatingId, sizeof(mRotatingId), rotatingId.Value());
+            Platform::CopyString(mRotatingId, sizeof(mRotatingId), rotatingId.Value());
             mRotatingIdHasValue = true;
         }
         else
@@ -233,7 +233,7 @@ public:
     {
         if (pairingInstr.HasValue())
         {
-            chip::Platform::CopyString(mPairingInstr, sizeof(mPairingInstr), pairingInstr.Value());
+            Platform::CopyString(mPairingInstr, sizeof(mPairingInstr), pairingInstr.Value());
             mPairingInstrHasValue = true;
         }
         else

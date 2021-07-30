@@ -849,6 +849,7 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
 
     mUdcServer->SetInstanceNameResolver(this);
     mUdcServer->SetUserConfirmationProvider(this);
+    printf("UDC Server Setup Complete\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     return CHIP_NO_ERROR;
 }
@@ -864,16 +865,17 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     PersistDeviceList();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
-    if (mUdcServer != nullptr)
-    {
-        mUdcServer->SetInstanceNameResolver(nullptr);
-        mUdcServer->SetUserConfirmationProvider(nullptr);
-        mUdcServer = nullptr;
-    }
     if (mUdcTransportMgr != nullptr)
     {
         chip::Platform::Delete(mUdcTransportMgr);
         mUdcTransportMgr = nullptr;
+    }
+    if (mUdcServer != nullptr)
+    {
+        mUdcServer->SetInstanceNameResolver(nullptr);
+        mUdcServer->SetUserConfirmationProvider(nullptr);
+        chip::Platform::Delete(mUdcServer);
+        mUdcServer = nullptr;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
