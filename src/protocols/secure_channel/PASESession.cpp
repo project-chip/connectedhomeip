@@ -754,8 +754,8 @@ CHIP_ERROR PASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
     return err;
 }
 
-CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, const PacketHeader & packetHeader,
-                                                const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
+CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, const PayloadHeader & payloadHeader,
+                                                System::PacketBufferHandle && msg)
 {
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -783,10 +783,10 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const PacketHeader & packetHeader,
-                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
+CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const PayloadHeader & payloadHeader,
+                                          System::PacketBufferHandle && msg)
 {
-    CHIP_ERROR err = ValidateReceivedMessage(exchange, packetHeader, payloadHeader, std::move(msg));
+    CHIP_ERROR err = ValidateReceivedMessage(exchange, payloadHeader, std::move(msg));
     SuccessOrExit(err);
 
     SetPeerAddress(mMessageDispatch.GetPeerAddress());

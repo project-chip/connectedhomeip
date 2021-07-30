@@ -94,15 +94,10 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(const Header::Flags & headerFlags, const PayloadHeader & payloadHeader,
-                                                      uint32_t messageId, const Transport::PeerAddress & peerAddress,
-                                                      MessageFlags msgFlags, ReliableMessageContext * reliableMessageContext)
+CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint32_t messageId, const PayloadHeader & payloadHeader,
+                                                      const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+                                                      ReliableMessageContext * reliableMessageContext)
 {
-    if (IsEncryptionRequired())
-    {
-        VerifyOrReturnError(headerFlags.Has(Header::FlagValues::kEncryptedMessage), CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
     ReturnErrorCodeIf(!MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
                       CHIP_ERROR_INVALID_ARGUMENT);
 

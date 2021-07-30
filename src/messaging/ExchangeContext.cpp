@@ -50,11 +50,10 @@ using namespace chip::System;
 namespace chip {
 namespace Messaging {
 
-static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, Protocols::Id protocolId,
-                                     uint8_t msgType, PacketBufferHandle && payload)
+static void DefaultOnMessageReceived(ExchangeContext * ec, Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle && payload)
 {
-    ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32,
-                 protocolId.ToFullyQualifiedSpecForm(), msgType, ec->GetExchangeId(), packetHeader.GetMessageId());
+    ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16, protocolId.ToFullyQualifiedSpecForm(),
+                 msgType, ec->GetExchangeId());
 }
 
 bool ExchangeContext::IsInitiator() const
@@ -307,6 +306,10 @@ bool ExchangeContext::MatchExchange(SessionHandle session, const PacketHeader & 
         // AND The Session ID associated with the incoming message matches the Session ID associated with the exchange.
         && (mSecureSession.MatchIncomingSession(session))
 
+        // TODO: This check should be already implied by the equality of session check,
+        // It should be removed after we have implemented the temporary node id for PASE and CASE sessions
+        && (IsEncryptionRequired() == packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
+
         // AND The message was sent by an initiator and the exchange context is a responder (IsInitiator==false)
         //    OR The message was sent by a responder and the exchange context is an initiator (IsInitiator==true) (for the broadcast
         //    case, the initiator is ill defined)
@@ -384,7 +387,7 @@ void ExchangeContext::NotifyResponseTimeout()
     MessageHandled();
 }
 
-CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageId, const PayloadHeader & payloadHeader,
                                           const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
                                           PacketBufferHandle && msgBuf)
 {
@@ -426,8 +429,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         MessageHandled();
     });
 
-    ReturnErrorOnFailure(mDispatch->OnMessageReceived(packetHeader.GetFlags(), payloadHeader, packetHeader.GetMessageId(),
-                                                      peerAddress, msgFlags, GetReliableMessageContext()));
+    ReturnErrorOnFailure(
+        mDispatch->OnMessageReceived(messageId, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
 
     if (IsAckPending() && !mDelegate)
     {
@@ -458,12 +461,11 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
     if (mDelegate != nullptr)
     {
-        return mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
+        return mDelegate->OnMessageReceived(this, payloadHeader, std::move(msgBuf));
     }
     else
     {
-        DefaultOnMessageReceived(this, packetHeader, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(),
-                                 std::move(msgBuf));
+        DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), std::move(msgBuf));
         return CHIP_NO_ERROR;
     }
 }

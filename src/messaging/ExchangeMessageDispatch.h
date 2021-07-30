@@ -58,7 +58,7 @@ public:
                                       EncryptedPacketBufferHandle & preparedMessage)                                         = 0;
     virtual CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const = 0;
 
-    virtual CHIP_ERROR OnMessageReceived(const Header::Flags & headerFlags, const PayloadHeader & payloadHeader, uint32_t messageId,
+    virtual CHIP_ERROR OnMessageReceived(uint32_t messageId, const PayloadHeader & payloadHeader,
                                          const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
                                          ReliableMessageContext * reliableMessageContext);
 

@@ -63,12 +63,10 @@ public:
      *   to the exchange.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
-    virtual CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader,
-                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) = 0;
+    virtual CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) = 0;
 
     /**
      * @brief
