@@ -2300,20 +2300,15 @@ public:
 
     ~CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
-        chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3, chip::ByteSpan Signature)
+    static void CallbackFn(void * context, chip::ByteSpan NOCSRElements, chip::ByteSpan AttestationSignature)
     {
         CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge * callback
             = reinterpret_cast<CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
-                    @"CSR" : [NSData dataWithBytes:CSR.data() length:CSR.size()],
-                    @"CSRNonce" : [NSData dataWithBytes:CSRNonce.data() length:CSRNonce.size()],
-                    @"VendorReserved1" : [NSData dataWithBytes:VendorReserved1.data() length:VendorReserved1.size()],
-                    @"VendorReserved2" : [NSData dataWithBytes:VendorReserved2.data() length:VendorReserved2.size()],
-                    @"VendorReserved3" : [NSData dataWithBytes:VendorReserved3.data() length:VendorReserved3.size()],
-                    @"Signature" : [NSData dataWithBytes:Signature.data() length:Signature.size()],
+                    @"NOCSRElements" : [NSData dataWithBytes:NOCSRElements.data() length:NOCSRElements.size()],
+                    @"AttestationSignature" : [NSData dataWithBytes:AttestationSignature.data() length:AttestationSignature.size()],
                 });
                 callback->Cancel();
                 delete callback;

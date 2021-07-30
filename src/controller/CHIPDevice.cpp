@@ -694,5 +694,12 @@ Device::~Device()
     }
 }
 
+CHIP_ERROR Device::ReduceNOCChainBufferSize(size_t new_size)
+{
+    ReturnErrorCodeIf(new_size > sizeof(mNOCChainBuffer), CHIP_ERROR_INVALID_ARGUMENT);
+    mNOCChainBufferSize = new_size;
+    return CHIP_NO_ERROR;
+}
+
 } // namespace Controller
 } // namespace chip

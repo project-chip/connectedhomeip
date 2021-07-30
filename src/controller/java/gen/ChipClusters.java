@@ -3773,13 +3773,7 @@ public class ChipClusters {
     }
 
     public interface OpCSRResponseCallback {
-      void onSuccess(
-          byte[] CSR,
-          byte[] CSRNonce,
-          byte[] VendorReserved1,
-          byte[] VendorReserved2,
-          byte[] VendorReserved3,
-          byte[] Signature);
+      void onSuccess(byte[] NOCSRElements, byte[] AttestationSignature);
 
       void onError(Exception error);
     }

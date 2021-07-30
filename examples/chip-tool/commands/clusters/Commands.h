@@ -597,9 +597,8 @@ static void OnOperationalCredentialsClusterNOCResponse(void * context, uint8_t S
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnOperationalCredentialsClusterOpCSRResponse(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
-                                                         chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
-                                                         chip::ByteSpan VendorReserved3, chip::ByteSpan Signature)
+static void OnOperationalCredentialsClusterOpCSRResponse(void * context, chip::ByteSpan NOCSRElements,
+                                                         chip::ByteSpan AttestationSignature)
 {
     ChipLogProgress(chipTool, "OperationalCredentialsClusterOpCSRResponse");
 

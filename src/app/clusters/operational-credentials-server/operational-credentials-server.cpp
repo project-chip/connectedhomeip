@@ -45,6 +45,9 @@ using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
 
+// As per specifications section 11.22.5.1. Constant RESP_MAX
+constexpr uint16_t kMaxRspLen = 900;
+
 /*
  * Temporary flow for fabric management until addOptCert + fabric index are implemented:
  * 1) When Commissioner pairs with CHIP device, store device nodeId in Fabric table as NodeId
@@ -446,12 +449,16 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::EndpointId e
     chip::Platform::ScopedMemoryBuffer<uint8_t> csr;
     size_t csrLength = Crypto::kMAX_CSR_Length;
 
+    chip::Platform::ScopedMemoryBuffer<uint8_t> csrElements;
+
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested an OpCSR");
 
     app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
                                          ZCL_OP_CSR_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     TLV::TLVWriter * writer = nullptr;
+    TLV::TLVWriter csrElementWriter;
+    TLV::TLVType containerType;
 
     // Fetch current fabric
     FabricInfo * fabric = retrieveCurrentFabric();
@@ -471,16 +478,28 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::EndpointId e
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(csrLength < UINT8_MAX, status = EMBER_ZCL_STATUS_FAILURE);
 
+    VerifyOrExit(csrElements.Alloc(kMaxRspLen), status = EMBER_ZCL_STATUS_FAILURE);
+    csrElementWriter.Init(csrElements.Get(), kMaxRspLen);
+
+    SuccessOrExit(err = csrElementWriter.StartContainer(TLV::AnonymousTag, TLV::TLVType::kTLVType_Structure, containerType));
+    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(1), ByteSpan(csr.Get(), csrLength)));
+    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(2), CSRNonce));
+    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(3), ByteSpan()));
+    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(4), ByteSpan()));
+    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(5), ByteSpan()));
+    SuccessOrExit(err = csrElementWriter.EndContainer(containerType));
+    SuccessOrExit(err = csrElementWriter.Finalize());
+
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
     writer = commandObj->GetCommandDataElementTLVWriter();
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(csr.Get(), csrLength)));
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), CSRNonce));
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(2), ByteSpan(nullptr, 0)));
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(3), ByteSpan(nullptr, 0)));
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(4), ByteSpan(nullptr, 0)));
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(5), ByteSpan(nullptr, 0)));
+
+    // Write CSR Elements
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(csrElements.Get(), csrElementWriter.GetLengthWritten())));
+
+    // TODO - Write attestation signature using attestation key
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), ByteSpan()));
     SuccessOrExit(err = commandObj->FinishCommand());
 
 exit:

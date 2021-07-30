@@ -4338,14 +4338,10 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
             break;
         }
         case Clusters::OperationalCredentials::Commands::Ids::OpCSRResponse: {
-            expectArgumentCount = 6;
-            chip::ByteSpan CSR;
-            chip::ByteSpan CSRNonce;
-            chip::ByteSpan VendorReserved1;
-            chip::ByteSpan VendorReserved2;
-            chip::ByteSpan VendorReserved3;
-            chip::ByteSpan Signature;
-            bool argExists[6];
+            expectArgumentCount = 2;
+            chip::ByteSpan NOCSRElements;
+            chip::ByteSpan AttestationSignature;
+            bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -4358,7 +4354,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 6)
+                if (currentDecodeTagId < 2)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -4377,37 +4373,13 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
                 case 0: {
                     const uint8_t * data = nullptr;
                     TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    CSR                  = chip::ByteSpan(data, aDataTlv.GetLength());
+                    NOCSRElements        = chip::ByteSpan(data, aDataTlv.GetLength());
                 }
                 break;
                 case 1: {
                     const uint8_t * data = nullptr;
                     TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    CSRNonce             = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
-                case 2: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    VendorReserved1      = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
-                case 3: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    VendorReserved2      = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
-                case 4: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    VendorReserved3      = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
-                case 5: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    Signature            = chip::ByteSpan(data, aDataTlv.GetLength());
+                    AttestationSignature = chip::ByteSpan(data, aDataTlv.GetLength());
                 }
                 break;
                 default:
@@ -4427,10 +4399,10 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 6 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterOpCSRResponseCallback(
-                    aEndpointId, apCommandObj, CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature);
+                wasHandled = emberAfOperationalCredentialsClusterOpCSRResponseCallback(aEndpointId, apCommandObj, NOCSRElements,
+                                                                                       AttestationSignature);
             }
             break;
         }
