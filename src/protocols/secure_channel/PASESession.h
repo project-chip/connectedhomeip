@@ -53,6 +53,12 @@ extern const char * kSpake2pKeyExchangeSalt;
 constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
 constexpr uint32_t kSpake2p_Iteration_Count    = 100;
 
+// Specifications section 3.9. Password-Based Key Derivation Function
+constexpr uint32_t kPBKDFMinimumIterations = 1000;
+constexpr uint32_t kPBKDFMaximumIterations = 100000;
+constexpr uint32_t kPBKDFMinimumSaltLen    = 16;
+constexpr uint32_t kPBKDFMaximumSaltLen    = 32;
+
 using namespace Crypto;
 
 constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;

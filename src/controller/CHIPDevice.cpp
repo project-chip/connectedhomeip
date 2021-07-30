@@ -370,11 +370,11 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption optio
         PASEVerifier verifier;
         ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
         ReturnErrorOnFailure(
-            PASESession::GeneratePASEVerifier(verifier, kSpake2p_Iteration_Count, salt, randomSetupPIN, setupPayload.setUpPINCode));
+            PASESession::GeneratePASEVerifier(verifier, kPBKDFMinimumIterations, salt, randomSetupPIN, setupPayload.setUpPINCode));
 
         ReturnErrorOnFailure(
             cluster.OpenCommissioningWindow(successCallback, failureCallback, timeout, ByteSpan(&verifier[0][0], sizeof(verifier)),
-                                            setupPayload.discriminator, kSpake2p_Iteration_Count, salt, mPAKEVerifierID++));
+                                            setupPayload.discriminator, kPBKDFMinimumIterations, salt, mPAKEVerifierID++));
     }
     else
     {

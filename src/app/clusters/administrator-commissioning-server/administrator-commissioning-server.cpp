@@ -23,10 +23,14 @@
 #include <app/CommandHandler.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
+#include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;
+
+// Specifications section 5.4.2.3. Announcement Duration
+constexpr uint32_t kMaxCommissionioningTimeoutSeconds = 15 * 60;
 
 bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(chip::EndpointId endpoint,
                                                                              app::CommandHandler * commandObj,
@@ -36,10 +40,22 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(chi
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     PASEVerifier verifier;
+    const uint8_t * verifierData = pakeVerifier.data();
+
     ChipLogProgress(Zcl, "Received command to open commissioning window");
+
     VerifyOrExit(!IsPairingWindowOpen(), status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(sizeof(verifier) == pakeVerifier.size(), status = EMBER_ZCL_STATUS_FAILURE);
-    memcpy(&verifier[0][0], pakeVerifier.data(), pakeVerifier.size());
+    VerifyOrExit(iterations >= kPBKDFMinimumIterations, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(iterations <= kPBKDFMaximumIterations, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(salt.size() >= kPBKDFMinimumSaltLen, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(salt.size() <= kPBKDFMaximumSaltLen, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(discriminator <= kMaxDiscriminatorValue, status = EMBER_ZCL_STATUS_FAILURE);
+
+    memcpy(&verifier[0][0], &verifierData[0], kSpake2p_WS_Length);
+    memcpy(&verifier[1][0], &verifierData[kSpake2p_WS_Length], kSpake2p_WS_Length);
+
     VerifyOrExit(OpenPairingWindowUsingVerifier(commissioningTimeout, discriminator, verifier, iterations, salt, passcodeID) ==
                      CHIP_NO_ERROR,
                  status = EMBER_ZCL_STATUS_FAILURE);
@@ -61,6 +77,7 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
     VerifyOrExit(!IsPairingWindowOpen(), status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(OpenDefaultPairingWindow(ResetFabrics::kNo, commissioningTimeout) == CHIP_NO_ERROR,
                  status = EMBER_ZCL_STATUS_FAILURE);
     ChipLogProgress(Zcl, "Commissioning window is now open");
