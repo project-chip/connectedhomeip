@@ -20,6 +20,9 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <app/common/gen/ids/Clusters.h>
+#include <app/common/gen/ids/Commands.h>
+
 #include <controller/CHIPCluster.h>
 #include <core/CHIPCallback.h>
 #include <lib/support/Span.h>
@@ -27,17 +30,10 @@
 namespace chip {
 namespace Controller {
 
-constexpr ClusterId kFlowMeasurementClusterId             = 0x0404;
-constexpr ClusterId kLevelControlClusterId                = 0x0008;
-constexpr ClusterId kOnOffClusterId                       = 0x0006;
-constexpr ClusterId kPressureMeasurementClusterId         = 0x0403;
-constexpr ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
-constexpr ClusterId kTemperatureMeasurementClusterId      = 0x0402;
-
 class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
 {
 public:
-    FlowMeasurementCluster() : ClusterBase(kFlowMeasurementClusterId) {}
+    FlowMeasurementCluster() : ClusterBase(app::Clusters::FlowMeasurement::Id) {}
     ~FlowMeasurementCluster() {}
 
     // Cluster Attributes
@@ -54,7 +50,7 @@ public:
 class DLL_EXPORT LevelControlCluster : public ClusterBase
 {
 public:
-    LevelControlCluster() : ClusterBase(kLevelControlClusterId) {}
+    LevelControlCluster() : ClusterBase(app::Clusters::LevelControl::Id) {}
     ~LevelControlCluster() {}
 
     // Cluster Commands
@@ -83,20 +79,12 @@ public:
     CHIP_ERROR ReportAttributeCurrentLevel(Callback::Cancelable * onReportCallback);
 
 private:
-    static constexpr CommandId kMoveCommandId                 = 0x01;
-    static constexpr CommandId kMoveToLevelCommandId          = 0x00;
-    static constexpr CommandId kMoveToLevelWithOnOffCommandId = 0x04;
-    static constexpr CommandId kMoveWithOnOffCommandId        = 0x05;
-    static constexpr CommandId kStepCommandId                 = 0x02;
-    static constexpr CommandId kStepWithOnOffCommandId        = 0x06;
-    static constexpr CommandId kStopCommandId                 = 0x03;
-    static constexpr CommandId kStopWithOnOffCommandId        = 0x07;
 };
 
 class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:
-    OnOffCluster() : ClusterBase(kOnOffClusterId) {}
+    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
     ~OnOffCluster() {}
 
     // Cluster Commands
@@ -110,15 +98,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kOffCommandId    = 0x00;
-    static constexpr CommandId kOnCommandId     = 0x01;
-    static constexpr CommandId kToggleCommandId = 0x02;
 };
 
 class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
 {
 public:
-    PressureMeasurementCluster() : ClusterBase(kPressureMeasurementClusterId) {}
+    PressureMeasurementCluster() : ClusterBase(app::Clusters::PressureMeasurement::Id) {}
     ~PressureMeasurementCluster() {}
 
     // Cluster Attributes
@@ -135,7 +120,7 @@ public:
 class DLL_EXPORT PumpConfigurationAndControlCluster : public ClusterBase
 {
 public:
-    PumpConfigurationAndControlCluster() : ClusterBase(kPumpConfigurationAndControlClusterId) {}
+    PumpConfigurationAndControlCluster() : ClusterBase(app::Clusters::PumpConfigurationAndControl::Id) {}
     ~PumpConfigurationAndControlCluster() {}
 
     // Cluster Attributes
@@ -160,7 +145,7 @@ public:
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
 {
 public:
-    TemperatureMeasurementCluster() : ClusterBase(kTemperatureMeasurementClusterId) {}
+    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
     ~TemperatureMeasurementCluster() {}
 
     // Cluster Attributes

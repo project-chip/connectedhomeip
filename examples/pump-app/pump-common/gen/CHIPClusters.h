@@ -20,6 +20,9 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <app/common/gen/ids/Clusters.h>
+#include <app/common/gen/ids/Commands.h>
+
 #include <controller/CHIPCluster.h>
 #include <core/CHIPCallback.h>
 #include <lib/support/Span.h>
@@ -27,14 +30,10 @@
 namespace chip {
 namespace Controller {
 
-constexpr ClusterId kFlowMeasurementClusterId        = 0x0404;
-constexpr ClusterId kPressureMeasurementClusterId    = 0x0403;
-constexpr ClusterId kTemperatureMeasurementClusterId = 0x0402;
-
 class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
 {
 public:
-    FlowMeasurementCluster() : ClusterBase(kFlowMeasurementClusterId) {}
+    FlowMeasurementCluster() : ClusterBase(app::Clusters::FlowMeasurement::Id) {}
     ~FlowMeasurementCluster() {}
 
     // Cluster Attributes
@@ -51,7 +50,7 @@ public:
 class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
 {
 public:
-    PressureMeasurementCluster() : ClusterBase(kPressureMeasurementClusterId) {}
+    PressureMeasurementCluster() : ClusterBase(app::Clusters::PressureMeasurement::Id) {}
     ~PressureMeasurementCluster() {}
 
     // Cluster Attributes
@@ -68,7 +67,7 @@ public:
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
 {
 public:
-    TemperatureMeasurementCluster() : ClusterBase(kTemperatureMeasurementClusterId) {}
+    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
     ~TemperatureMeasurementCluster() {}
 
     // Cluster Attributes
