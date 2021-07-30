@@ -107,4 +107,3 @@ ninja -C {out}/nrf-nrf5340-lock
 ninja -C {out}/nrf-nrf5340-shell
 
 
-
