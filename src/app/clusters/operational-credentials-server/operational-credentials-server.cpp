@@ -436,8 +436,7 @@ exit:
 bool emberAfOperationalCredentialsClusterCertChainRequestCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
                                                                   uint16_t certChainType)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested Device Attestation Credentials");
 
@@ -467,11 +466,6 @@ bool emberAfOperationalCredentialsClusterCertChainRequestCallback(chip::Endpoint
     SuccessOrExit(err = commandObj->FinishCommand());
 
 exit:
-    if (status == EMBER_ZCL_STATUS_FAILURE)
-    {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed CertChainRequest.");
-        emberAfSendImmediateDefaultResponse(status);
-    }
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to encode response command: %s", ErrorStr(err));
@@ -498,7 +492,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(chip::Endpoi
                                          ZCL_ATTESTATION_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(attestationNonce.size() == 32, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(attestationNonce.size() == 32, status = EMBER_ZCL_STATUS_FAILURE);
 
     attestationElementsLen = attestationNonce.size() + sizeof(uint64_t) * 8;
     VerifyOrExit(attestationElements.Alloc(attestationElementsLen), err = CHIP_ERROR_NO_MEMORY);
@@ -514,7 +508,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(chip::Endpoi
     // Retrieve attestation challenge
     state = commandObj->GetExchangeContext()->GetExchangeMgr()->GetSessionMgr()->GetPeerConnectionState(
         commandObj->GetExchangeContext()->GetSecureSession());
-    VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
+    VerifyOrExit(state != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
     // TODO: Sign using attestation private key via a delegate API so manufacturer provides specific implementation
     //    SuccessOrExit(err = keypair.ECDSA_sign_attestation_data(ByteSpan(attestationElements.Get(), attestationElementsLen),
@@ -529,7 +523,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(chip::Endpoi
 exit:
     if (status == EMBER_ZCL_STATUS_FAILURE)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed OpCSRRequest.");
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AttestationRequest.");
         emberAfSendImmediateDefaultResponse(status);
     }
     if (err != CHIP_NO_ERROR)
