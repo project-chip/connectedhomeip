@@ -129,15 +129,16 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
     ReturnErrorCodeIf(!rcac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
     uint16_t rootCertBufLen = kMaxCHIPDERCertLength;
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
     PERSISTENT_KEY_OP(mNextFabricId, kOperationalCredentialsRootCertificateStorage, key,
                       err = SyncGetKeyValue(key, rcac.Get(), rootCertBufLen));
     if (err != CHIP_NO_ERROR)
     {
         // Storage doesn't have an existing root certificate. Let's create one and add it to the storage.
-        chip::Credentials::X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, mNextFabricId, false, 0 };
-        uint32_t outCertLen                              = 0;
-        ReturnErrorOnFailure(NewRootX509Cert(request, mIssuer, rcac.Get(), kMaxCHIPDERCertLength, outCertLen));
+        chip::Credentials::X509CertRequestParams rcac_request = { 0,    mIssuerId,     mNow,  mNow + mValidity,
+                                                                  true, mNextFabricId, false, 0 };
+
+        uint32_t outCertLen = 0;
+        ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac.Get(), kMaxCHIPDERCertLength, outCertLen));
 
         VerifyOrReturnError(CanCastTo<uint16_t>(outCertLen), CHIP_ERROR_INVALID_ARGUMENT);
         rootCertBufLen = static_cast<uint16_t>(outCertLen);
