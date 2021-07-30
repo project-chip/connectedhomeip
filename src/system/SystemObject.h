@@ -314,9 +314,9 @@ inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
         Object * p = &mDummyHead;
         if (p->next)
         {
-            p->next->prev =  newNode;
+            p->next->prev = newNode;
         }
-        newNode->next = p->next;
+        newNode->next      = p->next;
         p->next            = newNode;
         newNode->prev      = p;
         newNode->mMutexRef = &mMutex;
