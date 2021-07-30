@@ -16,7 +16,7 @@ RUN curl --fail --location --silent --show-error http://dlm.cypress.com.edgesuit
 # ------------------------------------------------------------------------------
 # Execute post-build scripts
 RUN bash -e /opt/ModusToolbox/tools_2.3/modus-shell/postinstall \
- && sudo bash -e /opt/ModusToolbox/tools_2.3/fw-loader/udev_rules/install_rules.sh
+ && bash -e /opt/ModusToolbox/tools_2.3/fw-loader/udev_rules/install_rules.sh
 
 # ------------------------------------------------------------------------------
 # Set environment variable required by ModusToolbox application makefiles

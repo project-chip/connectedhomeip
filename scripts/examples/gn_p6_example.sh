@@ -23,23 +23,17 @@ source "$(dirname "$0")/../../scripts/activate.sh"
 # Install required software
 if [ -d "/opt/ModusToolbox" ]; then
     export CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.3"
+elif [ -d "$HOME/ModusToolbox" ]; then
+    # Set CY TOOLS PATH
+    export CY_TOOLS_PATHS="$HOME/ModusToolbox/tools_2.3"
 else
-    # Install tools
-    sudo apt install -y curl git make file libglib2.0-0 libusb-1.0-0 libncurses5
-
     # Install Modustoolbox
     curl --fail --location --silent --show-error http://dlm.cypress.com.edgesuite.net/akdlm/downloadmanager/software/ModusToolbox/ModusToolbox_2.3/ModusToolbox_2.3.0.4276-linux-install.tar.gz -o /tmp/ModusToolbox_2.3.0.4276-linux-install.tar.gz &&
-        tar -C /opt -zxf /tmp/ModusToolbox_2.3.0.4276-linux-install.tar.gz &&
+        tar -C "$HOME" -zxf /tmp/ModusToolbox_2.3.0.4276-linux-install.tar.gz &&
         rm /tmp/ModusToolbox_2.3.0.4276-linux-install.tar.gz
 
-    #Run postinstall script
-    bash -e /opt/ModusToolbox/tools_2.3/modus-shell/postinstall
-
-    #Run udev install script
-    bash -e /opt/ModusToolbox/tools_2.3/fw-loader/udev_rules/install_rules.sh
-
     # Set CY TOOLS PATH
-    export CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.3"
+    export CY_TOOLS_PATHS="$HOME/ModusToolbox/tools_2.3"
 fi
 
 set -x
