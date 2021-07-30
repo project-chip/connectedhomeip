@@ -1768,7 +1768,7 @@ void emberAfPluginColorControlServerHueSatTransitionEventHandler(void)
     }
 
     writeSaturation(colorSaturationTransitionState.endpoint, (uint8_t) colorSaturationTransitionState.currentValue);
- 
+
     if (colorHueTransitionState.isEnhancedHue)
     {
         emberAfColorControlClusterPrintln("Enhanced Hue %d Saturation %d endpoint %d", colorHueTransitionState.currentEnhancedHue,
