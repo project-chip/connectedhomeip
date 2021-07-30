@@ -46,6 +46,13 @@ CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeConte
     {
         ChipLogError(BDX, "failed to handle message: %s", ErrorStr(err));
     }
+
+    // Almost every BDX message will follow up with a response on the exchange. Even messages that might signify the end of a
+    // transfer could necessitate a response if they are received at the wrong time.
+    // For this reason, it is left up to the application logic to call ExchangeContext::Close() when it has determined that the
+    // transfer is finished.
+    mExchangeCtx->WillSendMessage();
+
     return err;
 }
 

@@ -56,6 +56,9 @@ private:
     /**
      * This method should be implemented to contain business-logic handling of BDX messages and other TransferSession events.
      *
+     * NOTE: It is the responsiblity of the implementer to Close the underlying ExchangeContext when it has determined that the
+     * tranfser is finished. This class assumes that a response message will be sent for all received messages.
+     *
      * @param[in] event An OutputEvent that contains output from the TransferSession object.
      */
     virtual void HandleTransferSessionOutput(TransferSession::OutputEvent & event) = 0;
