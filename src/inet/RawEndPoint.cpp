@@ -505,7 +505,7 @@ void RawEndPoint::Free()
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     DeferredFree(kReleaseDeferralErrorTactic_Die);
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
-    RawEndPoint::sPool.Release(this);
+    Release();
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 

@@ -1206,7 +1206,7 @@ void TCPEndPoint::Free()
     // Release the Retain() that happened when the end point was allocated
     // [on LwIP, the object may still be alive if DoClose() used the
     // EndPointBasis::DeferredFree() method.]
-    TCPEndPoint::sPool.Release(this);
+    Release();
 }
 
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
@@ -1734,7 +1734,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
             DeferredFree(kReleaseDeferralErrorTactic_Ignore);
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
-            TCPEndPoint::sPool.Release(this);
+            Release();
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
         }
     }
@@ -2530,7 +2530,7 @@ void TCPEndPoint::HandlePendingIO()
 
     mSocket.ClearPendingIO();
 
-    TCPEndPoint::sPool.Release(this);
+    Release();
 }
 
 void TCPEndPoint::ReceiveData()
@@ -2759,8 +2759,8 @@ void TCPEndPoint::HandleIncomingConnection()
     if (conEP != nullptr)
     {
         if (conEP->State == kState_Connected)
-            TCPEndPoint::sPool.Release(conEP);
-        TCPEndPoint::sPool.Release(conEP);
+            conEP->Release();
+        conEP->Release();
     }
     if (OnAcceptError != nullptr)
         OnAcceptError(this, err);

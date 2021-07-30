@@ -827,7 +827,7 @@ CHIP_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
             onComplete(appState, err, (err == CHIP_NO_ERROR) ? 1 : 0, addrArray);
         }
 
-        DNSResolver::sPool.Release(resolver);
+        resolver->Release();
         resolver = nullptr;
 
         ExitNow(err = CHIP_NO_ERROR);

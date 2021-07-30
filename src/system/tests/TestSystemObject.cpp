@@ -182,16 +182,16 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
         for (j = kPoolSize; j > i; --j)
         {
             NL_TEST_ASSERT(lContext.mTestSuite, lGotten->IsRetained(lLayer));
-            sPool.Release(lGotten);
+            lGotten->Release();
         }
 
         NL_TEST_ASSERT(lContext.mTestSuite, lGotten->IsRetained(lLayer));
-        sPool.Release(lGotten);
+        lGotten->Release();
         NL_TEST_ASSERT(lContext.mTestSuite, !lGotten->IsRetained(lLayer));
     }
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    NL_TEST_ASSERT(lContext.mTestSuite, sPool.mObjects.size() == 0);
+    NL_TEST_ASSERT(lContext.mTestSuite, sPool.Size() == 0);
 #else
     for (i = 0; i < kPoolSize; ++i)
     {
@@ -257,7 +257,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
 
     if (lObject != nullptr)
     {
-        sPool.Release(lObject);
+        lObject->Release();
         NL_TEST_ASSERT(lContext.mTestSuite, !lObject->IsRetained(lLayer));
     }
 
@@ -281,7 +281,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
         lObject->Delay(lContext.mAccumulator);
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-        j = sPool.mObjects.size();
+        j = sPool.Size();
 #else
         j = kPoolSize;
 #endif
@@ -293,7 +293,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
             if (lObject == nullptr)
                 continue;
 
-            sPool.Release(lObject);
+            lObject->Release();
             NL_TEST_ASSERT(lContext.mTestSuite, !lObject->IsRetained(lLayer));
             break;
         }
@@ -310,7 +310,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
         if (lObject == nullptr)
             continue;
 
-        sPool.Release(lObject);
+        lObject->Release();
         NL_TEST_ASSERT(lContext.mTestSuite, !lObject->IsRetained(lLayer));
     }
 
@@ -432,7 +432,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
 
         NL_TEST_ASSERT(lContext.mTestSuite, lObject != nullptr);
 
-        sPool.Release(lObject);
+        lObject->Release();
         NL_TEST_ASSERT(lContext.mTestSuite, !lObject->IsRetained(lLayer));
 
         sPool.GetStatistics(lNumInUse, lHighWatermark);
@@ -466,7 +466,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
         if (lObject == nullptr)
             continue;
 
-        sPool.Release(lObject);
+        lObject->Release();
         NL_TEST_ASSERT(lContext.mTestSuite, !lObject->IsRetained(lLayer));
     }
 
