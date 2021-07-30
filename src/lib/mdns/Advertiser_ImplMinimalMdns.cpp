@@ -587,11 +587,6 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         snprintf(txtDiscriminator, sizeof(txtDiscriminator), "D=%d", params.GetLongDiscriminator());
         txtFields[numTxtFields++] = txtDiscriminator;
 
-        if (!params.GetVendorId().HasValue())
-        {
-            return allocator->AllocateQName(txtDiscriminator);
-        }
-
         char txtCommissioningMode[chip::Mdns::kKeyCommissioningModeMaxLength + 4];
         snprintf(txtCommissioningMode, sizeof(txtCommissioningMode), "CM=%d", params.GetCommissioningMode() ? 1 : 0);
         txtFields[numTxtFields++] = txtCommissioningMode;

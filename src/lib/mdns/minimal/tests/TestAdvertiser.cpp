@@ -41,29 +41,120 @@ using namespace chip::Mdns;
 using namespace mdns::Minimal;
 using namespace mdns::Minimal::test;
 
-const QNamePart kDnsSdQueryParts[]              = { "_services", "_dns-sd", "_udp", "local" };
-const FullQName kDnsSdQueryName                 = FullQName(kDnsSdQueryParts);
+// Used for everything.
+const QNamePart kDnsSdQueryParts[]  = { "_services", "_dns-sd", "_udp", "local" };
+const FullQName kDnsSdQueryName     = FullQName(kDnsSdQueryParts);
+constexpr size_t kMdnsMaxPacketSize = 512;
+const uint8_t kMac[kMaxMacSize]     = { 1, 2, 3, 4, 5, 6, 7, 8 };
+const QNamePart kHostnameParts[]    = { "0102030405060708", "local" };
+const FullQName kHostnameName       = FullQName(kHostnameParts);
+
+// Operational records and queries.
 const QNamePart kMatterOperationalQueryParts[3] = { "_matter", "_tcp", "local" };
 const FullQName kMatterOperationalQueryName     = FullQName(kMatterOperationalQueryParts);
+const PeerId kPeerId1                           = PeerId().SetFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
+const PeerId kPeerId2                           = PeerId().SetFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
+const PeerId kPeerId3                           = PeerId().SetFabricId(0x3333333333333333).SetNodeId(0x3333333333333333);
+const PeerId kPeerId4                           = PeerId().SetFabricId(0x4444444444444444).SetNodeId(0x4444444444444444);
+const PeerId kPeerId5                           = PeerId().SetFabricId(0x5555555555555555).SetNodeId(0x5555555555555555);
+const PeerId kPeerId6                           = PeerId().SetFabricId(0x6666666666666666).SetNodeId(0x6666666666666666);
+const QNamePart kInstanceNameParts1[]           = { "BEEFBEEFF00DF00D-1111222233334444", "_matter", "_tcp", "local" };
+const FullQName kInstanceName1                  = FullQName(kInstanceNameParts1);
+const QNamePart kInstanceNameParts2[]           = { "5555666677778888-1212343456567878", "_matter", "_tcp", "local" };
+const FullQName kInstanceName2                  = FullQName(kInstanceNameParts2);
+const QNamePart kTxtRecordEmptyParts[]          = { "=" };
+const FullQName kTxtRecordEmptyName             = FullQName(kTxtRecordEmptyParts);
+OperationalAdvertisingParameters operationalParams1 =
+    OperationalAdvertisingParameters().SetPeerId(kPeerId1).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+OperationalAdvertisingParameters operationalParams2 =
+    OperationalAdvertisingParameters().SetPeerId(kPeerId2).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+OperationalAdvertisingParameters operationalParams3 =
+    OperationalAdvertisingParameters().SetPeerId(kPeerId3).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+OperationalAdvertisingParameters operationalParams4 =
+    OperationalAdvertisingParameters().SetPeerId(kPeerId4).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+OperationalAdvertisingParameters operationalParams5 =
+    OperationalAdvertisingParameters().SetPeerId(kPeerId5).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+OperationalAdvertisingParameters operationalParams6 =
+    OperationalAdvertisingParameters().SetPeerId(kPeerId6).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
+PtrResourceRecord ptrOperationalService = PtrResourceRecord(kDnsSdQueryName, kMatterOperationalQueryName);
+PtrResourceRecord ptrOperational1       = PtrResourceRecord(kMatterOperationalQueryName, kInstanceName1);
+SrvResourceRecord srvOperational1       = SrvResourceRecord(kInstanceName1, kHostnameName, CHIP_PORT);
+TxtResourceRecord txtOperational1       = TxtResourceRecord(kInstanceName1, kTxtRecordEmptyName);
+PtrResourceRecord ptrOperational2       = PtrResourceRecord(kMatterOperationalQueryName, kInstanceName2);
+SrvResourceRecord srvOperational2       = SrvResourceRecord(kInstanceName2, kHostnameName, CHIP_PORT);
+TxtResourceRecord txtOperational2       = TxtResourceRecord(kInstanceName2, kTxtRecordEmptyName);
 
-constexpr size_t kMdnsMaxPacketSize = 512;
+// Commissionable node records and queries.
+const QNamePart kMatterCommissionableNodeQueryParts[3] = { "_matterc", "_udp", "local" };
+const QNamePart kLongSubPartsFullLen[]                 = { "_L4094", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kShortSubPartsFullLen[]                = { "_S254", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kCmSubParts0[]                         = { "_C0", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kLongSubParts[]                        = { "_L22", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kShortSubParts[]                       = { "_S2", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kVendorSubParts[]                      = { "_V555", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kDeviceTypeSubParts[]                  = { "_T25", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kCmSubParts1[]                         = { "_C1", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kOpenWindowSubParts[]                  = { "_A1", "_sub", "_matterc", "_udp", "local" };
+const FullQName kMatterCommissionableNodeQueryName     = FullQName(kMatterCommissionableNodeQueryParts);
+FullQName kLongSubFullLenName                          = FullQName(kLongSubPartsFullLen);
+FullQName kShortSubFullLenName                         = FullQName(kShortSubPartsFullLen);
+FullQName kCmSub0Name                                  = FullQName(kCmSubParts0);
+FullQName kLongSubName                                 = FullQName(kLongSubParts);
+FullQName kShortSubName                                = FullQName(kShortSubParts);
+FullQName kCmSub1Name                                  = FullQName(kCmSubParts1);
+FullQName kVendorSubName                               = FullQName(kVendorSubParts);
+FullQName kDeviceTypeSubName                           = FullQName(kDeviceTypeSubParts);
+FullQName kOpenWindowSubName                           = FullQName(kOpenWindowSubParts);
+PtrResourceRecord ptrCommissionableNodeService         = PtrResourceRecord(kDnsSdQueryName, kMatterCommissionableNodeQueryName);
+PtrResourceRecord ptrServiceSubLFullLen                = PtrResourceRecord(kDnsSdQueryName, kLongSubFullLenName);
+PtrResourceRecord ptrServiceSubSFullLen                = PtrResourceRecord(kDnsSdQueryName, kShortSubFullLenName);
+PtrResourceRecord ptrServiceSubC0                      = PtrResourceRecord(kDnsSdQueryName, kCmSub0Name);
+PtrResourceRecord ptrServiceSubLong                    = PtrResourceRecord(kDnsSdQueryName, kLongSubName);
+PtrResourceRecord ptrServiceSubShort                   = PtrResourceRecord(kDnsSdQueryName, kShortSubName);
+PtrResourceRecord ptrServiceSubC1                      = PtrResourceRecord(kDnsSdQueryName, kCmSub1Name);
+PtrResourceRecord ptrServiceSubVendor                  = PtrResourceRecord(kDnsSdQueryName, kVendorSubName);
+PtrResourceRecord ptrServiceSubDeviceType              = PtrResourceRecord(kDnsSdQueryName, kDeviceTypeSubName);
+PtrResourceRecord ptrServiceSubOpenWindow              = PtrResourceRecord(kDnsSdQueryName, kOpenWindowSubName);
 
-const uint8_t kMac[kMaxMacSize]        = { 1, 2, 3, 4, 5, 6, 7, 8 };
-const PeerId kPeerId1                  = PeerId().SetFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
-const PeerId kPeerId2                  = PeerId().SetFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
-const PeerId kPeerId3                  = PeerId().SetFabricId(0x3333333333333333).SetNodeId(0x3333333333333333);
-const PeerId kPeerId4                  = PeerId().SetFabricId(0x4444444444444444).SetNodeId(0x4444444444444444);
-const PeerId kPeerId5                  = PeerId().SetFabricId(0x5555555555555555).SetNodeId(0x5555555555555555);
-const PeerId kPeerId6                  = PeerId().SetFabricId(0x6666666666666666).SetNodeId(0x6666666666666666);
-const QNamePart kInstanceNameParts1[]  = { "BEEFBEEFF00DF00D-1111222233334444", "_matter", "_tcp", "local" };
-const FullQName kInstanceName1         = FullQName(kInstanceNameParts1);
-const QNamePart kInstanceNameParts2[]  = { "5555666677778888-1212343456567878", "_matter", "_tcp", "local" };
-const FullQName kInstanceName2         = FullQName(kInstanceNameParts2);
-const QNamePart kHostnameParts[]       = { "0102030405060708", "local" };
-const FullQName kHostnameName          = FullQName(kHostnameParts);
-const QNamePart kTxtRecordEmptyParts[] = { "=" };
-const FullQName kTxtRecordEmptyName    = FullQName(kTxtRecordEmptyParts);
+// For commissioning, the instance name is chosen randomly by the advertiser, so we have to get this value from it. We can, however,
+// pre-populate the records with the ptr.
+char instanceNamePrefix[17];
+QNamePart instanceNameParts[]           = { instanceNamePrefix, "_matterc", "_udp", "local" };
+FullQName instanceName                  = FullQName(instanceNameParts);
+PtrResourceRecord ptrCommissionableNode = PtrResourceRecord(kMatterCommissionableNodeQueryName, instanceName);
+SrvResourceRecord srvCommissionableNode = SrvResourceRecord(instanceName, kHostnameName, CHIP_PORT);
 
+CommissionAdvertisingParameters commissionableNodeParamsSmall =
+    CommissionAdvertisingParameters()
+        .SetCommissionAdvertiseMode(CommssionAdvertiseMode::kCommissionableNode)
+        .SetMac(ByteSpan(kMac))
+        .SetLongDiscriminator(0xFFE)
+        .SetShortDiscriminator(0xFE)
+        .SetCommissioningMode(false, false);
+const QNamePart txtCommissionableNodeParamsSmallParts[] = { "CM=0", "D=4094" };
+FullQName txtCommissionableNodeParamsSmallName          = FullQName(txtCommissionableNodeParamsSmallParts);
+TxtResourceRecord txtCommissionableNodeParamsSmall      = TxtResourceRecord(instanceName, txtCommissionableNodeParamsSmallName);
+
+CommissionAdvertisingParameters commissionableNodeParamsLarge =
+    CommissionAdvertisingParameters()
+        .SetCommissionAdvertiseMode(CommssionAdvertiseMode::kCommissionableNode)
+        .SetMac(ByteSpan(kMac, sizeof(kMac)))
+        .SetLongDiscriminator(22)
+        .SetShortDiscriminator(2)
+        .SetVendorId(chip::Optional<uint16_t>(555))
+        .SetDeviceType(chip::Optional<uint16_t>(25))
+        .SetCommissioningMode(true, true)
+        .SetDeviceName(chip::Optional<const char *>("testy-test"))
+        .SetPairingHint(chip::Optional<uint16_t>(3))
+        .SetPairingInstr(chip::Optional<const char *>("Pair me"))
+        .SetProductId(chip::Optional<uint16_t>(897))
+        .SetRotatingId(chip::Optional<const char *>("id_that_spins"));
+QNamePart txtCommissionableNodeParamsLargeParts[]  = { "D=22",          "VP=555+897",       "AP=1",       "CM=1", "DT=25",
+                                                      "DN=testy-test", "RI=id_that_spins", "PI=Pair me", "PH=3" };
+FullQName txtCommissionableNodeParamsLargeName     = FullQName(txtCommissionableNodeParamsLargeParts);
+TxtResourceRecord txtCommissionableNodeParamsLarge = TxtResourceRecord(instanceName, txtCommissionableNodeParamsLargeName);
+
+// Our server doesn't do anything with this, blank is fine.
 Inet::IPPacketInfo packetInfo;
 
 CHIP_ERROR SendQuery(FullQName qname)
@@ -95,14 +186,11 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
 
     // Start a single operational advertiser
     ChipLogProgress(Discovery, "Testing single operational advertiser");
-    OperationalAdvertisingParameters params =
-        OperationalAdvertisingParameters().SetPeerId(kPeerId1).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(params) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams1) == CHIP_NO_ERROR);
 
     // Test for PTR response to _services request.
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
-    PtrResourceRecord ptr_service = PtrResourceRecord(kDnsSdQueryName, kMatterOperationalQueryName);
-    server.AddExpectedRecord(&ptr_service);
+    server.AddExpectedRecord(&ptrOperationalService);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
 
     // These check that the requested records added are sent out correctly.
@@ -113,14 +201,11 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     // We won't get any A/AAAA because this is a test and we don't have addresses.
     ChipLogProgress(Discovery, "Testing response to _matter._tcp.local");
     server.Reset();
-    PtrResourceRecord ptr_matter1 = PtrResourceRecord(kMatterOperationalQueryName, kInstanceName1);
-    SrvResourceRecord srv1        = SrvResourceRecord(kInstanceName1, kHostnameName, CHIP_PORT);
     // For now, we don't check TXT records content, just that they exist. Operational currently
     // sends a TXT record regardless of content being present or not.
-    TxtResourceRecord txt1 = TxtResourceRecord(kInstanceName1, kTxtRecordEmptyName);
-    server.AddExpectedRecord(&ptr_matter1);
-    server.AddExpectedRecord(&srv1);
-    server.AddExpectedRecord(&txt1);
+    server.AddExpectedRecord(&ptrOperational1);
+    server.AddExpectedRecord(&srvOperational1);
+    server.AddExpectedRecord(&txtOperational1);
 
     NL_TEST_ASSERT(inSuite, SendQuery(kMatterOperationalQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
@@ -129,19 +214,19 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     ChipLogProgress(Discovery, "Testing response to instance name");
     server.Reset();
     // Just the SRV and TXT should return
-    server.AddExpectedRecord(&srv1);
-    server.AddExpectedRecord(&txt1);
+    server.AddExpectedRecord(&srvOperational1);
+    server.AddExpectedRecord(&txtOperational1);
     NL_TEST_ASSERT(inSuite, SendQuery(kInstanceName1) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
 
     // If we try to re-advertise with the same operational parameters, we should not get duplicates
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(params) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams1) == CHIP_NO_ERROR);
     ChipLogProgress(Discovery, "Testing single operational advertiser with Advertise called twice");
     // We should get a single PTR back for _services
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
     server.Reset();
-    server.AddExpectedRecord(&ptr_service);
+    server.AddExpectedRecord(&ptrOperationalService);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -149,9 +234,9 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     // Same records should come back for _matter._tcp.local queries.
     ChipLogProgress(Discovery, "Testing response to _matter._tcp.local");
     server.Reset();
-    server.AddExpectedRecord(&ptr_matter1);
-    server.AddExpectedRecord(&srv1);
-    server.AddExpectedRecord(&txt1);
+    server.AddExpectedRecord(&ptrOperational1);
+    server.AddExpectedRecord(&srvOperational1);
+    server.AddExpectedRecord(&txtOperational1);
     NL_TEST_ASSERT(inSuite, SendQuery(kMatterOperationalQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -160,14 +245,12 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     ChipLogProgress(Discovery, "Adding a second operational Advertiser");
     server.Reset();
     // Mac is the same, peer id is different
-    OperationalAdvertisingParameters params2 =
-        OperationalAdvertisingParameters().SetPeerId(kPeerId2).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(params2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams2) == CHIP_NO_ERROR);
 
     // For now, we'll get back two copies of the PTR. Not sure if that's totally correct, but for now, that's expected.
     ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
-    server.AddExpectedRecord(&ptr_service);
-    server.AddExpectedRecord(&ptr_service);
+    server.AddExpectedRecord(&ptrOperationalService);
+    server.AddExpectedRecord(&ptrOperationalService);
     NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -175,15 +258,12 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     // Requests for _matter._tcp.local will respond with all records from both parameter sets
     ChipLogProgress(Discovery, "Testing response to _matter._tcp.local");
     server.Reset();
-    PtrResourceRecord ptr_matter2 = PtrResourceRecord(kMatterOperationalQueryName, kInstanceName2);
-    SrvResourceRecord srv2        = SrvResourceRecord(kInstanceName2, kHostnameName, CHIP_PORT);
-    TxtResourceRecord txt2        = TxtResourceRecord(kInstanceName2, kTxtRecordEmptyName);
-    server.AddExpectedRecord(&ptr_matter1);
-    server.AddExpectedRecord(&srv1);
-    server.AddExpectedRecord(&txt1);
-    server.AddExpectedRecord(&ptr_matter2);
-    server.AddExpectedRecord(&srv2);
-    server.AddExpectedRecord(&txt2);
+    server.AddExpectedRecord(&ptrOperational1);
+    server.AddExpectedRecord(&srvOperational1);
+    server.AddExpectedRecord(&txtOperational1);
+    server.AddExpectedRecord(&ptrOperational2);
+    server.AddExpectedRecord(&srvOperational2);
+    server.AddExpectedRecord(&txtOperational2);
     NL_TEST_ASSERT(inSuite, SendQuery(kMatterOperationalQueryName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -192,8 +272,8 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     ChipLogProgress(Discovery, "Testing response to instance name for fabric 1");
     server.Reset();
     // Just the SRV and TXT should return
-    server.AddExpectedRecord(&srv1);
-    server.AddExpectedRecord(&txt1);
+    server.AddExpectedRecord(&srvOperational1);
+    server.AddExpectedRecord(&txtOperational1);
     NL_TEST_ASSERT(inSuite, SendQuery(kInstanceName1) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
@@ -201,32 +281,192 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     ChipLogProgress(Discovery, "Testing response to instance name for fabric 2");
     server.Reset();
     // Just the SRV and TXT should return
-    server.AddExpectedRecord(&srv2);
-    server.AddExpectedRecord(&txt2);
+    server.AddExpectedRecord(&srvOperational2);
+    server.AddExpectedRecord(&txtOperational2);
     NL_TEST_ASSERT(inSuite, SendQuery(kInstanceName2) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
 
     // We should be able to add up to 5 operational networks total
-    OperationalAdvertisingParameters params3 =
-        OperationalAdvertisingParameters().SetPeerId(kPeerId3).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(params3) == CHIP_NO_ERROR);
-    OperationalAdvertisingParameters params4 =
-        OperationalAdvertisingParameters().SetPeerId(kPeerId4).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(params4) == CHIP_NO_ERROR);
-    OperationalAdvertisingParameters params5 =
-        OperationalAdvertisingParameters().SetPeerId(kPeerId5).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(params5) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams3) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams4) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams5) == CHIP_NO_ERROR);
 
     // Adding a 6th should return an error
-    OperationalAdvertisingParameters params6 =
-        OperationalAdvertisingParameters().SetPeerId(kPeerId6).SetMac(ByteSpan(kMac)).SetPort(CHIP_PORT).EnableIpV4(true);
-    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(params6) == CHIP_ERROR_NO_MEMORY);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams6) == CHIP_ERROR_NO_MEMORY);
+}
+
+void CommissionableAdverts(nlTestSuite * inSuite, void * inContext)
+{
+    auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
+    mdnsAdvertiser.StopPublishDevice();
+    auto & server = reinterpret_cast<CheckOnlyServer &>(GlobalMinimalMdnsServer::Server());
+    server.SetTestSuite(inSuite);
+    server.Reset();
+
+    // Start a single operational advertiser
+    ChipLogProgress(Discovery, "Testing commissionable advertiser");
+    // Start very basic - only the mandatory values (short and long discriminator and commissioning modes)
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsSmall) == CHIP_NO_ERROR);
+
+    // Test for PTR response to _services request.
+    ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local for small parameters");
+    server.AddExpectedRecord(&ptrCommissionableNodeService);
+    server.AddExpectedRecord(&ptrServiceSubLFullLen);
+    server.AddExpectedRecord(&ptrServiceSubSFullLen);
+    server.AddExpectedRecord(&ptrServiceSubC0);
+    NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
+    // These check that the requested records added are sent out correctly.
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    // Want PTR response to _matterc._udp. We will also get the SRV and TXT as additionals.
+    // We won't get any A/AAAA because this is a test and we don't have addresses.
+    // First fill in the instance name - FullQNames already have this space included.
+    NL_TEST_ASSERT(inSuite,
+                   mdnsAdvertiser.GetCommissionableInstanceName(instanceNamePrefix, sizeof(instanceNamePrefix)) == CHIP_NO_ERROR);
+
+    ChipLogProgress(Discovery, "Testing response to _matterc._udp.local for small parameters");
+    server.Reset();
+    server.AddExpectedRecord(&ptrCommissionableNode);
+    server.AddExpectedRecord(&srvCommissionableNode);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsSmall);
+    NL_TEST_ASSERT(inSuite, SendQuery(kMatterCommissionableNodeQueryName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    ChipLogProgress(Discovery, "Testing response to instance name for small parameters");
+    server.Reset();
+    // Just the SRV and TXT should return
+    server.AddExpectedRecord(&srvCommissionableNode);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsSmall);
+    NL_TEST_ASSERT(inSuite, SendQuery(instanceName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    // Add more parameters, check that the subtypes and TXT values get set correctly.
+    // Also check that we get proper values when the discriminators are small (no leading 0's)
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsLarge) == CHIP_NO_ERROR);
+    ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local for large parameters");
+    server.Reset();
+    server.AddExpectedRecord(&ptrCommissionableNodeService);
+    server.AddExpectedRecord(&ptrServiceSubLong);
+    server.AddExpectedRecord(&ptrServiceSubShort);
+    server.AddExpectedRecord(&ptrServiceSubC1);
+    server.AddExpectedRecord(&ptrServiceSubVendor);
+    server.AddExpectedRecord(&ptrServiceSubDeviceType);
+    server.AddExpectedRecord(&ptrServiceSubOpenWindow);
+    NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    ChipLogProgress(Discovery, "Testing response to _matterc._udp.local for large parameters");
+    server.Reset();
+    server.AddExpectedRecord(&ptrCommissionableNode);
+    server.AddExpectedRecord(&srvCommissionableNode);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLarge);
+    NL_TEST_ASSERT(inSuite, SendQuery(kMatterCommissionableNodeQueryName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    ChipLogProgress(Discovery, "Testing response to instance name for large parameters");
+    server.Reset();
+    // Just the SRV and TXT should return
+    server.AddExpectedRecord(&srvCommissionableNode);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLarge);
+    NL_TEST_ASSERT(inSuite, SendQuery(instanceName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+}
+
+void CommissionableAndOperationalAdverts(nlTestSuite * inSuite, void * inContext)
+{
+    auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
+    mdnsAdvertiser.StopPublishDevice();
+    auto & server = reinterpret_cast<CheckOnlyServer &>(GlobalMinimalMdnsServer::Server());
+    server.SetTestSuite(inSuite);
+    server.Reset();
+
+    // Add two operational and a commissionable and test that we get the correct values back.
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(operationalParams2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsAdvertiser.Advertise(commissionableNodeParamsLarge) == CHIP_NO_ERROR);
+
+    // Services listing should have two operational ptrs, the base commissionable node ptr and the various _sub ptrs
+    ChipLogProgress(Discovery, "Checking response to _services._dns-sd._udp.local");
+    server.Reset();
+    server.AddExpectedRecord(&ptrOperationalService);
+    server.AddExpectedRecord(&ptrOperationalService);
+    server.AddExpectedRecord(&ptrCommissionableNodeService);
+    server.AddExpectedRecord(&ptrServiceSubLong);
+    server.AddExpectedRecord(&ptrServiceSubShort);
+    server.AddExpectedRecord(&ptrServiceSubC1);
+    server.AddExpectedRecord(&ptrServiceSubVendor);
+    server.AddExpectedRecord(&ptrServiceSubDeviceType);
+    server.AddExpectedRecord(&ptrServiceSubOpenWindow);
+    NL_TEST_ASSERT(inSuite, SendQuery(kDnsSdQueryName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    // Requests for _matter._tcp.local will respond with all records from both operational records, but no commissionable.
+    ChipLogProgress(Discovery, "Testing response to _matter._tcp.local");
+    server.Reset();
+    server.AddExpectedRecord(&ptrOperational1);
+    server.AddExpectedRecord(&srvOperational1);
+    server.AddExpectedRecord(&txtOperational1);
+    server.AddExpectedRecord(&ptrOperational2);
+    server.AddExpectedRecord(&srvOperational2);
+    server.AddExpectedRecord(&txtOperational2);
+    NL_TEST_ASSERT(inSuite, SendQuery(kMatterOperationalQueryName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    // Responses to _matterc query should return commissionable node, but no operational.
+    ChipLogProgress(Discovery, "Testing response to _matterc._udp.local");
+    server.Reset();
+    server.AddExpectedRecord(&ptrCommissionableNode);
+    server.AddExpectedRecord(&srvCommissionableNode);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLarge);
+    NL_TEST_ASSERT(inSuite, SendQuery(kMatterCommissionableNodeQueryName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    // Requests for each SRV record should give only records specific to that fabric.
+    ChipLogProgress(Discovery, "Testing response to operational instance name for fabric 1");
+    server.Reset();
+    // Just the SRV and TXT should return
+    server.AddExpectedRecord(&srvOperational1);
+    server.AddExpectedRecord(&txtOperational1);
+    NL_TEST_ASSERT(inSuite, SendQuery(kInstanceName1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    ChipLogProgress(Discovery, "Testing response to operational instance name for fabric 2");
+    server.Reset();
+    // Just the SRV and TXT should return
+    server.AddExpectedRecord(&srvOperational2);
+    server.AddExpectedRecord(&txtOperational2);
+    NL_TEST_ASSERT(inSuite, SendQuery(kInstanceName2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    ChipLogProgress(Discovery, "Testing response to commissionable instance name");
+    server.Reset();
+    // Just the SRV and TXT should return
+    server.AddExpectedRecord(&srvCommissionableNode);
+    server.AddExpectedRecord(&txtCommissionableNodeParamsLarge);
+    NL_TEST_ASSERT(inSuite, SendQuery(instanceName) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, server.GetSendCalled());
+    NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
+
+    // NL_TEST_ASSERT(inSuite, true == false);
 }
 
 const nlTest sTests[] = {
-    NL_TEST_DEF("OperationalAdverts", OperationalAdverts), //
-    NL_TEST_SENTINEL()                                     //
+    NL_TEST_DEF("OperationalAdverts", OperationalAdverts),                                   //
+    NL_TEST_DEF("CommissionableNodeAdverts", CommissionableAdverts),                         //
+    NL_TEST_DEF("CommissionableAndOperationalAdverts", CommissionableAndOperationalAdverts), //
+    NL_TEST_SENTINEL()                                                                       //
 };
 
 } // namespace
