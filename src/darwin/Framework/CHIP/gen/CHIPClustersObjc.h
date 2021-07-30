@@ -915,7 +915,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOperationalCredentials : CHIPCluster
 
-- (void)addOpCert:(NSData *)nOCArray
+- (void)addNOC:(NSData *)nOCArray
            iPKValue:(NSData *)iPKValue
       caseAdminNode:(uint64_t)caseAdminNode
       adminVendorId:(uint16_t)adminVendorId
@@ -1117,6 +1117,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestCluster : CHIPCluster
 
 - (void)test:(ResponseHandler)responseHandler;
+- (void)testAddArguments:(uint8_t)arg1 arg2:(uint8_t)arg2 responseHandler:(ResponseHandler)responseHandler;
 - (void)testNotHandled:(ResponseHandler)responseHandler;
 - (void)testSpecific:(ResponseHandler)responseHandler;
 - (void)testUnknownCommand:(ResponseHandler)responseHandler;

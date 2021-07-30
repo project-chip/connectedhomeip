@@ -71,23 +71,19 @@ SecureSessionMgr::~SecureSessionMgr()
     CancelExpiryTimer();
 }
 
-CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                                  Transport::FabricTable * fabrics,
+CHIP_ERROR SecureSessionMgr::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr, Transport::FabricTable * fabrics,
                                   Transport::MessageCounterManagerInterface * messageCounterManager)
 {
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mState                 = State::kInitialized;
-    mLocalNodeId           = localNodeId;
     mSystemLayer           = systemLayer;
     mTransportMgr          = transportMgr;
     mFabrics               = fabrics;
     mMessageCounterManager = messageCounterManager;
 
     mGlobalEncryptedMessageCounter.Init();
-
-    ChipLogProgress(Inet, "local node id is 0x" ChipLogFormatX64, ChipLogValueX64(mLocalNodeId));
 
     ScheduleExpiryTimer();
 
@@ -103,7 +99,6 @@ void SecureSessionMgr::Shutdown()
     mMessageCounterManager = nullptr;
 
     mState        = State::kNotReady;
-    mLocalNodeId  = kUndefinedNodeId;
     mSystemLayer  = nullptr;
     mTransportMgr = nullptr;
     mFabrics      = nullptr;

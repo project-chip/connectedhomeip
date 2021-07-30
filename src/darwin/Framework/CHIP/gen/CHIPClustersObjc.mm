@@ -2319,6 +2319,40 @@ private:
     dispatch_queue_t mQueue;
 };
 
+class CHIPOperationalCredentialsClusterNOCResponseCallbackBridge
+    : public Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> {
+public:
+    CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<OperationalCredentialsClusterNOCResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPOperationalCredentialsClusterNOCResponseCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint8_t StatusCode, uint8_t FabricIndex, chip::ByteSpan DebugText)
+    {
+        CHIPOperationalCredentialsClusterNOCResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPOperationalCredentialsClusterNOCResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"StatusCode" : [NSNumber numberWithUnsignedChar:StatusCode],
+                    @"FabricIndex" : [NSNumber numberWithUnsignedChar:FabricIndex],
+                    @"DebugText" : [NSData dataWithBytes:DebugText.data() length:DebugText.size()],
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
 class CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge
     : public Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> {
 public:
@@ -2345,40 +2379,6 @@ public:
                     @"VendorReserved2" : [NSData dataWithBytes:VendorReserved2.data() length:VendorReserved2.size()],
                     @"VendorReserved3" : [NSData dataWithBytes:VendorReserved3.data() length:VendorReserved3.size()],
                     @"Signature" : [NSData dataWithBytes:Signature.data() length:Signature.size()],
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPOperationalCredentialsClusterOpCertResponseCallbackBridge
-    : public Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> {
-public:
-    CHIPOperationalCredentialsClusterOpCertResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPOperationalCredentialsClusterOpCertResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText)
-    {
-        CHIPOperationalCredentialsClusterOpCertResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPOperationalCredentialsClusterOpCertResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"StatusCode" : [NSNumber numberWithUnsignedChar:StatusCode],
-                    @"FabricIndex" : [NSNumber numberWithUnsignedLongLong:FabricIndex],
-                    @"DebugText" : [NSString stringWithFormat:@"%s", DebugText],
                 });
                 callback->Cancel();
                 delete callback;
@@ -2679,6 +2679,38 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"data" : [NSString stringWithFormat:@"%s", data],
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge
+    : public Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback> {
+public:
+    CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<TestClusterClusterTestAddArgumentsResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint8_t returnValue)
+    {
+        CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"returnValue" : [NSNumber numberWithUnsignedChar:returnValue],
                 });
                 callback->Cancel();
                 delete callback;
@@ -13477,14 +13509,14 @@ private:
     return &_cppCluster;
 }
 
-- (void)addOpCert:(NSData *)nOCArray
+- (void)addNOC:(NSData *)nOCArray
            iPKValue:(NSData *)iPKValue
       caseAdminNode:(uint64_t)caseAdminNode
       adminVendorId:(uint16_t)adminVendorId
     responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPOperationalCredentialsClusterOpCertResponseCallbackBridge * onSuccess
-        = new CHIPOperationalCredentialsClusterOpCertResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPOperationalCredentialsClusterNOCResponseCallbackBridge * onSuccess
+        = new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -13499,7 +13531,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.AddOpCert(onSuccess->Cancel(), onFailure->Cancel(),
+        err = self.cppCluster.AddNOC(onSuccess->Cancel(), onFailure->Cancel(),
             chip::ByteSpan((const uint8_t *) nOCArray.bytes, nOCArray.length),
             chip::ByteSpan((const uint8_t *) iPKValue.bytes, iPKValue.length), caseAdminNode, adminVendorId);
     });
@@ -13651,8 +13683,8 @@ private:
             vendorId:(uint16_t)vendorId
      responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPOperationalCredentialsClusterOpCertResponseCallbackBridge * onSuccess
-        = new CHIPOperationalCredentialsClusterOpCertResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPOperationalCredentialsClusterNOCResponseCallbackBridge * onSuccess
+        = new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -13732,8 +13764,8 @@ private:
 }
 - (void)updateFabricLabel:(NSString *)label responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPOperationalCredentialsClusterOpCertResponseCallbackBridge * onSuccess
-        = new CHIPOperationalCredentialsClusterOpCertResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPOperationalCredentialsClusterNOCResponseCallbackBridge * onSuccess
+        = new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -15586,6 +15618,33 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.Test(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)testAddArguments:(uint8_t)arg1 arg2:(uint8_t)arg2 responseHandler:(ResponseHandler)responseHandler
+{
+    CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge * onSuccess
+        = new CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.TestAddArguments(onSuccess->Cancel(), onFailure->Cancel(), arg1, arg2);
     });
 
     if (err != CHIP_NO_ERROR) {

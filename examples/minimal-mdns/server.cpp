@@ -247,7 +247,8 @@ int main(int argc, char ** args)
         queryResponder.AddResponder(&ipv4Responder);
     }
 
-    mdns::Minimal::ResponseSender responseSender(&mdnsServer, &queryResponder);
+    mdns::Minimal::ResponseSender responseSender(&mdnsServer);
+    responseSender.AddQueryResponder(&queryResponder);
 
     ReplyDelegate delegate(&responseSender);
     mdnsServer.SetDelegate(&delegate);

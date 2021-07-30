@@ -30,9 +30,9 @@ if [ -z "$app" ]; then
     exit 1
 fi
 
+source "$IDF_PATH/export.sh"
 source "scripts/activate.sh"
 # shellcheck source=/dev/null
-source "$IDF_PATH/export.sh"
 
 if [ "$sdkconfig_name" == "sdkconfig_c3devkit.defaults" ]; then
     idf_target="esp32c3"

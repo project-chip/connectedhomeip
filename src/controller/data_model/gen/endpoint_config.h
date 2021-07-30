@@ -414,7 +414,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (233)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (235)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -537,8 +537,8 @@
             { 0x003E, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* CertChainResponse */                                           \
             { 0x003E, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* OpCSRRequest */                                                \
             { 0x003E, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* OpCSRResponse */                                               \
-            { 0x003E, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddOpCert */                                                   \
-            { 0x003E, 0x08, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* OpCertResponse */                                              \
+            { 0x003E, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddNOC */                                                      \
+            { 0x003E, 0x08, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* NOCResponse */                                                 \
             { 0x003E, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* UpdateFabricLabel */                                           \
             { 0x003E, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveFabric */                                                \
             { 0x003E, 0x0B, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveAllFabrics */                                            \
@@ -723,8 +723,10 @@
             { 0x050F, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Test */                                                        \
             { 0x050F, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* TestSpecificResponse */                                        \
             { 0x050F, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestNotHandled */                                              \
+            { 0x050F, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* TestAddArgumentsResponse */                                    \
             { 0x050F, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestSpecific */                                                \
             { 0x050F, 0x03, ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* TestUnknownCommand */                                          \
+            { 0x050F, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestAddArguments */                                            \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Binding (client) */                                                                           \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Bind */                                                        \

@@ -34,6 +34,30 @@ tests:
               - name: "returnValue"
                 value: 7
 
+    - label: "Send Test Add Arguments Command"
+      command: "testAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 3
+              - name: "arg2"
+                value: 17
+      response:
+          values:
+              - name: "returnValue"
+                value: 20
+
+    - label: "Send failing Test Add Arguments Command"
+      command: "testAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 250
+              - name: "arg2"
+                value: 6
+      response:
+          error: 1
+
     # Tests for Boolean attribute
 
     - label: "Read attribute BOOLEAN Default Value"

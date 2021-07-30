@@ -683,9 +683,9 @@ private:
                                                        ByteSpan VendorReserved2, ByteSpan VendorReserved3, ByteSpan Signature);
 
     /* Callback when adding operational certs to device results in failure */
-    static void OnAddOpCertFailureResponse(void * context, uint8_t status);
+    static void OnAddNOCFailureResponse(void * context, uint8_t status);
     /* Callback when the device confirms that it has added the operational certificates */
-    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText);
+    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex, ByteSpan DebugText);
 
     /* Callback when the device confirms that it has added the root certificate */
     static void OnRootCertSuccessResponse(void * context);
@@ -725,11 +725,12 @@ private:
     Callback::Callback<BasicFailureCallback> mFailure;
 
     CommissioningStage GetNextCommissioningStage();
+    static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
     Callback::Callback<OperationalCredentialsClusterCertChainResponseCallback> mCertChainResponseCallback;
     Callback::Callback<OperationalCredentialsClusterAttestationResponseCallback> mAttestationResponseCallback;
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
-    Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> mOpCertResponseCallback;
+    Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;
     Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
     Callback::Callback<DefaultFailureCallback> mOnCertChainFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnAttestationFailureCallback;

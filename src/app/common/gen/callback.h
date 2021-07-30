@@ -15831,16 +15831,16 @@ bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::EndpointId 
                                                                chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
                                                                chip::ByteSpan VendorReserved3, chip::ByteSpan Signature);
 /**
- * @brief  Cluster AddOpCert Command callback (from client)
+ * @brief  Cluster AddNOC Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                           chip::ByteSpan NOCArray, chip::ByteSpan IPKValue,
-                                                           chip::NodeId CaseAdminNode, uint16_t AdminVendorId);
+bool emberAfOperationalCredentialsClusterAddNOCCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                        chip::ByteSpan NOCArray, chip::ByteSpan IPKValue,
+                                                        chip::NodeId CaseAdminNode, uint16_t AdminVendorId);
 /**
- * @brief  Cluster OpCertResponse Command callback (from server)
+ * @brief  Cluster NOCResponse Command callback (from server)
  */
-bool emberAfOperationalCredentialsClusterOpCertResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText);
+bool emberAfOperationalCredentialsClusterNOCResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                             uint8_t StatusCode, uint8_t FabricIndex, chip::ByteSpan DebugText);
 /**
  * @brief  Cluster UpdateFabricLabel Command callback (from client)
  */
@@ -16718,6 +16718,11 @@ bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::EndpointId endp
  */
 bool emberAfTestClusterClusterTestNotHandledCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj);
 /**
+ * @brief  Cluster TestAddArgumentsResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                               uint8_t returnValue);
+/**
  * @brief  Cluster TestSpecific Command callback (from client)
  */
 bool emberAfTestClusterClusterTestSpecificCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj);
@@ -16725,6 +16730,11 @@ bool emberAfTestClusterClusterTestSpecificCallback(chip::EndpointId endpoint, ch
  * @brief  Cluster TestUnknownCommand Command callback (from client)
  */
 bool emberAfTestClusterClusterTestUnknownCommandCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj);
+/**
+ * @brief  Cluster TestAddArguments Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestAddArgumentsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                       uint8_t arg1, uint8_t arg2);
 /**
  * @brief  Cluster DisplayMessage Command callback (from server)
  */
