@@ -58,10 +58,17 @@ public:
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
 
     // OperationalCredentialsDelegate implementation
-    CHIP_ERROR GenerateNOCChain(const chip::Optional<chip::NodeId> & nodeId, chip::FabricId fabricId,
-                                const chip::ByteSpan & csrElements, const chip::ByteSpan & attestationSignature,
+    CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & attestationSignature,
                                 const chip::ByteSpan & DAC, const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
                                 chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
+
+    void SetNodeIdForNextNOCRequest(NodeId nodeId) override
+    {
+        mNextRequestedNodeId = nodeId;
+        mNodeIdRequested     = true;
+    }
+
+    void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mNextFabricId = fabricId; }
 
     // DeviceStatusDelegate implementation
     void OnMessage(chip::System::PacketBufferHandle && msg) override;
@@ -98,6 +105,10 @@ private:
     jobject mJavaObjectRef = nullptr;
 
     chip::NodeId mNextAvailableNodeId = 1;
+
+    NodeId mNextRequestedNodeId = 1;
+    FabricId mNextFabricId      = 0;
+    bool mNodeIdRequested       = false;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, pthread_mutex_t * stackLock) :
         mController(std::move(controller)), mStackLock(stackLock)

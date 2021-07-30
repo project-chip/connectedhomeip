@@ -89,24 +89,24 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const Optional<NodeId> & nodeId, FabricId fabricId,
-                                                                 const ByteSpan & csrElements,
+CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements,
                                                                  const ByteSpan & attestationSignature, const ByteSpan & DAC,
                                                                  const ByteSpan & PAI, const ByteSpan & PAA,
                                                                  Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     NodeId assignedId;
-    if (nodeId.HasValue())
+    if (mNodeIdRequested)
     {
-        assignedId = nodeId.Value();
+        assignedId       = mNextRequestedNodeId;
+        mNodeIdRequested = false;
     }
     else
     {
         assignedId = mNextAvailableNodeId++;
     }
 
-    X509CertRequestParams noc_request = { 1, mIntermediateIssuerId, mNow, mNow + mValidity, true, fabricId, true, assignedId };
+    X509CertRequestParams noc_request = { 1, mIntermediateIssuerId, mNow, mNow + mValidity, true, mNextFabricId, true, assignedId };
 
     ChipLogProgress(Controller, "Verifying Certificate Signing Request");
     TLVReader reader;
@@ -138,7 +138,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const Optional<
     ReturnErrorOnFailure(NewNodeOperationalX509Cert(noc_request, CertificateIssuerLevel::kIssuerIsIntermediateCA, pubkey,
                                                     mIntermediateIssuer, noc.Get(), kMaxCHIPDERCertLength, nocLen));
 
-    X509CertRequestParams icac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+    X509CertRequestParams icac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, mNextFabricId, false, 0 };
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
     ReturnErrorCodeIf(!icac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
@@ -153,19 +153,19 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const Optional<
     uint16_t rootCertBufLen = kMaxCHIPDERCertLength;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+    PERSISTENT_KEY_OP(mNextFabricId, kOperationalCredentialsRootCertificateStorage, key,
                       err = mStorage->SyncGetKeyValue(key, rcac.Get(), rootCertBufLen));
     if (err != CHIP_NO_ERROR)
     {
         // Storage doesn't have an existing root certificate. Let's create one and add it to the storage.
-        X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+        X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, mNextFabricId, false, 0 };
         uint32_t outCertLen           = 0;
         ChipLogProgress(Controller, "Generating RCAC");
         ReturnErrorOnFailure(NewRootX509Cert(request, mIssuer, rcac.Get(), kMaxCHIPDERCertLength, outCertLen));
 
         VerifyOrReturnError(CanCastTo<uint16_t>(outCertLen), CHIP_ERROR_INVALID_ARGUMENT);
         rootCertBufLen = static_cast<uint16_t>(outCertLen);
-        PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+        PERSISTENT_KEY_OP(mNextFabricId, kOperationalCredentialsRootCertificateStorage, key,
                           err = mStorage->SyncSetKeyValue(key, rcac.Get(), rootCertBufLen));
         ReturnErrorOnFailure(err);
     }

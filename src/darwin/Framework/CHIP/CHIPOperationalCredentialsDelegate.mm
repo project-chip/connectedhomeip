@@ -242,9 +242,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Optional<chip::NodeId> & nodeId,
-    chip::FabricId fabricId, const chip::ByteSpan & csrElements, const chip::ByteSpan & attestationSignature,
-    const chip::ByteSpan & DAC, const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::ByteSpan & csrElements,
+    const chip::ByteSpan & attestationSignature, const chip::ByteSpan & DAC, const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
     chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
 {
     uint32_t validityStart, validityEnd;
@@ -260,8 +259,9 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Opti
     }
 
     chip::NodeId assignedId;
-    if (nodeId.HasValue()) {
-        assignedId = nodeId.Value();
+    if (mNodeIdRequested) {
+        assignedId = mNextRequestedNodeId;
+        mNodeIdRequested = false;
     } else {
         if (mDeviceBeingPaired == chip::kUndefinedNodeId) {
             return CHIP_ERROR_INCORRECT_STATE;
@@ -270,7 +270,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Opti
     }
 
     chip::Credentials::X509CertRequestParams noc_request
-        = { 1, mIssuerId, validityStart, validityEnd, true, fabricId, true, assignedId };
+        = { 1, mIssuerId, validityStart, validityEnd, true, mNextFabricId, true, assignedId };
 
     TLVReader reader;
     reader.Init(csrElements.data(), static_cast<uint32_t>(csrElements.size()));
@@ -306,11 +306,11 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Opti
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     PERSISTENT_KEY_OP(
-        fabricId, kOperationalCredentialsRootCertificateStorage, key, err = mStorage->SyncGetKeyValue(key, rcac, rcacLen));
+        mNextFabricId, kOperationalCredentialsRootCertificateStorage, key, err = mStorage->SyncGetKeyValue(key, rcac, rcacLen));
 
     if (err != CHIP_NO_ERROR) {
         chip::Credentials::X509CertRequestParams rcac_request
-            = { 0, mIssuerId, validityStart, validityEnd, true, fabricId, false, 0 };
+            = { 0, mIssuerId, validityStart, validityEnd, true, mNextFabricId, false, 0 };
         uint32_t outCertLen = 0;
         ReturnErrorOnFailure(chip::Credentials::NewRootX509Cert(
             rcac_request, mIssuerKey, rcac, chip::Controller::kMaxCHIPDERCertLength, outCertLen));
@@ -318,7 +318,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Opti
         VerifyOrReturnError(CanCastTo<uint16_t>(outCertLen), CHIP_ERROR_INVALID_ARGUMENT);
         rcacLen = static_cast<uint16_t>(outCertLen);
         PERSISTENT_KEY_OP(
-            fabricId, kOperationalCredentialsRootCertificateStorage, key, err = mStorage->SyncSetKeyValue(key, rcac, rcacLen));
+            mNextFabricId, kOperationalCredentialsRootCertificateStorage, key, err = mStorage->SyncSetKeyValue(key, rcac, rcacLen));
         ReturnErrorOnFailure(err);
     }
 

@@ -50,9 +50,6 @@ public:
      *
      *   The delegate will call `onCompletion` when the NOC certificate chain is ready.
      *
-     * @param[in] nodeId               Optional node ID. If provided, the generated NOC must use the provided ID.
-     *                                 If ID is not provided, the delegate must generate one.
-     * @param[in] fabricId             Fabric ID for which the certificate is being requested.
      * @param[in] csrElements          CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
      * @param[in] attestationSignature Attestation signature as per specifications section 11.22.7.6. CSRResponse Command.
      * @param[in] DAC                  Device attestation certificate received from the device being commissioned
@@ -62,9 +59,23 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR GenerateNOCChain(const Optional<NodeId> & nodeId, FabricId fabricId, const ByteSpan & csrElements,
-                                        const ByteSpan & attestationSignature, const ByteSpan & DAC, const ByteSpan & PAI,
-                                        const ByteSpan & PAA, Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
+    virtual CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
+                                        const ByteSpan & PAI, const ByteSpan & PAA,
+                                        Callback::Callback<OnNOCChainGeneration> * onCompletion) = 0;
+
+    /**
+     *   This function sets the node ID for which the next NOC Chain would be requested. The node ID is
+     *   provided as a hint, and the delegate implementation may chose to ignore it and pick node ID of
+     *   their choice.
+     */
+    virtual void SetNodeIdForNextNOCRequest(NodeId nodeId) {}
+
+    /**
+     *   This function sets the fabric ID for which the next NOC Chain should be generated. This API is
+     *   not required to be implemented if the delegate implementation has other mechanisms to find the
+     *   fabric ID.
+     */
+    virtual void SetFabricIdForNextNOCRequest(FabricId fabricId) {}
 };
 
 } // namespace Controller

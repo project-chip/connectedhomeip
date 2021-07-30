@@ -281,8 +281,31 @@ CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::FabricInfo * fabric
 
         ChipLogProgress(Controller, "Getting certificate chain for the controller from the issuer");
 
+        // As per specifications section 11.22.5.1. Constant RESP_MAX
+        constexpr uint16_t kMaxRspLen = 900;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> csrElements;
+        ReturnErrorCodeIf(!csrElements.Alloc(kMaxRspLen), CHIP_ERROR_NO_MEMORY);
+
+        TLV::TLVWriter csrElementWriter;
+        TLV::TLVType containerType;
+        csrElementWriter.Init(csrElements.Get(), kMaxRspLen);
+        ReturnErrorOnFailure(csrElementWriter.StartContainer(TLV::AnonymousTag, TLV::TLVType::kTLVType_Structure, containerType));
+        ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(1), ByteSpan(CSR.Get(), csrLength)));
+
+        // TODO - Need a mechanism to generate CSRNonce for commissioner's CSR
+        ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(2), ByteSpan()));
+        ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(3), ByteSpan()));
+        ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(4), ByteSpan()));
+        ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(5), ByteSpan()));
+        ReturnErrorOnFailure(csrElementWriter.EndContainer(containerType));
+        ReturnErrorOnFailure(csrElementWriter.Finalize());
+
+        mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(mLocalDeviceId);
+        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(0);
+
+        // TODO - Need a mechanism to generate signature for commissioner's CSR
         ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNOCChain(
-            Optional<NodeId>(mLocalDeviceId), 0, ByteSpan(CSR.Get(), csrLength), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
+            ByteSpan(csrElements.Get(), csrElementWriter.GetLengthWritten()), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
             &mLocalNOCChainCallback));
 
         ReturnErrorOnFailure(mFabrics.Store(fabric->GetFabricIndex()));
@@ -1296,9 +1319,11 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & NOCSRElements, cons
 
     ChipLogProgress(Controller, "Getting certificate chain for the device from the issuer");
 
-    return mOperationalCredentialsDelegate->GenerateNOCChain(Optional<NodeId>(device->GetDeviceId()), 0, NOCSRElements,
-                                                             AttestationSignature, ByteSpan(), ByteSpan(), ByteSpan(),
-                                                             &mDeviceNOCChainCallback);
+    mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(device->GetDeviceId());
+    mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(0);
+
+    return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, AttestationSignature, ByteSpan(), ByteSpan(),
+                                                             ByteSpan(), &mDeviceNOCChainCallback);
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf)

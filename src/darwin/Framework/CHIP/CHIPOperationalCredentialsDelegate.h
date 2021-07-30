@@ -33,10 +33,17 @@ public:
 
     CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage);
 
-    CHIP_ERROR GenerateNOCChain(const chip::Optional<chip::NodeId> & nodeId, chip::FabricId fabricId,
-        const chip::ByteSpan & csrElements, const chip::ByteSpan & attestationSignature, const chip::ByteSpan & DAC,
-        const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
+    CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & attestationSignature,
+        const chip::ByteSpan & DAC, const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
         chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
+
+    void SetNodeIdForNextNOCRequest(chip::NodeId nodeId) override
+    {
+        mNextRequestedNodeId = nodeId;
+        mNodeIdRequested = true;
+    }
+
+    void SetFabricIdForNextNOCRequest(chip::FabricId fabricId) override { mNextFabricId = fabricId; }
 
     void SetDeviceID(chip::NodeId deviceId) { mDeviceBeingPaired = deviceId; }
     void ResetDeviceID() { mDeviceBeingPaired = chip::kUndefinedNodeId; }
@@ -69,6 +76,10 @@ private:
     CHIPPersistentStorageDelegateBridge * mStorage;
 
     chip::NodeId mDeviceBeingPaired = chip::kUndefinedNodeId;
+
+    chip::NodeId mNextRequestedNodeId = 1;
+    chip::FabricId mNextFabricId = 0;
+    bool mNodeIdRequested = false;
 };
 
 NS_ASSUME_NONNULL_END

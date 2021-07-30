@@ -63,8 +63,7 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 
 // TODO Refactor this API to match latest spec, so that GenerateNodeOperationalCertificate receives the full CSR Elements data
 // payload.
-CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const Optional<NodeId> & nodeId, FabricId fabricId,
-                                                            const ByteSpan & csrElements, const ByteSpan & attestationSignature,
+CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature,
                                                             const ByteSpan & DAC, const ByteSpan & PAI, const ByteSpan & PAA,
                                                             Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
@@ -82,16 +81,19 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const Optional<NodeI
     Initialize();
 
     chip::NodeId assignedId;
-    if (nodeId.HasValue())
+    if (mNodeIdRequested)
     {
-        assignedId = nodeId.Value();
+        assignedId       = mNextRequestedNodeId;
+        mNodeIdRequested = false;
     }
     else
     {
         assignedId = mNextAvailableNodeId++;
     }
 
-    chip::Credentials::X509CertRequestParams request = { 1, mIssuerId, mNow, mNow + mValidity, true, fabricId, true, assignedId };
+    chip::Credentials::X509CertRequestParams request = {
+        1, mIssuerId, mNow, mNow + mValidity, true, mNextFabricId, true, assignedId
+    };
 
     TLVReader reader;
     reader.Init(csrElements.data(), static_cast<uint32_t>(csrElements.size()));
@@ -128,18 +130,18 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const Optional<NodeI
     uint16_t rootCertBufLen = kMaxCHIPDERCertLength;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+    PERSISTENT_KEY_OP(mNextFabricId, kOperationalCredentialsRootCertificateStorage, key,
                       err = SyncGetKeyValue(key, rcac.Get(), rootCertBufLen));
     if (err != CHIP_NO_ERROR)
     {
         // Storage doesn't have an existing root certificate. Let's create one and add it to the storage.
-        chip::Credentials::X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+        chip::Credentials::X509CertRequestParams request = { 0, mIssuerId, mNow, mNow + mValidity, true, mNextFabricId, false, 0 };
         uint32_t outCertLen                              = 0;
         ReturnErrorOnFailure(NewRootX509Cert(request, mIssuer, rcac.Get(), kMaxCHIPDERCertLength, outCertLen));
 
         VerifyOrReturnError(CanCastTo<uint16_t>(outCertLen), CHIP_ERROR_INVALID_ARGUMENT);
         rootCertBufLen = static_cast<uint16_t>(outCertLen);
-        PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+        PERSISTENT_KEY_OP(mNextFabricId, kOperationalCredentialsRootCertificateStorage, key,
                           err = SyncSetKeyValue(key, rcac.Get(), rootCertBufLen));
         ReturnErrorOnFailure(err);
     }

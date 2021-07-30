@@ -43,9 +43,17 @@ class DLL_EXPORT ExampleOperationalCredentialsIssuer : public OperationalCredent
 public:
     virtual ~ExampleOperationalCredentialsIssuer() {}
 
-    CHIP_ERROR GenerateNOCChain(const Optional<NodeId> & nodeId, FabricId fabricId, const ByteSpan & csrElements,
-                                const ByteSpan & attestationSignature, const ByteSpan & DAC, const ByteSpan & PAI,
-                                const ByteSpan & PAA, Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
+    CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
+                                const ByteSpan & PAI, const ByteSpan & PAA,
+                                Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
+
+    void SetNodeIdForNextNOCRequest(NodeId nodeId) override
+    {
+        mNextRequestedNodeId = nodeId;
+        mNodeIdRequested     = true;
+    }
+
+    void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mNextFabricId = fabricId; }
 
     /**
      * @brief Initialize the issuer with the keypair in the storage.
@@ -88,6 +96,10 @@ private:
 
     NodeId mNextAvailableNodeId          = 1;
     PersistentStorageDelegate * mStorage = nullptr;
+
+    NodeId mNextRequestedNodeId = 1;
+    FabricId mNextFabricId      = 0;
+    bool mNodeIdRequested       = false;
 };
 
 } // namespace Controller
