@@ -16,12 +16,27 @@
  */
 
 #include <app/CommandHandler.h>
+#include <app/common/gen/attributes/Accessors.h>
 #include <app/util/af.h>
+
+using namespace chip::app::Clusters;
 
 bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
 {
-    // TODO: Implement the ResetWatermarks in the platform layer.
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    uint64_t currentHeapUsed;
+
+    EmberAfStatus status = SoftwareDiagnostics::Attributes::GetCurrentHeapUsed(endpoint, &currentHeapUsed);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to get the value of the CurrentHeapUsed attribute"));
+
+    status = SoftwareDiagnostics::Attributes::SetCurrentHeapHighWatermark(endpoint, currentHeapUsed);
+    VerifyOrExit(
+        status == EMBER_ZCL_STATUS_SUCCESS,
+        ChipLogError(
+            Zcl,
+            "Failed to reset the value of the CurrentHeapHighWaterMark attribute to the value of the CurrentHeapUsed attribute"));
+
+exit:
     emberAfSendImmediateDefaultResponse(status);
+
     return true;
 }

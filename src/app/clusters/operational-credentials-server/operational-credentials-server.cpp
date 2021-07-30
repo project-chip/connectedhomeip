@@ -26,6 +26,7 @@
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
+#include <app/common/gen/enums.h>
 #include <app/server/Mdns.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
@@ -322,6 +323,58 @@ void DoRemoveAllFabrics(intptr_t)
 {
     OpenDefaultPairingWindow(ResetFabrics::kYes);
 }
+
+CHIP_ERROR SendNOCResponse(chip::app::Command * commandObj, EmberAfNodeOperationalCertStatus status, uint8_t index,
+                           ByteSpan debug_text)
+{
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
+                                         ZCL_NOC_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+    TLV::TLVWriter * writer          = nullptr;
+
+    VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(commandObj->PrepareCommand(cmdParams));
+    writer = commandObj->GetCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(0), status));
+    if (status == EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS)
+    {
+        ReturnErrorOnFailure(writer->Put(TLV::ContextTag(1), index));
+    }
+    // TODO: Change DebugText to CHAR_STRING once strings are supported in command/response fields
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(2), debug_text));
+    return commandObj->FinishCommand();
+}
+
+EmberAfNodeOperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;
+    }
+    else if (err == CHIP_ERROR_INVALID_PUBLIC_KEY)
+    {
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_PUBLIC_KEY;
+    }
+    else if (err == CHIP_ERROR_INVALID_FABRIC_ID || err == CHIP_ERROR_WRONG_NODE_ID)
+    {
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NODE_OP_ID;
+    }
+    else if (err == CHIP_ERROR_CA_CERT_NOT_FOUND || err == CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED ||
+             err == CHIP_ERROR_CERT_PATH_TOO_LONG || err == CHIP_ERROR_CERT_USAGE_NOT_ALLOWED || err == CHIP_ERROR_CERT_EXPIRED ||
+             err == CHIP_ERROR_CERT_NOT_VALID_YET || err == CHIP_ERROR_UNSUPPORTED_CERT_FORMAT ||
+             err == CHIP_ERROR_UNSUPPORTED_ELLIPTIC_CURVE || err == CHIP_ERROR_CERT_LOAD_FAILED ||
+             err == CHIP_ERROR_CERT_NOT_TRUSTED || err == CHIP_ERROR_WRONG_CERT_SUBJECT)
+    {
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NOC;
+    }
+    else if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_TABLE_FULL;
+    }
+
+    return EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_NOC;
+}
+
 } // namespace
 
 // Up for discussion in Multi-Admin TT: chip-spec:#2891
@@ -333,19 +386,25 @@ bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::Endpoint
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                           chip::ByteSpan NOCArray, chip::ByteSpan IPKValue,
-                                                           chip::NodeId CaseAdminNode, uint16_t AdminVendorId)
+bool emberAfOperationalCredentialsClusterAddNOCCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                        chip::ByteSpan NOCArray, chip::ByteSpan IPKValue,
+                                                        chip::NodeId CaseAdminNode, uint16_t AdminVendorId)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfNodeOperationalCertStatus nocResponse = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS;
+
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    uint8_t fabricIndex = 0;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added an Op Cert");
 
     FabricInfo * fabric = retrieveCurrentFabric();
-    VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(fabric != nullptr, nocResponse = EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_MISSING_CSR);
 
-    VerifyOrExit(fabric->SetOperationalCertsFromCertArray(NOCArray) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(GetGlobalFabricTable().Store(fabric->GetFabricIndex()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    err = fabric->SetOperationalCertsFromCertArray(NOCArray);
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
+
+    err = GetGlobalFabricTable().Store(fabric->GetFabricIndex());
+    VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We have a new operational identity and should start advertising it.  We
     // can't just wait until we get network configuration commands, because we
@@ -353,11 +412,15 @@ bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::EndpointId endp
     // expected to be live with our new identity at this point.
     chip::app::Mdns::AdvertiseOperational();
 
+    fabricIndex = GetGlobalFabricTable().GetFabricIndex(fabric);
+
 exit:
-    emberAfSendImmediateDefaultResponse(status);
-    if (status == EMBER_ZCL_STATUS_FAILURE)
+
+    SendNOCResponse(commandObj, nocResponse, fabricIndex, ByteSpan());
+
+    if (nocResponse != EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddOpCert request.");
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddNOC request. Status %d", nocResponse);
     }
 
     return true;

@@ -3642,7 +3642,7 @@
               "outgoing": 1
             },
             {
-              "name": "AddOpCert",
+              "name": "AddNOC",
               "code": 6,
               "mfgCode": null,
               "source": "client",
@@ -3733,7 +3733,7 @@
               "outgoing": 0
             },
             {
-              "name": "OpCertResponse",
+              "name": "NOCResponse",
               "code": 8,
               "mfgCode": null,
               "source": "server",
@@ -8694,6 +8694,14 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 1
+            },
+            {
+              "name": "TestAddArguments",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -8725,6 +8733,14 @@
             {
               "name": "TestSpecificResponse",
               "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "TestAddArgumentsResponse",
+              "code": 1,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,

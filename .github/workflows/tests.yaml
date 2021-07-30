@@ -87,7 +87,6 @@ jobs:
             - name: Run Tests
               timeout-minutes: 10
               run: |
-                  ifconfig -a
                   scripts/tests/test_suites.sh
             - name: Run TV Tests
               timeout-minutes: 10

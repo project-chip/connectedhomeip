@@ -81,7 +81,7 @@ void InitializeChip(nlTestSuite * apSuite)
 
     gSystemLayer.Init();
 
-    err = gSessionManager.Init(kTestDeviceNodeId1, &gSystemLayer, &gTransportManager, &fabrics, &gMessageCounterManager);
+    err = gSessionManager.Init(&gSystemLayer, &gTransportManager, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = gExchangeManager.Init(&gSessionManager);
