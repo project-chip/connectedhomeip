@@ -105,9 +105,9 @@ public:
     AdvertiserMinMdns() : mResponseSender(&GlobalMinimalMdnsServer::Server())
     {
         GlobalMinimalMdnsServer::Instance().SetQueryDelegate(this);
-        for (size_t i = 0; i < kMaxOperationalNetworks; ++i)
+        for (auto & allocator : mQueryResponderAllocatorOperational)
         {
-            mResponseSender.AddQueryResponder(mQueryResponderAllocatorOperational[i].GetQueryResponder());
+            mResponseSender.AddQueryResponder(allocator.GetQueryResponder());
         }
         mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissionable.GetQueryResponder());
         mResponseSender.AddQueryResponder(mQueryResponderAllocatorCommissioner.GetQueryResponder());
@@ -216,9 +216,9 @@ CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t 
 /// Stops the advertiser.
 CHIP_ERROR AdvertiserMinMdns::StopPublishDevice()
 {
-    for (size_t i = 0; i < kMaxOperationalNetworks; ++i)
+    for (auto & allocator : mQueryResponderAllocatorOperational)
     {
-        mQueryResponderAllocatorOperational[i].Clear();
+        allocator.Clear();
     }
     mQueryResponderAllocatorCommissionable.Clear();
     mQueryResponderAllocatorCommissioner.Clear();
