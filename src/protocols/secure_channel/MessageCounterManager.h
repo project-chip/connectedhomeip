@@ -102,15 +102,10 @@ private:
     void ProcessPendingMessages(NodeId peerNodeId);
 
     CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, FixedByteSpan<kChallengeSize> challenge);
-
-    CHIP_ERROR HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                       System::PacketBufferHandle && msgBuf);
-
-    CHIP_ERROR HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                        System::PacketBufferHandle && msgBuf);
-
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                 const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
+    CHIP_ERROR HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, System::PacketBufferHandle && msgBuf);
+    CHIP_ERROR HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, System::PacketBufferHandle && msgBuf);
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override;
 
     void OnResponseTimeout(Messaging::ExchangeContext * exchangeContext) override;
 };

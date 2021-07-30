@@ -224,7 +224,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             }
 
             // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
+            ec->HandleMessage(packetHeader.GetMessageId(), payloadHeader, source, msgFlags, std::move(msgBuf));
             found = true;
             return false;
         }
@@ -290,7 +290,16 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%p", ec->GetExchangeId(), ec->GetDelegate());
 
-        ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
+        // Check is encryption required
+        if (ec->IsEncryptionRequired() != packetHeader.GetFlags().Has(Header::FlagValues::kEncryptedMessage))
+        {
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_INVALID_MESSAGE_TYPE));
+            ec->Close();
+            return;
+        }
+
+        // Matched ExchangeContext; send to message handler.
+        ec->HandleMessage(packetHeader.GetMessageId(), payloadHeader, source, msgFlags, std::move(msgBuf));
     }
 }
 

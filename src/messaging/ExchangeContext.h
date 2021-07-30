@@ -77,6 +77,8 @@ public:
      */
     bool IsInitiator() const;
 
+    bool IsEncryptionRequired() const { return mDispatch->IsEncryptionRequired(); }
+
     /**
      *  Send a CHIP message on this exchange.
      *
@@ -126,14 +128,10 @@ public:
     /**
      *  Handle a received CHIP message on this exchange.
      *
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
-     *
+     *  @param[in]    messageId     The message id of the packet.
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
-     *
      *  @param[in]    peerAddress   The address of the sender
-     *
      *  @param[in]    msgFlags      The message flags corresponding to the received message
-     *
      *  @param[in]    msgBuf        A handle to the packet buffer holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
@@ -141,9 +139,8 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully delivered the message up to the
      *                                                       protocol layer.
      */
-    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
-                             System::PacketBufferHandle && msgBuf);
+    CHIP_ERROR HandleMessage(uint32_t messageId, const PayloadHeader & payloadHeader, const Transport::PeerAddress & peerAddress,
+                             MessageFlags msgFlags, System::PacketBufferHandle && msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }

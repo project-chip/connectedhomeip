@@ -1252,8 +1252,8 @@ CHIP_ERROR CASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
     return err;
 }
 
-CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const PacketHeader & packetHeader,
-                                                const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                                System::PacketBufferHandle & msg)
 {
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1278,26 +1278,13 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
                             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_SigmaErr),
                         CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    if (packetHeader.GetSourceNodeId().HasValue())
-    {
-        if (mConnectionState.GetPeerNodeId() == kUndefinedNodeId)
-        {
-            mConnectionState.SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
-        }
-        else
-        {
-            VerifyOrReturnError(packetHeader.GetSourceNodeId().Value() == mConnectionState.GetPeerNodeId(),
-                                CHIP_ERROR_WRONG_NODE_ID);
-        }
-    }
-
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader,
-                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
+CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                          System::PacketBufferHandle && msg)
 {
-    CHIP_ERROR err = ValidateReceivedMessage(ec, packetHeader, payloadHeader, msg);
+    CHIP_ERROR err = ValidateReceivedMessage(ec, payloadHeader, msg);
     SuccessOrExit(err);
 
     mConnectionState.SetPeerAddress(mMessageDispatch.GetPeerAddress());

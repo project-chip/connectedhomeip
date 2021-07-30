@@ -41,6 +41,8 @@ public:
 
     CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
+    virtual bool IsEncryptionRequired() const { return true; }
+
     CHIP_ERROR SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
                            ReliableMessageContext * reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
                            uint8_t type, System::PacketBufferHandle && message);
@@ -59,14 +61,13 @@ public:
     virtual CHIP_ERROR SendPreparedMessage(SecureSessionHandle session,
                                            const EncryptedPacketBufferHandle & preparedMessage) const                       = 0;
 
-    virtual CHIP_ERROR OnMessageReceived(const Header::Flags & headerFlags, const PayloadHeader & payloadHeader, uint32_t messageId,
+    virtual CHIP_ERROR OnMessageReceived(uint32_t messageId, const PayloadHeader & payloadHeader,
                                          const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
                                          ReliableMessageContext * reliableMessageContext);
 
 protected:
     virtual bool MessagePermitted(uint16_t protocol, uint8_t type) = 0;
     virtual bool IsReliableTransmissionAllowed() const { return true; }
-    virtual bool IsEncryptionRequired() const { return true; }
 };
 
 } // namespace Messaging
