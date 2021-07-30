@@ -1768,9 +1768,16 @@ void emberAfPluginColorControlServerHueSatTransitionEventHandler(void)
     }
 
     writeSaturation(colorSaturationTransitionState.endpoint, (uint8_t) colorSaturationTransitionState.currentValue);
-
-    emberAfColorControlClusterPrintln("Hue %d Saturation %d endpoint %d", colorHueTransitionState.currentHue,
-                                      colorSaturationTransitionState.currentValue, endpoint);
+    if (colorHueTransitionState.isEnhancedHue)
+    {
+        emberAfColorControlClusterPrintln("Enhanced Hue %d Saturation %d endpoint %d", colorHueTransitionState.currentEnhancedHue,
+                                          colorSaturationTransitionState.currentValue, endpoint);
+    }
+    else
+    {
+        emberAfColorControlClusterPrintln("Hue %d Saturation %d endpoint %d", colorHueTransitionState.currentHue,
+                                          colorSaturationTransitionState.currentValue, endpoint);
+    }
 
     emberAfPluginColorControlServerComputePwmFromHsvCallback(endpoint);
 }
