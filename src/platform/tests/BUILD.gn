@@ -42,7 +42,7 @@ if (chip_device_platform != "none") {
     if (chip_mdns != "none" && chip_enable_happy_tests &&
         (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
       test_sources += [ "TestMdns.cpp" ]
-      public_deps += [ "${chip_root}/src/lib/mdns:mdns" ]
+      public_deps += [ "${chip_root}/src/lib/mdns" ]
     }
 
     # These tests appear to be broken on Mac.

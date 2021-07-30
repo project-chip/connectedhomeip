@@ -67,7 +67,7 @@ executable("mdns-advertiser") {
   deps = [
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib/mdns:mdns",
+    "${chip_root}/src/lib/mdns",
   ]
 
   cflags = [ "-Wconversion" ]

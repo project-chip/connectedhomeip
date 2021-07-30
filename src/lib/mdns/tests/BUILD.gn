@@ -29,7 +29,7 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/lib/mdns:mdns",
+    "${chip_root}/src/lib/mdns",
     "${nlunit_test_root}:nlunit-test",
   ]
 }
