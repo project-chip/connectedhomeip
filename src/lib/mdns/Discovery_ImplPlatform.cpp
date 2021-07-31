@@ -444,7 +444,7 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
     Inet::InterfaceId iface;
 
     /* see if the entry is cached and use it.... */
-    if(sMdnsCache.Lookup(peerId, addr, port, iface) == CHIP_NO_ERROR) 
+    if(sMdnsCache.Lookup(peerId, addr, port, iface) == CHIP_NO_ERROR)
     {
         ResolvedNodeData nodeData;
 
@@ -457,9 +457,9 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
 
         return CHIP_NO_ERROR;
     }
-  
-         
-    
+
+
+
 
     MdnsService service;
 
@@ -568,7 +568,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
     error = mgr->sMdnsCache.Insert(nodeData.mPeerId, result->mAddress.Value(), result->mPort,
 		result->mInterface, 2 * 1000);
 
-    if(CHIP_NO_ERROR != error) 
+    if(CHIP_NO_ERROR != error)
     {
         ChipLogError(Discovery, "MdnsCache insert failed with %s", chip::ErrorStr(error));
     }

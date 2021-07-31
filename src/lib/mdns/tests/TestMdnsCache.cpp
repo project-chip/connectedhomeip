@@ -67,7 +67,7 @@ void TestInsert(nlTestSuite *inSuite, void *inContext)
 	Inet::IPAddress::FromString("1.0.0.1", addr);
 
 	peerId.SetFabricId(KNOWN_FABRIC);
-	
+
 	for(uint16_t i = 0; i < 10; i++) {
 		CHIP_ERROR result;
 
@@ -127,16 +127,16 @@ void TestInsert(nlTestSuite *inSuite, void *inContext)
 
 static const nlTest sTests[] =
 {
-	NL_TEST_DEF_FN(TestCreate), 
+	NL_TEST_DEF_FN(TestCreate),
 	NL_TEST_DEF_FN(TestInsert),
-	NL_TEST_SENTINEL() 
+	NL_TEST_SENTINEL()
 };
 
 
 int TestMdnsCache(void)
 {
 	nlTestSuite theSuite = { "MDNS Cache Creation", &sTests[0], nullptr, nullptr };
-				
+
 	nlTestRunner(&theSuite, nullptr);
 	return nlTestRunnerStats(&theSuite);
 }

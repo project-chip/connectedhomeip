@@ -15,14 +15,14 @@
 #ifdef MDNS_LOGGING
 #define MdnsLogProgress  ChipLogProgress
 #else
-#define MdnsLogProgress(...)	
+#define MdnsLogProgress(...)
 #endif
 
 namespace chip {
 namespace Mdns {
 
 template <size_t CACHE_SIZE>
-class MdnsCache 
+class MdnsCache
 {
 public:
 	MdnsCache()  : elementsUsed(CACHE_SIZE)
@@ -36,11 +36,11 @@ public:
 			MarkEntryUnused(e);
 		}
 		MdnsLogProgress(Discovery, "construct mdns cache of size %ld", CACHE_SIZE);
-		
+
 	}
-	
+
 	// insert this entry into the cache.
-	// return error if cache is full 
+	// return error if cache is full
 	// TODO:   have an eviction policy so if the cache is full, an entry may be deleted.
 	//         One policy may be Least-time-to-live
 	CHIP_ERROR Insert(PeerId peerId, const Inet::IPAddress & addr, uint16_t port,
@@ -53,7 +53,7 @@ public:
 		entry = FindPeerId(peerId, currentTime);
 		if(entry) {
 			// update timeout if found entry
-			entry->expiryTime = currentTime + TTLms;	
+			entry->expiryTime = currentTime + TTLms;
 			entry->TTL = TTLms;	// in case it changes */
 			return CHIP_NO_ERROR;
 		}
@@ -78,14 +78,14 @@ public:
        		const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
 
 		VerifyOrReturnError(pentry = FindPeerId(peerId, currentTime), CHIP_ERROR_KEY_NOT_FOUND);
-		
+
 		MarkEntryUnused(*pentry);
-		return CHIP_NO_ERROR;	
-		
+		return CHIP_NO_ERROR;
+
 	}
 
 	// given a peerId, find the parameters if its in the cache, or return error
-	CHIP_ERROR Lookup(PeerId peerId,  Inet::IPAddress &addr, uint16_t & port, 
+	CHIP_ERROR Lookup(PeerId peerId,  Inet::IPAddress &addr, uint16_t & port,
 			Inet::InterfaceId &iface)
 	{
 		MdnsCacheEntry *pentry;
@@ -107,22 +107,22 @@ public:
 	{
 		int i = 0;
 
-		MdnsLogProgress(Discovery, "cache size = %d", elementsUsed); 
+		MdnsLogProgress(Discovery, "cache size = %d", elementsUsed);
 		for(MdnsCacheEntry &e: mLookupTable) {
 			if(e.peerId == nullPeerId) {
-				MdnsLogProgress(Discovery, "Entry %d unused", i);	
+				MdnsLogProgress(Discovery, "Entry %d unused", i);
 			} else {
 				char address[100];
 
 				e.ipAddr.ToString(address, sizeof address);
 				MdnsLogProgress(Discovery, "Entry %d: node %lx fabric %lx, port = %d, address = %s",
-				     i, e.peerId.GetNodeId(), e.peerId.GetFabricId(), e.port, 
+				     i, e.peerId.GetNodeId(), e.peerId.GetFabricId(), e.port,
 				     address );
 			}
 			i++;
 		}
 	}
-			
+
 
 private:
 	struct MdnsCacheEntry
@@ -160,7 +160,7 @@ private:
 		for(MdnsCacheEntry &entry : mLookupTable) {
 			if(entry.peerId == peerId)
 				return &entry;
-			if(entry.peerId != nullPeerId && 
+			if(entry.peerId != nullPeerId &&
 				entry.expiryTime <= current_time) {// ml -- should I use < or <=?
 				MarkEntryUnused(entry);
 			}
@@ -169,14 +169,14 @@ private:
 		return nullptr;
 	}
 
-		
+
 	// have a method to mark ununused --  so its easy to change
-	void MarkEntryUnused(MdnsCacheEntry & pentry) 
+	void MarkEntryUnused(MdnsCacheEntry & pentry)
 	{
 		pentry.peerId = nullPeerId;
 		elementsUsed--;
 	}
-		
+
 };
 
 #ifndef MDNS_LOGGING
@@ -185,4 +185,3 @@ private:
 
 } // namespace mdns
 } // namespace chip
-
