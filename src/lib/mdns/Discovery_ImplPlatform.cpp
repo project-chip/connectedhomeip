@@ -16,6 +16,7 @@
  */
 
 #include "Discovery_ImplPlatform.h"
+#include "MdnsCache.h"
 
 #include <inttypes.h>
 
@@ -35,6 +36,7 @@ namespace chip {
 namespace Mdns {
 
 DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
+MdnsCache<CHIP_CONFIG_MDNS_CACHE_SIZE> DiscoveryImplPlatform::sMdnsCache;
 
 DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
 
@@ -437,6 +439,28 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
 {
     ReturnErrorOnFailure(Init());
 
+    Inet::IPaAddress addr;
+    uint16_t port;
+    Inet::InterfaceId iface;
+
+    /* see if the entry is cached and use it.... */
+    if(sMdnsCache.Lookup(peerId, addr, port, iface) == CHIP_NO_ERROR) 
+    {
+        ResolvedNodeData nodeData;
+
+        nodeData.mInterfaceId = iface;
+        nodeData.mPort        = port;
+        nodeData.mAddress     = addr;
+        nodeData.mPeerId      = peerId;
+
+        mResolverDelegate->OnNodeIdResolved(nodeData);
+
+        return CHIP_NO_ERROR;
+    }
+  
+         
+    
+
     MdnsService service;
 
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
@@ -537,6 +561,16 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
         ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
         mgr->mResolverDelegate->OnNodeIdResolutionFailed(PeerId(), error);
         return;
+    }
+
+    // TODO --  define appropriate TTL, for now use 2000 msec (rfc default)
+    // figure out way to use TTL value from mDNS packet in  future update
+    error = mgr->sMdnsCache.Insert(nodeData.mPeerId, result->mAddress.Value(), result->mPort,
+		result->mInterface, 2 * 1000);
+
+    if(CHIP_NO_ERROR != error) 
+    {
+        ChipLogError(Discovery, "MdnsCache insert failed with %s", chip::ErrorStr(error));
     }
 
     nodeData.mInterfaceId = result->mInterface;

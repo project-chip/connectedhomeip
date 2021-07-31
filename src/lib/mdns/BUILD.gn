@@ -33,6 +33,7 @@ static_library("mdns") {
     "ServiceNaming.h",
     "TxtFields.cpp",
     "TxtFields.h",
+    "MdnsCache.h" 
   ]
 
   if (chip_mdns == "none") {
