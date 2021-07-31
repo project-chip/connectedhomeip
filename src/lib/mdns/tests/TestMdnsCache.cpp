@@ -18,127 +18,121 @@
 #include <support/logging/CHIPLogging.h>
 // set this to 1 to enable DumpCache to see the state of the cache when needed
 // #define MDNS_LOGGING 1
-#include <mdns/MdnsCache.h>
 #include <iostream>
+#include <mdns/MdnsCache.h>
 
-#include <support/UnitTestRegistration.h>
-#include <nlunit-test.h>
 #include <cstdint>
+#include <nlunit-test.h>
+#include <support/UnitTestRegistration.h>
 
+#include <core/CHIPError.h>
 #include <core/PeerId.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
-#include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
-#include <core/CHIPError.h>
 #include <system/SystemTimer.h>
 #include <system/TimeSource.h>
-
 
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
 
 using namespace chip;
 using namespace chip::Mdns;
 
-
-
-void TestCreate(nlTestSuite *inSuite, void *inContext)
+void TestCreate(nlTestSuite * inSuite, void * inContext)
 {
-	MdnsCache<10> tMdnsCache;
-	tMdnsCache.DumpCache();
+    MdnsCache<10> tMdnsCache;
+    tMdnsCache.DumpCache();
 }
 
-void TestInsert(nlTestSuite *inSuite, void *inContext)
+void TestInsert(nlTestSuite * inSuite, void * inContext)
 {
-	const int sizeOfCache = 5;
-	MdnsCache<sizeOfCache> tMdnsCache;
-	PeerId  peerId;
-	int64_t id = 0x100;
-	uint16_t port = 2000;
-	Inet::InterfaceId iface = 2;
-	Inet::IPAddress addr;
-	Inet::IPAddress addrV6;
-	const int ttl = 2;	/* seconds */
-	Inet::InterfaceId iface_out;
-	Inet::IPAddress addr_out;
-	uint16_t port_out;
-	const uint64_t KNOWN_FABRIC = 0x100;
+    const int sizeOfCache = 5;
+    MdnsCache<sizeOfCache> tMdnsCache;
+    PeerId peerId;
+    int64_t id              = 0x100;
+    uint16_t port           = 2000;
+    Inet::InterfaceId iface = 2;
+    Inet::IPAddress addr;
+    Inet::IPAddress addrV6;
+    const int ttl = 2; /* seconds */
+    Inet::InterfaceId iface_out;
+    Inet::IPAddress addr_out;
+    uint16_t port_out;
+    const uint64_t KNOWN_FABRIC = 0x100;
 
-	Inet::IPAddress::FromString("1.0.0.1", addr);
+    Inet::IPAddress::FromString("1.0.0.1", addr);
 
-	peerId.SetFabricId(KNOWN_FABRIC);
+    peerId.SetFabricId(KNOWN_FABRIC);
 
-	for(uint16_t i = 0; i < 10; i++) {
-		CHIP_ERROR result;
+    for (uint16_t i = 0; i < 10; i++)
+    {
+        CHIP_ERROR result;
 
-		// ml -- why doesn't adding 2 uint16_t give a uint16_t?
-		peerId.SetNodeId(id + i);
-		result = tMdnsCache.Insert(peerId, addr, (uint16_t) (port + i), iface, 1000 * ttl);
-		if(i < sizeOfCache) {
-			NL_TEST_ASSERT(inSuite,  result == CHIP_NO_ERROR);
-		} else {
-			NL_TEST_ASSERT(inSuite, result != CHIP_NO_ERROR);
-		}
-	}
+        // ml -- why doesn't adding 2 uint16_t give a uint16_t?
+        peerId.SetNodeId(id + i);
+        result = tMdnsCache.Insert(peerId, addr, (uint16_t)(port + i), iface, 1000 * ttl);
+        if (i < sizeOfCache)
+        {
+            NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
+        }
+        else
+        {
+            NL_TEST_ASSERT(inSuite, result != CHIP_NO_ERROR);
+        }
+    }
 
-	tMdnsCache.DumpCache();
-	sleep(ttl + 1);
-	id = 0x200;
-	port = 3000;
-	for(uint16_t i = 0; i < sizeOfCache; i++) {
-		CHIP_ERROR result;
+    tMdnsCache.DumpCache();
+    sleep(ttl + 1);
+    id   = 0x200;
+    port = 3000;
+    for (uint16_t i = 0; i < sizeOfCache; i++)
+    {
+        CHIP_ERROR result;
 
-		peerId.SetNodeId(id + i);
-		result = tMdnsCache.Insert(peerId, addr, (uint16_t) (port + i), iface, 1000 * ttl);
-		NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
-	}
-	tMdnsCache.DumpCache();
+        peerId.SetNodeId(id + i);
+        result = tMdnsCache.Insert(peerId, addr, (uint16_t)(port + i), iface, 1000 * ttl);
+        NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
+    }
+    tMdnsCache.DumpCache();
 
-	for(uint16_t i = 0; i < sizeOfCache; i++) {
-		CHIP_ERROR result;
+    for (uint16_t i = 0; i < sizeOfCache; i++)
+    {
+        CHIP_ERROR result;
 
-		peerId.SetNodeId(id + i);
-		result = tMdnsCache.Delete(peerId);
-		NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
-	}
+        peerId.SetNodeId(id + i);
+        result = tMdnsCache.Delete(peerId);
+        NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
+    }
 
-	tMdnsCache.DumpCache();
+    tMdnsCache.DumpCache();
 
-	// ipv6 inserts
-	Inet::IPAddress::FromString("::1", addrV6);
-	port = 4000;
-	for(uint16_t i = 0; i < sizeOfCache; i++) {
-		CHIP_ERROR result;
+    // ipv6 inserts
+    Inet::IPAddress::FromString("::1", addrV6);
+    port = 4000;
+    for (uint16_t i = 0; i < sizeOfCache; i++)
+    {
+        CHIP_ERROR result;
 
-		peerId.SetNodeId(id + i);
-		result = tMdnsCache.Insert(peerId, addrV6, (uint16_t) (port + i), iface, 1000 * ttl);
-		NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
-	}
+        peerId.SetNodeId(id + i);
+        result = tMdnsCache.Insert(peerId, addrV6, (uint16_t)(port + i), iface, 1000 * ttl);
+        NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
+    }
 
-	tMdnsCache.DumpCache();
+    tMdnsCache.DumpCache();
 
-	NL_TEST_ASSERT(inSuite,
-		 tMdnsCache.Lookup(peerId, addr_out, port_out, iface_out) == CHIP_NO_ERROR);
-	peerId.SetFabricId(KNOWN_FABRIC + 1);
-	NL_TEST_ASSERT(inSuite,
-		 tMdnsCache.Lookup(peerId, addr_out, port_out, iface_out) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, tMdnsCache.Lookup(peerId, addr_out, port_out, iface_out) == CHIP_NO_ERROR);
+    peerId.SetFabricId(KNOWN_FABRIC + 1);
+    NL_TEST_ASSERT(inSuite, tMdnsCache.Lookup(peerId, addr_out, port_out, iface_out) != CHIP_NO_ERROR);
 }
 
-
-static const nlTest sTests[] =
-{
-	NL_TEST_DEF_FN(TestCreate),
-	NL_TEST_DEF_FN(TestInsert),
-	NL_TEST_SENTINEL()
-};
-
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCreate), NL_TEST_DEF_FN(TestInsert), NL_TEST_SENTINEL() };
 
 int TestMdnsCache(void)
 {
-	nlTestSuite theSuite = { "MDNS Cache Creation", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "MDNS Cache Creation", &sTests[0], nullptr, nullptr };
 
-	nlTestRunner(&theSuite, nullptr);
-	return nlTestRunnerStats(&theSuite);
+    nlTestRunner(&theSuite, nullptr);
+    return nlTestRunnerStats(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestMdnsCache)

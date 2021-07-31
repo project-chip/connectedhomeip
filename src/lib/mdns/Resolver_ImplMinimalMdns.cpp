@@ -15,14 +15,13 @@
  *    limitations under the License.
  */
 
-#include "Resolver.h"
 #include "MdnsCache.h"
+#include "Resolver.h"
 
 #include <limits>
 
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
-
 
 #include <core/CHIPConfig.h>
 
@@ -79,7 +78,7 @@ class PacketDataReporter : public ParserDelegate
 {
 public:
     PacketDataReporter(ResolverDelegate * delegate, chip::Inet::InterfaceId interfaceId, DiscoveryType discoveryType,
-                       const BytesRange & packet, MdnsCacheType  & mdnsCache) :
+                       const BytesRange & packet, MdnsCacheType & mdnsCache) :
         mDelegate(delegate),
         mDiscoveryType(discoveryType), mPacketRange(packet)
     {
@@ -358,11 +357,10 @@ private:
     }
     static constexpr int kMaxQnameSize = 100;
     char qnameStorage[kMaxQnameSize];
-    //should this be static?
+    // should this be static?
     // original version had:    static Mdns::IPCache<CHIP_CONFIG_IPCACHE_SIZE, CHIP_CONFIG_TTL_MS> sIPCache;
     MdnsCacheType sMdnsCache;
 };
-
 
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
