@@ -22,9 +22,9 @@ chip_test_suite("tests") {
   output_name = "libMdnsTests"
 
   test_sources = [
+    "TestMdnsCache.cpp",
     "TestServiceNaming.cpp",
     "TestTxtFields.cpp",
-    "TestMdnsCache.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
