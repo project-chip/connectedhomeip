@@ -38,6 +38,8 @@ public:
         return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId && mFabric == that.mFabric;
     }
 
+    explicit operator bool() const { return !(*this == SecureSessionHandle()); }
+
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     uint16_t GetPeerKeyId() const { return mPeerKeyId; }
 
