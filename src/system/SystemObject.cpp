@@ -53,9 +53,9 @@ DLL_EXPORT void Object::Release()
         this->mSystemLayer = nullptr;
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
         std::lock_guard<std::mutex> lock(*mMutexRef);
-        this->prev->next = this->next;
-        if (this->next)
-            this->next->prev = this->prev;
+        this->mPrev->mNext = this->mNext;
+        if (this->mNext)
+            this->mNext->mPrev = this->mPrev;
         delete this;
 #endif
         __sync_synchronize();
