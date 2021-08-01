@@ -37,6 +37,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <utility>
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 #include <memory>
 #include <mutex>
@@ -197,8 +198,39 @@ public:
     T * TryCreate(Layer & aLayer);
     void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
 
+    /**
+     * @brief
+     *   Run a functor for each active object in the pool
+     *
+     *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
+     *  @return    bool     Returns false if broke during iteration
+     */
+    template <typename Function>
+    bool ForEachActiveObject(Function && function)
+    {
+        LambdaProxy<Function> proxy(std::forward<Function>(function));
+        return ForEachActiveObjectInner(&proxy, &LambdaProxy<Function>::Call);
+    }
+
 private:
     friend class TestObject;
+
+    template <typename Function>
+    class LambdaProxy
+    {
+    public:
+        LambdaProxy(Function && function) : mFunction(std::move(function)) {}
+        static bool Call(void * context, void * target)
+        {
+            return static_cast<LambdaProxy *>(context)->mFunction(static_cast<T *>(target));
+        }
+
+    private:
+        Function mFunction;
+    };
+
+    using Lambda = bool (*)(void *, void *);
+    bool ForEachActiveObjectInner(void * context, Lambda lambda);
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     std::mutex mMutex;
@@ -359,6 +391,35 @@ inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
     return lReturn;
+}
+
+template <class T, unsigned int N>
+inline bool ObjectPool<T, N>::ForEachActiveObjectInner(void * context, Lambda lambda)
+{
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    std::lock_guard<std::mutex> lock(mMutex);
+    Object * p = mDummyHead.next;
+    while (p)
+    {
+        if (!lambda(context, static_cast<void *>(p)))
+        {
+            return false;
+        }
+        p = p->next;
+    }
+#else
+    for (unsigned int i = 0; i < N; ++i)
+    {
+        T & lObject = reinterpret_cast<T *>(mArena.uMemory)[i];
+
+        if (lObject.mSystemLayer != nullptr)
+        {
+            if (!lambda(context, static_cast<void *>(&lObject)))
+                return false;
+        }
+    }
+#endif
+    return true;
 }
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS && !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
