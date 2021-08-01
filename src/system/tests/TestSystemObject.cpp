@@ -73,6 +73,7 @@ class TestObject : public Object
 public:
     CHIP_ERROR Init();
 
+    static void CheckIteration(nlTestSuite * inSuite, void * aContext);
     static void CheckRetention(nlTestSuite * inSuite, void * aContext);
     static void CheckConcurrency(nlTestSuite * inSuite, void * aContext);
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
@@ -133,7 +134,107 @@ struct TestContext
 struct TestContext sContext;
 } // namespace
 
+// Test Object Iteration
+
+void TestObject::CheckIteration(nlTestSuite * inSuite, void * aContext)
+{
+    TestContext & lContext = *static_cast<TestContext *>(aContext);
+    Layer lLayer;
+    unsigned int i;
+
+    lLayer.Init();
+    sPool.Reset();
+
+    for (i = 0; i < kPoolSize; ++i)
+    {
+        TestObject * lCreated = sPool.TryCreate(lLayer);
+
+        NL_TEST_ASSERT(lContext.mTestSuite, lCreated != nullptr);
+        lCreated->Init();
+    }
+
+    i = 0;
+    sPool.ForEachActiveObject([&](TestObject * lCreated) {
+        NL_TEST_ASSERT(lContext.mTestSuite, lCreated->IsRetained(lLayer));
+        NL_TEST_ASSERT(lContext.mTestSuite, &(lCreated->SystemLayer()) == &lLayer);
+        i++;
+        return true;
+    });
+    NL_TEST_ASSERT(lContext.mTestSuite, i == kPoolSize);
+
+    i = 0;
+    sPool.ForEachActiveObject([&](TestObject * lCreated) {
+        i++;
+        if (i == kPoolSize / 2)
+            return false;
+
+        return true;
+    });
+    NL_TEST_ASSERT(lContext.mTestSuite, i == kPoolSize / 2);
+
+    lLayer.Shutdown();
+}
+
 // Test Object retention
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
+{
+    TestContext & lContext = *static_cast<TestContext *>(aContext);
+    Layer lLayer;
+    unsigned int i, j;
+
+    lLayer.Init();
+    sPool.Reset();
+
+    for (i = 0; i < kPoolSize; ++i)
+    {
+        TestObject * lCreated = sPool.TryCreate(lLayer);
+
+        NL_TEST_ASSERT(lContext.mTestSuite, lCreated != nullptr);
+        NL_TEST_ASSERT(lContext.mTestSuite, lCreated->IsRetained(lLayer));
+        NL_TEST_ASSERT(lContext.mTestSuite, &(lCreated->SystemLayer()) == &lLayer);
+
+        lCreated->Init();
+
+        for (j = 0; j < kPoolSize; ++j)
+        {
+            TestObject * lGotten = sPool.Get(lLayer, j);
+
+            if (j > i)
+            {
+                NL_TEST_ASSERT(lContext.mTestSuite, lGotten == nullptr);
+            }
+            else
+            {
+                NL_TEST_ASSERT(lContext.mTestSuite, lGotten != nullptr);
+                lGotten->Retain();
+            }
+        }
+    }
+
+    for (i = 0; i < kPoolSize; ++i)
+    {
+        TestObject * lGotten = sPool.Get(lLayer, 0);
+
+        NL_TEST_ASSERT(lContext.mTestSuite, lGotten != nullptr);
+
+        for (j = 0; j < i + 1; ++j)
+        {
+            NL_TEST_ASSERT(lContext.mTestSuite, lGotten->IsRetained(lLayer));
+            lGotten->Release();
+        }
+
+        NL_TEST_ASSERT(lContext.mTestSuite, lGotten->IsRetained(lLayer));
+        lGotten->Release();
+        NL_TEST_ASSERT(lContext.mTestSuite, !lGotten->IsRetained(lLayer));
+    }
+
+    NL_TEST_ASSERT(lContext.mTestSuite, sPool.Size() == 0);
+    lLayer.Shutdown();
+}
+
+#else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
 {
@@ -172,11 +273,7 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
 
     for (i = 0; i < kPoolSize; ++i)
     {
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-        TestObject * lGotten = sPool.Get(lLayer, 0);
-#else
         TestObject * lGotten = sPool.Get(lLayer, i);
-#endif
 
         NL_TEST_ASSERT(lContext.mTestSuite, lGotten != nullptr);
 
@@ -191,19 +288,16 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
         NL_TEST_ASSERT(lContext.mTestSuite, !lGotten->IsRetained(lLayer));
     }
 
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    NL_TEST_ASSERT(lContext.mTestSuite, sPool.Size() == 0);
-#else
     for (i = 0; i < kPoolSize; ++i)
     {
         TestObject * lGotten = sPool.Get(lLayer, i);
 
         NL_TEST_ASSERT(lContext.mTestSuite, lGotten == nullptr);
     }
-#endif
 
     lLayer.Shutdown();
 }
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 // Test Object concurrency
 
@@ -239,6 +333,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
 
     for (i = 0; i < kNumObjects; ++i)
     {
+        lObject = nullptr;
         while (lObject == nullptr)
         {
             lObject = sPool.TryCreate(lLayer);
@@ -298,8 +393,6 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
             NL_TEST_ASSERT(lContext.mTestSuite, !lObject->IsRetained(lLayer));
             break;
         }
-
-        NL_TEST_ASSERT(lContext.mTestSuite, lObject != nullptr);
     }
 
     // Cleanup
@@ -483,6 +576,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
 // clang-format off
 static const nlTest sTests[] =
 {
+    NL_TEST_DEF("Iteration",                TestObject::CheckIteration),
     NL_TEST_DEF("Retention",                TestObject::CheckRetention),
     NL_TEST_DEF("Concurrency",              TestObject::CheckConcurrency),
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
