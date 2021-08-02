@@ -207,28 +207,46 @@ CHIP_ERROR TLVReader::Get(uint64_t & v)
     return CHIP_NO_ERROR;
 }
 
+namespace {
+float BitCastToFloat(const uint64_t elemLenOrVal)
+{
+    float f;
+    auto u32 = static_cast<uint32_t>(elemLenOrVal);
+    memcpy(&f, &u32, sizeof(f));
+    return f;
+}
+} // namespace
+
+// Note: Unlike the integer Get functions, this code avoids doing conversions
+// between float and double wherever possible, because these conversions are
+// relatively expensive on platforms that use soft-float instruction sets.
+
+CHIP_ERROR TLVReader::Get(float & v)
+{
+    switch (ElementType())
+    {
+    case TLVElementType::FloatingPointNumber32: {
+        v = BitCastToFloat(mElemLenOrVal);
+        break;
+    }
+    default:
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR TLVReader::Get(double & v)
 {
     switch (ElementType())
     {
     case TLVElementType::FloatingPointNumber32: {
-        union
-        {
-            uint32_t u32;
-            float f;
-        } cvt;
-        cvt.u32 = static_cast<uint32_t>(mElemLenOrVal);
-        v       = cvt.f;
+        v = BitCastToFloat(mElemLenOrVal);
         break;
     }
     case TLVElementType::FloatingPointNumber64: {
-        union
-        {
-            uint64_t u64;
-            double d;
-        } cvt;
-        cvt.u64 = mElemLenOrVal;
-        v       = cvt.d;
+        double d;
+        memcpy(&d, &mElemLenOrVal, sizeof(d));
+        v = d;
         break;
     }
     default:

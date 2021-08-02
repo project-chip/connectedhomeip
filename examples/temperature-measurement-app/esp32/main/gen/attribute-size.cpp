@@ -203,7 +203,8 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     uint32_t totalSize = kSizeLengthInBytes + (entryCount * entryLength);
     if (!chip::CanCastTo<uint16_t>(totalSize))
     {
-        ChipLogError(Zcl, "Cluster %" PRIx32 ": Size of attribute %" PRIx32 " is too large.", clusterId, attributeId);
+        ChipLogError(Zcl, "Cluster " ChipLogFormatMEI ": Size of attribute " ChipLogFormatMEI " is too large.",
+                     ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
         return 0;
     }
 

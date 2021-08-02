@@ -21,28 +21,30 @@
 #include "PumpManager.h"
 
 #include <app/chip-zcl-zpro-codec.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
 #include <app/common/gen/enums.h>
+#include <app/common/gen/ids/Attributes.h>
+#include <app/common/gen/ids/Clusters.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 
 using namespace ::chip;
+using namespace ::chip::app::Clusters;
 
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
-    ChipLogProgress(Zcl, "%s: %" PRIx16 " %" PRIx32 " %" PRIx32 " %d", __FUNCTION__, endpoint, clusterId, attributeId, *value);
-    if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
+    ChipLogProgress(Zcl, "%s: %" PRIx16 " " ChipLogFormatMEI " " ChipLogFormatMEI " %d", __FUNCTION__, endpoint,
+                    ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId), *value);
+    if (clusterId != OnOff::Id)
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: %" PRIx32, clusterId);
+        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
         return;
     }
 
-    if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
+    if (attributeId != OnOff::Attributes::Ids::OnOff)
     {
-        ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
+        ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
         return;
     }
 
@@ -105,7 +107,8 @@ void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
 bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
                                         chip::AttributeId attributeId)
 {
-    ChipLogProgress(Zcl, "%s: %d %" PRIx32 " %" PRIx32 " %d", __FUNCTION__, endpoint, clusterId, manufacturerCode, attributeId);
+    ChipLogProgress(Zcl, "%s: %d " ChipLogFormatMEI " %" PRIx16 " " ChipLogFormatMEI, __FUNCTION__, endpoint,
+                    ChipLogValueMEI(clusterId), manufacturerCode, ChipLogValueMEI(attributeId));
     return true;
 }
 
@@ -120,7 +123,8 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, c
 bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
                                          chip::AttributeId attributeId)
 {
-    ChipLogProgress(Zcl, "%s: %d %" PRIx32 " %" PRIx32 " %d", __FUNCTION__, endpoint, clusterId, manufacturerCode, attributeId);
+    ChipLogProgress(Zcl, "%s: %d " ChipLogFormatMEI " %" PRIx16 " " ChipLogFormatMEI, __FUNCTION__, endpoint,
+                    ChipLogValueMEI(clusterId), manufacturerCode, ChipLogValueMEI(attributeId));
     return true;
 }
 
@@ -171,44 +175,44 @@ EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::
 
 bool emberAfReadAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: " ChipLogFormatMEI, __FUNCTION__, ChipLogValueMEI(clusterId));
     return false;
 }
 
 bool emberAfWriteAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: " ChipLogFormatMEI, __FUNCTION__, ChipLogValueMEI(clusterId));
     return false;
 }
 
 bool emberAfConfigureReportingResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: " ChipLogFormatMEI, __FUNCTION__, ChipLogValueMEI(clusterId));
     return false;
 }
 
 bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: " ChipLogFormatMEI, __FUNCTION__, ChipLogValueMEI(clusterId));
     return false;
 }
 
 bool emberAfReportAttributesCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: " ChipLogFormatMEI, __FUNCTION__, ChipLogValueMEI(clusterId));
     return false;
 }
 
 bool emberAfDefaultResponseCallback(chip::ClusterId clusterId, chip::CommandId commandId, EmberAfStatus status)
 {
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: " ChipLogFormatMEI, __FUNCTION__, ChipLogValueMEI(clusterId));
     return false;
 }
 
 bool emberAfDiscoverAttributesResponseCallback(chip::ClusterId clusterId, bool discoveryComplete, uint8_t * buffer, uint16_t bufLen,
                                                bool extended)
 {
-    ChipLogProgress(Zcl, "%s: %" PRIx32, __FUNCTION__, clusterId);
+    ChipLogProgress(Zcl, "%s: " ChipLogFormatMEI, __FUNCTION__, ChipLogValueMEI(clusterId));
     return false;
 }
 
