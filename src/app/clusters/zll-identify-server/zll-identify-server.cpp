@@ -166,9 +166,8 @@ void emberAfPluginZllIdentifyServerTriggerEffectEndpointEventHandler(EndpointId 
     }
 }
 
-bool emberAfIdentifyClusterTriggerEffectCallback(chip::app::CommandHandler * commandObj, uint8_t effectId, uint8_t effectVariant)
+bool emberAfIdentifyClusterTriggerEffectCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint8_t effectId, uint8_t effectVariant)
 {
-    EndpointId endpoint          = emberAfCurrentEndpoint();
     EmAfZllIdentifyState * state = getZllIdentifyState(endpoint);
     EmberAfStatus status;
 
