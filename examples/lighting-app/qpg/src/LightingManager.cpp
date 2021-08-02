@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
@@ -22,28 +22,22 @@
 #include <support/logging/CHIPLogging.h>
 
 // initialization values for Blue in XY color space
-#define BLUE_XY                                                                                                                    \
-    {                                                                                                                              \
-        9830, 3932                                                                                                                 \
-    }
+constexpr XyColor_t kBlueXY = { 9830, 3932 };
 
 // initialization values for Blue in HSV color space
-#define BLUE_HSV                                                                                                                   \
-    {                                                                                                                              \
-        240, 100, 255                                                                                                              \
-    }
+constexpr HsvColor_t kBlueHSV = { 240, 100, 255 };
 
 // default initialization value for the light level after start
-#define DEFAULT_LEVEL (64)
+constexpr uint8_t kDefaultLevel = 64;
 
 LightingManager LightingManager::sLight;
 
 CHIP_ERROR LightingManager::Init()
 {
     mState = kState_Off;
-    mLevel = DEFAULT_LEVEL;
-    mXY    = BLUE_XY;
-    mHSV   = BLUE_HSV;
+    mLevel = kDefaultLevel;
+    mXY    = kBlueXY;
+    mHSV   = kBlueHSV;
     mRGB   = XYToRgb(mLevel, mXY.x, mXY.y);
 
     return CHIP_NO_ERROR;
@@ -85,11 +79,11 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint16_t 
         ChipLogProgress(NotSpecified, "LightMgr:LEVEL: lev:%u->%u", mLevel, *value);
         break;
     case COLOR_ACTION_XY:
-        xy = *static_cast<XyColor_t *>(static_cast<void *>(value));
+        xy = *reinterpret_cast<XyColor_t *>(value);
         ChipLogProgress(NotSpecified, "LightMgr:COLOR: xy:%u|%u->%u|%u", mXY.x, mXY.y, xy.x, xy.y);
         break;
     case COLOR_ACTION_HSV:
-        hsv = *static_cast<HsvColor_t *>(static_cast<void *>(value));
+        hsv = *reinterpret_cast<HsvColor_t *>(value);
         ChipLogProgress(NotSpecified, "LightMgr:COLOR: hsv:%u|%u->%u|%u", mHSV.h, mHSV.s, hsv.h, hsv.s);
         break;
     default:

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,28 +18,27 @@
 
 #pragma once
 
-#include <stdbool.h>
 #include <stdint.h>
 
-typedef struct RgbColor_
+struct RgbColor_t
 {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-} RgbColor_t;
+};
 
-typedef struct HsvColor_
+struct HsvColor_t
 {
     uint8_t h;
     uint8_t s;
     uint8_t v;
-} HsvColor_t;
+};
 
-typedef struct XyColor_
+struct XyColor_t
 {
     uint16_t x;
     uint16_t y;
-} XyColor_t;
+};
 
 RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY);
 RgbColor_t HsvToRgb(HsvColor_t hsv);

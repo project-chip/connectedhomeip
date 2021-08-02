@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,9 @@
 #include "color_format.h"
 
 #include <math.h>
+
+// define a clamp macro to substitute the std::clamp macro which is available from C++17 onwards
+#define clamp(a, max, min) ((a) < (min) ? (min) : ((a) > (max) ? (max) : (a)))
 
 RgbColor_t HsvToRgb(HsvColor_t hsv)
 {
@@ -113,9 +116,9 @@ RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
     b = b <= 0.00304f ? 12.92f * b : (1.055f) * pow(b, (1.0f / 2.4f)) - 0.055f;
 
     // Round off
-    r = r < 0 ? 0 : (r > 1 ? 1 : r);
-    g = g < 0 ? 0 : (g > 1 ? 1 : g);
-    b = b < 0 ? 0 : (b > 1 ? 1 : b);
+    r = clamp(r, 0, 1);
+    g = clamp(g, 0, 1);
+    b = clamp(b, 0, 1);
 
     // these rgb values are in  the range of 0 to 1, convert to limit of HW specific LED
     rgb.r = (uint8_t)(r * 255);

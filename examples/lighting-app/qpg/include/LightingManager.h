@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,8 +26,8 @@
 #include "AppEvent.h"
 
 #include "FreeRTOS.h"
-#include "color_format.h"
 #include "timers.h" // provides FreeRTOS timer support
+#include "color_format.h"
 
 #include <core/CHIPError.h>
 
