@@ -21,7 +21,7 @@ from enum import IntEnum, auto
 
 class Platform(IntEnum):
   """Represents a supported build platform for compilation."""
-  LINUX = auto()
+  HOST = auto()
   QPG = auto()
   ESP32 = auto()
   EFR32 = auto()
@@ -77,6 +77,7 @@ class Application(IntEnum):
   LOCK = auto()
   WINDOW_COVERING = auto()
   SHELL = auto()
+  CHIP_TOOL = auto()
 
   @property
   def ArgName(self):

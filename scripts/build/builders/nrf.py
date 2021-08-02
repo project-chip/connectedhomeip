@@ -65,10 +65,10 @@ class NrfConnectBuilder(Builder):
   def __init__(self,
                root,
                runner,
-               output_dir: str,
+               output_prefix: str,
                app: NrfApp = NrfApp.LIGHT,
                board: NrfBoard = NrfBoard.NRF52840):
-    super(NrfConnectBuilder, self).__init__(root, runner, output_dir)
+    super(NrfConnectBuilder, self).__init__(root, runner, output_prefix)
     self.app = app
     self.board = board
 

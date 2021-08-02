@@ -26,11 +26,14 @@ class Builder(ABC):
 
   """
 
-  def __init__(self, root, runner, output_dir='out'):
+  def __init__(self, root, runner, output_prefix: str ='out'):
     self.root = os.path.abspath(root)
     self._runner = runner
-    self.output_dir = output_dir
+    self.output_prefix = output_prefix
+
+    # Set post-init once actual build target is known
     self.identifier = None
+    self.output_dir = None
 
   @abstractmethod
   def generate(self):
@@ -67,3 +70,7 @@ class Builder(ABC):
         os.makedirs(target_dir_full_name)
 
       shutil.copyfile(source_name, target_full_name)
+
+  def SetIdentifier(self, platform: str, board: str, app: str):
+    self.identifier = '-'.join([platform, board, app])
+    self.output_dir = os.path.join(self.output_prefix, self.identifier)
