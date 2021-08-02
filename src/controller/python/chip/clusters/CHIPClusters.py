@@ -577,7 +577,7 @@ class ChipClusters:
                 },
             },
             "OperationalCredentials": {
-                "AddOpCert": {
+                "AddNOC": {
                     "nOCArray": "bytes",
                     "iPKValue": "bytes",
                     "caseAdminNode": "int",
@@ -674,6 +674,10 @@ class ChipClusters:
             },
             "TestCluster": {
                 "Test": {
+                },
+                "TestAddArguments": {
+                    "arg1": "int",
+                    "arg2": "int",
                 },
                 "TestNotHandled": {
                 },
@@ -1565,6 +1569,14 @@ class ChipClusters:
                 "FabricsList": {
                     "attributeId": 0x0001,
                     "type": "",
+                },
+                "SupportedFabrics": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "CommissionedFabrics": {
+                    "attributeId": 0x0003,
+                    "type": "int",
                 },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
@@ -2776,8 +2788,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OnOff_Toggle(
                 device, ZCLendpoint, ZCLgroupid
         )
-    def ClusterOperationalCredentials_CommandAddOpCert(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nOCArray: bytes, iPKValue: bytes, caseAdminNode: int, adminVendorId: int):
-        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddOpCert(
+    def ClusterOperationalCredentials_CommandAddNOC(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nOCArray: bytes, iPKValue: bytes, caseAdminNode: int, adminVendorId: int):
+        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC(
                 device, ZCLendpoint, ZCLgroupid, nOCArray, len(nOCArray), iPKValue, len(iPKValue), caseAdminNode, adminVendorId
         )
     def ClusterOperationalCredentials_CommandAddTrustedRootCertificate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, rootCertificate: bytes):
@@ -2863,6 +2875,10 @@ class ChipClusters:
     def ClusterTestCluster_CommandTest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_Test(
                 device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterTestCluster_CommandTestAddArguments(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, arg1: int, arg2: int):
+        return self._chipLib.chip_ime_AppendCommand_TestCluster_TestAddArguments(
+                device, ZCLendpoint, ZCLgroupid, arg1, arg2
         )
     def ClusterTestCluster_CommandTestNotHandled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled(
@@ -3372,6 +3388,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOperationalCredentials_ReadAttributeFabricsList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_FabricsList(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOperationalCredentials_ReadAttributeSupportedFabrics(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_SupportedFabrics(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOperationalCredentials_ReadAttributeCommissionedFabrics(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CommissionedFabrics(device, ZCLendpoint, ZCLgroupid)
     def ClusterOperationalCredentials_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterPressureMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -4798,9 +4818,9 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OperationalCredentials
-        # Cluster OperationalCredentials Command AddOpCert
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddOpCert.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddOpCert.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials Command AddNOC
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command AddTrustedRootCertificate
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddTrustedRootCertificate.restype = ctypes.c_uint32
@@ -4825,6 +4845,12 @@ class ChipClusters:
         # Cluster OperationalCredentials ReadAttribute FabricsList
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_FabricsList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_FabricsList.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials ReadAttribute SupportedFabrics
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_SupportedFabrics.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_SupportedFabrics.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials ReadAttribute CommissionedFabrics
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CommissionedFabrics.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CommissionedFabrics.restype = ctypes.c_uint32
         # Cluster OperationalCredentials ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.restype = ctypes.c_uint32
@@ -5006,6 +5032,9 @@ class ChipClusters:
         # Cluster TestCluster Command Test
         self._chipLib.chip_ime_AppendCommand_TestCluster_Test.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TestCluster_Test.restype = ctypes.c_uint32
+        # Cluster TestCluster Command TestAddArguments
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestAddArguments.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestAddArguments.restype = ctypes.c_uint32
         # Cluster TestCluster Command TestNotHandled
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.restype = ctypes.c_uint32

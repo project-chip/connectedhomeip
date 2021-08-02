@@ -31,6 +31,7 @@ OPENTHREAD_CHECKOUT=$(cd "$REPO_DIR" && git rev-parse :third_party/openthread/re
 
 CIRQUE_CACHE_PATH=${GITHUB_CACHE_PATH:-"/tmp/cirque-cache/"}
 OT_SIMULATION_CACHE="$CIRQUE_CACHE_PATH/ot-simulation.tgz"
+OT_SIMULATION_CACHE_STAMP_FILE="$CIRQUE_CACHE_PATH/ot-simulation.commit"
 
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
@@ -66,12 +67,17 @@ function __cirquetest_build_ot() {
     ./bootstrap
     make -f examples/Makefile-simulation
     tar czf "$OT_SIMULATION_CACHE" output
+    echo "$OPENTHREAD_CHECKOUT" >"$OT_SIMULATION_CACHE_STAMP_FILE"
 }
 
 function __cirquetest_build_ot_lazy() {
     pushd .
     cd "$REPO_DIR"/third_party/openthread/repo
-    ([[ -f "$OT_SIMULATION_CACHE" ]] && tar zxf "$OT_SIMULATION_CACHE") || __cirquetest_build_ot
+    ([[ -f "$OT_SIMULATION_CACHE_STAMP_FILE" ]] &&
+        [[ "$(cat "$OT_SIMULATION_CACHE_STAMP_FILE")" = "$OPENTHREAD_CHECKOUT" ]] &&
+        [[ -f "$OT_SIMULATION_CACHE" ]] &&
+        tar zxf "$OT_SIMULATION_CACHE") ||
+        __cirquetest_build_ot
     popd
 }
 
@@ -120,7 +126,7 @@ function cirquetest_run_test() {
     mkdir -p "$DEVICE_LOG_DIR"
     __cirquetest_start_flask
     sleep 5
-    "$TEST_DIR/$CURRENT_TEST.sh" "$@"
+    "$TEST_DIR/$CURRENT_TEST.py" "$@"
     exitcode=$?
     __cirquetest_clean_flask
     # TODO: Do docker system prune, we cannot filter which container

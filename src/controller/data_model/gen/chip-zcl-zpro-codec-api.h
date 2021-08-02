@@ -2368,7 +2368,7 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddOpCert                                                         |   0x06 |
+| * AddNOC                                                            |   0x06 |
 | * AddTrustedRootCertificate                                         |   0xA1 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
@@ -2379,6 +2379,8 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FabricsList                                                       | 0x0001 |
+| * SupportedFabrics                                                  | 0x0002 |
+| * CommissionedFabrics                                               | 0x0003 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -2395,6 +2397,20 @@ chip::System::PacketBufferHandle encodeOperationalCredentialsClusterDiscoverAttr
  */
 chip::System::PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsListAttribute(uint8_t seqNum,
                                                                                              chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server read command for the SupportedFabrics attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOperationalCredentialsClusterReadSupportedFabricsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server read command for the CommissionedFabrics attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOperationalCredentialsClusterReadCommissionedFabricsAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief
@@ -2905,6 +2921,7 @@ encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, 
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Test                                                              |   0x00 |
+| * TestAddArguments                                                  |   0x04 |
 | * TestNotHandled                                                    |   0x01 |
 | * TestSpecific                                                      |   0x02 |
 | * TestUnknownCommand                                                |   0x03 |

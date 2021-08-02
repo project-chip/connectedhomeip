@@ -231,8 +231,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::TCP(gDestAddr, gSendArguments.GetPort());
 
-        err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer, &gTCPManager, &fabrics, &gMessageCounterManager);
         SuccessOrExit(err);
     }
     else
@@ -240,8 +239,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), INET_NULL_INTERFACEID);
 
-        err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &fabrics, &gMessageCounterManager);
+        err = gSessionManager.Init(&DeviceLayer::SystemLayer, &gUDPManager, &fabrics, &gMessageCounterManager);
         SuccessOrExit(err);
     }
 

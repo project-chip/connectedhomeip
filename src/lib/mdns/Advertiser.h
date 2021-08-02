@@ -156,7 +156,7 @@ public:
     }
     uint8_t GetShortDiscriminator() const { return mShortDiscriminator; }
 
-    CommissionAdvertisingParameters & SetLongDiscrimininator(uint16_t discriminator)
+    CommissionAdvertisingParameters & SetLongDiscriminator(uint16_t discriminator)
     {
         mLongDiscriminator = discriminator;
         return *this;

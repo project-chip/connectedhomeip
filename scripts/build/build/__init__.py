@@ -53,9 +53,7 @@ class Context:
         ])
       else:
         # when nothing is specified, start with a default host build
-        # TODO: this is only for linux. Should be moved to 'HOST' as a platform
-        # to also support building on MacOS
-        platforms = [Platform.LINUX]
+        platforms = [Platform.HOST]
 
     # at this point, at least one of 'platforms' or 'boards' is non-empty
     if not boards:

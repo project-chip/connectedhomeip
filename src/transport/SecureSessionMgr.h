@@ -236,14 +236,13 @@ public:
      * @brief
      *   Initialize a Secure Session Manager
      *
-     * @param localNodeId           Node id for the current node
      * @param systemLayer           System, layer to use
      * @param transportMgr          Transport to use
      * @param fabrics                A table of device administrators
      * @param messageCounterManager The message counter manager
      */
-    CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                    Transport::FabricTable * fabrics, Transport::MessageCounterManagerInterface * messageCounterManager);
+    CHIP_ERROR Init(System::Layer * systemLayer, TransportMgrBase * transportMgr, Transport::FabricTable * fabrics,
+                    Transport::MessageCounterManagerInterface * messageCounterManager);
 
     /**
      * @brief
@@ -251,16 +250,6 @@ public:
      *  of the object and reset it's state.
      */
     void Shutdown();
-
-    /**
-     * @brief
-     *   Set local node ID
-     *
-     * @param nodeId    Node id for the current node
-     */
-    void SetLocalNodeId(NodeId nodeId) { mLocalNodeId = nodeId; }
-
-    NodeId GetLocalNodeId() { return mLocalNodeId; }
 
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
 
@@ -290,7 +279,6 @@ private:
     };
 
     System::Layer * mSystemLayer = nullptr;
-    NodeId mLocalNodeId;                                                                // < Id of the current node
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
     State mState;                                                                       // < Initialization state of the object
 

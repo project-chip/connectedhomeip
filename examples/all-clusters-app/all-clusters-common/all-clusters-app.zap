@@ -3240,7 +3240,7 @@
               "outgoing": 0
             },
             {
-              "name": "AddOpCert",
+              "name": "AddNOC",
               "code": 6,
               "mfgCode": null,
               "source": "client",
@@ -3331,7 +3331,7 @@
               "outgoing": 1
             },
             {
-              "name": "OpCertResponse",
+              "name": "NOCResponse",
               "code": 8,
               "mfgCode": null,
               "source": "server",
@@ -3343,6 +3343,36 @@
             {
               "name": "fabrics list",
               "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "supported fabrics",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "commissioned fabrics",
+              "code": 3,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -12973,6 +13003,22 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "TestSpecific",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "TestAddArguments",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -13007,6 +13053,14 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "TestAddArgumentsResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
               "outgoing": 1
             }
           ],

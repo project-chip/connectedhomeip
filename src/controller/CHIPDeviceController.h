@@ -355,13 +355,6 @@ protected:
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
-    // This function uses `OperationalCredentialsDelegate` to generate the operational certificates
-    // for the given device. The output is a TLV encoded array of compressed CHIP certificates. The
-    // array can contain up to two certificates (node operational certificate, and ICA certificate).
-    // If the certificate issuer doesn't require an ICA (i.e. NOC is signed by the root CA), the array
-    // will have only one certificate (node operational certificate).
-    CHIP_ERROR GenerateOperationalCertificates(const ByteSpan & noc, MutableByteSpan & cert);
-
 private:
     //////////// ExchangeDelegate Implementation ///////////////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
@@ -376,8 +369,9 @@ private:
 
     CHIP_ERROR LoadLocalCredentials(Transport::FabricInfo * fabric);
 
-    static void OnLocalNOCGenerated(void * context, const ByteSpan & noc);
-    Callback::Callback<NOCGenerated> mLocalNOCCallback;
+    static void OnLocalNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
+                                          const ByteSpan & rcac);
+    Callback::Callback<OnNOCChainGeneration> mLocalNOCChainCallback;
 };
 
 /**
@@ -630,7 +624,7 @@ private:
     /* This function sends the trusted root certificate to the device.
        The function does not hold a refernce to the device object.
      */
-    CHIP_ERROR SendTrustedRootCertificate(Device * device);
+    CHIP_ERROR SendTrustedRootCertificate(Device * device, const ByteSpan & rcac);
 
     /* This function is called by the commissioner code when the device completes
        the operational credential provisioning process.
@@ -646,21 +640,16 @@ private:
      *   This function is called by the IM layer when the commissioner receives the CSR from the device.
      *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
      *
-     * @param[in] context         The context provided while registering the callback.
-     * @param[in] CSR             The Certificate Signing Request.
-     * @param[in] CSRNonce        The Nonce sent by us when we requested the CSR.
-     * @param[in] VendorReserved1 vendor-specific information that may aid in device commissioning.
-     * @param[in] VendorReserved2 vendor-specific information that may aid in device commissioning.
-     * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
-     * @param[in] Signature       Cryptographic signature generated for the fields in the response message.
+     * @param[in] context               The context provided while registering the callback.
+     * @param[in] NOCSRElements         CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in] AttestationSignature  Cryptographic signature generated for the fields in the response message.
      */
-    static void OnOperationalCertificateSigningRequest(void * context, ByteSpan CSR, ByteSpan CSRNonce, ByteSpan VendorReserved1,
-                                                       ByteSpan VendorReserved2, ByteSpan VendorReserved3, ByteSpan Signature);
+    static void OnOperationalCertificateSigningRequest(void * context, ByteSpan NOCSRElements, ByteSpan AttestationSignature);
 
     /* Callback when adding operational certs to device results in failure */
-    static void OnAddOpCertFailureResponse(void * context, uint8_t status);
+    static void OnAddNOCFailureResponse(void * context, uint8_t status);
     /* Callback when the device confirms that it has added the operational certificates */
-    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText);
+    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint8_t FabricIndex, ByteSpan DebugText);
 
     /* Callback when the device confirms that it has added the root certificate */
     static void OnRootCertSuccessResponse(void * context);
@@ -670,31 +659,28 @@ private:
     static void OnDeviceConnectedFn(void * context, Device * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
-    static void OnDeviceNOCGenerated(void * context, const ByteSpan & noc);
+    static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
+                                           const ByteSpan & rcac);
 
     /**
      * @brief
      *   This function processes the CSR sent by the device.
      *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
      *
-     * @param[in] CSR             The Certificate Signing Request.
-     * @param[in] CSRNonce        The Nonce sent by us when we requested the CSR.
-     * @param[in] VendorReserved1 vendor-specific information that may aid in device commissioning.
-     * @param[in] VendorReserved2 vendor-specific information that may aid in device commissioning.
-     * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
-     * @param[in] Signature       Cryptographic signature generated for all the above fields.
+     * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
      */
-    CHIP_ERROR ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
-                            const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
+    CHIP_ERROR ProcessOpCSR(const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature);
 
     // Cluster callbacks for advancing commissioning flows
     Callback::Callback<BasicSuccessCallback> mSuccess;
     Callback::Callback<BasicFailureCallback> mFailure;
 
     CommissioningStage GetNextCommissioningStage();
+    static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
-    Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> mOpCertResponseCallback;
+    Callback::Callback<OperationalCredentialsClusterNOCResponseCallback> mNOCResponseCallback;
     Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
     Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
@@ -703,7 +689,7 @@ private:
     Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
-    Callback::Callback<NOCGenerated> mDeviceNOCCallback;
+    Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
 
     PASESession mPairingSession;
 };

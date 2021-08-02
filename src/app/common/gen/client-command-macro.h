@@ -2244,46 +2244,41 @@
 /** @brief Command description for OpCSRResponse
  *
  * Command: OpCSRResponse
- * @param CSR OCTET_STRING
- * @param CSRNonce OCTET_STRING
- * @param VendorReserved1 OCTET_STRING
- * @param VendorReserved2 OCTET_STRING
- * @param VendorReserved3 OCTET_STRING
- * @param Signature OCTET_STRING
+ * @param NOCSRElements OCTET_STRING
+ * @param AttestationSignature OCTET_STRING
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterOpCSRResponse(CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature)                   \
+    CredentialsClusterOpCSRResponse(NOCSRElements, AttestationSignature)                                                           \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_OP_CSR_RESPONSE_COMMAND_ID, "uuuuuu", CSR, CSRNonce, VendorReserved1, VendorReserved2,       \
-                                  VendorReserved3, Signature);
+                                  ZCL_OP_CSR_RESPONSE_COMMAND_ID, "uu", NOCSRElements, AttestationSignature);
 
-/** @brief Command description for AddOpCert
+/** @brief Command description for AddNOC
  *
- * Command: AddOpCert
+ * Command: AddNOC
  * @param NOCArray OCTET_STRING
  * @param IPKValue OCTET_STRING
  * @param CaseAdminNode NODE_ID
  * @param AdminVendorId INT16U
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterAddOpCert(NOCArray, IPKValue, CaseAdminNode, AdminVendorId)                                                  \
+    CredentialsClusterAddNOC(NOCArray, IPKValue, CaseAdminNode, AdminVendorId)                                                     \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_ADD_OP_CERT_COMMAND_ID, "uuuu", NOCArray, IPKValue, CaseAdminNode, AdminVendorId);
+                                  ZCL_ADD_NOC_COMMAND_ID, "uuuu", NOCArray, IPKValue, CaseAdminNode, AdminVendorId);
 
-/** @brief Command description for OpCertResponse
+/** @brief Command description for NOCResponse
  *
- * Command: OpCertResponse
+ * Command: NOCResponse
  * @param StatusCode INT8U
- * @param FabricIndex INT64U
- * @param DebugText CHAR_STRING
+ * @param FabricIndex INT8U
+ * @param DebugText OCTET_STRING
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterOpCertResponse(StatusCode, FabricIndex, DebugText)                                                           \
+    CredentialsClusterNOCResponse(StatusCode, FabricIndex, DebugText)                                                              \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_OP_CERT_RESPONSE_COMMAND_ID, "uuu", StatusCode, FabricIndex, DebugText);
+                                  ZCL_NOC_RESPONSE_COMMAND_ID, "uuu", StatusCode, FabricIndex, DebugText);
 
 /** @brief Command description for UpdateFabricLabel
  *
@@ -4643,6 +4638,17 @@
                                                                                                                                    \
                                                              ZCL_TEST_NOT_HANDLED_COMMAND_ID, "", );
 
+/** @brief Command description for TestAddArgumentsResponse
+ *
+ * Command: TestAddArgumentsResponse
+ * @param returnValue INT8U
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestAddArgumentsResponse(returnValue)                                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_TEST_ADD_ARGUMENTS_RESPONSE_COMMAND_ID, "u", returnValue);
+
 /** @brief Command description for TestSpecific
  *
  * Command: TestSpecific
@@ -4660,6 +4666,17 @@
     ClusterClusterTestUnknownCommand() emberAfFillExternalBuffer(mask,                                                             \
                                                                                                                                    \
                                                                  ZCL_TEST_UNKNOWN_COMMAND_COMMAND_ID, "", );
+
+/** @brief Command description for TestAddArguments
+ *
+ * Command: TestAddArguments
+ * @param arg1 INT8U
+ * @param arg2 INT8U
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestAddArguments(arg1, arg2) emberAfFillExternalBuffer(mask,                                                     \
+                                                                                                                                   \
+                                                                         ZCL_TEST_ADD_ARGUMENTS_COMMAND_ID, "uu", arg1, arg2);
 
 /** @brief Command description for GetLastMessage
  *

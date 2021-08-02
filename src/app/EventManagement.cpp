@@ -569,10 +569,11 @@ exit:
 
 #if CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
         ChipLogDetail(EventLogging,
-                      "LogEvent event number: 0x" ChipLogFormatX64 " schema priority: %u cluster id: 0x%" PRIx32
+                      "LogEvent event number: 0x" ChipLogFormatX64 " schema priority: %u cluster id: " ChipLogFormatMEI
                       " event id: 0x%" PRIx32 " sys timestamp: 0x" ChipLogFormatX64,
                       ChipLogValueX64(aEventNumber), static_cast<unsigned>(opts.mpEventSchema->mPriority),
-                      opts.mpEventSchema->mClusterId, opts.mpEventSchema->mEventId, ChipLogValueX64(opts.mTimestamp.mValue));
+                      ChipLogValueMEI(opts.mpEventSchema->mClusterId), opts.mpEventSchema->mEventId,
+                      ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
         ScheduleFlushIfNeeded(opts.mUrgent);

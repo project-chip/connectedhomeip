@@ -67,10 +67,10 @@ class Esp32Builder(Builder):
   def __init__(self,
                root,
                runner,
-               output_dir: str,
+               output_prefix: str,
                board: Esp32Board = Esp32Board.M5Stack,
                app: Esp32App = Esp32App.ALL_CLUSTERS):
-    super(Esp32Builder, self).__init__(root, runner, output_dir)
+    super(Esp32Builder, self).__init__(root, runner, output_prefix)
     self.board = board
     self.app = app
 

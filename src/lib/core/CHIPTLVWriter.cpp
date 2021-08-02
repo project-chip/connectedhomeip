@@ -211,26 +211,18 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int64_t v, bool preserveSize)
     return Put(tag, v);
 }
 
-CHIP_ERROR TLVWriter::Put(uint64_t tag, float v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, const float v)
 {
-    union
-    {
-        float f;
-        uint32_t u32;
-    } cvt;
-    cvt.f = v;
-    return WriteElementHead(TLVElementType::FloatingPointNumber32, tag, cvt.u32);
+    uint32_t u32;
+    memcpy(&u32, &v, sizeof(u32));
+    return WriteElementHead(TLVElementType::FloatingPointNumber32, tag, u32);
 }
 
-CHIP_ERROR TLVWriter::Put(uint64_t tag, double v)
+CHIP_ERROR TLVWriter::Put(uint64_t tag, const double v)
 {
-    union
-    {
-        double d;
-        uint64_t u64;
-    } cvt;
-    cvt.d = v;
-    return WriteElementHead(TLVElementType::FloatingPointNumber64, tag, cvt.u64);
+    uint64_t u64;
+    memcpy(&u64, &v, sizeof(u64));
+    return WriteElementHead(TLVElementType::FloatingPointNumber64, tag, u64);
 }
 
 CHIP_ERROR TLVWriter::Put(uint64_t tag, ByteSpan data)

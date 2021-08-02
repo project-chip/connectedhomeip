@@ -76,8 +76,8 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Error retrieving data from clusterId: %" PRIx32 ", err = %" CHIP_ERROR_FORMAT,
-                     aClusterInfo.mClusterId, ChipError::FormatError(err));
+        ChipLogError(DataManagement, "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
+                     ChipLogValueMEI(aClusterInfo.mClusterId), ChipError::FormatError(err));
     }
 
     return err;
@@ -98,8 +98,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
         if (clusterInfo->IsDirty())
         {
             AttributeDataElement::Builder attributeDataElementBuilder = attributeDataList.CreateAttributeDataElementBuilder();
-            ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", clusterInfo->mClusterId,
-                          clusterInfo->mFieldId);
+            ChipLogDetail(DataManagement, "<RE:Run> Cluster " ChipLogFormatMEI ", Field %" PRIx32 " is dirty",
+                          ChipLogValueMEI(clusterInfo->mClusterId), clusterInfo->mFieldId);
             // Retrieve data for this cluster instance and clear its dirty flag.
             err = RetrieveClusterData(attributeDataElementBuilder, *clusterInfo);
             VerifyOrExit(err == CHIP_NO_ERROR,
