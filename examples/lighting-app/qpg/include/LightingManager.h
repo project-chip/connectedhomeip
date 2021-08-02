@@ -26,8 +26,8 @@
 #include "AppEvent.h"
 
 #include "FreeRTOS.h"
-#include "timers.h" // provides FreeRTOS timer support
 #include "color_format.h"
+#include "timers.h" // provides FreeRTOS timer support
 
 #include <core/CHIPError.h>
 
