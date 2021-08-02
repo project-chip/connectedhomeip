@@ -183,7 +183,7 @@ public:
 
 void test_os_sleep_ms(uint64_t millisecs)
 {
-    usleep((useconds_t)(millisecs * 1000));
+    usleep(static_cast<useconds_t>(millisecs * 1000));
 }
 
 void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)

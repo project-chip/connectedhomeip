@@ -72,7 +72,7 @@ static const struct time_test_vector test_vector_system_time_us[] = {
 
 void test_os_sleep_us(uint64_t microsecs)
 {
-    usleep(microsecs);
+    usleep(static_cast<useconds_t>(microsecs));
 }
 
 void test_os_sleep_ms(uint64_t millisecs)
