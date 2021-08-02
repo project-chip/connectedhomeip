@@ -672,6 +672,65 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, write{{asCamelCased name
     }
 }
 {{/if}}
+{{#if isReportableAttribute}}
+
+JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, configure{{asCamelCased name false}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval{{#if isAnalog}}, {{asJniBasicType type}} change{{/if}})
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
+    if (!onSuccess) {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY);
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure) {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY);
+        return;
+    }
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    {{asCamelCased ../name false}}Cluster * cppCluster = reinterpret_cast<{{asCamelCased ../name false}}Cluster *>(clusterPtr);
+    if (cppCluster == nullptr) {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    err = cppCluster->ConfigureAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval){{#if isAnalog}}, static_cast<{{chipCallback.type}}>(change){{/if}});
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error configuring attribute", err);
+    }
+}
+
+JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, report{{asCamelCased name false}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP{{chipCallback.name}}AttributeCallback * onReport = new CHIP{{chipCallback.name}}AttributeCallback(callback{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}, true);
+    if (!onReport) {
+        ReturnIllegalStateException(env, callback, "Error creating native report callback", CHIP_ERROR_NO_MEMORY);
+        return;
+    }
+    
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    {{asCamelCased ../name false}}Cluster * cppCluster = reinterpret_cast<{{asCamelCased ../name false}}Cluster *>(clusterPtr);
+    if (cppCluster == nullptr) {
+        delete onReport;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    err = cppCluster->ReportAttribute{{asCamelCased name false}}(onReport->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onReport;
+        ReturnIllegalStateException(env, callback, "Error registering for attribute reporting", err);
+    }
+}
+{{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 {{/if}}

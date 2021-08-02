@@ -67,6 +67,10 @@ public class ChipClusters {
       super(devicePtr, endpointId);
     }
 
+    public static long clusterId() {
+      return Long.parseUnsignedLong("{{code}}");
+    }
+
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
   {{#chip_cluster_commands}}
@@ -183,6 +187,16 @@ public class ChipClusters {
       write{{asCamelCased name false}}Attribute(chipClusterPtr, callback, value);
     }
   {{/if}}
+  {{#if isReportableAttribute}}
+
+    public void configure{{asCamelCased name false}}Attribute(DefaultClusterCallback callback, int minInterval, int maxInterval{{#unless (isDiscreteType)}}, {{asJavaBasicType type}} change{{/unless}}) {
+      configure{{asCamelCased name false}}Attribute(chipClusterPtr, callback, minInterval, maxInterval{{#unless (isDiscreteType)}}, change{{/unless}});
+    }
+
+    public void report{{asCamelCased name false}}Attribute({{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback) {
+      report{{asCamelCased name false}}Attribute(chipClusterPtr, callback);
+    }
+  {{/if}}
   {{/chip_server_cluster_attributes}}
   {{#chip_server_cluster_attributes}}
   
@@ -196,6 +210,12 @@ public class ChipClusters {
   {{#if isWritableAttribute}}
 
     private native void write{{asCamelCased name false}}Attribute(long chipClusterPtr, DefaultClusterCallback callback, {{asJavaBasicType type}} value);
+  {{/if}}
+  {{#if isReportableAttribute}}
+
+    private native void configure{{asCamelCased name false}}Attribute(long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval{{#unless (isDiscreteType)}}, {{asJavaBasicType type}} change{{/unless}});
+
+    private native void report{{asCamelCased name false}}Attribute(long chipClusterPtr, {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback);
   {{/if}}
   {{/chip_server_cluster_attributes}}
   }

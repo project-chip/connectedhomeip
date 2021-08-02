@@ -1,29 +1,38 @@
 package com.google.chip.chiptool.clusterclient
 
+import android.app.AlertDialog
+import android.content.Context
+import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipClusters.OnOffCluster
 import chip.devicecontroller.ChipDeviceController
-import chip.devicecontroller.ChipDeviceControllerException
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.util.DeviceIdUtil
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 import kotlinx.android.synthetic.main.on_off_client_fragment.commandStatusTv
 import kotlinx.android.synthetic.main.on_off_client_fragment.deviceIdEd
 import kotlinx.android.synthetic.main.on_off_client_fragment.fabricIdEd
 import kotlinx.android.synthetic.main.on_off_client_fragment.levelBar
+import kotlinx.android.synthetic.main.on_off_client_fragment.view.cancelReportBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.levelBar
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.offBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.onBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.readBtn
+import kotlinx.android.synthetic.main.on_off_client_fragment.view.reportBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.toggleBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.updateAddressBtn
 import kotlinx.coroutines.CoroutineScope
@@ -38,11 +47,17 @@ class OnOffClientFragment : Fragment() {
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
 
+  private lateinit var multicastLock: WifiManager.MulticastLock
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    multicastLock = (requireContext().getSystemService(Context.WIFI_SERVICE) as WifiManager)
+      .createMulticastLock("chipOnOffMulticastLock")
+    multicastLock.acquire()
+
     return inflater.inflate(R.layout.on_off_client_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
 
@@ -51,6 +66,8 @@ class OnOffClientFragment : Fragment() {
       offBtn.setOnClickListener { scope.launch { sendOffCommandClick() } }
       toggleBtn.setOnClickListener { scope.launch { sendToggleCommandClick() } }
       readBtn.setOnClickListener { scope.launch { sendReadOnOffClick() } }
+      reportBtn.setOnClickListener { showReportDialog() }
+      cancelReportBtn.setOnClickListener { scope.launch { cancelReporting() } }
 
       levelBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
@@ -83,6 +100,103 @@ class OnOffClientFragment : Fragment() {
         Log.e(TAG, "Error reading onOff attribute", ex)
       }
     })
+  }
+
+  private suspend fun cancelReporting() {
+    val bindingCluster = ChipClusters.BindingCluster(
+      ChipClient.getConnectedDevicePointer(
+        deviceIdEd.text.toString().toLong()
+      ), 1
+    )
+    // TODO: switch out hardcoded controller nodeID 112233
+    bindingCluster.unbind(object : ChipClusters.DefaultClusterCallback {
+      override fun onSuccess() {
+        Log.v(TAG, "Successfully unbound on/off cluster")
+        showMessage("Unbound on/off cluster")
+      }
+
+      override fun onError(ex: Exception) {
+        Log.e(TAG, "Error unbinding on/off cluster", ex)
+      }
+    }, 112233, 0, 1, OnOffCluster.clusterId())
+
+    // According to spec: max interval set to 0xFFFF cancels reporting.
+    getOnOffClusterForDevice().configureOnOffAttribute(object :
+                                                         ChipClusters.DefaultClusterCallback {
+      override fun onSuccess() {
+        Log.v(TAG, "Successfully configured on/off attribute for reporting cancellation")
+        showMessage("Cancelled reporting for on/off cluster")
+      }
+
+      override fun onError(ex: Exception) {
+        Log.e(TAG, "Failed to configure on/off attribute for reporting cancellation", ex)
+      }
+    }, 1, 0xFFFF, 1)
+  }
+
+  private fun showReportDialog() {
+    val dialogView = requireActivity().layoutInflater.inflate(R.layout.report_dialog, null)
+    val dialog = AlertDialog.Builder(requireContext()).apply {
+      setView(dialogView)
+    }.create()
+
+    val minIntervalEd = dialogView.findViewById<EditText>(R.id.minIntervalEd)
+    val maxIntervalEd = dialogView.findViewById<EditText>(R.id.maxIntervalEd)
+    val changeEd = dialogView.findViewById<EditText>(R.id.changeEd)
+    dialogView.findViewById<Button>(R.id.reportBtn).setOnClickListener {
+      scope.launch {
+        sendReportOnOffClick(
+          minIntervalEd.text.toString().toInt(),
+          maxIntervalEd.text.toString().toInt(),
+          changeEd.text.toString().toInt()
+        )
+        dialog.dismiss()
+      }
+    }
+    dialog.show()
+  }
+
+  private suspend fun sendReportOnOffClick(minInterval: Int, maxInterval: Int, change: Int) {
+    val bindingCluster = ChipClusters.BindingCluster(
+      ChipClient.getConnectedDevicePointer(
+        deviceIdEd.text.toString().toLong()
+      ), 1
+    )
+    val onOffCluster = getOnOffClusterForDevice()
+
+    val configureCallback = object : ChipClusters.DefaultClusterCallback {
+      override fun onSuccess() {
+        Log.v(TAG, "Configure on/off success")
+
+        onOffCluster.reportOnOffAttribute(object : ChipClusters.BooleanAttributeCallback {
+          override fun onSuccess(on: Boolean) {
+            Log.v(TAG, "Report on/off attribute value: $on")
+
+            val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+            val time = formatter.format(Calendar.getInstance(Locale.getDefault()).time)
+            showMessage("Report on/off at $time: ${if (on) "ON" else "OFF"}")
+          }
+
+          override fun onError(ex: Exception) {
+            Log.e(TAG, "Error reporting on/off attribute", ex)
+          }
+        })
+      }
+
+      override fun onError(ex: Exception) {
+        Log.e(TAG, "Error configuring on/off attribute", ex)
+      }
+    }
+    // TODO: switch out hardcoded controller nodeID 112233
+    bindingCluster.bind(object : ChipClusters.DefaultClusterCallback {
+      override fun onSuccess() {
+        onOffCluster.configureOnOffAttribute(configureCallback, minInterval, maxInterval, change)
+      }
+
+      override fun onError(ex: Exception) {
+        Log.e(TAG, "Error binding on/off cluster", ex)
+      }
+    }, 112233, 0, 1, OnOffCluster.clusterId())
   }
 
   override fun onStart() {
@@ -120,13 +234,14 @@ class OnOffClientFragment : Fragment() {
   override fun onStop() {
     super.onStop()
     scope.cancel()
+    multicastLock.release()
   }
 
   private fun updateAddressClick() {
-    try{
+    try {
       deviceController.updateDevice(
-          fabricIdEd.text.toString().toULong().toLong(),
-          deviceIdEd.text.toString().toULong().toLong()
+        fabricIdEd.text.toString().toULong().toLong(),
+        deviceIdEd.text.toString().toULong().toLong()
       )
       showMessage("Address update started")
     } catch (ex: Exception) {
