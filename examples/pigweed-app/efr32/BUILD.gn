@@ -56,9 +56,9 @@ efr32_executable("pigweed_app") {
     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/PigweedLogger.cpp",
+    "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.c",
-    "${examples_plat_dir}/heap_4_silabs.c",
     "src/main.cpp",
   ]
 

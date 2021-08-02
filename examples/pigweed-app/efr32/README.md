@@ -34,8 +34,9 @@ following features are available:
     [sdk_support](https://github.com/SiliconLabs/sdk_support) from GitHub
 
             git clone https://github.com/SiliconLabs/sdk_support.git
-            
-    and export the path with : 
+
+
+    and export the path with :
 
             export EFR32_SDK_ROOT=<Path to cloned git repo>
 
@@ -52,13 +53,13 @@ following features are available:
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-    - Linux 
-        
-            sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+    -   Linux
 
-    - Mac OS X 
+              sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
 
-            brew install ninja
+    -   Mac OS X
+
+              brew install ninja
 
 -   Supported hardware:
 
