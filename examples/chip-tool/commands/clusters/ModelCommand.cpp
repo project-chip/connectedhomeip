@@ -26,8 +26,9 @@ using namespace ::chip;
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
-    ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16, aClusterId,
-                  aCommandId, aEndPointId);
+    ChipLogDetail(Controller,
+                  "Received Cluster Command: Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " Endpoint=%" PRIx16,
+                  ChipLogValueMEI(aClusterId), ChipLogValueMEI(aCommandId), aEndPointId);
     ChipLogError(
         Controller,
         "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");

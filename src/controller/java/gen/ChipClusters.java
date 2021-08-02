@@ -3695,13 +3695,13 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void addOpCert(
-        OpCertResponseCallback callback,
+    public void addNOC(
+        NOCResponseCallback callback,
         byte[] nOCArray,
         byte[] iPKValue,
         long caseAdminNode,
         int adminVendorId) {
-      addOpCert(chipClusterPtr, callback, nOCArray, iPKValue, caseAdminNode, adminVendorId);
+      addNOC(chipClusterPtr, callback, nOCArray, iPKValue, caseAdminNode, adminVendorId);
     }
 
     public void addTrustedRootCertificate(DefaultClusterCallback callback, byte[] rootCertificate) {
@@ -3717,7 +3717,7 @@ public class ChipClusters {
     }
 
     public void removeFabric(
-        OpCertResponseCallback callback, long fabricId, long nodeId, int vendorId) {
+        NOCResponseCallback callback, long fabricId, long nodeId, int vendorId) {
       removeFabric(chipClusterPtr, callback, fabricId, nodeId, vendorId);
     }
 
@@ -3730,13 +3730,13 @@ public class ChipClusters {
       setFabric(chipClusterPtr, callback, vendorId);
     }
 
-    public void updateFabricLabel(OpCertResponseCallback callback, String label) {
+    public void updateFabricLabel(NOCResponseCallback callback, String label) {
       updateFabricLabel(chipClusterPtr, callback, label);
     }
 
-    private native void addOpCert(
+    private native void addNOC(
         long chipClusterPtr,
-        OpCertResponseCallback callback,
+        NOCResponseCallback callback,
         byte[] nOCArray,
         byte[] iPKValue,
         long caseAdminNode,
@@ -3752,7 +3752,7 @@ public class ChipClusters {
 
     private native void removeFabric(
         long chipClusterPtr,
-        OpCertResponseCallback callback,
+        NOCResponseCallback callback,
         long fabricId,
         long nodeId,
         int vendorId);
@@ -3764,22 +3764,16 @@ public class ChipClusters {
         long chipClusterPtr, SetFabricResponseCallback callback, int vendorId);
 
     private native void updateFabricLabel(
-        long chipClusterPtr, OpCertResponseCallback callback, String label);
+        long chipClusterPtr, NOCResponseCallback callback, String label);
 
-    public interface OpCSRResponseCallback {
-      void onSuccess(
-          byte[] CSR,
-          byte[] CSRNonce,
-          byte[] VendorReserved1,
-          byte[] VendorReserved2,
-          byte[] VendorReserved3,
-          byte[] Signature);
+    public interface NOCResponseCallback {
+      void onSuccess(int StatusCode, int FabricIndex, byte[] DebugText);
 
       void onError(Exception error);
     }
 
-    public interface OpCertResponseCallback {
-      void onSuccess(int StatusCode, long FabricIndex, String DebugText);
+    public interface OpCSRResponseCallback {
+      void onSuccess(byte[] NOCSRElements, byte[] AttestationSignature);
 
       void onError(Exception error);
     }
@@ -3814,12 +3808,26 @@ public class ChipClusters {
       readFabricsListAttribute(chipClusterPtr, callback);
     }
 
+    public void readSupportedFabricsAttribute(IntegerAttributeCallback callback) {
+      readSupportedFabricsAttribute(chipClusterPtr, callback);
+    }
+
+    public void readCommissionedFabricsAttribute(IntegerAttributeCallback callback) {
+      readCommissionedFabricsAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
     private native void readFabricsListAttribute(
         long chipClusterPtr, FabricsListAttributeCallback callback);
+
+    private native void readSupportedFabricsAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readCommissionedFabricsAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -4398,6 +4406,10 @@ public class ChipClusters {
       test(chipClusterPtr, callback);
     }
 
+    public void testAddArguments(TestAddArgumentsResponseCallback callback, int arg1, int arg2) {
+      testAddArguments(chipClusterPtr, callback, arg1, arg2);
+    }
+
     public void testNotHandled(DefaultClusterCallback callback) {
       testNotHandled(chipClusterPtr, callback);
     }
@@ -4412,11 +4424,20 @@ public class ChipClusters {
 
     private native void test(long chipClusterPtr, DefaultClusterCallback callback);
 
+    private native void testAddArguments(
+        long chipClusterPtr, TestAddArgumentsResponseCallback callback, int arg1, int arg2);
+
     private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback callback);
 
     private native void testSpecific(long chipClusterPtr, TestSpecificResponseCallback callback);
 
     private native void testUnknownCommand(long chipClusterPtr, DefaultClusterCallback callback);
+
+    public interface TestAddArgumentsResponseCallback {
+      void onSuccess(int returnValue);
+
+      void onError(Exception error);
+    }
 
     public interface TestSpecificResponseCallback {
       void onSuccess(int returnValue);

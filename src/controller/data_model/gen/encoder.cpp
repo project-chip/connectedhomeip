@@ -3767,7 +3767,7 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddOpCert                                                         |   0x06 |
+| * AddNOC                                                            |   0x06 |
 | * AddTrustedRootCertificate                                         |   0xA1 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
@@ -3778,6 +3778,8 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FabricsList                                                       | 0x0001 |
+| * SupportedFabrics                                                  | 0x0002 |
+| * CommissionedFabrics                                               | 0x0003 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3798,6 +3800,33 @@ PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsListAttribute(u
         .Put8(seqNum)
         .Put32(Globals::Commands::Ids::ReadAttributes)
         .Put32(OperationalCredentials::Attributes::Ids::FabricsList);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute SupportedFabrics
+ */
+PacketBufferHandle encodeOperationalCredentialsClusterReadSupportedFabricsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOperationalCredentialsSupportedFabrics", OperationalCredentials::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OperationalCredentials::Attributes::Ids::SupportedFabrics);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CommissionedFabrics
+ */
+PacketBufferHandle encodeOperationalCredentialsClusterReadCommissionedFabricsAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOperationalCredentialsCommissionedFabrics", OperationalCredentials::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OperationalCredentials::Attributes::Ids::CommissionedFabrics);
     COMMAND_FOOTER();
 }
 
@@ -4594,6 +4623,7 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Test                                                              |   0x00 |
+| * TestAddArguments                                                  |   0x04 |
 | * TestNotHandled                                                    |   0x01 |
 | * TestSpecific                                                      |   0x02 |
 | * TestUnknownCommand                                                |   0x03 |

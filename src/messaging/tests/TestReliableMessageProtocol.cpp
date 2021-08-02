@@ -183,14 +183,7 @@ public:
 
 void test_os_sleep_ms(uint64_t millisecs)
 {
-    struct timespec sleep_time;
-    uint64_t s = millisecs / 1000;
-
-    millisecs -= s * 1000;
-    sleep_time.tv_sec  = static_cast<time_t>(s);
-    sleep_time.tv_nsec = static_cast<long>(millisecs * 1000000);
-
-    nanosleep(&sleep_time, nullptr);
+    usleep(static_cast<useconds_t>(millisecs * 1000));
 }
 
 void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
@@ -452,18 +445,15 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     gLoopback.mNumMessagesToDrop   = 0;
     gLoopback.mDroppedMessageCount = 0;
 
-    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    // We are sending a malicious packet, doesn't expect an ack
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     // Test that the message was actually sent (and not dropped)
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
     // Test that the message was dropped by the receiver
     NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
-
-    // Since peer dropped the message, we might have pending acks. Let's clear the table
-    rm->ClearRetransTable(rc);
-
-    exchange->Close();
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
 
 void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void * inContext)

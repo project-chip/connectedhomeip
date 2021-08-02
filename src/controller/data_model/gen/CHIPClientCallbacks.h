@@ -160,11 +160,10 @@ typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(void 
                                                                            uint8_t * imageURI, uint32_t softwareVersion,
                                                                            chip::ByteSpan updateToken, uint8_t userConsentNeeded,
                                                                            chip::ByteSpan metadataForRequestor);
-typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
-                                                                   chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
-                                                                   chip::ByteSpan VendorReserved3, chip::ByteSpan Signature);
-typedef void (*OperationalCredentialsClusterOpCertResponseCallback)(void * context, uint8_t StatusCode, uint64_t FabricIndex,
-                                                                    uint8_t * DebugText);
+typedef void (*OperationalCredentialsClusterNOCResponseCallback)(void * context, uint8_t StatusCode, uint8_t FabricIndex,
+                                                                 chip::ByteSpan DebugText);
+typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan NOCSRElements,
+                                                                   chip::ByteSpan AttestationSignature);
 typedef void (*OperationalCredentialsClusterSetFabricResponseCallback)(void * context, chip::FabricId FabricId);
 typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId);
 typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t capacity, uint16_t groupId,
@@ -180,6 +179,7 @@ typedef void (*TvChannelClusterChangeChannelResponseCallback)(void * context,
                                                               /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch,
                                                               uint8_t ErrorType);
 typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * context, uint8_t * data);
+typedef void (*TestClusterClusterTestAddArgumentsResponseCallback)(void * context, uint8_t returnValue);
 typedef void (*TestClusterClusterTestSpecificResponseCallback)(void * context, uint8_t returnValue);
 
 // List specific responses

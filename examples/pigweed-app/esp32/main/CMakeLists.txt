@@ -16,34 +16,6 @@
 
 idf_component_register(INCLUDE_DIRS 
                      "${CMAKE_CURRENT_LIST_DIR}"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_sys_io/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log/public_overrides" 
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_bytes/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_checksum/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic/public_overrides"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_span/public_overrides"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_span/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/standard_library_public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public_overrides"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/nanopb/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/raw/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_function/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_status/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_stream/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_result/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_varint/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/system_server/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nanopb/repo"
                      "${CMAKE_SOURCE_DIR}/../../platform/esp32/pw_sys_io/public"
                      "${CMAKE_SOURCE_DIR}/../../platform/esp32"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed"
@@ -59,6 +31,21 @@ idf_component_register(INCLUDE_DIRS
                       PRIV_REQUIRES bt chip)
 
 idf_component_get_property(chip_lib chip COMPONENT_LIB)
+
+get_filename_component(CHIP_ROOT ../third_party/connectedhomeip REALPATH)
+set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
+
+include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
+include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
+set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
+
+target_link_libraries(${COMPONENT_LIB} PUBLIC
+    pw_checksum
+    pw_hdlc
+    pw_log
+    pw_rpc.nanopb.echo_service
+    pw_rpc.server
+)
 
 set(WRAP_FUNCTIONS esp_log_write)
 target_link_libraries(${chip_lib} INTERFACE "-Wl,--wrap=${WRAP_FUNCTIONS}")
