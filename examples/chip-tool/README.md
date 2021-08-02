@@ -55,7 +55,8 @@ the ESP32 all-clusters-app:
 
 #### Pair a device over IP
 
-The command below will pair to a localhost device (`::1`) running the `all-clusters-app` on the default port (`5540`) over IPv6:
+The command below will pair to a localhost device (`::1`) running the
+`all-clusters-app` on the default port (`5540`) over IPv6:
 
     $ chip-tool pairing onnetwork 0 20202021 3840 ::1 5540
 
