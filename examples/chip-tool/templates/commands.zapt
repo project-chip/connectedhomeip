@@ -390,16 +390,16 @@ void registerCluster{{asCamelCased name false}}(Commands & commands)
 
     commands_list clusterCommands = {
         {{#chip_server_cluster_commands}}
-        make_unique<{{asCamelCased clusterName false}}{{asCamelCased name false}}>(),
+        make_unique<{{asCamelCased clusterName false}}{{asCamelCased name false}}>(), //
         {{/chip_server_cluster_commands}}
-        make_unique<Discover{{asCamelCased name false}}Attributes>(),
+        make_unique<Discover{{asCamelCased name false}}Attributes>(), //
         {{#chip_server_cluster_attributes}}
-        make_unique<Read{{asCamelCased parent.name false}}{{asCamelCased name false}}>(),
+        make_unique<Read{{asCamelCased parent.name false}}{{asCamelCased name false}}>(), //
         {{#if isWritableAttribute}}
-        make_unique<Write{{asCamelCased parent.name false}}{{asCamelCased name false}}>(),
+        make_unique<Write{{asCamelCased parent.name false}}{{asCamelCased name false}}>(), //
         {{/if}}
         {{#if isReportableAttribute}}
-        make_unique<Report{{asCamelCased parent.name false}}{{asCamelCased name false}}>(),
+        make_unique<Report{{asCamelCased parent.name false}}{{asCamelCased name false}}>(), //
         {{/if}}
         {{/chip_server_cluster_attributes}}
     };

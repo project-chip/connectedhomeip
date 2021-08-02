@@ -25,10 +25,12 @@
 #include "AndroidBleApplicationDelegate.h"
 #include "AndroidBleConnectionDelegate.h"
 #include "AndroidBlePlatformDelegate.h"
+#include "AndroidCallbacks.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include "CHIPJNIError.h"
 #include "JniReferences.h"
 #include "JniTypeWrappers.h"
+#include "MdnsImpl.h"
 #include "StackLock.h"
 
 #include <app/chip-zcl-zpro-codec.h>
@@ -261,6 +263,22 @@ JNI_METHOD(void, setKeyValueStoreManager)(JNIEnv * env, jclass self, jobject man
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeWithObject(manager);
 }
 
+JNI_METHOD(void, setServiceResolver)(JNIEnv * env, jclass self, jobject resolver)
+{
+    using namespace chip::Mdns;
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    InitializeWithObject(resolver);
+}
+
+JNI_METHOD(void, handleServiceResolve)
+(JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring address, jint port, jlong callbackHandle,
+ jlong contextHandle)
+{
+    using namespace chip::Mdns;
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    HandleResolve(instanceName, serviceType, address, port, callbackHandle, contextHandle);
+}
+
 JNI_METHOD(void, pairDevice)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode, jbyteArray csrNonce)
 {
@@ -333,8 +351,18 @@ JNI_METHOD(jlong, getDevicePointer)(JNIEnv * env, jobject self, jlong handle, jl
 
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
 
-    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
+    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a Java handle");
     return reinterpret_cast<jlong>(chipDevice);
+}
+
+JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jlong callbackHandle)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
+    VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallback handle is nullptr"));
+    wrapper->Controller()->GetConnectedDevice(nodeId, &connectedDeviceCallback->mOnSuccess, &connectedDeviceCallback->mOnFailure);
 }
 
 JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
@@ -421,25 +449,16 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
     return env->NewStringUTF(addrStr);
 }
 
-JNI_METHOD(void, updateAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port)
+JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong fabricId, jlong deviceId)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    Device * chipDevice = nullptr;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
 
-    GetCHIPDevice(env, handle, deviceId, &chipDevice);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    CHIP_ERROR err = wrapper->Controller()->UpdateDevice(static_cast<chip::NodeId>(deviceId), static_cast<uint64_t>(fabricId));
 
-    Inet::IPAddress ipAddress = {};
-    JniUtfString addressAccessor(env, address);
-    VerifyOrExit(Inet::IPAddress::FromString(addressAccessor.c_str(), ipAddress), err = CHIP_ERROR_INVALID_ADDRESS);
-    VerifyOrExit(CanCastTo<uint16_t>(port), err = CHIP_ERROR_INVALID_ADDRESS);
-
-    err = chipDevice->UpdateAddress(Transport::PeerAddress::UDP(ipAddress, port));
-
-exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to update address");
+        ChipLogError(Controller, "Failed to update device");
         ThrowError(env, err);
     }
 }
@@ -467,7 +486,9 @@ JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong de
         }
         else
         {
-            err = chipDevice->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, std::move(buffer));
+            // We don't install a response handler, so aren't waiting for a response
+            err = chipDevice->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, Messaging::SendMessageFlags::kNone,
+                                          std::move(buffer));
         }
     }
 

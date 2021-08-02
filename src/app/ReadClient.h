@@ -72,7 +72,7 @@ public:
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * aSecureSession,
+    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * aSecureSession,
                                EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
                                AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
                                EventNumber aEventNumber);

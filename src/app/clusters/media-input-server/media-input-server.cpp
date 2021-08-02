@@ -44,7 +44,7 @@ static void storeCurrentInput(chip::EndpointId endpoint, uint8_t currentInput)
     }
 }
 
-bool emberAfMediaInputClusterSelectInputCallback(chip::app::CommandHandler * command, uint8_t input)
+bool emberAfMediaInputClusterSelectInputCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command, uint8_t input)
 {
     bool success         = mediaInputClusterSelectInput(input);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -56,7 +56,7 @@ bool emberAfMediaInputClusterSelectInputCallback(chip::app::CommandHandler * com
     return true;
 }
 
-bool emberAfMediaInputClusterShowInputStatusCallback(chip::app::CommandHandler * command)
+bool emberAfMediaInputClusterShowInputStatusCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command)
 {
     bool success         = mediaInputClusterShowInputStatus();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -64,7 +64,7 @@ bool emberAfMediaInputClusterShowInputStatusCallback(chip::app::CommandHandler *
     return true;
 }
 
-bool emberAfMediaInputClusterHideInputStatusCallback(chip::app::CommandHandler * command)
+bool emberAfMediaInputClusterHideInputStatusCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command)
 {
     bool success         = mediaInputClusterHideInputStatus();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
@@ -72,7 +72,8 @@ bool emberAfMediaInputClusterHideInputStatusCallback(chip::app::CommandHandler *
     return true;
 }
 
-bool emberAfMediaInputClusterRenameInputCallback(chip::app::CommandHandler * command, uint8_t input, uint8_t * name)
+bool emberAfMediaInputClusterRenameInputCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command, uint8_t input,
+                                                 uint8_t * name)
 {
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string nameString(reinterpret_cast<char *>(name));

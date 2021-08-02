@@ -941,7 +941,7 @@ CHIP_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
         const int fd = ::socket(family, aType, aProtocol);
         if (fd == -1)
             return chip::System::MapErrorPOSIX(errno);
-        mSocket.Attach(fd);
+        ReturnErrorOnFailure(mSocket.Attach(fd));
 
         mAddrType = aAddressType;
 

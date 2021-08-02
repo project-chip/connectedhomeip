@@ -320,16 +320,16 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
-CHIP_ERROR InteractionModelEngine::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId,
-                                                   SecureSessionHandle * apSecureSession, EventPathParams * apEventPathParamsList,
-                                                   size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
+CHIP_ERROR InteractionModelEngine::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession,
+                                                   EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
+                                                   AttributePathParams * apAttributePathParamsList,
                                                    size_t aAttributePathParamsListSize, EventNumber aEventNumber,
                                                    intptr_t aAppIdentifier)
 {
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     ReturnErrorOnFailure(NewReadClient(&client, aAppIdentifier));
-    err = client->SendReadRequest(aNodeId, aAdminId, apSecureSession, apEventPathParamsList, aEventPathParamsListSize,
+    err = client->SendReadRequest(aNodeId, aFabricIndex, apSecureSession, apEventPathParamsList, aEventPathParamsListSize,
                                   apAttributePathParamsList, aAttributePathParamsListSize, aEventNumber);
     if (err != CHIP_NO_ERROR)
     {
@@ -342,10 +342,10 @@ CHIP_ERROR __attribute__((weak))
 WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     ChipLogDetail(DataManagement,
-                  "Received Cluster Attribute: Cluster=%" PRIx32 " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx16
+                  "Received Cluster Attribute: Cluster=" ChipLogFormatMEI " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx16
                   " FieldId=%" PRIx32 " ListIndex=%" PRIx16,
-                  aClusterInfo.mClusterId, ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId, aClusterInfo.mFieldId,
-                  aClusterInfo.mListIndex);
+                  ChipLogValueMEI(aClusterInfo.mClusterId), ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId,
+                  aClusterInfo.mFieldId, aClusterInfo.mListIndex);
     ChipLogError(DataManagement,
                  "Default WriteSingleClusterData is called, this should be replaced by actual dispatched for cluster");
     return CHIP_NO_ERROR;

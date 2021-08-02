@@ -281,8 +281,7 @@ class ChipDeviceController(object):
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         im.ClearCommandStatus(im.PLACEHOLDER_COMMAND_HANDLE)
-        self._Cluster.SendCommand(
-            device, cluster, command, endpoint, groupid, args, True)
+        self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args, True)
         if blocking:
             # We only send 1 command by this function, so index is always 0
             return im.WaitCommandIndexStatus(im.PLACEHOLDER_COMMAND_HANDLE, 1)
@@ -298,8 +297,7 @@ class ChipDeviceController(object):
             raise self._ChipStack.ErrorToException(res)
 
         # We are not using IM for Attributes.
-        res = self._Cluster.ReadAttribute(
-            device, cluster, attribute, endpoint, groupid, False)
+        res = self._Cluster.ReadAttribute(device, cluster, attribute, endpoint, groupid, False)
         if blocking:
             return im.GetAttributeReadResponse(im.DEFAULT_ATTRIBUTEREAD_APPID)
 

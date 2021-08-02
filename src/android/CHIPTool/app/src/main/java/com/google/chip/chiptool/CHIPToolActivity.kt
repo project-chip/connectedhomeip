@@ -27,9 +27,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.NsdManagerServiceResolver
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.chip.chiptool.attestation.AttestationTestFragment
-import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.echoclient.EchoClientFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
@@ -39,6 +39,8 @@ import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
 import chip.devicecontroller.PreferencesKeyValueStoreManager
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
+import com.google.chip.chiptool.clusterclient.OnOffClientFragment
+import com.google.chip.chiptool.clusterclient.SensorClientFragment
 
 class CHIPToolActivity :
     AppCompatActivity(),
@@ -54,6 +56,7 @@ class CHIPToolActivity :
 
     if (savedInstanceState == null) {
       ChipDeviceController.setKeyValueStoreManager(PreferencesKeyValueStoreManager(this))
+      ChipDeviceController.setServiceResolver(NsdManagerServiceResolver(this))
       val fragment = SelectActionFragment.newInstance()
       supportFragmentManager
           .beginTransaction()
@@ -110,6 +113,10 @@ class CHIPToolActivity :
 
   override fun handleOnOffClicked() {
     showFragment(OnOffClientFragment.newInstance())
+  }
+
+  override fun handleSensorClicked() {
+    showFragment(SensorClientFragment.newInstance())
   }
 
   override fun handleAttestationTestClicked() {

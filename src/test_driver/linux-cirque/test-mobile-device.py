@@ -99,7 +99,7 @@ class TestPythonController(CHIPVirtualHome):
         for device_id in server_ids:
             self.logger.info("checking device log for {}".format(
                 self.get_device_pretty_id(device_id)))
-            self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["LightingManager::InitiateAction(ON_ACTION)", "LightingManager::InitiateAction(OFF_ACTION)", "No Cluster 0x6 on Endpoint 0xe9"]),
+            self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["LightingManager::InitiateAction(ON_ACTION)", "LightingManager::InitiateAction(OFF_ACTION)", "No Cluster 0x0000_0006 on Endpoint 0xe9"]),
                             "Datamodel test failed: cannot find matching string from device {}".format(device_id))
 
 

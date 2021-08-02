@@ -48,7 +48,7 @@ static chip::SecureSessionMgr gSessionManager;
 static chip::Messaging::ExchangeManager gExchangeManager;
 static chip::secure_channel::MessageCounterManager gMessageCounterManager;
 static chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-static const chip::Transport::AdminId gAdminId = 0;
+static const chip::FabricIndex gFabricIndex = 0;
 } // namespace
 
 namespace chip {
@@ -109,17 +109,17 @@ void InitializeChip(nlTestSuite * apSuite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
+    chip::Transport::FabricTable fabrics;
+    chip::Transport::FabricInfo * fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, chip::kTestDeviceNodeId);
 
-    NL_TEST_ASSERT(apSuite, adminInfo != nullptr);
+    NL_TEST_ASSERT(apSuite, fabricInfo != nullptr);
 
     err = chip::Platform::MemoryInit();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     gSystemLayer.Init();
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins, &gMessageCounterManager);
+    err = gSessionManager.Init(&gSystemLayer, &gTransportManager, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = gExchangeManager.Init(&gSessionManager);

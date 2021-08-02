@@ -26,6 +26,7 @@
 #include "Hash_SHA256_test_vectors.h"
 #include "PBKDF2_SHA256_test_vectors.h"
 
+#include "RawIntegerToDer_test_vectors.h"
 #include "SPAKE2P_FE_MUL_test_vectors.h"
 #include "SPAKE2P_FE_RW_test_vectors.h"
 #include "SPAKE2P_HMAC_test_vectors.h"
@@ -619,26 +620,110 @@ static void TestAsn1Conversions(nlTestSuite * inSuite, void * inContext)
         out_raw_sig.Calloc(out_raw_sig_allocated_size);
         NL_TEST_ASSERT(inSuite, out_raw_sig);
 
-        chip::Platform::ScopedMemoryBuffer<uint8_t> out_asn1_sig;
-        size_t out_asn1_sig_allocated_size = (vector->fe_length_bytes * 2) + kMax_ECDSA_X9Dot62_Asn1_Overhead;
-        out_asn1_sig.Calloc(out_asn1_sig_allocated_size);
-        NL_TEST_ASSERT(inSuite, out_asn1_sig);
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_der_sig;
+        size_t out_der_sig_allocated_size = (vector->fe_length_bytes * 2) + kMax_ECDSA_X9Dot62_Asn1_Overhead;
+        out_der_sig.Calloc(out_der_sig_allocated_size);
+        NL_TEST_ASSERT(inSuite, out_der_sig);
 
         // Test converstion from ASN.1 ER to raw
-        CHIP_ERROR status = EcdsaAsn1SignatureToRaw(vector->fe_length_bytes, vector->der_version, vector->der_version_length,
-                                                    out_raw_sig.Get(), out_raw_sig_allocated_size);
+        MutableByteSpan out_raw_sig_span(out_raw_sig.Get(), out_raw_sig_allocated_size);
+
+        CHIP_ERROR status = EcdsaAsn1SignatureToRaw(vector->fe_length_bytes,
+                                                    ByteSpan{ vector->der_version, vector->der_version_length }, out_raw_sig_span);
         NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, (memcmp(out_raw_sig.Get(), vector->raw_version, vector->raw_version_length) == 0));
+        NL_TEST_ASSERT(inSuite, out_raw_sig_span.size() == vector->raw_version_length);
+        NL_TEST_ASSERT(inSuite, (memcmp(out_raw_sig_span.data(), vector->raw_version, vector->raw_version_length) == 0));
 
         // Test conversion from raw to ASN.1 DER
-        size_t der_size = 0;
-        status          = EcdsaRawSignatureToAsn1(vector->fe_length_bytes, vector->raw_version, vector->raw_version_length,
-                                         out_asn1_sig.Get(), out_asn1_sig_allocated_size, der_size);
-
+        MutableByteSpan out_der_sig_span(out_der_sig.Get(), out_der_sig_allocated_size);
+        status = EcdsaRawSignatureToAsn1(vector->fe_length_bytes, ByteSpan{ vector->raw_version, vector->raw_version_length },
+                                         out_der_sig_span);
         NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, der_size <= out_asn1_sig_allocated_size);
-        NL_TEST_ASSERT(inSuite, der_size == vector->der_version_length);
-        NL_TEST_ASSERT(inSuite, (memcmp(out_asn1_sig.Get(), vector->der_version, vector->der_version_length) == 0));
+        NL_TEST_ASSERT(inSuite, out_der_sig_span.size() <= out_der_sig_allocated_size);
+        NL_TEST_ASSERT(inSuite, out_der_sig_span.size() == vector->der_version_length);
+        NL_TEST_ASSERT(inSuite, (memcmp(out_der_sig_span.data(), vector->der_version, vector->der_version_length) == 0));
+    }
+}
+
+static void TestRawIntegerToDerValidCases(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestCases = ArraySize(kRawIntegerToDerVectors);
+
+    for (int testIdx = 0; testIdx < numOfTestCases; testIdx++)
+    {
+        RawIntegerToDerVector v = kRawIntegerToDerVectors[testIdx];
+
+        // Cover case with tag/length
+        {
+            chip::Platform::ScopedMemoryBuffer<uint8_t> out_der_buffer;
+            out_der_buffer.Alloc(v.expected_size);
+            NL_TEST_ASSERT(inSuite, out_der_buffer);
+
+            MutableByteSpan out_der_integer(out_der_buffer.Get(), v.expected_size);
+            CHIP_ERROR status = ConvertIntegerRawToDer(ByteSpan{ v.candidate, v.candidate_size }, out_der_integer);
+            NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, out_der_integer.size() == v.expected_size);
+            NL_TEST_ASSERT(inSuite, out_der_integer.data_equal(ByteSpan(v.expected, v.expected_size)));
+
+            // Cover case of buffer too small
+            MutableByteSpan out_der_integer_too_small(out_der_buffer.Get(), v.expected_size - 1);
+            status = ConvertIntegerRawToDer(ByteSpan{ v.candidate, v.candidate_size }, out_der_integer_too_small);
+            NL_TEST_ASSERT(inSuite, status == CHIP_ERROR_BUFFER_TOO_SMALL);
+        }
+
+        // Cover case without tag/length
+        {
+            chip::Platform::ScopedMemoryBuffer<uint8_t> out_der_buffer;
+            out_der_buffer.Alloc(v.expected_without_tag_size);
+            NL_TEST_ASSERT(inSuite, out_der_buffer);
+
+            MutableByteSpan out_der_integer(out_der_buffer.Get(), v.expected_without_tag_size);
+            CHIP_ERROR status = ConvertIntegerRawToDerWithoutTag(ByteSpan{ v.candidate, v.candidate_size }, out_der_integer);
+
+            NL_TEST_ASSERT(inSuite, status == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, out_der_integer.size() == v.expected_without_tag_size);
+            NL_TEST_ASSERT(inSuite, out_der_integer.data_equal(ByteSpan(v.expected_without_tag, v.expected_without_tag_size)));
+        }
+    }
+}
+
+static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inContext)
+{
+    // Cover case of invalid buffers
+    uint8_t placeholder[10] = { 0 };
+    MutableByteSpan good_out_buffer(placeholder, sizeof(placeholder));
+    ByteSpan good_buffer(placeholder, sizeof(placeholder));
+
+    MutableByteSpan bad_out_buffer_nullptr(nullptr, sizeof(placeholder));
+    MutableByteSpan bad_out_buffer_empty(placeholder, 0);
+
+    ByteSpan bad_buffer_nullptr(nullptr, sizeof(placeholder));
+    ByteSpan bad_buffer_empty(placeholder, 0);
+
+    struct ErrorCase
+    {
+        const ByteSpan & input;
+        MutableByteSpan & output;
+        CHIP_ERROR expected_status;
+    };
+
+    const ErrorCase error_cases[] = {
+        { .input = good_buffer, .output = bad_out_buffer_nullptr, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input = good_buffer, .output = bad_out_buffer_empty, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input = bad_buffer_nullptr, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input = bad_buffer_empty, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT }
+    };
+
+    int case_idx = 0;
+    for (const ErrorCase & v : error_cases)
+    {
+        CHIP_ERROR status = ConvertIntegerRawToDerWithoutTag(v.input, v.output);
+        if (status != v.expected_status)
+        {
+            ChipLogError(Crypto, "Failed TestRawIntegerToDerInvalidCases sub-case %d", case_idx);
+            NL_TEST_ASSERT(inSuite, v.expected_status == status);
+        }
+        ++case_idx;
     }
 }
 
@@ -681,23 +766,108 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
         {
             size_t rand_data_length = static_cast<unsigned int>(rand()) % (data_length + 1);
 
-            error = sha256.AddData(data, rand_data_length);
+            error = sha256.AddData(ByteSpan{ data, rand_data_length });
             NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
             data += rand_data_length;
             data_length -= rand_data_length;
         }
 
-        error = sha256.AddData(data, data_length);
+        error = sha256.AddData(ByteSpan{ data, data_length });
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
-        error = sha256.Finish(out_buffer);
+        MutableByteSpan out_span(out_buffer);
+        error = sha256.Finish(out_span);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, out_span.size() == kSHA256_Hash_Length);
 
-        bool success = memcmp(v.hash, out_buffer, sizeof(out_buffer)) == 0;
+        bool success = memcmp(v.hash, out_span.data(), out_span.size()) == 0;
         NL_TEST_ASSERT(inSuite, success);
     }
+
     NL_TEST_ASSERT(inSuite, numOfTestsExecuted == ArraySize(hash_sha256_test_vectors));
+
+    // Test partial digests
+    uint8_t source_buf[2 * kSHA256_Hash_Length];
+
+    // Use a basic counter for all data
+    for (size_t idx = 0; idx < sizeof(source_buf); idx++)
+    {
+        source_buf[idx] = static_cast<uint8_t>(idx & 0xFFu);
+    }
+
+    // Use split blocks of every length including digest length, to cover
+    // all padding cases.
+    for (size_t block1_size = 1; block1_size <= kSHA256_Hash_Length; block1_size++)
+    {
+        for (size_t block2_size = 1; block2_size <= kSHA256_Hash_Length; block2_size++)
+        {
+            uint8_t partial_digest1[kSHA256_Hash_Length];
+            uint8_t partial_digest2[kSHA256_Hash_Length];
+            uint8_t partial_digest_ref[kSHA256_Hash_Length];
+            uint8_t total_digest[kSHA256_Hash_Length];
+            uint8_t total_digest_ref[kSHA256_Hash_Length];
+            MutableByteSpan partial_digest_span1(partial_digest1);
+            MutableByteSpan partial_digest_span2(partial_digest2);
+            MutableByteSpan total_digest_span(total_digest);
+
+            Hash_SHA256_stream sha256;
+            NL_TEST_ASSERT(inSuite, sha256.Begin() == CHIP_NO_ERROR);
+
+            // Compute partial digest after first block
+            NL_TEST_ASSERT(inSuite, sha256.AddData(ByteSpan{ &source_buf[0], block1_size }) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, sha256.GetDigest(partial_digest_span1) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, partial_digest_span1.size() == kSHA256_Hash_Length);
+
+            // Validate partial digest matches expectations
+            Hash_SHA256(&source_buf[0], block1_size, &partial_digest_ref[0]);
+            NL_TEST_ASSERT(inSuite, 0 == memcmp(partial_digest_span1.data(), partial_digest_ref, partial_digest_span1.size()));
+
+            // Compute partial digest and total digest after second block
+            NL_TEST_ASSERT(inSuite, sha256.AddData(ByteSpan{ &source_buf[block1_size], block2_size }) == CHIP_NO_ERROR);
+
+            NL_TEST_ASSERT(inSuite, sha256.GetDigest(partial_digest_span2) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, partial_digest_span2.size() == kSHA256_Hash_Length);
+
+            NL_TEST_ASSERT(inSuite, sha256.Finish(total_digest_span) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, total_digest_span.size() == kSHA256_Hash_Length);
+
+            // Validate second partial digest matches final digest
+            Hash_SHA256(&source_buf[0], block1_size + block2_size, &total_digest_ref[0]);
+            NL_TEST_ASSERT(inSuite, 0 == memcmp(partial_digest_span2.data(), total_digest_ref, partial_digest_span2.size()));
+            NL_TEST_ASSERT(inSuite, 0 == memcmp(total_digest_span.data(), total_digest_ref, total_digest_span.size()));
+        }
+    }
+
+    // Validate error cases
+    {
+        uint8_t source_buf2[5] = { 1, 2, 3, 4, 5 };
+        uint8_t digest_buf_too_small[kSHA256_Hash_Length - 1];
+        uint8_t digest_buf_ok[kSHA256_Hash_Length];
+        uint8_t digest_buf_ref[kSHA256_Hash_Length];
+        MutableByteSpan digest_span_too_small(digest_buf_too_small);
+        MutableByteSpan digest_span_ok(digest_buf_ok);
+
+        Hash_SHA256(&source_buf2[0], sizeof(source_buf2), &digest_buf_ref[0]);
+
+        Hash_SHA256_stream sha256;
+        NL_TEST_ASSERT(inSuite, sha256.Begin() == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(inSuite, sha256.AddData(ByteSpan{ source_buf2 }) == CHIP_NO_ERROR);
+
+        // Check that error behavior works on buffer too small
+        NL_TEST_ASSERT(inSuite, sha256.GetDigest(digest_span_too_small) == CHIP_ERROR_BUFFER_TOO_SMALL);
+        NL_TEST_ASSERT(inSuite, sha256.Finish(digest_span_too_small) == CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        // Check that both GetDigest/Finish can still work after error.
+        NL_TEST_ASSERT(inSuite, sha256.GetDigest(digest_span_ok) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, 0 == memcmp(digest_span_ok.data(), digest_buf_ref, digest_span_ok.size()));
+
+        memset(digest_buf_ok, 0, sizeof(digest_buf_ok));
+
+        NL_TEST_ASSERT(inSuite, sha256.Finish(digest_span_ok) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, 0 == memcmp(digest_span_ok.data(), digest_buf_ref, digest_span_ok.size()));
+    }
 }
 
 static void TestHMAC_SHA256(nlTestSuite * inSuite, void * inContext)
@@ -1555,7 +1725,7 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
         err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        err = GetTestCertPubkey(certType, certPubkey, certPubkeyLen);
+        err = GetTestCertPubkey(certType, &certPubkey, certPubkeyLen);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = ExtractPubkeyFromX509Cert(cert, publicKey);
@@ -1591,6 +1761,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid IV", TestAES_CCM_256DecryptInvalidIVLen),
     NL_TEST_DEF("Test decrypting AES-CCM-256 invalid vectors", TestAES_CCM_256DecryptInvalidTestVectors),
     NL_TEST_DEF("Test ASN.1 signature conversion routines", TestAsn1Conversions),
+    NL_TEST_DEF("Test Integer to ASN.1 DER conversion", TestRawIntegerToDerValidCases),
+    NL_TEST_DEF("Test Integer to ASN.1 DER conversion error cases", TestRawIntegerToDerInvalidCases),
     NL_TEST_DEF("Test ECDSA signing and validation message using SHA256", TestECDSA_Signing_SHA256_Msg),
     NL_TEST_DEF("Test ECDSA signing and validation SHA256 Hash", TestECDSA_Signing_SHA256_Hash),
     NL_TEST_DEF("Test ECDSA signature validation fail - Different msg", TestECDSA_ValidationFailsDifferentMessage),

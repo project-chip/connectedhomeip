@@ -123,8 +123,8 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    Transport::AdminPairingTable admins;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins, &gMessageCounterManager);
+    Transport::FabricTable fabrics;
+    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -152,8 +152,8 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    Transport::AdminPairingTable admins;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins, &gMessageCounterManager);
+    Transport::FabricTable fabrics;
+    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -162,11 +162,11 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    Transport::AdminPairingInfo * admin = admins.AssignAdminId(0, kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, admin != nullptr);
+    Transport::FabricInfo * fabric = fabrics.AssignFabricIndex(0, kSourceNodeId);
+    NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
-    admin = admins.AssignAdminId(1, kDestinationNodeId);
-    NL_TEST_ASSERT(inSuite, admin != nullptr);
+    fabric = fabrics.AssignFabricIndex(1, kDestinationNodeId);
+    NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
     SecurePairingUsingTestSecret pairing1(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
@@ -250,8 +250,8 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    Transport::AdminPairingTable admins;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins, &gMessageCounterManager);
+    Transport::FabricTable fabrics;
+    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -260,11 +260,11 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    Transport::AdminPairingInfo * admin = admins.AssignAdminId(0, kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, admin != nullptr);
+    Transport::FabricInfo * fabric = fabrics.AssignFabricIndex(0, kSourceNodeId);
+    NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
-    admin = admins.AssignAdminId(1, kDestinationNodeId);
-    NL_TEST_ASSERT(inSuite, admin != nullptr);
+    fabric = fabrics.AssignFabricIndex(1, kDestinationNodeId);
+    NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
     SecurePairingUsingTestSecret pairing1(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
@@ -332,8 +332,8 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    Transport::AdminPairingTable admins;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins, &gMessageCounterManager);
+    Transport::FabricTable fabrics;
+    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -342,11 +342,11 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    Transport::AdminPairingInfo * admin = admins.AssignAdminId(0, kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, admin != nullptr);
+    Transport::FabricInfo * fabric = fabrics.AssignFabricIndex(0, kSourceNodeId);
+    NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
-    admin = admins.AssignAdminId(1, kDestinationNodeId);
-    NL_TEST_ASSERT(inSuite, admin != nullptr);
+    fabric = fabrics.AssignFabricIndex(1, kDestinationNodeId);
+    NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
     SecurePairingUsingTestSecret pairing1(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);

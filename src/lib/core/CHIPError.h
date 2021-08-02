@@ -105,13 +105,24 @@ public:
     };
 
     ChipError() = default;
+
+#if CHIP_CONFIG_ERROR_SOURCE
+    explicit constexpr ChipError(StorageType error) : mError(error), mFile(nullptr), mLine(0) {}
+    constexpr ChipError(StorageType error, const char * file, unsigned int line) : mError(error), mFile(file), mLine(line) {}
+    const char * GetFile() const { return mFile; }
+    unsigned int GetLine() const { return mLine; }
+#else
     explicit constexpr ChipError(StorageType error) : mError(error) {}
+#endif // CHIP_CONFIG_ERROR_SOURCE
 
     bool operator==(const ChipError & other) const { return mError == other.mError; }
     bool operator!=(const ChipError & other) const { return mError != other.mError; }
 
     static constexpr StorageType AsInteger(StorageType error) { return error; }
     static constexpr StorageType AsInteger(ChipError error) { return error.mError; }
+
+    static constexpr bool IsSuccess(StorageType error) { return error == 0; }
+    static constexpr bool IsSuccess(ChipError error) { return error.mError == 0; }
 
     /// Format an @a error for printing.
 #if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
@@ -202,6 +213,11 @@ private:
 
     StorageType mError;
 
+#if CHIP_CONFIG_ERROR_SOURCE
+    const char * mFile;
+    unsigned int mLine;
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
 public:
     /*
      * Wrapper for constructing error constants. This is a C macro so that it can easily be augmented to track
@@ -229,8 +245,12 @@ public:
 using CHIP_ERROR = ::chip::ChipError::ErrorType;
 
 #if CHIP_CONFIG_ERROR_CLASS
+#if CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_SDK_ERROR(part, code) (::chip::ChipError(CHIP_SDK_ERROR_CONSTANT((part), (code)), __FILE__, __LINE__))
+#else // CHIP_CONFIG_ERROR_SOURCE
 #define CHIP_SDK_ERROR(part, code) (::chip::ChipError(CHIP_SDK_ERROR_CONSTANT((part), (code))))
-#else // CHIP_CONFIG_ERROR_CLASS
+#endif // CHIP_CONFIG_ERROR_SOURCE
+#else  // CHIP_CONFIG_ERROR_CLASS
 #define CHIP_SDK_ERROR(part, code) CHIP_SDK_ERROR_CONSTANT((part), (code))
 #endif // CHIP_CONFIG_ERROR_CLASS
 
@@ -256,7 +276,11 @@ using CHIP_ERROR = ::chip::ChipError::ErrorType;
  *    This defines the CHIP error code for success or no error.
  *
  */
+#if CHIP_CONFIG_ERROR_CLASS && CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_NO_ERROR                                          CHIP_ERROR(0, __FILE__, __LINE__)
+#else // CHIP_CONFIG_ERROR_CLASS && CHIP_CONFIG_ERROR_SOURCE
 #define CHIP_NO_ERROR                                          CHIP_ERROR(0)
+#endif // CHIP_CONFIG_ERROR_CLASS && CHIP_CONFIG_ERROR_SOURCE
 
 /**
  *  @def CHIP_ERROR_SENDING_BLOCKED
@@ -2012,6 +2036,14 @@ using CHIP_ERROR = ::chip::ChipError::ErrorType;
  *   The received message is a duplicate of a previously received message.
  */
 #define CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED                  CHIP_CORE_ERROR(0xc4)
+
+/**
+ * @def CHIP_ERROR_INVALID_PUBLIC_KEY
+ *
+ * @brief
+ *   The received public key doesn't match locally generated key.
+ */
+#define CHIP_ERROR_INVALID_PUBLIC_KEY                          CHIP_CORE_ERROR(197)
 
 /**
  *  @}

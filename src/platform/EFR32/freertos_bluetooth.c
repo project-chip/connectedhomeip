@@ -142,6 +142,8 @@ void BluetoothTask(void * p)
             vRaiseEventFlagBasedOnContext(bluetooth_event_flags, BLUETOOTH_EVENT_FLAG_RSP_WAITING);
         }
 
+        // Run Bluetooth stack. Pop the next event for application
+        sl_bt_run();
         // Bluetooth stack needs updating, and evt can be used
         if (sl_bt_event_pending() && (flags & BLUETOOTH_EVENT_FLAG_EVT_HANDLED))
         { // update bluetooth & read event

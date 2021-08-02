@@ -52,6 +52,7 @@ CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHa
                                     Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    Messaging::SendFlags sendFlags;
 
     VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!payload.IsNull(), err = CHIP_ERROR_INTERNAL);
@@ -61,7 +62,12 @@ CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHa
         mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
     }
 
-    err = mDevice->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, std::move(payload));
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse);
+    }
+
+    err = mDevice->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, sendFlags, std::move(payload));
     SuccessOrExit(err);
 
 exit:

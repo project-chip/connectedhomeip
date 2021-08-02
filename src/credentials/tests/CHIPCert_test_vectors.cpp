@@ -131,7 +131,7 @@ const char * GetTestCertName(uint8_t certType)
     return nullptr;
 }
 
-CHIP_ERROR GetTestCertPubkey(uint8_t certType, const uint8_t *& certPubkey, uint32_t & certPubkeyLen)
+CHIP_ERROR GetTestCertPubkey(uint8_t certType, const uint8_t ** certPubkey, uint32_t & certPubkeyLen)
 {
     CHIP_ERROR err;
 
@@ -140,7 +140,7 @@ CHIP_ERROR GetTestCertPubkey(uint8_t certType, const uint8_t *& certPubkey, uint
     {                                                                                                                              \
         if (certType == TestCert::k##NAME)                                                                                         \
         {                                                                                                                          \
-            certPubkey    = sTestCert_##NAME##_PublicKey;                                                                          \
+            *certPubkey   = sTestCert_##NAME##_PublicKey;                                                                          \
             certPubkeyLen = sTestCert_##NAME##_PublicKey_Len;                                                                      \
             ExitNow(err = CHIP_NO_ERROR);                                                                                          \
         }                                                                                                                          \

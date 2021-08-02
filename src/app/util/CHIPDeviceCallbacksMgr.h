@@ -95,7 +95,7 @@ private:
 
     struct TLVFilterItem
     {
-        ResponseCallbackInfo info = { kAnyNodeId, 0 };
+        ResponseCallbackInfo info = { kPlaceholderNodeId, 0 };
         TLVDataFilter filter      = nullptr;
     };
 

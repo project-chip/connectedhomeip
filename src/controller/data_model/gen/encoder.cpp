@@ -22,6 +22,7 @@
 #include <support/BufferWriter.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
 
 #include <app/common/gen/ids/Attributes.h>
 #include <app/common/gen/ids/Clusters.h>
@@ -3766,7 +3767,7 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddOpCert                                                         |   0x06 |
+| * AddNOC                                                            |   0x06 |
 | * AddTrustedRootCertificate                                         |   0xA1 |
 | * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
@@ -3777,6 +3778,8 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FabricsList                                                       | 0x0001 |
+| * SupportedFabrics                                                  | 0x0002 |
+| * CommissionedFabrics                                               | 0x0003 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3797,6 +3800,33 @@ PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsListAttribute(u
         .Put8(seqNum)
         .Put32(Globals::Commands::Ids::ReadAttributes)
         .Put32(OperationalCredentials::Attributes::Ids::FabricsList);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute SupportedFabrics
+ */
+PacketBufferHandle encodeOperationalCredentialsClusterReadSupportedFabricsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOperationalCredentialsSupportedFabrics", OperationalCredentials::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OperationalCredentials::Attributes::Ids::SupportedFabrics);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CommissionedFabrics
+ */
+PacketBufferHandle encodeOperationalCredentialsClusterReadCommissionedFabricsAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOperationalCredentialsCommissionedFabrics", OperationalCredentials::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(OperationalCredentials::Attributes::Ids::CommissionedFabrics);
     COMMAND_FOOTER();
 }
 
@@ -4593,6 +4623,7 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Test                                                              |   0x00 |
+| * TestAddArguments                                                  |   0x04 |
 | * TestNotHandled                                                    |   0x01 |
 | * TestSpecific                                                      |   0x02 |
 | * TestUnknownCommand                                                |   0x03 |
@@ -5236,6 +5267,10 @@ PacketBufferHandle encodeTestClusterClusterReadClusterRevisionAttribute(uint8_t 
 | * OccupiedHeatingSetpoint                                           | 0x0012 |
 | * ControlSequenceOfOperation                                        | 0x001B |
 | * SystemMode                                                        | 0x001C |
+| * StartOfWeek                                                       | 0x0020 |
+| * NumberOfWeeklyTransitions                                         | 0x0021 |
+| * NumberOfDailyTransitions                                          | 0x0022 |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -5377,6 +5412,58 @@ PacketBufferHandle encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNu
         .Put32(Thermostat::Attributes::Ids::SystemMode)
         .Put8(48)
         .Put8(static_cast<uint8_t>(systemMode));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute StartOfWeek
+ */
+PacketBufferHandle encodeThermostatClusterReadStartOfWeekAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThermostatStartOfWeek", Thermostat::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Thermostat::Attributes::Ids::StartOfWeek);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute NumberOfWeeklyTransitions
+ */
+PacketBufferHandle encodeThermostatClusterReadNumberOfWeeklyTransitionsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThermostatNumberOfWeeklyTransitions", Thermostat::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Thermostat::Attributes::Ids::NumberOfWeeklyTransitions);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute NumberOfDailyTransitions
+ */
+PacketBufferHandle encodeThermostatClusterReadNumberOfDailyTransitionsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThermostatNumberOfDailyTransitions", Thermostat::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Thermostat::Attributes::Ids::NumberOfDailyTransitions);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute FeatureMap
+ */
+PacketBufferHandle encodeThermostatClusterReadFeatureMapAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadThermostatFeatureMap", Thermostat::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ReadAttributes)
+        .Put32(Globals::Attributes::Ids::FeatureMap);
     COMMAND_FOOTER();
 }
 
@@ -6334,6 +6421,7 @@ PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t se
 | Cluster WiFiNetworkDiagnostics                                      | 0x0036 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * ResetCounts                                                       |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Bssid                                                             | 0x0000 |

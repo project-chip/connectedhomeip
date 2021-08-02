@@ -67,7 +67,8 @@ bool SendStatusIfDelegateNull(chip::EndpointId endpointId)
  * @param newVersion The SoftwareVersion value of the new Software Image that the client is ready to apply.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(chip::app::CommandHandler * commandObj,
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(chip::EndpointId endpoint,
+                                                                       chip::app::CommandHandler * commandObj,
                                                                        chip::ByteSpan updateToken, uint32_t newVersion)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
@@ -105,7 +106,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(chip::app
  *                       OTA Requestor's Basic Information Cluster.
  */
 
-bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::app::CommandHandler * commandObj,
+bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::EndpointId endpoint,
+                                                                        chip::app::CommandHandler * commandObj,
                                                                         chip::ByteSpan updateToken, uint32_t currentVersion)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
@@ -152,8 +154,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::ap
  */
 
 bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-    chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
-    uint32_t currentVersion,
+    chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType,
+    uint16_t hardwareVersion, uint32_t currentVersion,
     /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint8_t * location, uint8_t clientCanConsent,
     chip::ByteSpan metadataForProvider)
 {

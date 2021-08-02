@@ -41,8 +41,8 @@ class WatchableSocket;
 class WatchableEventManager
 {
 public:
-    void Init(System::Layer & systemLayer);
-    void Shutdown();
+    CHIP_ERROR Init(System::Layer & systemLayer);
+    CHIP_ERROR Shutdown();
     void Signal();
 
     void EventLoopBegins() {}
@@ -59,8 +59,8 @@ public:
 protected:
     friend class WatchableSocket;
 
-    void Set(int fd, fd_set * fds);
-    void Clear(int fd, fd_set * fds);
+    CHIP_ERROR Set(int fd, fd_set * fds);
+    CHIP_ERROR Clear(int fd, fd_set * fds);
 
     Layer * mSystemLayer               = nullptr;
     WatchableSocket * mAttachedSockets = nullptr;

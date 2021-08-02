@@ -48,3 +48,6 @@ CONFIG_ESP_MAIN_TASK_STACK_SIZE=4096
 
 #enable debug shell
 CONFIG_ENABLE_CHIP_SHELL=y
+
+#Disable Hardware SHA - Workaround to issue 8702
+CONFIG_MBEDTLS_HARDWARE_SHA=n

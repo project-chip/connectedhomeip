@@ -24,18 +24,18 @@ class SecureSessionMgr;
 class SecureSessionHandle
 {
 public:
-    SecureSessionHandle() : mPeerNodeId(kAnyNodeId), mPeerKeyId(0), mAdmin(Transport::kUndefinedAdminId) {}
-    SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId, Transport::AdminId admin) :
-        mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId), mAdmin(admin)
+    SecureSessionHandle() : mPeerNodeId(kPlaceholderNodeId), mPeerKeyId(0), mFabric(Transport::kUndefinedFabricIndex) {}
+    SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId, FabricIndex fabric) :
+        mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId), mFabric(fabric)
     {}
 
-    bool HasAdminId() const { return (mAdmin != Transport::kUndefinedAdminId); }
-    Transport::AdminId GetAdminId() const { return mAdmin; }
-    void SetAdminId(Transport::AdminId adminId) { mAdmin = adminId; }
+    bool HasFabricIndex() const { return (mFabric != Transport::kUndefinedFabricIndex); }
+    FabricIndex GetFabricIndex() const { return mFabric; }
+    void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
 
     bool operator==(const SecureSessionHandle & that) const
     {
-        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId && mAdmin == that.mAdmin;
+        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId && mFabric == that.mFabric;
     }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
@@ -45,11 +45,11 @@ private:
     friend class SecureSessionMgr;
     NodeId mPeerNodeId;
     uint16_t mPeerKeyId;
-    // TODO: Re-evaluate the storing of Admin ID in SecureSessionHandle
-    //       The Admin ID will not be available for PASE and group sessions. So need
+    // TODO: Re-evaluate the storing of Fabric ID in SecureSessionHandle
+    //       The Fabric ID will not be available for PASE and group sessions. So need
     //       to identify an approach that'll allow looking up the corresponding information for
     //       such sessions.
-    Transport::AdminId mAdmin;
+    FabricIndex mFabric;
 };
 
 } // namespace chip

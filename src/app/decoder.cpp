@@ -53,17 +53,17 @@ uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * 
                                .ReadOctet(&outApsFrame->radius)
                                .StatusCode();
 
-    return err == CHIP_NO_ERROR ? reader.OctetsRead() : 0;
+    return err == CHIP_NO_ERROR ? static_cast<uint16_t>(reader.OctetsRead()) : 0;
 }
 
 void printApsFrame(EmberApsFrame * frame)
 {
     ChipLogProgress(Zcl,
-                    "\n<EmberApsFrame %p> clusterID %" PRIx32
+                    "\n<EmberApsFrame %p> clusterID " ChipLogFormatMEI
                     ", sourceEndpoint %d, destinationEndPoint %d, options %d, groupID %d, "
                     "sequence %d, radius %d\n",
-                    frame, frame->clusterId, frame->sourceEndpoint, frame->destinationEndpoint, frame->options, frame->groupId,
-                    frame->sequence, frame->radius);
+                    frame, ChipLogValueMEI(frame->clusterId), frame->sourceEndpoint, frame->destinationEndpoint, frame->options,
+                    frame->groupId, frame->sequence, frame->radius);
 }
 
 uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg)

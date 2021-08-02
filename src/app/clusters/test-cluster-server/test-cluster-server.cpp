@@ -26,6 +26,7 @@
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
+#include <app/common/gen/ids/Commands.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <core/CHIPSafeCasts.h>
@@ -33,6 +34,7 @@
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::TestCluster;
 
 constexpr const char * kErrorStr = "Test Cluster: List Octet cluster (0x%02x) Error setting '%s' attribute: 0x%02x";
 
@@ -146,19 +148,18 @@ void emberAfPluginTestClusterServerInitCallback(void)
     }
 }
 
-bool emberAfTestClusterClusterTestCallback(chip::app::CommandHandler *)
+bool emberAfTestClusterClusterTestCallback(chip::EndpointId endpoint, chip::app::CommandHandler *)
 {
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
-bool emberAfTestClusterClusterTestSpecificCallback(chip::app::CommandHandler * apCommandObj)
+bool sendNumericResponse(EndpointId endpoint, app::CommandHandler * apCommandObj, CommandId responseCommand, uint8_t returnValue)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    uint8_t returnValue = 7;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TEST_CLUSTER_ID,
-                                         ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::CommandPathParams cmdParams = { endpoint, /* group id */ 0, ZCL_TEST_CLUSTER_ID, responseCommand,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
     TLV::TLVWriter * writer          = nullptr;
 
     VerifyOrExit(apCommandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -176,7 +177,23 @@ exit:
     return true;
 }
 
-bool emberAfTestClusterClusterTestNotHandledCallback(chip::app::CommandHandler *)
+bool emberAfTestClusterClusterTestSpecificCallback(EndpointId endpoint, app::CommandHandler * apCommandObj)
+{
+    return sendNumericResponse(endpoint, apCommandObj, Commands::Ids::TestSpecificResponse, 7);
+}
+
+bool emberAfTestClusterClusterTestNotHandledCallback(EndpointId endpoint, app::CommandHandler *)
 {
     return false;
+}
+
+bool emberAfTestClusterClusterTestAddArgumentsCallback(EndpointId endpoint, app::CommandHandler * apCommandObj, uint8_t arg1,
+                                                       uint8_t arg2)
+{
+    if (arg1 > UINT8_MAX - arg2)
+    {
+        return emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    }
+
+    return sendNumericResponse(endpoint, apCommandObj, Commands::Ids::TestAddArgumentsResponse, static_cast<uint8_t>(arg1 + arg2));
 }

@@ -20,14 +20,18 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 
+#include <type_traits>
+
 using namespace chip;
 using namespace chip::Mdns;
+
+static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
 
 namespace {
 
 // callback types shared with python code (see ptyhon code in chip.discovery.types)
 using DiscoverSuccessCallback = void (*)(uint64_t fabricId, uint64_t nodeId, uint32_t interfaceId, const char * ip, uint16_t port);
-using DiscoverFailureCallback = void (*)(uint64_t fabricId, uint64_t nodeId, CHIP_ERROR error_code);
+using DiscoverFailureCallback = void (*)(uint64_t fabricId, uint64_t nodeId, ChipError::StorageType error_code);
 
 constexpr uint16_t kMdnsPort = 5353;
 
@@ -58,7 +62,7 @@ public:
     {
         if (mFailureCallback != nullptr)
         {
-            mFailureCallback(peerId.GetFabricId(), peerId.GetNodeId(), error);
+            mFailureCallback(peerId.GetFabricId(), peerId.GetNodeId(), ChipError::AsInteger(error));
         }
         else
         {
@@ -86,7 +90,7 @@ extern "C" void pychip_discovery_set_callbacks(DiscoverSuccessCallback success, 
     gPythonResolverDelegate.SetFailureCallback(failure);
 }
 
-extern "C" int32_t pychip_discovery_resolve(uint64_t fabricId, uint64_t nodeId)
+extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, uint64_t nodeId)
 {
     CHIP_ERROR result = CHIP_NO_ERROR;
 

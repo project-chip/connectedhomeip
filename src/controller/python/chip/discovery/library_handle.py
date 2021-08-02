@@ -16,7 +16,7 @@
 
 import chip.native
 import ctypes
-from ctypes import c_void_p, c_int32, c_uint64
+from ctypes import c_void_p, c_int32, c_uint32, c_uint64
 from chip.discovery.types import DiscoverSuccessCallback_t, DiscoverFailureCallback_t
 
 def _GetDiscoveryLibraryHandle() -> ctypes.CDLL:
@@ -33,7 +33,7 @@ def _GetDiscoveryLibraryHandle() -> ctypes.CDLL:
   if not handle.pychip_discovery_resolve.argtypes:
     setter = chip.native.NativeLibraryHandleMethodArguments(handle)
 
-    setter.Set('pychip_discovery_resolve', c_int32, [c_uint64, c_uint64])
+    setter.Set('pychip_discovery_resolve', c_uint32, [c_uint64, c_uint64])
     setter.Set('pychip_discovery_set_callbacks', None, [DiscoverSuccessCallback_t, DiscoverFailureCallback_t])
 
   return handle

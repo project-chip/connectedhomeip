@@ -48,6 +48,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${LOCK_COMMON}/gen/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
+               ${CHIP_ROOT}/src/app/common/gen/attributes/Accessors.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp

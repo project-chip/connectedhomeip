@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -471,7 +473,9 @@ static constexpr AttributeId MultiPressMax     = 0x00000002;
 namespace OperationalCredentials {
 namespace Attributes {
 namespace Ids {
-static constexpr AttributeId FabricsList = 0x00000001;
+static constexpr AttributeId FabricsList         = 0x00000001;
+static constexpr AttributeId SupportedFabrics    = 0x00000002;
+static constexpr AttributeId CommissionedFabrics = 0x00000003;
 } // namespace Ids
 } // namespace Attributes
 } // namespace OperationalCredentials

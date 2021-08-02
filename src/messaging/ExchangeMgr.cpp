@@ -199,12 +199,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                                         SecureSessionHandle session, const Transport::PeerAddress & source,
                                         DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf)
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
 
-    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %" PRIu32 " on exchange %d",
-                    payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().ToFullyQualifiedSpecForm(),
-                    payloadHeader.GetExchangeID());
+    ChipLogProgress(ExchangeManager, "Received message of type 0x%02x with vendorId 0x%04x and protocolId 0x%04x on exchange %d",
+                    payloadHeader.GetMessageType(), payloadHeader.GetProtocolID().GetVendorId(),
+                    payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetExchangeID());
 
     MessageFlags msgFlags;
     if (isDuplicate == DuplicateMessage::Yes)
@@ -234,7 +233,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
     if (found)
     {
-        ExitNow(err = CHIP_NO_ERROR);
+        return;
     }
 
     // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.
@@ -265,7 +264,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // an ack to the peer.
     else if (!payloadHeader.NeedsAck())
     {
-        ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
+        // Using same error message for all errors to reduce code size.
+        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR));
+        return;
     }
 
     // If we found a handler or we need to send an ack, create an exchange to
@@ -280,17 +281,21 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ExchangeContext * ec =
             mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), delegate);
 
-        VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        if (ec == nullptr)
+        {
+            // Using same error message for all errors to reduce code size.
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(CHIP_ERROR_NO_MEMORY));
+            return;
+        }
 
         ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%p", ec->GetExchangeId(), ec->GetDelegate());
 
-        ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+        CHIP_ERROR err = ec->HandleMessage(packetHeader, payloadHeader, source, msgFlags, std::move(msgBuf));
+        if (err != CHIP_NO_ERROR)
+        {
+            // Using same error message for all errors to reduce code size.
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
+        }
     }
 }
 

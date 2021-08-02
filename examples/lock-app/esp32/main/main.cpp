@@ -52,12 +52,11 @@ static DeviceCallbacks EchoCallbacks;
 
 extern "C" void app_main()
 {
-    int err = 0;
     // Initialize the ESP NVS layer.
-    err = nvs_flash_init();
-    if (err != CHIP_NO_ERROR)
+    esp_err_t err = nvs_flash_init();
+    if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
 
@@ -75,19 +74,19 @@ extern "C" void app_main()
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
-    err = deviceMgr.Init(&EchoCallbacks);
-    if (err != CHIP_NO_ERROR)
+    CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
+    if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(err));
+        ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
         return;
     }
 
     InitServer();
 
     ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
-    err = GetAppTask().StartAppTask();
-    if (err != CHIP_NO_ERROR)
+    error = GetAppTask().StartAppTask();
+    if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "GetAppTask().Init() failed");
+        ESP_LOGE(TAG, "GetAppTask().Init() failed: %s", ErrorStr(error));
     }
 }

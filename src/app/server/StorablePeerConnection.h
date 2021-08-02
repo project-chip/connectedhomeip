@@ -32,7 +32,7 @@ class DLL_EXPORT StorablePeerConnection
 public:
     StorablePeerConnection() {}
 
-    StorablePeerConnection(PASESession & session, Transport::AdminId admin);
+    StorablePeerConnection(PASESession & session, FabricIndex fabric);
 
     virtual ~StorablePeerConnection() {}
 
@@ -44,7 +44,7 @@ public:
 
     void GetPASESession(PASESession * session) { session->FromSerializable(mSession.mOpCreds); }
 
-    Transport::AdminId GetAdminId() { return mSession.mAdmin; }
+    FabricIndex GetFabricIndex() { return mSession.mFabric; }
 
 private:
     static constexpr size_t KeySize();
@@ -54,7 +54,7 @@ private:
     struct StorableSession
     {
         PASESessionSerializable mOpCreds;
-        Transport::AdminId mAdmin; /* This field is serialized in LittleEndian byte order */
+        FabricIndex mFabric;
     };
 
     StorableSession mSession;

@@ -36,3 +36,6 @@ CONFIG_LWIP_IPV6_AUTOCONFIG=y
 # Use a custom partition table
 CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
+
+#Disable Hardware SHA - Workaround to issue 8702
+CONFIG_MBEDTLS_HARDWARE_SHA=n
