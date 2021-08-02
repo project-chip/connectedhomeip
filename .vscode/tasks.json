@@ -358,19 +358,19 @@
             "default": "develop"
         },
         {
-          "id": "efr32_board",
-          "type": "pickString",
-          "description": "What's the type of your EFR32 board?",
-          "options": [
-            "BRD4304A",
-            "BRD4161A",
-            "BRD4163A",
-            "BRD4164A",
-            "BRD4166A",
-            "BRD4170A",
-            "BRD4180A",
-          ],
-          "default": "BRD4166A"
+            "id": "efr32_board",
+            "type": "pickString",
+            "description": "What's the type of your EFR32 board?",
+            "options": [
+                "BRD4304A",
+                "BRD4161A",
+                "BRD4163A",
+                "BRD4164A",
+                "BRD4166A",
+                "BRD4170A",
+                "BRD4180A"
+            ],
+            "default": "BRD4166A"
         }
     ]
 }
