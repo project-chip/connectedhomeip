@@ -55,9 +55,9 @@ the ESP32 all-clusters-app:
 
 #### Pair a device over IP
 
-The command below will pair to a localhost device (`::1`) running the `all-clusters-app` on the default port (`11097`) over IPv6:
+The command below will pair to a localhost device (`::1`) running the `all-clusters-app` on the default port (`5540`) over IPv6:
 
-    $ chip-tool pairing onnetwork 0 20202021 3840 ::1 11097
+    $ chip-tool pairing onnetwork 0 20202021 3840 ::1 5540
 
 ### Unpair a device
 
@@ -129,7 +129,7 @@ with the target cluster name and the target command name
 
 ### Run a test suite against a paired peer device
 
-    $ chip-tool tests Test_TC_OO_1_
+    $ chip-tool tests Test_TC_OO_1_1
 
 ## Using the Client for Setup Payload
 

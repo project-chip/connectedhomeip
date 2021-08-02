@@ -29,7 +29,7 @@ This section summarizes how to run some common scenarios with the [**chip-tool**
 
 #### IP Pairing
 
-`chip-tool pairing onnetwork 0 20202021 3840 ::1 11097` will use PASE over IUP to pair a device.
+`chip-tool pairing onnetwork 0 20202021 3840 ::1 5540` will use PASE over IUP to pair a device.
 
 NOTE: to run both the Node and Controller as separate processes on the same Linux or Mac machine, build the all-clusters-app with BLE disabled as follows:
 
@@ -37,4 +37,4 @@ NOTE: to run both the Node and Controller as separate processes on the same Linu
 
 #### Automated CASE tests
 
-`chip-tool tests Test_TC_OO_1_` will run a suite of tests that use CASE To communicate with a paired `all-clusters-app` peer node.
+`chip-tool tests Test_TC_OO_1_1` will run a suite of tests that use CASE To communicate with a paired `all-clusters-app` peer node.
