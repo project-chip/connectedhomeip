@@ -226,6 +226,7 @@ enum InternalEventTypes
     kCHIPoBLEWriteReceived,
     kCHIPoBLEIndicateConfirm,
     kCHIPoBLEConnectionError,
+    kCHIPoBLENotifyConfirm
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
@@ -392,6 +393,10 @@ struct ChipDeviceEvent final
             BLE_CONNECTION_OBJECT ConId;
             CHIP_ERROR Reason;
         } CHIPoBLEConnectionError;
+        struct
+        {
+            BLE_CONNECTION_OBJECT ConId;
+        } CHIPoBLENotifyConfirm;
         struct
         {
             bool RoleChanged : 1;
