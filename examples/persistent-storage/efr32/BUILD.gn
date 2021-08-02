@@ -41,9 +41,7 @@ efr32_sdk("sdk") {
     "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
-  defines = [
-    "BOARD_ID=${efr32_board}",
-  ]
+  defines = [ "BOARD_ID=${efr32_board}" ]
 }
 
 efr32_executable("persistent_storage") {
@@ -51,9 +49,9 @@ efr32_executable("persistent_storage") {
 
   sources = [
     "${efr32_project_dir}/../KeyValueStorageTest.cpp",
+    "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.c",
-    "${examples_plat_dir}/heap_4_silabs.c",
     "main.cpp",
   ]
 
