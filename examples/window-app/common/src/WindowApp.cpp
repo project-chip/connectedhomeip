@@ -65,6 +65,14 @@ CHIP_ERROR WindowApp::Init()
 
     WindowCover & cover = WindowCover::Instance();
 
+    // Initialize Actuators
+    cover.Lift().OpenLimitSet(LIFT_OPEN_LIMIT);
+    cover.Lift().ClosedLimitSet(LIFT_CLOSED_LIMIT);
+    cover.Lift().PositionValueSet(LIFT_CLOSED_LIMIT);
+    cover.Tilt().OpenLimitSet(TILT_OPEN_LIMIT);
+    cover.Tilt().ClosedLimitSet(TILT_CLOSED_LIMIT);
+    cover.Tilt().PositionValueSet(TILT_CLOSED_LIMIT);
+
     // Attribute: Id  0 Type
     cover.TypeSet(EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT);
 
@@ -406,9 +414,9 @@ void WindowApp::GotoLift()
 
 void WindowApp::GotoTilt()
 {
-    WindowCover::TiltActuator & lift = WindowCover::Instance().Tilt();
-    uint16_t current                 = lift.PositionGet();
-    uint16_t target                  = lift.TargetGet();
+    WindowCover::TiltActuator & tilt = WindowCover::Instance().Tilt();
+    uint16_t current                 = tilt.PositionGet();
+    uint16_t target                  = tilt.TargetGet();
 
     if (WindowApp::Event::TiltUp == mTiltAction)
     {

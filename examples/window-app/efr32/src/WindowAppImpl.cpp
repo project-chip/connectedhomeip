@@ -208,16 +208,6 @@ CHIP_ERROR WindowAppImpl::Init()
     mStatusLED.Init(APP_STATE_LED);
     mActionLED.Init(APP_ACTION_LED);
 
-    // Initialize Actuators
-    WindowCover::LiftActuator & lift = WindowCover::Instance().Lift();
-    WindowCover::TiltActuator & tilt = WindowCover::Instance().Tilt();
-    lift.OpenLimitSet(LIFT_OPEN_LIMIT);
-    lift.ClosedLimitSet(LIFT_CLOSED_LIMIT);
-    lift.PositionValueSet(LIFT_CLOSED_LIMIT);
-    tilt.OpenLimitSet(TILT_OPEN_LIMIT);
-    tilt.ClosedLimitSet(TILT_CLOSED_LIMIT);
-    tilt.PositionValueSet(TILT_CLOSED_LIMIT);
-
     // Print setup info on LCD if available
     UpdateLCD();
 

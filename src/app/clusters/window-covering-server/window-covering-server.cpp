@@ -46,6 +46,7 @@
 #include <app/util/af-event.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/TypeTraits.h>
 #include <string.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
@@ -67,27 +68,24 @@ WindowCover & WindowCover::Instance()
     return sInstance;
 }
 
-WindowCover::WindowCover() {}
-
 void WindowCover::TypeSet(EmberAfWcType type)
 {
-    std::underlying_type<EmberAfWcType>::type value = static_cast<std::underlying_type<EmberAfWcType>::type>(type);
-    WindowCovering::Attributes::SetType(mEndPoint, value);
+    WindowCovering::Attributes::SetType(mEndpoint, chip::to_underlying(type));
 }
 
 EmberAfWcType WindowCover::TypeGet(void)
 {
     std::underlying_type<EmberAfWcType>::type value;
-    WindowCovering::Attributes::GetType(mEndPoint, &value);
+    WindowCovering::Attributes::GetType(mEndpoint, &value);
     return static_cast<EmberAfWcType>(value);
 }
 
-void WindowCover::ConfigStatusSet(WindowCover::ConfigStatus status)
+void WindowCover::ConfigStatusSet(const WindowCover::ConfigStatus & status)
 {
     uint8_t value = (status.operational ? 0x01 : 0) | (status.online ? 0x02 : 0) | (status.liftIsReversed ? 0x04 : 0) |
         (status.liftIsPA ? 0x08 : 0) | (status.tiltIsPA ? 0x10 : 0) | (status.liftIsEncoderControlled ? 0x20 : 0) |
         (status.tiltIsEncoderControlled ? 0x40 : 0);
-    WindowCovering::Attributes::SetConfigStatus(mEndPoint, value);
+    WindowCovering::Attributes::SetConfigStatus(mEndpoint, value);
 }
 
 const WindowCover::ConfigStatus WindowCover::ConfigStatusGet(void)
@@ -95,7 +93,7 @@ const WindowCover::ConfigStatus WindowCover::ConfigStatusGet(void)
     uint8_t value = 0;
     ConfigStatus status;
 
-    WindowCovering::Attributes::GetConfigStatus(mEndPoint, &value);
+    WindowCovering::Attributes::GetConfigStatus(mEndpoint, &value);
     status.operational             = (value & 0x01) ? 1 : 0;
     status.online                  = (value & 0x02) ? 1 : 0;
     status.liftIsReversed          = (value & 0x04) ? 1 : 0;
@@ -106,13 +104,13 @@ const WindowCover::ConfigStatus WindowCover::ConfigStatusGet(void)
     return status;
 }
 
-void WindowCover::OperationalStatusSet(WindowCover::OperationalStatus status)
+void WindowCover::OperationalStatusSet(const WindowCover::OperationalStatus & status)
 {
     uint8_t global = OperationalStateToValue(status.global);
     uint8_t lift   = OperationalStateToValue(status.lift);
     uint8_t tilt   = OperationalStateToValue(status.tilt);
-    uint8_t value  = (global & 0x03) | ((lift & 0x03) >> 2) | ((tilt & 0x03) >> 4);
-    WindowCovering::Attributes::SetOperationalStatus(mEndPoint, value);
+    uint8_t value  = (global & 0x03) | static_cast<uint8_t>((lift & 0x03) << 2) | static_cast<uint8_t>((tilt & 0x03) << 4);
+    WindowCovering::Attributes::SetOperationalStatus(mEndpoint, value);
 }
 
 const WindowCover::OperationalStatus WindowCover::OperationalStatusGet(void)
@@ -120,30 +118,30 @@ const WindowCover::OperationalStatus WindowCover::OperationalStatusGet(void)
     uint8_t value = 0;
     OperationalStatus status;
 
-    WindowCovering::Attributes::GetOperationalStatus(mEndPoint, &value);
+    WindowCovering::Attributes::GetOperationalStatus(mEndpoint, &value);
     status.global = ValueToOperationalState(value & 0x03);
-    status.lift   = ValueToOperationalState((value << 2) & 0x03);
-    status.tilt   = ValueToOperationalState((value << 4) & 0x03);
+    status.lift   = ValueToOperationalState((value >> 2) & 0x03);
+    status.tilt   = ValueToOperationalState((value >> 4) & 0x03);
     return status;
 }
 
 void WindowCover::EndProductTypeSet(EmberAfWcEndProductType type)
 {
-    WindowCovering::Attributes::SetEndProductType(mEndPoint, to_underlying(value));
+    WindowCovering::Attributes::SetEndProductType(mEndpoint, chip::to_underlying(type));
 }
 
 EmberAfWcEndProductType WindowCover::EndProductTypeGet(void)
 {
     std::underlying_type<EmberAfWcType>::type value;
-    WindowCovering::Attributes::GetEndProductType(mEndPoint, &value);
+    WindowCovering::Attributes::GetEndProductType(mEndpoint, &value);
     return static_cast<EmberAfWcEndProductType>(value);
 }
 
-void WindowCover::ModeSet(WindowCover::Mode mode)
+void WindowCover::ModeSet(const WindowCover::Mode & mode)
 {
     uint8_t value = (mode.motorDirReversed ? 0x01 : 0) | (mode.calibrationMode ? 0x02 : 0) | (mode.maintenanceMode ? 0x04 : 0) |
         (mode.ledDisplay ? 0x08 : 0);
-    WindowCovering::Attributes::SetMode(mEndPoint, value);
+    WindowCovering::Attributes::SetMode(mEndpoint, value);
 }
 
 const WindowCover::Mode WindowCover::ModeGet(void)
@@ -151,7 +149,7 @@ const WindowCover::Mode WindowCover::ModeGet(void)
     uint8_t value = 0;
     Mode mode;
 
-    WindowCovering::Attributes::GetMode(mEndPoint, &value);
+    WindowCovering::Attributes::GetMode(mEndpoint, &value);
     mode.motorDirReversed = (value & 0x01) ? 1 : 0;
     mode.calibrationMode  = (value & 0x02) ? 1 : 0;
     mode.maintenanceMode  = (value & 0x04) ? 1 : 0;
@@ -159,7 +157,7 @@ const WindowCover::Mode WindowCover::ModeGet(void)
     return mode;
 }
 
-void WindowCover::SafetyStatusSet(WindowCover::SafetyStatus status)
+void WindowCover::SafetyStatusSet(WindowCover::SafetyStatus & status)
 {
     uint16_t value = (status.remoteLockout ? 0x0001 : 0) | (status.tamperDetection ? 0x0002 : 0) |
         (status.failedCommunication ? 0x0004 : 0) | (status.positionFailure ? 0x0008 : 0) |
@@ -167,7 +165,7 @@ void WindowCover::SafetyStatusSet(WindowCover::SafetyStatus status)
         (status.stopInput ? 0x0080 : 0);
     value |= (uint16_t)(status.motorJammed ? 0x0100 : 0) | (uint16_t)(status.hardwareFailure ? 0x0200 : 0) |
         (uint16_t)(status.manualOperation ? 0x0400 : 0);
-    WindowCovering::Attributes::SetSafetyStatus(mEndPoint, value);
+    WindowCovering::Attributes::SetSafetyStatus(mEndpoint, value);
 }
 
 const WindowCover::SafetyStatus WindowCover::SafetyStatusGet(void)
@@ -175,7 +173,7 @@ const WindowCover::SafetyStatus WindowCover::SafetyStatusGet(void)
     uint16_t value = 0;
     WindowCover::SafetyStatus status;
 
-    WindowCovering::Attributes::GetSafetyStatus(mEndPoint, &value);
+    WindowCovering::Attributes::GetSafetyStatus(mEndpoint, &value);
     status.remoteLockout       = (value & 0x0001) ? 1 : 0;
     status.tamperDetection     = (value & 0x0002) ? 1 : 0;
     status.failedCommunication = (value & 0x0004) ? 1 : 0;
@@ -219,7 +217,7 @@ WindowCover::OperationalState WindowCover::ValueToOperationalState(uint8_t value
         return OperationalState::Reserved;
     }
 }
-uint8_t WindowCover::OperationalStateToValue(WindowCover::OperationalState state)
+uint8_t WindowCover::OperationalStateToValue(const WindowCover::OperationalState & state)
 {
     switch (state)
     {
@@ -302,25 +300,25 @@ uint16_t WindowCover::Actuator<ActuatorImpl>::Percent100thsToValue(uint16_t perc
 
 void WindowCover::LiftActuator::OpenLimitSet(uint16_t limit)
 {
-    WindowCovering::Attributes::SetInstalledOpenLimitLift(mEndPoint, limit);
+    WindowCovering::Attributes::SetInstalledOpenLimitLift(mEndpoint, limit);
 }
 
 uint16_t WindowCover::LiftActuator::OpenLimitGet(void)
 {
     uint16_t limit = 0;
-    WindowCovering::Attributes::GetInstalledOpenLimitLift(mEndPoint, &limit);
+    WindowCovering::Attributes::GetInstalledOpenLimitLift(mEndpoint, &limit);
     return limit;
 }
 
 void WindowCover::LiftActuator::ClosedLimitSet(uint16_t limit)
 {
-    WindowCovering::Attributes::SetInstalledClosedLimitLift(mEndPoint, limit);
+    WindowCovering::Attributes::SetInstalledClosedLimitLift(mEndpoint, limit);
 }
 
 uint16_t WindowCover::LiftActuator::ClosedLimitGet(void)
 {
     uint16_t limit = 0;
-    WindowCovering::Attributes::GetInstalledClosedLimitLift(mEndPoint, &limit);
+    WindowCovering::Attributes::GetInstalledClosedLimitLift(mEndpoint, &limit);
     return limit;
 }
 
@@ -329,42 +327,42 @@ void WindowCover::LiftActuator::PositionSet(uint16_t percent100ths)
     uint8_t percent = static_cast<uint8_t>(percent100ths / 100);
     uint16_t value  = Percent100thsToValue(percent100ths);
 
-    WindowCovering::Attributes::SetCurrentPositionLift(mEndPoint, value);
-    WindowCovering::Attributes::SetCurrentPositionLiftPercentage(mEndPoint, percent);
-    WindowCovering::Attributes::SetCurrentPositionLiftPercent100ths(mEndPoint, percent100ths);
+    WindowCovering::Attributes::SetCurrentPositionLift(mEndpoint, value);
+    WindowCovering::Attributes::SetCurrentPositionLiftPercentage(mEndpoint, percent);
+    WindowCovering::Attributes::SetCurrentPositionLiftPercent100ths(mEndpoint, percent100ths);
     emberAfWindowCoveringClusterPrint("LiftActuator::PositionSet(%u%%)", percent100ths / 100);
 }
 
 uint16_t WindowCover::LiftActuator::PositionGet()
 {
     uint16_t percent100ths = 0;
-    WindowCovering::Attributes::GetCurrentPositionLiftPercent100ths(mEndPoint, &percent100ths);
+    WindowCovering::Attributes::GetCurrentPositionLiftPercent100ths(mEndpoint, &percent100ths);
     return percent100ths;
 }
 
 void WindowCover::LiftActuator::TargetSet(uint16_t percent100ths)
 {
     emberAfWindowCoveringClusterPrint("LiftActuator::TargetSet(%u%%)", percent100ths / 100);
-    WindowCovering::Attributes::SetTargetPositionLiftPercent100ths(mEndPoint, percent100ths);
+    WindowCovering::Attributes::SetTargetPositionLiftPercent100ths(mEndpoint, percent100ths);
 }
 
 uint16_t WindowCover::LiftActuator::TargetGet()
 {
     uint16_t percent100ths = 0;
-    WindowCovering::Attributes::GetTargetPositionLiftPercent100ths(mEndPoint, &percent100ths);
+    WindowCovering::Attributes::GetTargetPositionLiftPercent100ths(mEndpoint, &percent100ths);
     return percent100ths;
 }
 
 void WindowCover::LiftActuator::NumberOfActuationsIncrement()
 {
     uint16_t count = static_cast<uint16_t>(NumberOfActuationsGet() + 1);
-    WindowCovering::Attributes::SetNumberOfActuationsLift(mEndPoint, count);
+    WindowCovering::Attributes::SetNumberOfActuationsLift(mEndpoint, count);
 }
 
 uint16_t WindowCover::LiftActuator::NumberOfActuationsGet(void)
 {
     uint16_t count = 0;
-    WindowCovering::Attributes::GetNumberOfActuationsLift(mEndPoint, &count);
+    WindowCovering::Attributes::GetNumberOfActuationsLift(mEndpoint, &count);
     return count;
 }
 
@@ -374,25 +372,25 @@ uint16_t WindowCover::LiftActuator::NumberOfActuationsGet(void)
 
 void WindowCover::TiltActuator::OpenLimitSet(uint16_t limit)
 {
-    WindowCovering::Attributes::SetInstalledOpenLimitTilt(mEndPoint, limit);
+    WindowCovering::Attributes::SetInstalledOpenLimitTilt(mEndpoint, limit);
 }
 
 uint16_t WindowCover::TiltActuator::OpenLimitGet(void)
 {
     uint16_t limit = 0;
-    WindowCovering::Attributes::GetInstalledOpenLimitTilt(mEndPoint, &limit);
+    WindowCovering::Attributes::GetInstalledOpenLimitTilt(mEndpoint, &limit);
     return limit;
 }
 
 void WindowCover::TiltActuator::ClosedLimitSet(uint16_t limit)
 {
-    WindowCovering::Attributes::SetInstalledClosedLimitTilt(mEndPoint, limit);
+    WindowCovering::Attributes::SetInstalledClosedLimitTilt(mEndpoint, limit);
 }
 
 uint16_t WindowCover::TiltActuator::ClosedLimitGet(void)
 {
     uint16_t limit = 0;
-    WindowCovering::Attributes::GetInstalledClosedLimitTilt(mEndPoint, &limit);
+    WindowCovering::Attributes::GetInstalledClosedLimitTilt(mEndpoint, &limit);
     return limit;
 }
 
@@ -401,42 +399,42 @@ void WindowCover::TiltActuator::PositionSet(uint16_t percent100ths)
     uint8_t percent = static_cast<uint8_t>(percent100ths / 100);
     uint16_t value  = Percent100thsToValue(percent100ths);
 
-    WindowCovering::Attributes::SetCurrentPositionTilt(mEndPoint, value);
-    WindowCovering::Attributes::SetCurrentPositionTiltPercentage(mEndPoint, percent);
-    WindowCovering::Attributes::SetCurrentPositionTiltPercent100ths(mEndPoint, percent100ths);
+    WindowCovering::Attributes::SetCurrentPositionTilt(mEndpoint, value);
+    WindowCovering::Attributes::SetCurrentPositionTiltPercentage(mEndpoint, percent);
+    WindowCovering::Attributes::SetCurrentPositionTiltPercent100ths(mEndpoint, percent100ths);
     emberAfWindowCoveringClusterPrint("TiltActuator::PositionSet(%u%%)", percent100ths / 100);
 }
 
 uint16_t WindowCover::TiltActuator::PositionGet()
 {
     uint16_t percent100ths = 0;
-    WindowCovering::Attributes::GetCurrentPositionTiltPercent100ths(mEndPoint, &percent100ths);
+    WindowCovering::Attributes::GetCurrentPositionTiltPercent100ths(mEndpoint, &percent100ths);
     return percent100ths;
 }
 
 void WindowCover::TiltActuator::TargetSet(uint16_t percent100ths)
 {
     emberAfWindowCoveringClusterPrint("TiltActuator::TargetSet(%u%%)", percent100ths / 100);
-    WindowCovering::Attributes::SetTargetPositionTiltPercent100ths(mEndPoint, percent100ths);
+    WindowCovering::Attributes::SetTargetPositionTiltPercent100ths(mEndpoint, percent100ths);
 }
 
 uint16_t WindowCover::TiltActuator::TargetGet()
 {
     uint16_t percent100ths = 0;
-    WindowCovering::Attributes::GetTargetPositionTiltPercent100ths(mEndPoint, &percent100ths);
+    WindowCovering::Attributes::GetTargetPositionTiltPercent100ths(mEndpoint, &percent100ths);
     return percent100ths;
 }
 
 void WindowCover::TiltActuator::NumberOfActuationsIncrement()
 {
     uint16_t count = static_cast<uint16_t>(NumberOfActuationsGet() + 1);
-    WindowCovering::Attributes::SetNumberOfActuationsTilt(mEndPoint, count);
+    WindowCovering::Attributes::SetNumberOfActuationsTilt(mEndpoint, count);
 }
 
 uint16_t WindowCover::TiltActuator::NumberOfActuationsGet(void)
 {
     uint16_t count = 0;
-    WindowCovering::Attributes::GetNumberOfActuationsTilt(mEndPoint, &count);
+    WindowCovering::Attributes::GetNumberOfActuationsTilt(mEndpoint, &count);
     return count;
 }
 

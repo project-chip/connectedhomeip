@@ -19,7 +19,8 @@
 
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/enums.h>
-#include <app/util/af-enums.h>
+#include <app/util/af-types.h>
+#include <map>
 
 class WindowCover
 {
@@ -90,6 +91,8 @@ public:
     class Actuator
     {
     public:
+        Actuator(chip::EndpointId endpoint) : mEndpoint(endpoint) {}
+
         constexpr void OpenLimitSet(uint16_t limit) { Impl()->OpenLimitSet(limit); }
         constexpr uint16_t OpenLimitGet() { return Impl()->OpenLimitGet(); }
 
@@ -132,6 +135,8 @@ public:
         uint16_t ValueToPercent100ths(uint16_t position);
         uint16_t Percent100thsToValue(uint16_t percent100ths);
 
+        chip::EndpointId mEndpoint;
+
     private:
         constexpr ActuatorImpl * Impl() { return static_cast<ActuatorImpl *>(this); }
     };
@@ -139,6 +144,7 @@ public:
     class LiftActuator : public Actuator<LiftActuator>
     {
     public:
+        LiftActuator(chip::EndpointId endpoint) : Actuator<LiftActuator>(endpoint) {}
         void OpenLimitSet(uint16_t limit);
         uint16_t OpenLimitGet();
         void ClosedLimitSet(uint16_t limit);
@@ -154,6 +160,7 @@ public:
     class TiltActuator : public Actuator<TiltActuator>
     {
     public:
+        TiltActuator(chip::EndpointId endpoint) : Actuator<TiltActuator>(endpoint) {}
         void OpenLimitSet(uint16_t limit);
         uint16_t OpenLimitGet();
         void ClosedLimitSet(uint16_t limit);
@@ -167,7 +174,6 @@ public:
     };
 
     static WindowCover & Instance();
-    static constexpr uint8_t mEndPoint = 1;
 
     bool hasFeature(Feature feat) { return (mFeatures & (uint8_t) feat) > 0; }
 
@@ -179,11 +185,11 @@ public:
     EmberAfWcType TypeGet();
 
     // Attribute: Id  7 ConfigStatus
-    void ConfigStatusSet(ConfigStatus status);
+    void ConfigStatusSet(const ConfigStatus & status);
     const ConfigStatus ConfigStatusGet();
 
     // Attribute: Id 10 OperationalStatus
-    void OperationalStatusSet(OperationalStatus status);
+    void OperationalStatusSet(const OperationalStatus & status);
     const OperationalStatus OperationalStatusGet();
 
     // Attribute: Id 13 EndProductType
@@ -191,12 +197,12 @@ public:
     EmberAfWcEndProductType EndProductTypeGet();
 
     // Attribute: Id 24 Mode
-    void ModeSet(Mode mode);
+    void ModeSet(const Mode & mode);
     const Mode ModeGet();
 
     // OPTIONAL Attributes -- Setter/Getter Internal Variables equivalent
     // Attribute: Id 27 SafetyStatus (Optional)
-    void SafetyStatusSet(SafetyStatus status);
+    void SafetyStatusSet(SafetyStatus & status);
     const SafetyStatus SafetyStatusGet();
 
     bool IsOpen();
@@ -204,13 +210,14 @@ public:
 
 protected:
     OperationalState ValueToOperationalState(uint8_t value);
-    uint8_t OperationalStateToValue(OperationalState state);
+    uint8_t OperationalStateToValue(const OperationalState & state);
+
+    static constexpr chip::EndpointId mEndpoint = 1;
 
 private:
+    WindowCover() : mLift(mEndpoint), mTilt(mEndpoint) {}
+
     static WindowCover sInstance;
-
-    WindowCover();
-
     uint8_t mFeatures = ((uint8_t) Feature::Lift | (uint8_t) Feature::Tilt | (uint8_t) Feature::PositionAware);
     LiftActuator mLift;
     TiltActuator mTilt;
