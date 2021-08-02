@@ -45,7 +45,6 @@ efr32_sdk("sdk") {
     "HAL_VCOM_ENABLE=1",
     "EFR32_LOG_ENABLED=1",
     "PW_RPC_ENABLED",
-    "SL_HEAP_SIZE=(16 * 1024)",
   ]
 }
 
@@ -59,6 +58,7 @@ efr32_executable("pigweed_app") {
     "${examples_plat_dir}/PigweedLogger.cpp",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.c",
+    "${examples_plat_dir}/heap_4_silabs.c",
     "src/main.cpp",
   ]
 
