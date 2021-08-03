@@ -97,6 +97,7 @@ int AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
+    UpdateClusterState();
 
     /* intialize the Keyboard and button press calback */
     KBD_Init(KBD_Callback);
@@ -570,6 +571,11 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
         K32W_LOG("Unlock Action has been initiated")
     }
 
+    if (aActor == AppEvent::kEventType_Button)
+    {
+        sAppTask.mSyncClusterToButtonAction = true;
+    }
+
     sAppTask.mFunction = kFunctionLockUnlock;
     sLockLED.Blink(50, 50);
 }
@@ -588,6 +594,12 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     {
         K32W_LOG("Unlock Action has been completed")
         sLockLED.Set(false);
+    }
+
+    if (sAppTask.mSyncClusterToButtonAction)
+    {
+        sAppTask.UpdateClusterState();
+        sAppTask.mSyncClusterToButtonAction = false;
     }
 
     sAppTask.mFunction = kFunction_NoneSelected;
