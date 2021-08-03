@@ -27,19 +27,16 @@ chip_test_suite("tests") {
     "TestRecordData.cpp",
     "TestResponseSender.cpp",
   ]
+  if (chip_mdns == "minimal") {
+    test_sources +=  [ "TestAdvertiser.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
     "${nlunit_test_root}:nlunit-test",
+    "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/lib/mdns/minimal",
   ]
-
-  if (current_os != "zephyr") {
-    defines = [ "MDNS_MINIMAL_TEST_SERVER=true" ]
-    public_deps += [ "${chip_root}/src/lib/mdns:minimal_mdns_tests" ]
-    test_sources += [ "TestAdvertiser.cpp" ]
-  } else {
-    public_deps += [ "${chip_root}/src/lib/mdns/minimal" ]
-  }
 }

@@ -203,6 +203,9 @@ CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t 
 
     mCommissionInstanceName1 = GetRandU32();
     mCommissionInstanceName2 = GetRandU32();
+    // Re-set the server in the response sender in case this has been swapped in the
+    // GlobalMinimalMdnsServer (used for testing).
+    mResponseSender.SetServer(&GlobalMinimalMdnsServer::Server());
 
     ReturnErrorOnFailure(GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, port));
 
