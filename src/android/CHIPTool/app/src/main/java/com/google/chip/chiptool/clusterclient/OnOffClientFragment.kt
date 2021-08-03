@@ -47,17 +47,11 @@ class OnOffClientFragment : Fragment() {
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
 
-  private lateinit var multicastLock: WifiManager.MulticastLock
-
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    multicastLock = (requireContext().getSystemService(Context.WIFI_SERVICE) as WifiManager)
-      .createMulticastLock("chipOnOffMulticastLock")
-    multicastLock.acquire()
-
     return inflater.inflate(R.layout.on_off_client_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
 
@@ -106,9 +100,8 @@ class OnOffClientFragment : Fragment() {
     val bindingCluster = ChipClusters.BindingCluster(
       ChipClient.getConnectedDevicePointer(
         deviceIdEd.text.toString().toLong()
-      ), 1
+      ), BINDING_CLUSTER_ENDPOINT
     )
-    // TODO: switch out hardcoded controller nodeID 112233
     bindingCluster.unbind(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
         Log.v(TAG, "Successfully unbound on/off cluster")
@@ -118,7 +111,7 @@ class OnOffClientFragment : Fragment() {
       override fun onError(ex: Exception) {
         Log.e(TAG, "Error unbinding on/off cluster", ex)
       }
-    }, 112233, 0, 1, OnOffCluster.clusterId())
+    }, CONTROLLER_NODE_ID, 0, ON_OFF_CLUSTER_ENDPOINT, OnOffCluster.clusterId())
 
     // According to spec: max interval set to 0xFFFF cancels reporting.
     getOnOffClusterForDevice().configureOnOffAttribute(object :
@@ -131,7 +124,7 @@ class OnOffClientFragment : Fragment() {
       override fun onError(ex: Exception) {
         Log.e(TAG, "Failed to configure on/off attribute for reporting cancellation", ex)
       }
-    }, 1, 0xFFFF, 1)
+    }, 1, REPORT_MAX_INTERVAL_CANCELLATION_VALUE, 1)
   }
 
   private fun showReportDialog() {
@@ -160,7 +153,7 @@ class OnOffClientFragment : Fragment() {
     val bindingCluster = ChipClusters.BindingCluster(
       ChipClient.getConnectedDevicePointer(
         deviceIdEd.text.toString().toLong()
-      ), 1
+      ), BINDING_CLUSTER_ENDPOINT
     )
     val onOffCluster = getOnOffClusterForDevice()
 
@@ -187,7 +180,6 @@ class OnOffClientFragment : Fragment() {
         Log.e(TAG, "Error configuring on/off attribute", ex)
       }
     }
-    // TODO: switch out hardcoded controller nodeID 112233
     bindingCluster.bind(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
         onOffCluster.configureOnOffAttribute(configureCallback, minInterval, maxInterval, change)
@@ -196,7 +188,7 @@ class OnOffClientFragment : Fragment() {
       override fun onError(ex: Exception) {
         Log.e(TAG, "Error binding on/off cluster", ex)
       }
-    }, 112233, 0, 1, OnOffCluster.clusterId())
+    }, CONTROLLER_NODE_ID, 0, ON_OFF_CLUSTER_ENDPOINT, OnOffCluster.clusterId())
   }
 
   override fun onStart() {
@@ -234,7 +226,6 @@ class OnOffClientFragment : Fragment() {
   override fun onStop() {
     super.onStop()
     scope.cancel()
-    multicastLock.release()
   }
 
   private fun updateAddressClick() {
@@ -251,7 +242,8 @@ class OnOffClientFragment : Fragment() {
 
   private suspend fun sendLevelCommandClick() {
     val cluster = ChipClusters.LevelControlCluster(
-      ChipClient.getConnectedDevicePointer(deviceIdEd.text.toString().toLong()), 1
+      ChipClient.getConnectedDevicePointer(deviceIdEd.text.toString().toLong()),
+      LEVEL_CONTROL_CLUSTER_ENDPOINT
     )
     cluster.moveToLevel(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
@@ -308,7 +300,8 @@ class OnOffClientFragment : Fragment() {
 
   private suspend fun getOnOffClusterForDevice(): OnOffCluster {
     return OnOffCluster(
-      ChipClient.getConnectedDevicePointer(deviceIdEd.text.toString().toLong()), 1
+      ChipClient.getConnectedDevicePointer(deviceIdEd.text.toString().toLong()),
+      ON_OFF_CLUSTER_ENDPOINT
     )
   }
 
@@ -320,6 +313,13 @@ class OnOffClientFragment : Fragment() {
 
   companion object {
     private const val TAG = "OnOffClientFragment"
+
+    private const val ON_OFF_CLUSTER_ENDPOINT = 1
+    private const val LEVEL_CONTROL_CLUSTER_ENDPOINT = 1
+    private const val BINDING_CLUSTER_ENDPOINT = 1
+    private const val CONTROLLER_NODE_ID = 112233L
+    private const val REPORT_MAX_INTERVAL_CANCELLATION_VALUE = 0xFFFF
+
     fun newInstance(): OnOffClientFragment = OnOffClientFragment()
   }
 }
