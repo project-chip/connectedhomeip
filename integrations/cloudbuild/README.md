@@ -21,7 +21,7 @@ examine the output of the script.
 
 #### Automated build location
 
-Builds are setup to run automatically, with history available at:
+Builds are set up to run automatically, with history available at:
 
 https://console.cloud.google.com/cloud-build/builds?project=matter-build-automation
 
