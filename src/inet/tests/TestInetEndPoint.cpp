@@ -95,6 +95,10 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     char testHostName[20]  = "www.nest.com";
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
+    // Deinit system layer and network
+    ShutdownSystemLayer();
+    ShutdownNetwork();
+
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
     err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRawEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
@@ -484,7 +488,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    testTCPEP1->Shutdown();
+    testTCPEP1->Free();
 }
 
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
@@ -492,24 +496,26 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    RawEndPoint * testRawEP = nullptr;
+    RawEndPoint * testRawEP[INET_CONFIG_NUM_RAW_ENDPOINTS + 1] = { nullptr };
 #endif //
-    UDPEndPoint * testUDPEP = nullptr;
-    TCPEndPoint * testTCPEP = nullptr;
-    CHIP_ERROR err          = CHIP_NO_ERROR;
+
+    UDPEndPoint * testUDPEP[INET_CONFIG_NUM_UDP_ENDPOINTS + 1] = { nullptr };
+    TCPEndPoint * testTCPEP[INET_CONFIG_NUM_TCP_ENDPOINTS + 1] = { nullptr };
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
     for (int i = 0; i < INET_CONFIG_NUM_RAW_ENDPOINTS + 1; i++)
-        err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRawEP);
+        err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRawEP[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
     for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS + 1; i++)
-        err = gInet.NewUDPEndPoint(&testUDPEP);
+        err = gInet.NewUDPEndPoint(&testUDPEP[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
 
     for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS + 1; i++)
-        err = gInet.NewTCPEndPoint(&testTCPEP);
+        err = gInet.NewTCPEndPoint(&testTCPEP[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
 
     // Verify same aComplete and aAppState args do not exhaust timer pool
@@ -528,6 +534,22 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 
     ShutdownNetwork();
     ShutdownSystemLayer();
+
+#if INET_CONFIG_ENABLE_RAW_ENDPOINT
+    // Release RAW endpoints
+    for (int i = 0; i < INET_CONFIG_NUM_RAW_ENDPOINTS; i++)
+        testRawEP[i]->Free();
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
+
+    // Release UDP endpoints
+    for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS; i++)
+        testUDPEP[i]->Free();
+
+    // Release TCP endpoints
+    for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
+    {
+        testTCPEP[i]->Free();
+    }
 }
 #endif
 
