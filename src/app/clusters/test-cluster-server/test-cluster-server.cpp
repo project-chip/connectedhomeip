@@ -172,7 +172,7 @@ bool sendNumericResponse(EndpointId endpoint, app::CommandHandler * apCommandObj
 exit:
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(Zcl, "Test Cluster: failed to send TestSpecific response: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+        ChipLogError(Zcl, "Test Cluster: failed to send TestSpecific response: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return true;
 }

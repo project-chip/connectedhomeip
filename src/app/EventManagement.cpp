@@ -404,7 +404,7 @@ EventNumber CircularEventBuffer::VendEventNumber()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(EventLogging, "%s Advance() for priority %u failed with %" CHIP_ERROR_FORMAT, __FUNCTION__,
-                     static_cast<unsigned>(mPriority), ChipError::FormatError(err));
+                     static_cast<unsigned>(mPriority), err.Format());
     }
 
     return mLastEventNumber;

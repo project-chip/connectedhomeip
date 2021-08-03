@@ -28,7 +28,7 @@
 
 using namespace chip;
 
-#if CHIP_CONFIG_ERROR_CLASS && CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
+#if CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
 
 const char * CheckAndSkipSource(nlTestSuite * inSuite, const char * s, const char * file, unsigned int line)
 {
@@ -43,11 +43,11 @@ const char * CheckAndSkipSource(nlTestSuite * inSuite, const char * s, const cha
 
 #define CHECK_AND_SKIP_SOURCE(suite, s) CheckAndSkipSource((suite), (s), __FILE__, __LINE__)
 
-#else // CHIP_CONFIG_ERROR_CLASS && CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
+#else // CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
 
 #define CHECK_AND_SKIP_SOURCE(suite, s) (s)
 
-#endif // CHIP_CONFIG_ERROR_CLASS && CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
+#endif // CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
 
 static int falseFormatCalled = 0;
 static bool falseFormat(char * buf, uint16_t bufSize, CHIP_ERROR err)

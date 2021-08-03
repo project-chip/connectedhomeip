@@ -1927,30 +1927,29 @@
 #endif // CHIP_CONFIG_TEST
 
 /**
- *  @def CHIP_CONFIG_ERROR_CLASS
- *
- *  If 0, #CHIP_ERROR is an integer type, ::chip::ChipError::StorageType.
- *  If 1, #CHIP_ERROR is a class type, ::chip::ChipError.
- */
-#ifndef CHIP_CONFIG_ERROR_CLASS
-#define CHIP_CONFIG_ERROR_CLASS 0
-#endif // CHIP_CONFIG_ERROR_CLASS
-
-/**
  *  @def CHIP_CONFIG_ERROR_SOURCE
  *
- *  If asserted (1), and CHIP_CONFIG_ERROR_CLASS is also 1, then CHIP_ERROR constants
- *  will include the source location of their expansion.
+ *  If asserted (1), then CHIP_ERROR constants will include the source location of their expansion.
  */
 #ifndef CHIP_CONFIG_ERROR_SOURCE
 #define CHIP_CONFIG_ERROR_SOURCE 0
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 /**
+ *  @def CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+ *
+ *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then instances of CHIP_NO_ERROR will also include
+ *  the source location of their expansion. Otherwise, CHIP_NO_ERROR is excluded from source tracking.
+ */
+#ifndef CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 1
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
+/**
  *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
  *
- *  If 0, then ChipError::FormatError() returns an integer (ChipError::BaseType).
- *  If 1, then ChipError::FormatError() returns a const char *, from chip::ErrorStr().
+ *  If 0, then .Format() returns an integer (ChipError::BaseType).
+ *  If 1, then .Format() returns a const char *, from chip::ErrorStr().
  *  In either case, the macro CHIP_ERROR_FORMAT expands to a suitable printf format.
  */
 

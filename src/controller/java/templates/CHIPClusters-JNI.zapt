@@ -135,7 +135,7 @@ class CHIPDefaultSuccessCallback : public Callback::Callback<DefaultSuccessCallb
 
         exit:
             if (err != CHIP_NO_ERROR) {
-                ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+                ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format());
             }
             if (cppCallback != nullptr) {
                 cppCallback->Cancel();
@@ -201,7 +201,7 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
             env->CallVoidMethod(javaCallbackRef, javaMethod, exception);
         exit:
             if (err != CHIP_NO_ERROR) {
-                ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+                ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format());
             }
             if (cppCallback != nullptr) {
                 cppCallback->Cancel();
@@ -385,7 +385,7 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
 
         exit:
             if (err != CHIP_NO_ERROR) {
-                ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+                ChipLogError(Zcl, "Error invoking Java callback: %" CHIP_ERROR_FORMAT, err.Format());
             }
             if (cppCallback != nullptr) {
                 cppCallback->Cancel();
@@ -578,13 +578,13 @@ exit:
 
         err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR) {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
 
-        err = CreateIllegalStateException(env, "Error invoking cluster", ChipError::FormatError(err), exception);
+        err = CreateIllegalStateException(env, "Error invoking cluster", err.Format(), exception);
         if (err != CHIP_NO_ERROR) {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
         env->CallVoidMethod(callback, method, exception);
@@ -602,14 +602,14 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, read{{asCamelCased name 
     CHIP{{chipCallback.name}}AttributeCallback * onSuccess = new CHIP{{chipCallback.name}}AttributeCallback(callback{{#if (isString type)}}, {{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}});
 {{/if}}
     if (!onSuccess) {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
     CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
     if (!onFailure) {
         delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -618,7 +618,7 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, read{{asCamelCased name 
     if (cppCluster == nullptr) {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
         return;
     }
 
@@ -626,7 +626,7 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, read{{asCamelCased name 
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error reading attribute", err);
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
 {{#if isWritableAttribute}}
@@ -636,14 +636,14 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, write{{asCamelCased name
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess) {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
     CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
     if (!onFailure) {
         delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -652,7 +652,7 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, write{{asCamelCased name
     if (cppCluster == nullptr) {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
         return;
     }
 
@@ -668,7 +668,7 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, write{{asCamelCased name
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error writing attribute", err);
+        ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
 {{/if}}

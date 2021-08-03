@@ -242,7 +242,7 @@ static void CheckCoreErrorStr(nlTestSuite * inSuite, void * inContext)
         char expectedText[9];
 
         // Assert that the error string contains the error number in hex.
-        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(ChipError::AsInteger(err)));
+        snprintf(expectedText, sizeof(expectedText), "%08" PRIX32, static_cast<uint32_t>(err.AsInteger()));
         NL_TEST_ASSERT(inSuite, (strstr(errStr, expectedText) != nullptr));
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR

@@ -84,7 +84,7 @@ void TestBytesToHexNullTerminated(nlTestSuite * inSuite, void * inContext)
 
         // Test Alias
         CHIP_ERROR retval = BytesToUppercaseHexString(&src[0], sizeof(src), &dest2[0], sizeof(dest2));
-        printf("retval=%" CHIP_ERROR_FORMAT "\n", chip::ChipError::FormatError(retval));
+        printf("retval=%" CHIP_ERROR_FORMAT "\n", retval.Format());
         NL_TEST_ASSERT(inSuite, retval == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, memcmp(&dest2[0], &expected[0], sizeof(expected)) == 0);
     }
