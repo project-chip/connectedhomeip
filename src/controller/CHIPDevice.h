@@ -61,9 +61,9 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
-constexpr size_t kMaxBlePendingPackets     = 1;
-constexpr uint32_t kOpCSRNonceLength       = 32;
-constexpr uint32_t kAttestationNonceLength = 32;
+constexpr size_t kMaxBlePendingPackets   = 1;
+constexpr size_t kOpCSRNonceLength       = 32;
+constexpr size_t kAttestationNonceLength = 32;
 
 using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4

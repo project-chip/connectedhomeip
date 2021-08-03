@@ -810,15 +810,7 @@ DeviceCommissioner::DeviceCommissioner() :
     mOnAttestationFailureCallback(OnAttestationFailureResponse, this), mOnCSRFailureCallback(OnCSRFailureResponse, this),
     mOnCertFailureCallback(OnAddNOCFailureResponse, this), mOnRootCertFailureCallback(OnRootCertFailureResponse, this),
     mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
-//    mDeviceNOCCallback(OnDeviceNOCGenerated, this),
-// ??
-#if 0
-    mOnCSRFailureCallback(OnCSRFailureResponse, this), mOnCertFailureCallback(OnAddNOCFailureResponse, this),
-    mOnRootCertFailureCallback(OnRootCertFailureResponse, this), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
-    mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this), mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this)
-#endif
- mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this)
-
+    mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this)
 {
     mPairingDelegate      = nullptr;
     mDeviceBeingPaired    = kNumMaxActiveDevices;
@@ -843,12 +835,12 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     mUdcTransportMgr = chip::Platform::New<DeviceTransportMgr>();
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mInetLayer)
                                                     .SetAddressType(Inet::kIPAddressType_IPv6)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort((uint16_t) (mUdcListenPort))
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
                                                 Transport::UdpListenParameters(mInetLayer)
                                                     .SetAddressType(Inet::kIPAddressType_IPv4)
-                                                    .SetListenPort((uint16_t)(mUdcListenPort))
+                                                    .SetListenPort((uint16_t) (mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4
 #if CONFIG_NETWORK_LAYER_BLE
                                                     ,
@@ -1226,7 +1218,7 @@ void DeviceCommissioner::OnSessionEstablished()
         err = SendCertificateChainRequestCommand(device, CertificateChainType::kPAI);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Ble, "Failed in sending Certificate Chain request command to the device: err %s", ErrorStr(err));
+            ChipLogError(Ble, "Failed in sending 'Certificate Chain request' command to the device: err %s", ErrorStr(err));
             OnSessionEstablishmentError(err);
             return;
         }
@@ -1420,6 +1412,7 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(chip::ByteSpan attestatio
 
     // Step d
     P256ECDSASignature deviceSignature;
+    // SetLength will fail if signature doesn't fit
     ReturnErrorOnFailure(deviceSignature.SetLength(signature.size()));
     memcpy(deviceSignature, signature.data(), signature.size());
     // TODO: re-enable the method call below (after introducing a set of delegate APIs for interacting with DAC/PAI
