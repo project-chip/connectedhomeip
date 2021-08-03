@@ -358,8 +358,10 @@ void Device::OnOpenPairingWindowFailureResponse(void * context, uint8_t status)
 
 CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
 {
+    constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
+
     chip::Controller::AdministratorCommissioningCluster cluster;
-    cluster.Associate(this, 0);
+    cluster.Associate(this, kAdministratorCommissioningClusterEndpoint);
 
     Callback::Cancelable * successCallback = mOpenPairingSuccessCallback.Cancel();
     Callback::Cancelable * failureCallback = mOpenPairingFailureCallback.Cancel();
@@ -372,9 +374,9 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption optio
         ReturnErrorOnFailure(
             PASESession::GeneratePASEVerifier(verifier, kPBKDFMinimumIterations, salt, randomSetupPIN, setupPayload.setUpPINCode));
 
-        ReturnErrorOnFailure(
-            cluster.OpenCommissioningWindow(successCallback, failureCallback, timeout, ByteSpan(&verifier[0][0], sizeof(verifier)),
-                                            setupPayload.discriminator, kPBKDFMinimumIterations, salt, mPAKEVerifierID++));
+        ReturnErrorOnFailure(cluster.OpenCommissioningWindow(
+            successCallback, failureCallback, timeout, ByteSpan(reinterpret_cast<uint8_t *>(&verifier), sizeof(verifier)),
+            setupPayload.discriminator, kPBKDFMinimumIterations, salt, mPAKEVerifierID++));
     }
     else
     {

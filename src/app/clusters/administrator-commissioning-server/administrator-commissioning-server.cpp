@@ -53,8 +53,8 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(chi
     VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(discriminator <= kMaxDiscriminatorValue, status = EMBER_ZCL_STATUS_FAILURE);
 
-    memcpy(&verifier[0][0], &verifierData[0], kSpake2p_WS_Length);
-    memcpy(&verifier[1][0], &verifierData[kSpake2p_WS_Length], kSpake2p_WS_Length);
+    memcpy(verifier.mW0, &verifierData[0], kSpake2p_WS_Length);
+    memcpy(verifier.mL, &verifierData[kSpake2p_WS_Length], kSpake2p_WS_Length);
 
     VerifyOrExit(OpenPairingWindowUsingVerifier(commissioningTimeout, discriminator, verifier, iterations, salt, passcodeID) ==
                      CHIP_NO_ERROR,

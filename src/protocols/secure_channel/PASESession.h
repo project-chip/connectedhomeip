@@ -74,7 +74,11 @@ struct PASESessionSerializable
     uint16_t mPeerKeyId;
 };
 
-typedef uint8_t PASEVerifier[2][kSpake2p_WS_Length];
+struct PASEVerifier
+{
+    uint8_t mW0[kSpake2p_WS_Length];
+    uint8_t mL[kSpake2p_WS_Length];
+};
 
 class DLL_EXPORT PASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
