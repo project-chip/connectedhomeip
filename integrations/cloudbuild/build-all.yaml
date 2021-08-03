@@ -10,7 +10,7 @@ steps:
           ]
       timeout: 7200s
 
-    # Final steps: upload artifacts. Use this becaus the artifacts/objects command does not seem to
+    # Final steps: upload artifacts. Use this because the artifacts/objects command does not seem to
     # support recursive copies.
     #
     # This has the unfortunate sideffect that 'artifacts' will not be visible as part of the
