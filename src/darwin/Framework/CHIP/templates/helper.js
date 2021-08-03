@@ -123,4 +123,4 @@ exports.asObjectiveCNumberType       = asObjectiveCNumberType;
 exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
 exports.asTestIndex                  = asTestIndex;
 exports.asTestValue                  = asTestValue;
-exports.attributeTypeSupported = attributeTypeSupported;
+exports.attributeTypeSupported       = attributeTypeSupported;
