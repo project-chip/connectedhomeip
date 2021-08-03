@@ -374,8 +374,14 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption optio
         ReturnErrorOnFailure(
             PASESession::GeneratePASEVerifier(verifier, kPBKDFMinimumIterations, salt, randomSetupPIN, setupPayload.setUpPINCode));
 
+        uint8_t serializedVerifier[2 * kSpake2p_WS_Length];
+        VerifyOrReturnError(sizeof(serializedVerifier) == sizeof(verifier), CHIP_ERROR_INTERNAL);
+
+        memcpy(serializedVerifier, verifier.mW0, kSpake2p_WS_Length);
+        memcpy(&serializedVerifier[kSpake2p_WS_Length], verifier.mL, kSpake2p_WS_Length);
+
         ReturnErrorOnFailure(cluster.OpenCommissioningWindow(
-            successCallback, failureCallback, timeout, ByteSpan(reinterpret_cast<uint8_t *>(&verifier), sizeof(verifier)),
+            successCallback, failureCallback, timeout, ByteSpan(serializedVerifier, sizeof(serializedVerifier)),
             setupPayload.discriminator, kPBKDFMinimumIterations, salt, mPAKEVerifierID++));
     }
     else

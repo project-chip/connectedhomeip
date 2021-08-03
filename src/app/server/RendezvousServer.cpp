@@ -82,17 +82,18 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
 
     mAdvDelegate = params.GetAdvertisementDelegate();
 
-    // Note: Since BLE is only used for initial setup, enable BLE advertisement in rendezvous session can be expected.
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
-#if CONFIG_NETWORK_LAYER_BLE
-    {
-        ReturnErrorOnFailure(GetAdvertisementDelegate()->StartAdvertisement());
-    }
-#else
+#if !CONFIG_NETWORK_LAYER_BLE
     {
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 #endif
+
+    if (HasAdvertisementDelegate())
+    {
+        ReturnErrorOnFailure(GetAdvertisementDelegate()->StartAdvertisement());
+    }
+
     mSessionMgr      = sessionMgr;
     mFabric          = fabric;
     mExchangeManager = exchangeManager;

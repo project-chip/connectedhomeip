@@ -423,14 +423,8 @@ CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t commissioningTimeoutSeconds, 
 
     ReturnErrorOnFailure(gDeviceDiscriminatorCache.UpdateDiscriminator(discriminator));
 
-#if CONFIG_NETWORK_LAYER_BLE
-    params.SetPASEVerifier(verifier)
-        .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
-        .SetPeerAddress(Transport::PeerAddress::BLE())
-        .SetAdvertisementDelegate(&gAdvDelegate);
-#else
-    params.SetPASEVerifier(verifier);
-#endif // CONFIG_NETWORK_LAYER_BLE
+    gAdvDelegate.SetBLE(false);
+    params.SetPASEVerifier(verifier).SetAdvertisementDelegate(&gAdvDelegate);
 
     FabricIndex fabricIndex = gNextAvailableFabricIndex;
     FabricInfo * fabricInfo = gFabrics.AssignFabricIndex(fabricIndex);
