@@ -68,13 +68,13 @@ class Efr32Builder(GnBuilder):
   def __init__(self,
                root,
                runner,
-               output_dir: str,
+               output_prefix: str,
                app: Efr32App = Efr32App.LIGHT,
                board: Efr32Board = Efr32Board.BRD4161A):
     super(Efr32Builder, self).__init__(
         root=os.path.join(root, 'examples', app.ExampleName(), 'efr32'),
         runner=runner,
-        output_dir=output_dir)
+        output_prefix=output_prefix)
 
     self.app = app
     self.gn_build_args = ['efr32_board="%s"' % board.GnArgName()]

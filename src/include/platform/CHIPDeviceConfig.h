@@ -178,7 +178,7 @@
  * persistent storage (e.g. by a factory provisioning process).
  */
 #ifndef CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION
-#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION 1
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION 0
 #endif
 
 /**
@@ -196,7 +196,7 @@
  * A monothonic number identifying the firmware revision running on the device.
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION 1
+#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION 0
 #endif
 
 /**

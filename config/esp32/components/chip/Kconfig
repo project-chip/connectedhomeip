@@ -385,7 +385,7 @@ menu "CHIP Device Layer"
         config DEFAULT_DEVICE_PRODUCT_REVISION
             int "Default Device Product Revision"
             range 0 65535
-            default 1
+            default 0
             help
                 The default device product revision.
 
