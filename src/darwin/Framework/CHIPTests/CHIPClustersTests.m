@@ -5284,7 +5284,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPAdministratorCommissioning * cluster = [[CHIPAdministratorCommissioning alloc] initWithDevice:device
-                                                                                             endpoint:1
+                                                                                             endpoint:0
                                                                                                 queue:queue];
     XCTAssertNotNil(cluster);
 

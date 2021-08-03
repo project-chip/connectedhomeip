@@ -28,6 +28,7 @@ const StringHelper    = require('../../../../../src/app/zap-templates/common/Str
 function asExpectedEndpointForCluster(clusterName)
 {
   switch (clusterName) {
+  case 'AdministratorCommissioning':
   case 'Basic':
   case 'Descriptor':
   case 'GeneralCommissioning':
