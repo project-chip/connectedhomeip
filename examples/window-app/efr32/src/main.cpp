@@ -17,13 +17,13 @@
  *    limitations under the License.
  */
 
+#include "heap_4_silabs.h"
 #include <AppConfig.h>
 #include <FreeRTOS.h>
 #include <WindowApp.h>
 #include <app/server/Server.h>
 #include <init_efrPlatform.h>
 #include <mbedtls/threading.h>
-#include "heap_4_silabs.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <support/CHIPMem.h>
