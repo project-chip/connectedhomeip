@@ -2269,19 +2269,14 @@
 /** @brief Command description for OpCSRResponse
  *
  * Command: OpCSRResponse
- * @param CSR OCTET_STRING
- * @param CSRNonce OCTET_STRING
- * @param VendorReserved1 OCTET_STRING
- * @param VendorReserved2 OCTET_STRING
- * @param VendorReserved3 OCTET_STRING
- * @param Signature OCTET_STRING
+ * @param NOCSRElements OCTET_STRING
+ * @param AttestationSignature OCTET_STRING
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterOpCSRResponse(CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature)                   \
+    CredentialsClusterOpCSRResponse(NOCSRElements, AttestationSignature)                                                           \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_OP_CSR_RESPONSE_COMMAND_ID, "uuuuuu", CSR, CSRNonce, VendorReserved1, VendorReserved2,       \
-                                  VendorReserved3, Signature);
+                                  ZCL_OP_CSR_RESPONSE_COMMAND_ID, "uu", NOCSRElements, AttestationSignature);
 
 /** @brief Command description for AddNOC
  *

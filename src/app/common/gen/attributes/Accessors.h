@@ -598,6 +598,10 @@ EmberAfStatus SetMultiPressMax(chip::EndpointId endpoint, uint8_t multiPressMax)
 
 namespace OperationalCredentials {
 namespace Attributes {
+EmberAfStatus GetSupportedFabrics(chip::EndpointId endpoint, uint8_t * supportedFabrics); // int8u
+EmberAfStatus SetSupportedFabrics(chip::EndpointId endpoint, uint8_t supportedFabrics);
+EmberAfStatus GetCommissionedFabrics(chip::EndpointId endpoint, uint8_t * commissionedFabrics); // int8u
+EmberAfStatus SetCommissionedFabrics(chip::EndpointId endpoint, uint8_t commissionedFabrics);
 } // namespace Attributes
 } // namespace OperationalCredentials
 

@@ -17,8 +17,9 @@
 
 // Import helpers from zap core
 const zapPath      = '../../../../../third_party/zap/repo/src-electron/';
-const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const templateUtil = require(zapPath + 'generator/template-util.js');
+const zclHelper    = require(zapPath + 'generator/helper-zcl.js');
+const iteratorUtil = require(zapPath + 'util/iterator-util.js');
 
 const { Clusters, asBlocks, asPromise } = require('../../common/ClustersHelper.js');
 const StringHelper                      = require('../../common/StringHelper.js');
@@ -282,6 +283,27 @@ function chip_attribute_list_entryTypes(options)
   return templateUtil.collectBlocks(this.items, options, this);
 }
 
+/**
+ * Creates block iterator over commands for a given cluster that have the
+ * following properties:
+ *
+ * 1) Are not manufacturer-specific (to exclude MfgSpecificPing)
+ * 2) Are available in the isCommandAvailable sense.
+ */
+function chip_available_cluster_commands(options)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, 'chip_available_cluster_commands');
+  let promise                        = iteratorUtil.all_user_cluster_commands_helper.call(this, options)
+                    .then(endpointCommands => endpointCommands.filter(command => {
+                      return command.clusterName == clusterName
+                          && zclHelper.isCommandAvailable(
+                              clusterSide, command.incoming, command.outgoing, command.commandSource, command.name)
+                          && /* exclude MfgSpecificPing */ !command.mfgCode;
+                    }))
+                    .then(filteredCommands => templateUtil.collectBlocks(filteredCommands, options, this));
+  return promise;
+}
+
 //
 // Module exports
 //
@@ -299,3 +321,4 @@ exports.chip_server_cluster_response_arguments = chip_server_cluster_response_ar
 exports.chip_attribute_list_entryTypes         = chip_attribute_list_entryTypes;
 exports.chip_server_cluster_attributes         = chip_server_cluster_attributes;
 exports.chip_server_has_list_attributes        = chip_server_has_list_attributes;
+exports.chip_available_cluster_commands        = chip_available_cluster_commands;

@@ -400,6 +400,12 @@ public:
     CHIP_ERROR SetDAC(const ByteSpan & dac);
     CHIP_ERROR SetPAI(const ByteSpan & pai);
 
+    MutableByteSpan GetMutableNOCChain() { return MutableByteSpan(mNOCChainBuffer, sizeof(mNOCChainBuffer)); }
+
+    CHIP_ERROR ReduceNOCChainBufferSize(size_t new_size);
+
+    ByteSpan GetNOCChain() const { return ByteSpan(mNOCChainBuffer, mNOCChainBufferSize); }
+
     /*
      * This function can be called to establish a secure session with the device.
      *
@@ -516,6 +522,10 @@ private:
     uint16_t mDACLen = 0;
     uint8_t * mPAI   = nullptr;
     uint16_t mPAILen = 0;
+
+    // The chain can contain ICAC and OpCert
+    uint8_t mNOCChainBuffer[Credentials::kMaxCHIPCertLength * 2];
+    size_t mNOCChainBufferSize = 0;
 
     SessionIDAllocator * mIDAllocator = nullptr;
 

@@ -614,9 +614,8 @@ static void OnOperationalCredentialsClusterNOCResponse(void * context, uint8_t S
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnOperationalCredentialsClusterOpCSRResponse(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
-                                                         chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
-                                                         chip::ByteSpan VendorReserved3, chip::ByteSpan Signature)
+static void OnOperationalCredentialsClusterOpCSRResponse(void * context, chip::ByteSpan NOCSRElements,
+                                                         chip::ByteSpan AttestationSignature)
 {
     ChipLogProgress(chipTool, "OperationalCredentialsClusterOpCSRResponse");
 
@@ -14289,6 +14288,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FabricsList                                                       | 0x0001 |
+| * SupportedFabrics                                                  | 0x0002 |
+| * CommissionedFabrics                                               | 0x0003 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -14708,6 +14709,74 @@ private:
     chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>(
             OnOperationalCredentialsFabricsListListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute SupportedFabrics
+ */
+class ReadOperationalCredentialsSupportedFabrics : public ModelCommand
+{
+public:
+    ReadOperationalCredentialsSupportedFabrics() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-fabrics");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOperationalCredentialsSupportedFabrics()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSupportedFabrics(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute CommissionedFabrics
+ */
+class ReadOperationalCredentialsCommissionedFabrics : public ModelCommand
+{
+public:
+    ReadOperationalCredentialsCommissionedFabrics() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "commissioned-fabrics");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOperationalCredentialsCommissionedFabrics()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCommissionedFabrics(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -24163,6 +24232,8 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<OperationalCredentialsUpdateFabricLabel>(),            //
         make_unique<DiscoverOperationalCredentialsAttributes>(),           //
         make_unique<ReadOperationalCredentialsFabricsList>(),              //
+        make_unique<ReadOperationalCredentialsSupportedFabrics>(),         //
+        make_unique<ReadOperationalCredentialsCommissionedFabrics>(),      //
         make_unique<ReadOperationalCredentialsClusterRevision>(),          //
     };
 

@@ -24,6 +24,7 @@
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
+#include <app/common/gen/attributes/Accessors.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/common/gen/enums.h>
@@ -50,6 +51,9 @@ constexpr uint16_t kPAICertificate = 2;
 // TODO: Remove this later. DAC needs to be provided by delegate API
 constexpr uint16_t kDACCertificateSize                    = 600;
 static const uint8_t sDACCertificate[kDACCertificateSize] = { 0 };
+
+// As per specifications section 11.22.5.1. Constant RESP_MAX
+constexpr uint16_t kMaxRspLen = 900;
 
 /*
  * Temporary flow for fabric management until addOptCert + fabric index are implemented:
@@ -88,7 +92,7 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
                                     index + 1);
 }
 
-EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel, int32_t index)
+EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, const uint8_t * fabricLabel, uint8_t index)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -106,7 +110,7 @@ EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, c
                    "OpCreds: Writing fabric into attribute store at index %d: fabricId 0x" ChipLogFormatX64
                    ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
                    index, ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
-    status = writeFabricAttribute((uint8_t *) &fabricDescriptor, index);
+    status = writeFabricAttribute((uint8_t *) &fabricDescriptor, static_cast<int32_t>(index));
     return status;
 }
 
@@ -116,7 +120,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Loop through fabrics
-    int32_t fabricIndex = 0;
+    uint8_t fabricIndex = 0;
     for (auto & pairing : GetGlobalFabricTable())
     {
         NodeId nodeId               = pairing.GetNodeId();
@@ -128,7 +132,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
         if (nodeId == kUndefinedNodeId || fabricId == kUndefinedFabricId || vendorId == kUndefinedVendorId)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                           "OpCreds: Skipping over unitialized fabric with fabricId 0x" ChipLogFormatX64
+                           "OpCreds: Skipping over uninitialized fabric with fabricId 0x" ChipLogFormatX64
                            ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
                            ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
             continue;
@@ -145,10 +149,19 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     }
 
     // Store the count of fabrics we just stored
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Stored %" PRIu32 " fabrics in fabrics list attribute.", fabricIndex);
-    if (writeFabricAttribute((uint8_t *) &fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Stored %" PRIu8 " fabrics in fabrics list attribute.", fabricIndex);
+    uint16_t u16Index = fabricIndex;
+    if (writeFabricAttribute(reinterpret_cast<uint8_t *>(&u16Index)) != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabric count %" PRIu32 " in fabrics list", fabricIndex);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabric count %" PRIu8 " in fabrics list", fabricIndex);
+        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
+
+    if (err == CHIP_NO_ERROR &&
+        app::Clusters::OperationalCredentials::Attributes::SetCommissionedFabrics(0, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabrics count %" PRIu8 " in commissioned fabrics",
+                       fabricIndex);
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
@@ -544,12 +557,16 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::EndpointId e
     chip::Platform::ScopedMemoryBuffer<uint8_t> csr;
     size_t csrLength = Crypto::kMAX_CSR_Length;
 
+    chip::Platform::ScopedMemoryBuffer<uint8_t> csrElements;
+
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested an OpCSR");
 
     app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
                                          ZCL_OP_CSR_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     TLV::TLVWriter * writer = nullptr;
+    TLV::TLVWriter csrElementWriter;
+    TLV::TLVType containerType;
 
     // Fetch current fabric
     FabricInfo * fabric = retrieveCurrentFabric();
@@ -569,16 +586,28 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::EndpointId e
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(csrLength < UINT8_MAX, status = EMBER_ZCL_STATUS_FAILURE);
 
+    VerifyOrExit(csrElements.Alloc(kMaxRspLen), status = EMBER_ZCL_STATUS_FAILURE);
+    csrElementWriter.Init(csrElements.Get(), kMaxRspLen);
+
+    SuccessOrExit(err = csrElementWriter.StartContainer(TLV::AnonymousTag, TLV::TLVType::kTLVType_Structure, containerType));
+    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(1), ByteSpan(csr.Get(), csrLength)));
+    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(2), CSRNonce));
+    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(3), ByteSpan()));
+    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(4), ByteSpan()));
+    SuccessOrExit(err = csrElementWriter.Put(TLV::ContextTag(5), ByteSpan()));
+    SuccessOrExit(err = csrElementWriter.EndContainer(containerType));
+    SuccessOrExit(err = csrElementWriter.Finalize());
+
     VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
     writer = commandObj->GetCommandDataElementTLVWriter();
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(csr.Get(), csrLength)));
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), CSRNonce));
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(2), ByteSpan(nullptr, 0)));
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(3), ByteSpan(nullptr, 0)));
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(4), ByteSpan(nullptr, 0)));
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(5), ByteSpan(nullptr, 0)));
+
+    // Write CSR Elements
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(csrElements.Get(), csrElementWriter.GetLengthWritten())));
+
+    // TODO - Write attestation signature using attestation key
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), ByteSpan()));
     SuccessOrExit(err = commandObj->FinishCommand());
 
 exit:

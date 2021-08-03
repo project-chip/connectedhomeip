@@ -157,3 +157,14 @@ tests:
     - label: "Read current color temprature"
       command: "readAttribute"
       attribute: "color temperature"
+
+    - label: "Turn off light that we turned on"
+      cluster: "On/Off"
+      command: "off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
