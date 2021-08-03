@@ -100,6 +100,7 @@ CHIP_ERROR AppTask::Init()
 
     sLightLED.Init(LIGHT_STATE_LED);
     sLightLED.Set(LightingMgr().IsTurnedOff());
+    UpdateClusterState();
 
     /* intialize the Keyboard and button press calback */
     KBD_Init(KBD_Callback);
@@ -565,6 +566,11 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
         K32W_LOG("Turn off Action has been initiated")
     }
 
+    if (aActor == AppEvent::kEventType_Button)
+    {
+        sAppTask.mSyncClusterToButtonAction = true;
+    }
+
     sAppTask.mFunction = kFunctionTurnOnTurnOff;
 }
 
@@ -581,6 +587,12 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     {
         K32W_LOG("Turn off action has been completed")
         sLightLED.Set(false);
+    }
+
+    if (sAppTask.mSyncClusterToButtonAction)
+    {
+        sAppTask.UpdateClusterState();
+        sAppTask.mSyncClusterToButtonAction = false;
     }
 
     sAppTask.mFunction = kFunction_NoneSelected;

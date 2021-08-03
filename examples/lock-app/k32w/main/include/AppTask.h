@@ -81,6 +81,7 @@ private:
 
     Function_t mFunction;
     bool mResetTimerActive;
+    bool mSyncClusterToButtonAction;
 
     static AppTask sAppTask;
 };
