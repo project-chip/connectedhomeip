@@ -15,12 +15,13 @@
  *    limitations under the License.
  */
 
-const basePath = '../../../../';
-const testPath = 'src/app/tests/suites/';
-const zapPath  = basePath + 'third_party/zap/repo/';
-const YAML     = require(zapPath + 'node_modules/yaml');
-const fs       = require('fs');
-const path     = require('path');
+const basePath          = '../../../../';
+const testPath          = 'src/app/tests/suites/';
+const certificationPath = 'src/app/tests/suites/certification/';
+const zapPath           = basePath + 'third_party/zap/repo/';
+const YAML              = require(zapPath + 'node_modules/yaml');
+const fs                = require('fs');
+const path              = require('path');
 
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'src-electron/generator/template-util.js')
@@ -141,9 +142,16 @@ function setDefaults(test, defaultConfig)
 
 function parse(filename)
 {
-  const filepath = path.resolve(__dirname, basePath + testPath + filename + '.yaml');
-  const data     = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
-  const yaml     = YAML.parse(data);
+  let filepath;
+  const isCertificationTest = filename.startsWith('Test_TC_');
+  if (isCertificationTest) {
+    filepath = path.resolve(__dirname, basePath + certificationPath + filename + '.yaml');
+  } else {
+    filepath = path.resolve(__dirname, basePath + testPath + filename + '.yaml');
+  }
+
+  const data = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
+  const yaml = YAML.parse(data);
 
   const defaultConfig = yaml.config || [];
   yaml.tests.forEach(test => {
