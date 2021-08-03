@@ -69,6 +69,9 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
             chip::app::Mdns::StartServer();
+#ifdef RENDEZVOUS_WAIT_FOR_COMMISSIONING_COMPLETE
+            chip::app::Mdns::AdvertiseCommissionableNode();
+#endif
         }
         break;
     }
