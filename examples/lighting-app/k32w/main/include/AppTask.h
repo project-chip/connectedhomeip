@@ -87,9 +87,9 @@ private:
         kFunction_Invalid
     } Function;
 
-    Function_t mFunction;
-    bool mResetTimerActive;
-    bool mSyncClusterToButtonAction;
+    Function_t mFunction = kFunction_NoneSelected;
+    bool mResetTimerActive = false;
+    bool mSyncClusterToButtonAction = false;
 
     static AppTask sAppTask;
 };
