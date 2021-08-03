@@ -32,7 +32,6 @@ namespace chip {
 namespace Shell {
 
 static chip::Shell::Engine sShellDnsSubcommands;
-static bool isResolverStarted;
 
 class DnsShellResolverDelegate : public chip::Mdns::ResolverDelegate
 {
@@ -104,19 +103,15 @@ static CHIP_ERROR BrowseHandler(int argc, char ** argv)
 
 static CHIP_ERROR DnsHandler(int argc, char ** argv)
 {
-    if (!isResolverStarted)
-    {
-        chip::Mdns::Resolver::Instance().StartResolver(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
-        chip::Mdns::Resolver::Instance().SetResolverDelegate(&sDnsShellResolverDelegate);
-
-        isResolverStarted = true;
-    }
-
     if (argc == 0)
     {
         DnsHelpHandler(argc, argv);
         return CHIP_NO_ERROR;
     }
+
+    chip::Mdns::Resolver::Instance().StartResolver(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    chip::Mdns::Resolver::Instance().SetResolverDelegate(&sDnsShellResolverDelegate);
+
     return sShellDnsSubcommands.ExecCommand(argc, argv);
 }
 
