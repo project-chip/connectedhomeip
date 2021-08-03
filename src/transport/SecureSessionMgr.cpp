@@ -225,7 +225,7 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     Transport::FabricInfo * fabric = mFabrics->FindFabricWithIndex(fabricIndex);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    PeerId peerId{ peerNodeId, fabric->GetFabricId()};
+    PeerId peerId{ peerNodeId, fabric->GetFabricId() };
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerId, peerKeyId);
 
     // Find any existing connection with the same node and key ID
@@ -351,7 +351,8 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         if (!state->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized())
         {
             // Queue and start message sync procedure
-            err = mMessageCounterManager->QueueReceivedMessageAndStartSync(packetHeader, state->ToSessionHandle(), state, peerAddress, std::move(msg));
+            err = mMessageCounterManager->QueueReceivedMessageAndStartSync(packetHeader, state->ToSessionHandle(), state,
+                                                                           peerAddress, std::move(msg));
 
             if (err != CHIP_NO_ERROR)
             {
@@ -523,8 +524,9 @@ void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, 
 PeerConnectionState * SecureSessionMgr::GetPeerConnectionState(SecureSessionHandle session)
 {
     Transport::FabricInfo * fabric = mFabrics->FindFabricWithIndex(session.mFabric);
-    if (fabric == nullptr) return nullptr;
-    return mPeerConnections.FindPeerConnectionState(PeerId{ session.mPeerNodeId, fabric->GetFabricId()}, session.mPeerKeyId);
+    if (fabric == nullptr)
+        return nullptr;
+    return mPeerConnections.FindPeerConnectionState(PeerId{ session.mPeerNodeId, fabric->GetFabricId() }, session.mPeerKeyId);
 }
 
 } // namespace chip

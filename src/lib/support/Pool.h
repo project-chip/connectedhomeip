@@ -151,7 +151,8 @@ private:
     };
 
     std::atomic<tBitChunkType> mUsage[(N + kBitChunkSize - 1) / kBitChunkSize];
-    union Data {
+    union Data
+    {
         Data() {}
         ~Data() {}
         alignas(alignof(T)) uint8_t mMemory[N * sizeof(T)];

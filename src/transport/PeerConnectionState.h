@@ -54,7 +54,8 @@ public:
     PeerConnectionState(PeerConnectionState &&)                  = delete;
     PeerConnectionState & operator=(PeerConnectionState &&) = delete;
 
-    SecureSessionHandle ToSessionHandle() const {
+    SecureSessionHandle ToSessionHandle() const
+    {
         return SecureSessionHandle{ GetPeerInfo().GetPeer().GetNodeId(), GetPeerKeyID(), GetFabricIndex() };
     }
 
