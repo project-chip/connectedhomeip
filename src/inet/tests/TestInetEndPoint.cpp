@@ -419,6 +419,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
     testRaw4EP->Free();
 #endif // INET_CONFIG_ENABLE_IPV4
+    testRaw6EP->Free();
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
     // UdpEndPoint special cases to cover the error branch
