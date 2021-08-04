@@ -644,10 +644,9 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
     // Must drop uncompressed point form format specifier (first byte), per spec method
     ByteSpan input_key_span(root_public_key.ConstBytes() + 1, root_public_key.Length() - 1);
 
-    CHIP_ERROR status = hkdf.HKDF_SHA256(input_key_span.data(), input_key_span.size(), &fabric_id_as_big_endian_salt[0],
-                                         sizeof(fabric_id_as_big_endian_salt), &kCompressedFabricInfo[0],
-                                         sizeof(kCompressedFabricInfo), out_compressed_fabric_id.data(),
-                                         kCompressedFabricIdentifierSize);
+    CHIP_ERROR status = hkdf.HKDF_SHA256(
+        input_key_span.data(), input_key_span.size(), &fabric_id_as_big_endian_salt[0], sizeof(fabric_id_as_big_endian_salt),
+        &kCompressedFabricInfo[0], sizeof(kCompressedFabricInfo), out_compressed_fabric_id.data(), kCompressedFabricIdentifierSize);
 
     // Resize output to final bounds on success
     if (status == CHIP_NO_ERROR)
