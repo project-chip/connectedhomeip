@@ -35,6 +35,20 @@ constexpr uint32_t sLiftIcon[] = {
     0xc0ffffc3, 0xc0ffffc3, 0xc0000003, 0xc0000003, 0xc0000003, 0xc0000003, 0xffffffff, 0xffffffff,
 };
 
+constexpr uint32_t sOneIcon[] = {
+    0xffffffff, 0xffffffff, 0xc0000003, 0xc0000003, 0xc0000003, 0xc00fe003, 0xc01fe003, 0xc03fe003,
+    0xc07fe003, 0xc0fbe003, 0xc1f3e003, 0xc3e3e003, 0xc003e003, 0xc003e003, 0xc003e003, 0xc003e003,
+    0xc003e003, 0xc003e003, 0xc003e003, 0xc003e003, 0xc003e003, 0xc003e003, 0xc003e003, 0xc3ffffc3,
+    0xc3ffffc3, 0xc3ffffc3, 0xc3ffffc3, 0xc0000003, 0xc0000003, 0xc0000003, 0xffffffff, 0xffffffff,
+};
+
+constexpr uint32_t sTwoIcon[] = {
+    0xffffffff, 0xffffffff, 0xc0000003, 0xc0000003, 0xc0000003, 0xc07ffe03, 0xc0ffff03, 0xc1ffff83,
+    0xc3ffffc3, 0xc3f00fc3, 0xc3e007c3, 0xc3e007c3, 0xc00007c3, 0xc00007c3, 0xc0000fc3, 0xc00fff83,
+    0xc03fff03, 0xc07ffe03, 0xc0fc0003, 0xc1f80003, 0xc1f00003, 0xc3e00003, 0xc3e00003, 0xc3ffffc3,
+    0xc3ffffc3, 0xc3ffffc3, 0xc3ffffc3, 0xc0000003, 0xc0000003, 0xc0000003, 0xffffffff, 0xffffffff,
+};
+
 PixelPainter::PixelPainter(uint8_t lift, uint8_t tilt) : mLift(lift), mTilt(tilt) {}
 
 CompositePainter::CompositePainter(uint8_t lift, uint8_t tilt, PixelPainter * painter1, PixelPainter * painter2,
@@ -101,6 +115,12 @@ uint8_t IconPainter::Color(uint32_t x, uint32_t y)
     const uint32_t * icon = nullptr;
     switch (mIcon)
     {
+    case LcdIcon::One:
+        icon = sOneIcon;
+        break;
+    case LcdIcon::Two:
+        icon = sTwoIcon;
+        break;
     case LcdIcon::Lift:
         icon = sLiftIcon;
         break;
@@ -144,7 +164,8 @@ uint8_t VerticalBlindPainter::Color(uint32_t x, uint32_t y)
     {
         uint32_t closedCount = (mLift + 1) / mBandSize;
         uint32_t bandCount   = (y - LCD_FRAME_SIZE) / mBandSize;
-        if (bandCount < closedCount)
+        // ChipLogProgress(Zcl, "BLIND: ccount:%u, ccount:%u", clusterId);
+        if (bandCount <= closedCount)
         {
             return y <= (LCD_FRAME_SIZE + mBandSize * bandCount + mTilt);
         }
