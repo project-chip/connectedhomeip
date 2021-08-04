@@ -417,7 +417,7 @@ private:
 };
 
 {{#chip_client_clusters}}
-{{#chip_server_cluster_responses}}
+{{#chip_cluster_responses}}
 class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge : public Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback>
 {
 public:
@@ -425,14 +425,14 @@ public:
 
     ~CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge() {};
 
-    static void CallbackFn(void * context{{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_server_cluster_response_arguments}})
+    static void CallbackFn(void * context{{#chip_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_cluster_response_arguments}})
     {
         CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge * callback = reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackBridge *>(context);
         if (callback && callback->mQueue)
         {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @{
-                  {{#chip_server_cluster_response_arguments}}
+                  {{#chip_cluster_response_arguments}}
                   {{#unless (isStrEqual label "status")}}
                   {{#if isArray}}
                   // {{asSymbol label}}: {{asUnderlyingZclType type}}
@@ -445,7 +445,7 @@ public:
                   @"{{asSymbol label}}": [NSNumber numberWith{{asObjectiveCNumberType label type false}}:{{asSymbol label}}],
                   {{/if}}
                   {{/unless}}
-                  {{/chip_server_cluster_response_arguments}}
+                  {{/chip_cluster_response_arguments}}
                 });
                 callback->Cancel();
                 delete callback;
@@ -458,7 +458,7 @@ private:
     dispatch_queue_t mQueue;
 };
 
-{{/chip_server_cluster_responses}}
+{{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 
 {{#chip_client_clusters}}
@@ -582,9 +582,9 @@ private:
     return &_cppCluster;
 }
 
-{{#chip_server_cluster_commands}}
+{{#chip_cluster_commands}}
 {{#if (zcl_command_arguments_count this.id)}}
-- (void){{asLowerCamelCase name}}:{{#chip_server_cluster_command_arguments}}{{#not_first}}{{asLowerCamelCase label}}:{{/not_first}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_server_cluster_command_arguments}}responseHandler:(ResponseHandler)responseHandler
+- (void){{asLowerCamelCase name}}:{{#chip_cluster_command_arguments}}{{#not_first}}{{asLowerCamelCase label}}:{{/not_first}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_cluster_command_arguments}}responseHandler:(ResponseHandler)responseHandler
 {{else}}
 - (void){{asLowerCamelCase name}}:(ResponseHandler)responseHandler
 {{/if}}
@@ -608,7 +608,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*){{asLowerCamelCase label}}.bytes, {{asLowerCamelCase label}}.length){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*)[{{asLowerCamelCase label}} dataUsingEncoding:NSUTF8StringEncoding].bytes, [{{asLowerCamelCase label}} lengthOfBytesUsingEncoding:NSUTF8StringEncoding]){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_server_cluster_command_arguments}});
+        err = self.cppCluster.{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*){{asLowerCamelCase label}}.bytes, {{asLowerCamelCase label}}.length){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*)[{{asLowerCamelCase label}} dataUsingEncoding:NSUTF8StringEncoding].bytes, [{{asLowerCamelCase label}} lengthOfBytesUsingEncoding:NSUTF8StringEncoding]){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments}});
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -617,7 +617,7 @@ private:
         responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-{{/chip_server_cluster_commands}}
+{{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
 - (void)readAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)responseHandler

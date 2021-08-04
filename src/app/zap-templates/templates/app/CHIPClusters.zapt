@@ -20,13 +20,13 @@ class DLL_EXPORT {{asUpperCamelCase name}}Cluster : public ClusterBase
 public:
     {{asUpperCamelCase name}}Cluster() : ClusterBase(app::Clusters::{{asUpperCamelCase name}}::Id) {}
     ~{{asUpperCamelCase name}}Cluster() {}
-    {{#chip_server_cluster_commands}}
+    {{#chip_cluster_commands}}
     {{#first}}
 
     // Cluster Commands
     {{/first}}
-    CHIP_ERROR {{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_server_cluster_command_arguments}});
-    {{/chip_server_cluster_commands}}
+    CHIP_ERROR {{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}});
+    {{/chip_cluster_commands}}
 
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -44,12 +44,12 @@ public:
     CHIP_ERROR ReportAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onReportCallback);
     {{/if}}
     {{/chip_server_cluster_attributes}}
-    {{#chip_server_cluster_commands}}
+    {{#chip_cluster_commands}}
     {{#first}}
 
 private:
     {{/first}}
-    {{/chip_server_cluster_commands}}
+    {{/chip_cluster_commands}}
 };
 
 {{/chip_client_clusters}}
