@@ -103,7 +103,11 @@ enum
     kCertType_Root            = 0x01, /**< A CHIP Root certificate. */
     kCertType_ICA             = 0x02, /**< A CHIP Intermediate CA certificate. */
     kCertType_Node            = 0x03, /**< A CHIP node certificate. */
-    kCertType_FirmwareSigning = 0x04, /**< A CHIP firmware signing certificate. */
+    kCertType_FirmwareSigning = 0x04, /**< A CHIP firmware signing certificate. Note that CHIP doesn't
+                                           specify how firmware images are signed and implementation of
+                                           firmware image signing is manufacturer-specific. The CHIP
+                                           certificate format supports encoding of firmware signing
+                                           certificates if chosen by the manufacturer to use them. */
 };
 
 /** X.509 Certificate Key Purpose Flags
