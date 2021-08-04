@@ -12,6 +12,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'ALARM_CLUSTER': [],
     'APPLICATION_BASIC_CLUSTER': ['application-basic-server'],
     'ACCOUNT_LOGIN_CLUSTER': ['account-login-server'],
+    'ADMINISTRATOR_COMMISSIONING_CLUSTER': ['administrator-commissioning-server'],
     'APPLICATION_LAUNCHER_CLUSTER': ['application-launcher-server'],
     'AUDIO_OUTPUT_CLUSTER': ['audio-output-server'],
     'BARRIER_CONTROL_CLUSTER': ['barrier-control-server'],
@@ -71,6 +72,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
 CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'ALARM_CLUSTER': [],
     'ACCOUNT_LOGIN_CLUSTER': [],
+    'ADMINISTRATOR_COMMISSIONING_CLUSTER': [],
     'APPLICATION_LAUNCHER_CLUSTER': [],
     'AUDIO_OUTPUT_CLUSTER': [],
     'APPLICATION_BASIC_CLUSTER': [],

@@ -56,6 +56,26 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster AdministratorCommissioning
+ *
+ */
+@interface CHIPAdministratorCommissioning : CHIPCluster
+
+- (void)openBasicCommissioningWindow:(uint16_t)commissioningTimeout responseHandler:(ResponseHandler)responseHandler;
+- (void)openCommissioningWindow:(uint16_t)commissioningTimeout
+                   pAKEVerifier:(NSData *)pAKEVerifier
+                  discriminator:(uint16_t)discriminator
+                     iterations:(uint32_t)iterations
+                           salt:(NSData *)salt
+                     passcodeID:(uint16_t)passcodeID
+                responseHandler:(ResponseHandler)responseHandler;
+- (void)revokeCommissioning:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Application Basic
  *
  */

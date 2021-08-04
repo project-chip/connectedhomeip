@@ -49,6 +49,27 @@ public:
 private:
 };
 
+class DLL_EXPORT AdministratorCommissioningCluster : public ClusterBase
+{
+public:
+    AdministratorCommissioningCluster() : ClusterBase(app::Clusters::AdministratorCommissioning::Id) {}
+    ~AdministratorCommissioningCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR OpenBasicCommissioningWindow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint16_t commissioningTimeout);
+    CHIP_ERROR OpenCommissioningWindow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t commissioningTimeout, chip::ByteSpan pAKEVerifier, uint16_t discriminator,
+                                       uint32_t iterations, chip::ByteSpan salt, uint16_t passcodeID);
+    CHIP_ERROR RevokeCommissioning(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+};
+
 class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
 {
 public:
