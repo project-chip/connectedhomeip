@@ -59,27 +59,3 @@ static_library("mdns") {
     assert(false, "Unknown mDNS advertiser implementation.")
   }
 }
-
-static_library("minimal_mdns_tests") {
-  public_deps = [
-    ":platform_header",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-  ]
-  defines = [ "MDNS_MINIMAL_TEST_SERVER=true" ]
-  sources = [
-    "Advertiser.h",
-    "Advertiser_ImplMinimalMdns.cpp",
-    "MinimalMdnsServer.cpp",
-    "MinimalMdnsServer.h",
-    "Resolver.h",
-    "ServiceNaming.cpp",
-    "ServiceNaming.h",
-    "TxtFields.cpp",
-    "TxtFields.h",
-  ]
-  public_deps += [
-    "${chip_root}/src/lib/mdns/minimal",
-    "${nlunit_test_root}:nlunit-test",
-  ]
-}
