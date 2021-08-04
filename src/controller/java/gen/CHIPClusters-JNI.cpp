@@ -7925,14 +7925,14 @@ exit:
         err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
 
-        err = CreateIllegalStateException(env, "Error invoking cluster", ChipError::FormatError(err), exception);
+        err = CreateIllegalStateException(env, "Error invoking cluster", err.Format(), exception);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
         env->CallVoidMethod(callback, method, exception);
@@ -7977,14 +7977,14 @@ exit:
         err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
 
-        err = CreateIllegalStateException(env, "Error invoking cluster", ChipError::FormatError(err), exception);
+        err = CreateIllegalStateException(env, "Error invoking cluster", err.Format(), exception);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
         env->CallVoidMethod(callback, method, exception);
@@ -8023,14 +8023,14 @@ exit:
         err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
 
-        err = CreateIllegalStateException(env, "Error invoking cluster", ChipError::FormatError(err), exception);
+        err = CreateIllegalStateException(env, "Error invoking cluster", err.Format(), exception);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+            ChipLogError(Zcl, "Error throwing IllegalStateException %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
         env->CallVoidMethod(callback, method, exception);
@@ -8044,7 +8044,7 @@ JNI_METHOD(void, AdministratorCommissioningCluster, readClusterRevisionAttribute
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -8052,7 +8052,7 @@ JNI_METHOD(void, AdministratorCommissioningCluster, readClusterRevisionAttribute
     if (!onFailure)
     {
         delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -8062,7 +8062,7 @@ JNI_METHOD(void, AdministratorCommissioningCluster, readClusterRevisionAttribute
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
         return;
     }
 
@@ -8071,7 +8071,7 @@ JNI_METHOD(void, AdministratorCommissioningCluster, readClusterRevisionAttribute
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error reading attribute", err);
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
 JNI_METHOD(jlong, ApplicationBasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)

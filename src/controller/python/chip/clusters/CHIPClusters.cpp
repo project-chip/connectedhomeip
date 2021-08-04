@@ -377,42 +377,42 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_AccountLogin_ClusterRevision
 chip::ChipError::StorageType chip_ime_AppendCommand_AdministratorCommissioning_OpenBasicCommissioningWindow(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t commissioningTimeout)
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::AdministratorCommissioningCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return chip::ChipError::AsInteger(cluster.OpenBasicCommissioningWindow(nullptr, nullptr, commissioningTimeout));
+    return cluster.OpenBasicCommissioningWindow(nullptr, nullptr, commissioningTimeout).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_AdministratorCommissioning_OpenCommissioningWindow(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t commissioningTimeout,
     const uint8_t * pAKEVerifier, uint32_t pAKEVerifier_Len, uint16_t discriminator, uint32_t iterations, const uint8_t * salt,
     uint32_t salt_Len, uint16_t passcodeID)
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::AdministratorCommissioningCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return chip::ChipError::AsInteger(cluster.OpenCommissioningWindow(nullptr, nullptr, commissioningTimeout,
-                                                                      chip::ByteSpan(pAKEVerifier, pAKEVerifier_Len), discriminator,
-                                                                      iterations, chip::ByteSpan(salt, salt_Len), passcodeID));
+    return cluster
+        .OpenCommissioningWindow(nullptr, nullptr, commissioningTimeout, chip::ByteSpan(pAKEVerifier, pAKEVerifier_Len),
+                                 discriminator, iterations, chip::ByteSpan(salt, salt_Len), passcodeID)
+        .AsInteger();
 }
 chip::ChipError::StorageType
 chip_ime_AppendCommand_AdministratorCommissioning_RevokeCommissioning(chip::Controller::Device * device,
                                                                       chip::EndpointId ZCLendpointId, chip::GroupId)
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::AdministratorCommissioningCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return chip::ChipError::AsInteger(cluster.RevokeCommissioning(nullptr, nullptr));
+    return cluster.RevokeCommissioning(nullptr, nullptr).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_AdministratorCommissioning_ClusterRevision(chip::Controller::Device * device,
                                                                                                chip::EndpointId ZCLendpointId,
                                                                                                chip::GroupId /* ZCLgroupId */)
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::AdministratorCommissioningCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return chip::ChipError::AsInteger(
-        cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 // End of Cluster AdministratorCommissioning
