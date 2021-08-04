@@ -67,7 +67,7 @@ protected:
     /**
      * The callback for when the poll timer expires. The poll timer regulates how often the TransferSession is polled.
      */
-    static void PollTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error);
+    static void PollTimerHandler(chip::System::Layer * systemLayer, void * appState);
 
     /**
      * Polls the TransferSession object and calls HandleTransferSessionOutput.

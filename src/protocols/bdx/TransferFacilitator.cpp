@@ -63,7 +63,7 @@ void TransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec)
     mTransfer.Reset();
 }
 
-void TransferFacilitator::PollTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
+void TransferFacilitator::PollTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     VerifyOrReturn(appState != nullptr);
     static_cast<TransferFacilitator *>(appState)->PollForOutput();

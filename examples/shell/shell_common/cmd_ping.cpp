@@ -132,7 +132,7 @@ Protocols::Echo::EchoClient gEchoClient;
 Transport::FabricTable gFabrics;
 
 CHIP_ERROR SendEchoRequest(streamer_t * stream);
-void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error);
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState);
 
 Transport::PeerAddress GetEchoPeerAddress()
 {
@@ -166,7 +166,7 @@ void Shutdown()
     gSessionManager.Shutdown();
 }
 
-void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     if (gPingArguments.GetEchoRespCount() != gPingArguments.GetEchoCount())
     {

@@ -298,7 +298,7 @@ exit:
     return err;
 }
 
-void Engine::Run(System::Layer * aSystemLayer, void * apAppState, CHIP_ERROR)
+void Engine::Run(System::Layer * aSystemLayer, void * apAppState)
 {
     Engine * const pEngine = reinterpret_cast<Engine *>(apAppState);
     pEngine->Run();

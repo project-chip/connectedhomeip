@@ -244,7 +244,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     }
 }
 
-void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
+void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;

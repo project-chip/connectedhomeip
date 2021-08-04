@@ -285,7 +285,7 @@ public:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-    static void HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
+    static void HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
 
 private:

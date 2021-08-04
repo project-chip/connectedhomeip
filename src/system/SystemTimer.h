@@ -52,7 +52,7 @@ namespace System {
 
 namespace Timers {
 
-typedef void (*OnCompleteFunct)(Layer * aLayer, void * appState, CHIP_ERROR aError);
+typedef void (*OnCompleteFunct)(Layer * aLayer, void * appState);
 
 } // namespace Timers
 
