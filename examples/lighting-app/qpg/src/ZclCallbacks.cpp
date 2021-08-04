@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,7 @@
 
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/common/gen/attribute-id.h>
+#include <app/common/gen/attributes/Accessors.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
 #include <app/util/af-types.h>
@@ -30,6 +31,7 @@
 #include <app/util/util.h>
 
 using namespace ::chip;
+using namespace chip::app::Clusters;
 
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
@@ -60,6 +62,70 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
         else
         {
             ChipLogError(Zcl, "wrong length for level: %d", size);
+        }
+    }
+    else if (clusterId == ZCL_COLOR_CONTROL_CLUSTER_ID)
+    {
+        /* ignore several attributes that are currently not processed */
+        if ((attributeId == ZCL_COLOR_CONTROL_REMAINING_TIME_ATTRIBUTE_ID) ||
+            (attributeId == ZCL_COLOR_CONTROL_ENHANCED_COLOR_MODE_ATTRIBUTE_ID) ||
+            (attributeId == ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID))
+        {
+            return;
+        }
+
+        if ((attributeId != ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID) &&
+            (attributeId != ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID) &&
+            (attributeId != ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID) &&
+            (attributeId != ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID))
+        {
+            ChipLogProgress(Zcl, "Unknown attribute ID: %" PRIx32, attributeId);
+            return;
+        }
+
+        if (size == sizeof(uint16_t))
+        {
+            XyColor_t xy;
+            if (attributeId == ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID)
+            {
+                xy.x = *reinterpret_cast<uint16_t *>(value);
+                // get Y from cluster value storage
+                EmberAfStatus status = ColorControl::Attributes::GetCurrentY(endpoint, &xy.y);
+                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+            }
+            if (attributeId == ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID)
+            {
+                xy.y = *reinterpret_cast<uint16_t *>(value);
+                // get X from cluster value storage
+                EmberAfStatus status = ColorControl::Attributes::GetCurrentX(endpoint, &xy.x);
+                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+            }
+            ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
+            LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_XY, 0, sizeof(xy), (uint8_t *) &xy);
+        }
+        else if (size == sizeof(uint8_t))
+        {
+            HsvColor_t hsv;
+            if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
+            {
+                hsv.h = *value;
+                // get saturation from cluster value storage
+                EmberAfStatus status = ColorControl::Attributes::GetCurrentSaturation(endpoint, &hsv.s);
+                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+            }
+            if (attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID)
+            {
+                hsv.s = *value;
+                // get hue from cluster value storage
+                EmberAfStatus status = ColorControl::Attributes::GetCurrentHue(endpoint, &hsv.h);
+                assert(status == EMBER_ZCL_STATUS_SUCCESS);
+            }
+            ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
+            LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_HSV, 0, sizeof(hsv), (uint8_t *) &hsv);
+        }
+        else
+        {
+            ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
         }
     }
     else

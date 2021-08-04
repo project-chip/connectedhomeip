@@ -1,6 +1,6 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright(c) 2021 Project CHIP Authors
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0(the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -20,7 +20,6 @@ import("//build_overrides/qpg_sdk.gni")
 import("${build_root}/config/defaults.gni")
 import("${qpg_sdk_build_root}/qpg_executable.gni")
 import("${qpg_sdk_build_root}/qpg_sdk.gni")
-
 assert(current_os == "freertos")
 
 qpg_project_dir = "${chip_root}/examples/lighting-app/qpg"
@@ -42,6 +41,7 @@ qpg_executable("lighting_app") {
   output_name = "chip-${qpg_target_ic}-lighting-example.out"
 
   sources = [
+    "${chip_root}/examples/lighting-app/lighting-common/color_format/color_format.cpp",
     "${examples_plat_dir}/app/main.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
@@ -65,6 +65,7 @@ qpg_executable("lighting_app") {
     "${qpg_project_dir}/include/",
     "${examples_plat_dir}",
     "${examples_plat_dir}/app/include",
+    "${chip_root}/examples/lighting-app/lighting-common/color_format",
   ]
 
   ldscript = "${qpg_sdk_root}/${qpg_target_ic}/ldscripts/chip-${qpg_target_ic}-example.ld"
