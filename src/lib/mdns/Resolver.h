@@ -44,9 +44,12 @@ struct ResolvedNodeData
     }
 
     PeerId mPeerId;
-    Inet::InterfaceId mInterfaceId;
-    Inet::IPAddress mAddress;
-    uint16_t mPort;
+    Inet::IPAddress mAddress         = Inet::IPAddress::Any;
+    Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;
+    uint16_t mPort                   = 0;
+    bool mSupportsTcp                = false;
+    uint32_t mMrpRetryIntervalIdle   = 0;
+    uint32_t mMrpRetryIntervalActive = 0;
 };
 
 constexpr size_t kMaxDeviceNameLen         = 32;

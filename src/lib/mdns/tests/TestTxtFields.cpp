@@ -42,7 +42,7 @@ ByteSpan GetSpan(char * key)
 
 void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
 {
-    char key[3];
+    char key[4];
     sprintf(key, "D");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kLongDiscriminator);
 
@@ -69,6 +69,15 @@ void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
 
     sprintf(key, "PH");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kPairingHint);
+
+    sprintf(key, "CRI");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kMrpRetryIntervalIdle);
+
+    sprintf(key, "CRA");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kMrpRetryIntervalActive);
+
+    sprintf(key, "T");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kTcpSupport);
 
     sprintf(key, "XX");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kUnknown);
@@ -302,7 +311,7 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
 }
 
 // The individual fill tests test the error cases for each key type, this test is used to ensure the proper record is filled.
-void TestFillNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
+void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
 {
     char key[3];
     char val[16];
@@ -311,7 +320,7 @@ void TestFillNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     // Long discriminator
     sprintf(key, "D");
     sprintf(val, "840");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), &filled);
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.longDiscriminator == 840);
     filled.longDiscriminator = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
@@ -319,7 +328,7 @@ void TestFillNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     // vendor and product
     sprintf(key, "VP");
     sprintf(val, "123+456");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), &filled);
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.vendorId == 123);
     NL_TEST_ASSERT(inSuite, filled.productId == 456);
     filled.vendorId  = 0;
@@ -329,7 +338,7 @@ void TestFillNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     // Additional Pairing
     sprintf(key, "AP");
     sprintf(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), &filled);
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.additionalPairing == 1);
     filled.additionalPairing = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
@@ -337,7 +346,7 @@ void TestFillNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     // Commissioning mode
     sprintf(key, "CM");
     sprintf(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), &filled);
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.commissioningMode == 1);
     filled.commissioningMode = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
@@ -345,7 +354,7 @@ void TestFillNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     // Device type
     sprintf(key, "DT");
     sprintf(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), &filled);
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.deviceType == 1);
     filled.deviceType = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
@@ -353,7 +362,7 @@ void TestFillNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     // Device name
     sprintf(key, "DN");
     sprintf(val, "abc");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), &filled);
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, strcmp(filled.deviceName, "abc") == 0);
     memset(filled.deviceName, 0, sizeof(filled.deviceName));
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
@@ -361,7 +370,7 @@ void TestFillNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     // Rotating device id
     sprintf(key, "RI");
     sprintf(val, "1A2B");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), &filled);
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.rotatingId[0] == 0x1A);
     NL_TEST_ASSERT(inSuite, filled.rotatingId[1] == 0x2B);
     NL_TEST_ASSERT(inSuite, filled.rotatingIdLen == 2);
@@ -372,7 +381,7 @@ void TestFillNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     // Pairing instruction
     sprintf(key, "PI");
     sprintf(val, "hint");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), &filled);
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, strcmp(filled.pairingInstruction, "hint") == 0);
     memset(filled.pairingInstruction, 0, sizeof(filled.pairingInstruction));
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
@@ -380,27 +389,138 @@ void TestFillNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     // Pairing hint
     sprintf(key, "PH");
     sprintf(val, "1");
-    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), &filled);
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.pairingHint == 1);
     filled.pairingHint = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 }
 
+bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
+{
+    return nodeData.mPeerId == PeerId{} && nodeData.mAddress == Inet::IPAddress::Any && nodeData.mPort == 0 &&
+        nodeData.mMrpRetryIntervalIdle == 0 && nodeData.mMrpRetryIntervalActive == 0 && !nodeData.mSupportsTcp;
+}
+
+// Test CRI
+void TxtFieldMrpRetryIntervalIdle(nlTestSuite * inSuite, void * inContext)
+{
+    char key[4];
+    char val[8];
+    ResolvedNodeData nodeData;
+
+    // Minimum
+    sprintf(key, "CRI");
+    sprintf(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalIdle == 1);
+
+    // Maximum
+    sprintf(key, "CRI");
+    sprintf(val, "3600000");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalIdle == 3600000);
+
+    // Test no other fields were populated
+    nodeData.mMrpRetryIntervalIdle = 0;
+    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
+
+    // Invalid CRI => fallback to 0
+    sprintf(key, "CRI");
+    sprintf(val, "-1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalIdle == 0);
+
+    // Invalid CRI => fallback to 0
+    sprintf(key, "CRI");
+    sprintf(val, "asdf");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalIdle == 0);
+}
+
+// Test CRA
+void TxtFieldMrpRetryIntervalActive(nlTestSuite * inSuite, void * inContext)
+{
+    char key[4];
+    char val[8];
+    ResolvedNodeData nodeData;
+
+    // Minimum
+    sprintf(key, "CRA");
+    sprintf(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalActive == 1);
+
+    // Maximum
+    sprintf(key, "CRA");
+    sprintf(val, "3600000");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalActive == 3600000);
+
+    // Test no other fields were populated
+    nodeData.mMrpRetryIntervalActive = 0;
+    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
+
+    // Invalid CRI => fallback to 0
+    sprintf(key, "CRA");
+    sprintf(val, "-1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalActive == 0);
+
+    // Invalid CRI => fallback to 0
+    sprintf(key, "CRA");
+    sprintf(val, "asdf");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalActive == 0);
+}
+
+// Test T (TCP support)
+void TxtFieldTcpSupport(nlTestSuite * inSuite, void * inContext)
+{
+    char key[4];
+    char val[8];
+    ResolvedNodeData nodeData;
+
+    // True
+    sprintf(key, "T");
+    sprintf(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, nodeData.mSupportsTcp);
+
+    // Test no other fields were populated
+    nodeData.mSupportsTcp = false;
+    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
+
+    // False
+    sprintf(key, "T");
+    sprintf(val, "0");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, !nodeData.mSupportsTcp);
+
+    // Invalid value, stil false
+    sprintf(key, "T");
+    sprintf(val, "asdf");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, !nodeData.mSupportsTcp);
+}
+
 const nlTest sTests[] = {
-    NL_TEST_DEF("TxtFieldKey", TestGetTxtFieldKey),                               //
-    NL_TEST_DEF("TxtFieldKeyCaseInsensitive", TestGetTxtFieldKeyCaseInsensitive), //
-    NL_TEST_DEF("TxtFieldProduct", TestGetProduct),                               //
-    NL_TEST_DEF("TxtFieldVendor", TestGetVendor),                                 //
-    NL_TEST_DEF("TxtFieldLongDiscriminator", TestGetLongDiscriminator),           //
-    NL_TEST_DEF("TxtFieldAdditionalPairing", TestGetAdditionalPairing),           //
-    NL_TEST_DEF("TxtFieldCommissioningMode", TestGetCommissioningMode),           //
-    NL_TEST_DEF("TxtFieldDeviceType", TestGetDeviceType),                         //
-    NL_TEST_DEF("TxtFieldDeviceName", TestGetDeviceName),                         //
-    NL_TEST_DEF("TxtFieldRotatingDeviceId", TestGetRotatingDeviceId),             //
-    NL_TEST_DEF("TxtFieldPairingHint", TestGetPairingHint),                       //
-    NL_TEST_DEF("TxtFieldPairingInstruction", TestGetPairingInstruction),         //
-    NL_TEST_DEF("TxtFieldFillNodeDataFromTxt", TestFillNodeDataFromTxt),          //
-    NL_TEST_SENTINEL()                                                            //
+    NL_TEST_DEF("TxtFieldKey", TestGetTxtFieldKey),                                          //
+    NL_TEST_DEF("TxtFieldKeyCaseInsensitive", TestGetTxtFieldKeyCaseInsensitive),            //
+    NL_TEST_DEF("TxtFieldProduct", TestGetProduct),                                          //
+    NL_TEST_DEF("TxtFieldVendor", TestGetVendor),                                            //
+    NL_TEST_DEF("TxtFieldLongDiscriminator", TestGetLongDiscriminator),                      //
+    NL_TEST_DEF("TxtFieldAdditionalPairing", TestGetAdditionalPairing),                      //
+    NL_TEST_DEF("TxtFieldCommissioningMode", TestGetCommissioningMode),                      //
+    NL_TEST_DEF("TxtFieldDeviceType", TestGetDeviceType),                                    //
+    NL_TEST_DEF("TxtFieldDeviceName", TestGetDeviceName),                                    //
+    NL_TEST_DEF("TxtFieldRotatingDeviceId", TestGetRotatingDeviceId),                        //
+    NL_TEST_DEF("TxtFieldPairingHint", TestGetPairingHint),                                  //
+    NL_TEST_DEF("TxtFieldPairingInstruction", TestGetPairingInstruction),                    //
+    NL_TEST_DEF("TxtFieldFillDiscoveredNodeDataFromTxt", TestFillDiscoveredNodeDataFromTxt), //
+    NL_TEST_DEF("TxtFieldMrpRetryIntervalIdle", TxtFieldMrpRetryIntervalIdle),               //
+    NL_TEST_DEF("TxtFieldMrpRetryIntervalActive", TxtFieldMrpRetryIntervalActive),           //
+    NL_TEST_DEF("TxtFieldTcpSupport", TxtFieldTcpSupport),                                   //
+    NL_TEST_SENTINEL()                                                                       //
 };
 
 } // namespace

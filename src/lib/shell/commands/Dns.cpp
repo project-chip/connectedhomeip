@@ -41,7 +41,16 @@ public:
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\n",
                         ChipLogValueX64(nodeData.mPeerId.GetFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
         streamer_printf(streamer_get(), "   IP address: %s\n", nodeData.mAddress.ToString(ipAddressBuf));
-        streamer_printf(streamer_get(), "   Port: %d\n", nodeData.mPort);
+        streamer_printf(streamer_get(), "   Port: %" PRIu16 "\n", nodeData.mPort);
+
+        if (nodeData.mMrpRetryIntervalIdle != 0)
+            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\n", nodeData.mMrpRetryIntervalIdle);
+
+        if (nodeData.mMrpRetryIntervalActive != 0)
+            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\n", nodeData.mMrpRetryIntervalActive);
+
+        if (nodeData.mSupportsTcp)
+            streamer_printf(streamer_get(), "   Supports TCP: yes\n");
     }
 
     void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}

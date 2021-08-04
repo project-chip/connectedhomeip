@@ -42,6 +42,9 @@ enum class TxtFieldKey : uint8_t
     kRotatingDeviceId,
     kPairingInstruction,
     kPairingHint,
+    kMrpRetryIntervalIdle,
+    kMrpRetryIntervalActive,
+    kTcpSupport,
 };
 
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key);
@@ -61,7 +64,8 @@ void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction);
 } // namespace Internal
 #endif
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, DiscoveredNodeData * nodeData);
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, DiscoveredNodeData & nodeData);
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedNodeData & nodeData);
 
 } // namespace Mdns
 } // namespace chip

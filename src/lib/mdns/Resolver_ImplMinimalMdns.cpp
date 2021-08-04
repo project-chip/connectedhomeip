@@ -39,31 +39,24 @@ namespace chip {
 namespace Mdns {
 namespace {
 
-class TxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
-{
-public:
-    TxtRecordDelegateImpl(DiscoveredNodeData * nodeData) : mNodeData(nodeData) {}
-    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value);
-
-private:
-    DiscoveredNodeData * mNodeData;
-};
-
 const ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
 {
     return ByteSpan(range.Start(), range.Size());
 }
 
-void TxtRecordDelegateImpl::OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value)
+template <class NodeData>
+class TxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
 {
-    if (mNodeData == nullptr)
+public:
+    explicit TxtRecordDelegateImpl(NodeData & nodeData) : mNodeData(nodeData) {}
+    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value) override
     {
-        return;
+        FillNodeDataFromTxt(GetSpan(name), GetSpan(value), mNodeData);
     }
-    ByteSpan key = GetSpan(name);
-    ByteSpan val = GetSpan(value);
-    FillNodeDataFromTxt(key, val, mNodeData);
-}
+
+private:
+    NodeData & mNodeData;
+};
 
 constexpr size_t kMdnsMaxPacketSize = 1024;
 constexpr uint16_t kMdnsPort        = 5353;
@@ -257,7 +250,12 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
     case QType::TXT:
         if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
-            TxtRecordDelegateImpl textRecordDelegate(&mDiscoveredNodeData);
+            TxtRecordDelegateImpl<DiscoveredNodeData> textRecordDelegate(mDiscoveredNodeData);
+            ParseTxtRecord(data.GetData(), &textRecordDelegate);
+        }
+        else if (mDiscoveryType == DiscoveryType::kOperational)
+        {
+            TxtRecordDelegateImpl<ResolvedNodeData> textRecordDelegate(mNodeData);
             ParseTxtRecord(data.GetData(), &textRecordDelegate);
         }
         break;
