@@ -16,9 +16,6 @@
  */
 #pragma once
 #include <mdns/minimal/Server.h>
-#ifdef MDNS_MINIMAL_TEST_SERVER
-#include <mdns/minimal/tests/CheckOnlyServer.h>
-#endif
 
 namespace chip {
 namespace Mdns {
