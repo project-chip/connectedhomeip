@@ -106,6 +106,9 @@ static constexpr chip::ClusterId ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID = 0x0039;
 // Definitions for cluster: Switch
 static constexpr chip::ClusterId ZCL_SWITCH_CLUSTER_ID = 0x003B;
 
+// Definitions for cluster: AdministratorCommissioning
+static constexpr chip::ClusterId ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_ID = 0x003C;
+
 // Definitions for cluster: Operational Credentials
 static constexpr chip::ClusterId ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID = 0x003E;
 

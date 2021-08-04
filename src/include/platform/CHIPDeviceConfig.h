@@ -608,75 +608,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING 0
 #endif
 
-// -------------------- Service Discovery Configuration -----------------------
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_MDNS
- *
- * Enable support to use MDNS for service advertising and discovery in CHIP.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_MDNS
-#define CHIP_DEVICE_CONFIG_ENABLE_MDNS 0
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
- *
- * Enable MDNS commissionable node advertising when not yet provisioned.
- *
- * This should be 1 for WiFi SoftAP devices, ethernet devices, and (probably) bridge devices
- *
- * This should be 0 for Thread/BLE devices and WiFi/BLE devices
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
-#define CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS 0
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
- *
- * Maximum number of CHIP Commissioners or Commissionable Nodes that can be discovered
- */
-#ifndef CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
-#define CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES 10
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
- *
- * Enable support to DNS-SD SRP client usage for service advertising and discovery in CHIP.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 0
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
- *
- * Amount of services available for advertising using SRP.
- */
-#ifndef CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
-#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES 3
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
- *
- * Enable support to Commissionable Discovery for Thread devices.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
-#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY 0
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
- *
- * Enable support to DNS client usage for resolving and browsing services in CHIP.
- */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
-#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 0
-#endif
-
 // -------------------- Thread Configuration --------------------
 
 /**
@@ -768,6 +699,42 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 #define CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+ *
+ * Enable support to DNS-SD SRP client usage for service advertising and discovery in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
+ *
+ * Amount of services available for advertising using SRP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
+#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES 3
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
+ *
+ * Enable support to Commissionable Discovery for Thread devices.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_COMMISSIONABLE_DISCOVERY 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+ *
+ * Enable support to DNS client usage for resolving and browsing services in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 0
 #endif
 
 // -------------------- Trait Manager Configuration --------------------
@@ -1103,7 +1070,42 @@
 #define CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME __TIME__
 #endif
 
-// -------------------- Device DNS-SD Advertising Configuration --------------------
+// -------------------- Device DNS-SD Configuration --------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_MDNS
+ *
+ * Enable support to use MDNS for service advertising and discovery in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#define CHIP_DEVICE_CONFIG_ENABLE_MDNS 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
+ *
+ * Enable MDNS commissionable node advertising when not yet provisioned.
+ *
+ * This should be 1 for WiFi SoftAP devices, ethernet devices, and (probably) bridge devices
+ *
+ * This should be 0 for Thread/BLE devices and WiFi/BLE devices
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#define CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS 0
+#else
+#define CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS 1
+#endif
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
+ *
+ * Maximum number of CHIP Commissioners or Commissionable Nodes that can be discovered
+ */
+#ifndef CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
+#define CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES 10
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

@@ -33,7 +33,7 @@ class HostApp(Enum):
 
   def BinaryName(self):
     if self == HostApp.ALL_CLUSTERS:
-      return 'all-clusters-app'
+      return 'chip-all-clusters-app'
     elif self == HostApp.CHIP_TOOL:
       return 'chip-tool'
     else:

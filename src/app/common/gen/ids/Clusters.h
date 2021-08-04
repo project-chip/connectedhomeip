@@ -109,6 +109,9 @@ static constexpr ClusterId Id = 0x00000039;
 namespace Switch {
 static constexpr ClusterId Id = 0x0000003B;
 } // namespace Switch
+namespace AdministratorCommissioning {
+static constexpr ClusterId Id = 0x0000003C;
+} // namespace AdministratorCommissioning
 namespace OperationalCredentials {
 static constexpr ClusterId Id = 0x0000003E;
 } // namespace OperationalCredentials

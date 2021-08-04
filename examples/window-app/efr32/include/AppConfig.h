@@ -53,14 +53,27 @@ extern "C" {
 #define LCD_COVER_SIZE (LCD_SIZE - 2 * LCD_FRAME_SIZE)
 #define LIFT_OPEN_LIMIT 0
 #define LIFT_CLOSED_LIMIT (LCD_COVER_SIZE - 1)
+#define LIFT_DELTA 1000 // 10%
 #define TILT_OPEN_LIMIT 1
 #define TILT_CLOSED_LIMIT (LCD_COVER_SIZE / 10 - 1)
+#define TILT_DELTA 1000 // 10%
+
+#ifndef COVER_LIFT_TILT_TIMEOUT
+#define COVER_LIFT_TILT_TIMEOUT 500
+#endif
+
+#ifndef WINDOW_COVER_TYPE_CYCLE_TIMEOUT
+#define WINDOW_COVER_TYPE_CYCLE_TIMEOUT 3000
+#endif
+
+#ifndef FACTORY_RESET_WINDOW_TIMEOUT
+#define FACTORY_RESET_WINDOW_TIMEOUT 3000
+#endif
 
 void efr32LogInit(void);
 
 void efr32Log(const char * aFormat, ...);
 #define EFR32_LOG(...) efr32Log(__VA_ARGS__);
-void appError(int err);
 
 #ifdef __cplusplus
 }
