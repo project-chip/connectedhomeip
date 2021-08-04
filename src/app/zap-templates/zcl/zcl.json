@@ -3,6 +3,7 @@
     "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/"],
     "xmlFile": [
         "account-login-cluster.xml",
+        "administrator-commissioning-cluster.xml",
         "application-basic-cluster.xml",
         "application-launcher-cluster.xml",
         "audio-output-cluster.xml",

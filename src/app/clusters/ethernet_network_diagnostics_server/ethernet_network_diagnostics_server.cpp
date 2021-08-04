@@ -16,12 +16,29 @@
  */
 
 #include <app/CommandHandler.h>
+#include <app/common/gen/attributes/Accessors.h>
 #include <app/util/af.h>
+
+using namespace chip::app::Clusters;
 
 bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
 {
-    // TODO: Implement the ResetCounts in the platform layer.
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = EthernetNetworkDiagnostics::Attributes::SetPacketRxCount(endpoint, 0);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketRxCount attribute"));
+
+    status = EthernetNetworkDiagnostics::Attributes::SetPacketTxCount(endpoint, 0);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketTxCount attribute"));
+
+    status = EthernetNetworkDiagnostics::Attributes::SetTxErrCount(endpoint, 0);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset TxErrCount attribute"));
+
+    status = EthernetNetworkDiagnostics::Attributes::SetCollisionCount(endpoint, 0);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset CollisionCount attribute"));
+
+    status = EthernetNetworkDiagnostics::Attributes::SetOverrunCount(endpoint, 0);
+    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset OverrunCount attribute"));
+
+exit:
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }

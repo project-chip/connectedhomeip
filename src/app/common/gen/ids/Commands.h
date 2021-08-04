@@ -332,6 +332,16 @@ static constexpr CommandId ReachableChanged = 0x00000003;
 } // namespace Commands
 } // namespace BridgedDeviceBasic
 
+namespace AdministratorCommissioning {
+namespace Commands {
+namespace Ids {
+static constexpr CommandId OpenCommissioningWindow      = 0x00000000;
+static constexpr CommandId OpenBasicCommissioningWindow = 0x00000001;
+static constexpr CommandId RevokeCommissioning          = 0x00000002;
+} // namespace Ids
+} // namespace Commands
+} // namespace AdministratorCommissioning
+
 namespace OperationalCredentials {
 namespace Commands {
 namespace Ids {

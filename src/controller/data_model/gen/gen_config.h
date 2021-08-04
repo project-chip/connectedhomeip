@@ -30,6 +30,7 @@
 
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_ACCOUNT_LOGIN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_ADMINISTRATOR_COMMISSIONING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_APPLICATION_BASIC_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_AUDIO_OUTPUT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -83,6 +84,10 @@
 // Use this macro to check if the client side of the Account Login cluster is included
 #define ZCL_USING_ACCOUNT_LOGIN_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_ACCOUNT_LOGIN_CLIENT
+
+// Use this macro to check if the client side of the AdministratorCommissioning cluster is included
+#define ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING_CLIENT
 
 // Use this macro to check if the client side of the Application Basic cluster is included
 #define ZCL_USING_APPLICATION_BASIC_CLUSTER_CLIENT

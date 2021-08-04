@@ -57,8 +57,8 @@
 
     chip::SetupPayload setupPayload;
 
-    if (duration > UINT32_MAX) {
-        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT32_MAX);
+    if (duration > UINT16_MAX) {
+        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -67,7 +67,7 @@
 
     [self.lock lock];
     err = self.cppDevice->OpenPairingWindow(
-        (uint32_t) duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode, setupPayload);
+        (uint16_t) duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode, setupPayload);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
@@ -90,8 +90,8 @@
 
     chip::SetupPayload setupPayload;
 
-    if (duration > UINT32_MAX) {
-        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT32_MAX);
+    if (duration > UINT16_MAX) {
+        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT16_MAX);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
         }
@@ -113,7 +113,7 @@
 
     [self.lock lock];
     err = self.cppDevice->OpenPairingWindow(
-        (uint32_t) duration, chip::Controller::Device::PairingWindowOption::kTokenWithProvidedPIN, setupPayload);
+        (uint16_t) duration, chip::Controller::Device::PairingWindowOption::kTokenWithProvidedPIN, setupPayload);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {

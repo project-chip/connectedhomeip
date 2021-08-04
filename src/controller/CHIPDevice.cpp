@@ -26,6 +26,8 @@
 
 #include <controller/CHIPDevice.h>
 
+#include <controller/data_model/gen/CHIPClusters.h>
+
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #endif
@@ -344,36 +346,48 @@ CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, cons
 
 void Device::OnResponseTimeout(Messaging::ExchangeContext * ec) {}
 
-CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
+void Device::OnOpenPairingWindowSuccessResponse(void * context)
 {
-    // TODO: This code is temporary, and must be updated to use the Cluster API.
-    // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
+    ChipLogProgress(Controller, "Successfully opened pairing window on the device");
+}
 
-    // Construct and send "open pairing window" message to the device
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    System::PacketBufferTLVWriter writer;
+void Device::OnOpenPairingWindowFailureResponse(void * context, uint8_t status)
+{
+    ChipLogError(Controller, "Failed to open pairing window on the device. Status %d", status);
+}
 
-    writer.Init(std::move(buf));
-    writer.ImplicitProfileId = chip::Protocols::ServiceProvisioning::Id.ToTLVProfileId();
+CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
+{
+    constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
 
-    ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 1), timeout));
+    chip::Controller::AdministratorCommissioningCluster cluster;
+    cluster.Associate(this, kAdministratorCommissioningClusterEndpoint);
+
+    Callback::Cancelable * successCallback = mOpenPairingSuccessCallback.Cancel();
+    Callback::Cancelable * failureCallback = mOpenPairingFailureCallback.Cancel();
 
     if (option != PairingWindowOption::kOriginalSetupCode)
     {
-        ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 2), setupPayload.discriminator));
-
-        PASEVerifier verifier;
         bool randomSetupPIN = (option == PairingWindowOption::kTokenWithRandomPIN);
-        ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, randomSetupPIN, setupPayload.setUpPINCode));
-        ReturnErrorOnFailure(writer.PutBytes(TLV::ProfileTag(writer.ImplicitProfileId, 3),
-                                             reinterpret_cast<const uint8_t *>(verifier), sizeof(verifier)));
+        PASEVerifier verifier;
+        ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
+        ReturnErrorOnFailure(
+            PASESession::GeneratePASEVerifier(verifier, kPBKDFMinimumIterations, salt, randomSetupPIN, setupPayload.setUpPINCode));
+
+        uint8_t serializedVerifier[2 * kSpake2p_WS_Length];
+        VerifyOrReturnError(sizeof(serializedVerifier) == sizeof(verifier), CHIP_ERROR_INTERNAL);
+
+        memcpy(serializedVerifier, verifier.mW0, kSpake2p_WS_Length);
+        memcpy(&serializedVerifier[kSpake2p_WS_Length], verifier.mL, kSpake2p_WS_Length);
+
+        ReturnErrorOnFailure(cluster.OpenCommissioningWindow(
+            successCallback, failureCallback, timeout, ByteSpan(serializedVerifier, sizeof(serializedVerifier)),
+            setupPayload.discriminator, kPBKDFMinimumIterations, salt, mPAKEVerifierID++));
     }
-
-    System::PacketBufferHandle outBuffer;
-    ReturnErrorOnFailure(writer.Finalize(&outBuffer));
-
-    ReturnErrorOnFailure(SendMessage(Protocols::ServiceProvisioning::MsgType::ServiceProvisioningRequest,
-                                     Messaging::SendMessageFlags::kNone, std::move(outBuffer)));
+    else
+    {
+        ReturnErrorOnFailure(cluster.OpenBasicCommissioningWindow(successCallback, failureCallback, timeout));
+    }
 
     setupPayload.version               = 0;
     setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
