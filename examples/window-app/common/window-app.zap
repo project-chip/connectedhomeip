@@ -63,7 +63,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -113,7 +113,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -188,7 +188,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -262,7 +262,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -345,7 +345,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -495,7 +495,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -521,7 +521,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -737,7 +737,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -788,7 +788,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -869,7 +869,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -968,7 +968,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -1059,7 +1059,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -1085,7 +1085,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -1141,7 +1141,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -1176,7 +1176,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -1217,7 +1217,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -1243,7 +1243,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -2169,7 +2169,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -2195,7 +2195,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -2296,7 +2296,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -2331,7 +2331,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -2432,7 +2432,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -2600,7 +2600,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -2666,7 +2666,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -2717,7 +2717,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -2848,7 +2848,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -2899,7 +2899,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -2949,7 +2949,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -3024,7 +3024,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -3098,7 +3098,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -3181,7 +3181,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -3331,7 +3331,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -3357,7 +3357,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -3573,7 +3573,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -3672,7 +3672,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -3763,7 +3763,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -3789,7 +3789,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -4715,7 +4715,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -4798,7 +4798,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -5109,7 +5109,7 @@
               "reportableChange": 0
             },
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
