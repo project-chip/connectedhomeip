@@ -17,8 +17,8 @@ timeout: 7200s
 
 artifacts:
     objects:
-        location: 'gs://matter-build-automation-artifacts/$PROJECT_ID/$COMMIT_SHA/'
-        paths: ['/workspace/artifacts/*.tar.gz']
+        location: "gs://matter-build-automation-artifacts/$PROJECT_ID/$COMMIT_SHA/"
+        paths: ["/workspace/artifacts/*.tar.gz"]
 
 # Using higher CPU machines generally speeds up builds by > 4x (faster as we spend more time
 # building instead of docker download/checkout/bootstrap)
