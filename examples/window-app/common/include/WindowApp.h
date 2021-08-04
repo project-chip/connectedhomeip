@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/common/gen/enums.h>
+#include <app/util/af-types.h>
 #include <core/CHIPError.h>
 
 class WindowApp
@@ -59,7 +60,7 @@ public:
         const char * mName = nullptr;
     };
 
-    enum class Event
+    enum class EventId
     {
         None = 0,
         Reset,
@@ -72,6 +73,7 @@ public:
         DownPressed,
         DownReleased,
         // Cover events
+        CoverChange,
         CoverTypeChange,
         TiltModeChange,
         LiftUp,
@@ -87,6 +89,38 @@ public:
         BLEConnectionsChanged,
     };
 
+    struct Event
+    {
+        Event(EventId id) : mId(id), mEndpoint(0) {}
+        Event(EventId id, chip::EndpointId endpoint) : mId(id), mEndpoint(endpoint) {}
+
+        EventId mId;
+        chip::EndpointId mEndpoint;
+    };
+
+    struct Cover
+    {
+        void Init(chip::EndpointId endpoint);
+        void Finish();
+        void LiftUp();
+        void LiftDown();
+        void GotoLift(EventId action = EventId::None);
+        void TiltUp();
+        void TiltDown();
+        void GotoTilt(EventId action = EventId::None);
+        void StopMotion();
+        EmberAfWcType CycleType();
+
+        static void OnLiftTimeout(Timer & timer);
+        static void OnTiltTimeout(Timer & timer);
+
+        chip::EndpointId mEndpoint = 0;
+        Timer * mLiftTimer         = nullptr;
+        Timer * mTiltTimer         = nullptr;
+        EventId mLiftAction        = EventId::None;
+        EventId mTiltAction        = EventId::None;
+    };
+
     static WindowApp & Instance();
 
     virtual ~WindowApp() = default;
@@ -99,16 +133,14 @@ public:
 protected:
     struct StateFlags
     {
-        bool upPressed               = false;
-        bool downPressed             = false;
-        bool longPress               = false;
-        bool tiltMode                = false;
-        bool resetWarning            = false;
         bool isThreadProvisioned     = false;
         bool isThreadEnabled         = false;
         bool haveBLEConnections      = false;
         bool haveServiceConnectivity = false;
     };
+
+    Cover & GetCover();
+    Cover * GetCover(chip::EndpointId endpoint);
 
     virtual Button * CreateButton(Button::Id id, const char * name) = 0;
     virtual void DestroyButton(Button * b);
@@ -117,30 +149,23 @@ protected:
 
     virtual void ProcessEvents() = 0;
     virtual void DispatchEvent(const Event & event);
-
     virtual void OnMainLoop() = 0;
-    static void OnLiftTimeout(Timer & timer);
-    static void OnTiltTimeout(Timer & timer);
-    static void OnCoverTypeTimeout(Timer & timer);
-    static void OnResetTimeout(Timer & timer);
+    static void OnLongPressTimeout(Timer & timer);
 
-    Timer * mLiftTimer      = nullptr;
-    Timer * mTiltTimer      = nullptr;
-    Timer * mResetTimer     = nullptr;
-    Timer * mCoverTypeTimer = nullptr;
+    Timer * mLongPressTimer = nullptr;
     Button * mButtonUp      = nullptr;
     Button * mButtonDown    = nullptr;
-    Event mLiftAction       = Event::None;
-    Event mTiltAction       = Event::None;
     StateFlags mState;
+    bool mTiltMode       = false;
+    bool mUpPressed      = false;
+    bool mDownPressed    = false;
+    bool mUpSuppressed   = false;
+    bool mDownSuppressed = false;
+    bool mResetWarning   = false;
 
 private:
-    void LiftUp();
-    void LiftDown();
-    void TiltUp();
-    void TiltDown();
-    void GotoLift();
-    void GotoTilt();
-    void CoverTypeCycle();
-    void StopMotion();
+    void HandleLongPress();
+
+    Cover mCoverList[WINDOW_COVER_COUNT];
+    uint8_t mCurrentCover = 0;
 };
