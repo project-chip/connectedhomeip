@@ -20,6 +20,9 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <app/common/gen/ids/Clusters.h>
+#include <app/common/gen/ids/Commands.h>
+
 #include <controller/CHIPCluster.h>
 #include <core/CHIPCallback.h>
 #include <lib/support/Span.h>
@@ -27,59 +30,10 @@
 namespace chip {
 namespace Controller {
 
-constexpr ClusterId kAccountLoginClusterId                = 0x050E;
-constexpr ClusterId kApplicationBasicClusterId            = 0x050D;
-constexpr ClusterId kApplicationLauncherClusterId         = 0x050C;
-constexpr ClusterId kAudioOutputClusterId                 = 0x050B;
-constexpr ClusterId kBarrierControlClusterId              = 0x0103;
-constexpr ClusterId kBasicClusterId                       = 0x0028;
-constexpr ClusterId kBinaryInputBasicClusterId            = 0x000F;
-constexpr ClusterId kBindingClusterId                     = 0xF000;
-constexpr ClusterId kBridgedDeviceBasicClusterId          = 0x0039;
-constexpr ClusterId kColorControlClusterId                = 0x0300;
-constexpr ClusterId kContentLauncherClusterId             = 0x050A;
-constexpr ClusterId kDescriptorClusterId                  = 0x001D;
-constexpr ClusterId kDiagnosticLogsClusterId              = 0x0032;
-constexpr ClusterId kDoorLockClusterId                    = 0x0101;
-constexpr ClusterId kElectricalMeasurementClusterId       = 0x0B04;
-constexpr ClusterId kEthernetNetworkDiagnosticsClusterId  = 0x0037;
-constexpr ClusterId kFixedLabelClusterId                  = 0x0040;
-constexpr ClusterId kFlowMeasurementClusterId             = 0x0404;
-constexpr ClusterId kGeneralCommissioningClusterId        = 0x0030;
-constexpr ClusterId kGeneralDiagnosticsClusterId          = 0x0033;
-constexpr ClusterId kGroupKeyManagementClusterId          = 0xF004;
-constexpr ClusterId kGroupsClusterId                      = 0x0004;
-constexpr ClusterId kIdentifyClusterId                    = 0x0003;
-constexpr ClusterId kKeypadInputClusterId                 = 0x0509;
-constexpr ClusterId kLevelControlClusterId                = 0x0008;
-constexpr ClusterId kLowPowerClusterId                    = 0x0508;
-constexpr ClusterId kMediaInputClusterId                  = 0x0507;
-constexpr ClusterId kMediaPlaybackClusterId               = 0x0506;
-constexpr ClusterId kNetworkCommissioningClusterId        = 0x0031;
-constexpr ClusterId kOtaSoftwareUpdateProviderClusterId   = 0x0029;
-constexpr ClusterId kOccupancySensingClusterId            = 0x0406;
-constexpr ClusterId kOnOffClusterId                       = 0x0006;
-constexpr ClusterId kOperationalCredentialsClusterId      = 0x003E;
-constexpr ClusterId kPressureMeasurementClusterId         = 0x0403;
-constexpr ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
-constexpr ClusterId kRelativeHumidityMeasurementClusterId = 0x0405;
-constexpr ClusterId kScenesClusterId                      = 0x0005;
-constexpr ClusterId kSoftwareDiagnosticsClusterId         = 0x0034;
-constexpr ClusterId kSwitchClusterId                      = 0x003B;
-constexpr ClusterId kTvChannelClusterId                   = 0x0504;
-constexpr ClusterId kTargetNavigatorClusterId             = 0x0505;
-constexpr ClusterId kTemperatureMeasurementClusterId      = 0x0402;
-constexpr ClusterId kTestClusterClusterId                 = 0x050F;
-constexpr ClusterId kThermostatClusterId                  = 0x0201;
-constexpr ClusterId kThreadNetworkDiagnosticsClusterId    = 0x0035;
-constexpr ClusterId kWakeOnLanClusterId                   = 0x0503;
-constexpr ClusterId kWiFiNetworkDiagnosticsClusterId      = 0x0036;
-constexpr ClusterId kWindowCoveringClusterId              = 0x0102;
-
 class DLL_EXPORT AccountLoginCluster : public ClusterBase
 {
 public:
-    AccountLoginCluster() : ClusterBase(kAccountLoginClusterId) {}
+    AccountLoginCluster() : ClusterBase(app::Clusters::AccountLogin::Id) {}
     ~AccountLoginCluster() {}
 
     // Cluster Commands
@@ -93,14 +47,33 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kGetSetupPINCommandId = 0x00;
-    static constexpr CommandId kLoginCommandId       = 0x01;
+};
+
+class DLL_EXPORT AdministratorCommissioningCluster : public ClusterBase
+{
+public:
+    AdministratorCommissioningCluster() : ClusterBase(app::Clusters::AdministratorCommissioning::Id) {}
+    ~AdministratorCommissioningCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR OpenBasicCommissioningWindow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint16_t commissioningTimeout);
+    CHIP_ERROR OpenCommissioningWindow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t commissioningTimeout, chip::ByteSpan pAKEVerifier, uint16_t discriminator,
+                                       uint32_t iterations, chip::ByteSpan salt, uint16_t passcodeID);
+    CHIP_ERROR RevokeCommissioning(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
 };
 
 class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
 {
 public:
-    ApplicationBasicCluster() : ClusterBase(kApplicationBasicClusterId) {}
+    ApplicationBasicCluster() : ClusterBase(app::Clusters::ApplicationBasic::Id) {}
     ~ApplicationBasicCluster() {}
 
     // Cluster Commands
@@ -118,13 +91,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kChangeStatusCommandId = 0x00;
 };
 
 class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
 {
 public:
-    ApplicationLauncherCluster() : ClusterBase(kApplicationLauncherClusterId) {}
+    ApplicationLauncherCluster() : ClusterBase(app::Clusters::ApplicationLauncher::Id) {}
     ~ApplicationLauncherCluster() {}
 
     // Cluster Commands
@@ -140,13 +112,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kLaunchAppCommandId = 0x00;
 };
 
 class DLL_EXPORT AudioOutputCluster : public ClusterBase
 {
 public:
-    AudioOutputCluster() : ClusterBase(kAudioOutputClusterId) {}
+    AudioOutputCluster() : ClusterBase(app::Clusters::AudioOutput::Id) {}
     ~AudioOutputCluster() {}
 
     // Cluster Commands
@@ -161,14 +132,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kRenameOutputCommandId = 0x01;
-    static constexpr CommandId kSelectOutputCommandId = 0x00;
 };
 
 class DLL_EXPORT BarrierControlCluster : public ClusterBase
 {
 public:
-    BarrierControlCluster() : ClusterBase(kBarrierControlClusterId) {}
+    BarrierControlCluster() : ClusterBase(app::Clusters::BarrierControl::Id) {}
     ~BarrierControlCluster() {}
 
     // Cluster Commands
@@ -185,14 +154,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kBarrierControlGoToPercentCommandId = 0x00;
-    static constexpr CommandId kBarrierControlStopCommandId        = 0x01;
 };
 
 class DLL_EXPORT BasicCluster : public ClusterBase
 {
 public:
-    BasicCluster() : ClusterBase(kBasicClusterId) {}
+    BasicCluster() : ClusterBase(app::Clusters::Basic::Id) {}
     ~BasicCluster() {}
 
     // Cluster Commands
@@ -230,13 +197,12 @@ public:
                                                  uint8_t value);
 
 private:
-    static constexpr CommandId kMfgSpecificPingCommandId = 0x00;
 };
 
 class DLL_EXPORT BinaryInputBasicCluster : public ClusterBase
 {
 public:
-    BinaryInputBasicCluster() : ClusterBase(kBinaryInputBasicClusterId) {}
+    BinaryInputBasicCluster() : ClusterBase(app::Clusters::BinaryInputBasic::Id) {}
     ~BinaryInputBasicCluster() {}
 
     // Cluster Attributes
@@ -260,7 +226,7 @@ public:
 class DLL_EXPORT BindingCluster : public ClusterBase
 {
 public:
-    BindingCluster() : ClusterBase(kBindingClusterId) {}
+    BindingCluster() : ClusterBase(app::Clusters::Binding::Id) {}
     ~BindingCluster() {}
 
     // Cluster Commands
@@ -274,14 +240,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kBindCommandId   = 0x00;
-    static constexpr CommandId kUnbindCommandId = 0x01;
 };
 
 class DLL_EXPORT BridgedDeviceBasicCluster : public ClusterBase
 {
 public:
-    BridgedDeviceBasicCluster() : ClusterBase(kBridgedDeviceBasicClusterId) {}
+    BridgedDeviceBasicCluster() : ClusterBase(app::Clusters::BridgedDeviceBasic::Id) {}
     ~BridgedDeviceBasicCluster() {}
 
     // Cluster Attributes
@@ -310,7 +274,7 @@ public:
 class DLL_EXPORT ColorControlCluster : public ClusterBase
 {
 public:
-    ColorControlCluster() : ClusterBase(kColorControlClusterId) {}
+    ColorControlCluster() : ClusterBase(app::Clusters::ColorControl::Id) {}
     ~ColorControlCluster() {}
 
     // Cluster Commands
@@ -465,31 +429,12 @@ public:
     CHIP_ERROR ReportAttributeColorTemperature(Callback::Cancelable * onReportCallback);
 
 private:
-    static constexpr CommandId kColorLoopSetCommandId                   = 0x44;
-    static constexpr CommandId kEnhancedMoveHueCommandId                = 0x41;
-    static constexpr CommandId kEnhancedMoveToHueCommandId              = 0x40;
-    static constexpr CommandId kEnhancedMoveToHueAndSaturationCommandId = 0x43;
-    static constexpr CommandId kEnhancedStepHueCommandId                = 0x42;
-    static constexpr CommandId kMoveColorCommandId                      = 0x08;
-    static constexpr CommandId kMoveColorTemperatureCommandId           = 0x4B;
-    static constexpr CommandId kMoveHueCommandId                        = 0x01;
-    static constexpr CommandId kMoveSaturationCommandId                 = 0x04;
-    static constexpr CommandId kMoveToColorCommandId                    = 0x07;
-    static constexpr CommandId kMoveToColorTemperatureCommandId         = 0x0A;
-    static constexpr CommandId kMoveToHueCommandId                      = 0x00;
-    static constexpr CommandId kMoveToHueAndSaturationCommandId         = 0x06;
-    static constexpr CommandId kMoveToSaturationCommandId               = 0x03;
-    static constexpr CommandId kStepColorCommandId                      = 0x09;
-    static constexpr CommandId kStepColorTemperatureCommandId           = 0x4C;
-    static constexpr CommandId kStepHueCommandId                        = 0x02;
-    static constexpr CommandId kStepSaturationCommandId                 = 0x05;
-    static constexpr CommandId kStopMoveStepCommandId                   = 0x47;
 };
 
 class DLL_EXPORT ContentLauncherCluster : public ClusterBase
 {
 public:
-    ContentLauncherCluster() : ClusterBase(kContentLauncherClusterId) {}
+    ContentLauncherCluster() : ClusterBase(app::Clusters::ContentLauncher::Id) {}
     ~ContentLauncherCluster() {}
 
     // Cluster Commands
@@ -506,14 +451,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kLaunchContentCommandId = 0x00;
-    static constexpr CommandId kLaunchURLCommandId     = 0x01;
 };
 
 class DLL_EXPORT DescriptorCluster : public ClusterBase
 {
 public:
-    DescriptorCluster() : ClusterBase(kDescriptorClusterId) {}
+    DescriptorCluster() : ClusterBase(app::Clusters::Descriptor::Id) {}
     ~DescriptorCluster() {}
 
     // Cluster Attributes
@@ -528,7 +471,7 @@ public:
 class DLL_EXPORT DiagnosticLogsCluster : public ClusterBase
 {
 public:
-    DiagnosticLogsCluster() : ClusterBase(kDiagnosticLogsClusterId) {}
+    DiagnosticLogsCluster() : ClusterBase(app::Clusters::DiagnosticLogs::Id) {}
     ~DiagnosticLogsCluster() {}
 
     // Cluster Commands
@@ -539,13 +482,12 @@ public:
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kRetrieveLogsRequestCommandId = 0x00;
 };
 
 class DLL_EXPORT DoorLockCluster : public ClusterBase
 {
 public:
-    DoorLockCluster() : ClusterBase(kDoorLockClusterId) {}
+    DoorLockCluster() : ClusterBase(app::Clusters::DoorLock::Id) {}
     ~DoorLockCluster() {}
 
     // Cluster Commands
@@ -599,35 +541,12 @@ public:
     CHIP_ERROR ReportAttributeLockState(Callback::Cancelable * onReportCallback);
 
 private:
-    static constexpr CommandId kClearAllPinsCommandId         = 0x08;
-    static constexpr CommandId kClearAllRfidsCommandId        = 0x19;
-    static constexpr CommandId kClearHolidayScheduleCommandId = 0x13;
-    static constexpr CommandId kClearPinCommandId             = 0x07;
-    static constexpr CommandId kClearRfidCommandId            = 0x18;
-    static constexpr CommandId kClearWeekdayScheduleCommandId = 0x0D;
-    static constexpr CommandId kClearYeardayScheduleCommandId = 0x10;
-    static constexpr CommandId kGetHolidayScheduleCommandId   = 0x12;
-    static constexpr CommandId kGetLogRecordCommandId         = 0x04;
-    static constexpr CommandId kGetPinCommandId               = 0x06;
-    static constexpr CommandId kGetRfidCommandId              = 0x17;
-    static constexpr CommandId kGetUserTypeCommandId          = 0x15;
-    static constexpr CommandId kGetWeekdayScheduleCommandId   = 0x0C;
-    static constexpr CommandId kGetYeardayScheduleCommandId   = 0x0F;
-    static constexpr CommandId kLockDoorCommandId             = 0x00;
-    static constexpr CommandId kSetHolidayScheduleCommandId   = 0x11;
-    static constexpr CommandId kSetPinCommandId               = 0x05;
-    static constexpr CommandId kSetRfidCommandId              = 0x16;
-    static constexpr CommandId kSetUserTypeCommandId          = 0x14;
-    static constexpr CommandId kSetWeekdayScheduleCommandId   = 0x0B;
-    static constexpr CommandId kSetYeardayScheduleCommandId   = 0x0E;
-    static constexpr CommandId kUnlockDoorCommandId           = 0x01;
-    static constexpr CommandId kUnlockWithTimeoutCommandId    = 0x03;
 };
 
 class DLL_EXPORT ElectricalMeasurementCluster : public ClusterBase
 {
 public:
-    ElectricalMeasurementCluster() : ClusterBase(kElectricalMeasurementClusterId) {}
+    ElectricalMeasurementCluster() : ClusterBase(app::Clusters::ElectricalMeasurement::Id) {}
     ~ElectricalMeasurementCluster() {}
 
     // Cluster Attributes
@@ -649,7 +568,7 @@ public:
 class DLL_EXPORT EthernetNetworkDiagnosticsCluster : public ClusterBase
 {
 public:
-    EthernetNetworkDiagnosticsCluster() : ClusterBase(kEthernetNetworkDiagnosticsClusterId) {}
+    EthernetNetworkDiagnosticsCluster() : ClusterBase(app::Clusters::EthernetNetworkDiagnostics::Id) {}
     ~EthernetNetworkDiagnosticsCluster() {}
 
     // Cluster Commands
@@ -665,13 +584,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kResetCountsCommandId = 0x00;
 };
 
 class DLL_EXPORT FixedLabelCluster : public ClusterBase
 {
 public:
-    FixedLabelCluster() : ClusterBase(kFixedLabelClusterId) {}
+    FixedLabelCluster() : ClusterBase(app::Clusters::FixedLabel::Id) {}
     ~FixedLabelCluster() {}
 
     // Cluster Attributes
@@ -683,7 +601,7 @@ public:
 class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
 {
 public:
-    FlowMeasurementCluster() : ClusterBase(kFlowMeasurementClusterId) {}
+    FlowMeasurementCluster() : ClusterBase(app::Clusters::FlowMeasurement::Id) {}
     ~FlowMeasurementCluster() {}
 
     // Cluster Attributes
@@ -697,7 +615,7 @@ public:
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 {
 public:
-    GeneralCommissioningCluster() : ClusterBase(kGeneralCommissioningClusterId) {}
+    GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
     ~GeneralCommissioningCluster() {}
 
     // Cluster Commands
@@ -716,15 +634,12 @@ public:
                                         uint64_t value);
 
 private:
-    static constexpr CommandId kArmFailSafeCommandId           = 0x00;
-    static constexpr CommandId kCommissioningCompleteCommandId = 0x04;
-    static constexpr CommandId kSetRegulatoryConfigCommandId   = 0x02;
 };
 
 class DLL_EXPORT GeneralDiagnosticsCluster : public ClusterBase
 {
 public:
-    GeneralDiagnosticsCluster() : ClusterBase(kGeneralDiagnosticsClusterId) {}
+    GeneralDiagnosticsCluster() : ClusterBase(app::Clusters::GeneralDiagnostics::Id) {}
     ~GeneralDiagnosticsCluster() {}
 
     // Cluster Attributes
@@ -737,7 +652,7 @@ public:
 class DLL_EXPORT GroupKeyManagementCluster : public ClusterBase
 {
 public:
-    GroupKeyManagementCluster() : ClusterBase(kGroupKeyManagementClusterId) {}
+    GroupKeyManagementCluster() : ClusterBase(app::Clusters::GroupKeyManagement::Id) {}
     ~GroupKeyManagementCluster() {}
 
     // Cluster Attributes
@@ -750,7 +665,7 @@ public:
 class DLL_EXPORT GroupsCluster : public ClusterBase
 {
 public:
-    GroupsCluster() : ClusterBase(kGroupsClusterId) {}
+    GroupsCluster() : ClusterBase(app::Clusters::Groups::Id) {}
     ~GroupsCluster() {}
 
     // Cluster Commands
@@ -770,18 +685,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kAddGroupCommandId              = 0x00;
-    static constexpr CommandId kAddGroupIfIdentifyingCommandId = 0x05;
-    static constexpr CommandId kGetGroupMembershipCommandId    = 0x02;
-    static constexpr CommandId kRemoveAllGroupsCommandId       = 0x04;
-    static constexpr CommandId kRemoveGroupCommandId           = 0x03;
-    static constexpr CommandId kViewGroupCommandId             = 0x01;
 };
 
 class DLL_EXPORT IdentifyCluster : public ClusterBase
 {
 public:
-    IdentifyCluster() : ClusterBase(kIdentifyClusterId) {}
+    IdentifyCluster() : ClusterBase(app::Clusters::Identify::Id) {}
     ~IdentifyCluster() {}
 
     // Cluster Commands
@@ -796,14 +705,12 @@ public:
                                           uint16_t value);
 
 private:
-    static constexpr CommandId kIdentifyCommandId      = 0x00;
-    static constexpr CommandId kIdentifyQueryCommandId = 0x01;
 };
 
 class DLL_EXPORT KeypadInputCluster : public ClusterBase
 {
 public:
-    KeypadInputCluster() : ClusterBase(kKeypadInputClusterId) {}
+    KeypadInputCluster() : ClusterBase(app::Clusters::KeypadInput::Id) {}
     ~KeypadInputCluster() {}
 
     // Cluster Commands
@@ -814,13 +721,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kSendKeyCommandId = 0x00;
 };
 
 class DLL_EXPORT LevelControlCluster : public ClusterBase
 {
 public:
-    LevelControlCluster() : ClusterBase(kLevelControlClusterId) {}
+    LevelControlCluster() : ClusterBase(app::Clusters::LevelControl::Id) {}
     ~LevelControlCluster() {}
 
     // Cluster Commands
@@ -849,20 +755,12 @@ public:
     CHIP_ERROR ReportAttributeCurrentLevel(Callback::Cancelable * onReportCallback);
 
 private:
-    static constexpr CommandId kMoveCommandId                 = 0x01;
-    static constexpr CommandId kMoveToLevelCommandId          = 0x00;
-    static constexpr CommandId kMoveToLevelWithOnOffCommandId = 0x04;
-    static constexpr CommandId kMoveWithOnOffCommandId        = 0x05;
-    static constexpr CommandId kStepCommandId                 = 0x02;
-    static constexpr CommandId kStepWithOnOffCommandId        = 0x06;
-    static constexpr CommandId kStopCommandId                 = 0x03;
-    static constexpr CommandId kStopWithOnOffCommandId        = 0x07;
 };
 
 class DLL_EXPORT LowPowerCluster : public ClusterBase
 {
 public:
-    LowPowerCluster() : ClusterBase(kLowPowerClusterId) {}
+    LowPowerCluster() : ClusterBase(app::Clusters::LowPower::Id) {}
     ~LowPowerCluster() {}
 
     // Cluster Commands
@@ -873,13 +771,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kSleepCommandId = 0x00;
 };
 
 class DLL_EXPORT MediaInputCluster : public ClusterBase
 {
 public:
-    MediaInputCluster() : ClusterBase(kMediaInputClusterId) {}
+    MediaInputCluster() : ClusterBase(app::Clusters::MediaInput::Id) {}
     ~MediaInputCluster() {}
 
     // Cluster Commands
@@ -896,16 +793,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kHideInputStatusCommandId = 0x02;
-    static constexpr CommandId kRenameInputCommandId     = 0x03;
-    static constexpr CommandId kSelectInputCommandId     = 0x00;
-    static constexpr CommandId kShowInputStatusCommandId = 0x01;
 };
 
 class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
 {
 public:
-    MediaPlaybackCluster() : ClusterBase(kMediaPlaybackClusterId) {}
+    MediaPlaybackCluster() : ClusterBase(app::Clusters::MediaPlayback::Id) {}
     ~MediaPlaybackCluster() {}
 
     // Cluster Commands
@@ -928,23 +821,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kMediaFastForwardCommandId  = 0x07;
-    static constexpr CommandId kMediaNextCommandId         = 0x05;
-    static constexpr CommandId kMediaPauseCommandId        = 0x01;
-    static constexpr CommandId kMediaPlayCommandId         = 0x00;
-    static constexpr CommandId kMediaPreviousCommandId     = 0x04;
-    static constexpr CommandId kMediaRewindCommandId       = 0x06;
-    static constexpr CommandId kMediaSeekCommandId         = 0x0A;
-    static constexpr CommandId kMediaSkipBackwardCommandId = 0x09;
-    static constexpr CommandId kMediaSkipForwardCommandId  = 0x08;
-    static constexpr CommandId kMediaStartOverCommandId    = 0x03;
-    static constexpr CommandId kMediaStopCommandId         = 0x02;
 };
 
 class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
 {
 public:
-    NetworkCommissioningCluster() : ClusterBase(kNetworkCommissioningClusterId) {}
+    NetworkCommissioningCluster() : ClusterBase(app::Clusters::NetworkCommissioning::Id) {}
     ~NetworkCommissioningCluster() {}
 
     // Cluster Commands
@@ -972,21 +854,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kAddThreadNetworkCommandId                  = 0x06;
-    static constexpr CommandId kAddWiFiNetworkCommandId                    = 0x02;
-    static constexpr CommandId kDisableNetworkCommandId                    = 0x0E;
-    static constexpr CommandId kEnableNetworkCommandId                     = 0x0C;
-    static constexpr CommandId kGetLastNetworkCommissioningResultCommandId = 0x10;
-    static constexpr CommandId kRemoveNetworkCommandId                     = 0x0A;
-    static constexpr CommandId kScanNetworksCommandId                      = 0x00;
-    static constexpr CommandId kUpdateThreadNetworkCommandId               = 0x08;
-    static constexpr CommandId kUpdateWiFiNetworkCommandId                 = 0x04;
 };
 
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
-    OtaSoftwareUpdateProviderCluster() : ClusterBase(kOtaSoftwareUpdateProviderClusterId) {}
+    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
     ~OtaSoftwareUpdateProviderCluster() {}
 
     // Cluster Commands
@@ -1004,15 +877,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kApplyUpdateRequestCommandId  = 0x01;
-    static constexpr CommandId kNotifyUpdateAppliedCommandId = 0x02;
-    static constexpr CommandId kQueryImageCommandId          = 0x00;
 };
 
 class DLL_EXPORT OccupancySensingCluster : public ClusterBase
 {
 public:
-    OccupancySensingCluster() : ClusterBase(kOccupancySensingClusterId) {}
+    OccupancySensingCluster() : ClusterBase(app::Clusters::OccupancySensing::Id) {}
     ~OccupancySensingCluster() {}
 
     // Cluster Attributes
@@ -1030,7 +900,7 @@ public:
 class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:
-    OnOffCluster() : ClusterBase(kOnOffClusterId) {}
+    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
     ~OnOffCluster() {}
 
     // Cluster Commands
@@ -1063,18 +933,12 @@ public:
     CHIP_ERROR ReportAttributeOnOff(Callback::Cancelable * onReportCallback);
 
 private:
-    static constexpr CommandId kOffCommandId                     = 0x00;
-    static constexpr CommandId kOffWithEffectCommandId           = 0x40;
-    static constexpr CommandId kOnCommandId                      = 0x01;
-    static constexpr CommandId kOnWithRecallGlobalSceneCommandId = 0x41;
-    static constexpr CommandId kOnWithTimedOffCommandId          = 0x42;
-    static constexpr CommandId kToggleCommandId                  = 0x02;
 };
 
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
-    OperationalCredentialsCluster() : ClusterBase(kOperationalCredentialsClusterId) {}
+    OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
     ~OperationalCredentialsCluster() {}
 
     // Cluster Commands
@@ -1096,23 +960,17 @@ public:
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeFabricsList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSupportedFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCommissionedFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kAddNOCCommandId                       = 0x06;
-    static constexpr CommandId kAddTrustedRootCertificateCommandId    = 0xA1;
-    static constexpr CommandId kOpCSRRequestCommandId                 = 0x04;
-    static constexpr CommandId kRemoveAllFabricsCommandId             = 0x0B;
-    static constexpr CommandId kRemoveFabricCommandId                 = 0x0A;
-    static constexpr CommandId kRemoveTrustedRootCertificateCommandId = 0xA2;
-    static constexpr CommandId kSetFabricCommandId                    = 0x00;
-    static constexpr CommandId kUpdateFabricLabelCommandId            = 0x09;
 };
 
 class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
 {
 public:
-    PressureMeasurementCluster() : ClusterBase(kPressureMeasurementClusterId) {}
+    PressureMeasurementCluster() : ClusterBase(app::Clusters::PressureMeasurement::Id) {}
     ~PressureMeasurementCluster() {}
 
     // Cluster Attributes
@@ -1129,7 +987,7 @@ public:
 class DLL_EXPORT PumpConfigurationAndControlCluster : public ClusterBase
 {
 public:
-    PumpConfigurationAndControlCluster() : ClusterBase(kPumpConfigurationAndControlClusterId) {}
+    PumpConfigurationAndControlCluster() : ClusterBase(app::Clusters::PumpConfigurationAndControl::Id) {}
     ~PumpConfigurationAndControlCluster() {}
 
     // Cluster Attributes
@@ -1154,7 +1012,7 @@ public:
 class DLL_EXPORT RelativeHumidityMeasurementCluster : public ClusterBase
 {
 public:
-    RelativeHumidityMeasurementCluster() : ClusterBase(kRelativeHumidityMeasurementClusterId) {}
+    RelativeHumidityMeasurementCluster() : ClusterBase(app::Clusters::RelativeHumidityMeasurement::Id) {}
     ~RelativeHumidityMeasurementCluster() {}
 
     // Cluster Attributes
@@ -1171,7 +1029,7 @@ public:
 class DLL_EXPORT ScenesCluster : public ClusterBase
 {
 public:
-    ScenesCluster() : ClusterBase(kScenesClusterId) {}
+    ScenesCluster() : ClusterBase(app::Clusters::Scenes::Id) {}
     ~ScenesCluster() {}
 
     // Cluster Commands
@@ -1201,19 +1059,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kAddSceneCommandId           = 0x00;
-    static constexpr CommandId kGetSceneMembershipCommandId = 0x06;
-    static constexpr CommandId kRecallSceneCommandId        = 0x05;
-    static constexpr CommandId kRemoveAllScenesCommandId    = 0x03;
-    static constexpr CommandId kRemoveSceneCommandId        = 0x02;
-    static constexpr CommandId kStoreSceneCommandId         = 0x04;
-    static constexpr CommandId kViewSceneCommandId          = 0x01;
 };
 
 class DLL_EXPORT SoftwareDiagnosticsCluster : public ClusterBase
 {
 public:
-    SoftwareDiagnosticsCluster() : ClusterBase(kSoftwareDiagnosticsClusterId) {}
+    SoftwareDiagnosticsCluster() : ClusterBase(app::Clusters::SoftwareDiagnostics::Id) {}
     ~SoftwareDiagnosticsCluster() {}
 
     // Cluster Commands
@@ -1226,13 +1077,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kResetWatermarksCommandId = 0x00;
 };
 
 class DLL_EXPORT SwitchCluster : public ClusterBase
 {
 public:
-    SwitchCluster() : ClusterBase(kSwitchClusterId) {}
+    SwitchCluster() : ClusterBase(app::Clusters::Switch::Id) {}
     ~SwitchCluster() {}
 
     // Cluster Attributes
@@ -1248,7 +1098,7 @@ public:
 class DLL_EXPORT TvChannelCluster : public ClusterBase
 {
 public:
-    TvChannelCluster() : ClusterBase(kTvChannelClusterId) {}
+    TvChannelCluster() : ClusterBase(app::Clusters::TvChannel::Id) {}
     ~TvChannelCluster() {}
 
     // Cluster Commands
@@ -1266,15 +1116,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kChangeChannelCommandId         = 0x00;
-    static constexpr CommandId kChangeChannelByNumberCommandId = 0x01;
-    static constexpr CommandId kSkipChannelCommandId           = 0x02;
 };
 
 class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
 {
 public:
-    TargetNavigatorCluster() : ClusterBase(kTargetNavigatorClusterId) {}
+    TargetNavigatorCluster() : ClusterBase(app::Clusters::TargetNavigator::Id) {}
     ~TargetNavigatorCluster() {}
 
     // Cluster Commands
@@ -1287,13 +1134,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kNavigateTargetCommandId = 0x00;
 };
 
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
 {
 public:
-    TemperatureMeasurementCluster() : ClusterBase(kTemperatureMeasurementClusterId) {}
+    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
     ~TemperatureMeasurementCluster() {}
 
     // Cluster Attributes
@@ -1310,7 +1156,7 @@ public:
 class DLL_EXPORT TestClusterCluster : public ClusterBase
 {
 public:
-    TestClusterCluster() : ClusterBase(kTestClusterClusterId) {}
+    TestClusterCluster() : ClusterBase(app::Clusters::TestCluster::Id) {}
     ~TestClusterCluster() {}
 
     // Cluster Commands
@@ -1390,17 +1236,12 @@ public:
                                          uint8_t value);
 
 private:
-    static constexpr CommandId kTestCommandId               = 0x00;
-    static constexpr CommandId kTestAddArgumentsCommandId   = 0x04;
-    static constexpr CommandId kTestNotHandledCommandId     = 0x01;
-    static constexpr CommandId kTestSpecificCommandId       = 0x02;
-    static constexpr CommandId kTestUnknownCommandCommandId = 0x03;
 };
 
 class DLL_EXPORT ThermostatCluster : public ClusterBase
 {
 public:
-    ThermostatCluster() : ClusterBase(kThermostatClusterId) {}
+    ThermostatCluster() : ClusterBase(app::Clusters::Thermostat::Id) {}
     ~ThermostatCluster() {}
 
     // Cluster Commands
@@ -1445,17 +1286,12 @@ public:
     CHIP_ERROR ReportAttributeLocalTemperature(Callback::Cancelable * onReportCallback);
 
 private:
-    static constexpr CommandId kClearWeeklyScheduleCommandId = 0x03;
-    static constexpr CommandId kGetRelayStatusLogCommandId   = 0x04;
-    static constexpr CommandId kGetWeeklyScheduleCommandId   = 0x02;
-    static constexpr CommandId kSetWeeklyScheduleCommandId   = 0x01;
-    static constexpr CommandId kSetpointRaiseLowerCommandId  = 0x00;
 };
 
 class DLL_EXPORT ThreadNetworkDiagnosticsCluster : public ClusterBase
 {
 public:
-    ThreadNetworkDiagnosticsCluster() : ClusterBase(kThreadNetworkDiagnosticsClusterId) {}
+    ThreadNetworkDiagnosticsCluster() : ClusterBase(app::Clusters::ThreadNetworkDiagnostics::Id) {}
     ~ThreadNetworkDiagnosticsCluster() {}
 
     // Cluster Commands
@@ -1540,13 +1376,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kResetCountsCommandId = 0x00;
 };
 
 class DLL_EXPORT WakeOnLanCluster : public ClusterBase
 {
 public:
-    WakeOnLanCluster() : ClusterBase(kWakeOnLanClusterId) {}
+    WakeOnLanCluster() : ClusterBase(app::Clusters::WakeOnLan::Id) {}
     ~WakeOnLanCluster() {}
 
     // Cluster Attributes
@@ -1558,7 +1393,7 @@ public:
 class DLL_EXPORT WiFiNetworkDiagnosticsCluster : public ClusterBase
 {
 public:
-    WiFiNetworkDiagnosticsCluster() : ClusterBase(kWiFiNetworkDiagnosticsClusterId) {}
+    WiFiNetworkDiagnosticsCluster() : ClusterBase(app::Clusters::WiFiNetworkDiagnostics::Id) {}
     ~WiFiNetworkDiagnosticsCluster() {}
 
     // Cluster Commands
@@ -1574,13 +1409,12 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kResetCountsCommandId = 0x00;
 };
 
 class DLL_EXPORT WindowCoveringCluster : public ClusterBase
 {
 public:
-    WindowCoveringCluster() : ClusterBase(kWindowCoveringClusterId) {}
+    WindowCoveringCluster() : ClusterBase(app::Clusters::WindowCovering::Id) {}
     ~WindowCoveringCluster() {}
 
     // Cluster Commands
@@ -1662,13 +1496,6 @@ public:
     CHIP_ERROR ReportAttributeSafetyStatus(Callback::Cancelable * onReportCallback);
 
 private:
-    static constexpr CommandId kDownOrCloseCommandId        = 0x01;
-    static constexpr CommandId kGoToLiftPercentageCommandId = 0x05;
-    static constexpr CommandId kGoToLiftValueCommandId      = 0x04;
-    static constexpr CommandId kGoToTiltPercentageCommandId = 0x08;
-    static constexpr CommandId kGoToTiltValueCommandId      = 0x07;
-    static constexpr CommandId kStopMotionCommandId         = 0x02;
-    static constexpr CommandId kUpOrOpenCommandId           = 0x00;
 };
 
 } // namespace Controller

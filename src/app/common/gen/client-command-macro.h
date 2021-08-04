@@ -2211,6 +2211,42 @@
                                                                                                                                    \
                                                                     ZCL_REACHABLE_CHANGED_COMMAND_ID, "", );
 
+/** @brief Command description for OpenCommissioningWindow
+ *
+ * Command: OpenCommissioningWindow
+ * @param CommissioningTimeout INT16U
+ * @param PAKEVerifier OCTET_STRING
+ * @param Discriminator INT16U
+ * @param Iterations INT32U
+ * @param Salt OCTET_STRING
+ * @param PasscodeID INT16U
+ */
+#define emberAfFillCommandAdministratorCommissioningClusterOpenCommissioningWindow(CommissioningTimeout, PAKEVerifier,             \
+                                                                                   Discriminator, Iterations, Salt, PasscodeID)    \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_OPEN_COMMISSIONING_WINDOW_COMMAND_ID, "uuuuuu", CommissioningTimeout, PAKEVerifier,              \
+                              Discriminator, Iterations, Salt, PasscodeID);
+
+/** @brief Command description for OpenBasicCommissioningWindow
+ *
+ * Command: OpenBasicCommissioningWindow
+ * @param CommissioningTimeout INT16U
+ */
+#define emberAfFillCommandAdministratorCommissioningClusterOpenBasicCommissioningWindow(CommissioningTimeout)                      \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_OPEN_BASIC_COMMISSIONING_WINDOW_COMMAND_ID, "u", CommissioningTimeout);
+
+/** @brief Command description for RevokeCommissioning
+ *
+ * Command: RevokeCommissioning
+ */
+#define emberAfFillCommandAdministratorCommissioningClusterRevokeCommissioning()                                                   \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_REVOKE_COMMISSIONING_COMMAND_ID, "", );
+
 /** @brief Command description for SetFabric
  *
  * Command: SetFabric
@@ -2244,19 +2280,14 @@
 /** @brief Command description for OpCSRResponse
  *
  * Command: OpCSRResponse
- * @param CSR OCTET_STRING
- * @param CSRNonce OCTET_STRING
- * @param VendorReserved1 OCTET_STRING
- * @param VendorReserved2 OCTET_STRING
- * @param VendorReserved3 OCTET_STRING
- * @param Signature OCTET_STRING
+ * @param NOCSRElements OCTET_STRING
+ * @param AttestationSignature OCTET_STRING
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterOpCSRResponse(CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature)                   \
+    CredentialsClusterOpCSRResponse(NOCSRElements, AttestationSignature)                                                           \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_OP_CSR_RESPONSE_COMMAND_ID, "uuuuuu", CSR, CSRNonce, VendorReserved1, VendorReserved2,       \
-                                  VendorReserved3, Signature);
+                                  ZCL_OP_CSR_RESPONSE_COMMAND_ID, "uu", NOCSRElements, AttestationSignature);
 
 /** @brief Command description for AddNOC
  *

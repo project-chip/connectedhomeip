@@ -373,6 +373,50 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_AccountLogin_ClusterRevision
 }
 
 // End of Cluster AccountLogin
+// Cluster AdministratorCommissioning
+
+chip::ChipError::StorageType chip_ime_AppendCommand_AdministratorCommissioning_OpenBasicCommissioningWindow(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t commissioningTimeout)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::AdministratorCommissioningCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(cluster.OpenBasicCommissioningWindow(nullptr, nullptr, commissioningTimeout));
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_AdministratorCommissioning_OpenCommissioningWindow(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t commissioningTimeout,
+    const uint8_t * pAKEVerifier, uint32_t pAKEVerifier_Len, uint16_t discriminator, uint32_t iterations, const uint8_t * salt,
+    uint32_t salt_Len, uint16_t passcodeID)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::AdministratorCommissioningCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(cluster.OpenCommissioningWindow(nullptr, nullptr, commissioningTimeout,
+                                                                      chip::ByteSpan(pAKEVerifier, pAKEVerifier_Len), discriminator,
+                                                                      iterations, chip::ByteSpan(salt, salt_Len), passcodeID));
+}
+chip::ChipError::StorageType
+chip_ime_AppendCommand_AdministratorCommissioning_RevokeCommissioning(chip::Controller::Device * device,
+                                                                      chip::EndpointId ZCLendpointId, chip::GroupId)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::AdministratorCommissioningCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(cluster.RevokeCommissioning(nullptr, nullptr));
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_AdministratorCommissioning_ClusterRevision(chip::Controller::Device * device,
+                                                                                               chip::EndpointId ZCLendpointId,
+                                                                                               chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::AdministratorCommissioningCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(
+        cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+}
+
+// End of Cluster AdministratorCommissioning
 // Cluster ApplicationBasic
 
 chip::ChipError::StorageType chip_ime_AppendCommand_ApplicationBasic_ChangeStatus(chip::Controller::Device * device,
@@ -3951,6 +3995,28 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_Fabri
     cluster.Associate(device, ZCLendpointId);
     return chip::ChipError::AsInteger(cluster.ReadAttributeFabricsList(
         gOperationalCredentialsFabricsListListAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_SupportedFabrics(chip::Controller::Device * device,
+                                                                                            chip::EndpointId ZCLendpointId,
+                                                                                            chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(
+        cluster.ReadAttributeSupportedFabrics(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_CommissionedFabrics(chip::Controller::Device * device,
+                                                                                               chip::EndpointId ZCLendpointId,
+                                                                                               chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(
+        cluster.ReadAttributeCommissionedFabrics(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision(chip::Controller::Device * device,

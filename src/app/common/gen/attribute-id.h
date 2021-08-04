@@ -464,12 +464,20 @@
 #define ZCL_CURRENT_POSITION_ATTRIBUTE_ID (0x0001)
 #define ZCL_MULTI_PRESS_MAX_ATTRIBUTE_ID (0x0002)
 
+// Attribute ids for cluster: AdministratorCommissioning
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Operational Credentials
 
 // Client attributes
 
 // Server attributes
 #define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
+#define ZCL_SUPPORTED_FABRICS_ATTRIBUTE_ID (0x0002)
+#define ZCL_COMMISSIONED_FABRICS_ATTRIBUTE_ID (0x0003)
 
 // Attribute ids for cluster: Fixed Label
 

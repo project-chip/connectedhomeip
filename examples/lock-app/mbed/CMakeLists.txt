@@ -48,6 +48,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${LOCK_COMMON}/gen/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
+               ${CHIP_ROOT}/src/app/common/gen/attributes/Accessors.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
@@ -72,6 +73,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/server/RendezvousServer.cpp
                ${CHIP_ROOT}/src/app/server/Server.cpp
                ${CHIP_ROOT}/src/app/server/StorablePeerConnection.cpp
+               ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
                ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp               
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp

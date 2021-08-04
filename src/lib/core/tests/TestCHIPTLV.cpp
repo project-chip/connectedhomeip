@@ -582,8 +582,8 @@ void ReadEncoding1(nlTestSuite * inSuite, TLVReader & reader)
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535),
-                                   static_cast<float>(17.9));
+        TestGet<TLVReader, float>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), 17.9f);
+        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), 17.9f);
 
         TestNext<TLVReader>(inSuite, reader2);
 
@@ -2965,8 +2965,8 @@ void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535),
-                                   static_cast<float>(17.9));
+        TestGet<TLVReader, float>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), 17.9f);
+        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), 17.9f);
 
         TestNext<TLVReader>(inSuite, reader2);
 
@@ -2992,6 +2992,11 @@ void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
     // Get(bool&)
     bool val;
     err = reader.Get(val);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
+
+    // Get(float&)
+    float numF;
+    err = reader.Get(numF);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
 
     // Get(double&)
@@ -3040,6 +3045,38 @@ void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
     chip::Platform::MemoryFree(const_cast<uint8_t *>(data));
 }
+
+/**
+ *  Test that CHIP TLV reader returns an error when a read is requested that
+ *  would truncate the output.
+ */
+void TestCHIPTLVReaderTruncatedReads(nlTestSuite * inSuite)
+{
+    uint8_t buf[2048];
+    TLVWriter writer;
+    TLVReader reader;
+
+    CHIP_ERROR err;
+    float outF;
+
+    // Setup: Write some values into the buffer
+    writer.Init(buf, sizeof(buf));
+    writer.ImplicitProfileId = TestProfile_2;
+
+    err = writer.Put(AnonymousTag, double{ 12.5 });
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Test reading values from the buffer
+    reader.Init(buf, sizeof(buf));
+
+    TestNext<TLVReader>(inSuite, reader);
+
+    TestGet<TLVReader, double>(inSuite, reader, kTLVType_FloatingPointNumber, AnonymousTag, 12.5);
+
+    err = reader.Get(outF);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
+}
+
 /**
  *  Test CHIP TLV Reader in a use case
  */
@@ -3068,8 +3105,8 @@ void TestCHIPTLVReaderInPractice(nlTestSuite * inSuite)
 
     TestNext<TLVReader>(inSuite, reader);
 
-    TestGet<TLVReader, double>(inSuite, reader, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_1, 4000000000ULL),
-                               static_cast<float>(1.0));
+    TestGet<TLVReader, float>(inSuite, reader, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_1, 4000000000ULL),
+                              static_cast<float>(1.0));
 }
 
 void TestCHIPTLVReader_NextOverContainer_ProcessElement(nlTestSuite * inSuite, TLVReader & reader, void * context)
@@ -3169,6 +3206,8 @@ void CheckCHIPTLVReader(nlTestSuite * inSuite, void * inContext)
     TestCHIPTLVReaderDup(inSuite);
 
     TestCHIPTLVReaderErrorHandling(inSuite);
+
+    TestCHIPTLVReaderTruncatedReads(inSuite);
 
     TestCHIPTLVReaderInPractice(inSuite);
 

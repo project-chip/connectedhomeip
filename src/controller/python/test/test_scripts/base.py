@@ -130,9 +130,9 @@ class BaseTestHelper:
             "ProductID": 65279,
             "UserLabel": "",
             "Location": "",
-            "HardwareVersion": 1,
+            "HardwareVersion": 0,
             "HardwareVersionString": "TEST_VERSION",
-            "SoftwareVersion": 1,
+            "SoftwareVersion": 0,
             "SoftwareVersionString": "prerelease",
         }
         failed_zcl = {}

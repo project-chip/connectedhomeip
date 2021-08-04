@@ -47,6 +47,21 @@ class ChipClusters:
                     "setupPIN": "str",
                 },
             },
+            "AdministratorCommissioning": {
+                "OpenBasicCommissioningWindow": {
+                    "commissioningTimeout": "int",
+                },
+                "OpenCommissioningWindow": {
+                    "commissioningTimeout": "int",
+                    "pAKEVerifier": "bytes",
+                    "discriminator": "int",
+                    "iterations": "int",
+                    "salt": "bytes",
+                    "passcodeID": "int",
+                },
+                "RevokeCommissioning": {
+                },
+            },
             "ApplicationBasic": {
                 "ChangeStatus": {
                     "status": "int",
@@ -743,6 +758,12 @@ class ChipClusters:
     def ListClusterAttributes(self):
         return {
             "AccountLogin": {
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "AdministratorCommissioning": {
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
                     "type": "int",
@@ -1570,6 +1591,14 @@ class ChipClusters:
                     "attributeId": 0x0001,
                     "type": "",
                 },
+                "SupportedFabrics": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                },
+                "CommissionedFabrics": {
+                    "attributeId": 0x0003,
+                    "type": "int",
+                },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
                     "type": "int",
@@ -2328,6 +2357,18 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_AccountLogin_Login(
                 device, ZCLendpoint, ZCLgroupid, tempAccountIdentifier, len(tempAccountIdentifier), setupPIN, len(setupPIN)
         )
+    def ClusterAdministratorCommissioning_CommandOpenBasicCommissioningWindow(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, commissioningTimeout: int):
+        return self._chipLib.chip_ime_AppendCommand_AdministratorCommissioning_OpenBasicCommissioningWindow(
+                device, ZCLendpoint, ZCLgroupid, commissioningTimeout
+        )
+    def ClusterAdministratorCommissioning_CommandOpenCommissioningWindow(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, commissioningTimeout: int, pAKEVerifier: bytes, discriminator: int, iterations: int, salt: bytes, passcodeID: int):
+        return self._chipLib.chip_ime_AppendCommand_AdministratorCommissioning_OpenCommissioningWindow(
+                device, ZCLendpoint, ZCLgroupid, commissioningTimeout, pAKEVerifier, len(pAKEVerifier), discriminator, iterations, salt, len(salt), passcodeID
+        )
+    def ClusterAdministratorCommissioning_CommandRevokeCommissioning(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_AdministratorCommissioning_RevokeCommissioning(
+                device, ZCLendpoint, ZCLgroupid
+        )
     def ClusterApplicationBasic_CommandChangeStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, status: int):
         return self._chipLib.chip_ime_AppendCommand_ApplicationBasic_ChangeStatus(
                 device, ZCLendpoint, ZCLgroupid, status
@@ -2945,6 +2986,8 @@ class ChipClusters:
 
     def ClusterAccountLogin_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_AccountLogin_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterAdministratorCommissioning_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_AdministratorCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeVendorName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_VendorName(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeVendorId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -3380,6 +3423,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOperationalCredentials_ReadAttributeFabricsList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_FabricsList(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOperationalCredentials_ReadAttributeSupportedFabrics(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_SupportedFabrics(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOperationalCredentials_ReadAttributeCommissionedFabrics(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CommissionedFabrics(device, ZCLendpoint, ZCLgroupid)
     def ClusterOperationalCredentials_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterPressureMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -3802,6 +3849,19 @@ class ChipClusters:
         # Cluster AccountLogin ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_AccountLogin_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_AccountLogin_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster AdministratorCommissioning
+        # Cluster AdministratorCommissioning Command OpenBasicCommissioningWindow
+        self._chipLib.chip_ime_AppendCommand_AdministratorCommissioning_OpenBasicCommissioningWindow.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_AdministratorCommissioning_OpenBasicCommissioningWindow.restype = ctypes.c_uint32
+        # Cluster AdministratorCommissioning Command OpenCommissioningWindow
+        self._chipLib.chip_ime_AppendCommand_AdministratorCommissioning_OpenCommissioningWindow.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_AdministratorCommissioning_OpenCommissioningWindow.restype = ctypes.c_uint32
+        # Cluster AdministratorCommissioning Command RevokeCommissioning
+        self._chipLib.chip_ime_AppendCommand_AdministratorCommissioning_RevokeCommissioning.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_AdministratorCommissioning_RevokeCommissioning.restype = ctypes.c_uint32
+        # Cluster AdministratorCommissioning ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_AdministratorCommissioning_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_AdministratorCommissioning_ClusterRevision.restype = ctypes.c_uint32
         # Cluster ApplicationBasic
         # Cluster ApplicationBasic Command ChangeStatus
         self._chipLib.chip_ime_AppendCommand_ApplicationBasic_ChangeStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
@@ -4833,6 +4893,12 @@ class ChipClusters:
         # Cluster OperationalCredentials ReadAttribute FabricsList
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_FabricsList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_FabricsList.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials ReadAttribute SupportedFabrics
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_SupportedFabrics.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_SupportedFabrics.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials ReadAttribute CommissionedFabrics
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CommissionedFabrics.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_CommissionedFabrics.restype = ctypes.c_uint32
         # Cluster OperationalCredentials ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.restype = ctypes.c_uint32

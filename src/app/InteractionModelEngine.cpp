@@ -49,12 +49,12 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
     mReportingEngine.Init();
 
-    for (uint32_t index = 0; index < IM_SERVER_MAX_NUM_PATH_GROUPS - 1; index++)
+    for (uint32_t index = 0; index < CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS - 1; index++)
     {
         mClusterInfoPool[index].mpNext = &mClusterInfoPool[index + 1];
     }
-    mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS - 1].mpNext = nullptr;
-    mpNextAvailableClusterInfo                                 = mClusterInfoPool;
+    mClusterInfoPool[CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS - 1].mpNext = nullptr;
+    mpNextAvailableClusterInfo                                      = mClusterInfoPool;
 
     return CHIP_NO_ERROR;
 }
@@ -109,7 +109,7 @@ void InteractionModelEngine::Shutdown()
         }
     }
 
-    for (uint32_t index = 0; index < IM_SERVER_MAX_NUM_PATH_GROUPS; index++)
+    for (uint32_t index = 0; index < CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS; index++)
     {
         mClusterInfoPool[index].mpNext = nullptr;
         mClusterInfoPool[index].ClearDirty();
@@ -342,10 +342,10 @@ CHIP_ERROR __attribute__((weak))
 WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     ChipLogDetail(DataManagement,
-                  "Received Cluster Attribute: Cluster=%" PRIx32 " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx16
+                  "Received Cluster Attribute: Cluster=" ChipLogFormatMEI " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx16
                   " FieldId=%" PRIx32 " ListIndex=%" PRIx16,
-                  aClusterInfo.mClusterId, ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId, aClusterInfo.mFieldId,
-                  aClusterInfo.mListIndex);
+                  ChipLogValueMEI(aClusterInfo.mClusterId), ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId,
+                  aClusterInfo.mFieldId, aClusterInfo.mListIndex);
     ChipLogError(DataManagement,
                  "Default WriteSingleClusterData is called, this should be replaced by actual dispatched for cluster");
     return CHIP_NO_ERROR;

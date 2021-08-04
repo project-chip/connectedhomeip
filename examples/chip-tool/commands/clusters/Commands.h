@@ -597,9 +597,8 @@ static void OnOperationalCredentialsClusterNOCResponse(void * context, uint8_t S
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnOperationalCredentialsClusterOpCSRResponse(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
-                                                         chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
-                                                         chip::ByteSpan VendorReserved3, chip::ByteSpan Signature)
+static void OnOperationalCredentialsClusterOpCSRResponse(void * context, chip::ByteSpan NOCSRElements,
+                                                         chip::ByteSpan AttestationSignature)
 {
     ChipLogProgress(chipTool, "OperationalCredentialsClusterOpCSRResponse");
 
@@ -1098,6 +1097,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
 | AccountLogin                                                        | 0x050E |
+| AdministratorCommissioning                                          | 0x003C |
 | ApplicationBasic                                                    | 0x050D |
 | ApplicationLauncher                                                 | 0x050C |
 | AudioOutput                                                         | 0x050B |
@@ -1148,6 +1148,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 \*----------------------------------------------------------------------------*/
 
 constexpr chip::ClusterId kAccountLoginClusterId                = 0x050E;
+constexpr chip::ClusterId kAdministratorCommissioningClusterId  = 0x003C;
 constexpr chip::ClusterId kApplicationBasicClusterId            = 0x050D;
 constexpr chip::ClusterId kApplicationLauncherClusterId         = 0x050C;
 constexpr chip::ClusterId kAudioOutputClusterId                 = 0x050B;
@@ -1334,6 +1335,191 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x050E) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::AccountLoginCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster AdministratorCommissioning                                  | 0x003C |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * OpenBasicCommissioningWindow                                      |   0x01 |
+| * OpenCommissioningWindow                                           |   0x00 |
+| * RevokeCommissioning                                               |   0x02 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command OpenBasicCommissioningWindow
+ */
+class AdministratorCommissioningOpenBasicCommissioningWindow : public ModelCommand
+{
+public:
+    AdministratorCommissioningOpenBasicCommissioningWindow() : ModelCommand("open-basic-commissioning-window")
+    {
+        AddArgument("CommissioningTimeout", 0, UINT16_MAX, &mCommissioningTimeout);
+        ModelCommand::AddArguments();
+    }
+    ~AdministratorCommissioningOpenBasicCommissioningWindow()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003C) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.OpenBasicCommissioningWindow(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                    mCommissioningTimeout);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint16_t mCommissioningTimeout;
+};
+
+/*
+ * Command OpenCommissioningWindow
+ */
+class AdministratorCommissioningOpenCommissioningWindow : public ModelCommand
+{
+public:
+    AdministratorCommissioningOpenCommissioningWindow() : ModelCommand("open-commissioning-window")
+    {
+        AddArgument("CommissioningTimeout", 0, UINT16_MAX, &mCommissioningTimeout);
+        AddArgument("PAKEVerifier", &mPAKEVerifier);
+        AddArgument("Discriminator", 0, UINT16_MAX, &mDiscriminator);
+        AddArgument("Iterations", 0, UINT32_MAX, &mIterations);
+        AddArgument("Salt", &mSalt);
+        AddArgument("PasscodeID", 0, UINT16_MAX, &mPasscodeID);
+        ModelCommand::AddArguments();
+    }
+    ~AdministratorCommissioningOpenCommissioningWindow()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.OpenCommissioningWindow(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mCommissioningTimeout,
+                                               mPAKEVerifier, mDiscriminator, mIterations, mSalt, mPasscodeID);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint16_t mCommissioningTimeout;
+    chip::ByteSpan mPAKEVerifier;
+    uint16_t mDiscriminator;
+    uint32_t mIterations;
+    chip::ByteSpan mSalt;
+    uint16_t mPasscodeID;
+};
+
+/*
+ * Command RevokeCommissioning
+ */
+class AdministratorCommissioningRevokeCommissioning : public ModelCommand
+{
+public:
+    AdministratorCommissioningRevokeCommissioning() : ModelCommand("revoke-commissioning") { ModelCommand::AddArguments(); }
+    ~AdministratorCommissioningRevokeCommissioning()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003C) command (0x02) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.RevokeCommissioning(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Discover Attributes
+ */
+class DiscoverAdministratorCommissioningAttributes : public ModelCommand
+{
+public:
+    DiscoverAdministratorCommissioningAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverAdministratorCommissioningAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadAdministratorCommissioningClusterRevision : public ModelCommand
+{
+public:
+    ReadAdministratorCommissioningClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAdministratorCommissioningClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
@@ -14270,6 +14456,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FabricsList                                                       | 0x0001 |
+| * SupportedFabrics                                                  | 0x0002 |
+| * CommissionedFabrics                                               | 0x0003 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -14619,6 +14807,74 @@ private:
     chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>(
             OnOperationalCredentialsFabricsListListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute SupportedFabrics
+ */
+class ReadOperationalCredentialsSupportedFabrics : public ModelCommand
+{
+public:
+    ReadOperationalCredentialsSupportedFabrics() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-fabrics");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOperationalCredentialsSupportedFabrics()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSupportedFabrics(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute CommissionedFabrics
+ */
+class ReadOperationalCredentialsCommissionedFabrics : public ModelCommand
+{
+public:
+    ReadOperationalCredentialsCommissionedFabrics() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "commissioned-fabrics");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOperationalCredentialsCommissionedFabrics()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCommissionedFabrics(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -23423,6 +23679,20 @@ void registerClusterAccountLogin(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterAdministratorCommissioning(Commands & commands)
+{
+    const char * clusterName = "AdministratorCommissioning";
+
+    commands_list clusterCommands = {
+        make_unique<AdministratorCommissioningOpenBasicCommissioningWindow>(), //
+        make_unique<AdministratorCommissioningOpenCommissioningWindow>(),      //
+        make_unique<AdministratorCommissioningRevokeCommissioning>(),          //
+        make_unique<DiscoverAdministratorCommissioningAttributes>(),           //
+        make_unique<ReadAdministratorCommissioningClusterRevision>(),          //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterApplicationBasic(Commands & commands)
 {
     const char * clusterName = "ApplicationBasic";
@@ -24072,6 +24342,8 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<OperationalCredentialsUpdateFabricLabel>(),            //
         make_unique<DiscoverOperationalCredentialsAttributes>(),           //
         make_unique<ReadOperationalCredentialsFabricsList>(),              //
+        make_unique<ReadOperationalCredentialsSupportedFabrics>(),         //
+        make_unique<ReadOperationalCredentialsCommissionedFabrics>(),      //
         make_unique<ReadOperationalCredentialsClusterRevision>(),          //
     };
 
@@ -24461,6 +24733,7 @@ void registerClusterWindowCovering(Commands & commands)
 void registerClusters(Commands & commands)
 {
     registerClusterAccountLogin(commands);
+    registerClusterAdministratorCommissioning(commands);
     registerClusterApplicationBasic(commands);
     registerClusterApplicationLauncher(commands);
     registerClusterAudioOutput(commands);

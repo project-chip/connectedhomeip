@@ -2302,6 +2302,26 @@ EmberAfStatus SetMultiPressMax(chip::EndpointId endpoint, uint8_t multiPressMax)
 
 namespace OperationalCredentials {
 namespace Attributes {
+EmberAfStatus GetSupportedFabrics(chip::EndpointId endpoint, uint8_t * supportedFabrics)
+{
+    return emberAfReadServerAttribute(endpoint, OperationalCredentials::Id, Ids::SupportedFabrics, (uint8_t *) supportedFabrics,
+                                      sizeof(*supportedFabrics));
+}
+EmberAfStatus SetSupportedFabrics(chip::EndpointId endpoint, uint8_t supportedFabrics)
+{
+    return emberAfWriteServerAttribute(endpoint, OperationalCredentials::Id, Ids::SupportedFabrics, (uint8_t *) &supportedFabrics,
+                                       ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+EmberAfStatus GetCommissionedFabrics(chip::EndpointId endpoint, uint8_t * commissionedFabrics)
+{
+    return emberAfReadServerAttribute(endpoint, OperationalCredentials::Id, Ids::CommissionedFabrics,
+                                      (uint8_t *) commissionedFabrics, sizeof(*commissionedFabrics));
+}
+EmberAfStatus SetCommissionedFabrics(chip::EndpointId endpoint, uint8_t commissionedFabrics)
+{
+    return emberAfWriteServerAttribute(endpoint, OperationalCredentials::Id, Ids::CommissionedFabrics,
+                                       (uint8_t *) &commissionedFabrics, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
 } // namespace Attributes
 } // namespace OperationalCredentials
 
