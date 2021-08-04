@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build example - Mbed OS
+name: Build examples - Mbed OS
 
 on:
     push:
@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
     mbedos:
-        name: MbedOS application build
+        name: Mbed OS examples building
         timeout-minutes: 30
         
         env:
@@ -63,7 +63,7 @@ jobs:
                   cp examples/lighting-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-lighting-app-example.hex \
                      /tmp/output_binaries/$BUILD_TYPE-build/lighting-app-$APP_TARGET-$APP_PROFILE.hex
 
-            - name: Binary artifact suffix
+            - name: Binary artifacts suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
               with:
@@ -71,7 +71,7 @@ jobs:
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
 
-            - name: Uploading Binaries
+            - name: Uploading binaries as artifacts
               uses: actions/upload-artifact@v1
               with:
                   name:
