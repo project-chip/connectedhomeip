@@ -16,23 +16,6 @@ def main(args):
     sdk_dir = Path(__file__).parent.resolve()
     build_json_path = sdk_dir / Path(f"build/{args.board}/{args.config}/{args.toolchain}.json")
 
-    # call make getlibs to acquire the SDK collateral.
-    if not build_json_path.exists():
-        getlibs_args = [ "make", "-C", str(sdk_dir), "getlibs", f"TARGET={args.board}" ]
-        getlibs_rslt = subprocess.run(getlibs_args, capture_output=True)
-        if getlibs_rslt.returncode != 0:
-           exit(getlibs_rslt.returncode)
-        # make getlibs doesn't always return non-zero error codes after errors
-        # so do some basic checks here
-        if b"Could not find .mtb files in the app." in getlibs_rslt.stdout:
-            exit(1)
-
-    # use SDK's json generation capability to calculate build recipe details
-    json_gen_args = [ "make", "-C", str(sdk_dir), "chip_json", f"TARGET={args.board}", f"CONFIG={args.config}", f"TOOLCHAIN={args.toolchain}" ]
-    json_gen_rslt = subprocess.run(json_gen_args, capture_output=True)
-    if json_gen_rslt.returncode != 0:
-       exit(json_gen_rslt.returncode)
-
     # We now have a JSON file that provides correct...
     #   CFLAGS, CXXFLAGS, ASFLAGS, LDFLAGS, defines, includes, all source files, all pre-compiled libs
     # ... for the given TARGET/CONFIG/TOOLCHAIN.
