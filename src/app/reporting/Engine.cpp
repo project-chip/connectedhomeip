@@ -324,7 +324,7 @@ void Engine::Run()
     InteractionModelEngine * imEngine = InteractionModelEngine::GetInstance();
     ReadHandler * readHandler         = imEngine->mReadHandlers + mCurReadHandlerIdx;
 
-    while ((mNumReportsInFlight < CHIP_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < CHIP_MAX_NUM_READ_HANDLER))
+    while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < CHIP_IM_MAX_NUM_READ_HANDLER))
     {
         if (readHandler->IsReportable())
         {
@@ -333,7 +333,7 @@ void Engine::Run()
             return;
         }
         numReadHandled++;
-        mCurReadHandlerIdx = (mCurReadHandlerIdx + 1) % CHIP_MAX_NUM_READ_HANDLER;
+        mCurReadHandlerIdx = (mCurReadHandlerIdx + 1) % CHIP_IM_MAX_NUM_READ_HANDLER;
         readHandler        = imEngine->mReadHandlers + mCurReadHandlerIdx;
     }
 }
