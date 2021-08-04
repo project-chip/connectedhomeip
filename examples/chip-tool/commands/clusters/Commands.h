@@ -1141,61 +1141,63 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | TemperatureMeasurement                                              | 0x0402 |
 | TestCluster                                                         | 0x050F |
 | Thermostat                                                          | 0x0201 |
+| ThermostatUserInterfaceConfiguration                                | 0x0204 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
 | WakeOnLan                                                           | 0x0503 |
 | WiFiNetworkDiagnostics                                              | 0x0036 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
 
-constexpr chip::ClusterId kAccountLoginClusterId                = 0x050E;
-constexpr chip::ClusterId kAdministratorCommissioningClusterId  = 0x003C;
-constexpr chip::ClusterId kApplicationBasicClusterId            = 0x050D;
-constexpr chip::ClusterId kApplicationLauncherClusterId         = 0x050C;
-constexpr chip::ClusterId kAudioOutputClusterId                 = 0x050B;
-constexpr chip::ClusterId kBarrierControlClusterId              = 0x0103;
-constexpr chip::ClusterId kBasicClusterId                       = 0x0028;
-constexpr chip::ClusterId kBinaryInputBasicClusterId            = 0x000F;
-constexpr chip::ClusterId kBindingClusterId                     = 0xF000;
-constexpr chip::ClusterId kBridgedDeviceBasicClusterId          = 0x0039;
-constexpr chip::ClusterId kColorControlClusterId                = 0x0300;
-constexpr chip::ClusterId kContentLauncherClusterId             = 0x050A;
-constexpr chip::ClusterId kDescriptorClusterId                  = 0x001D;
-constexpr chip::ClusterId kDiagnosticLogsClusterId              = 0x0032;
-constexpr chip::ClusterId kDoorLockClusterId                    = 0x0101;
-constexpr chip::ClusterId kElectricalMeasurementClusterId       = 0x0B04;
-constexpr chip::ClusterId kEthernetNetworkDiagnosticsClusterId  = 0x0037;
-constexpr chip::ClusterId kFixedLabelClusterId                  = 0x0040;
-constexpr chip::ClusterId kFlowMeasurementClusterId             = 0x0404;
-constexpr chip::ClusterId kGeneralCommissioningClusterId        = 0x0030;
-constexpr chip::ClusterId kGeneralDiagnosticsClusterId          = 0x0033;
-constexpr chip::ClusterId kGroupKeyManagementClusterId          = 0xF004;
-constexpr chip::ClusterId kGroupsClusterId                      = 0x0004;
-constexpr chip::ClusterId kIdentifyClusterId                    = 0x0003;
-constexpr chip::ClusterId kKeypadInputClusterId                 = 0x0509;
-constexpr chip::ClusterId kLevelControlClusterId                = 0x0008;
-constexpr chip::ClusterId kLowPowerClusterId                    = 0x0508;
-constexpr chip::ClusterId kMediaInputClusterId                  = 0x0507;
-constexpr chip::ClusterId kMediaPlaybackClusterId               = 0x0506;
-constexpr chip::ClusterId kNetworkCommissioningClusterId        = 0x0031;
-constexpr chip::ClusterId kOtaSoftwareUpdateProviderClusterId   = 0x0029;
-constexpr chip::ClusterId kOccupancySensingClusterId            = 0x0406;
-constexpr chip::ClusterId kOnOffClusterId                       = 0x0006;
-constexpr chip::ClusterId kOperationalCredentialsClusterId      = 0x003E;
-constexpr chip::ClusterId kPressureMeasurementClusterId         = 0x0403;
-constexpr chip::ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
-constexpr chip::ClusterId kRelativeHumidityMeasurementClusterId = 0x0405;
-constexpr chip::ClusterId kScenesClusterId                      = 0x0005;
-constexpr chip::ClusterId kSoftwareDiagnosticsClusterId         = 0x0034;
-constexpr chip::ClusterId kSwitchClusterId                      = 0x003B;
-constexpr chip::ClusterId kTvChannelClusterId                   = 0x0504;
-constexpr chip::ClusterId kTargetNavigatorClusterId             = 0x0505;
-constexpr chip::ClusterId kTemperatureMeasurementClusterId      = 0x0402;
-constexpr chip::ClusterId kTestClusterClusterId                 = 0x050F;
-constexpr chip::ClusterId kThermostatClusterId                  = 0x0201;
-constexpr chip::ClusterId kThreadNetworkDiagnosticsClusterId    = 0x0035;
-constexpr chip::ClusterId kWakeOnLanClusterId                   = 0x0503;
-constexpr chip::ClusterId kWiFiNetworkDiagnosticsClusterId      = 0x0036;
-constexpr chip::ClusterId kWindowCoveringClusterId              = 0x0102;
+constexpr chip::ClusterId kAccountLoginClusterId                         = 0x050E;
+constexpr chip::ClusterId kAdministratorCommissioningClusterId           = 0x003C;
+constexpr chip::ClusterId kApplicationBasicClusterId                     = 0x050D;
+constexpr chip::ClusterId kApplicationLauncherClusterId                  = 0x050C;
+constexpr chip::ClusterId kAudioOutputClusterId                          = 0x050B;
+constexpr chip::ClusterId kBarrierControlClusterId                       = 0x0103;
+constexpr chip::ClusterId kBasicClusterId                                = 0x0028;
+constexpr chip::ClusterId kBinaryInputBasicClusterId                     = 0x000F;
+constexpr chip::ClusterId kBindingClusterId                              = 0xF000;
+constexpr chip::ClusterId kBridgedDeviceBasicClusterId                   = 0x0039;
+constexpr chip::ClusterId kColorControlClusterId                         = 0x0300;
+constexpr chip::ClusterId kContentLauncherClusterId                      = 0x050A;
+constexpr chip::ClusterId kDescriptorClusterId                           = 0x001D;
+constexpr chip::ClusterId kDiagnosticLogsClusterId                       = 0x0032;
+constexpr chip::ClusterId kDoorLockClusterId                             = 0x0101;
+constexpr chip::ClusterId kElectricalMeasurementClusterId                = 0x0B04;
+constexpr chip::ClusterId kEthernetNetworkDiagnosticsClusterId           = 0x0037;
+constexpr chip::ClusterId kFixedLabelClusterId                           = 0x0040;
+constexpr chip::ClusterId kFlowMeasurementClusterId                      = 0x0404;
+constexpr chip::ClusterId kGeneralCommissioningClusterId                 = 0x0030;
+constexpr chip::ClusterId kGeneralDiagnosticsClusterId                   = 0x0033;
+constexpr chip::ClusterId kGroupKeyManagementClusterId                   = 0xF004;
+constexpr chip::ClusterId kGroupsClusterId                               = 0x0004;
+constexpr chip::ClusterId kIdentifyClusterId                             = 0x0003;
+constexpr chip::ClusterId kKeypadInputClusterId                          = 0x0509;
+constexpr chip::ClusterId kLevelControlClusterId                         = 0x0008;
+constexpr chip::ClusterId kLowPowerClusterId                             = 0x0508;
+constexpr chip::ClusterId kMediaInputClusterId                           = 0x0507;
+constexpr chip::ClusterId kMediaPlaybackClusterId                        = 0x0506;
+constexpr chip::ClusterId kNetworkCommissioningClusterId                 = 0x0031;
+constexpr chip::ClusterId kOtaSoftwareUpdateProviderClusterId            = 0x0029;
+constexpr chip::ClusterId kOccupancySensingClusterId                     = 0x0406;
+constexpr chip::ClusterId kOnOffClusterId                                = 0x0006;
+constexpr chip::ClusterId kOperationalCredentialsClusterId               = 0x003E;
+constexpr chip::ClusterId kPressureMeasurementClusterId                  = 0x0403;
+constexpr chip::ClusterId kPumpConfigurationAndControlClusterId          = 0x0200;
+constexpr chip::ClusterId kRelativeHumidityMeasurementClusterId          = 0x0405;
+constexpr chip::ClusterId kScenesClusterId                               = 0x0005;
+constexpr chip::ClusterId kSoftwareDiagnosticsClusterId                  = 0x0034;
+constexpr chip::ClusterId kSwitchClusterId                               = 0x003B;
+constexpr chip::ClusterId kTvChannelClusterId                            = 0x0504;
+constexpr chip::ClusterId kTargetNavigatorClusterId                      = 0x0505;
+constexpr chip::ClusterId kTemperatureMeasurementClusterId               = 0x0402;
+constexpr chip::ClusterId kTestClusterClusterId                          = 0x050F;
+constexpr chip::ClusterId kThermostatClusterId                           = 0x0201;
+constexpr chip::ClusterId kThermostatUserInterfaceConfigurationClusterId = 0x0204;
+constexpr chip::ClusterId kThreadNetworkDiagnosticsClusterId             = 0x0035;
+constexpr chip::ClusterId kWakeOnLanClusterId                            = 0x0503;
+constexpr chip::ClusterId kWiFiNetworkDiagnosticsClusterId               = 0x0036;
+constexpr chip::ClusterId kWindowCoveringClusterId                       = 0x0102;
 
 /*----------------------------------------------------------------------------*\
 | Cluster AccountLogin                                                | 0x050E |
@@ -19718,6 +19720,284 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster ThermostatUserInterfaceConfiguration                        | 0x0204 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * TemperatureDisplayMode                                            | 0x0000 |
+| * KeypadLockout                                                     | 0x0001 |
+| * ScheduleProgrammingVisibility                                     | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Discover Attributes
+ */
+class DiscoverThermostatUserInterfaceConfigurationAttributes : public ModelCommand
+{
+public:
+    DiscoverThermostatUserInterfaceConfigurationAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverThermostatUserInterfaceConfigurationAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute TemperatureDisplayMode
+ */
+class ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode : public ModelCommand
+{
+public:
+    ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "temperature-display-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0204) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeTemperatureDisplayMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteThermostatUserInterfaceConfigurationTemperatureDisplayMode : public ModelCommand
+{
+public:
+    WriteThermostatUserInterfaceConfigurationTemperatureDisplayMode() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "temperature-display-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteThermostatUserInterfaceConfigurationTemperatureDisplayMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0204) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeTemperatureDisplayMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mValue;
+};
+
+/*
+ * Attribute KeypadLockout
+ */
+class ReadThermostatUserInterfaceConfigurationKeypadLockout : public ModelCommand
+{
+public:
+    ReadThermostatUserInterfaceConfigurationKeypadLockout() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "keypad-lockout");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatUserInterfaceConfigurationKeypadLockout()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0204) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeKeypadLockout(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteThermostatUserInterfaceConfigurationKeypadLockout : public ModelCommand
+{
+public:
+    WriteThermostatUserInterfaceConfigurationKeypadLockout() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "keypad-lockout");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteThermostatUserInterfaceConfigurationKeypadLockout()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0204) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeKeypadLockout(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mValue;
+};
+
+/*
+ * Attribute ScheduleProgrammingVisibility
+ */
+class ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility : public ModelCommand
+{
+public:
+    ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "schedule-programming-visibility");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0204) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeScheduleProgrammingVisibility(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility : public ModelCommand
+{
+public:
+    WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "schedule-programming-visibility");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0204) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeScheduleProgrammingVisibility(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                   mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mValue;
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadThermostatUserInterfaceConfigurationClusterRevision : public ModelCommand
+{
+public:
+    ReadThermostatUserInterfaceConfigurationClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatUserInterfaceConfigurationClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0204) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster ThreadNetworkDiagnostics                                    | 0x0035 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -24583,6 +24863,23 @@ void registerClusterThermostat(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterThermostatUserInterfaceConfiguration(Commands & commands)
+{
+    const char * clusterName = "ThermostatUserInterfaceConfiguration";
+
+    commands_list clusterCommands = {
+        make_unique<DiscoverThermostatUserInterfaceConfigurationAttributes>(),                 //
+        make_unique<ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode>(),         //
+        make_unique<WriteThermostatUserInterfaceConfigurationTemperatureDisplayMode>(),        //
+        make_unique<ReadThermostatUserInterfaceConfigurationKeypadLockout>(),                  //
+        make_unique<WriteThermostatUserInterfaceConfigurationKeypadLockout>(),                 //
+        make_unique<ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility>(),  //
+        make_unique<WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility>(), //
+        make_unique<ReadThermostatUserInterfaceConfigurationClusterRevision>(),                //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterThreadNetworkDiagnostics(Commands & commands)
 {
     const char * clusterName = "ThreadNetworkDiagnostics";
@@ -24777,6 +25074,7 @@ void registerClusters(Commands & commands)
     registerClusterTemperatureMeasurement(commands);
     registerClusterTestCluster(commands);
     registerClusterThermostat(commands);
+    registerClusterThermostatUserInterfaceConfiguration(commands);
     registerClusterThreadNetworkDiagnostics(commands);
     registerClusterWakeOnLan(commands);
     registerClusterWiFiNetworkDiagnostics(commands);

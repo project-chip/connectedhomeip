@@ -1288,6 +1288,28 @@ public:
 private:
 };
 
+class DLL_EXPORT ThermostatUserInterfaceConfigurationCluster : public ClusterBase
+{
+public:
+    ThermostatUserInterfaceConfigurationCluster() : ClusterBase(app::Clusters::ThermostatUserInterfaceConfiguration::Id) {}
+    ~ThermostatUserInterfaceConfigurationCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeTemperatureDisplayMode(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeKeypadLockout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeScheduleProgrammingVisibility(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeTemperatureDisplayMode(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint8_t value);
+    CHIP_ERROR WriteAttributeKeypadLockout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint8_t value);
+    CHIP_ERROR WriteAttributeScheduleProgrammingVisibility(Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback, uint8_t value);
+};
+
 class DLL_EXPORT ThreadNetworkDiagnosticsCluster : public ClusterBase
 {
 public:

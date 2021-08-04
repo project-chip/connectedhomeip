@@ -721,6 +721,8 @@ class ChipClusters:
                     "amount": "int",
                 },
             },
+            "ThermostatUserInterfaceConfiguration": {
+            },
             "ThreadNetworkDiagnostics": {
                 "ResetCounts": {
                 },
@@ -1935,6 +1937,27 @@ class ChipClusters:
                 "FeatureMap": {
                     "attributeId": 0xFFFC,
                     "type": "int",
+                },
+                "ClusterRevision": {
+                    "attributeId": 0xFFFD,
+                    "type": "int",
+                },
+            },
+            "ThermostatUserInterfaceConfiguration": {
+                "TemperatureDisplayMode": {
+                    "attributeId": 0x0000,
+                    "type": "int",
+                    "writable": True,
+                },
+                "KeypadLockout": {
+                    "attributeId": 0x0001,
+                    "type": "int",
+                    "writable": True,
+                },
+                "ScheduleProgrammingVisibility": {
+                    "attributeId": 0x0002,
+                    "type": "int",
+                    "writable": True,
                 },
                 "ClusterRevision": {
                     "attributeId": 0xFFFD,
@@ -3635,6 +3658,20 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_FeatureMap(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostatUserInterfaceConfiguration_ReadAttributeTemperatureDisplayMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_TemperatureDisplayMode(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostatUserInterfaceConfiguration_WriteAttributeTemperatureDisplayMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_TemperatureDisplayMode(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterThermostatUserInterfaceConfiguration_ReadAttributeKeypadLockout(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_KeypadLockout(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostatUserInterfaceConfiguration_WriteAttributeKeypadLockout(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_KeypadLockout(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterThermostatUserInterfaceConfiguration_ReadAttributeScheduleProgrammingVisibility(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_ScheduleProgrammingVisibility(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostatUserInterfaceConfiguration_WriteAttributeScheduleProgrammingVisibility(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_ScheduleProgrammingVisibility(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterThermostatUserInterfaceConfiguration_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterThreadNetworkDiagnostics_ReadAttributeChannel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ThreadNetworkDiagnostics_Channel(device, ZCLendpoint, ZCLgroupid)
     def ClusterThreadNetworkDiagnostics_ReadAttributeRoutingRole(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -5285,6 +5322,28 @@ class ChipClusters:
         # Cluster Thermostat ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster ThermostatUserInterfaceConfiguration
+        # Cluster ThermostatUserInterfaceConfiguration ReadAttribute TemperatureDisplayMode
+        self._chipLib.chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_TemperatureDisplayMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_TemperatureDisplayMode.restype = ctypes.c_uint32
+        # Cluster ThermostatUserInterfaceConfiguration WriteAttribute TemperatureDisplayMode
+        self._chipLib.chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_TemperatureDisplayMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_TemperatureDisplayMode.restype = ctypes.c_uint32
+        # Cluster ThermostatUserInterfaceConfiguration ReadAttribute KeypadLockout
+        self._chipLib.chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_KeypadLockout.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_KeypadLockout.restype = ctypes.c_uint32
+        # Cluster ThermostatUserInterfaceConfiguration WriteAttribute KeypadLockout
+        self._chipLib.chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_KeypadLockout.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_KeypadLockout.restype = ctypes.c_uint32
+        # Cluster ThermostatUserInterfaceConfiguration ReadAttribute ScheduleProgrammingVisibility
+        self._chipLib.chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_ScheduleProgrammingVisibility.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_ScheduleProgrammingVisibility.restype = ctypes.c_uint32
+        # Cluster ThermostatUserInterfaceConfiguration WriteAttribute ScheduleProgrammingVisibility
+        self._chipLib.chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_ScheduleProgrammingVisibility.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_ScheduleProgrammingVisibility.restype = ctypes.c_uint32
+        # Cluster ThermostatUserInterfaceConfiguration ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_ClusterRevision.restype = ctypes.c_uint32
         # Cluster ThreadNetworkDiagnostics
         # Cluster ThreadNetworkDiagnostics Command ResetCounts
         self._chipLib.chip_ime_AppendCommand_ThreadNetworkDiagnostics_ResetCounts.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

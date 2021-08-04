@@ -4988,6 +4988,65 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
+  public static class ThermostatUserInterfaceConfigurationCluster extends BaseChipCluster {
+    public ThermostatUserInterfaceConfigurationCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void readTemperatureDisplayModeAttribute(IntegerAttributeCallback callback) {
+      readTemperatureDisplayModeAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeTemperatureDisplayModeAttribute(DefaultClusterCallback callback, int value) {
+      writeTemperatureDisplayModeAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readKeypadLockoutAttribute(IntegerAttributeCallback callback) {
+      readKeypadLockoutAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeKeypadLockoutAttribute(DefaultClusterCallback callback, int value) {
+      writeKeypadLockoutAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readScheduleProgrammingVisibilityAttribute(IntegerAttributeCallback callback) {
+      readScheduleProgrammingVisibilityAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeScheduleProgrammingVisibilityAttribute(
+        DefaultClusterCallback callback, int value) {
+      writeScheduleProgrammingVisibilityAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readTemperatureDisplayModeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeTemperatureDisplayModeAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readKeypadLockoutAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeKeypadLockoutAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readScheduleProgrammingVisibilityAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeScheduleProgrammingVisibilityAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
   public static class ThreadNetworkDiagnosticsCluster extends BaseChipCluster {
     public ThreadNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
