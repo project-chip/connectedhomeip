@@ -113,16 +113,15 @@ void chip_ime_SetFailureResponseDelegate(FailureResponseDelegate delegate)
 {{#chip_client_clusters}}
 // Cluster {{asCamelCased name false}}
 
-{{#chip_server_cluster_commands}}
-chip::ChipError::StorageType chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId{{#chip_server_cluster_command_arguments}}, {{#if (isString type)}}const uint8_t * {{asCamelCased label}}, uint32_t {{asCamelCased label}}_Len{{else}}{{chipType}} {{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}})
+{{#chip_cluster_commands}}
+chip::ChipError::StorageType chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId{{#chip_cluster_command_arguments}}, {{#if (isString type)}}const uint8_t * {{asCamelCased label}}, uint32_t {{asCamelCased label}}_Len{{else}}{{chipType}} {{asCamelCased label}}{{/if}}{{/chip_cluster_command_arguments}})
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::{{asCamelCased clusterName false}}Cluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.{{asCamelCased name false}}(nullptr, nullptr{{#chip_server_cluster_command_arguments}}, {{#if (isString type)}}chip::ByteSpan({{asCamelCased label}}, {{asCamelCased label}}_Len){{else}}{{asCamelCased label}}{{/if}}
-    {{/chip_server_cluster_command_arguments}}).AsInteger();
+    return cluster.{{asCamelCased name false}}(nullptr, nullptr{{#chip_cluster_command_arguments}}, {{#if (isString type)}}chip::ByteSpan({{asCamelCased label}}, {{asCamelCased label}}_Len){{else}}{{asCamelCased label}}{{/if}}{{/chip_cluster_command_arguments}}).AsInteger();
 }
-{{/chip_server_cluster_commands}}
+{{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
 chip::ChipError::StorageType chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)

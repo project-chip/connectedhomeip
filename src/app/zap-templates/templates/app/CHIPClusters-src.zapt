@@ -68,8 +68,8 @@ namespace Controller {
 {{#chip_client_clusters}}
 
 // {{asUpperCamelCase name}} Cluster Commands
-{{#chip_server_cluster_commands}}
-CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_server_cluster_command_arguments}})
+{{#chip_cluster_commands}}
+CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}})
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -89,7 +89,7 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-{{#chip_server_cluster_command_arguments}}
+{{#chip_cluster_command_arguments}}
 {{#first}}
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 {{/first}}
@@ -97,7 +97,7 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}));
 {{else}}
     // Command takes no arguments.
-{{/chip_server_cluster_command_arguments}}
+{{/chip_cluster_command_arguments}}
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -115,9 +115,9 @@ exit:
     return err;
 }
 
-{{/chip_server_cluster_commands}}
+{{/chip_cluster_commands}}
 // {{asUpperCamelCase name}} Cluster Attributes
-CHIP_ERROR {{asUpperCamelCase name}}Cluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR {{asCamelCased name false}}Cluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     COMMAND_HEADER("Discover{{asUpperCamelCase name}}Attributes", {{asUpperCamelCase name}}::Id);
     buf.Put8(kFrameControlGlobalCommand)
