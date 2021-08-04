@@ -151,12 +151,20 @@ def cmd_generate(context):
     default=None,
     type=click.Path(file_okay=False, resolve_path=True),
     help='Prefix for the generated file output.')
+@click.option(
+    '--create-archives',
+    default=None,
+    type=click.Path(file_okay=False, resolve_path=True),
+    help='Prefix of compressed archives of the generated files.')
 @click.pass_context
-def cmd_build(context, copy_artifacts_to):
+def cmd_build(context, copy_artifacts_to, create_archives):
   context.obj.Build()
 
   if copy_artifacts_to:
     context.obj.CopyArtifactsTo(copy_artifacts_to)
+
+  if create_archives:
+    context.obj.CreateArtifactArchives(create_archives)
 
 
 if __name__ == '__main__':
