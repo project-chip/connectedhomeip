@@ -12,6 +12,7 @@
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
+#include <controller/BasicAttributeFilter.h>
 #include <core/CHIPEncoding.h>
 #include <support/BytesToHex.h>
 #include <support/SafeInt.h>
@@ -757,6 +758,7 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
+{{#if (chip_any_server_has_list_attributes)}}
 static EmberAfStatus PrepareListFromTLV(TLV::TLVReader * tlvData, const uint8_t *& message, uint16_t & messageLen)
 {
     CHIP_ERROR tlvError = CHIP_NO_ERROR;
@@ -781,6 +783,7 @@ static EmberAfStatus PrepareListFromTLV(TLV::TLVReader * tlvData, const uint8_t 
     reader.ExitContainer(type);
     return EMBER_ZCL_STATUS_SUCCESS;
 }
+{{/if}}
 
 {{#chip_client_clusters}}
 {{#if (chip_server_has_list_attributes)}}

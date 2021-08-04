@@ -230,6 +230,10 @@ function chip_server_cluster_response_arguments(options)
   return asBlocks.call(this, promise, options);
 }
 
+function chip_any_server_has_list_attributes(options)
+{
+}
+
 /**
  * Returns if a given server cluster has any attributes of type List[T]
  *

@@ -30,6 +30,7 @@
 
 #include <app/InteractionModelDelegate.h>
 #include <controller/AbstractMdnsDiscoveryController.h>
+#include <controller/BasicAttributeFilter.h>
 #include <controller/CHIPDevice.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/data_model/gen/CHIPClientCallbacks.h>

@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "chip-zcl-zpro-codec-api.h"
+#include <controller/BasicAttributeFilter.h>
 #include <lib/support/Span.h>
 #include <gen/CHIPClientCallbacks.h>
 
