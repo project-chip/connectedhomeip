@@ -151,12 +151,17 @@ def cmd_generate(context):
     default=None,
     type=click.Path(file_okay=False, resolve_path=True),
     help='Prefix for the generated file output.')
+@click.option(
+    '--compress',
+    default=False,
+    is_flag=True,
+    help='Compress the generated files into single files.')
 @click.pass_context
-def cmd_build(context, copy_artifacts_to):
+def cmd_build(context, copy_artifacts_to, compress):
   context.obj.Build()
 
   if copy_artifacts_to:
-    context.obj.CopyArtifactsTo(copy_artifacts_to)
+    context.obj.CopyArtifactsTo(copy_artifacts_to, compress)
 
 
 if __name__ == '__main__':

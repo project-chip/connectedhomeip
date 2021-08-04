@@ -139,11 +139,15 @@ class Context:
     # any generated output was cleaned
     self.completed_steps.discard(BuildSteps.GENERATED)
 
-  def CopyArtifactsTo(self, path: str):
+  def CopyArtifactsTo(self, path: str, compress: bool = False):
     logging.info('Copying build artifacts to %s', path)
     if not os.path.exists(path):
       os.makedirs(path)
 
     for builder in self.builders:
       # FIXME: builder subdir...
-      builder.CopyArtifacts(os.path.join(path, builder.identifier))
+      if compress:
+        builder.CompressArtifacts(os.path.join(
+            path, f'{builder.identifier}.tar.gz'))
+      else:
+        builder.CopyArtifacts(os.path.join(path, builder.identifier))
