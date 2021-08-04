@@ -260,9 +260,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     /// need to set server name
     ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
 
-    QNamePart nameCheckParts[] = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
-    FullQName nameCheck        = FullQName(nameCheckParts);
-    QueryResponderAllocator<AdvertiserMinMdns::kMaxOperationalRecords> * operationalAllocator = FindOperationalAllocator(nameCheck);
+    QNamePart nameCheckParts[]  = { nameBuffer, kOperationalServiceName, kOperationalProtocol, kLocalDomain };
+    FullQName nameCheck         = FullQName(nameCheckParts);
+    auto * operationalAllocator = FindOperationalAllocator(nameCheck);
     if (operationalAllocator != nullptr)
     {
         operationalAllocator->Clear();
