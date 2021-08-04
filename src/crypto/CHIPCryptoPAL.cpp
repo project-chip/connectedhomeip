@@ -616,15 +616,16 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    else if (out_compressed_fabric_id.size() < sizeof(uint64_t))
+    else if (out_compressed_fabric_id.size() < kCompressedFabricIdentifierSize)
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
     // Ensure proper endianness for Fabric ID (i.e. big-endian as it appears in certificates)
-    uint8_t fabric_id_as_big_endian_salt[sizeof(uint64_t)];
+    uint8_t fabric_id_as_big_endian_salt[kCompressedFabricIdentifierSize];
     chip::Encoding::BigEndian::BufferWriter big_endian_writer(MutableByteSpan{ fabric_id_as_big_endian_salt });
     big_endian_writer.Put64(fabric_id);
+    ReturnErrorCodeIf(!big_endian_writer.Fit(), CHIP_ERROR_INTERNAL);
 
     // Compute Compressed fabric reference per spec pseudocode
     //   CompressedFabricIdentifier =
@@ -645,12 +646,13 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
 
     CHIP_ERROR status = hkdf.HKDF_SHA256(input_key_span.data(), input_key_span.size(), &fabric_id_as_big_endian_salt[0],
                                          sizeof(fabric_id_as_big_endian_salt), &kCompressedFabricInfo[0],
-                                         sizeof(kCompressedFabricInfo), out_compressed_fabric_id.data(), sizeof(uint64_t));
+                                         sizeof(kCompressedFabricInfo), out_compressed_fabric_id.data(),
+                                         kCompressedFabricIdentifierSize);
 
     // Resize output to final bounds on success
     if (status == CHIP_NO_ERROR)
     {
-        out_compressed_fabric_id = out_compressed_fabric_id.SubSpan(0, sizeof(uint64_t));
+        out_compressed_fabric_id = out_compressed_fabric_id.SubSpan(0, kCompressedFabricIdentifierSize);
     }
 
     return status;

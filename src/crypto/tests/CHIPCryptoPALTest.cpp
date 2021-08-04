@@ -1703,36 +1703,36 @@ static void TestCompressedFabricIdentifier(nlTestSuite * inSuite, void * inConte
     const uint8_t kExpectedCompressedFabricIdentifier[8] = {
         0x87, 0xe1, 0xb0, 0x04, 0xe2, 0x35, 0xa1, 0x30,
     };
-    static_assert(sizeof(kExpectedCompressedFabricIdentifier) == sizeof(uint64_t),
-                  "Expected compressed fabric identifier must be 64 bits long");
+    static_assert(sizeof(kExpectedCompressedFabricIdentifier) == kCompressedFabricIdentifierSize,
+                  "Expected compressed fabric identifier must the correct size");
 
-    uint8_t compressed_fabric_id[sizeof(uint64_t)];
+    uint8_t compressed_fabric_id[kCompressedFabricIdentifierSize];
     MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
     ClearSecretData(compressed_fabric_id, sizeof(compressed_fabric_id));
 
     CHIP_ERROR error = GenerateCompressedFabricId(root_public_key, kFabricId, compressed_fabric_id_span);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, compressed_fabric_id_span.size() == sizeof(uint64_t));
+    NL_TEST_ASSERT(inSuite, compressed_fabric_id_span.size() == kCompressedFabricIdentifierSize);
     NL_TEST_ASSERT(inSuite,
                    0 ==
                        memcmp(compressed_fabric_id_span.data(), kExpectedCompressedFabricIdentifier,
                               sizeof(kExpectedCompressedFabricIdentifier)));
 
     // Test bigger input buffer than needed
-    uint8_t compressed_fabric_id_large[3 * sizeof(uint64_t)];
+    uint8_t compressed_fabric_id_large[3 * kCompressedFabricIdentifierSize];
     MutableByteSpan compressed_fabric_id_large_span(compressed_fabric_id_large);
     ClearSecretData(compressed_fabric_id_large, sizeof(compressed_fabric_id_large));
 
     error = GenerateCompressedFabricId(root_public_key, kFabricId, compressed_fabric_id_large_span);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, compressed_fabric_id_large_span.size() == sizeof(uint64_t));
+    NL_TEST_ASSERT(inSuite, compressed_fabric_id_large_span.size() == kCompressedFabricIdentifierSize);
     NL_TEST_ASSERT(inSuite,
                    0 ==
                        memcmp(compressed_fabric_id_large_span.data(), kExpectedCompressedFabricIdentifier,
                               sizeof(kExpectedCompressedFabricIdentifier)));
 
     // Test smaller buffer than needed
-    MutableByteSpan compressed_fabric_id_small_span(compressed_fabric_id, sizeof(uint64_t) - 1);
+    MutableByteSpan compressed_fabric_id_small_span(compressed_fabric_id, kCompressedFabricIdentifierSize - 1);
     error = GenerateCompressedFabricId(root_public_key, kFabricId, compressed_fabric_id_small_span);
     NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_BUFFER_TOO_SMALL);
 

@@ -108,6 +108,8 @@ static_assert(kMax_ECDH_Secret_Length >= kP256_FE_Length, "ECDH shared secret is
 static_assert(kMax_ECDSA_Signature_Length >= kP256_ECDSA_Signature_Length_Raw,
               "ECDSA signature buffer length is too short for crypto suite");
 
+constexpr size_t kCompressedFabricIdentifierSize = 8;
+
 /**
  * Spake2+ parameters for P256
  * Defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html#name-ciphersuites
@@ -1126,16 +1128,16 @@ private:
 /**
  * @brief Compute the compressed fabric identifier used for operational discovery service
  *        records from a Node's root public key and Fabric ID. On success, out_compressed_fabric_id
- *        will have a size of exactly 8.
+ *        will have a size of exactly kCompressedFabricIdentifierSize.
  *
  * Errors are:
  *   - CHIP_ERROR_INVALID_ARGUMENT if root_public_key is invalid
  *   - CHIP_ERROR_BUFFER_TOO_SMALL if out_compressed_fabric_id is too small for serialization
- *   - CHIP_ERROR_INTERNAL on any unexpected crypto errors.
+ *   - CHIP_ERROR_INTERNAL on any unexpected crypto or data conversion errors.
  *
  * @param[in] root_public_key The root public key associated with the node's fabric
  * @param[in] fabric_id The fabric ID associated with the node's fabric
- * @param[out] out_compressed_fabric_id Span where output will be written. Its size must be >= 8.
+ * @param[out] out_compressed_fabric_id Span where output will be written. Its size must be >= kCompressedFabricIdentifierSize.
  * @returns a CHIP_ERROR (see above) on failure or CHIP_NO_ERROR otherwise.
  */
 CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id,
