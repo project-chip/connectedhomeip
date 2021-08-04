@@ -15727,10 +15727,11 @@ bool emberAfBasicClusterLeaveCallback(chip::EndpointId endpoint, chip::app::Comm
 /**
  * @brief  Cluster QueryImage Command callback (from client)
  */
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-    chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType,
-    uint16_t hardwareVersion, uint32_t currentVersion, /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported,
-    uint8_t * location, uint8_t requestorCanConsent, chip::ByteSpan metadataForProvider);
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                               uint16_t vendorId, uint16_t productId, uint16_t imageType,
+                                                               uint16_t hardwareVersion, uint32_t currentVersion,
+                                                               uint8_t protocolsSupported, uint8_t * location,
+                                                               uint8_t requestorCanConsent, chip::ByteSpan metadataForProvider);
 /**
  * @brief  Cluster ApplyUpdateRequest Command callback (from client)
  */
