@@ -49,10 +49,11 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current hue"
-    #      response:
-    #          value: 150
+      response:
+          value: 150
 
     - label: "Move to hue longest distance command"
       command: "MoveToHue"
@@ -72,10 +73,11 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current hue"
-    #      response:
-    #          value: 150
+      response:
+          value: 150
 
     - label: "Move to hue up command"
       command: "MoveToHue"
@@ -95,10 +97,11 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current hue"
-    #      response:
-    #          value: 250
+      response:
+          value: 250
 
     - label: "Move to hue down command"
       command: "MoveToHue"
@@ -118,10 +121,11 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current hue"
-    #      response:
-    #          value: 225
+      response:
+          value: 225
 
     - label: "Move hue up command"
       command: "MoveHue"
@@ -139,8 +143,11 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current hue"
+      response:
+          value: -1
 
     - label: "Move hue stop command"
       command: "MoveHue"
@@ -158,8 +165,11 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current hue"
+      response:
+          value: -1
 
     - label: "Move hue down command"
       command: "MoveHue"
@@ -177,8 +187,11 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current hue"
+      response:
+          value: -1
 
     - label: "Move hue stop command"
       command: "MoveHue"
@@ -196,8 +209,11 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current hue"
+      response:
+          value: -1
 
     - label: "Step hue up command"
       command: "StepHue"
@@ -217,8 +233,11 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current hue"
+      response:
+          value: -1
 
     - label: "Step hue down command"
       command: "StepHue"
@@ -238,14 +257,18 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current hue"
+      response:
+          value: -1
 
     - label: "Check Saturation attribute value matched before any change"
+      disabled: true
       command: "readAttribute"
       attribute: "current saturation"
-    #      response:
-    #          value: 90
+      response:
+          value: 90
 
     - label: "Move to saturation command"
       command: "MoveToSaturation"
@@ -263,10 +286,11 @@ tests:
     - label:
           "Check Saturation attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current saturation"
-    #      response:
-    #          value: 90
+      response:
+          value: 90
 
     - label: "Move saturation up command"
       command: "MoveSaturation"
@@ -284,8 +308,11 @@ tests:
     - label:
           "Check Saturation attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current saturation"
+      response:
+          value: -1
 
     - label: "Move saturation down command"
       command: "MoveSaturation"
@@ -303,8 +330,11 @@ tests:
     - label:
           "Check Saturation attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current saturation"
+      response:
+          value: -1
 
     - label: "Step saturation up command"
       command: "StepSaturation"
@@ -324,8 +354,11 @@ tests:
     - label:
           "Check Saturation attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current saturation"
+      response:
+          value: -1
 
     - label: "Step saturation down command"
       command: "StepSaturation"
@@ -345,8 +378,11 @@ tests:
     - label:
           "Check Saturation attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current saturation"
+      response:
+          value: -1
 
     - label: "Move To current hue and saturation command"
       command: "MoveToHueAndSaturation"
@@ -365,18 +401,20 @@ tests:
     - label:
           "Check current hue attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current hue"
-    #      response:
-    #          value: 40
+      response:
+          value: 40
 
     - label:
           "Check Saturation attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current saturation"
-    #      response:
-    #          value: 160
+      response:
+          value: 160
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

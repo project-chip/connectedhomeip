@@ -44,10 +44,11 @@ tests:
                 value: 0
 
     - label: "Read current color temprature"
+      disabled: true
       command: "readAttribute"
       attribute: "color temperature"
-    #      response:
-    #          value: 100
+      response:
+          value: 100
 
     - label: "Move up color temperature command"
       command: "MoveColorTemperature"
@@ -67,8 +68,11 @@ tests:
                 value: 0
 
     - label: "Read current color temprature"
+      disabled: true
       command: "readAttribute"
       attribute: "color temperature"
+      response:
+          value: -1
 
     - label: "Stop Color Temperature command"
       command: "MoveColorTemperature"
@@ -88,8 +92,11 @@ tests:
                 value: 0
 
     - label: "Read current color temprature"
+      disabled: true
       command: "readAttribute"
       attribute: "color temperature"
+      response:
+          value: -1
 
     - label: "Move down color temperature command"
       command: "MoveColorTemperature"
@@ -109,8 +116,11 @@ tests:
                 value: 0
 
     - label: "Read current color temprature"
+      disabled: true
       command: "readAttribute"
       attribute: "color temperature"
+      response:
+          value: -1
 
     - label: "Step up color temperature command"
       command: "StepColorTemperature"
@@ -132,8 +142,11 @@ tests:
                 value: 0
 
     - label: "Read current color temprature"
+      disabled: true
       command: "readAttribute"
       attribute: "color temperature"
+      response:
+          value: -1
 
     - label: "Step down color temperature command"
       command: "StepColorTemperature"
@@ -155,8 +168,11 @@ tests:
                 value: 0
 
     - label: "Read current color temprature"
+      disabled: true
       command: "readAttribute"
       attribute: "color temperature"
+      response:
+          value: -1
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

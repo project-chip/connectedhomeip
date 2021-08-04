@@ -56,10 +56,11 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
+      disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
-    #      response:
-    #          value: 1025
+      response:
+          value: 1025
 
     - label: "Enhanced Move Hue Down command "
       command: "EnhancedMoveHue"
@@ -91,6 +92,8 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      response:
+          value: -1
 
     - label: "Enhanced Move Hue Up command"
       command: "EnhancedMoveHue"
@@ -122,6 +125,8 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      response:
+          value: -1
 
     - label: "Enhanced Step Hue Up command"
       command: "EnhancedStepHue"
@@ -144,8 +149,8 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
-    #      response:
-    #          value: 1075
+      response:
+          value: 1075
 
     - label: "Enhanced Step Hue Down command"
       command: "EnhancedStepHue"
@@ -168,8 +173,8 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
-    #      response:
-    #          value: 1000
+      response:
+          value: 1000
 
     - label: "Enhanced move to hue and saturation command"
       command: "EnhancedMoveToHueAndSaturation"
@@ -189,18 +194,20 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
+      disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
-    #      response:
-    #          value: 1200
+      response:
+          value: 1200
 
     - label:
           "Check Saturation attribute value matched the value sent by the last
           command"
+      disabled: true
       command: "readAttribute"
       attribute: "current saturation"
-    #      response:
-    #          value: 90
+      response:
+          value: 90
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
