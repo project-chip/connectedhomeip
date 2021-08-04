@@ -52,7 +52,10 @@ constexpr size_t kMaxOperationalServiceNameSize =
 /// builds the MDNS advertising name for a given fabric + nodeid pair
 CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peerId);
 
-/// Inverse of MakeInstanceName
+/// Inverse of MakeInstanceName.  Will return errors on non-spec-compliant ids,
+/// _except_ for allowing lowercase hex, not just the spec-defined uppercase
+/// hex.  The part of "name" up to the first '.' (or end of string, whichever
+/// comes first) is parsed as a FABRICID-NODEID.
 CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId);
 
 /// Generates the host name that a CHIP device is to use for a given unique
