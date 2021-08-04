@@ -10947,6 +10947,107 @@ CHIP_ERROR ThermostatCluster::ReadAttributeClusterRevision(Callback::Cancelable 
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
+// ThermostatUserInterfaceConfiguration Cluster Commands
+// ThermostatUserInterfaceConfiguration Cluster Attributes
+CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                                           Callback::Cancelable * onFailureCallback)
+{
+    COMMAND_HEADER("DiscoverThermostatUserInterfaceConfigurationAttributes", ThermostatUserInterfaceConfiguration::Id);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+CHIP_ERROR
+ThermostatUserInterfaceConfigurationCluster::ReadAttributeTemperatureDisplayMode(Callback::Cancelable * onSuccessCallback,
+                                                                                 Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000000;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeTemperatureDisplayMode(
+    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t temperatureDisplayMode)
+{
+    COMMAND_HEADER("WriteThermostatUserInterfaceConfigurationTemperatureDisplayMode", ThermostatUserInterfaceConfiguration::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::WriteAttributes)
+        .Put32(ThermostatUserInterfaceConfiguration::Attributes::Ids::TemperatureDisplayMode)
+        .Put8(48)
+        .Put8(static_cast<uint8_t>(temperatureDisplayMode));
+    COMMAND_FOOTER();
+}
+
+CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::ReadAttributeKeypadLockout(Callback::Cancelable * onSuccessCallback,
+                                                                                   Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000001;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeKeypadLockout(Callback::Cancelable * onSuccessCallback,
+                                                                                    Callback::Cancelable * onFailureCallback,
+                                                                                    uint8_t keypadLockout)
+{
+    COMMAND_HEADER("WriteThermostatUserInterfaceConfigurationKeypadLockout", ThermostatUserInterfaceConfiguration::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::WriteAttributes)
+        .Put32(ThermostatUserInterfaceConfiguration::Attributes::Ids::KeypadLockout)
+        .Put8(48)
+        .Put8(static_cast<uint8_t>(keypadLockout));
+    COMMAND_FOOTER();
+}
+
+CHIP_ERROR
+ThermostatUserInterfaceConfigurationCluster::ReadAttributeScheduleProgrammingVisibility(Callback::Cancelable * onSuccessCallback,
+                                                                                        Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000002;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeScheduleProgrammingVisibility(
+    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t scheduleProgrammingVisibility)
+{
+    COMMAND_HEADER("WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility",
+                   ThermostatUserInterfaceConfiguration::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::WriteAttributes)
+        .Put32(ThermostatUserInterfaceConfiguration::Attributes::Ids::ScheduleProgrammingVisibility)
+        .Put8(48)
+        .Put8(static_cast<uint8_t>(scheduleProgrammingVisibility));
+    COMMAND_FOOTER();
+}
+
+CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                                     Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0000FFFD;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
 // ThreadNetworkDiagnostics Cluster Commands
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::ResetCounts(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)

@@ -5365,6 +5365,76 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_Thermostat_ClusterRevision(c
 }
 
 // End of Cluster Thermostat
+// Cluster ThermostatUserInterfaceConfiguration
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_TemperatureDisplayMode(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(
+        cluster.ReadAttributeTemperatureDisplayMode(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+}
+
+chip::ChipError::StorageType chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_TemperatureDisplayMode(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint8_t value)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return ChipError::AsInteger(
+        cluster.WriteAttributeTemperatureDisplayMode(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value));
+}
+chip::ChipError::StorageType chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_KeypadLockout(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(
+        cluster.ReadAttributeKeypadLockout(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+}
+
+chip::ChipError::StorageType chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_KeypadLockout(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint8_t value)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return ChipError::AsInteger(
+        cluster.WriteAttributeKeypadLockout(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value));
+}
+chip::ChipError::StorageType chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_ScheduleProgrammingVisibility(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(
+        cluster.ReadAttributeScheduleProgrammingVisibility(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+}
+
+chip::ChipError::StorageType chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_ScheduleProgrammingVisibility(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint8_t value)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return ChipError::AsInteger(cluster.WriteAttributeScheduleProgrammingVisibility(gDefaultSuccessCallback.Cancel(),
+                                                                                    gDefaultFailureCallback.Cancel(), value));
+}
+chip::ChipError::StorageType chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_ClusterRevision(
+    chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return chip::ChipError::AsInteger(
+        cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+}
+
+// End of Cluster ThermostatUserInterfaceConfiguration
 // Cluster ThreadNetworkDiagnostics
 
 chip::ChipError::StorageType chip_ime_AppendCommand_ThreadNetworkDiagnostics_ResetCounts(chip::Controller::Device * device,

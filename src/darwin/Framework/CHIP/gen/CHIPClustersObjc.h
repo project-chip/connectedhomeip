@@ -1228,6 +1228,22 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Thermostat User Interface Configuration
+ *
+ */
+@interface CHIPThermostatUserInterfaceConfiguration : CHIPCluster
+
+- (void)readAttributeTemperatureDisplayModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeTemperatureDisplayModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeKeypadLockoutWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeKeypadLockoutWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeScheduleProgrammingVisibilityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeScheduleProgrammingVisibilityWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Thread Network Diagnostics
  *
  */

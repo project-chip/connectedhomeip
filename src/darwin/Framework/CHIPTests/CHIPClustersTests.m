@@ -9795,6 +9795,159 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterThermostatUserInterfaceConfigurationReadAttributeTemperatureDisplayModeWithResponseHandler
+{
+    XCTestExpectation * expectation = [self
+        expectationWithDescription:@"ThermostatUserInterfaceConfigurationReadAttributeTemperatureDisplayModeWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTemperatureDisplayModeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ThermostatUserInterfaceConfiguration TemperatureDisplayMode Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterThermostatUserInterfaceConfigurationWriteAttributeTemperatureDisplayModeWithValue
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ThermostatUserInterfaceConfigurationWriteAttributeTemperatureDisplayModeWithValue"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t value = 0x00;
+    [cluster writeAttributeTemperatureDisplayModeWithValue:value
+                                           responseHandler:^(NSError * err, NSDictionary * values) {
+                                               NSLog(@"ThermostatUserInterfaceConfiguration TemperatureDisplayMode Error: %@", err);
+                                               XCTAssertEqual(err.code, 0);
+                                               [expectation fulfill];
+                                           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterThermostatUserInterfaceConfigurationReadAttributeKeypadLockoutWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ThermostatUserInterfaceConfigurationReadAttributeKeypadLockoutWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeKeypadLockoutWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ThermostatUserInterfaceConfiguration KeypadLockout Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterThermostatUserInterfaceConfigurationWriteAttributeKeypadLockoutWithValue
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ThermostatUserInterfaceConfigurationWriteAttributeKeypadLockoutWithValue"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t value = 0x00;
+    [cluster writeAttributeKeypadLockoutWithValue:value
+                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                      NSLog(@"ThermostatUserInterfaceConfiguration KeypadLockout Error: %@", err);
+                                      XCTAssertEqual(err.code, 0);
+                                      [expectation fulfill];
+                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterThermostatUserInterfaceConfigurationReadAttributeScheduleProgrammingVisibilityWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:
+                  @"ThermostatUserInterfaceConfigurationReadAttributeScheduleProgrammingVisibilityWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeScheduleProgrammingVisibilityWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ThermostatUserInterfaceConfiguration ScheduleProgrammingVisibility Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterThermostatUserInterfaceConfigurationWriteAttributeScheduleProgrammingVisibilityWithValue
+{
+    XCTestExpectation * expectation = [self
+        expectationWithDescription:@"ThermostatUserInterfaceConfigurationWriteAttributeScheduleProgrammingVisibilityWithValue"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t value = 0x00;
+    [cluster writeAttributeScheduleProgrammingVisibilityWithValue:value
+                                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                                      NSLog(@"ThermostatUserInterfaceConfiguration ScheduleProgrammingVisibility "
+                                                            @"Error: %@",
+                                                          err);
+                                                      XCTAssertEqual(err.code, 0);
+                                                      [expectation fulfill];
+                                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterThermostatUserInterfaceConfigurationReadAttributeClusterRevisionWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ThermostatUserInterfaceConfigurationReadAttributeClusterRevisionWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ThermostatUserInterfaceConfiguration ClusterRevision Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterThreadNetworkDiagnosticsReadAttributeChannelWithResponseHandler
 {
     XCTestExpectation * expectation =
