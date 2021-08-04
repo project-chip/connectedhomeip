@@ -167,11 +167,6 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 
     ReturnErrorOnFailure(mFabrics.Init(mStorageDelegate));
 
-    Transport::FabricInfo * const fabric = mFabrics.AssignFabricIndex(mFabricIndex, localDeviceId);
-    VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    ReturnErrorOnFailure(mFabrics.LoadFromStorage(mFabricIndex));
-
     ReturnErrorOnFailure(mSessionMgr->Init(mSystemLayer, mTransportMgr, &mFabrics, mMessageCounterManager));
 
     ReturnErrorOnFailure(mExchangeMgr->Init(mSessionMgr));
@@ -206,7 +201,10 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
 
-    ReturnErrorOnFailure(LoadLocalCredentials(fabric));
+    if (LoadLocalCredentials() != CHIP_NO_ERROR)
+    {
+        ReturnErrorOnFailure(GenerateLocalCredentials());
+    }
 
     ReleaseAllDevices();
 
@@ -220,23 +218,26 @@ void DeviceController::OnLocalNOCChainGeneration(void * context, CHIP_ERROR stat
 
     DeviceController * controller = static_cast<DeviceController *>(context);
 
-    Transport::FabricInfo * const fabric = controller->mFabrics.FindFabricWithIndex(controller->mFabricIndex);
+    Transport::FabricInfo newFabric;
+
+    newFabric.SetOperationalKey(&controller->mOperationalKey);
 
     constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
 
     uint32_t chipCertLen = 0;
 
+    Transport::FabricInfo * fabric = nullptr;
+
     // Check if the callback returned a failure
     VerifyOrExit(status == CHIP_NO_ERROR, err = status);
 
-    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(chipCert.Alloc(chipCertAllocatedLen), err = CHIP_ERROR_NO_MEMORY);
 
     err = ConvertX509CertToChipCert(rcac, chipCert.Get(), chipCertAllocatedLen, chipCertLen);
     SuccessOrExit(err);
 
-    err = fabric->SetRootCert(ByteSpan(chipCert.Get(), chipCertLen));
+    err = newFabric.SetRootCert(ByteSpan(chipCert.Get(), chipCertLen));
     SuccessOrExit(err);
 
     if (icac.empty())
@@ -250,11 +251,24 @@ void DeviceController::OnLocalNOCChainGeneration(void * context, CHIP_ERROR stat
         err = ConvertX509CertsToChipCertArray(noc, icac, chipCertSpan);
         SuccessOrExit(err);
 
-        err = fabric->SetOperationalCertsFromCertArray(chipCertSpan);
+        err = newFabric.SetOperationalCertsFromCertArray(chipCertSpan);
         SuccessOrExit(err);
     }
 
-    err = controller->mFabrics.Store(fabric->GetFabricIndex());
+    err = controller->mFabrics.AddNewFabric(newFabric, controller->mFabricIndex);
+    SuccessOrExit(err);
+    ChipLogProgress(Controller, "Added new fabric %d", controller->mFabricIndex);
+
+    ChipLogProgress(Controller, "Storing controller credentials");
+    err = controller->mFabrics.Store(controller->mFabricIndex);
+    SuccessOrExit(err);
+
+    fabric = controller->mFabrics.FindFabricWithIndex(controller->mFabricIndex);
+    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = fabric->GetCredentials(controller->mCredentials, controller->mCertificates, controller->mRootKeyId,
+                                 controller->mCredentialsIndex);
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -264,54 +278,61 @@ exit:
     }
 }
 
-CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::FabricInfo * fabric)
+CHIP_ERROR DeviceController::GenerateLocalCredentials()
 {
-    ChipLogProgress(Controller, "Getting operational keys");
-    Crypto::P256Keypair * keypair = fabric->GetOperationalKey();
+    ChipLogProgress(Controller, "Generating new local credentials");
+    mOperationalKey.Initialize();
 
-    ReturnErrorCodeIf(keypair == nullptr, CHIP_ERROR_NO_MEMORY);
+    chip::Platform::ScopedMemoryBuffer<uint8_t> CSR;
+    size_t csrLength = kMaxCHIPCSRLength;
+    ReturnErrorCodeIf(!CSR.Alloc(csrLength), CHIP_ERROR_NO_MEMORY);
 
-    if (!fabric->AreCredentialsAvailable())
-    {
-        chip::Platform::ScopedMemoryBuffer<uint8_t> CSR;
-        size_t csrLength = kMaxCHIPCSRLength;
-        ReturnErrorCodeIf(!CSR.Alloc(csrLength), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(mOperationalKey.NewCertificateSigningRequest(CSR.Get(), csrLength));
 
-        ReturnErrorOnFailure(keypair->NewCertificateSigningRequest(CSR.Get(), csrLength));
+    ChipLogProgress(Controller, "Getting certificate chain for the controller from the issuer");
 
-        ChipLogProgress(Controller, "Getting certificate chain for the controller from the issuer");
+    // As per specifications section 11.22.5.1. Constant RESP_MAX
+    constexpr uint16_t kMaxRspLen = 900;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> csrElements;
+    ReturnErrorCodeIf(!csrElements.Alloc(kMaxRspLen), CHIP_ERROR_NO_MEMORY);
 
-        // As per specifications section 11.22.5.1. Constant RESP_MAX
-        constexpr uint16_t kMaxRspLen = 900;
-        chip::Platform::ScopedMemoryBuffer<uint8_t> csrElements;
-        ReturnErrorCodeIf(!csrElements.Alloc(kMaxRspLen), CHIP_ERROR_NO_MEMORY);
+    TLV::TLVWriter csrElementWriter;
+    TLV::TLVType containerType;
+    csrElementWriter.Init(csrElements.Get(), kMaxRspLen);
+    ReturnErrorOnFailure(csrElementWriter.StartContainer(TLV::AnonymousTag, TLV::TLVType::kTLVType_Structure, containerType));
+    ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(1), ByteSpan(CSR.Get(), csrLength)));
 
-        TLV::TLVWriter csrElementWriter;
-        TLV::TLVType containerType;
-        csrElementWriter.Init(csrElements.Get(), kMaxRspLen);
-        ReturnErrorOnFailure(csrElementWriter.StartContainer(TLV::AnonymousTag, TLV::TLVType::kTLVType_Structure, containerType));
-        ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(1), ByteSpan(CSR.Get(), csrLength)));
+    // TODO - Need a mechanism to generate CSRNonce for commissioner's CSR
+    ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(2), ByteSpan()));
+    ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(3), ByteSpan()));
+    ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(4), ByteSpan()));
+    ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(5), ByteSpan()));
+    ReturnErrorOnFailure(csrElementWriter.EndContainer(containerType));
+    ReturnErrorOnFailure(csrElementWriter.Finalize());
 
-        // TODO - Need a mechanism to generate CSRNonce for commissioner's CSR
-        ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(2), ByteSpan()));
-        ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(3), ByteSpan()));
-        ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(4), ByteSpan()));
-        ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(5), ByteSpan()));
-        ReturnErrorOnFailure(csrElementWriter.EndContainer(containerType));
-        ReturnErrorOnFailure(csrElementWriter.Finalize());
+    mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(mLocalDeviceId);
+    mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(0);
 
-        mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(mLocalDeviceId);
-        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(0);
+    // TODO - Need a mechanism to generate signature for commissioner's CSR
+    ReturnErrorOnFailure(
+        mOperationalCredentialsDelegate->GenerateNOCChain(ByteSpan(csrElements.Get(), csrElementWriter.GetLengthWritten()),
+                                                          ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(), &mLocalNOCChainCallback));
 
-        // TODO - Need a mechanism to generate signature for commissioner's CSR
-        ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNOCChain(
-            ByteSpan(csrElements.Get(), csrElementWriter.GetLengthWritten()), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
-            &mLocalNOCChainCallback));
+    ChipLogProgress(Controller, "Called credentials delegate to generate credentials");
+    return CHIP_NO_ERROR;
+}
 
-        ReturnErrorOnFailure(mFabrics.Store(fabric->GetFabricIndex()));
-    }
+CHIP_ERROR DeviceController::LoadLocalCredentials()
+{
+    ChipLogProgress(Controller, "Loading local credentials for fabric %d from the storage", mFabricIndex);
+    ReturnErrorOnFailure(mFabrics.LoadFromStorage(mFabricIndex));
 
-    ChipLogProgress(Controller, "Generating credentials");
+    Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
+    ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorCodeIf(!fabric->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorCodeIf(!fabric->AreCredentialsAvailable(), CHIP_ERROR_INCORRECT_STATE);
+
     ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId, mCredentialsIndex));
 
     ChipLogProgress(Controller, "Loaded credentials successfully");

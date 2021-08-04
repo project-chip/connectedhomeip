@@ -38,7 +38,6 @@ namespace SecureMessageCodec {
  *  Attach payload header to the message and encrypt the message buffer using
  *  key from the connection state.
  *
- * @param localNodeId   Node Id of local node
  * @param state         The connection state with peer node
  * @param payloadHeader Reference to the payload header that should be inserted in
  *                      the message
@@ -50,8 +49,8 @@ namespace SecureMessageCodec {
  * @param counter       The local counter object to be used
  * @ return CHIP_ERROR  The result of the encode operation
  */
-CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, PayloadHeader & payloadHeader,
-                  PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf, MessageCounter & counter);
+CHIP_ERROR Encode(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+                  System::PacketBufferHandle & msgBuf, MessageCounter & counter);
 
 /**
  * @brief

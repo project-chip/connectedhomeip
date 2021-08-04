@@ -22,7 +22,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
-#include <app/server/StorablePeerConnection.h>
 #include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
@@ -106,107 +105,6 @@ class ServerStorageDelegate : public PersistentStorageDelegate
 ServerStorageDelegate gServerStorage;
 SessionIDAllocator gSessionIDAllocator;
 
-CHIP_ERROR PersistFabricToKVS(FabricInfo * fabric, FabricIndex nextAvailableId)
-{
-    ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogProgress(AppServer, "Persisting fabric ID %d, next available %d", fabric->GetFabricIndex(), nextAvailableId);
-
-    ReturnErrorOnFailure(GetGlobalFabricTable().Store(fabric->GetFabricIndex()));
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kFabricTableCountKey, &nextAvailableId, sizeof(nextAvailableId)));
-
-    ChipLogProgress(AppServer, "Persisting fabric ID successfully");
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR RestoreAllFabricsFromKVS(FabricTable & fabrics, FabricIndex & nextAvailableId)
-{
-    // It's not an error if the key doesn't exist. Just return right away.
-    VerifyOrReturnError(PersistedStorage::KeyValueStoreMgr().Get(kFabricTableCountKey, &nextAvailableId) == CHIP_NO_ERROR,
-                        CHIP_NO_ERROR);
-    ChipLogProgress(AppServer, "Next available fabric ID is %d", nextAvailableId);
-
-    // TODO: The fabric ID space allocation should be re-evaluated. With the current approach, the space could be
-    //       exhausted while IDs are still available (e.g. if the fabric IDs are allocated and freed over a period of time).
-    //       Also, the current approach can make ID lookup slower as more IDs are allocated and freed.
-    for (FabricIndex id = 0; id < nextAvailableId; id++)
-    {
-        // Recreate the binding if one exists in persistent storage. Else skip to the next ID
-        if (fabrics.LoadFromStorage(id) == CHIP_NO_ERROR)
-        {
-            FabricInfo * fabric = fabrics.FindFabricWithIndex(id);
-            if (fabric != nullptr)
-            {
-                ChipLogProgress(AppServer, "Found fabric pairing for %d, node ID 0x" ChipLogFormatX64, fabric->GetFabricIndex(),
-                                ChipLogValueX64(fabric->GetNodeId()));
-            }
-        }
-    }
-    ChipLogProgress(AppServer, "Restored all fabric pairings from KVS.");
-
-    return CHIP_NO_ERROR;
-}
-
-void EraseAllFabricsUpTo(FabricIndex nextAvailableId)
-{
-    PersistedStorage::KeyValueStoreMgr().Delete(kFabricTableCountKey);
-
-    for (FabricIndex id = 0; id < nextAvailableId; id++)
-    {
-        GetGlobalFabricTable().Delete(id);
-    }
-}
-
-static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr)
-{
-    uint16_t nextSessionKeyId = 0;
-    // It's not an error if the key doesn't exist. Just return right away.
-    VerifyOrReturnError(PersistedStorage::KeyValueStoreMgr().Get(kStorablePeerConnectionCountKey, &nextSessionKeyId) ==
-                            CHIP_NO_ERROR,
-                        CHIP_NO_ERROR);
-    ChipLogProgress(AppServer, "Found %d stored connections", nextSessionKeyId);
-
-    PASESession * session = chip::Platform::New<PASESession>();
-    VerifyOrReturnError(session != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
-    {
-        StorablePeerConnection connection;
-        if (CHIP_NO_ERROR == connection.FetchFromKVS(gServerStorage, keyId))
-        {
-            connection.GetPASESession(session);
-
-            ChipLogProgress(AppServer, "Fetched the session information: from 0x" ChipLogFormatX64,
-                            ChipLogValueX64(session->PeerConnection().GetPeerNodeId()));
-            if (gSessionIDAllocator.Reserve(keyId) == CHIP_NO_ERROR)
-            {
-                sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
-                                      session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
-                                      connection.GetFabricIndex());
-            }
-            else
-            {
-                ChipLogProgress(AppServer, "Session Key ID  %" PRIu16 " cannot be used. Skipping over this session", keyId);
-            }
-            session->Clear();
-        }
-    }
-
-    chip::Platform::Delete(session);
-
-    return CHIP_NO_ERROR;
-}
-
-void EraseAllSessionsUpTo(uint16_t nextSessionKeyId)
-{
-    PersistedStorage::KeyValueStoreMgr().Delete(kStorablePeerConnectionCountKey);
-
-    for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
-    {
-        gSessionIDAllocator.Free(keyId);
-        StorablePeerConnection::DeleteFromKVS(gServerStorage, keyId);
-    }
-}
-
 // TODO: The following class is setting the discriminator in Persistent Storage. This is
 //       is needed since BLE reads the discriminator using ConfigurationMgr APIs. The
 //       better solution will be to pass the discriminator to BLE without changing it
@@ -246,8 +144,7 @@ private:
 
 DeviceDiscriminatorCache gDeviceDiscriminatorCache;
 FabricTable gFabrics;
-FabricIndex gNextAvailableFabricIndex = 0;
-bool gPairingWindowOpen               = false;
+bool gPairingWindowOpen = false;
 
 class ServerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
 {
@@ -279,12 +176,6 @@ public:
         if (mDelegate != nullptr)
         {
             mDelegate->OnPairingWindowClosed();
-        }
-
-        FabricInfo * fabric = gFabrics.FindFabricWithIndex(mFabric);
-        if (fabric != nullptr)
-        {
-            ReturnErrorOnFailure(PersistFabricToKVS(fabric, gNextAvailableFabricIndex));
         }
 
         return CHIP_NO_ERROR;
@@ -389,23 +280,17 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetFabrics resetFabrics, uint16_t commissi
 
     if (resetFabrics == ResetFabrics::kYes)
     {
-        EraseAllFabricsUpTo(gNextAvailableFabricIndex);
-        EraseAllSessionsUpTo(gSessionIDAllocator.Peek());
+        gFabrics.DeleteAllFabrics();
         // Only resetting gNextAvailableFabricIndex at reboot otherwise previously paired device with fabricID 0
         // can continue sending messages to accessory as next available fabric will also be 0.
         // This logic is not up to spec, will be implemented up to spec once AddOptCert is implemented.
         gFabrics.Reset();
     }
 
-    FabricIndex fabricIndex = gNextAvailableFabricIndex;
-    FabricInfo * fabricInfo = gFabrics.AssignFabricIndex(fabricIndex);
-    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NO_MEMORY);
-    gNextAvailableFabricIndex++;
-
     ReturnErrorOnFailure(gRendezvousServer.WaitForPairing(
         std::move(params), kSpake2p_Iteration_Count,
         ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), 0, &gExchangeMgr,
-        &gTransports, &gSessions, fabricInfo));
+        &gTransports, &gSessions));
 
     if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
@@ -426,13 +311,8 @@ CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t commissioningTimeoutSeconds, 
     gAdvDelegate.SetBLE(false);
     params.SetPASEVerifier(verifier).SetAdvertisementDelegate(&gAdvDelegate);
 
-    FabricIndex fabricIndex = gNextAvailableFabricIndex;
-    FabricInfo * fabricInfo = gFabrics.AssignFabricIndex(fabricIndex);
-    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NO_MEMORY);
-    gNextAvailableFabricIndex++;
-
-    ReturnErrorOnFailure(gRendezvousServer.WaitForPairing(std::move(params), iterations, salt, passcodeID, &gExchangeMgr,
-                                                          &gTransports, &gSessions, fabricInfo));
+    ReturnErrorOnFailure(
+        gRendezvousServer.WaitForPairing(std::move(params), iterations, salt, passcodeID, &gExchangeMgr, &gTransports, &gSessions));
 
     if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
     {
@@ -475,7 +355,7 @@ void InitServer(AppDelegate * delegate)
     PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 #endif
 
-    err = gRendezvousServer.Init(delegate, &gServerStorage, &gSessionIDAllocator);
+    err = gRendezvousServer.Init(delegate, &gSessionIDAllocator);
     SuccessOrExit(err);
 
     gAdvDelegate.SetDelegate(delegate);
@@ -524,13 +404,6 @@ void InitServer(AppDelegate * delegate)
         // If the network is already provisioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Network already provisioned. Disabling BLE advertisement");
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
-
-        // Restore any previous fabric pairings
-        VerifyOrExit(CHIP_NO_ERROR == RestoreAllFabricsFromKVS(gFabrics, gNextAvailableFabricIndex),
-                     ChipLogError(AppServer, "Could not restore fabric table"));
-
-        VerifyOrExit(CHIP_NO_ERROR == RestoreAllSessionsFromKVS(gSessions),
-                     ChipLogError(AppServer, "Could not restore previous sessions"));
     }
     else
     {
@@ -618,25 +491,15 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress com
 CHIP_ERROR AddTestPairing()
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
-    FabricInfo * fabricInfo   = nullptr;
     PASESession * testSession = nullptr;
     PASESessionSerializable serializedTestSession;
 
-    for (const FabricInfo & fabric : gFabrics)
-        if (fabric.IsInitialized() && fabric.GetNodeId() == chip::kTestDeviceNodeId)
-            ExitNow();
-
-    fabricInfo = gFabrics.AssignFabricIndex(gNextAvailableFabricIndex);
-    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    fabricInfo->SetNodeId(chip::kTestDeviceNodeId);
     gTestPairing.ToSerializable(serializedTestSession);
 
     testSession = chip::Platform::New<PASESession>();
     testSession->FromSerializable(serializedTestSession);
     SuccessOrExit(err = gSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             testSession, SecureSession::SessionRole::kResponder, gNextAvailableFabricIndex));
-    ++gNextAvailableFabricIndex;
+                                             testSession, SecureSession::SessionRole::kResponder, kMinValidFabricIndex));
 
 exit:
     if (testSession)
@@ -645,9 +508,8 @@ exit:
         chip::Platform::Delete(testSession);
     }
 
-    if (err != CHIP_NO_ERROR && fabricInfo != nullptr)
-        gFabrics.ReleaseFabricIndex(gNextAvailableFabricIndex);
-
+    if (err != CHIP_NO_ERROR)
+        gFabrics.ReleaseFabricIndex(kMinValidFabricIndex);
     return err;
 }
 

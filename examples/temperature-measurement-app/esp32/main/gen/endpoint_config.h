@@ -442,7 +442,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (39)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (35)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -489,17 +489,13 @@
             { 0x003C, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RevokeCommissioning */                                         \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
-            { 0x003E, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* SetFabric */                                                   \
-            { 0x003E, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* SetFabricResponse */                                           \
             { 0x003E, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* OpCSRRequest */                                                \
             { 0x003E, 0x05, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* OpCSRResponse */                                               \
             { 0x003E, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddNOC */                                                      \
             { 0x003E, 0x08, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* NOCResponse */                                                 \
             { 0x003E, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* UpdateFabricLabel */                                           \
             { 0x003E, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveFabric */                                                \
-            { 0x003E, 0x0B, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveAllFabrics */                                            \
-            { 0x003E, 0xA1, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddTrustedRootCertificate */                                   \
-            { 0x003E, 0xA2, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveTrustedRootCertificate */                                \
+            { 0x003E, 0x0B, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddTrustedRootCertificate */                                   \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.

@@ -15963,16 +15963,6 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
 bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(chip::EndpointId endpoint,
                                                                          chip::app::CommandHandler * commandObj);
 /**
- * @brief  Cluster SetFabric Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                           uint16_t VendorId);
-/**
- * @brief  Cluster SetFabricResponse Command callback (from server)
- */
-bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                   chip::FabricId FabricId);
-/**
  * @brief  Cluster OpCSRRequest Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
@@ -15989,6 +15979,11 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(chip::EndpointId endpoin
                                                         chip::ByteSpan NOCArray, chip::ByteSpan IPKValue,
                                                         chip::NodeId CaseAdminNode, uint16_t AdminVendorId);
 /**
+ * @brief  Cluster UpdateNOC Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterUpdateNOCCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                           chip::ByteSpan NOCArray);
+/**
  * @brief  Cluster NOCResponse Command callback (from server)
  */
 bool emberAfOperationalCredentialsClusterNOCResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
@@ -16002,12 +15997,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::Endpoin
  * @brief  Cluster RemoveFabric Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                              chip::FabricId FabricId, chip::NodeId NodeId, uint16_t VendorId);
-/**
- * @brief  Cluster RemoveAllFabrics Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::EndpointId endpoint,
-                                                                  chip::app::CommandHandler * commandObj);
+                                                              uint8_t FabricIndex);
 /**
  * @brief  Cluster AddTrustedRootCertificate Command callback (from client)
  */

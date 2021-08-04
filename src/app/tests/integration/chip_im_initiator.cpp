@@ -552,8 +552,6 @@ int main(int argc, char * argv[])
     std::unique_lock<std::mutex> lock(mutex);
     MockInteractionModelApp mockDelegate;
     chip::Transport::FabricTable fabrics;
-    chip::Transport::FabricInfo * fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, chip::kTestControllerNodeId);
-    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     if (argc <= 1)
     {

@@ -336,8 +336,10 @@ protected:
 
     void PersistNextKeyId();
 
-    FabricIndex mFabricIndex = 0;
+    FabricIndex mFabricIndex = 1;
     Transport::FabricTable mFabrics;
+
+    Crypto::P256Keypair mOperationalKey;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
@@ -367,7 +369,9 @@ private:
 
     void ReleaseAllDevices();
 
-    CHIP_ERROR LoadLocalCredentials(Transport::FabricInfo * fabric);
+    CHIP_ERROR LoadLocalCredentials();
+
+    CHIP_ERROR GenerateLocalCredentials();
 
     static void OnLocalNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                           const ByteSpan & rcac);

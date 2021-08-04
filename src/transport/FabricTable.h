@@ -42,6 +42,7 @@ namespace chip {
 namespace Transport {
 
 static constexpr FabricIndex kUndefinedFabricIndex    = UINT8_MAX;
+static constexpr FabricIndex kMinValidFabricIndex     = 1;
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 // KVS store is sensitive to length of key strings, based on the underlying
@@ -70,7 +71,11 @@ struct AccessControlList
 class DLL_EXPORT FabricInfo
 {
 public:
-    FabricInfo() { Reset(); }
+    FabricInfo()
+    {
+        Reset();
+        mFabric = kUndefinedFabricIndex;
+    }
 
     // Returns a pointer to a null terminated char array
     const uint8_t * GetFabricLabel() const { return Uint8::from_const_char(mFabricLabel); };
@@ -89,14 +94,10 @@ public:
         ReleaseNOCCert();
     }
 
-    NodeId GetNodeId() const { return mNodeId; }
-    void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
-
-    FabricId GetFabricId() const { return mFabricId; }
-    void SetFabricId(FabricId fabricId) { mFabricId = fabricId; }
+    NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
+    FabricId GetFabricId() const { return mOperationalId.GetFabricId(); }
 
     FabricIndex GetFabricIndex() const { return mFabric; }
-    void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
 
     uint16_t GetVendorId() const { return mVendorId; }
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
@@ -115,7 +116,7 @@ public:
         }
         return mOperationalKey;
     }
-    CHIP_ERROR SetOperationalKey(const Crypto::P256Keypair & key);
+    CHIP_ERROR SetOperationalKey(const Crypto::P256Keypair * key);
 
     bool AreCredentialsAvailable() const
     {
@@ -145,24 +146,20 @@ public:
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
     CHIP_ERROR SetOperationalCertsFromCertArray(const chip::ByteSpan & certArray);
-    CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert);
-    CHIP_ERROR SetICACert(const chip::ByteSpan & cert);
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
 
     const AccessControlList & GetACL() const { return mACL; }
     AccessControlList & GetACL() { return mACL; }
     void SetACL(const AccessControlList & acl) { mACL = acl; }
 
-    bool IsInitialized() const { return (mFabric != kUndefinedFabricIndex); }
+    bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
 
     /**
      *  Reset the state to a completely uninitialized status.
      */
     void Reset()
     {
-        mNodeId         = kUndefinedNodeId;
-        mFabric         = kUndefinedFabricIndex;
-        mFabricId       = kUndefinedFabricId;
+        mOperationalId  = PeerId();
         mVendorId       = kUndefinedVendorId;
         mFabricLabel[0] = '\0';
 
@@ -178,8 +175,8 @@ public:
     friend class FabricTable;
 
 private:
-    NodeId mNodeId                                      = kUndefinedNodeId;
-    FabricId mFabricId                                  = kUndefinedFabricId;
+    PeerId mOperationalId;
+
     FabricIndex mFabric                                 = kUndefinedFabricIndex;
     uint16_t mVendorId                                  = kUndefinedVendorId;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
@@ -207,6 +204,11 @@ private:
     CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate * kvs);
     CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, FabricIndex id);
+
+    void SetOperationalId(PeerId id) { mOperationalId = id; }
+
+    CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert);
+    CHIP_ERROR SetICACert(const chip::ByteSpan & cert);
 
     void ReleaseNOCCert();
     void ReleaseICACert();
@@ -324,19 +326,18 @@ private:
 class DLL_EXPORT FabricTable
 {
 public:
+    FabricTable() { Reset(); }
     CHIP_ERROR Store(FabricIndex id);
     CHIP_ERROR LoadFromStorage(FabricIndex id);
+
     CHIP_ERROR Delete(FabricIndex id);
+    void DeleteAllFabrics();
 
-    FabricInfo * AssignFabricIndex(FabricIndex fabricId);
-
-    FabricInfo * AssignFabricIndex(FabricIndex fabricId, NodeId nodeId);
+    CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex & assignedIndex);
 
     void ReleaseFabricIndex(FabricIndex fabricId);
 
     FabricInfo * FindFabricWithIndex(FabricIndex fabricId);
-
-    FabricInfo * FindFabricForNode(FabricId fabricId, NodeId nodeId = kUndefinedNodeId, uint16_t vendorId = kUndefinedVendorId);
 
     void Reset();
 
@@ -350,17 +351,6 @@ public:
     }
     ConstFabricIterator begin() const { return cbegin(); }
     ConstFabricIterator end() const { return cend(); }
-
-    uint8_t GetFabricIndex(FabricInfo * fabric) const
-    {
-        std::ptrdiff_t diff = reinterpret_cast<const uint8_t *>(fabric) - reinterpret_cast<const uint8_t *>(&mStates[0]);
-        assert(diff >= 0);
-        assert(static_cast<size_t>(diff) % sizeof(FabricInfo) == 0);
-        auto index = static_cast<size_t>(diff) / sizeof(FabricInfo);
-        assert(index < CHIP_CONFIG_MAX_DEVICE_ADMINS);
-        assert(index < UINT8_MAX);
-        return static_cast<uint8_t>(index);
-    }
 
 private:
     FabricInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];

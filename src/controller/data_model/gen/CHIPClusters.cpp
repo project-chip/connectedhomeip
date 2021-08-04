@@ -8296,49 +8296,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR OperationalCredentialsCluster::RemoveAllFabrics(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    app::CommandSender * sender = nullptr;
-    TLV::TLVWriter * writer     = nullptr;
-    uint8_t argSeqNumber        = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         OperationalCredentials::Commands::Ids::RemoveAllFabrics,
-                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
-
-    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    // Command takes no arguments.
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
-
-    err = mDevice->SendCommands(sender);
-
-exit:
-    // On error, we are responsible to close the sender.
-    if (err != CHIP_NO_ERROR && sender != nullptr)
-    {
-        sender->Shutdown();
-    }
-    return err;
-}
-
 CHIP_ERROR OperationalCredentialsCluster::RemoveFabric(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, chip::FabricId fabricId,
-                                                       chip::NodeId nodeId, uint16_t vendorId)
+                                                       Callback::Cancelable * onFailureCallback, uint8_t fabricIndex)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -8360,12 +8319,8 @@ CHIP_ERROR OperationalCredentialsCluster::RemoveFabric(Callback::Cancelable * on
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // fabricId: fabricId
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), fabricId));
-    // nodeId: nodeId
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), nodeId));
-    // vendorId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
+    // fabricIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), fabricIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -8426,47 +8381,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR OperationalCredentialsCluster::SetFabric(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint16_t vendorId)
-{
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    app::CommandSender * sender = nullptr;
-    TLV::TLVWriter * writer     = nullptr;
-    uint8_t argSeqNumber        = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OperationalCredentials::Commands::Ids::SetFabric,
-                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
-
-    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // vendorId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
-
-    err = mDevice->SendCommands(sender);
-
-exit:
-    // On error, we are responsible to close the sender.
-    if (err != CHIP_NO_ERROR && sender != nullptr)
-    {
-        sender->Shutdown();
-    }
-    return err;
-}
-
 CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, chip::ByteSpan label)
 {
@@ -8492,6 +8406,47 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // label: charString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), label));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::UpdateNOC(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, chip::ByteSpan nOCArray)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OperationalCredentials::Commands::Ids::UpdateNOC,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // nOCArray: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), nOCArray));
 
     SuccessOrExit(err = sender->FinishCommand());
 
