@@ -519,8 +519,6 @@ ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTa
     {
         return ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT);
     }
-    // This function is not called and should not be called on CHIP thread, thus we need to acquire a lock for posting tasks.
-    StackLock lock;
     PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext));
     return ChipError::AsInteger(CHIP_NO_ERROR);
 }
