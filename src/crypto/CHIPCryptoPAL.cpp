@@ -608,7 +608,8 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id, MutableByteSpan & out_compressed_fabric_id)
+CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id,
+                                      MutableByteSpan & out_compressed_fabric_id)
 {
     constexpr uint8_t kUncompressedPointMarker = 0x04;
     if ((root_public_key.Length() != kP256_PublicKey_Length) || (root_public_key.ConstBytes()[0] != kUncompressedPointMarker))
@@ -622,7 +623,7 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
 
     // Ensure proper endianness for Fabric ID (i.e. big-endian as it appears in certificates)
     uint8_t fabric_id_as_big_endian_salt[sizeof(uint64_t)];
-    chip::Encoding::BigEndian::BufferWriter big_endian_writer(MutableByteSpan{fabric_id_as_big_endian_salt});
+    chip::Encoding::BigEndian::BufferWriter big_endian_writer(MutableByteSpan{ fabric_id_as_big_endian_salt });
     big_endian_writer.Put64(fabric_id);
 
     // Compute Compressed fabric reference per spec pseudocode
@@ -636,15 +637,15 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
     // NOTE: len=64 bits is implied by output buffer size when calling HKDF_sha::HKDF_SHA256.
 
     constexpr uint8_t kCompressedFabricInfo[16] = /* "CompressedFabric" */
-        { 0x43, 0x6f, 0x6d, 0x70, 0x72, 0x65, 0x73, 0x73,
-          0x65, 0x64, 0x46, 0x61, 0x62, 0x72, 0x69, 0x63 };
+        { 0x43, 0x6f, 0x6d, 0x70, 0x72, 0x65, 0x73, 0x73, 0x65, 0x64, 0x46, 0x61, 0x62, 0x72, 0x69, 0x63 };
     HKDF_sha hkdf;
 
     // Must drop uncompressed point form format specifier (first byte), per spec method
     ByteSpan input_key_span(root_public_key.ConstBytes() + 1, root_public_key.Length() - 1);
 
-    CHIP_ERROR status = hkdf.HKDF_SHA256(input_key_span.data(), input_key_span.size(), &fabric_id_as_big_endian_salt[0], sizeof(fabric_id_as_big_endian_salt),
-                                   &kCompressedFabricInfo[0], sizeof(kCompressedFabricInfo), out_compressed_fabric_id.data(), sizeof(uint64_t));
+    CHIP_ERROR status = hkdf.HKDF_SHA256(input_key_span.data(), input_key_span.size(), &fabric_id_as_big_endian_salt[0],
+                                         sizeof(fabric_id_as_big_endian_salt), &kCompressedFabricInfo[0],
+                                         sizeof(kCompressedFabricInfo), out_compressed_fabric_id.data(), sizeof(uint64_t));
 
     // Resize output to final bounds on success
     if (status == CHIP_NO_ERROR)

@@ -157,12 +157,12 @@ class ECPKey
 {
 public:
     virtual ~ECPKey() {}
-    virtual SupportedECPKeyTypes Type() const     = 0;
-    virtual size_t Length() const                 = 0;
-    virtual operator const uint8_t *() const      = 0;
-    virtual operator uint8_t *()                  = 0;
-    virtual const uint8_t * ConstBytes() const    = 0;
-    virtual uint8_t * Bytes()                     = 0;
+    virtual SupportedECPKeyTypes Type() const  = 0;
+    virtual size_t Length() const              = 0;
+    virtual operator const uint8_t *() const   = 0;
+    virtual operator uint8_t *()               = 0;
+    virtual const uint8_t * ConstBytes() const = 0;
+    virtual uint8_t * Bytes()                  = 0;
 
     virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const
     {
@@ -242,6 +242,7 @@ public:
                                             const P256ECDSASignature & signature) const override;
     CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, size_t hash_length,
                                              const P256ECDSASignature & signature) const override;
+
 private:
     uint8_t bytes[kP256_PublicKey_Length];
 };
@@ -1137,7 +1138,8 @@ private:
  * @param[out] out_compressed_fabric_id Span where output will be written. Its size must be >= 8.
  * @returns a CHIP_ERROR (see above) on failure or CHIP_NO_ERROR otherwise.
  */
-CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id, MutableByteSpan & out_compressed_fabric_id);
+CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id,
+                                      MutableByteSpan & out_compressed_fabric_id);
 
 /** @brief Safely clears the first `len` bytes of memory area `buf`.
  * @param buf Pointer to a memory buffer holding secret data that must be cleared.
