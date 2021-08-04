@@ -274,7 +274,7 @@ public:
     template <typename T>
     static constexpr bool CanEncapsulate()
     {
-        return std::numeric_limits<typename std::make_unsigned<T>::type>::digits <= kValueLength;
+        return std::numeric_limits<typename std::make_unsigned_t<T>>::digits <= kValueLength;
     }
 
     /**
@@ -369,6 +369,26 @@ private:
     {
         return MakeInteger(Range::kSDK, MakeField(kSdkPartStart, to_underlying(part)) | MakeField(kSdkCodeStart, code));
     }
+    template <unsigned int START, unsigned int LENGTH>
+    struct MaskConstant
+    {
+        static constexpr StorageType value = ((1u << LENGTH) - 1) << START;
+    };
+
+    // Assert that Range and Value fields fit in StorageType and don't overlap.
+    static_assert(kRangeStart + kRangeLength <= std::numeric_limits<StorageType>::digits, "Range does not fit in StorageType");
+    static_assert(kValueStart + kValueLength <= std::numeric_limits<StorageType>::digits, "Value does not fit in StorageType");
+    static_assert((MaskConstant<kRangeStart, kRangeLength>::value & MaskConstant<kValueStart, kValueLength>::value) == 0,
+                  "Range and Value overlap");
+
+    // Assert that SDK Part and Code fields fit in SdkCode field and don't overlap.
+    static_assert(kSdkPartStart + kSdkPartLength <= kValueLength, "SdkPart does not fit in Value");
+    static_assert(kSdkCodeStart + kSdkCodeLength <= kValueLength, "SdkCode does not fit in Value");
+    static_assert((MaskConstant<kSdkPartStart, kSdkPartLength>::value & MaskConstant<kSdkCodeStart, kSdkCodeLength>::value) == 0,
+                  "SdkPart and SdkCode overlap");
+
+    // Assert that Value fits in ValueType.
+    static_assert(kValueStart + kValueLength <= std::numeric_limits<ValueType>::digits, "Value does not fit in ValueType");
 
     StorageType mError;
 
