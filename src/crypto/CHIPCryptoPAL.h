@@ -157,10 +157,12 @@ class ECPKey
 {
 public:
     virtual ~ECPKey() {}
-    virtual SupportedECPKeyTypes Type() const = 0;
-    virtual size_t Length() const             = 0;
-    virtual operator const uint8_t *() const  = 0;
-    virtual operator uint8_t *()              = 0;
+    virtual SupportedECPKeyTypes Type() const     = 0;
+    virtual size_t Length() const                 = 0;
+    virtual operator const uint8_t *() const      = 0;
+    virtual operator uint8_t *()                  = 0;
+    virtual const uint8_t * ConstBytes() const    = 0;
+    virtual uint8_t * Bytes()                     = 0;
 
     virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const
     {
@@ -220,16 +222,26 @@ typedef CapacityBoundBuffer<kMax_ECDH_Secret_Length> P256ECDHDerivedSecret;
 class P256PublicKey : public ECPKey<P256ECDSASignature>
 {
 public:
+    P256PublicKey() {}
+
+    template <size_t N>
+    constexpr P256PublicKey(const uint8_t (&raw_value)[N])
+    {
+        static_assert(N == kP256_PublicKey_Length, "Can only array-initialize from proper bounds");
+        memcpy(&bytes[0], &raw_value[0], N);
+    }
+
     SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
     size_t Length() const override { return kP256_PublicKey_Length; }
     operator uint8_t *() override { return bytes; }
     operator const uint8_t *() const override { return bytes; }
+    const uint8_t * ConstBytes() const override { return &bytes[0]; }
+    uint8_t * Bytes() override { return &bytes[0]; }
 
     CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, size_t msg_length,
                                             const P256ECDSASignature & signature) const override;
     CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, size_t hash_length,
                                              const P256ECDSASignature & signature) const override;
-
 private:
     uint8_t bytes[kP256_PublicKey_Length];
 };
@@ -1110,11 +1122,28 @@ private:
     Spake2pOpaqueContext mSpake2pContext;
 };
 
-/** @brief Clears the first `len` bytes of memory area `buf`.
- * @param buf Pointer to a memory buffer holding secret data that should be cleared.
+/**
+ * @brief Compute the compressed fabric identifier used for operational discovery service
+ *        records from a Node's root public key and Fabric ID. On success, out_compressed_fabric_id
+ *        will have a size of exactly 8.
+ *
+ * Errors are:
+ *   - CHIP_ERROR_INVALID_ARGUMENT if root_public_key is invalid
+ *   - CHIP_ERROR_BUFFER_TOO_SMALL if out_compressed_fabric_id is too small for serialization
+ *   - CHIP_ERROR_INTERNAL on any unexpected crypto errors.
+ *
+ * @param[in] root_public_key The root public key associated with the node's fabric
+ * @param[in] fabric_id The fabric ID associated with the node's fabric
+ * @param[out] out_compressed_fabric_id Span where output will be written. Its size must be >= 8.
+ * @returns a CHIP_ERROR (see above) on failure or CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id, MutableByteSpan & out_compressed_fabric_id);
+
+/** @brief Safely clears the first `len` bytes of memory area `buf`.
+ * @param buf Pointer to a memory buffer holding secret data that must be cleared.
  * @param len Specifies secret data size in bytes.
  **/
-void ClearSecretData(uint8_t * buf, uint32_t len);
+void ClearSecretData(uint8_t * buf, size_t len);
 
 typedef CapacityBoundBuffer<kMax_x509_Certificate_Length> X509DerCertificate;
 
