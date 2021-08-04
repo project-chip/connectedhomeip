@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 
+#include <mdns/MinimalMdnsServer.h>
 #include <mdns/minimal/RecordData.h>
 #include <mdns/minimal/Server.h>
 #include <mdns/minimal/records/Ptr.h>
@@ -189,6 +190,12 @@ private:
             }
         }
     }
+};
+
+struct ServerSwapper
+{
+    ServerSwapper(CheckOnlyServer * server) { chip::Mdns::GlobalMinimalMdnsServer::Instance().SetReplacementServer(server); }
+    ~ServerSwapper() { chip::Mdns::GlobalMinimalMdnsServer::Instance().SetReplacementServer(nullptr); }
 };
 
 } // namespace test

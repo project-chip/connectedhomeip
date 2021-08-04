@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#pragma once
 #include <mdns/minimal/Server.h>
 #ifdef MDNS_MINIMAL_TEST_SERVER
 #include <mdns/minimal/tests/CheckOnlyServer.h>

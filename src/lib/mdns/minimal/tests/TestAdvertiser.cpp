@@ -233,7 +233,7 @@ const nlTest sTests[] = {
 int TestAdvertiser(void)
 {
     chip::Platform::MemoryInit();
-    GlobalMinimalMdnsServer::Instance().SetReplacementServer(&server);
+    test::ServerSwapper swapper(&server);
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
     mdnsAdvertiser.Start(nullptr, CHIP_PORT);
     nlTestSuite theSuite = { "AdvertiserImplMinimal", sTests, nullptr, nullptr };
