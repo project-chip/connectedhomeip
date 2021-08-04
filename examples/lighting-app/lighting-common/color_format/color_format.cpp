@@ -21,7 +21,7 @@
 #include <math.h>
 
 // define a clamp macro to substitute the std::clamp macro which is available from C++17 onwards
-#define clamp(a, max, min) ((a) < (min) ? (min) : ((a) > (max) ? (max) : (a)))
+#define clamp(a, min, max) ((a) < (min) ? (min) : ((a) > (max) ? (max) : (a)))
 
 RgbColor_t HsvToRgb(HsvColor_t hsv)
 {
@@ -99,21 +99,24 @@ RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
 
     // Y - given brightness in 0 - 1 range
     Y = ((float) Level) / 254.0f;
-
     X = (Y / y) * x;
     Z = (Y / y) * z;
 
     // X, Y and Z input refer to a D65/2° standard illuminant.
     // sR, sG and sB (standard RGB) output range = 0 ÷ 255
     // convert XYZ to RGB - CIE XYZ to sRGB
-    r = (X * 3.2410f) - (Y * 1.5374f) - (Z * 0.4986f);
-    g = -(X * 0.9692f) + (Y * 1.8760f) + (Z * 0.0416f);
-    b = (X * 0.0556f) - (Y * 0.2040f) + (Z * 1.0570f);
+    X = X / 100.0f;
+    Y = Y / 100.0f;
+    Z = Z / 100.0f;
+
+    r = (X * 3.2406f) - (Y * 1.5372f) - (Z * 0.4986f);
+    g = -(X * 0.9689f) + (Y * 1.8758f) + (Z * 0.0415f);
+    b = (X * 0.0557f) - (Y * 0.2040f) + (Z * 1.0570f);
 
     // apply gamma 2.2 correction
-    r = r <= 0.00304f ? 12.92f * r : (1.055f) * pow(r, (1.0f / 2.4f)) - 0.055f;
-    g = g <= 0.00304f ? 12.92f * g : (1.055f) * pow(g, (1.0f / 2.4f)) - 0.055f;
-    b = b <= 0.00304f ? 12.92f * b : (1.055f) * pow(b, (1.0f / 2.4f)) - 0.055f;
+    r = (r <= 0.0031308f ? 12.92f * r : (1.055f) * pow(r, (1.0f / 2.4f)) - 0.055f);
+    g = (g <= 0.0031308f ? 12.92f * g : (1.055f) * pow(g, (1.0f / 2.4f)) - 0.055f);
+    b = (b <= 0.0031308f ? 12.92f * b : (1.055f) * pow(b, (1.0f / 2.4f)) - 0.055f);
 
     // Round off
     r = clamp(r, 0, 1);
