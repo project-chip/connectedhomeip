@@ -40,6 +40,7 @@ extern "C" {
 #include <string.h>
 
 void * pvPortCalloc(size_t num, size_t size);
+void * pvPortRealloc(void * pv, size_t size);
 
 #ifdef __cplusplus
 }

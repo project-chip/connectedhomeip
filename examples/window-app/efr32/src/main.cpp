@@ -17,7 +17,6 @@
  *    limitations under the License.
  */
 
-#include "heap_4_silabs.h"
 #include <AppConfig.h>
 #include <FreeRTOS.h>
 #include <WindowApp.h>
@@ -86,7 +85,7 @@ int main(void)
     chip::rpc::Init();
 #endif
 
-    mbedtls_platform_set_calloc_free(pvPortCalloc, vPortFree);
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-window-cover-example starting");

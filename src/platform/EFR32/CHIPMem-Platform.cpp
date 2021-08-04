@@ -126,6 +126,7 @@ void * MemoryCalloc(size_t num, size_t size)
     VERIFY_INITIALIZED();
 
     void * ptr = pvPortCalloc(num, size);
+    trackAlloc(ptr, size * num);
     return ptr;
 }
 
@@ -133,8 +134,7 @@ void * MemoryRealloc(void * p, size_t size)
 {
     VERIFY_INITIALIZED();
 
-    MemoryFree(p);
-    p = MemoryAlloc(size);
+    p = pvPortRealloc(p, size);
     return p;
 }
 

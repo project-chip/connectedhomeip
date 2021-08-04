@@ -20,7 +20,7 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
 
-  # Link options that provides replace dynamic memory operations in standard
+  # Link options that provide a replacement for dynamic memory operations in standard
   # library with the FreeRTOS malloc in platform code.
   ldflags = [
     # memory allocation -- these must be re-entrant and do locking

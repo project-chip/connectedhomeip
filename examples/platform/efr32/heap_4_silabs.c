@@ -1,53 +1,17 @@
-/***************************************************************************/
-/**
- * # License
- *
- * The licensor of this software is Silicon
- *Laboratories Inc. Your use of this software is
- *governed by the terms of Silicon Labs Master
- *Software License Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement.
- *This software is Third Party Software licensed by
- *Silicon Labs from a third party and is governed by
- *the sections of the MSLA applicable to Third Party
- * Software and the additional terms set forth below.
- *
- ******************************************************************************/
-
 /*
- * FreeRTOS Kernel V10.3.0
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * Copyright (c) 2021 Project CHIP Authors
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
- * the Software, and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
- * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * http://www.FreeRTOS.org
- * http://aws.amazon.com/freertos
- *
- * 1 tab == 4 spaces!
- */
-
-/*
- * A sample implementation of pvPortMalloc() and vPortFree() that combines
- * (coalescences) adjacent memory blocks as they are freed, and in so doing
- * limits memory fragmentation.
- *
- * See heap_1.c, heap_2.c and heap_3.c for alternative implementations, and the
- * memory management pages of http://www.FreeRTOS.org for more information.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 #include <stdlib.h>
 
@@ -128,6 +92,44 @@ member of an BlockLink_t structure is set then the block belongs to the
 application.  When the bit is free the block is still part of the free heap
 space. */
 static size_t xBlockAllocatedBit = 0;
+
+/**
+ * @brief xPortPointerSize is based on the malloc implementation of heap_4
+ * Returns the size of allocated block associated to the pointer
+ *
+ * @param pv pointer
+ * @return size_t block size
+ */
+size_t xPortPointerSize(void * pv)
+{
+    uint8_t * puc = (uint8_t *) pv;
+    BlockLink_t * pxLink;
+    void * voidp;
+    size_t sz = 0;
+
+    if (pv != NULL)
+    {
+        vTaskSuspendAll();
+        {
+            /* The memory being checked will have an BlockLink_t structure immediately
+            before it. */
+            puc -= xHeapStructSize;
+
+            /* This casting is to keep the compiler from issuing warnings. */
+            voidp  = (void *) puc;
+            pxLink = (BlockLink_t *) voidp;
+
+            /* Check if the block is actually allocated. */
+            configASSERT((pxLink->xBlockSize & xBlockAllocatedBit) != 0);
+            configASSERT(pxLink->pxNextFreeBlock == NULL);
+
+            sz = (pxLink->xBlockSize & ~xBlockAllocatedBit) - xHeapStructSize;
+        }
+        (void) xTaskResumeAll();
+    }
+
+    return sz;
+}
 
 /*-----------------------------------------------------------*/
 
@@ -292,6 +294,45 @@ void * pvPortCalloc(size_t num, size_t size)
 
     return ptr;
 }
+
+void * pvPortRealloc(void * pv, size_t size)
+{
+    void * resized_ptr  = NULL;
+    size_t current_size = xPortPointerSize(pv);
+
+    if (current_size > 0) // pv is allocated
+    {
+        if (size) // New size is not 0
+        {
+
+            if (size == current_size) // if existing pointer is the same size
+            {
+                resized_ptr = pv;
+            }
+            else // New size is a different from current size
+            {
+                resized_ptr = pvPortCalloc(1, size);
+                if (resized_ptr != NULL)
+                {
+                    int smallest_size = size < current_size ? size : current_size;
+                    memcpy(resized_ptr, pv, smallest_size);
+                }
+                vPortFree(pv);
+            }
+        }
+        else // If size if 0, free pointer
+        {
+            vPortFree(pv);
+        }
+    }
+    else // pv is not allocated, allocate a new pointer
+    {
+        resized_ptr = pvPortCalloc(1, size);
+    }
+
+    return resized_ptr;
+}
+
 /*-----------------------------------------------------------*/
 
 void vPortFree(void * pv)
@@ -301,6 +342,9 @@ void vPortFree(void * pv)
 
     if (pv != NULL)
     {
+        int size = xPortPointerSize(pv);
+        memset(pv, 0, size);
+
         /* The memory being freed will have an BlockLink_t structure immediately
         before it. */
         puc -= xHeapStructSize;
@@ -537,8 +581,7 @@ void __wrap_free(void * ptr)
 
 void * __wrap_realloc(void * ptr, size_t new_size)
 {
-    vPortFree(ptr);
-    return pvPortMalloc(new_size);
+    return pvPortRealloc(ptr, new_size);
 }
 
 void * __wrap_calloc(size_t num, size_t size)
