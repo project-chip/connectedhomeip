@@ -458,8 +458,6 @@ void CommissionableAndOperationalAdverts(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, SendQuery(instanceName) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, server.GetSendCalled());
     NL_TEST_ASSERT(inSuite, server.GetHeaderFound());
-
-    // NL_TEST_ASSERT(inSuite, true == false);
 }
 
 const nlTest sTests[] = {
