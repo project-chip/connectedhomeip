@@ -259,7 +259,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Read attribute BOOLEAN Default Value Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -296,7 +296,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Read attribute BOOLEAN True Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -333,7 +333,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Read attribute BOOLEAN False Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2210,7 +2210,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         }
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2343,7 +2343,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"read the mandatory attribute: OnOff Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2361,7 +2361,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"reads back mandatory attribute: OnOff Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2379,7 +2379,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"read LT attribute: GlobalSceneControl Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -2580,7 +2580,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2615,7 +2615,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -2650,7 +2650,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2686,7 +2686,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after toggle command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -2722,7 +2722,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after toggle command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2757,7 +2757,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -2792,7 +2792,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -3184,7 +3184,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -3637,7 +3637,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -3673,7 +3673,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -3808,7 +3808,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -3844,7 +3844,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -4053,7 +4053,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -4089,7 +4089,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -4351,7 +4351,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
