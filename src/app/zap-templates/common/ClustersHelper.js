@@ -351,7 +351,9 @@ function inlineStructItems(args)
       return;
     }
 
-    argument.items.forEach(item => { arguments.push(item); });
+    argument.items.forEach(item => {
+      arguments.push(item);
+    });
   });
 
   return arguments;
@@ -359,7 +361,11 @@ function inlineStructItems(args)
 
 function enhancedCommands(commands, types)
 {
-  commands.forEach(command => { command.arguments.forEach(argument => { enhancedItem(argument, types); }); });
+  commands.forEach(command => {
+    command.arguments.forEach(argument => {
+      enhancedItem(argument, types);
+    });
+  });
 
   commands.forEach(command => {
     command.isResponse                    = command.name.includes('Response');
