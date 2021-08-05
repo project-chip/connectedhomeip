@@ -1066,7 +1066,6 @@ void * IOThreadMain(void * arg)
     // Loop until we are told to exit.
     while (!quit.load(std::memory_order_relaxed))
     {
-        // TODO(#5556): add a timer for `sleepTime.tv_sec  = 10; sleepTime.tv_usec = 0;`
         watchState.PrepareEvents();
 
         // Unlock the stack so that Java threads can make API calls.

@@ -132,12 +132,9 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     char testHostName2[20] = "127.0.0.1";
     char testHostName3[20] = "";
     char testHostName4[260];
-    struct timeval sleepTime;
     IPAddress testDestAddr[1] = { IPAddress::Any };
     CHIP_ERROR err;
-
-    sleepTime.tv_sec  = 0;
-    sleepTime.tv_usec = 10000;
+    constexpr uint32_t kSleepTimeMilliseconds = 100;
 
     memset(testHostName4, 'w', sizeof(testHostName4));
     testHostName4[259] = '\0';
@@ -150,7 +147,7 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     {
         while (!callbackHandlerCalled)
         {
-            ServiceNetwork(sleepTime);
+            ServiceNetwork(kSleepTimeMilliseconds);
         }
     }
 
@@ -162,7 +159,7 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     {
         while (!callbackHandlerCalled)
         {
-            ServiceNetwork(sleepTime);
+            ServiceNetwork(kSleepTimeMilliseconds);
         }
     }
 
@@ -174,7 +171,7 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     {
         while (!callbackHandlerCalled)
         {
-            ServiceNetwork(sleepTime);
+            ServiceNetwork(kSleepTimeMilliseconds);
         }
     }
 
