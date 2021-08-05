@@ -15693,7 +15693,7 @@ bool emberAfPollControlClusterCheckInCallback(chip::EndpointId endpoint, chip::a
  * @brief  Cluster CheckInResponse Command callback (from client)
  */
 bool emberAfPollControlClusterCheckInResponseCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                      uint8_t startFastPolling, uint16_t fastPollTimeout);
+                                                      bool startFastPolling, uint16_t fastPollTimeout);
 /**
  * @brief  Cluster FastPollStop Command callback (from client)
  */
@@ -15731,7 +15731,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(chip::EndpointId 
                                                                uint16_t vendorId, uint16_t productId, uint16_t imageType,
                                                                uint16_t hardwareVersion, uint32_t currentVersion,
                                                                uint8_t protocolsSupported, uint8_t * location,
-                                                               uint8_t requestorCanConsent, chip::ByteSpan metadataForProvider);
+                                                               bool requestorCanConsent, chip::ByteSpan metadataForProvider);
 /**
  * @brief  Cluster ApplyUpdateRequest Command callback (from client)
  */
@@ -15751,8 +15751,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::End
                                                                        chip::app::CommandSender * commandObj, uint8_t status,
                                                                        uint32_t delayedActionTime, uint8_t * imageURI,
                                                                        uint32_t softwareVersion, chip::ByteSpan updateToken,
-                                                                       uint8_t userConsentNeeded,
-                                                                       chip::ByteSpan metadataForRequestor);
+                                                                       bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 /**
  * @brief  Cluster ApplyUpdateRequestResponse Command callback (from server)
  */
@@ -16607,13 +16606,13 @@ bool emberAfIasAceClusterGetBypassedZoneListCallback(chip::EndpointId endpoint, 
  * @brief  Cluster GetZoneStatusResponse Command callback (from server)
  */
 bool emberAfIasAceClusterGetZoneStatusResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                       uint8_t zoneStatusComplete, uint8_t numberOfZones,
+                                                       bool zoneStatusComplete, uint8_t numberOfZones,
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * zoneStatusResult);
 /**
  * @brief  Cluster GetZoneStatus Command callback (from client)
  */
 bool emberAfIasAceClusterGetZoneStatusCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                               uint8_t startingZoneId, uint8_t maxNumberOfZoneIds, uint8_t zoneStatusMaskFlag,
+                                               uint8_t startingZoneId, uint8_t maxNumberOfZoneIds, bool zoneStatusMaskFlag,
                                                uint16_t zoneStatusMask);
 /**
  * @brief  Cluster StartWarning Command callback (from client)
@@ -16790,7 +16789,7 @@ bool emberAfKeypadInputClusterSendKeyResponseCallback(chip::EndpointId endpoint,
  * @brief  Cluster LaunchContent Command callback (from client)
  */
 bool emberAfContentLauncherClusterLaunchContentCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                        uint8_t autoPlay, uint8_t * data);
+                                                        bool autoPlay, uint8_t * data);
 /**
  * @brief  Cluster LaunchContentResponse Command callback (from server)
  */

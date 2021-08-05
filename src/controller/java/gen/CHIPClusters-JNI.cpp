@@ -4792,7 +4792,7 @@ public:
     };
 
     static void CallbackFn(void * context, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-                           chip::ByteSpan updateToken, uint8_t userConsentNeeded, chip::ByteSpan metadataForRequestor)
+                           chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4814,7 +4814,7 @@ public:
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
         err =
-            JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(JLjava/lang/String;J[BI[B)V", &javaMethod);
+            JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(JLjava/lang/String;J[BZ[B)V", &javaMethod);
         SuccessOrExit(err);
 
         updateTokenArr = env->NewByteArray(updateToken.size());
@@ -4830,7 +4830,7 @@ public:
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(delayedActionTime), imageURIStr.jniValue(),
-                            static_cast<jlong>(softwareVersion), updateTokenArr, static_cast<jint>(userConsentNeeded),
+                            static_cast<jlong>(softwareVersion), updateTokenArr, static_cast<jboolean>(userConsentNeeded),
                             metadataForRequestorArr);
 
         env->DeleteLocalRef(updateTokenArr);
@@ -6513,17 +6513,17 @@ public:
                 Zcl,
                 "Could not find class chip/devicecontroller/ChipClusters$GeneralDiagnosticsCluster$NetworkInterfacesAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "([BIII[BI)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "([BZZZ[BI)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find NetworkInterfacesAttribute constructor"));
 
         for (uint16_t i = 0; i < count; i++)
         {
             jbyteArray name = env->NewByteArray(entries[i].Name.size());
             env->SetByteArrayRegion(name, 0, entries[i].Name.size(), reinterpret_cast<const jbyte *>(entries[i].Name.data()));
-            jint fabricConnected                 = entries[i].FabricConnected;
-            jint offPremiseServicesReachableIPv4 = entries[i].OffPremiseServicesReachableIPv4;
-            jint offPremiseServicesReachableIPv6 = entries[i].OffPremiseServicesReachableIPv6;
-            jbyteArray hardwareAddress           = env->NewByteArray(entries[i].HardwareAddress.size());
+            jboolean fabricConnected                 = entries[i].FabricConnected;
+            jboolean offPremiseServicesReachableIPv4 = entries[i].OffPremiseServicesReachableIPv4;
+            jboolean offPremiseServicesReachableIPv6 = entries[i].OffPremiseServicesReachableIPv6;
+            jbyteArray hardwareAddress               = env->NewByteArray(entries[i].HardwareAddress.size());
             env->SetByteArrayRegion(hardwareAddress, 0, entries[i].HardwareAddress.size(),
                                     reinterpret_cast<const jbyte *>(entries[i].HardwareAddress.data()));
             jint type = entries[i].Type;
@@ -7344,25 +7344,25 @@ public:
                          "Could not find class "
                          "chip/devicecontroller/ChipClusters$ThreadNetworkDiagnosticsCluster$NeighborTableListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(JJIJJIIIIIIIII)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(JJIJJIIIIIZZZZ)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find NeighborTableListAttribute constructor"));
 
         for (uint16_t i = 0; i < count; i++)
         {
-            jlong extAddress       = entries[i].ExtAddress;
-            jlong age              = entries[i].Age;
-            jint rloc16            = entries[i].Rloc16;
-            jlong linkFrameCounter = entries[i].LinkFrameCounter;
-            jlong mleFrameCounter  = entries[i].MleFrameCounter;
-            jint lqi               = entries[i].LQI;
-            jint averageRssi       = entries[i].AverageRssi;
-            jint lastRssi          = entries[i].LastRssi;
-            jint frameErrorRate    = entries[i].FrameErrorRate;
-            jint messageErrorRate  = entries[i].MessageErrorRate;
-            jint rxOnWhenIdle      = entries[i].RxOnWhenIdle;
-            jint fullThreadDevice  = entries[i].FullThreadDevice;
-            jint fullNetworkData   = entries[i].FullNetworkData;
-            jint isChild           = entries[i].IsChild;
+            jlong extAddress          = entries[i].ExtAddress;
+            jlong age                 = entries[i].Age;
+            jint rloc16               = entries[i].Rloc16;
+            jlong linkFrameCounter    = entries[i].LinkFrameCounter;
+            jlong mleFrameCounter     = entries[i].MleFrameCounter;
+            jint lqi                  = entries[i].LQI;
+            jint averageRssi          = entries[i].AverageRssi;
+            jint lastRssi             = entries[i].LastRssi;
+            jint frameErrorRate       = entries[i].FrameErrorRate;
+            jint messageErrorRate     = entries[i].MessageErrorRate;
+            jboolean rxOnWhenIdle     = entries[i].RxOnWhenIdle;
+            jboolean fullThreadDevice = entries[i].FullThreadDevice;
+            jboolean fullNetworkData  = entries[i].FullNetworkData;
+            jboolean isChild          = entries[i].IsChild;
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, extAddress, age, rloc16, linkFrameCounter,
                                                   mleFrameCounter, lqi, averageRssi, lastRssi, frameErrorRate, messageErrorRate,
@@ -7442,21 +7442,21 @@ public:
                 Zcl,
                 "Could not find class chip/devicecontroller/ChipClusters$ThreadNetworkDiagnosticsCluster$RouteTableListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(JIIIIIIIII)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(JIIIIIIIZZ)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find RouteTableListAttribute constructor"));
 
         for (uint16_t i = 0; i < count; i++)
         {
-            jlong extAddress     = entries[i].ExtAddress;
-            jint rloc16          = entries[i].Rloc16;
-            jint routerId        = entries[i].RouterId;
-            jint nextHop         = entries[i].NextHop;
-            jint pathCost        = entries[i].PathCost;
-            jint lQIIn           = entries[i].LQIIn;
-            jint lQIOut          = entries[i].LQIOut;
-            jint age             = entries[i].Age;
-            jint allocated       = entries[i].Allocated;
-            jint linkEstablished = entries[i].LinkEstablished;
+            jlong extAddress         = entries[i].ExtAddress;
+            jint rloc16              = entries[i].Rloc16;
+            jint routerId            = entries[i].RouterId;
+            jint nextHop             = entries[i].NextHop;
+            jint pathCost            = entries[i].PathCost;
+            jint lQIIn               = entries[i].LQIIn;
+            jint lQIOut              = entries[i].LQIOut;
+            jint age                 = entries[i].Age;
+            jboolean allocated       = entries[i].Allocated;
+            jboolean linkEstablished = entries[i].LinkEstablished;
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, extAddress, rloc16, routerId, nextHop, pathCost,
                                                   lQIIn, lQIOut, age, allocated, linkEstablished);
@@ -7621,24 +7621,24 @@ public:
                 "Could not find class "
                 "chip/devicecontroller/ChipClusters$ThreadNetworkDiagnosticsCluster$OperationalDatasetComponentsAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(IIIIIIIIIIII)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(ZZZZZZZZZZZZ)V");
         VerifyOrReturn(attributeCtor != nullptr,
                        ChipLogError(Zcl, "Could not find OperationalDatasetComponentsAttribute constructor"));
 
         for (uint16_t i = 0; i < count; i++)
         {
-            jint activeTimestampPresent  = entries[i].ActiveTimestampPresent;
-            jint pendingTimestampPresent = entries[i].PendingTimestampPresent;
-            jint masterKeyPresent        = entries[i].MasterKeyPresent;
-            jint networkNamePresent      = entries[i].NetworkNamePresent;
-            jint extendedPanIdPresent    = entries[i].ExtendedPanIdPresent;
-            jint meshLocalPrefixPresent  = entries[i].MeshLocalPrefixPresent;
-            jint delayPresent            = entries[i].DelayPresent;
-            jint panIdPresent            = entries[i].PanIdPresent;
-            jint channelPresent          = entries[i].ChannelPresent;
-            jint pskcPresent             = entries[i].PskcPresent;
-            jint securityPolicyPresent   = entries[i].SecurityPolicyPresent;
-            jint channelMaskPresent      = entries[i].ChannelMaskPresent;
+            jboolean activeTimestampPresent  = entries[i].ActiveTimestampPresent;
+            jboolean pendingTimestampPresent = entries[i].PendingTimestampPresent;
+            jboolean masterKeyPresent        = entries[i].MasterKeyPresent;
+            jboolean networkNamePresent      = entries[i].NetworkNamePresent;
+            jboolean extendedPanIdPresent    = entries[i].ExtendedPanIdPresent;
+            jboolean meshLocalPrefixPresent  = entries[i].MeshLocalPrefixPresent;
+            jboolean delayPresent            = entries[i].DelayPresent;
+            jboolean panIdPresent            = entries[i].PanIdPresent;
+            jboolean channelPresent          = entries[i].ChannelPresent;
+            jboolean pskcPresent             = entries[i].PskcPresent;
+            jboolean securityPolicyPresent   = entries[i].SecurityPolicyPresent;
+            jboolean channelMaskPresent      = entries[i].ChannelMaskPresent;
 
             jobject attributeObj =
                 env->NewObject(attributeClass, attributeCtor, activeTimestampPresent, pendingTimestampPresent, masterKeyPresent,
@@ -9910,7 +9910,7 @@ JNI_METHOD(void, BasicCluster, readLocalConfigDisabledAttribute)(JNIEnv * env, j
 }
 
 JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
@@ -10067,7 +10067,7 @@ JNI_METHOD(void, BinaryInputBasicCluster, readOutOfServiceAttribute)(JNIEnv * en
 }
 
 JNI_METHOD(void, BinaryInputBasicCluster, writeOutOfServiceAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
@@ -10142,7 +10142,7 @@ JNI_METHOD(void, BinaryInputBasicCluster, readPresentValueAttribute)(JNIEnv * en
 }
 
 JNI_METHOD(void, BinaryInputBasicCluster, writePresentValueAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
@@ -14327,7 +14327,7 @@ JNI_METHOD(jlong, ContentLauncherCluster, initWithDevice)(JNIEnv * env, jobject 
 }
 
 JNI_METHOD(void, ContentLauncherCluster, launchContent)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint autoPlay, jstring data)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean autoPlay, jstring data)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -20193,7 +20193,7 @@ exit:
 }
 JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, queryImage)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint vendorId, jint productId, jint imageType,
- jint hardwareVersion, jlong currentVersion, jint protocolsSupported, jstring location, jint requestorCanConsent,
+ jint hardwareVersion, jlong currentVersion, jint protocolsSupported, jstring location, jboolean requestorCanConsent,
  jbyteArray metadataForProvider)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23974,7 +23974,7 @@ JNI_METHOD(void, TestClusterCluster, readBooleanAttribute)(JNIEnv * env, jobject
 }
 
 JNI_METHOD(void, TestClusterCluster, writeBooleanAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
@@ -25520,7 +25520,7 @@ JNI_METHOD(void, TestClusterCluster, readUnsupportedAttribute)(JNIEnv * env, job
 }
 
 JNI_METHOD(void, TestClusterCluster, writeUnsupportedAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jboolean value)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);

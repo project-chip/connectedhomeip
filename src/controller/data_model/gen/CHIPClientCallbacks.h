@@ -158,7 +158,7 @@ typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallbac
                                                                                    uint32_t delayedActionTime);
 typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(void * context, uint32_t delayedActionTime,
                                                                            uint8_t * imageURI, uint32_t softwareVersion,
-                                                                           chip::ByteSpan updateToken, uint8_t userConsentNeeded,
+                                                                           chip::ByteSpan updateToken, bool userConsentNeeded,
                                                                            chip::ByteSpan metadataForRequestor);
 typedef void (*OperationalCredentialsClusterNOCResponseCallback)(void * context, uint8_t StatusCode, uint8_t FabricIndex,
                                                                  chip::ByteSpan DebugText);
