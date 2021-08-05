@@ -1165,7 +1165,7 @@ CHIP_ERROR BasicCluster::ReadAttributeLocalConfigDisabled(Callback::Cancelable *
 }
 
 CHIP_ERROR BasicCluster::WriteAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint8_t localConfigDisabled)
+                                                           Callback::Cancelable * onFailureCallback, bool localConfigDisabled)
 {
     COMMAND_HEADER("WriteBasicLocalConfigDisabled", Basic::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -1223,7 +1223,7 @@ CHIP_ERROR BinaryInputBasicCluster::ReadAttributeOutOfService(Callback::Cancelab
 }
 
 CHIP_ERROR BinaryInputBasicCluster::WriteAttributeOutOfService(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint8_t outOfService)
+                                                               Callback::Cancelable * onFailureCallback, bool outOfService)
 {
     COMMAND_HEADER("WriteBinaryInputBasicOutOfService", BinaryInputBasic::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -1248,7 +1248,7 @@ CHIP_ERROR BinaryInputBasicCluster::ReadAttributePresentValue(Callback::Cancelab
 }
 
 CHIP_ERROR BinaryInputBasicCluster::WriteAttributePresentValue(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint8_t presentValue)
+                                                               Callback::Cancelable * onFailureCallback, bool presentValue)
 {
     COMMAND_HEADER("WriteBinaryInputBasicPresentValue", BinaryInputBasic::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -3504,7 +3504,7 @@ CHIP_ERROR ColorControlCluster::ReadAttributeClusterRevision(Callback::Cancelabl
 
 // ContentLauncher Cluster Commands
 CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t autoPlay, chip::ByteSpan data)
+                                                 bool autoPlay, chip::ByteSpan data)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -7615,7 +7615,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
                                                         Callback::Cancelable * onFailureCallback, uint16_t vendorId,
                                                         uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
                                                         uint32_t currentVersion, uint8_t protocolsSupported,
-                                                        chip::ByteSpan location, uint8_t requestorCanConsent,
+                                                        chip::ByteSpan location, bool requestorCanConsent,
                                                         chip::ByteSpan metadataForProvider)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
@@ -9962,7 +9962,7 @@ CHIP_ERROR TestClusterCluster::ReadAttributeBoolean(Callback::Cancelable * onSuc
 }
 
 CHIP_ERROR TestClusterCluster::WriteAttributeBoolean(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint8_t boolean)
+                                                     Callback::Cancelable * onFailureCallback, bool boolean)
 {
     COMMAND_HEADER("WriteTestClusterBoolean", TestCluster::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -10506,7 +10506,7 @@ CHIP_ERROR TestClusterCluster::ReadAttributeUnsupported(Callback::Cancelable * o
 }
 
 CHIP_ERROR TestClusterCluster::WriteAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, uint8_t unsupported)
+                                                         Callback::Cancelable * onFailureCallback, bool unsupported)
 {
     COMMAND_HEADER("WriteTestClusterUnsupported", TestCluster::Id);
     buf.Put8(kFrameControlGlobalCommand)

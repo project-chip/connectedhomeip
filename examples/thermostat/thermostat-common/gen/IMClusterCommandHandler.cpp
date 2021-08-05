@@ -5315,7 +5315,7 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
             uint32_t currentVersion;
             uint8_t protocolsSupported;
             const uint8_t * location;
-            uint8_t requestorCanConsent;
+            bool requestorCanConsent;
             chip::ByteSpan metadataForProvider;
             bool argExists[9];
 

@@ -580,7 +580,7 @@ static void OnOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponse(void * 
 
 static void OnOtaSoftwareUpdateProviderClusterQueryImageResponse(void * context, uint32_t delayedActionTime, uint8_t * imageURI,
                                                                  uint32_t softwareVersion, chip::ByteSpan updateToken,
-                                                                 uint8_t userConsentNeeded, chip::ByteSpan metadataForRequestor)
+                                                                 bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
 {
     ChipLogProgress(chipTool, "OtaSoftwareUpdateProviderClusterQueryImageResponse");
 
@@ -832,9 +832,9 @@ static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(void * co
     {
         ChipLogProgress(chipTool, "NetworkInterfaceType[%" PRIu16 "]:", i);
         ChipLogProgress(Zcl, "  Name: %zu", entries[i].Name.size());
-        ChipLogProgress(chipTool, "  FabricConnected: %" PRIu8 "", entries[i].FabricConnected);
-        ChipLogProgress(chipTool, "  OffPremiseServicesReachableIPv4: %" PRIu8 "", entries[i].OffPremiseServicesReachableIPv4);
-        ChipLogProgress(chipTool, "  OffPremiseServicesReachableIPv6: %" PRIu8 "", entries[i].OffPremiseServicesReachableIPv6);
+        ChipLogProgress(chipTool, "  FabricConnected: %d", entries[i].FabricConnected);
+        ChipLogProgress(chipTool, "  OffPremiseServicesReachableIPv4: %d", entries[i].OffPremiseServicesReachableIPv4);
+        ChipLogProgress(chipTool, "  OffPremiseServicesReachableIPv6: %d", entries[i].OffPremiseServicesReachableIPv6);
         ChipLogProgress(Zcl, "  HardwareAddress: %zu", entries[i].HardwareAddress.size());
         ChipLogProgress(chipTool, "  Type: %" PRIu8 "", entries[i].Type);
     }
@@ -1004,10 +1004,10 @@ static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(voi
         ChipLogProgress(chipTool, "  LastRssi: %" PRId8 "", entries[i].LastRssi);
         ChipLogProgress(chipTool, "  FrameErrorRate: %" PRIu8 "", entries[i].FrameErrorRate);
         ChipLogProgress(chipTool, "  MessageErrorRate: %" PRIu8 "", entries[i].MessageErrorRate);
-        ChipLogProgress(chipTool, "  RxOnWhenIdle: %" PRIu8 "", entries[i].RxOnWhenIdle);
-        ChipLogProgress(chipTool, "  FullThreadDevice: %" PRIu8 "", entries[i].FullThreadDevice);
-        ChipLogProgress(chipTool, "  FullNetworkData: %" PRIu8 "", entries[i].FullNetworkData);
-        ChipLogProgress(chipTool, "  IsChild: %" PRIu8 "", entries[i].IsChild);
+        ChipLogProgress(chipTool, "  RxOnWhenIdle: %d", entries[i].RxOnWhenIdle);
+        ChipLogProgress(chipTool, "  FullThreadDevice: %d", entries[i].FullThreadDevice);
+        ChipLogProgress(chipTool, "  FullNetworkData: %d", entries[i].FullNetworkData);
+        ChipLogProgress(chipTool, "  IsChild: %d", entries[i].IsChild);
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
@@ -1029,8 +1029,8 @@ static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(void *
         ChipLogProgress(chipTool, "  LQIIn: %" PRIu8 "", entries[i].LQIIn);
         ChipLogProgress(chipTool, "  LQIOut: %" PRIu8 "", entries[i].LQIOut);
         ChipLogProgress(chipTool, "  Age: %" PRIu8 "", entries[i].Age);
-        ChipLogProgress(chipTool, "  Allocated: %" PRIu8 "", entries[i].Allocated);
-        ChipLogProgress(chipTool, "  LinkEstablished: %" PRIu8 "", entries[i].LinkEstablished);
+        ChipLogProgress(chipTool, "  Allocated: %d", entries[i].Allocated);
+        ChipLogProgress(chipTool, "  LinkEstablished: %d", entries[i].LinkEstablished);
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
@@ -1061,18 +1061,18 @@ static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeR
     for (uint16_t i = 0; i < count; i++)
     {
         ChipLogProgress(chipTool, "OperationalDatasetComponents[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  ActiveTimestampPresent: %" PRIu8 "", entries[i].ActiveTimestampPresent);
-        ChipLogProgress(chipTool, "  PendingTimestampPresent: %" PRIu8 "", entries[i].PendingTimestampPresent);
-        ChipLogProgress(chipTool, "  MasterKeyPresent: %" PRIu8 "", entries[i].MasterKeyPresent);
-        ChipLogProgress(chipTool, "  NetworkNamePresent: %" PRIu8 "", entries[i].NetworkNamePresent);
-        ChipLogProgress(chipTool, "  ExtendedPanIdPresent: %" PRIu8 "", entries[i].ExtendedPanIdPresent);
-        ChipLogProgress(chipTool, "  MeshLocalPrefixPresent: %" PRIu8 "", entries[i].MeshLocalPrefixPresent);
-        ChipLogProgress(chipTool, "  DelayPresent: %" PRIu8 "", entries[i].DelayPresent);
-        ChipLogProgress(chipTool, "  PanIdPresent: %" PRIu8 "", entries[i].PanIdPresent);
-        ChipLogProgress(chipTool, "  ChannelPresent: %" PRIu8 "", entries[i].ChannelPresent);
-        ChipLogProgress(chipTool, "  PskcPresent: %" PRIu8 "", entries[i].PskcPresent);
-        ChipLogProgress(chipTool, "  SecurityPolicyPresent: %" PRIu8 "", entries[i].SecurityPolicyPresent);
-        ChipLogProgress(chipTool, "  ChannelMaskPresent: %" PRIu8 "", entries[i].ChannelMaskPresent);
+        ChipLogProgress(chipTool, "  ActiveTimestampPresent: %d", entries[i].ActiveTimestampPresent);
+        ChipLogProgress(chipTool, "  PendingTimestampPresent: %d", entries[i].PendingTimestampPresent);
+        ChipLogProgress(chipTool, "  MasterKeyPresent: %d", entries[i].MasterKeyPresent);
+        ChipLogProgress(chipTool, "  NetworkNamePresent: %d", entries[i].NetworkNamePresent);
+        ChipLogProgress(chipTool, "  ExtendedPanIdPresent: %d", entries[i].ExtendedPanIdPresent);
+        ChipLogProgress(chipTool, "  MeshLocalPrefixPresent: %d", entries[i].MeshLocalPrefixPresent);
+        ChipLogProgress(chipTool, "  DelayPresent: %d", entries[i].DelayPresent);
+        ChipLogProgress(chipTool, "  PanIdPresent: %d", entries[i].PanIdPresent);
+        ChipLogProgress(chipTool, "  ChannelPresent: %d", entries[i].ChannelPresent);
+        ChipLogProgress(chipTool, "  PskcPresent: %d", entries[i].PskcPresent);
+        ChipLogProgress(chipTool, "  SecurityPolicyPresent: %d", entries[i].SecurityPolicyPresent);
+        ChipLogProgress(chipTool, "  ChannelMaskPresent: %d", entries[i].ChannelMaskPresent);
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
@@ -3341,7 +3341,7 @@ public:
     WriteBasicLocalConfigDisabled() : ModelCommand("write")
     {
         AddArgument("attr-name", "local-config-disabled");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-value", 0, 1, &mValue);
         ModelCommand::AddArguments();
     }
 
@@ -3365,7 +3365,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mValue;
+    bool mValue;
 };
 
 /*
@@ -3518,7 +3518,7 @@ public:
     WriteBinaryInputBasicOutOfService() : ModelCommand("write")
     {
         AddArgument("attr-name", "out-of-service");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-value", 0, 1, &mValue);
         ModelCommand::AddArguments();
     }
 
@@ -3542,7 +3542,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mValue;
+    bool mValue;
 };
 
 /*
@@ -3585,7 +3585,7 @@ public:
     WriteBinaryInputBasicPresentValue() : ModelCommand("write")
     {
         AddArgument("attr-name", "present-value");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-value", 0, 1, &mValue);
         ModelCommand::AddArguments();
     }
 
@@ -3609,7 +3609,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mValue;
+    bool mValue;
 };
 
 class ReportBinaryInputBasicPresentValue : public ModelCommand
@@ -7866,7 +7866,7 @@ class ContentLauncherLaunchContent : public ModelCommand
 public:
     ContentLauncherLaunchContent() : ModelCommand("launch-content")
     {
-        AddArgument("AutoPlay", 0, UINT8_MAX, &mAutoPlay);
+        AddArgument("AutoPlay", 0, 1, &mAutoPlay);
         AddArgument("Data", &mData);
         ModelCommand::AddArguments();
     }
@@ -7892,7 +7892,7 @@ private:
             OnContentLauncherClusterLaunchContentResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mAutoPlay;
+    bool mAutoPlay;
     char * mData;
 };
 
@@ -13491,7 +13491,7 @@ public:
         AddArgument("CurrentVersion", 0, UINT32_MAX, &mCurrentVersion);
         AddArgument("ProtocolsSupported", 0, UINT8_MAX, &mProtocolsSupported);
         AddArgument("Location", &mLocation);
-        AddArgument("RequestorCanConsent", 0, UINT8_MAX, &mRequestorCanConsent);
+        AddArgument("RequestorCanConsent", 0, 1, &mRequestorCanConsent);
         AddArgument("MetadataForProvider", &mMetadataForProvider);
         ModelCommand::AddArguments();
     }
@@ -13526,7 +13526,7 @@ private:
     uint32_t mCurrentVersion;
     uint8_t mProtocolsSupported;
     char * mLocation;
-    uint8_t mRequestorCanConsent;
+    bool mRequestorCanConsent;
     chip::ByteSpan mMetadataForProvider;
 };
 
@@ -17535,7 +17535,7 @@ public:
     WriteTestClusterBoolean() : ModelCommand("write")
     {
         AddArgument("attr-name", "boolean");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-value", 0, 1, &mValue);
         ModelCommand::AddArguments();
     }
 
@@ -17559,7 +17559,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mValue;
+    bool mValue;
 };
 
 /*
@@ -18914,7 +18914,7 @@ public:
     WriteTestClusterUnsupported() : ModelCommand("write")
     {
         AddArgument("attr-name", "unsupported");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        AddArgument("attr-value", 0, 1, &mValue);
         ModelCommand::AddArguments();
     }
 
@@ -18938,7 +18938,7 @@ private:
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint8_t mValue;
+    bool mValue;
 };
 
 /*

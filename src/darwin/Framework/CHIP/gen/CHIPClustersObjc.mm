@@ -2229,7 +2229,7 @@ public:
     ~CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-        chip::ByteSpan updateToken, uint8_t userConsentNeeded, chip::ByteSpan metadataForRequestor)
+        chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
     {
         CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge * callback
             = reinterpret_cast<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge *>(context);
@@ -5220,7 +5220,7 @@ private:
     }
 }
 
-- (void)writeAttributeLocalConfigDisabledWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeLocalConfigDisabledWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -5341,7 +5341,7 @@ private:
     }
 }
 
-- (void)writeAttributeOutOfServiceWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeOutOfServiceWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -5395,7 +5395,7 @@ private:
     }
 }
 
-- (void)writeAttributePresentValueWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributePresentValueWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -8736,7 +8736,7 @@ private:
     return &_cppCluster;
 }
 
-- (void)launchContent:(uint8_t)autoPlay data:(NSString *)data responseHandler:(ResponseHandler)responseHandler
+- (void)launchContent:(bool)autoPlay data:(NSString *)data responseHandler:(ResponseHandler)responseHandler
 {
     CHIPContentLauncherClusterLaunchContentResponseCallbackBridge * onSuccess
         = new CHIPContentLauncherClusterLaunchContentResponseCallbackBridge(responseHandler, [self callbackQueue]);
@@ -12831,7 +12831,7 @@ private:
          currentVersion:(uint32_t)currentVersion
      protocolsSupported:(uint8_t)protocolsSupported
                location:(NSString *)location
-    requestorCanConsent:(uint8_t)requestorCanConsent
+    requestorCanConsent:(bool)requestorCanConsent
     metadataForProvider:(NSData *)metadataForProvider
         responseHandler:(ResponseHandler)responseHandler
 {
@@ -15816,7 +15816,7 @@ private:
     }
 }
 
-- (void)writeAttributeBooleanWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeBooleanWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -16936,7 +16936,7 @@ private:
     }
 }
 
-- (void)writeAttributeUnsupportedWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+- (void)writeAttributeUnsupportedWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {

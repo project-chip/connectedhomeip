@@ -2763,8 +2763,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::End
                                                                        chip::app::CommandSender * commandObj, uint8_t status,
                                                                        uint32_t delayedActionTime, uint8_t * imageURI,
                                                                        uint32_t softwareVersion, chip::ByteSpan updateToken,
-                                                                       uint8_t userConsentNeeded,
-                                                                       chip::ByteSpan metadataForRequestor)
+                                                                       bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
 {
     ChipLogProgress(Zcl, "QueryImageResponse:");
     LogStatus(status);
@@ -2773,7 +2772,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::End
     // ChipLogProgress(Zcl, "  imageURI: %.*s", imageURI.size(), imageURI.data());
     ChipLogProgress(Zcl, "  softwareVersion: %" PRIu32 "", softwareVersion);
     ChipLogProgress(Zcl, "  updateToken: %zu", updateToken.size());
-    ChipLogProgress(Zcl, "  userConsentNeeded: %" PRIu8 "", userConsentNeeded);
+    ChipLogProgress(Zcl, "  userConsentNeeded: %d", userConsentNeeded);
     ChipLogProgress(Zcl, "  metadataForRequestor: %zu", metadataForRequestor.size());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateProviderClusterQueryImageResponseCallback");
