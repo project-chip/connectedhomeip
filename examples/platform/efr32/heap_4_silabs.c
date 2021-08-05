@@ -316,8 +316,9 @@ void * pvPortRealloc(void * pv, size_t size)
                 {
                     int smallest_size = size < current_size ? size : current_size;
                     memcpy(resized_ptr, pv, smallest_size);
+
+                    vPortFree(pv);
                 }
-                vPortFree(pv);
             }
         }
         else // If size if 0, free pointer
