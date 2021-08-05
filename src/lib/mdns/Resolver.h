@@ -27,6 +27,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
+#include <support/BytesToHex.h>
 
 namespace chip {
 namespace Mdns {
@@ -97,7 +98,9 @@ struct DiscoveredNodeData
     bool supportsTcp;
     uint32_t mrpRetryIntervalIdle;
     uint32_t mrpRetryIntervalActive;
+    uint16_t port;
     int numIPs;
+    Inet::InterfaceId interfaceId[kMaxIPAddresses];
     Inet::IPAddress ipAddress[kMaxIPAddresses];
 
     void Reset()
@@ -137,6 +140,67 @@ struct DiscoveredNodeData
     {
         return mrpRetryIntervalActive != kUndefinedRetryInterval ? Optional<uint32_t>{ mrpRetryIntervalActive }
                                                                  : Optional<uint32_t>{};
+    }
+
+    void Log() const
+    {
+        if (rotatingIdLen > 0)
+        {
+            char rotatingIdString[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
+            Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
+            ChipLogDetail(DiscoveryVerbose, "Rotating ID: %s", rotatingIdString);
+        }
+        if (strlen(deviceName) != 0)
+        {
+            ChipLogDetail(DiscoveryVerbose, "Device Name: %s", deviceName);
+        }
+        if (vendorId > 0)
+        {
+            ChipLogDetail(DiscoveryVerbose, "Vendor ID: %u", vendorId);
+        }
+        if (productId > 0)
+        {
+            ChipLogDetail(DiscoveryVerbose, "Product ID: %u", productId);
+        }
+        if (deviceType > 0)
+        {
+            ChipLogDetail(DiscoveryVerbose, "Device Type: %u", deviceType);
+        }
+        if (longDiscriminator > 0)
+        {
+            ChipLogDetail(DiscoveryVerbose, "Long Discriminator: %u", longDiscriminator);
+        }
+        if (!IsHost(""))
+        {
+            ChipLogDetail(DiscoveryVerbose, "Hostname: %s", hostName);
+        }
+        if (additionalPairing > 0)
+        {
+            ChipLogDetail(DiscoveryVerbose, "Additional Pairing: %u", additionalPairing);
+        }
+        if (strlen(pairingInstruction) != 0)
+        {
+            ChipLogDetail(DiscoveryVerbose, "Pairing Instruction: %s", pairingInstruction);
+        }
+        if (pairingHint > 0)
+        {
+            ChipLogDetail(DiscoveryVerbose, "Pairing Hint: 0x%x", pairingHint);
+        }
+        if (numIPs > 0)
+        {
+            for (int j = 0; j < numIPs; j++)
+            {
+                char ipAddressString[Inet::kMaxIPAddressStringLength];
+                ChipLogDetail(DiscoveryVerbose, "IP Address #%d: %s", j + 1,
+                              ipAddress[j].ToString(ipAddressString, sizeof(ipAddressString)));
+                (void) ipAddressString;
+            }
+        }
+        if (port > 0)
+        {
+            ChipLogDetail(DiscoveryVerbose, "Port: %u", port);
+        }
+        ChipLogDetail(DiscoveryVerbose, "Commissioning Mode: %u", commissioningMode);
     }
 };
 

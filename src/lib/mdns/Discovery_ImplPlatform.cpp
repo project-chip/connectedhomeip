@@ -474,8 +474,12 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, MdnsService * resu
 
     if (result->mAddress.HasValue())
     {
-        data.ipAddress[data.numIPs++] = result->mAddress.Value();
+        data.ipAddress[data.numIPs]   = result->mAddress.Value();
+        data.interfaceId[data.numIPs] = result->mInterface;
+        data.numIPs++;
     }
+
+    data.port = result->mPort;
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
