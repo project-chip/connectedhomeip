@@ -2205,7 +2205,7 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, 
         // Post callback to HandleConnectComplete.
         conErr = chip::System::MapErrorLwIP(lwipErr);
         if (lSystemLayer.WatchableEvents().PostEvent(*ep, kInetEvent_TCPConnectComplete,
-                                                     static_cast<uintptr_t>(ChipError::AsInteger(conErr))) != CHIP_NO_ERROR)
+                                                     static_cast<uintptr_t>(conErr.AsInteger())) != CHIP_NO_ERROR)
             res = ERR_ABRT;
     }
     else
@@ -2282,7 +2282,7 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
         // Otherwise, there was an error accepting the connection, so post a callback to the HandleError function.
         else
             lSystemLayer.WatchableEvents().PostEvent(*listenEP, kInetEvent_TCPError,
-                                                     static_cast<uintptr_t>(ChipError::AsInteger(err)));
+                                                     static_cast<uintptr_t>(err.AsInteger()));
     }
     else
         err = CHIP_ERROR_CONNECTION_ABORTED;
@@ -2359,7 +2359,7 @@ void TCPEndPoint::LwIPHandleError(void * arg, err_t lwipErr)
 
         // Post callback to HandleError.
         CHIP_ERROR err = chip::System::MapErrorLwIP(lwipErr);
-        lSystemLayer.WatchableEvents().PostEvent(*ep, kInetEvent_TCPError, static_cast<uintptr_t>(ChipError::AsInteger(err)));
+        lSystemLayer.WatchableEvents().PostEvent(*ep, kInetEvent_TCPError, static_cast<uintptr_t>(err.AsInteger()));
     }
 }
 

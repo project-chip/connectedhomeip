@@ -344,6 +344,8 @@ public:
 
     bool MatchesSession(SecureSessionHandle session) const { return mSecureSession == session; }
 
+    SecureSessionHandle GetSecureSession() const { return mSecureSession; }
+
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
     PASESessionSerializable & GetPairing() { return mPairing; }

@@ -77,7 +77,7 @@ void appError(int err)
 
 void appError(CHIP_ERROR error)
 {
-    appError(static_cast<int>(chip::ChipError::AsInteger(error)));
+    appError(static_cast<int>(error.AsInteger()));
 }
 
 // ================================================================================

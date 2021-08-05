@@ -19,9 +19,10 @@
 #include <app/common/gen/attributes/Accessors.h>
 #include <app/util/af.h>
 
+using namespace chip;
 using namespace chip::app::Clusters;
 
-bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+bool emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
 {
     EmberAfStatus status = ThreadNetworkDiagnostics::Attributes::SetOverrunCount(endpoint, 0);
     if (status != EMBER_ZCL_STATUS_SUCCESS)

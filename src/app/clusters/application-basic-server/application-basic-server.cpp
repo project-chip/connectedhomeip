@@ -27,9 +27,11 @@
 #include <app/util/af.h>
 #include <string>
 
-bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatus status, chip::EndpointId endpoint);
+using namespace chip;
 
-bool emberAfApplicationBasicClusterChangeStatusCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatus status, EndpointId endpoint);
+
+bool emberAfApplicationBasicClusterChangeStatusCallback(EndpointId endpoint, app::CommandHandler * commandObj,
                                                         uint8_t newApplicationStatus)
 {
     bool success = applicationBasicClusterChangeApplicationStatus(static_cast<EmberAfApplicationBasicStatus>(newApplicationStatus),

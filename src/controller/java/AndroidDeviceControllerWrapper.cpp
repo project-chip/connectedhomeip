@@ -73,7 +73,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
                                                   "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+        ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
 
@@ -230,13 +230,13 @@ void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePair
 void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 {
     StackUnlockGuard unlockGuard(mStackLock);
-    CallJavaMethod("onPairingComplete", static_cast<jint>(error));
+    CallJavaMethod("onPairingComplete", static_cast<jint>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
     StackUnlockGuard unlockGuard(mStackLock);
-    CallJavaMethod("onPairingDeleted", static_cast<jint>(error));
+    CallJavaMethod("onPairingDeleted", static_cast<jint>(error.AsInteger()));
 }
 
 void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
@@ -246,8 +246,8 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
     jmethodID onCommissioningCompleteMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningComplete", "(JI)V",
                                                              &onCommissioningCompleteMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %d", err));
-    env->CallVoidMethod(mJavaObjectRef, onCommissioningCompleteMethod, static_cast<jlong>(deviceId), error);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
+    env->CallVoidMethod(mJavaObjectRef, onCommissioningCompleteMethod, static_cast<jlong>(deviceId), error.AsInteger());
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::Initialize()

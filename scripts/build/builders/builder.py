@@ -15,6 +15,7 @@
 import logging
 import os
 import shutil
+import tarfile
 from abc import ABC, abstractmethod
 
 
@@ -56,6 +57,12 @@ class Builder(ABC):
 
   def _Execute(self, cmdarray, cwd=None, title=None):
     self._runner.Run(cmdarray, cwd=cwd, title=title)
+
+  def CompressArtifacts(self, target_file: str):
+    with tarfile.open(target_file, "w:gz") as tar:
+      for target_name, source_name in self.outputs().items():
+        logging.info(f'Adding {source_name} into {target_file}/{target_name}')
+        tar.add(source_name, target_name)
 
   def CopyArtifacts(self, target_dir: str):
     for target_name, source_name in self.outputs().items():

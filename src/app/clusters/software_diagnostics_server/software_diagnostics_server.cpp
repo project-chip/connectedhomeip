@@ -19,9 +19,10 @@
 #include <app/common/gen/attributes/Accessors.h>
 #include <app/util/af.h>
 
+using namespace chip;
 using namespace chip::app::Clusters;
 
-bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(EndpointId endpoint, app::CommandHandler * commandObj)
 {
     uint64_t currentHeapUsed;
 

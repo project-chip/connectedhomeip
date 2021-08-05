@@ -51,8 +51,8 @@ ChipError::StorageType
 pychip_CommissionableNodeController_NewController(chip::Controller::CommissionableNodeController ** outCommissionableNodeCtrl)
 {
     *outCommissionableNodeCtrl = new chip::Controller::CommissionableNodeController();
-    VerifyOrReturnError(*outCommissionableNodeCtrl != NULL, ChipError::AsInteger(CHIP_ERROR_NO_MEMORY));
-    return ChipError::AsInteger(CHIP_NO_ERROR);
+    VerifyOrReturnError(*outCommissionableNodeCtrl != NULL, CHIP_ERROR_NO_MEMORY.AsInteger());
+    return CHIP_NO_ERROR.AsInteger();
 }
 
 ChipError::StorageType
@@ -63,13 +63,13 @@ pychip_CommissionableNodeController_DeleteController(chip::Controller::Commissio
         delete commissionableNodeCtrl;
     }
 
-    return ChipError::AsInteger(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR.AsInteger();
 }
 
 ChipError::StorageType
 pychip_CommissionableNodeController_DiscoverCommissioners(chip::Controller::CommissionableNodeController * commissionableNodeCtrl)
 {
-    return ChipError::AsInteger(commissionableNodeCtrl->DiscoverCommissioners());
+    return commissionableNodeCtrl->DiscoverCommissioners().AsInteger();
 }
 
 void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(

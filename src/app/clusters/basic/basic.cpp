@@ -44,7 +44,7 @@ uint8_t * MakeZclCharString(uint8_t (&zclString)[BufferLength], char (&cString)[
 }
 } // namespace
 
-void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
+void emberAfBasicClusterServerInitCallback(EndpointId endpoint)
 {
     uint16_t vendorId;
     uint16_t productId;

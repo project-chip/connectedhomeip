@@ -36,7 +36,7 @@ void ScriptDevicePairingDelegate::OnPairingComplete(CHIP_ERROR error)
 {
     if (mOnPairingCompleteCallback != nullptr)
     {
-        mOnPairingCompleteCallback(ChipError::AsInteger(error));
+        mOnPairingCompleteCallback(error.AsInteger());
     }
 }
 
@@ -44,7 +44,7 @@ void ScriptDevicePairingDelegate::OnCommissioningComplete(NodeId nodeId, CHIP_ER
 {
     if (mOnCommissioningCompleteCallback != nullptr)
     {
-        mOnCommissioningCompleteCallback(nodeId, ChipError::AsInteger(error));
+        mOnCommissioningCompleteCallback(nodeId, error.AsInteger());
     }
 }
 

@@ -32,8 +32,7 @@ using namespace chip;
 // Specifications section 5.4.2.3. Announcement Duration
 constexpr uint32_t kMaxCommissionioningTimeoutSeconds = 15 * 60;
 
-bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(chip::EndpointId endpoint,
-                                                                             app::CommandHandler * commandObj,
+bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(EndpointId endpoint, app::CommandHandler * commandObj,
                                                                              uint16_t commissioningTimeout, ByteSpan pakeVerifier,
                                                                              uint16_t discriminator, uint32_t iterations,
                                                                              ByteSpan salt, uint16_t passcodeID)
@@ -70,7 +69,7 @@ exit:
     return true;
 }
 
-bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(chip::EndpointId endpoint,
+bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(EndpointId endpoint,
                                                                                   app::CommandHandler * commandObj,
                                                                                   uint16_t commissioningTimeout)
 {
@@ -91,8 +90,7 @@ exit:
     return true;
 }
 
-bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(chip::EndpointId endpoint,
-                                                                         app::CommandHandler * commandObj)
+bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(EndpointId endpoint, app::CommandHandler * commandObj)
 {
     ChipLogProgress(Zcl, "Received command to close commissioning window");
     ClosePairingWindow();
