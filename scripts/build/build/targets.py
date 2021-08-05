@@ -79,6 +79,7 @@ class Application(IntEnum):
   WINDOW_COVERING = auto()
   SHELL = auto()
   CHIP_TOOL = auto()
+  BRIDGE = auto()
 
   @property
   def ArgName(self):

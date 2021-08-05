@@ -31,6 +31,7 @@ class Esp32App(Enum):
   ALL_CLUSTERS = auto()
   LOCK = auto()
   SHELL = auto()
+  BRIDGE = auto()
 
   @property
   def ExampleName(self):
@@ -40,6 +41,8 @@ class Esp32App(Enum):
       return 'lock-app'
     elif self == Esp32App.SHELL:
       return 'shell'
+    elif self == Esp32App.BRIDGE:
+      return 'bridge-app'
     else:
       raise Exception('Unknown app type: %r' % self)
 
@@ -50,7 +53,9 @@ class Esp32App(Enum):
     elif self == Esp32App.LOCK:
       return 'chip-lock-app'
     elif self == Esp32App.SHELL:
-      return 'chip-shell-app'
+      return 'chip-shell'
+    elif self == Esp32App.BRIDGE:
+      return 'chip-bridge-app'
     else:
       raise Exception('Unknown app type: %r' % self)
 
