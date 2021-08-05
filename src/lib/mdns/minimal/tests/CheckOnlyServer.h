@@ -42,7 +42,7 @@ constexpr QNamePart kIgnoreQNameParts[] = { "IGNORE", "THIS" };
 namespace {
 bool StringMatches(const BytesRange & br, const char * str)
 {
-    return br.Size() == strlen(str) && strncmp(str, reinterpret_cast<const char *>(br.Start()), br.Size()) == 0;
+    return br.Size() == strlen(str) && memcmp(str, br.Start(), br.Size()) == 0;
 }
 
 template <size_t N>
@@ -68,11 +68,6 @@ void MakePrintableName(char (&location)[N], FullQName name)
     }
     buf.Put('\0');
 }
-#define CHECK_CONDITION(x)                                                                                                         \
-    if (mInSuite != nullptr)                                                                                                       \
-    {                                                                                                                              \
-        NL_TEST_ASSERT(mInSuite, x);                                                                                               \
-    }
 
 } // namespace
 
@@ -86,13 +81,13 @@ public:
     // Parser delegates
     void OnHeader(ConstHeaderRef & header) override
     {
-        CHECK_CONDITION(header.GetFlags().IsResponse());
-        CHECK_CONDITION(header.GetFlags().IsValidMdns());
+        NL_TEST_ASSERT(mInSuite, header.GetFlags().IsResponse());
+        NL_TEST_ASSERT(mInSuite, header.GetFlags().IsValidMdns());
         mTotalRecords += header.GetAnswerCount() + header.GetAdditionalCount();
 
         if (!header.GetFlags().IsTruncated())
         {
-            CHECK_CONDITION(mTotalRecords == GetNumExpectedRecords());
+            NL_TEST_ASSERT(mInSuite, mTotalRecords == GetNumExpectedRecords());
             mHeaderFound = true;
         }
     }
@@ -108,7 +103,7 @@ public:
         case QType::SRV: {
             SrvRecord srv;
             bool srvParseOk = srv.Parse(data.GetData(), data.GetData());
-            CHECK_CONDITION(srvParseOk);
+            NL_TEST_ASSERT(mInSuite, srvParseOk);
             if (!srvParseOk)
             {
                 return;
@@ -137,10 +132,10 @@ public:
                     // First parse out the expected record to see what keys/values we have.
                     ClearTxtRecords();
                     const TxtResourceRecord * expectedTxt = static_cast<const TxtResourceRecord *>(info.record);
-                    for (size_t t = 0; t < expectedTxt->mEntryCount; ++t)
+                    for (size_t t = 0; t < expectedTxt->GetNumEntries(); ++t)
                     {
-                        bool ok = AddExpectedTxtRecord(expectedTxt->mEntries[t]);
-                        CHECK_CONDITION(ok);
+                        bool ok = AddExpectedTxtRecord(expectedTxt->GetEntries()[t]);
+                        NL_TEST_ASSERT(mInSuite, ok);
                     }
                     ParseTxtRecord(data.GetData(), this);
                     if (CheckTxtRecordMatches())
@@ -158,7 +153,7 @@ public:
                 }
             }
         }
-        CHECK_CONDITION(recordIsExpected);
+        NL_TEST_ASSERT(mInSuite, recordIsExpected);
         if (!recordIsExpected)
         {
             char nameStr[64];
@@ -246,7 +241,7 @@ public:
     void AddExpectedRecord(SrvResourceRecord * srv)
     {
         RecordInfo * info = AddExpectedRecordBase(srv);
-        CHECK_CONDITION(info != nullptr);
+        NL_TEST_ASSERT(mInSuite, info != nullptr);
         if (info == nullptr)
         {
             return;
@@ -256,7 +251,7 @@ public:
     void AddExpectedRecord(TxtResourceRecord * txt)
     {
         RecordInfo * info = AddExpectedRecordBase(txt);
-        CHECK_CONDITION(info != nullptr);
+        NL_TEST_ASSERT(mInSuite, info != nullptr);
         if (info == nullptr)
         {
             return;
