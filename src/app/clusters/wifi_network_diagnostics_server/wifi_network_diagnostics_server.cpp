@@ -19,9 +19,10 @@
 #include <app/common/gen/attributes/Accessors.h>
 #include <app/util/af.h>
 
+using namespace chip;
 using namespace chip::app::Clusters;
 
-bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
 {
     EmberAfStatus status = WiFiNetworkDiagnostics::Attributes::SetBeaconLostCount(endpoint, 0);
     VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset BeaconLostCount attribute"));

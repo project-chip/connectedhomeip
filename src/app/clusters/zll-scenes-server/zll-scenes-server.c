@@ -56,21 +56,23 @@
 #include "../scenes/scenes.h"
 #include <app/CommandHandler.h>
 
+using namespace chip;
+
 #define ZCL_SCENES_CLUSTER_MODE_COPY_ALL_SCENES_MASK EMBER_BIT(0)
 
-bool emberAfScenesClusterEnhancedAddSceneCallback(chip::app::CommandHandler * commandObj, uint16_t groupId, uint8_t sceneId,
+bool emberAfScenesClusterEnhancedAddSceneCallback(app::CommandHandler * commandObj, uint16_t groupId, uint8_t sceneId,
                                                   uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets)
 {
     return emberAfPluginScenesServerParseAddScene(emberAfCurrentCommand(), groupId, sceneId, transitionTime, sceneName,
                                                   extensionFieldSets);
 }
 
-bool emberAfScenesClusterEnhancedViewSceneCallback(chip::app::CommandHandler * commandObj, uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterEnhancedViewSceneCallback(app::CommandHandler * commandObj, uint16_t groupId, uint8_t sceneId)
 {
     return emberAfPluginScenesServerParseViewScene(emberAfCurrentCommand(), groupId, sceneId);
 }
 
-bool emberAfScenesClusterCopySceneCallback(chip::app::CommandHandler * commandObj, uint8_t mode, uint16_t groupIdFrom,
+bool emberAfScenesClusterCopySceneCallback(app::CommandHandler * commandObj, uint8_t mode, uint16_t groupIdFrom,
                                            uint8_t sceneIdFrom, uint16_t groupIdTo, uint8_t sceneIdTo)
 {
     EmberStatus sendStatus = EMBER_SUCCESS;

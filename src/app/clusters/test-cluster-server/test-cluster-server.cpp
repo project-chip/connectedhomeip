@@ -83,7 +83,7 @@ EmberAfStatus writeTestListOctetAttribute(EndpointId endpoint)
 
     uint16_t attributeCount = 4;
     char data[6]            = { 'T', 'e', 's', 't', 'N', '\0' };
-    chip::ByteSpan span     = chip::ByteSpan(Uint8::from_char(data), strlen(data));
+    ByteSpan span           = ByteSpan(Uint8::from_char(data), strlen(data));
 
     for (uint8_t index = 0; index < attributeCount; index++)
     {
@@ -105,7 +105,7 @@ EmberAfStatus writeTestListStructOctetAttribute(EndpointId endpoint)
 
     uint16_t attributeCount = 4;
     char data[6]            = { 'T', 'e', 's', 't', 'N', '\0' };
-    chip::ByteSpan span     = chip::ByteSpan(Uint8::from_char(data), strlen(data));
+    ByteSpan span           = ByteSpan(Uint8::from_char(data), strlen(data));
 
     for (uint8_t index = 0; index < attributeCount; index++)
     {
@@ -148,7 +148,7 @@ void emberAfPluginTestClusterServerInitCallback(void)
     }
 }
 
-bool emberAfTestClusterClusterTestCallback(chip::EndpointId endpoint, chip::app::CommandHandler *)
+bool emberAfTestClusterClusterTestCallback(EndpointId endpoint, app::CommandHandler *)
 {
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -159,7 +159,7 @@ bool sendNumericResponse(EndpointId endpoint, app::CommandHandler * apCommandObj
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     app::CommandPathParams cmdParams = { endpoint, /* group id */ 0, ZCL_TEST_CLUSTER_ID, responseCommand,
-                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                         (app::CommandPathFlags::kEndpointIdValid) };
     TLV::TLVWriter * writer          = nullptr;
 
     VerifyOrExit(apCommandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

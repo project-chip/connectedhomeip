@@ -56,6 +56,8 @@
 #include "../../include/af.h"
 #include <app/CommandHandler.h>
 
+using namespace chip;
+
 #define ZLL_ON_OFF_CLUSTER_ON_OFF_CONTROL_ACCEPT_ONLY_WHEN_ON_MASK EMBER_BIT(0)
 
 #define readOnOff(endpoint, onOff) readBoolean((endpoint), ZCL_ON_OFF_ATTRIBUTE_ID, "on/off", (onOff))
@@ -167,7 +169,7 @@ void emberAfOnOffClusterServerTickCallback(uint8_t endpoint)
     emberAfScheduleServerTick(endpoint, ZCL_ON_OFF_CLUSTER_ID, MILLISECOND_TICKS_PER_SECOND / 10);
 }
 
-bool emberAfOnOffClusterOffWithEffectCallback(chip::app::CommandHandler * commandObj, uint8_t effectId, uint8_t effectVariant)
+bool emberAfOnOffClusterOffWithEffectCallback(app::CommandHandler * commandObj, uint8_t effectId, uint8_t effectVariant)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_VALUE;
     bool globalSceneControl;
@@ -228,7 +230,7 @@ kickout:
     return true;
 }
 
-bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(chip::app::CommandHandler * commandObj)
+bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(app::CommandHandler * commandObj)
 {
     EmberAfStatus status;
     bool globalSceneControl;
@@ -279,7 +281,7 @@ kickout:
     return true;
 }
 
-bool emberAfOnOffClusterOnWithTimedOffCallback(chip::app::CommandHandler * commandObj, uint8_t onOffControl, uint16_t onTime,
+bool emberAfOnOffClusterOnWithTimedOffCallback(app::CommandHandler * commandObj, uint8_t onOffControl, uint16_t onTime,
                                                uint16_t offWaitTime)
 {
     EmberAfStatus status;
