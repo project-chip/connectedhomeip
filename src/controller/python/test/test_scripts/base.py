@@ -1,3 +1,20 @@
+#
+#    Copyright (c) 2021 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
 from chip import ChipDeviceCtrl
 import threading
 import os
@@ -177,5 +194,21 @@ class BaseTestHelper:
                 failed_zcl.append(basic_attr)
         if failed_zcl:
             self.logger.exception(f"Following attributes failed: {failed_zcl}")
+            return False
+        return True
+
+    def TestNonControllerAPIs(self):
+        '''
+        This function validates various APIs provided by chip package which is not related to controller.
+        TODO: Add more tests for APIs
+        '''
+        try:
+            cluster = self.devCtrl.GetClusterHandler()
+            clusterInfo = cluster.GetClusterInfoById(0x50F)  # TestCluster
+            if clusterInfo["clusterName"] != "TestCluster":
+                raise Exception(
+                    f"Wrong cluster info clusterName: {clusterInfo['clusterName']} expected TestCluster")
+        except Exception as ex:
+            self.logger.exception(f"Failed to finish API test: {ex}")
             return False
         return True

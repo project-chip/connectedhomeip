@@ -6,41 +6,34 @@ import ctypes
 from chip.ChipStack import *
 from chip.exceptions import *
 
-'''
-TODO(#4511): This file only sends cluster commands, should add more functions.
-'''
-
 __all__ = ["ChipClusters"]
 
 class ChipClusters:
     SUCCESS_DELEGATE = ctypes.CFUNCTYPE(None)
     FAILURE_DELEGATE = ctypes.CFUNCTYPE(None, ctypes.c_uint8)
 
-    def __init__(self, chipstack):
-        self._ChipStack = chipstack
-
-    def ListClusterCommands(self):
-        return {
 {{#chip_client_clusters}}
-            "{{asCamelCased name false}}": {
+    _{{asDelimitedMacro name}}_CLUSTER_INFO = {
+            "clusterName": "{{asCamelCased name false}}",
+            "clusterId": {{asHex code 8}},
+            "commands": {
 {{#chip_cluster_commands}}
-                "{{asCamelCased name false}}": {
+            {{asHex code 8}}: {
+                    "commandId": {{asHex code 8}},
+                    "commandName": "{{asCamelCased name false}}",
+                    "args": {
 {{#chip_cluster_command_arguments}}
-                    "{{asCamelCased label}}": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
+                        "{{asCamelCased label}}": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
 {{/chip_cluster_command_arguments}}
+                    },
                 },
 {{/chip_cluster_commands}}
             },
-{{/chip_client_clusters}}
-        }
-
-    def ListClusterAttributes(self):
-        return {
-{{#chip_client_clusters}}
-            "{{asCamelCased name false}}": {
+            "attributes": {
 {{#chip_server_cluster_attributes}}
-                "{{asCamelCased name false}}": {
-                    "attributeId": {{asHex code 4}},
+                {{asHex code 8}}: {
+                    "attributeName": "{{asCamelCased name false}}",
+                    "attributeId": {{asHex code 8}},
                     "type": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
                     {{#if isReportableAttribute}}
                     "reportable": True,
@@ -51,8 +44,42 @@ class ChipClusters:
                 },
 {{/chip_server_cluster_attributes}}
             },
+    }
 {{/chip_client_clusters}}
-        }
+
+    _CLUSTER_ID_DICT = {
+{{#chip_client_clusters}}
+    {{asHex code 8}}: _{{asDelimitedMacro name}}_CLUSTER_INFO,
+{{/chip_client_clusters}}
+    }
+
+    _CLUSTER_NAME_DICT = {
+{{#chip_client_clusters}}
+        "{{asCamelCased name false}}": _{{asDelimitedMacro name}}_CLUSTER_INFO,
+{{/chip_client_clusters}}
+    }
+
+    def __init__(self, chipstack):
+        self._ChipStack = chipstack
+
+    def GetClusterInfoById(self, cluster_id: int):
+        data = ChipClusters._CLUSTER_ID_DICT.get(cluster_id, None)
+        if not data:
+            raise UnknownCluster(cluster_id)
+        return data
+
+    def ListClusterInfo(self):
+        return ChipClusters._CLUSTER_NAME_DICT
+
+    def ListClusterCommands(self):
+        return { clusterName: {
+            command["commandName"]: command["args"] for command in clusterInfo["commands"].values()
+        } for clusterName, clusterInfo in ChipClusters._CLUSTER_NAME_DICT.items() }
+
+    def ListClusterAttributes(self):
+        return { clusterName: {
+            attribute["attributeName"]: attribute for attribute in clusterInfo["attributes"].values()
+        } for clusterName, clusterInfo in ChipClusters._CLUSTER_NAME_DICT.items() }
 
     def SendCommand(self, device: ctypes.c_void_p, cluster: str, command: str, endpoint: int, groupid: int, args, imEnabled):
         func = getattr(self, "Cluster{}_Command{}".format(cluster, command), None)
