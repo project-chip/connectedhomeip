@@ -119,7 +119,7 @@ static void CheckRegisterDeregisterErrorFormatter(nlTestSuite * inSuite, void * 
 
 static void CheckNoError(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, strcmp(CHECK_AND_SKIP_SOURCE(inSuite, ErrorStr(CHIP_NO_ERROR)), "No Error") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(CHECK_AND_SKIP_SOURCE(inSuite, ErrorStr(CHIP_NO_ERROR)), CHIP_NO_ERROR_STRING) == 0);
 }
 
 static void CheckFormatErr(nlTestSuite * inSuite, void * inContext)

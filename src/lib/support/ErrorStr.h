@@ -32,6 +32,15 @@
 
 namespace chip {
 
+/**
+ *  @def CHIP_NO_ERROR_STRING
+ *
+ *  @brief
+ *    This defines the CHIP error string for success or no error.
+ *
+ */
+#define CHIP_NO_ERROR_STRING "Success"
+
 struct ErrorFormatter
 {
     typedef bool (*FormatFunct)(char * buf, uint16_t bufSize, CHIP_ERROR err);
