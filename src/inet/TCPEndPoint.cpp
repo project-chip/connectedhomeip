@@ -2281,8 +2281,7 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
 
         // Otherwise, there was an error accepting the connection, so post a callback to the HandleError function.
         else
-            lSystemLayer.WatchableEvents().PostEvent(*listenEP, kInetEvent_TCPError,
-                                                     static_cast<uintptr_t>(err.AsInteger()));
+            lSystemLayer.WatchableEvents().PostEvent(*listenEP, kInetEvent_TCPError, static_cast<uintptr_t>(err.AsInteger()));
     }
     else
         err = CHIP_ERROR_CONNECTION_ABORTED;
