@@ -15,24 +15,6 @@ using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-namespace {
-void SetupPretendDevices(void)
-{
-    // TODO
-}
-
-class AppCallbacks : public AppDelegate
-{
-public:
-    void OnReceiveError() override{};
-    void OnRendezvousStarted() override{};
-    void OnRendezvousStopped() override{};
-    void OnPairingWindowOpened() override{};
-    void OnPairingWindowClosed() override{};
-};
-
-} // namespace
-
 static DeviceCallbacks EchoCallbacks;
 
 extern "C" void ChipTest(void)
@@ -53,10 +35,7 @@ extern "C" void ChipTest(void)
         printf("DeviceManagerInit() - OK\r\n");
     }
 
-    SetupPretendDevices();
-
-    AppCallbacks callbacks;
-    InitServer(&callbacks);
+    InitServer();
 
     while (true)
         vTaskDelay(pdMS_TO_TICKS(50));

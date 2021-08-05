@@ -21,7 +21,7 @@ buildconfig = "${build_root}/config/BUILDCONFIG.gn"
 check_system_includes = true
 
 default_args = {
-  target_cpu = "ameba"
+  target_cpu = "arm"
   target_os = "freertos"
 
   import("//args.gni")
