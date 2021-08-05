@@ -116,9 +116,7 @@ bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThr
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t aMilliseconds)
 {
-    // TODO(#5556): Integrate timer platform details with WatchableEventManager.
-
-    // Let SystemLayer.PrepareSelect() handle timers.
+    // Let WatchableEventManager.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
 }
 

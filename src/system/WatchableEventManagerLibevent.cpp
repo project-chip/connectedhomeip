@@ -81,7 +81,6 @@ CHIP_ERROR WatchableEventManager::Init(System::Layer & systemLayer)
 
 void WatchableEventManager::PrepareEvents()
 {
-    // TODO(#5556): Integrate timer platform details with WatchableEventManager.
     timeval nextTimeout = { 0, 0 };
     PrepareEventsWithTimeout(nextTimeout);
 }

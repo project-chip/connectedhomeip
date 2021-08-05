@@ -82,9 +82,7 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_UnlockChipStack(void)
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(uint32_t aMilliseconds)
 {
-    // TODO(#5556): Integrate timer platform details with WatchableEventManager.
-
-    // Let SystemLayer.PrepareSelect() handle timers.
+    // Let WatchableEventManager.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
 }
 
