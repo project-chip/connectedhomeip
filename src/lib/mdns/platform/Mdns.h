@@ -43,8 +43,9 @@ static constexpr uint8_t kMdnsHostNameMaxSize     = 16; // 64-bits in hex.
 static constexpr size_t kMdnsProtocolTextMaxSize  = std::max(sizeof(kOperationalProtocol), sizeof(kCommissionProtocol)) - 1;
 static constexpr size_t kMdnsTypeMaxSize =
     std::max({ sizeof(kCommissionableServiceName), sizeof(kOperationalServiceName), sizeof(kCommissionerServiceName) }) - 1;
-static constexpr uint8_t kMdnsTypeAndProtocolMaxSize = kMdnsTypeMaxSize + kMdnsProtocolTextMaxSize + 1; // <type>.<protocol>
-static constexpr uint16_t kMdnsTextMaxSize           = 64;
+static constexpr uint8_t kMdnsTypeAndProtocolMaxSize     = kMdnsTypeMaxSize + kMdnsProtocolTextMaxSize + 1; // <type>.<protocol>
+static constexpr uint16_t kMdnsTextMaxSize               = 64;
+static constexpr uint8_t kMdnsFullTypeAndProtocolMaxSize = kMaxSubtypeDescSize + /* '.' */ 1 + kMdnsTypeAndProtocolMaxSize;
 
 enum class MdnsServiceProtocol : uint8_t
 {

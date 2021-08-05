@@ -88,7 +88,7 @@ CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, Inet:
     if (type == nullptr || callback == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    char serviceType[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1];
+    char serviceType[Mdns::kMdnsFullTypeAndProtocolMaxSize + 1]; // +1 for null-terminator
     snprintf(serviceType, sizeof(serviceType), "%s.%s", type, GetProtocolString(protocol));
 
     return ThreadStackMgr().DnsBrowse(serviceType, callback, context);
