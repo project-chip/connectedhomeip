@@ -94,8 +94,11 @@ _MATCHERS[Platform.HOST].AcceptApplication(Application.CHIP_TOOL, app=HostApp.CH
 
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.DEVKITC, board=Esp32Board.DevKitC)
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.M5STACK, board=Esp32Board.M5Stack)
+_MATCHERS[Platform.ESP32].AcceptBoard(Board.C3DEVKIT, board=Esp32Board.C3DevKit)
 _MATCHERS[Platform.ESP32].AcceptApplication(
     Application.ALL_CLUSTERS, app=Esp32App.ALL_CLUSTERS)
+_MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
+    Application.SHELL, Board.DEVKITC, app=Esp32App.SHELL)
 _MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
     Application.LOCK, Board.DEVKITC, app=Esp32App.LOCK)
 

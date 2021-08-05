@@ -50,6 +50,7 @@ class Board(IntEnum):
   # ESP32 platform
   M5STACK = auto()
   DEVKITC = auto()
+  C3DEVKIT = auto()
 
   # EFR32 platform
   BRD4161A = auto()

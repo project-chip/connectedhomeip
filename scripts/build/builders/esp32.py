@@ -24,11 +24,13 @@ from .builder import Builder
 class Esp32Board(Enum):
   DevKitC = auto()
   M5Stack = auto()
+  C3DevKit = auto()
 
 
 class Esp32App(Enum):
   ALL_CLUSTERS = auto()
   LOCK = auto()
+  SHELL = auto()
 
   @property
   def ExampleName(self):
@@ -36,6 +38,8 @@ class Esp32App(Enum):
       return 'all-clusters-app'
     elif self == Esp32App.LOCK:
       return 'lock-app'
+    elif self == Esp32App.SHELL:
+      return 'shell'
     else:
       raise Exception('Unknown app type: %r' % self)
 
@@ -45,6 +49,8 @@ class Esp32App(Enum):
       return 'chip-all-clusters-app'
     elif self == Esp32App.LOCK:
       return 'chip-lock-app'
+    elif self == Esp32App.SHELL:
+      return 'chip-shell-app'
     else:
       raise Exception('Unknown app type: %r' % self)
 
@@ -58,6 +64,8 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App):
     return 'sdkconfig.defaults'
   elif board == Esp32Board.M5Stack:
     return 'sdkconfig_m5stack.defaults'
+  elif board == Esp32Board.C3DevKit:
+    return 'sdkconfig_c3devkit.defaults'
   else:
     raise Exception('Unknown board type')
 
