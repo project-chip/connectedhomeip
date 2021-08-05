@@ -157,6 +157,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
+    case ArgumentType::Boolean:
     case ArgumentType::Number_uint8: {
         uint8_t * value = reinterpret_cast<uint8_t *>(arg.value);
 
