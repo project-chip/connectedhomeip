@@ -46,45 +46,45 @@ bool FormatASN1Error(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (!ChipError::IsPart(ChipError::SdkPart::kASN1, err))
+    if (!err.IsPart(ChipError::SdkPart::kASN1))
     {
         return false;
     }
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    switch (ChipError::AsInteger(err))
+    switch (err.AsInteger())
     {
-    case ChipError::AsInteger(ASN1_END):
+    case ASN1_END.AsInteger():
         desc = "End of input";
         break;
-    case ChipError::AsInteger(ASN1_ERROR_UNDERRUN):
+    case ASN1_ERROR_UNDERRUN.AsInteger():
         desc = "Reader underrun";
         break;
-    case ChipError::AsInteger(ASN1_ERROR_OVERFLOW):
+    case ASN1_ERROR_OVERFLOW.AsInteger():
         desc = "Writer overflow";
         break;
-    case ChipError::AsInteger(ASN1_ERROR_INVALID_STATE):
+    case ASN1_ERROR_INVALID_STATE.AsInteger():
         desc = "Invalid state";
         break;
-    case ChipError::AsInteger(ASN1_ERROR_MAX_DEPTH_EXCEEDED):
+    case ASN1_ERROR_MAX_DEPTH_EXCEEDED.AsInteger():
         desc = "Max depth exceeded";
         break;
-    case ChipError::AsInteger(ASN1_ERROR_INVALID_ENCODING):
+    case ASN1_ERROR_INVALID_ENCODING.AsInteger():
         desc = "Invalid encoding";
         break;
-    case ChipError::AsInteger(ASN1_ERROR_UNSUPPORTED_ENCODING):
+    case ASN1_ERROR_UNSUPPORTED_ENCODING.AsInteger():
         desc = "Unsupported encoding";
         break;
-    case ChipError::AsInteger(ASN1_ERROR_TAG_OVERFLOW):
+    case ASN1_ERROR_TAG_OVERFLOW.AsInteger():
         desc = "Tag overflow";
         break;
-    case ChipError::AsInteger(ASN1_ERROR_LENGTH_OVERFLOW):
+    case ASN1_ERROR_LENGTH_OVERFLOW.AsInteger():
         desc = "Length overflow";
         break;
-    case ChipError::AsInteger(ASN1_ERROR_VALUE_OVERFLOW):
+    case ASN1_ERROR_VALUE_OVERFLOW.AsInteger():
         desc = "Value overflow";
         break;
-    case ChipError::AsInteger(ASN1_ERROR_UNKNOWN_OBJECT_ID):
+    case ASN1_ERROR_UNKNOWN_OBJECT_ID.AsInteger():
         desc = "Unknown object id";
         break;
     }

@@ -54,7 +54,7 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
         else
         {
             ChipLogError(Discovery, "Commissioning errored out with error %" CHIP_ERROR_FORMAT,
-                         ChipError::FormatError(event->CommissioningComplete.status));
+                         event->CommissioningComplete.status.Format());
         }
         // TODO: Commissioning complete means we can finalize the fabric in our storage
     }

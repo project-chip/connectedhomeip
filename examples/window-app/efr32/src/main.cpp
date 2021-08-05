@@ -65,7 +65,7 @@ extern "C" void vApplicationIdleHook(void)
 
 void appError(CHIP_ERROR err)
 {
-    // appError(static_cast<int>(chip::ChipError::AsInteger(error)));
+    // appError(static_cast<int>(error.AsInteger()));
     EFR32_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
     portDISABLE_INTERRUPTS();
     while (1)
@@ -158,5 +158,5 @@ int main(void)
     }
 
     app.Finish();
-    return chip::ChipError::AsInteger(err);
+    return err.AsInteger();
 }

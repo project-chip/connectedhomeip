@@ -41,7 +41,7 @@ static int chip_command_handler(int argc, char ** argv)
     {
         err = CHIP_ERROR_INVALID_ARGUMENT;
     }
-    return static_cast<int>(chip::ChipError::AsInteger(err));
+    return static_cast<int>(err.AsInteger());
 }
 
 int streamer_esp32_init(streamer_t * streamer)

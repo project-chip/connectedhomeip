@@ -551,7 +551,7 @@ std::string createSetupPayload()
 
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "Couldn't get payload string %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+        ESP_LOGE(TAG, "Couldn't get payload string %" CHIP_ERROR_FORMAT, err.Format());
     }
     return result;
 };

@@ -64,10 +64,10 @@ extern "C" ChipError::StorageType pychip_SetupPayload_ParseQrCode(const char * q
 {
     SetupPayload payload;
     CHIP_ERROR err = QRCodeSetupPayloadParser(qrCode).populatePayload(payload);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, ChipError::AsInteger(err));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     YieldSetupPayloadAttributes(payload, attrVisitor, vendorAttrVisitor);
-    return ChipError::AsInteger(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR.AsInteger();
 }
 
 extern "C" ChipError::StorageType pychip_SetupPayload_ParseManualPairingCode(const char * manualPairingCode,
@@ -76,8 +76,8 @@ extern "C" ChipError::StorageType pychip_SetupPayload_ParseManualPairingCode(con
 {
     SetupPayload payload;
     CHIP_ERROR err = ManualSetupPayloadParser(manualPairingCode).populatePayload(payload);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, ChipError::AsInteger(err));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     YieldSetupPayloadAttributes(payload, attrVisitor, vendorAttrVisitor);
-    return ChipError::AsInteger(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR.AsInteger();
 }

@@ -99,6 +99,6 @@ int main(void)
     }
 
 exit:
-    LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, chip::ChipError::FormatError(err));
+    LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());
     return err == CHIP_NO_ERROR ? EXIT_SUCCESS : EXIT_FAILURE;
 }

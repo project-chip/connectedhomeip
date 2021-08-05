@@ -369,8 +369,8 @@ exit:
         mRxState = kState_Error;
 
         // Dump protocol engine state, plus header flags and received data length.
-        ChipLogError(Ble, "HandleCharacteristicReceived failed, err = %" CHIP_ERROR_FORMAT ", rx_flags = %u",
-                     ChipError::FormatError(err), rx_flags.Raw());
+        ChipLogError(Ble, "HandleCharacteristicReceived failed, err = %" CHIP_ERROR_FORMAT ", rx_flags = %u", err.Format(),
+                     rx_flags.Raw());
         if (didReceiveAck)
         {
             ChipLogError(Ble, "With rx'd ack = %u", receivedAck);
