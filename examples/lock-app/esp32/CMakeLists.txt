@@ -48,3 +48,4 @@ set_target_properties(pw_build.cpp17 PROPERTIES INTERFACE_COMPILE_OPTIONS "${_ta
 endif(CONFIG_ENABLE_PW_RPC)
 
 flashing_script()
+
