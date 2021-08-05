@@ -1068,7 +1068,8 @@ void * IOThreadMain(void * arg)
     {
         // Wait no more than 10 seconds.
         constexpr uint32_t k10secondsInMilliseconds = 10000;
-        sSystemLayer.StartTimer(k10secondsInMilliseconds, [](System::Layer *, void *, CHIP_ERROR) -> void {}, nullptr);
+        sSystemLayer.StartTimer(
+            k10secondsInMilliseconds, [](System::Layer *, void *, CHIP_ERROR) -> void {}, nullptr);
 
         watchState.PrepareEvents();
 
