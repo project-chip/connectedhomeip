@@ -611,21 +611,12 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1
 CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id,
                                       MutableByteSpan & out_compressed_fabric_id)
 {
-    constexpr uint8_t kUncompressedPointMarker = 0x04;
-    if ((root_public_key.Length() != kP256_PublicKey_Length) || (root_public_key.ConstBytes()[0] != kUncompressedPointMarker))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    else if (out_compressed_fabric_id.size() < kCompressedFabricIdentifierSize)
-    {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
+    VerifyOrReturnError(root_public_key.IsUncompressed(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_compressed_fabric_id.size() >= kCompressedFabricIdentifierSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Ensure proper endianness for Fabric ID (i.e. big-endian as it appears in certificates)
     uint8_t fabric_id_as_big_endian_salt[kCompressedFabricIdentifierSize];
-    chip::Encoding::BigEndian::BufferWriter big_endian_writer(MutableByteSpan{ fabric_id_as_big_endian_salt });
-    big_endian_writer.Put64(fabric_id);
-    ReturnErrorCodeIf(!big_endian_writer.Fit(), CHIP_ERROR_INTERNAL);
+    chip::Encoding::BigEndian::Put64(&fabric_id_as_big_endian_salt[0], fabric_id);
 
     // Compute Compressed fabric reference per spec pseudocode
     //   CompressedFabricIdentifier =

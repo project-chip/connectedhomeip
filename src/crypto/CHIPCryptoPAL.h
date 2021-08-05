@@ -161,19 +161,14 @@ public:
     virtual ~ECPKey() {}
     virtual SupportedECPKeyTypes Type() const  = 0;
     virtual size_t Length() const              = 0;
+    virtual bool IsUncompressed() const        = 0;
     virtual operator const uint8_t *() const   = 0;
     virtual operator uint8_t *()               = 0;
     virtual const uint8_t * ConstBytes() const = 0;
     virtual uint8_t * Bytes()                  = 0;
 
-    virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    virtual CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length, const Sig & signature) const
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const = 0;
+    virtual CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length, const Sig & signature) const = 0;
 };
 
 template <size_t Cap>
@@ -239,6 +234,13 @@ public:
     operator const uint8_t *() const override { return bytes; }
     const uint8_t * ConstBytes() const override { return &bytes[0]; }
     uint8_t * Bytes() override { return &bytes[0]; }
+    bool IsUncompressed() const override
+    {
+        constexpr uint8_t kUncompressedPointMarker = 0x04;
+        // SEC1 definition of an uncompressed point is (0x04 || X || Y) where X and Y are
+        // raw zero-padded big-endian large integers of the group size.
+        return (Length() == ((kP256_FE_Length * 2) + 1)) && (ConstBytes()[0] == kUncompressedPointMarker);
+    }
 
     CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, size_t msg_length,
                                             const P256ECDSASignature & signature) const override;
