@@ -131,7 +131,7 @@
 #define ZCL_SCENE_NAME_SUPPORT_ATTRIBUTE_ID (0x0004)
 #define ZCL_LAST_CONFIGURED_BY_ATTRIBUTE_ID (0x0005)
 
-// Attribute ids for cluster: On/off
+// Attribute ids for cluster: On/Off
 
 // Client attributes
 

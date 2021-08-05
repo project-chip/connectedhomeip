@@ -82,7 +82,7 @@ void emberAfGroupsClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfScenesClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief On/off Cluster Init
+/** @brief On/Off Cluster Init
  *
  * Cluster Init
  *
@@ -1565,10 +1565,10 @@ void emberAfScenesClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfScenesClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// On/off Cluster
+// On/Off Cluster
 //
 
-/** @brief On/off Cluster Server Init
+/** @brief On/Off Cluster Server Init
  *
  * Server Init
  *
@@ -1576,7 +1576,7 @@ void emberAfScenesClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfOnOffClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief On/off Cluster Client Init
+/** @brief On/Off Cluster Client Init
  *
  * Client Init
  *
@@ -1584,7 +1584,7 @@ void emberAfOnOffClusterServerInitCallback(chip::EndpointId endpoint);
  */
 void emberAfOnOffClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief On/off Cluster Server Attribute Changed
+/** @brief On/Off Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
@@ -1593,7 +1593,7 @@ void emberAfOnOffClusterClientInitCallback(chip::EndpointId endpoint);
  */
 void emberAfOnOffClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
-/** @brief On/off Cluster Client Attribute Changed
+/** @brief On/Off Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
@@ -1602,7 +1602,7 @@ void emberAfOnOffClusterServerAttributeChangedCallback(chip::EndpointId endpoint
  */
 void emberAfOnOffClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
-/** @brief On/off Cluster Server Manufacturer Specific Attribute Changed
+/** @brief On/Off Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
  *
@@ -1613,7 +1613,7 @@ void emberAfOnOffClusterClientAttributeChangedCallback(chip::EndpointId endpoint
 void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 
-/** @brief On/off Cluster Client Manufacturer Specific Attribute Changed
+/** @brief On/Off Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
  *
@@ -1624,7 +1624,7 @@ void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(chip:
 void emberAfOnOffClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 
-/** @brief On/off Cluster Server Message Sent
+/** @brief On/Off Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -1638,7 +1638,7 @@ void emberAfOnOffClusterClientManufacturerSpecificAttributeChangedCallback(chip:
 void emberAfOnOffClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
                                                   uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief On/off Cluster Client Message Sent
+/** @brief On/Off Cluster Client Message Sent
  *
  * Client Message Sent
  *
@@ -1652,7 +1652,7 @@ void emberAfOnOffClusterServerMessageSentCallback(const chip::MessageSendDestina
 void emberAfOnOffClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
                                                   uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief On/off Cluster Server Pre Attribute Changed
+/** @brief On/Off Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -1666,7 +1666,7 @@ EmberAfStatus emberAfOnOffClusterServerPreAttributeChangedCallback(chip::Endpoin
                                                                    EmberAfAttributeType attributeType, uint16_t size,
                                                                    uint8_t * value);
 
-/** @brief On/off Cluster Client Pre Attribute Changed
+/** @brief On/Off Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -1680,7 +1680,7 @@ EmberAfStatus emberAfOnOffClusterClientPreAttributeChangedCallback(chip::Endpoin
                                                                    EmberAfAttributeType attributeType, uint16_t size,
                                                                    uint8_t * value);
 
-/** @brief On/off Cluster Server Tick
+/** @brief On/Off Cluster Server Tick
  *
  * Server Tick
  *
@@ -1688,7 +1688,7 @@ EmberAfStatus emberAfOnOffClusterClientPreAttributeChangedCallback(chip::Endpoin
  */
 void emberAfOnOffClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief On/off Cluster Client Tick
+/** @brief On/Off Cluster Client Tick
  *
  * Client Tick
  *
