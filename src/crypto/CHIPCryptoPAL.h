@@ -168,7 +168,8 @@ public:
     virtual uint8_t * Bytes()                  = 0;
 
     virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const = 0;
-    virtual CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length, const Sig & signature) const = 0;
+    virtual CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length,
+                                                     const Sig & signature) const                                              = 0;
 };
 
 template <size_t Cap>
