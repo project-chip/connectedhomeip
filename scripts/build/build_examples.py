@@ -78,6 +78,12 @@ def ValidateRepoPath(context, parameter, value):
     help='What example application to build. Empty will find suitable applications.'
 )
 @click.option(
+    '--enable-flashbundle',
+    default=False,
+    is_flag=True,
+    help='Also generate the flashbundles for the app.'
+)
+@click.option(
     '--repo',
     default='.',
     callback=ValidateRepoPath,
@@ -104,7 +110,7 @@ def ValidateRepoPath(context, parameter, value):
     help='Where to write the dry run output')
 @click.pass_context
 def main(context, log_level, platform, board, app, repo, out_prefix, clean,
-         dry_run, dry_run_output):
+         dry_run, dry_run_output, enable_flashbundle):
   # Ensures somewhat pretty logging of what is going on
   coloredlogs.install(
       level=__LOG_LEVELS__[log_level],
@@ -132,7 +138,8 @@ before running this script.
   context.obj.SetupBuilders(
       platforms=[build.Platform.FromArgName(name) for name in platform],
       boards=[build.Board.FromArgName(name) for name in board],
-      applications=[build.Application.FromArgName(name) for name in app])
+      applications=[build.Application.FromArgName(name) for name in app],
+      enable_flashbundle=enable_flashbundle)
 
   if clean:
     context.obj.CleanOutputDirectories()
