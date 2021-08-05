@@ -5201,68 +5201,67 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_Thermostat_ClusterRevision(c
 chip::ChipError::StorageType chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_TemperatureDisplayMode(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return chip::ChipError::AsInteger(
-        cluster.ReadAttributeTemperatureDisplayMode(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+    return cluster.ReadAttributeTemperatureDisplayMode(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_TemperatureDisplayMode(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint8_t value)
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return ChipError::AsInteger(
-        cluster.WriteAttributeTemperatureDisplayMode(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value));
+    return cluster.WriteAttributeTemperatureDisplayMode(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value)
+        .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_KeypadLockout(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return chip::ChipError::AsInteger(
-        cluster.ReadAttributeKeypadLockout(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+    return cluster.ReadAttributeKeypadLockout(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_KeypadLockout(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint8_t value)
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return ChipError::AsInteger(
-        cluster.WriteAttributeKeypadLockout(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value));
+    return cluster.WriteAttributeKeypadLockout(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value)
+        .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_ScheduleProgrammingVisibility(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return chip::ChipError::AsInteger(
-        cluster.ReadAttributeScheduleProgrammingVisibility(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+    return cluster.ReadAttributeScheduleProgrammingVisibility(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+        .AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_WriteAttribute_ThermostatUserInterfaceConfiguration_ScheduleProgrammingVisibility(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint8_t value)
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return ChipError::AsInteger(cluster.WriteAttributeScheduleProgrammingVisibility(gDefaultSuccessCallback.Cancel(),
-                                                                                    gDefaultFailureCallback.Cancel(), value));
+    return cluster
+        .WriteAttributeScheduleProgrammingVisibility(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value)
+        .AsInteger();
 }
 chip::ChipError::StorageType chip_ime_ReadAttribute_ThermostatUserInterfaceConfiguration_ClusterRevision(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return chip::ChipError::AsInteger(
-        cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 }
 
 // End of Cluster ThermostatUserInterfaceConfiguration
