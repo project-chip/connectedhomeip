@@ -40,6 +40,7 @@ void TestTxt(nlTestSuite * inSuite, void * inContext)
 
     TxtResourceRecord record(kName, kData);
     record.SetTtl(128);
+    NL_TEST_ASSERT(inSuite, record.GetNumEntries() == 3);
 
     header.Clear();
 

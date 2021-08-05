@@ -48,6 +48,8 @@ public:
     {
         SetTtl(kDefaultTtl);
     }
+    size_t GetNumEntries() const { return mEntryCount; }
+    const char * const * GetEntries() const { return mEntries; }
 
 protected:
     bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const override
