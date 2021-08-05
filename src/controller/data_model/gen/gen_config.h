@@ -210,7 +210,7 @@
 #define ZCL_USING_OCCUPANCY_SENSING_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_OCCUPANCY_SENSING_CLIENT
 
-// Use this macro to check if the client side of the On/off cluster is included
+// Use this macro to check if the client side of the On/Off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_ON_OFF_CLIENT
 

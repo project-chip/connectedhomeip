@@ -214,39 +214,46 @@ function printErrorAndExit(context, msg)
 function assertCommandOrAttribute(context)
 {
   const clusterName = context.cluster;
-  let filterName;
-  let items;
-
-  if (context.isCommand) {
-    filterName = context.command;
-    items      = Clusters.getClientCommands(clusterName);
-  } else if (context.isAttribute) {
-    filterName = context.attribute;
-    items      = Clusters.getServerAttributes(clusterName);
-  } else {
-    printErrorAndExit(context, 'Unsupported command type: ', context);
-  }
-
-  return items.then(items => {
-    const filter = item => item.name.toLowerCase() == filterName.toLowerCase();
-    const item          = items.find(filter);
-    const itemType      = (context.isCommand ? 'Command' : 'Attribute');
-
-    // If the command or attribute is not found, it could be because of a typo in the test
-    // description, or an attribute name not matching the spec, or a wrongly configured zap
-    // file.
-    if (!item) {
-      const names = items.map(item => item.name);
-      printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" in: \n\t* ' + names.join('\n\t* '));
+  return Clusters.getClusters().then(clusters => {
+    if (!clusters.find(cluster => cluster.name == clusterName)) {
+      const names = clusters.map(item => item.name);
+      printErrorAndExit(context, 'Missing cluster "' + clusterName + '" in: \n\t* ' + names.join('\n\t* '));
     }
 
-    // If the command or attribute has been found but the response can not be found, it could be
-    // because of a wrongly configured cluster definition.
-    if (!item.response) {
-      printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" response');
+    let filterName;
+    let items;
+
+    if (context.isCommand) {
+      filterName = context.command;
+      items      = Clusters.getClientCommands(clusterName);
+    } else if (context.isAttribute) {
+      filterName = context.attribute;
+      items      = Clusters.getServerAttributes(clusterName);
+    } else {
+      printErrorAndExit(context, 'Unsupported command type: ', context);
     }
 
-    return item;
+    return items.then(items => {
+      const filter = item => item.name.toLowerCase() == filterName.toLowerCase();
+      const item          = items.find(filter);
+      const itemType      = (context.isCommand ? 'Command' : 'Attribute');
+
+      // If the command or attribute is not found, it could be because of a typo in the test
+      // description, or an attribute name not matching the spec, or a wrongly configured zap
+      // file.
+      if (!item) {
+        const names = items.map(item => item.name);
+        printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" in: \n\t* ' + names.join('\n\t* '));
+      }
+
+      // If the command or attribute has been found but the response can not be found, it could be
+      // because of a wrongly configured cluster definition.
+      if (!item.response) {
+        printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" response');
+      }
+
+      return item;
+    });
   });
 }
 

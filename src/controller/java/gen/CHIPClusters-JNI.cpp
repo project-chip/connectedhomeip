@@ -26377,7 +26377,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readTemperatureDis
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26385,7 +26385,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readTemperatureDis
     if (!onFailure)
     {
         delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26396,7 +26396,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readTemperatureDis
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
         return;
     }
 
@@ -26405,7 +26405,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readTemperatureDis
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error reading attribute", err);
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
 
@@ -26416,7 +26416,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDi
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26424,7 +26424,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDi
     if (!onFailure)
     {
         delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26435,7 +26435,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDi
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
         return;
     }
 
@@ -26444,7 +26444,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDi
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error writing attribute", err);
+        ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
 
@@ -26455,7 +26455,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readKeypadLockoutA
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26463,7 +26463,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readKeypadLockoutA
     if (!onFailure)
     {
         delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26474,7 +26474,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readKeypadLockoutA
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
         return;
     }
 
@@ -26483,7 +26483,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readKeypadLockoutA
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error reading attribute", err);
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
 
@@ -26494,7 +26494,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockout
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26502,7 +26502,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockout
     if (!onFailure)
     {
         delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26513,7 +26513,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockout
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
         return;
     }
 
@@ -26522,7 +26522,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockout
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error writing attribute", err);
+        ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
 
@@ -26533,7 +26533,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readScheduleProgra
     CHIPInt8uAttributeCallback * onSuccess = new CHIPInt8uAttributeCallback(callback);
     if (!onSuccess)
     {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26541,7 +26541,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readScheduleProgra
     if (!onFailure)
     {
         delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26552,7 +26552,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readScheduleProgra
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
         return;
     }
 
@@ -26561,7 +26561,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readScheduleProgra
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error reading attribute", err);
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
 
@@ -26572,7 +26572,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgr
     CHIPDefaultSuccessCallback * onSuccess = new CHIPDefaultSuccessCallback(callback);
     if (!onSuccess)
     {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26580,7 +26580,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgr
     if (!onFailure)
     {
         delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26591,7 +26591,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgr
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
         return;
     }
 
@@ -26601,7 +26601,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgr
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error writing attribute", err);
+        ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
     }
 }
 
@@ -26612,7 +26612,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readClusterRevisio
     CHIPInt16uAttributeCallback * onSuccess = new CHIPInt16uAttributeCallback(callback);
     if (!onSuccess)
     {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26620,7 +26620,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readClusterRevisio
     if (!onFailure)
     {
         delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY);
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
         return;
     }
 
@@ -26631,7 +26631,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readClusterRevisio
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE);
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
         return;
     }
 
@@ -26640,7 +26640,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, readClusterRevisio
     {
         delete onSuccess;
         delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error reading attribute", err);
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
 JNI_METHOD(jlong, ThreadNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)

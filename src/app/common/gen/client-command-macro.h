@@ -919,7 +919,7 @@
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterOff() emberAfFillExternalBuffer(mask,                                                                            \
+        OffClusterOff() emberAfFillExternalBuffer(mask,                                                                            \
                                                                                                                                    \
                                                   ZCL_OFF_COMMAND_ID, "", );
 
@@ -929,7 +929,7 @@
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterOn() emberAfFillExternalBuffer(mask,                                                                             \
+        OffClusterOn() emberAfFillExternalBuffer(mask,                                                                             \
                                                                                                                                    \
                                                  ZCL_ON_COMMAND_ID, "", );
 
@@ -939,7 +939,7 @@
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterToggle() emberAfFillExternalBuffer(mask,                                                                         \
+        OffClusterToggle() emberAfFillExternalBuffer(mask,                                                                         \
                                                                                                                                    \
                                                      ZCL_TOGGLE_COMMAND_ID, "", );
 
@@ -951,7 +951,7 @@
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterOffWithEffect(EffectId, EffectVariant)                                                                           \
+        OffClusterOffWithEffect(EffectId, EffectVariant)                                                                           \
             emberAfFillExternalBuffer(mask,                                                                                        \
                                                                                                                                    \
                                       ZCL_OFF_WITH_EFFECT_COMMAND_ID, "uu", EffectId, EffectVariant);
@@ -962,7 +962,7 @@
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterOnWithRecallGlobalScene() emberAfFillExternalBuffer(mask,                                                        \
+        OffClusterOnWithRecallGlobalScene() emberAfFillExternalBuffer(mask,                                                        \
                                                                                                                                    \
                                                                       ZCL_ON_WITH_RECALL_GLOBAL_SCENE_COMMAND_ID, "", );
 
@@ -975,7 +975,7 @@
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterOnWithTimedOff(OnOffControl, OnTime, OffWaitTime)                                                                \
+        OffClusterOnWithTimedOff(OnOffControl, OnTime, OffWaitTime)                                                                \
             emberAfFillExternalBuffer(mask,                                                                                        \
                                                                                                                                    \
                                       ZCL_ON_WITH_TIMED_OFF_COMMAND_ID, "uuu", OnOffControl, OnTime, OffWaitTime);
