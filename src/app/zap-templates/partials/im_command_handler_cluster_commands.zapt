@@ -38,13 +38,7 @@ while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
   {
 {{#zcl_command_arguments}}
     case {{index}}:
-{{#if (isOctetString type)}}
-    {
-        const uint8_t * data = nullptr;
-        TLVUnpackError = aDataTlv.GetDataPtr(data);
-        {{asSymbol label}} = {{asUnderlyingZclType type}}(data, aDataTlv.GetLength());
-    }
-{{else if (isString type)}}
+{{#if (isCharString type)}}
       // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
       TLVUnpackError = aDataTlv.GetDataPtr({{asSymbol label}});
 {{else if isArray}}

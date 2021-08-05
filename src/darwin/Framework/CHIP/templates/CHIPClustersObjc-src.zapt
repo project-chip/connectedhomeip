@@ -72,37 +72,26 @@ private:
     ResponseHandler mHandler;
     dispatch_queue_t mQueue;
 };
-
-class CHIPStringAttributeCallbackBridge : public Callback::Callback<StringAttributeCallback> {
+class CHIPOctetStringAttributeCallbackBridge : public Callback::Callback<OctetStringAttributeCallback> {
 public:
-    CHIPStringAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool octetString, bool keepAlive = false)
-        : Callback::Callback<StringAttributeCallback>(CallbackFn, this)
+    CHIPOctetStringAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool keepAlive = false)
+        : Callback::Callback<OctetStringAttributeCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
-        , mOctetString(octetString)
         , mKeepAlive(keepAlive)
     {
     }
 
-    ~CHIPStringAttributeCallbackBridge() {};
+    ~CHIPOctetStringAttributeCallbackBridge() {};
 
     static void CallbackFn(void * context, chip::ByteSpan value)
     {
         NSData * data = [NSData dataWithBytes: value.data() length: value.size()];
 
-        CHIPStringAttributeCallbackBridge * callback = reinterpret_cast<CHIPStringAttributeCallbackBridge *>(context);
+        CHIPOctetStringAttributeCallbackBridge * callback = reinterpret_cast<CHIPOctetStringAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                if (callback->mOctetString)
-                {
-                    callback->mHandler(nil, @{ @"value": data });
-                }
-                else
-                {
-                    NSString * str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-                    callback->mHandler(nil, @{ @"value": str });
-                }
-
+                callback->mHandler(nil, @{ @"value": data });
                 if (!callback->mKeepAlive)
                 {
                     callback->Cancel();
@@ -115,9 +104,45 @@ public:
 private:
     ResponseHandler mHandler;
     dispatch_queue_t mQueue;
-    bool mOctetString;
     bool mKeepAlive;
 };
+
+class CHIPCharStringAttributeCallbackBridge : public Callback::Callback<CharStringAttributeCallback> {
+public:
+    CHIPCharStringAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue, bool keepAlive = false)
+        : Callback::Callback<CharStringAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+        , mKeepAlive(keepAlive)
+    {
+    }
+
+    ~CHIPCharStringAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, chip::ByteSpan value)
+    {
+        NSData * data = [NSData dataWithBytes: value.data() length: value.size()];
+
+        CHIPCharStringAttributeCallbackBridge * callback = reinterpret_cast<CHIPCharStringAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                NSString * str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                callback->mHandler(nil, @{ @"value": str });
+                if (!callback->mKeepAlive)
+                {
+                    callback->Cancel();
+                    delete callback;
+                }
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+    bool mKeepAlive;
+};
+
 
 class CHIPBooleanAttributeCallbackBridge : public Callback::Callback<BooleanAttributeCallback> {
 public:
@@ -625,7 +650,7 @@ private:
 {{#if isList}}
     CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge * onSuccess = new CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallbackBridge(responseHandler, [self callbackQueue]);
 {{else}}
-    CHIP{{chipCallback.name}}AttributeCallbackBridge * onSuccess = new CHIP{{chipCallback.name}}AttributeCallbackBridge(responseHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}});
+    CHIP{{chipCallback.name}}AttributeCallbackBridge * onSuccess = new CHIP{{chipCallback.name}}AttributeCallbackBridge(responseHandler, [self callbackQueue]);
 {{/if}}
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
@@ -718,7 +743,7 @@ private:
 
 - (void) reportAttribute{{asUpperCamelCase name}}WithResponseHandler:(ResponseHandler)reportHandler
 {
-    CHIP{{chipCallback.name}}AttributeCallbackBridge * onReport = new CHIP{{chipCallback.name}}AttributeCallbackBridge(reportHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}}, true);
+    CHIP{{chipCallback.name}}AttributeCallbackBridge * onReport = new CHIP{{chipCallback.name}}AttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
         reportHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;

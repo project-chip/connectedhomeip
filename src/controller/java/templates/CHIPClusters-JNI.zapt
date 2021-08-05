@@ -217,8 +217,7 @@ class CHIPDefaultFailureCallback : public Callback::Callback<DefaultFailureCallb
 
 class CHIP{{chipCallback.name}}AttributeCallback : public Callback::Callback<{{chipCallback.name}}AttributeCallback> {
     public:
-        CHIP{{chipCallback.name}}AttributeCallback(jobject javaCallback{{#if (isStrEqual chipCallback.name "String")}}, bool octetString{{/if}}, bool keepAlive = false): Callback::Callback<{{chipCallback.name}}AttributeCallback>(CallbackFn, this)
-        {{#if (isStrEqual chipCallback.name "String")}}, octetString(octetString){{/if}}
+        CHIP{{chipCallback.name}}AttributeCallback(jobject javaCallback, bool keepAlive = false): Callback::Callback<{{chipCallback.name}}AttributeCallback>(CallbackFn, this)
         , keepAlive(keepAlive)
         {
             JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -254,36 +253,36 @@ class CHIP{{chipCallback.name}}AttributeCallback : public Callback::Callback<{{c
             VerifyOrReturn(javaCallbackRef != nullptr, ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
 
             jmethodID javaMethod;
-            {{#unless (isStrEqual chipCallback.name "String")}}
+            {{#unless (isStrEqual chipCallback.name "OctetString")}}
+            {{#unless (isStrEqual chipCallback.name "CharString")}}
             err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{convertCTypeToJniSignature chipCallback.type}})V", &javaMethod);
             VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
+            env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<{{convertBasicCTypeToJniType chipCallback.type}}>(value));
+            {{/unless}}
             {{/unless}}
 
-            {{#if (isStrEqual chipCallback.name "String")}}
-            if (cppCallback.get()->octetString) {
-                err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
-                VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
+            {{#if (isStrEqual chipCallback.name "OctetString")}}
+            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
+            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
 
-                jbyteArray valueArr = env->NewByteArray(value.size());
-                env->ExceptionClear();
-                env->SetByteArrayRegion(valueArr, 0, value.size(), reinterpret_cast<const jbyte *>(value.data()));
+            jbyteArray valueArr = env->NewByteArray(value.size());
+            env->ExceptionClear();
+            env->SetByteArrayRegion(valueArr, 0, value.size(), reinterpret_cast<const jbyte *>(value.data()));
 
-                env->CallVoidMethod(javaCallbackRef, javaMethod, valueArr);
-            } else {
-                err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
-                VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
+            env->CallVoidMethod(javaCallbackRef, javaMethod, valueArr);
+            {{/if}}
 
-                UtfString valueStr(env, value);
-                env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
-            }
-            {{else}}
-            env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<{{convertBasicCTypeToJniType chipCallback.type}}>(value));
+            {{#if (isStrEqual chipCallback.name "CharString")}}
+            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
+            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
+
+            UtfString valueStr(env, value);
+            env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
             {{/if}}
         }
 
     private:
         jobject javaCallbackRef;
-        {{#if (isStrEqual chipCallback.name "String")}}bool octetString;{{/if}}
         bool keepAlive;
 };
 {{/chip_server_global_responses}}
@@ -599,7 +598,7 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, read{{asCamelCased name 
 {{#if isList}}
     CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback * onSuccess = new CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback(callback);
 {{else}}
-    CHIP{{chipCallback.name}}AttributeCallback * onSuccess = new CHIP{{chipCallback.name}}AttributeCallback(callback{{#if (isString type)}}, {{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}});
+    CHIP{{chipCallback.name}}AttributeCallback * onSuccess = new CHIP{{chipCallback.name}}AttributeCallback(callback);
 {{/if}}
     if (!onSuccess) {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
