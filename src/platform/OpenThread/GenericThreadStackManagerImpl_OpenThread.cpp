@@ -1365,7 +1365,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
     uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
     otDnsServiceInfo serviceInfo;
     uint16_t index = 0;
-    bool wasAnythingBrowsed;
+    bool wasAnythingBrowsed = false;
 
     if (ThreadStackMgrImpl().mDnsBrowseCallback == nullptr)
     {
@@ -1421,18 +1421,17 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DnsBrowse(const
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     Impl()->LockThreadStack();
-    const otDnsQueryConfig * defaultConfig = otDnsClientGetDefaultConfig(mOTInst);
 
     VerifyOrExit(aServiceName, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     mDnsBrowseCallback = aCallback;
 
     // Append default SRP domain name to the service name.
-    // fullServiceName buffer size is kMdnsTypeAndProtocolMaxSize + . separator + kDefaultDomainNameSize + termination character.
-    char fullServiceName[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
+    // fullServiceName buffer size is kMdnsFullTypeAndProtocolMaxSize + . + kDefaultDomainNameSize + null-terminator.
+    char fullServiceName[Mdns::kMdnsFullTypeAndProtocolMaxSize + 1 + SrpClient::kDefaultDomainNameSize + 1];
     snprintf(fullServiceName, sizeof(fullServiceName), "%s.%s", aServiceName, SrpClient::kDefaultDomainName);
 
-    error = MapOpenThreadError(otDnsClientBrowse(mOTInst, fullServiceName, OnDnsBrowseResult, aContext, defaultConfig));
+    error = MapOpenThreadError(otDnsClientBrowse(mOTInst, fullServiceName, OnDnsBrowseResult, aContext, /* config */ nullptr));
 
 exit:
 
