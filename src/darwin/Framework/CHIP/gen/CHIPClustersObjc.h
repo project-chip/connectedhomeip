@@ -897,7 +897,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster On/off
+ * Cluster On/Off
  *
  */
 @interface CHIPOnOff : CHIPCluster

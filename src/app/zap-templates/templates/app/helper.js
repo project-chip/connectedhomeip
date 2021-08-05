@@ -127,7 +127,7 @@ function asReadType(type)
 
 // List of all cluster with generated functions
 var endpointClusterWithInit = [
-  'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/off', 'Level Control', 'Color Control', 'IAS Zone',
+  'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/Off', 'Level Control', 'Color Control', 'IAS Zone',
   'Pump Configuration and Control'
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];

@@ -783,7 +783,7 @@
             { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1672) }, /* fabrics list */                                 \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                              \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: On/off (server) */                                                                            \
+            /* Endpoint: 1, Cluster: On/Off (server) */                                                                            \
             { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                             /* OnOff */                 \
             { 0x4000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },                             /* GlobalSceneControl */    \
             { 0x4001, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x0000) }, /* OnTime */                \
@@ -896,7 +896,7 @@
               6,                                                                                                                   \
               9,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
-              chipFuncArrayOnOffServer }, /* Endpoint: 1, Cluster: On/off (server) */                                              \
+              chipFuncArrayOnOffServer }, /* Endpoint: 1, Cluster: On/Off (server) */                                              \
             { 0x0008,                                                                                                              \
               ZAP_ATTRIBUTE_INDEX(110),                                                                                            \
               5,                                                                                                                   \
@@ -1045,7 +1045,7 @@
             { 0x003E, 0xA1, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* AddTrustedRootCertificate */                                   \
             { 0x003E, 0xA2, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveTrustedRootCertificate */                                \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: On/off (server) */                                                                            \
+            /* Endpoint: 1, Cluster: On/Off (server) */                                                                            \
             { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Off */                                                         \
             { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On */                                                          \
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Toggle */                                                      \

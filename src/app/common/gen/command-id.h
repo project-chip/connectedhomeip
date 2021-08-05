@@ -86,7 +86,7 @@
 #define ZCL_COPY_SCENE_COMMAND_ID (0x42)
 #define ZCL_COPY_SCENE_RESPONSE_COMMAND_ID (0x42)
 
-// Commands for cluster: On/off
+// Commands for cluster: On/Off
 #define ZCL_OFF_COMMAND_ID (0x00)
 #define ZCL_SAMPLE_MFG_SPECIFIC_OFF_WITH_TRANSITION_COMMAND_ID (0x00)
 #define ZCL_ON_COMMAND_ID (0x01)

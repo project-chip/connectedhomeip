@@ -587,7 +587,7 @@
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 0, Cluster: On/off (client) */                                                                                \
+        /* Endpoint: 0, Cluster: On/Off (client) */                                                                                \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(2) }, /* ClusterRevision */                  \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Level Control (client) */                                                                     \
@@ -740,7 +740,7 @@
 #define GENERATED_CLUSTER_COUNT 17
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
-        { 0x0006, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 0, Cluster: On/off (client) */      \
+        { 0x0006, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 0, Cluster: On/Off (client) */      \
             {                                                                                                                      \
                 0x0008, ZAP_ATTRIBUTE_INDEX(1), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
             }, /* Endpoint: 0, Cluster: Level Control (client) */                                                                  \
@@ -857,7 +857,7 @@
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 0, Cluster: On/off (client) */                                                                                \
+        /* Endpoint: 0, Cluster: On/Off (client) */                                                                                \
         { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Off */                                                         \
             { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On */                                                          \
             { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Toggle */                                                      \
