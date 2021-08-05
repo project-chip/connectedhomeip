@@ -21,18 +21,20 @@
 #include <algorithm>
 #include <inttypes.h>
 
-#include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
 #include <support/logging/CHIPLogging.h>
 
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+using namespace ::chip::DeviceLayer;
+#endif
+
 constexpr char kQrCodeBaseUrl[]                   = "https://dhrishi.github.io/connectedhomeip/qrcode.html";
 constexpr char kUrlDataAssignmentPhrase[]         = "?data=";
 constexpr char kSpecialCharsUnreservedInRfc3986[] = "-._~";
-
-using namespace ::chip::DeviceLayer;
 
 void PrintOnboardingCodes(chip::RendezvousInformationFlags aRendezvousFlags)
 {
@@ -113,7 +115,8 @@ void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags)
 
 CHIP_ERROR GetSetupPayload(chip::SetupPayload & aSetupPayload, chip::RendezvousInformationFlags aRendezvousFlags)
 {
-    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+#if CONFIG_DEVICE_LAYER
     aSetupPayload.version               = 0;
     aSetupPayload.rendezvousInformation = aRendezvousFlags;
 
@@ -144,6 +147,9 @@ CHIP_ERROR GetSetupPayload(chip::SetupPayload & aSetupPayload, chip::RendezvousI
         ChipLogProgress(AppServer, "ConfigurationMgr().GetProductId() failed: %s", chip::ErrorStr(err));
         return err;
     }
+#else
+    err = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CONFIG_DEVICE_LAYER
 
     return err;
 }
