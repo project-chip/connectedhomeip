@@ -139,6 +139,15 @@ class Context:
     # any generated output was cleaned
     self.completed_steps.discard(BuildSteps.GENERATED)
 
+  def CreateArtifactArchives(self, directory: str):
+    logging.info('Copying build artifacts to %s', directory)
+    if not os.path.exists(directory):
+      os.makedirs(directory)
+    for builder in self.builders:
+      # FIXME: builder subdir...
+        builder.CompressArtifacts(os.path.join(
+            directory, f'{builder.identifier}.tar.gz'))
+
   def CopyArtifactsTo(self, path: str):
     logging.info('Copying build artifacts to %s', path)
     if not os.path.exists(path):
