@@ -52,15 +52,15 @@ function asReadTypeLength(type)
     const defaultResolver = zclQuery.selectAtomicType(db, pkgId, type);
 
     const enumResolver = zclHelper.isEnum(db, type, pkgId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectEnumByName(db, type, pkgId).then(rec => {
-        return zclQuery.selectAtomicType(db, pkgId, rec.type);
-      });
+      return result == 'unknown'
+          ? null
+          : zclQuery.selectEnumByName(db, type, pkgId).then(rec => { return zclQuery.selectAtomicType(db, pkgId, rec.type); });
     });
 
     const bitmapResolver = zclHelper.isBitmap(db, type, pkgId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectBitmapByName(db, pkgId, type).then(rec => {
-        return zclQuery.selectAtomicType(db, pkgId, rec.type);
-      });
+      return result == 'unknown'
+          ? null
+          : zclQuery.selectBitmapByName(db, pkgId, type).then(rec => { return zclQuery.selectAtomicType(db, pkgId, rec.type); });
     });
 
     const typeResolver = Promise.all([ defaultResolver, enumResolver, bitmapResolver ]);
@@ -89,6 +89,8 @@ function asReadType(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return 'Int8u';
       case 'int8_t':
         return 'Int8s';
       case 'uint8_t':
@@ -154,25 +156,25 @@ function chip_endpoint_generated_functions()
       {
         hasFunctionArray = true
         functionList     = functionList.concat(
-            `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
+                `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
       }
 
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
             cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
-        hasFunctionArray = true
+            hasFunctionArray = true
       }
 
       if (endpointClusterWithMessageSent.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
             cHelper.asCamelCased(clusterName, false)}ClusterServerMessageSentCallback,\\\n`)
-        hasFunctionArray = true
+            hasFunctionArray = true
       }
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
         functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
             cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
-        hasFunctionArray = true
+            hasFunctionArray = true
       }
 
       if (hasFunctionArray) {
@@ -252,6 +254,8 @@ function asPrintFormat(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return '%d';
       case 'int8_t':
         return '%" PRId8 "';
       case 'uint8_t':

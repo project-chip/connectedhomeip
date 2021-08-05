@@ -37,7 +37,7 @@ bool Command::InitArguments(int argc, char ** argv)
     bool isValidCommand = false;
     size_t argsCount    = mArgs.size();
 
-    VerifyOrExit(argsCount == (size_t)(argc),
+    VerifyOrExit(argsCount == (size_t) (argc),
                  ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %zu", argc, argsCount));
 
     for (size_t i = 0; i < argsCount; i++)
@@ -157,6 +157,7 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
+    case ArgumentType::Boolean:
     case ArgumentType::Number_uint8: {
         uint8_t * value = reinterpret_cast<uint8_t *>(arg.value);
 

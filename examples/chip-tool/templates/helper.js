@@ -36,6 +36,8 @@ function asTypeMinValue(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return '0';
       case 'int8_t':
       case 'int16_t':
       case 'int32_t':
@@ -65,6 +67,8 @@ function asTypeMaxValue(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return '1';
       case 'int8_t':
       case 'int16_t':
       case 'int32_t':

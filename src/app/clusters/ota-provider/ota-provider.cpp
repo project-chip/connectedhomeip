@@ -154,7 +154,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(EndpointId endpoi
                                                                uint16_t vendorId, uint16_t productId, uint16_t imageType,
                                                                uint16_t hardwareVersion, uint32_t currentVersion,
                                                                /* TODO(#8605): change this to list */ uint8_t protocolsSupported,
-                                                               uint8_t * location, uint8_t clientCanConsent,
+                                                               uint8_t * location, bool clientCanConsent,
                                                                ByteSpan metadataForProvider)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
