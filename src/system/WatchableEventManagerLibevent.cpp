@@ -76,8 +76,8 @@ CHIP_ERROR WatchableEventManager::Init(System::Layer & systemLayer)
     }
 #endif // CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
 
-    mEventBase    = event_base_new();
-    mTimeoutEvent = evtimer_new(mEventBase, TimeoutCallbackHandler, event_self_cbarg());
+    mEventBase     = event_base_new();
+    mTimeoutEvent  = evtimer_new(mEventBase, TimeoutCallbackHandler, event_self_cbarg());
     mActiveSockets = nullptr;
     mSystemLayer   = &systemLayer;
 
