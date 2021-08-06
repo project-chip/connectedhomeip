@@ -1,5 +1,5 @@
 {
-  "featureLevel": 39,
+  "featureLevel": 45,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -512,7 +512,7 @@
           ]
         },
         {
-          "name": "On/off",
+          "name": "On/Off",
           "code": 6,
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
@@ -563,7 +563,7 @@
           ]
         },
         {
-          "name": "On/off",
+          "name": "On/Off",
           "code": 6,
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
@@ -3222,7 +3222,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -3248,7 +3248,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -3289,7 +3289,7 @@
               "outgoing": 0
             },
             {
-              "name": "AddOpCert",
+              "name": "AddNOC",
               "code": 6,
               "mfgCode": null,
               "source": "client",
@@ -3380,7 +3380,7 @@
               "outgoing": 1
             },
             {
-              "name": "OpCertResponse",
+              "name": "NOCResponse",
               "code": 8,
               "mfgCode": null,
               "source": "server",
@@ -6522,7 +6522,7 @@
           ]
         },
         {
-          "name": "On/off",
+          "name": "On/Off",
           "code": 6,
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
@@ -6573,7 +6573,7 @@
           ]
         },
         {
-          "name": "On/off",
+          "name": "On/Off",
           "code": 6,
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
@@ -13650,7 +13650,7 @@
           ]
         },
         {
-          "name": "On/off",
+          "name": "On/Off",
           "code": 6,
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
@@ -13701,7 +13701,7 @@
           ]
         },
         {
-          "name": "On/off",
+          "name": "On/Off",
           "code": 6,
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
@@ -16226,6 +16226,5 @@
       "endpointVersion": null,
       "deviceIdentifier": null
     }
-  ],
-  "log": []
+  ]
 }

@@ -41,8 +41,6 @@ using namespace chip::Mdns;
 using namespace mdns::Minimal;
 using namespace mdns::Minimal::test;
 
-CheckOnlyServer server;
-
 const QNamePart kDnsSdQueryParts[]              = { "_services", "_dns-sd", "_udp", "local" };
 const FullQName kDnsSdQueryName                 = FullQName(kDnsSdQueryParts);
 const QNamePart kMatterOperationalQueryParts[3] = { "_matter", "_tcp", "local" };
@@ -90,7 +88,10 @@ CHIP_ERROR SendQuery(FullQName qname)
 void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
 {
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
+    mdnsAdvertiser.StopPublishDevice();
+    auto & server = reinterpret_cast<CheckOnlyServer &>(GlobalMinimalMdnsServer::Server());
     server.SetTestSuite(inSuite);
+    server.Reset();
 
     // Start a single operational advertiser
     ChipLogProgress(Discovery, "Testing single operational advertiser");
@@ -233,11 +234,12 @@ const nlTest sTests[] = {
 int TestAdvertiser(void)
 {
     chip::Platform::MemoryInit();
+    nlTestSuite theSuite = { "AdvertiserImplMinimal", sTests, nullptr, nullptr };
+    CheckOnlyServer server(&theSuite);
     test::ServerSwapper swapper(&server);
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
     mdnsAdvertiser.Start(nullptr, CHIP_PORT);
-    nlTestSuite theSuite = { "AdvertiserImplMinimal", sTests, nullptr, nullptr };
-    nlTestRunner(&theSuite, nullptr);
+    nlTestRunner(&theSuite, &server);
     return nlTestRunnerStats(&theSuite);
 }
 

@@ -49,8 +49,6 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 @interface CHIPDeviceController ()
 
-@property (nonatomic, readonly, strong, nonnull) NSRecursiveLock * lock;
-
 // queue used to serialize all work performed by the CHIPDeviceController
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 
@@ -377,9 +375,10 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
                      queue:(dispatch_queue_t)queue
          completionHandler:(CHIPDeviceConnectionCallback)completionHandler
 {
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     if (![self isRunning]) {
         NSError * error;
-        [self checkForError:CHIP_ERROR_INCORRECT_STATE logMsg:kErrorNotRunning error:&error];
+        [self checkForError:errorCode logMsg:kErrorNotRunning error:&error];
         dispatch_async(queue, ^{
             completionHandler(nil, error);
         });
@@ -387,8 +386,10 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     }
 
     dispatch_async(_chipWorkQueue, ^{
-        CHIPDeviceConnectionBridge * connectionBridge = new CHIPDeviceConnectionBridge(completionHandler, queue);
-        CHIP_ERROR errorCode = connectionBridge->connect(self->_cppCommissioner, deviceID);
+        if ([self isRunning]) {
+            CHIPDeviceConnectionBridge * connectionBridge = new CHIPDeviceConnectionBridge(completionHandler, queue);
+            errorCode = connectionBridge->connect(self->_cppCommissioner, deviceID);
+        }
 
         NSError * error;
         if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:&error]) {

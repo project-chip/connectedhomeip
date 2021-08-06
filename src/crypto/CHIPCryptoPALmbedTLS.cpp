@@ -630,9 +630,9 @@ exit:
 #endif
 }
 
-void ClearSecretData(uint8_t * buf, uint32_t len)
+void ClearSecretData(uint8_t * buf, size_t len)
 {
-    memset(buf, 0, len);
+    mbedtls_platform_zeroize(buf, len);
 }
 
 CHIP_ERROR P256Keypair::Initialize()
