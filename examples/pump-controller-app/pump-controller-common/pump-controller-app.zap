@@ -2795,6 +2795,14 @@
           "enabled": 0,
           "commands": [
             {
+              "name": "SetFabric",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
               "name": "OpCSRRequest",
               "code": 4,
               "mfgCode": null,
@@ -2809,14 +2817,6 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
-            },
-            {
-              "name": "UpdateNOC",
-              "code": 7,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 0
             },
             {
               "name": "UpdateFabricLabel",
@@ -2835,7 +2835,7 @@
               "outgoing": 1
             },
             {
-              "name": "AddTrustedRootCertificate",
+              "name": "RemoveAllFabrics",
               "code": 11,
               "mfgCode": null,
               "source": "client",
@@ -2843,8 +2843,16 @@
               "outgoing": 1
             },
             {
+              "name": "AddTrustedRootCertificate",
+              "code": 161,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
               "name": "RemoveTrustedRootCertificate",
-              "code": 12,
+              "code": 162,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -2878,6 +2886,14 @@
           "enabled": 1,
           "commands": [
             {
+              "name": "SetFabricResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
               "name": "OpCSRResponse",
               "code": 5,
               "mfgCode": null,
@@ -2898,36 +2914,6 @@
             {
               "name": "fabrics list",
               "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "SupportedFabrics",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "CommissionedFabrics",
-              "code": 3,
               "mfgCode": null,
               "side": "server",
               "included": 1,

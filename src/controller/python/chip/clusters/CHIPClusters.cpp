@@ -3816,14 +3816,24 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_OpCSR
     cluster.Associate(device, ZCLendpointId);
     return cluster.OpCSRRequest(nullptr, nullptr, chip::ByteSpan(cSRNonce, cSRNonce_Len)).AsInteger();
 }
-chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_RemoveFabric(chip::Controller::Device * device,
-                                                                                        chip::EndpointId ZCLendpointId,
-                                                                                        chip::GroupId, uint8_t fabricIndex)
+chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics(chip::Controller::Device * device,
+                                                                                            chip::EndpointId ZCLendpointId,
+                                                                                            chip::GroupId)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.RemoveFabric(nullptr, nullptr, fabricIndex).AsInteger();
+    return cluster.RemoveAllFabrics(nullptr, nullptr).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_RemoveFabric(chip::Controller::Device * device,
+                                                                                        chip::EndpointId ZCLendpointId,
+                                                                                        chip::GroupId, chip::FabricId fabricId,
+                                                                                        chip::NodeId nodeId, uint16_t vendorId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.RemoveFabric(nullptr, nullptr, fabricId, nodeId, vendorId).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_RemoveTrustedRootCertificate(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, const uint8_t * trustedRootIdentifier,
@@ -3835,6 +3845,15 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_Remov
     return cluster.RemoveTrustedRootCertificate(nullptr, nullptr, chip::ByteSpan(trustedRootIdentifier, trustedRootIdentifier_Len))
         .AsInteger();
 }
+chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_SetFabric(chip::Controller::Device * device,
+                                                                                     chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                     uint16_t vendorId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.SetFabric(nullptr, nullptr, vendorId).AsInteger();
+}
 chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel(chip::Controller::Device * device,
                                                                                              chip::EndpointId ZCLendpointId,
                                                                                              chip::GroupId, const uint8_t * label,
@@ -3844,16 +3863,6 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_Updat
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.UpdateFabricLabel(nullptr, nullptr, chip::ByteSpan(label, label_Len)).AsInteger();
-}
-chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_UpdateNOC(chip::Controller::Device * device,
-                                                                                     chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                                     const uint8_t * nOCArray,
-                                                                                     uint32_t nOCArray_Len)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    chip::Controller::OperationalCredentialsCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.UpdateNOC(nullptr, nullptr, chip::ByteSpan(nOCArray, nOCArray_Len)).AsInteger();
 }
 
 chip::ChipError::StorageType chip_ime_ReadAttribute_OperationalCredentials_FabricsList(chip::Controller::Device * device,

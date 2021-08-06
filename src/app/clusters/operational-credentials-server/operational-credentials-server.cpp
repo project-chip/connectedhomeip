@@ -222,17 +222,24 @@ void emberAfPluginOperationalCredentialsServerInitCallback(void)
 }
 
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                              uint8_t fabricIndex)
+                                                              FabricId fabricId, NodeId nodeId, uint16_t vendorId)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    CHIP_ERROR err       = GetGlobalFabricTable().Delete(fabricIndex);
-    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
-
-exit:
+    // TODO - Update RemoveFabric command to take FabricIndex as input parameter
+    //    CHIP_ERROR err       = GetGlobalFabricTable().Delete(fabricIndex);
+    //    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    // exit:
     writeFabricsIntoFabricsListAttribute();
     emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterSetFabricCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint16_t VendorId)
+{
+    // TODO - Delete SetFabric command as this is not spec compliant
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
@@ -317,6 +324,14 @@ EmberAfNodeOperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
 }
 
 } // namespace
+
+// Up for discussion in Multi-Admin TT: chip-spec:#2891
+bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
+{
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Remove all Fabrics");
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
 
 bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app::CommandHandler * commandObj, ByteSpan NOCArray,
                                                         ByteSpan IPKValue, NodeId adminNodeId, uint16_t adminVendorId)

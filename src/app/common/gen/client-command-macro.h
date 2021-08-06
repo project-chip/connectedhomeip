@@ -2245,6 +2245,26 @@
                                                                                                                                    \
                               ZCL_REVOKE_COMMISSIONING_COMMAND_ID, "", );
 
+/** @brief Command description for SetFabric
+ *
+ * Command: SetFabric
+ * @param VendorId INT16U
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterSetFabric(VendorId) emberAfFillExternalBuffer(mask,                                                          \
+                                                                                                                                   \
+                                                                    ZCL_SET_FABRIC_COMMAND_ID, "u", VendorId);
+
+/** @brief Command description for SetFabricResponse
+ *
+ * Command: SetFabricResponse
+ * @param FabricId FABRIC_ID
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterSetFabricResponse(FabricId) emberAfFillExternalBuffer(mask,                                                  \
+                                                                                                                                   \
+                                                                            ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "u", FabricId);
+
 /** @brief Command description for OpCSRRequest
  *
  * Command: OpCSRRequest
@@ -2281,16 +2301,6 @@
                                                                                                                                    \
                                   ZCL_ADD_NOC_COMMAND_ID, "uuuu", NOCArray, IPKValue, CaseAdminNode, AdminVendorId);
 
-/** @brief Command description for UpdateNOC
- *
- * Command: UpdateNOC
- * @param NOCArray OCTET_STRING
- */
-#define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterUpdateNOC(NOCArray) emberAfFillExternalBuffer(mask,                                                          \
-                                                                                                                                   \
-                                                                    ZCL_UPDATE_NOC_COMMAND_ID, "u", NOCArray);
-
 /** @brief Command description for NOCResponse
  *
  * Command: NOCResponse
@@ -2317,12 +2327,24 @@
 /** @brief Command description for RemoveFabric
  *
  * Command: RemoveFabric
- * @param FabricIndex INT8U
+ * @param FabricId FABRIC_ID
+ * @param NodeId NODE_ID
+ * @param VendorId INT16U
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterRemoveFabric(FabricIndex) emberAfFillExternalBuffer(mask,                                                    \
+    CredentialsClusterRemoveFabric(FabricId, NodeId, VendorId)                                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                                                          ZCL_REMOVE_FABRIC_COMMAND_ID, "u", FabricIndex);
+                                  ZCL_REMOVE_FABRIC_COMMAND_ID, "uuu", FabricId, NodeId, VendorId);
+
+/** @brief Command description for RemoveAllFabrics
+ *
+ * Command: RemoveAllFabrics
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterRemoveAllFabrics() emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_REMOVE_ALL_FABRICS_COMMAND_ID, "", );
 
 /** @brief Command description for AddTrustedRootCertificate
  *

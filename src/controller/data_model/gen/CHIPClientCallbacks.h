@@ -164,6 +164,7 @@ typedef void (*OperationalCredentialsClusterNOCResponseCallback)(void * context,
                                                                  chip::ByteSpan DebugText);
 typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan NOCSRElements,
                                                                    chip::ByteSpan AttestationSignature);
+typedef void (*OperationalCredentialsClusterSetFabricResponseCallback)(void * context, chip::FabricId FabricId);
 typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId);
 typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t capacity, uint16_t groupId,
                                                                 uint8_t sceneCount,

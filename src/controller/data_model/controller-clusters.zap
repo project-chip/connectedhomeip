@@ -3703,6 +3703,14 @@
           "enabled": 1,
           "commands": [
             {
+              "name": "SetFabric",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
               "name": "OpCSRRequest",
               "code": 4,
               "mfgCode": null,
@@ -3713,14 +3721,6 @@
             {
               "name": "AddNOC",
               "code": 6,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "UpdateNOC",
-              "code": 7,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
@@ -3743,7 +3743,7 @@
               "outgoing": 1
             },
             {
-              "name": "AddTrustedRootCertificate",
+              "name": "RemoveAllFabrics",
               "code": 11,
               "mfgCode": null,
               "source": "client",
@@ -3751,8 +3751,16 @@
               "outgoing": 1
             },
             {
+              "name": "AddTrustedRootCertificate",
+              "code": 161,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
               "name": "RemoveTrustedRootCertificate",
-              "code": 12,
+              "code": 162,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
@@ -3785,6 +3793,14 @@
           "side": "server",
           "enabled": 0,
           "commands": [
+            {
+              "name": "SetFabricResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
             {
               "name": "OpCSRResponse",
               "code": 5,
