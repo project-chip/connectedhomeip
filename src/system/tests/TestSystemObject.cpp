@@ -57,6 +57,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <type_traits>
 
 // Test context
 using namespace chip::System;
@@ -83,6 +84,7 @@ private:
         kPoolSize = 112 // a multiple of kNumThreads, less than CHIP_SYS_STATS_COUNT_MAX
     };
     static ObjectPool<TestObject, kPoolSize> sPool;
+    static_assert(kPoolSize < CHIP_SYS_STATS_COUNT_MAX, "kPoolSize is not less than CHIP_SYS_STATS_COUNT_MAX");
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     unsigned int mDelay;
@@ -90,6 +92,7 @@ private:
     static constexpr int kNumThreads         = 16;
     static constexpr int kLoopIterations     = 1000;
     static constexpr int kMaxDelayIterations = 3;
+    static_assert(kPoolSize % kNumThreads == 0, "kPoolSize is not a multiple of kNumThreads");
 
     void Delay(volatile unsigned int & aAccumulator);
     static void * CheckConcurrencyThread(void * aContext);
