@@ -248,8 +248,8 @@ void HandlePairingWindowTimeout(System::Layer * aSystemLayer, void * aAppState, 
 
 } // namespace
 
-CHIP_ERROR OpenDefaultPairingWindow(ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds,
-                                    chip::PairingWindowAdvertisement advertisementMode)
+CHIP_ERROR OpenBasicCommissioningWindow(ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds,
+                                        chip::PairingWindowAdvertisement advertisementMode)
 {
     // TODO(cecille): If this is re-called when the window is already open, what should happen?
     gDeviceDiscriminatorCache.RestoreDiscriminator();
@@ -292,8 +292,8 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetFabrics resetFabrics, uint16_t commissi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t commissioningTimeoutSeconds, uint16_t discriminator, PASEVerifier & verifier,
-                                          uint32_t iterations, ByteSpan salt, uint16_t passcodeID)
+CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator, PASEVerifier & verifier,
+                                           uint32_t iterations, ByteSpan salt, uint16_t passcodeID)
 {
     RendezvousParameters params;
 
@@ -388,7 +388,7 @@ void InitServer(AppDelegate * delegate)
     if (useTestPairing())
     {
         ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
-        SuccessOrExit(err = AddTestPairing());
+        SuccessOrExit(err = AddTestCommissioning());
     }
     else if (DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
@@ -399,7 +399,7 @@ void InitServer(AppDelegate * delegate)
     else
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
-        SuccessOrExit(err = OpenDefaultPairingWindow(ResetFabrics::kYes));
+        SuccessOrExit(err = OpenBasicCommissioningWindow(ResetFabrics::kYes));
 #endif
     }
 
@@ -479,7 +479,7 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress com
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-CHIP_ERROR AddTestPairing()
+CHIP_ERROR AddTestCommissioning()
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     PASESession * testSession = nullptr;

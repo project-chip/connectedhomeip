@@ -370,7 +370,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     FabricInfo fabric;
 
-    NL_TEST_ASSERT(inSuite, fabric.SetOperationalKey(&accessoryOpKeys) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, fabric.SetEphemeralKey(&accessoryOpKeys) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, fabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)) == CHIP_NO_ERROR);
 
     uint8_t chipCert[kMaxCHIPCertLength * 2];

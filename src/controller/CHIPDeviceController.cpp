@@ -220,7 +220,7 @@ void DeviceController::OnLocalNOCChainGeneration(void * context, CHIP_ERROR stat
 
     Transport::FabricInfo newFabric;
 
-    newFabric.SetOperationalKey(&controller->mOperationalKey);
+    newFabric.SetEphemeralKey(&controller->mOperationalKey);
 
     constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;

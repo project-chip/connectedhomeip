@@ -85,9 +85,9 @@ public:
 
     ~FabricInfo()
     {
-        if (mOperationalKey != nullptr)
+        if (mEphemeralKey != nullptr)
         {
-            chip::Platform::Delete(mOperationalKey);
+            chip::Platform::Delete(mEphemeralKey);
         }
         ReleaseRootCert();
         ReleaseICACert();
@@ -102,21 +102,21 @@ public:
     uint16_t GetVendorId() const { return mVendorId; }
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
-    Crypto::P256Keypair * GetOperationalKey()
+    Crypto::P256Keypair * GetEphemeralKey()
     {
-        if (mOperationalKey == nullptr)
+        if (mEphemeralKey == nullptr)
         {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
-            mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
-            mOperationalKey->SetKeyId(CASE_OPS_KEY);
+            mEphemeralKey = chip::Platform::New<Crypto::P256KeypairHSM>();
+            mEphemeralKey->SetKeyId(CASE_OPS_KEY);
 #else
-            mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
+            mEphemeralKey = chip::Platform::New<Crypto::P256Keypair>();
 #endif
-            mOperationalKey->Initialize();
+            mEphemeralKey->Initialize();
         }
-        return mOperationalKey;
+        return mEphemeralKey;
     }
-    CHIP_ERROR SetOperationalKey(const Crypto::P256Keypair * key);
+    CHIP_ERROR SetEphemeralKey(const Crypto::P256Keypair * key);
 
     bool AreCredentialsAvailable() const
     {
@@ -163,9 +163,9 @@ public:
         mVendorId       = kUndefinedVendorId;
         mFabricLabel[0] = '\0';
 
-        if (mOperationalKey != nullptr)
+        if (mEphemeralKey != nullptr)
         {
-            mOperationalKey->Initialize();
+            mEphemeralKey->Initialize();
         }
         ReleaseRootCert();
         ReleaseICACert();
@@ -184,9 +184,9 @@ private:
     AccessControlList mACL;
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
-    Crypto::P256KeypairHSM * mOperationalKey = nullptr;
+    Crypto::P256KeypairHSM * mEphemeralKey = nullptr;
 #else
-    Crypto::P256Keypair * mOperationalKey = nullptr;
+    Crypto::P256Keypair * mEphemeralKey = nullptr;
 #endif
 
     uint8_t * mRootCert            = nullptr;
@@ -225,7 +225,7 @@ private:
         uint16_t mICACertLen;  /* This field is serialized in LittleEndian byte order */
         uint16_t mNOCCertLen;  /* This field is serialized in LittleEndian byte order */
 
-        Crypto::P256SerializedKeypair mOperationalKey;
+        Crypto::P256SerializedKeypair mEphemeralKey;
         uint8_t mRootCert[Credentials::kMaxCHIPCertLength];
         uint8_t mICACert[Credentials::kMaxCHIPCertLength];
         uint8_t mNOCCert[Credentials::kMaxCHIPCertLength];

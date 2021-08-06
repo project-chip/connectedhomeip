@@ -430,14 +430,14 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(EndpointId endpoin
 
     VerifyOrExit(csr.Alloc(Crypto::kMAX_CSR_Length), err = CHIP_ERROR_NO_MEMORY);
 
-    if (gFabricBeingCommissioned.GetOperationalKey() == nullptr)
+    if (gFabricBeingCommissioned.GetEphemeralKey() == nullptr)
     {
         Crypto::P256Keypair keypair;
         keypair.Initialize();
-        SuccessOrExit(err = gFabricBeingCommissioned.SetOperationalKey(&keypair));
+        SuccessOrExit(err = gFabricBeingCommissioned.SetEphemeralKey(&keypair));
     }
 
-    err = gFabricBeingCommissioned.GetOperationalKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
+    err = gFabricBeingCommissioned.GetEphemeralKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: NewCertificateSigningRequest returned %d", err);
     SuccessOrExit(err);
     VerifyOrExit(csrLength < UINT8_MAX, err = CHIP_ERROR_INTERNAL);
