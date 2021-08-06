@@ -1278,19 +1278,6 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
                             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_SigmaErr),
                         CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    if (packetHeader.GetSourceNodeId().HasValue())
-    {
-        if (mConnectionState.GetPeerNodeId() == kUndefinedNodeId)
-        {
-            mConnectionState.SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
-        }
-        else
-        {
-            VerifyOrReturnError(packetHeader.GetSourceNodeId().Value() == mConnectionState.GetPeerNodeId(),
-                                CHIP_ERROR_WRONG_NODE_ID);
-        }
-    }
-
     return CHIP_NO_ERROR;
 }
 

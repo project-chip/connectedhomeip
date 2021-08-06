@@ -300,7 +300,6 @@ ExchangeContext::~ExchangeContext()
 bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader,
                                     const PayloadHeader & payloadHeader)
 {
-    ChipLogProgress(Inet, "Matching exchange %d with %d", mExchangeId, payloadHeader.GetExchangeID());
     // A given message is part of a particular exchange if...
     return
 
