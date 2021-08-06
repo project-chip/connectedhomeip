@@ -32,7 +32,7 @@
 class AppTask
 {
 public:
-    int StartAppTask();
+    CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
     void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
@@ -43,7 +43,7 @@ public:
 private:
     friend AppTask & GetAppTask(void);
 
-    int Init();
+    CHIP_ERROR Init();
 
     static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(BoltLockManager::Action_t aAction);

@@ -69,13 +69,12 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Success.", nil) }];
     }
 
-    return
-        [NSError errorWithDomain:CHIPErrorDomain
-                            code:CHIPErrorCodeUndefinedError
-                        userInfo:@{
-                            NSLocalizedDescriptionKey : [NSString stringWithFormat:NSLocalizedString(@"Undefined error:%u.", nil),
-                                                                  chip::ChipError::AsInteger(errorCode)]
-                        }];
+    return [NSError errorWithDomain:CHIPErrorDomain
+                               code:CHIPErrorCodeUndefinedError
+                           userInfo:@{
+                               NSLocalizedDescriptionKey :
+                                   [NSString stringWithFormat:NSLocalizedString(@"Undefined error:%u.", nil), errorCode.AsInteger()]
+                           }];
     ;
 }
 

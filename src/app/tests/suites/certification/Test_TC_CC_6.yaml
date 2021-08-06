@@ -1,0 +1,186 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.2.15. [TC-CC-6.1 to 6.3] Color Temperature Controls
+
+config:
+    cluster: "Color Control"
+    endpoint: 1
+
+tests:
+    - label: "Turn on light for color control tests"
+      cluster: "On/Off"
+      command: "on"
+
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Move To Color Temperature command"
+      command: "MoveToColorTemperature"
+      arguments:
+          values:
+              - name: "colorTemperature"
+                value: 100
+              - name: "transitionTime"
+                value: 10
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read current color temprature"
+      disabled: true
+      command: "readAttribute"
+      attribute: "color temperature"
+      response:
+          value: 100
+
+    - label: "Move up color temperature command"
+      command: "MoveColorTemperature"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 1
+              - name: "rate"
+                value: 10
+              - name: "colorTemperatureMinimum"
+                value: 1
+              - name: "colorTemperatureMaximum"
+                value: 255
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read current color temprature"
+      disabled: true
+      command: "readAttribute"
+      attribute: "color temperature"
+      response:
+          value: -1
+
+    - label: "Stop Color Temperature command"
+      command: "MoveColorTemperature"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 10
+              - name: "colorTemperatureMinimum"
+                value: 1
+              - name: "colorTemperatureMaximum"
+                value: 255
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read current color temprature"
+      disabled: true
+      command: "readAttribute"
+      attribute: "color temperature"
+      response:
+          value: -1
+
+    - label: "Move down color temperature command"
+      command: "MoveColorTemperature"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 3
+              - name: "rate"
+                value: 20
+              - name: "colorTemperatureMinimum"
+                value: 1
+              - name: "colorTemperatureMaximum"
+                value: 255
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read current color temprature"
+      disabled: true
+      command: "readAttribute"
+      attribute: "color temperature"
+      response:
+          value: -1
+
+    - label: "Step up color temperature command"
+      command: "StepColorTemperature"
+      arguments:
+          values:
+              - name: "stepMode"
+                value: 1
+              - name: "stepSize"
+                value: 5
+              - name: "transitionTime"
+                value: 50
+              - name: "colorTemperatureMinimum"
+                value: 5
+              - name: "colorTemperatureMaximum"
+                value: 100
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read current color temprature"
+      disabled: true
+      command: "readAttribute"
+      attribute: "color temperature"
+      response:
+          value: -1
+
+    - label: "Step down color temperature command"
+      command: "StepColorTemperature"
+      arguments:
+          values:
+              - name: "stepMode"
+                value: 3
+              - name: "stepSize"
+                value: 5
+              - name: "transitionTime"
+                value: 50
+              - name: "colorTemperatureMinimum"
+                value: 5
+              - name: "colorTemperatureMaximum"
+                value: 100
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read current color temprature"
+      disabled: true
+      command: "readAttribute"
+      attribute: "color temperature"
+      response:
+          value: -1
+
+    - label: "Turn off light that we turned on"
+      cluster: "On/Off"
+      command: "off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

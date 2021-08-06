@@ -82,7 +82,7 @@ void emberAfGroupsClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfScenesClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief On/off Cluster Init
+/** @brief On/Off Cluster Init
  *
  * Cluster Init
  *
@@ -265,6 +265,14 @@ void emberAfBridgedDeviceBasicClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfSwitchClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief AdministratorCommissioning Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAdministratorCommissioningClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Operational Credentials Cluster Init
  *
@@ -1557,10 +1565,10 @@ void emberAfScenesClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfScenesClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// On/off Cluster
+// On/Off Cluster
 //
 
-/** @brief On/off Cluster Server Init
+/** @brief On/Off Cluster Server Init
  *
  * Server Init
  *
@@ -1568,7 +1576,7 @@ void emberAfScenesClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfOnOffClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief On/off Cluster Client Init
+/** @brief On/Off Cluster Client Init
  *
  * Client Init
  *
@@ -1576,7 +1584,7 @@ void emberAfOnOffClusterServerInitCallback(chip::EndpointId endpoint);
  */
 void emberAfOnOffClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief On/off Cluster Server Attribute Changed
+/** @brief On/Off Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
@@ -1585,7 +1593,7 @@ void emberAfOnOffClusterClientInitCallback(chip::EndpointId endpoint);
  */
 void emberAfOnOffClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
-/** @brief On/off Cluster Client Attribute Changed
+/** @brief On/Off Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
@@ -1594,7 +1602,7 @@ void emberAfOnOffClusterServerAttributeChangedCallback(chip::EndpointId endpoint
  */
 void emberAfOnOffClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
-/** @brief On/off Cluster Server Manufacturer Specific Attribute Changed
+/** @brief On/Off Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
  *
@@ -1605,7 +1613,7 @@ void emberAfOnOffClusterClientAttributeChangedCallback(chip::EndpointId endpoint
 void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 
-/** @brief On/off Cluster Client Manufacturer Specific Attribute Changed
+/** @brief On/Off Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
  *
@@ -1616,7 +1624,7 @@ void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(chip:
 void emberAfOnOffClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 
-/** @brief On/off Cluster Server Message Sent
+/** @brief On/Off Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -1630,7 +1638,7 @@ void emberAfOnOffClusterClientManufacturerSpecificAttributeChangedCallback(chip:
 void emberAfOnOffClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
                                                   uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief On/off Cluster Client Message Sent
+/** @brief On/Off Cluster Client Message Sent
  *
  * Client Message Sent
  *
@@ -1644,7 +1652,7 @@ void emberAfOnOffClusterServerMessageSentCallback(const chip::MessageSendDestina
 void emberAfOnOffClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
                                                   uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief On/off Cluster Server Pre Attribute Changed
+/** @brief On/Off Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -1658,7 +1666,7 @@ EmberAfStatus emberAfOnOffClusterServerPreAttributeChangedCallback(chip::Endpoin
                                                                    EmberAfAttributeType attributeType, uint16_t size,
                                                                    uint8_t * value);
 
-/** @brief On/off Cluster Client Pre Attribute Changed
+/** @brief On/Off Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -1672,7 +1680,7 @@ EmberAfStatus emberAfOnOffClusterClientPreAttributeChangedCallback(chip::Endpoin
                                                                    EmberAfAttributeType attributeType, uint16_t size,
                                                                    uint8_t * value);
 
-/** @brief On/off Cluster Server Tick
+/** @brief On/Off Cluster Server Tick
  *
  * Server Tick
  *
@@ -1680,7 +1688,7 @@ EmberAfStatus emberAfOnOffClusterClientPreAttributeChangedCallback(chip::Endpoin
  */
 void emberAfOnOffClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief On/off Cluster Client Tick
+/** @brief On/Off Cluster Client Tick
  *
  * Client Tick
  *
@@ -4693,6 +4701,146 @@ void emberAfSwitchClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfSwitchClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// AdministratorCommissioning Cluster
+//
+
+/** @brief AdministratorCommissioning Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAdministratorCommissioningClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief AdministratorCommissioning Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAdministratorCommissioningClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief AdministratorCommissioning Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfAdministratorCommissioningClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId);
+
+/** @brief AdministratorCommissioning Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfAdministratorCommissioningClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId);
+
+/** @brief AdministratorCommissioning Cluster Server Manufacturer Specific Attribute Changed
+ *
+ * Server Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfAdministratorCommissioningClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                                chip::AttributeId attributeId,
+                                                                                                uint16_t manufacturerCode);
+
+/** @brief AdministratorCommissioning Cluster Client Manufacturer Specific Attribute Changed
+ *
+ * Client Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfAdministratorCommissioningClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                                chip::AttributeId attributeId,
+                                                                                                uint16_t manufacturerCode);
+
+/** @brief AdministratorCommissioning Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param type               The type of message sent
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfAdministratorCommissioningClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                                       EmberStatus status);
+
+/** @brief AdministratorCommissioning Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param type               The type of message sent
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfAdministratorCommissioningClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                                       EmberStatus status);
+
+/** @brief AdministratorCommissioning Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfAdministratorCommissioningClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                        chip::AttributeId attributeId,
+                                                                                        EmberAfAttributeType attributeType,
+                                                                                        uint16_t size, uint8_t * value);
+
+/** @brief AdministratorCommissioning Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfAdministratorCommissioningClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                        chip::AttributeId attributeId,
+                                                                                        EmberAfAttributeType attributeType,
+                                                                                        uint16_t size, uint8_t * value);
+
+/** @brief AdministratorCommissioning Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfAdministratorCommissioningClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief AdministratorCommissioning Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfAdministratorCommissioningClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Operational Credentials Cluster
@@ -15579,10 +15727,11 @@ bool emberAfBasicClusterLeaveCallback(chip::EndpointId endpoint, chip::app::Comm
 /**
  * @brief  Cluster QueryImage Command callback (from client)
  */
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-    chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType,
-    uint16_t hardwareVersion, uint32_t currentVersion, /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported,
-    uint8_t * location, uint8_t requestorCanConsent, chip::ByteSpan metadataForProvider);
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                               uint16_t vendorId, uint16_t productId, uint16_t imageType,
+                                                               uint16_t hardwareVersion, uint32_t currentVersion,
+                                                               uint8_t protocolsSupported, uint8_t * location,
+                                                               uint8_t requestorCanConsent, chip::ByteSpan metadataForProvider);
 /**
  * @brief  Cluster ApplyUpdateRequest Command callback (from client)
  */
@@ -15796,6 +15945,23 @@ bool emberAfBridgedDeviceBasicClusterLeaveCallback(chip::EndpointId endpoint, ch
  * @brief  Cluster ReachableChanged Command callback (from server)
  */
 bool emberAfBridgedDeviceBasicClusterReachableChangedCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
+/**
+ * @brief  Cluster OpenCommissioningWindow Command callback (from client)
+ */
+bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
+    chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint16_t CommissioningTimeout, chip::ByteSpan PAKEVerifier,
+    uint16_t Discriminator, uint32_t Iterations, chip::ByteSpan Salt, uint16_t PasscodeID);
+/**
+ * @brief  Cluster OpenBasicCommissioningWindow Command callback (from client)
+ */
+bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(chip::EndpointId endpoint,
+                                                                                  chip::app::CommandHandler * commandObj,
+                                                                                  uint16_t CommissioningTimeout);
+/**
+ * @brief  Cluster RevokeCommissioning Command callback (from client)
+ */
+bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(chip::EndpointId endpoint,
+                                                                         chip::app::CommandHandler * commandObj);
 /**
  * @brief  Cluster AttestationRequest Command callback (from client)
  */

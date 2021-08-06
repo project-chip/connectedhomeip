@@ -115,7 +115,7 @@ public:
     const PASEVerifier & GetPASEVerifier() const { return mPASEVerifier; }
     RendezvousParameters & SetPASEVerifier(PASEVerifier & verifier)
     {
-        memmove(mPASEVerifier, verifier, sizeof(verifier));
+        memmove(&mPASEVerifier, &verifier, sizeof(verifier));
         mHasPASEVerifier = true;
         return *this;
     }

@@ -106,8 +106,8 @@ static void OnStringAttributeResponse(void * context, const chip::ByteSpan value
 }
 
 {{#chip_client_clusters}}
-{{#chip_server_cluster_responses}}
-static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}(void * context{{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_server_cluster_response_arguments}})
+{{#chip_cluster_responses}}
+static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}(void * context{{#chip_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_cluster_response_arguments}})
 {
     ChipLogProgress(chipTool, "{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}");
 
@@ -115,7 +115,7 @@ static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-{{/chip_server_cluster_responses}}
+{{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 
 {{#chip_client_clusters}}
@@ -167,7 +167,7 @@ constexpr chip::ClusterId k{{asCamelCased name false}}ClusterId = {{asHex code 4
 {{#chip_client_clusters}}
 {{> cluster_header}}
 
-{{#chip_server_cluster_commands}}
+{{#chip_cluster_commands}}
 /*
  * Command {{asCamelCased name false}}
  */
@@ -176,13 +176,13 @@ class {{asCamelCased clusterName false}}{{asCamelCased name false}}: public Mode
 public:
     {{asCamelCased clusterName false}}{{asCamelCased name false}}(): ModelCommand("{{asDelimitedCommand name}}")
     {
-        {{#chip_server_cluster_command_arguments}}
+        {{#chip_cluster_command_arguments}}
         {{#if (isString type)}}
         AddArgument("{{asCamelCased label false}}", &m{{asCamelCased label false}});
         {{else}}
         AddArgument("{{asCamelCased label false}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asCamelCased label false}});
         {{/if}}
-        {{/chip_server_cluster_command_arguments}}
+        {{/chip_cluster_command_arguments}}
         ModelCommand::AddArguments();
     }
     ~{{asCamelCased clusterName false}}{{asCamelCased name false}}()
@@ -197,7 +197,7 @@ public:
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isCharString type)}} chip::ByteSpan(chip::Uint8::from_char(m{{asCamelCased label false}}), strlen(m{{asCamelCased label false}})){{else}}m{{asCamelCased label false}}{{/if}}{{/chip_server_cluster_command_arguments}});
+        return cluster.{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_cluster_command_arguments}}, {{#if (isCharString type)}} chip::ByteSpan(chip::Uint8::from_char(m{{asCamelCased label false}}), strlen(m{{asCamelCased label false}})){{else}}m{{asCamelCased label false}}{{/if}}{{/chip_cluster_command_arguments}});
     }
 
 private:
@@ -207,16 +207,16 @@ private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     {{/if}}
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    {{#chip_server_cluster_command_arguments}}
+    {{#chip_cluster_command_arguments}}
     {{#if (isCharString type)}}
     char * m{{asCamelCased label false}};
     {{else}}
     {{chipType}} m{{asCamelCased label false}};
     {{/if}}
-    {{/chip_server_cluster_command_arguments}}
+    {{/chip_cluster_command_arguments}}
 };
 
-{{/chip_server_cluster_commands}}
+{{/chip_cluster_commands}}
 
 /*
  * Discover Attributes
@@ -389,9 +389,9 @@ void registerCluster{{asCamelCased name false}}(Commands & commands)
     const char * clusterName = "{{asCamelCased name false}}";
 
     commands_list clusterCommands = {
-        {{#chip_server_cluster_commands}}
+        {{#chip_cluster_commands}}
         make_unique<{{asCamelCased clusterName false}}{{asCamelCased name false}}>(), //
-        {{/chip_server_cluster_commands}}
+        {{/chip_cluster_commands}}
         make_unique<Discover{{asCamelCased name false}}Attributes>(), //
         {{#chip_server_cluster_attributes}}
         make_unique<Read{{asCamelCased parent.name false}}{{asCamelCased name false}}>(), //

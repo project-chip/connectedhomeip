@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="General"/>
+
+  <enum name="StatusCode" type="ENUM8">
+     <item name="Success" value="0x00"/>
+     <item name="Busy" value="0x01"/>
+     <item name="GeneralError" value="0x02"/>
+  </enum>
+
+  <cluster>
+    <name>AdministratorCommissioning</name>
+    <domain>General</domain>
+    <code>0x003c</code>
+    <define>ADMINISTRATOR_COMMISSIONING_CLUSTER</define>
+    <description>Commands to trigger a Node to allow a new Administrator to commission it.</description>
+
+    <command source="client" code="0x00" name="OpenCommissioningWindow" optional="false">
+      <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method.</description>
+      <arg name="CommissioningTimeout" type="INT16U"/>
+      <arg name="PAKEVerifier" type="OCTET_STRING"/>
+      <arg name="Discriminator" type="INT16U"/>
+      <arg name="Iterations" type="INT32U"/>
+      <arg name="Salt" type="OCTET_STRING"/>
+      <arg name="PasscodeID" type="INT16U"/>
+    </command>
+
+    <command source="client" code="0x01" name="OpenBasicCommissioningWindow" optional="false">
+      <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it.</description>
+      <arg name="CommissioningTimeout" type="INT16U"/>
+    </command>
+
+    <command source="client" code="0x02" name="RevokeCommissioning" optional="false">
+      <description>This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic Commissioning Window command.</description>
+    </command>
+
+  </cluster>
+</configurator>

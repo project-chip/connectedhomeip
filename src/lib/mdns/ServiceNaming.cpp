@@ -49,9 +49,7 @@ uint8_t HexToInt(char c)
 
 CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peerId)
 {
-    constexpr size_t kServiceNameLen = 16 + 1 + 16; // 2 * 64-bit value in HEX + hyphen
-
-    ReturnErrorCodeIf(bufferLen <= kServiceNameLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(bufferLen <= kOperationalServiceNamePrefix, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     NodeId nodeId     = peerId.GetNodeId();
     FabricId fabricId = peerId.GetFabricId();

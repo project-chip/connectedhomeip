@@ -59,96 +59,96 @@ bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
     const char * desc = nullptr;
 
-    if (!ChipError::IsPart(ChipError::SdkPart::kInet, err))
+    if (!err.IsPart(ChipError::SdkPart::kInet))
     {
         return false;
     }
 
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    switch (ChipError::AsInteger(err))
+    switch (err.AsInteger())
     {
-    case ChipError::AsInteger(INET_ERROR_WRONG_ADDRESS_TYPE):
+    case INET_ERROR_WRONG_ADDRESS_TYPE.AsInteger():
         desc = "Wrong address type";
         break;
-    case ChipError::AsInteger(CHIP_ERROR_CONNECTION_ABORTED):
+    case CHIP_ERROR_CONNECTION_ABORTED.AsInteger():
         desc = "TCP connection aborted";
         break;
-    case ChipError::AsInteger(INET_ERROR_PEER_DISCONNECTED):
+    case INET_ERROR_PEER_DISCONNECTED.AsInteger():
         desc = "Peer disconnected";
         break;
-    case ChipError::AsInteger(CHIP_ERROR_INCORRECT_STATE):
+    case CHIP_ERROR_INCORRECT_STATE.AsInteger():
         desc = "Incorrect state";
         break;
-    case ChipError::AsInteger(CHIP_ERROR_MESSAGE_TOO_LONG):
+    case CHIP_ERROR_MESSAGE_TOO_LONG.AsInteger():
         desc = "Message too long";
         break;
-    case ChipError::AsInteger(CHIP_ERROR_NO_CONNECTION_HANDLER):
+    case CHIP_ERROR_NO_CONNECTION_HANDLER.AsInteger():
         desc = "No TCP connection handler";
         break;
-    case ChipError::AsInteger(CHIP_ERROR_NO_MEMORY):
+    case CHIP_ERROR_NO_MEMORY.AsInteger():
         desc = "No memory";
         break;
-    case ChipError::AsInteger(CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG):
+    case CHIP_ERROR_OUTBOUND_MESSAGE_TOO_BIG.AsInteger():
         desc = "Outbound message truncated";
         break;
-    case ChipError::AsInteger(CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG):
+    case CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG.AsInteger():
         desc = "Inbound message too big";
         break;
-    case ChipError::AsInteger(INET_ERROR_HOST_NOT_FOUND):
+    case INET_ERROR_HOST_NOT_FOUND.AsInteger():
         desc = "Host not found";
         break;
-    case ChipError::AsInteger(INET_ERROR_DNS_TRY_AGAIN):
+    case INET_ERROR_DNS_TRY_AGAIN.AsInteger():
         desc = "DNS try again";
         break;
-    case ChipError::AsInteger(INET_ERROR_DNS_NO_RECOVERY):
+    case INET_ERROR_DNS_NO_RECOVERY.AsInteger():
         desc = "DNS no recovery";
         break;
-    case ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT):
+    case CHIP_ERROR_INVALID_ARGUMENT.AsInteger():
         desc = "Bad arguments";
         break;
-    case ChipError::AsInteger(INET_ERROR_WRONG_PROTOCOL_TYPE):
+    case INET_ERROR_WRONG_PROTOCOL_TYPE.AsInteger():
         desc = "Wrong protocol type";
         break;
-    case ChipError::AsInteger(INET_ERROR_UNKNOWN_INTERFACE):
+    case INET_ERROR_UNKNOWN_INTERFACE.AsInteger():
         desc = "Unknown interface";
         break;
-    case ChipError::AsInteger(CHIP_ERROR_NOT_IMPLEMENTED):
+    case CHIP_ERROR_NOT_IMPLEMENTED.AsInteger():
         desc = "Not implemented";
         break;
-    case ChipError::AsInteger(INET_ERROR_ADDRESS_NOT_FOUND):
+    case INET_ERROR_ADDRESS_NOT_FOUND.AsInteger():
         desc = "Address not found";
         break;
-    case ChipError::AsInteger(INET_ERROR_HOST_NAME_TOO_LONG):
+    case INET_ERROR_HOST_NAME_TOO_LONG.AsInteger():
         desc = "Host name too long";
         break;
-    case ChipError::AsInteger(INET_ERROR_INVALID_HOST_NAME):
+    case INET_ERROR_INVALID_HOST_NAME.AsInteger():
         desc = "Invalid host name";
         break;
-    case ChipError::AsInteger(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE):
+    case CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE.AsInteger():
         desc = "Not supported";
         break;
-    case ChipError::AsInteger(CHIP_ERROR_ENDPOINT_POOL_FULL):
+    case CHIP_ERROR_ENDPOINT_POOL_FULL.AsInteger():
         desc = "No more TCP endpoints";
         break;
-    case ChipError::AsInteger(INET_ERROR_IDLE_TIMEOUT):
+    case INET_ERROR_IDLE_TIMEOUT.AsInteger():
         desc = "Idle timeout";
         break;
-    case ChipError::AsInteger(CHIP_ERROR_UNEXPECTED_EVENT):
+    case CHIP_ERROR_UNEXPECTED_EVENT.AsInteger():
         desc = "Unexpected event";
         break;
-    case ChipError::AsInteger(INET_ERROR_INVALID_IPV6_PKT):
+    case INET_ERROR_INVALID_IPV6_PKT.AsInteger():
         desc = "Invalid IPv6 Packet";
         break;
-    case ChipError::AsInteger(INET_ERROR_INTERFACE_INIT_FAILURE):
+    case INET_ERROR_INTERFACE_INIT_FAILURE.AsInteger():
         desc = "Failure to initialize interface";
         break;
-    case ChipError::AsInteger(INET_ERROR_TCP_USER_TIMEOUT):
+    case INET_ERROR_TCP_USER_TIMEOUT.AsInteger():
         desc = "TCP User Timeout";
         break;
-    case ChipError::AsInteger(INET_ERROR_TCP_CONNECT_TIMEOUT):
+    case INET_ERROR_TCP_CONNECT_TIMEOUT.AsInteger():
         desc = "TCP Connect Timeout";
         break;
-    case ChipError::AsInteger(INET_ERROR_INCOMPATIBLE_IP_ADDRESS_TYPE):
+    case INET_ERROR_INCOMPATIBLE_IP_ADDRESS_TYPE.AsInteger():
         desc = "Incompatible IP address type";
         break;
     }

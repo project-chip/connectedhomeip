@@ -27,14 +27,15 @@
 
 namespace chip {
 namespace Mdns {
-constexpr size_t kMaxSubtypeDescSize        = 16; // max 16 char service name
-constexpr char kSubtypeServiceNamePart[]    = "_sub";
-constexpr char kCommissionableServiceName[] = "_matterc";
-constexpr char kOperationalServiceName[]    = "_matter";
-constexpr char kCommissionerServiceName[]   = "_matterd";
-constexpr char kOperationalProtocol[]       = "_tcp";
-constexpr char kCommissionProtocol[]        = "_udp";
-constexpr char kLocalDomain[]               = "local";
+constexpr size_t kMaxSubtypeDescSize           = 16; // max 16 char service name
+constexpr char kSubtypeServiceNamePart[]       = "_sub";
+constexpr char kCommissionableServiceName[]    = "_matterc";
+constexpr char kOperationalServiceName[]       = "_matter";
+constexpr char kCommissionerServiceName[]      = "_matterd";
+constexpr char kOperationalProtocol[]          = "_tcp";
+constexpr char kCommissionProtocol[]           = "_udp";
+constexpr char kLocalDomain[]                  = "local";
+constexpr size_t kOperationalServiceNamePrefix = 16 + 1 + 16; // 2 * 64-bit value in HEX + hyphen
 
 // each includes space for a null terminator, which becomes a . when the names are appended.
 constexpr size_t kMaxCommisisonableServiceNameSize =
@@ -43,6 +44,10 @@ constexpr size_t kMaxCommisisonableServiceNameSize =
 // each includes space for a null terminator, which becomes a . when the names are appended.
 constexpr size_t kMaxCommisisonerServiceNameSize =
     kMaxSubtypeDescSize + sizeof(kSubtypeServiceNamePart) + sizeof(kCommissionerServiceName);
+
+// + 1 for nullchar on prefix.
+constexpr size_t kMaxOperationalServiceNameSize =
+    kOperationalServiceNamePrefix + 1 + sizeof(kOperationalServiceName) + sizeof(kOperationalProtocol) + sizeof(kLocalDomain);
 
 /// builds the MDNS advertising name for a given fabric + nodeid pair
 CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peerId);

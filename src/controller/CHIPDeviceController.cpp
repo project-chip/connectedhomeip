@@ -720,8 +720,7 @@ exit:
     }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to initialize the device list with error: %" CHIP_ERROR_FORMAT,
-                     ChipError::FormatError(err));
+        ChipLogError(Controller, "Failed to initialize the device list with error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
@@ -1443,7 +1442,7 @@ void DeviceCommissioner::HandleAttestationResult(CHIP_ERROR err)
 
         Device * device = &mActiveDevices[mDeviceBeingPaired];
 
-        ChipLogProgress(Controller, "Sending Trusted Root Certificate to the device.");
+        ChipLogProgress(Controller, "Sending 'CSR request' command to the device.");
         CHIP_ERROR error = SendOperationalCertificateSigningRequestCommand(device);
         if (error != CHIP_NO_ERROR)
         {

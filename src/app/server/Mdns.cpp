@@ -48,16 +48,16 @@ NodeId GetCurrentNodeId()
     // mdns advertises a single node id as parameter.
 
     // Search for one admin pairing and use its node id.
-    auto pairing = GetGlobalFabricTable().cbegin();
-    if (pairing != GetGlobalFabricTable().cend())
+    for (const Transport::FabricInfo & fabricInfo : GetGlobalFabricTable())
     {
-        ChipLogProgress(Discovery, "Found admin pairing for admin %" PRIX8 ", node 0x" ChipLogFormatX64, pairing->GetFabricIndex(),
-                        ChipLogValueX64(pairing->GetNodeId()));
-        return pairing->GetNodeId();
+        if (fabricInfo.GetNodeId() != kUndefinedNodeId)
+        {
+            return fabricInfo.GetNodeId();
+        }
     }
 
-    ChipLogError(Discovery, "Failed to find a valid admin pairing. Node ID unknown");
-    return chip::kTestDeviceNodeId;
+    ChipLogProgress(Discovery, "Failed to find a valid admin pairing. Node ID unknown");
+    return kUndefinedNodeId;
 }
 
 // Requires an 8-byte mac to accommodate thread.
@@ -174,7 +174,7 @@ CHIP_ERROR Advertise(bool commissionableNode)
         ChipLogError(Discovery, "Setup discriminator not known. Using a default.");
         value = 840;
     }
-    advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscrimininator(value);
+    advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscriminator(value);
 
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceTypeEnabled() &&
         DeviceLayer::ConfigurationMgr().GetDeviceType(value) == CHIP_NO_ERROR)
@@ -252,7 +252,7 @@ void StartServer()
 
     // TODO: advertise this only when really operational once we support both
     // operational and commisioning advertising is supported.
-    if (DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
+    if (GetCurrentNodeId() != kUndefinedNodeId)
     {
         err = app::Mdns::AdvertiseOperational();
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
@@ -261,10 +261,7 @@ void StartServer()
     }
     else
     {
-// TODO: Thread devices are not able to advertise using mDNS before being provisioned,
-// so configuraton should be added to enable commissioning advertising based on supported
-// Rendezvous methods.
-#if (!CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS)
+#if CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
         err = app::Mdns::AdvertiseCommissionableNode();
 #endif
     }

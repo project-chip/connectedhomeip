@@ -27,14 +27,14 @@
 
 using namespace chip;
 
-bool emberAfDoorLockClusterLockDoorResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status)
+bool emberAfDoorLockClusterLockDoorResponseCallback(app::CommandHandler * commandObj, uint8_t status)
 {
     emberAfDoorLockClusterPrintln("RX: LockDoorResponse 0x%x", status);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
-bool emberAfDoorLockClusterUnlockDoorResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status)
+bool emberAfDoorLockClusterUnlockDoorResponseCallback(app::CommandHandler * commandObj, uint8_t status)
 {
     emberAfDoorLockClusterPrintln("RX: UnlockDoorResponse 0x%x", status);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);

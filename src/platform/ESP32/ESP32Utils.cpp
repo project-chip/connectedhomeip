@@ -311,7 +311,7 @@ CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
     {
         return CHIP_NO_ERROR;
     }
-    return ChipError::Encapsulate(ChipError::Range::kPlatform, error);
+    return CHIP_ERROR(ChipError::Range::kPlatform, error);
 }
 
 /**
@@ -328,7 +328,7 @@ CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
  */
 bool ESP32Utils::FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
-    if (!ChipError::IsRange(ChipError::Range::kPlatform, err))
+    if (!err.IsRange(ChipError::Range::kPlatform))
     {
         return false;
     }
@@ -336,7 +336,7 @@ bool ESP32Utils::FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 #if CHIP_CONFIG_SHORT_ERROR_STR
     const char * desc = NULL;
 #else  // CHIP_CONFIG_SHORT_ERROR_STR
-    const char * desc = esp_err_to_name((esp_err_t) ChipError::GetValue(err));
+    const char * desc = esp_err_to_name((esp_err_t) err.GetValue());
 #endif // CHIP_CONFIG_SHORT_ERROR_STR
 
     chip::FormatError(buf, bufSize, "ESP32", err, desc);

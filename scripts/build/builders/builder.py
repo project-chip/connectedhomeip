@@ -15,6 +15,7 @@
 import logging
 import os
 import shutil
+import tarfile
 from abc import ABC, abstractmethod
 
 
@@ -26,11 +27,14 @@ class Builder(ABC):
 
   """
 
-  def __init__(self, root, runner, output_dir='out'):
+  def __init__(self, root, runner, output_prefix: str ='out'):
     self.root = os.path.abspath(root)
     self._runner = runner
-    self.output_dir = output_dir
+    self.output_prefix = output_prefix
+
+    # Set post-init once actual build target is known
     self.identifier = None
+    self.output_dir = None
 
   @abstractmethod
   def generate(self):
@@ -54,6 +58,12 @@ class Builder(ABC):
   def _Execute(self, cmdarray, cwd=None, title=None):
     self._runner.Run(cmdarray, cwd=cwd, title=title)
 
+  def CompressArtifacts(self, target_file: str):
+    with tarfile.open(target_file, "w:gz") as tar:
+      for target_name, source_name in self.outputs().items():
+        logging.info(f'Adding {source_name} into {target_file}/{target_name}')
+        tar.add(source_name, target_name)
+
   def CopyArtifacts(self, target_dir: str):
     for target_name, source_name in self.outputs().items():
       target_full_name = os.path.join(target_dir, target_name)
@@ -67,3 +77,7 @@ class Builder(ABC):
         os.makedirs(target_dir_full_name)
 
       shutil.copyfile(source_name, target_full_name)
+
+  def SetIdentifier(self, platform: str, board: str, app: str):
+    self.identifier = '-'.join([platform, board, app])
+    self.output_dir = os.path.join(self.output_prefix, self.identifier)

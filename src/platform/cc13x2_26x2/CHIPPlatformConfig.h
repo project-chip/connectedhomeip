@@ -39,8 +39,6 @@
 #define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY 0x01
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER 0x2
 
-#define CHIP_CONFIG_ERROR_CLASS 1
-
 // ==================== Security Adaptations ====================
 
 #define CHIP_CONFIG_USE_OPENSSL_ECC 0

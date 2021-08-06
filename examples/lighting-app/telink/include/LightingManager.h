@@ -20,6 +20,8 @@
 
 #include "AppEvent.h"
 
+#include <system/SystemError.h>
+
 #include <cstdint>
 #include <drivers/gpio.h>
 
@@ -43,7 +45,7 @@ public:
 
     using LightingCallback_fn = void (*)(Action_t, int32_t);
 
-    int Init(const char * pwmDeviceName, uint32_t pwmChannel);
+    CHIP_ERROR Init(const char * pwmDeviceName, uint32_t pwmChannel);
     bool IsTurnedOn() const { return mState == kState_On; }
     uint8_t GetLevel() const { return mLevel; }
     bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t size, uint8_t * value);

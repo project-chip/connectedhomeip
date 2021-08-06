@@ -117,7 +117,7 @@ bool emberAfPluginDoorLockServerGetLogEntry(uint16_t * entryId, EmberAfPluginDoo
     return true;
 }
 
-bool emberAfDoorLockClusterGetLogRecordCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint16_t entryId)
+bool emberAfDoorLockClusterGetLogRecordCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint16_t entryId)
 {
     EmberStatus status;
     EmberAfPluginDoorLockServerLogEntry entry;
@@ -135,7 +135,7 @@ bool emberAfDoorLockClusterGetLogRecordCallback(chip::EndpointId endpoint, chip:
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
                                                  ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID,
-                                                 (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                                 (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

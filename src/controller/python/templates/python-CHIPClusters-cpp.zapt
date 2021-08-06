@@ -113,41 +113,40 @@ void chip_ime_SetFailureResponseDelegate(FailureResponseDelegate delegate)
 {{#chip_client_clusters}}
 // Cluster {{asCamelCased name false}}
 
-{{#chip_server_cluster_commands}}
-chip::ChipError::StorageType chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId{{#chip_server_cluster_command_arguments}}, {{#if (isString type)}}const uint8_t * {{asCamelCased label}}, uint32_t {{asCamelCased label}}_Len{{else}}{{chipType}} {{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}})
+{{#chip_cluster_commands}}
+chip::ChipError::StorageType chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId{{#chip_cluster_command_arguments}}, {{#if (isString type)}}const uint8_t * {{asCamelCased label}}, uint32_t {{asCamelCased label}}_Len{{else}}{{chipType}} {{asCamelCased label}}{{/if}}{{/chip_cluster_command_arguments}})
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::{{asCamelCased clusterName false}}Cluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return chip::ChipError::AsInteger(cluster.{{asCamelCased name false}}(nullptr, nullptr{{#chip_server_cluster_command_arguments}}, {{#if (isString type)}}chip::ByteSpan({{asCamelCased label}}, {{asCamelCased label}}_Len){{else}}{{asCamelCased label}}{{/if}}
-    {{/chip_server_cluster_command_arguments}}));
+    return cluster.{{asCamelCased name false}}(nullptr, nullptr{{#chip_cluster_command_arguments}}, {{#if (isString type)}}chip::ByteSpan({{asCamelCased label}}, {{asCamelCased label}}_Len){{else}}{{asCamelCased label}}{{/if}}{{/chip_cluster_command_arguments}}).AsInteger();
 }
-{{/chip_server_cluster_commands}}
+{{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
 chip::ChipError::StorageType chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
     cluster.Associate(device, ZCLendpointId);
 {{#if isList}}
-    return chip::ChipError::AsInteger(cluster.ReadAttribute{{asCamelCased name false}}(g{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+    return cluster.ReadAttribute{{asCamelCased name false}}(g{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 {{else}}
-    return chip::ChipError::AsInteger(cluster.ReadAttribute{{asCamelCased name false}}(g{{chipCallback.name}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()));
+    return cluster.ReadAttribute{{asCamelCased name false}}(g{{chipCallback.name}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
 {{/if}}
 }
 
 {{#if isReportableAttribute}}
 chip::ChipError::StorageType chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}})
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
     cluster.Associate(device, ZCLendpointId);
 {{#if isList}}
     chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>(On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse, nullptr);
-    return ChipError::AsInteger(cluster.ConfigureAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval{{#if isAnalog}}, change{{/if}}));
+    return cluster.ConfigureAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval{{#if isAnalog}}, change{{/if}}).AsInteger();
 {{else}}
-    return ChipError::AsInteger(cluster.ConfigureAttribute{{asCamelCased name false}}(g{{chipCallback.name}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval{{#if isAnalog}}, change{{/if}}));
+    return cluster.ConfigureAttribute{{asCamelCased name false}}(g{{chipCallback.name}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval{{#if isAnalog}}, change{{/if}}).AsInteger();
 {{/if}}
 }
 {{/if}}
@@ -155,10 +154,10 @@ chip::ChipError::StorageType chip_ime_ConfigureAttribute_{{asCamelCased parent.n
 {{#if isWritableAttribute}}
 chip::ChipError::StorageType chip_ime_WriteAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, {{#if (isString type)}} uint8_t * value, size_t len{{else}}{{chipType}} value{{/if}})
 {
-    VerifyOrReturnError(device != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return ChipError::AsInteger(cluster.WriteAttribute{{asCamelCased name false}}(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), {{#if (isString type)}} chip::ByteSpan(value, len){{else}}value{{/if}}));
+    return cluster.WriteAttribute{{asCamelCased name false}}(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), {{#if (isString type)}} chip::ByteSpan(value, len){{else}}value{{/if}}).AsInteger();
 }
 {{/if}}
 {{/chip_server_cluster_attributes}}

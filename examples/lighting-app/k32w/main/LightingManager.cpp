@@ -30,8 +30,6 @@ TimerHandle_t sLightTimer; // FreeRTOS app sw timer.
 
 int LightingManager::Init()
 {
-    int err = CHIP_NO_ERROR;
-
     // Create FreeRTOS sw timer for light timer.
 
     sLightTimer = xTimerCreate("LightTmr",       // Just a text name, not used by the RTOS kernel
@@ -52,7 +50,7 @@ int LightingManager::Init()
     mAutoTurnOn           = false;
     mAutoTurnOnDuration   = 0;
 
-    return err;
+    return 0;
 }
 
 void LightingManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)

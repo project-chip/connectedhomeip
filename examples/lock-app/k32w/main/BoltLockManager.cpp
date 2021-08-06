@@ -30,7 +30,7 @@ TimerHandle_t sLockTimer; // FreeRTOS app sw timer.
 
 int BoltLockManager::Init()
 {
-    int err = CHIP_NO_ERROR;
+    int err = 0;
 
     // Create FreeRTOS sw timer for Lock timer.
 

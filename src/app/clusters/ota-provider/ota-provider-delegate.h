@@ -31,9 +31,9 @@ namespace clusters {
 class OTAProviderDelegate
 {
 public:
-    // TODO: protocolsSupported should be list of OTADownloadProtocol enums, not uint8_t*
+    // TODO(#8605): protocolsSupported should be list of OTADownloadProtocol enums, not uint8_t
     virtual EmberAfStatus HandleQueryImage(uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
-                                           uint32_t currentVersion, uint8_t * protocolsSupported, const chip::ByteSpan & location,
+                                           uint32_t currentVersion, uint8_t protocolsSupported, const chip::ByteSpan & location,
                                            bool clientCanConsent, const chip::ByteSpan & metadataForProvider) = 0;
 
     virtual EmberAfStatus HandleApplyUpdateRequest(const chip::ByteSpan & updateToken, uint32_t newVersion) = 0;

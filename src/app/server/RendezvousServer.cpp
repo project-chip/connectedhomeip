@@ -42,8 +42,6 @@ void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t
     server->OnPlatformEvent(event);
 }
 } // namespace
-static constexpr uint32_t kSpake2p_Iteration_Count = 100;
-static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Salt";
 
 void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
@@ -56,7 +54,7 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
         else
         {
             ChipLogError(Discovery, "Commissioning errored out with error %" CHIP_ERROR_FORMAT,
-                         ChipError::FormatError(event->CommissioningComplete.status));
+                         event->CommissioningComplete.status.Format());
         }
         // TODO: Commissioning complete means we can finalize the fabric in our storage
     }
@@ -67,7 +65,8 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
     }
 }
 
-CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params, Messaging::ExchangeManager * exchangeManager,
+CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params, uint32_t pbkdf2IterCount, const ByteSpan & salt,
+                                            uint16_t passcodeID, Messaging::ExchangeManager * exchangeManager,
                                             TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
                                             Transport::FabricInfo * fabric)
 {
@@ -83,17 +82,18 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
 
     mAdvDelegate = params.GetAdvertisementDelegate();
 
-    // Note: Since BLE is only used for initial setup, enable BLE advertisement in rendezvous session can be expected.
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
-#if CONFIG_NETWORK_LAYER_BLE
-    {
-        ReturnErrorOnFailure(GetAdvertisementDelegate()->StartAdvertisement());
-    }
-#else
+#if !CONFIG_NETWORK_LAYER_BLE
     {
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 #endif
+
+    if (HasAdvertisementDelegate())
+    {
+        ReturnErrorOnFailure(GetAdvertisementDelegate()->StartAdvertisement());
+    }
+
     mSessionMgr      = sessionMgr;
     mFabric          = fabric;
     mExchangeManager = exchangeManager;
@@ -106,13 +106,12 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
 
     if (params.HasPASEVerifier())
     {
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(params.GetPASEVerifier(), keyID, this));
+        ReturnErrorOnFailure(
+            mPairingSession.WaitForPairing(params.GetPASEVerifier(), pbkdf2IterCount, salt, passcodeID, keyID, this));
     }
     else
     {
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(params.GetSetupPINCode(), kSpake2p_Iteration_Count,
-                                                            reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
-                                                            strlen(kSpake2pKeyExchangeSalt), keyID, this));
+        ReturnErrorOnFailure(mPairingSession.WaitForPairing(params.GetSetupPINCode(), pbkdf2IterCount, salt, keyID, this));
     }
 
     ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transportMgr));

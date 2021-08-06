@@ -1,11 +1,62 @@
 {{> header}}
+
+{{#if (chip_has_client_clusters)}}
 #include "CHIPClusters.h"
 
 #include <cstdint>
 
-#include "chip-zcl-zpro-codec-api.h"
-#include <lib/support/Span.h>
+#include <support/BufferWriter.h>
+#include <support/SafeInt.h>
+#include <support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
+
+#include <app/chip-zcl-zpro-codec.h>
+#include <app/common/gen/ids/Attributes.h>
+#include <app/util/basic-types.h>
+
 #include <gen/CHIPClientCallbacks.h>
+
+#define COMMAND_HEADER(name, clusterId)                                                                                            \
+    const char * kName = name;                                                                                                     \
+    uint8_t seqNum     = mDevice->GetNextSequenceNumber();                                                                         \
+                                                                                                                                   \
+    PacketBufferWriter buf(System::PacketBufferHandle::New(kMaxBufferSize));                                                       \
+    if (buf.IsNull())                                                                                                              \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Could not allocate packet buffer while trying to encode %s command", kName);                            \
+        return CHIP_ERROR_INTERNAL;                                                                                                \
+    }                                                                                                                              \
+                                                                                                                                   \
+    if (doEncodeApsFrame(buf, clusterId, kSourceEndpoint, mEndpoint, 0, 0, 0, 0, false))                                           \
+    {
+
+#define COMMAND_FOOTER()                                                                                                           \
+    }                                                                                                                              \
+    if (!buf.Fit())                                                                                                                \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Command %s can't fit in the allocated buffer", kName);                                                  \
+    }                                                                                                                              \
+    return SendCommand(seqNum, buf.Finalize(), onSuccessCallback, onFailureCallback);
+
+namespace {
+  // TODO: Find a way to calculate maximum message length for clusters
+  //       https://github.com/project-chip/connectedhomeip/issues/965
+  constexpr uint16_t kMaxBufferSize = 1024;
+
+  // This is a global command, so the low bits are 0b00.  The command is
+  // standard, so does not need a manufacturer code, and we're sending client
+  // to server, so all the remaining bits are 0.
+  constexpr uint8_t kFrameControlGlobalCommand = 0x00;
+
+  // Pick source endpoint as 1 for now
+  constexpr chip::EndpointId kSourceEndpoint = 1;
+
+  const uint8_t kReportingDirectionReported = 0x00;
+}
+
+using namespace chip::app::Clusters;
+using namespace chip::System;
+using namespace chip::Encoding::LittleEndian;
 
 namespace chip {
 namespace Controller {
@@ -16,9 +67,9 @@ namespace Controller {
 
 {{#chip_client_clusters}}
 
-// {{asCamelCased name false}} Cluster Commands
-{{#chip_server_cluster_commands}}
-CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
+// {{asUpperCamelCase name}} Cluster Commands
+{{#chip_cluster_commands}}
+CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}})
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -31,22 +82,22 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, k{{asCamelCased name false}}CommandId,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, {{asUpperCamelCase parent.name}}::Commands::Ids::{{asUpperCamelCase name}},
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-{{#chip_server_cluster_command_arguments}}
+{{#chip_cluster_command_arguments}}
 {{#first}}
     VerifyOrExit((writer = sender->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 {{/first}}
-    // {{asCamelCased label}}: {{asCamelCased type}}
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
+    // {{asLowerCamelCase label}}: {{asLowerCamelCase type}}
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}));
 {{else}}
     // Command takes no arguments.
-{{/chip_server_cluster_command_arguments}}
+{{/chip_cluster_command_arguments}}
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -64,49 +115,78 @@ exit:
     return err;
 }
 
-{{/chip_server_cluster_commands}}
-// {{asCamelCased name false}} Cluster Attributes
+{{/chip_cluster_commands}}
+// {{asUpperCamelCase name}} Cluster Attributes
 CHIP_ERROR {{asCamelCased name false}}Cluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encode{{asCamelCased name false}}ClusterDiscoverAttributes(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    COMMAND_HEADER("Discover{{asUpperCamelCase name}}Attributes", {{asUpperCamelCase name}}::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put32(Globals::Commands::Ids::DiscoverAttributes)
+       .Put32(0x0000)
+       .Put8(0xFF);
+    COMMAND_FOOTER();
 }
+
 {{#chip_server_cluster_attributes}}
-CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReadAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = {{asHex code 4}};
+    attributePath.mFieldId    = {{asHex code 8}};
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-{{#if isList}}
-        {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAttributeFilter
-{{else}}
-         BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>
-{{/if}}
-        );
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,{{#if isList}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter{{else}}BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>{{/if}});
 }
 
 {{#if isWritableAttribute}}
-CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
+CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} {{asLowerCamelCase name}})
 {
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(seqNum, mEndpoint, value);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    COMMAND_HEADER("Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}", {{asUpperCamelCase parent.name}}::Id);
+    {{#if (isString type)}}
+    size_t {{asLowerCamelCase name}}StrLen = {{asLowerCamelCase name}}.size();
+    if (!CanCastTo<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asLowerCamelCase name}}StrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %zu", kName, {{asLowerCamelCase name}}StrLen);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    {{/if}}
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put32(Globals::Commands::Ids::WriteAttributes)
+       .Put32({{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::Ids::{{asUpperCamelCase name}})
+       .Put8({{atomicTypeId}})
+    {{#if (isString type)}}
+       .Put{{#if (isLongString type)}}16{{/if}}(static_cast<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asLowerCamelCase name}}StrLen))
+       .Put({{asLowerCamelCase name}}.data(), {{asLowerCamelCase name}}StrLen)
+    {{else}}
+       .Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>({{asLowerCamelCase name}}))
+    {{/if}}
+       ;
+    COMMAND_FOOTER();
 }
 
 {{/if}}
 {{#if isReportableAttribute}}
-CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ConfigureAttribute{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}})
+CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ConfigureAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval{{#if isAnalog}}, {{chipType}} change{{/if}})
 {
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encode{{asCamelCased parent.name false}}ClusterConfigure{{asCamelCased name false}}Attribute(seqNum, mEndpoint, minInterval, maxInterval{{#if isAnalog}}, change{{/if}});
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+    COMMAND_HEADER("Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}", {{asUpperCamelCase parent.name}}::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+       .Put8(seqNum)
+       .Put32(Globals::Commands::Ids::ConfigureReporting)
+       .Put8(kReportingDirectionReported)
+       .Put32({{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::Ids::{{asUpperCamelCase name}})
+       .Put8({{atomicTypeId}})
+       .Put16(minInterval)
+       .Put16(maxInterval);
+    {{#if isAnalog}}
+    buf.Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>(change));
+    {{/if}}
+    COMMAND_FOOTER();
 }
 
-CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReportAttribute{{asCamelCased name false}}(Callback::Cancelable * onReportCallback)
+CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReportAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onReportCallback)
 {
     return RequestAttributeReporting({{asHex code 4}}, onReportCallback);
 }
@@ -117,3 +197,4 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReportAttribute{{asCamelCa
 
 } // namespace Controller
 } // namespace chip
+{{/if}}

@@ -56,6 +56,26 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster AdministratorCommissioning
+ *
+ */
+@interface CHIPAdministratorCommissioning : CHIPCluster
+
+- (void)openBasicCommissioningWindow:(uint16_t)commissioningTimeout responseHandler:(ResponseHandler)responseHandler;
+- (void)openCommissioningWindow:(uint16_t)commissioningTimeout
+                   pAKEVerifier:(NSData *)pAKEVerifier
+                  discriminator:(uint16_t)discriminator
+                     iterations:(uint32_t)iterations
+                           salt:(NSData *)salt
+                     passcodeID:(uint16_t)passcodeID
+                responseHandler:(ResponseHandler)responseHandler;
+- (void)revokeCommissioning:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Application Basic
  *
  */
@@ -877,7 +897,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster On/off
+ * Cluster On/Off
  *
  */
 @interface CHIPOnOff : CHIPCluster
@@ -1205,6 +1225,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeNumberOfWeeklyTransitionsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeNumberOfDailyTransitionsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster Thermostat User Interface Configuration
+ *
+ */
+@interface CHIPThermostatUserInterfaceConfiguration : CHIPCluster
+
+- (void)readAttributeTemperatureDisplayModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeTemperatureDisplayModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeKeypadLockoutWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeKeypadLockoutWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeScheduleProgrammingVisibilityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeScheduleProgrammingVisibilityWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
