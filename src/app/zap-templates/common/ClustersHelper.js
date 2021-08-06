@@ -502,7 +502,7 @@ Clusters.init = function(context, packageId) {
     this._attributes = enhancedAttributes(attributes, globalAttributes, types);
 
     return this.ready.resolve();
-  });
+  }, err => this.ready.reject(err));
 }
 
 
@@ -512,13 +512,13 @@ Clusters.init = function(context, packageId) {
 function asBlocks(promise, options)
 {
   const fn = pkgId => Clusters.init(this, pkgId).then(() => promise.then(data => templateUtil.collectBlocks(data, options, this)));
-  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
+  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => { console.log(err); throw err; });
 }
 
 function asPromise(promise)
 {
   const fn = pkgId => Clusters.init(this, pkgId).then(() => promise);
-  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
+  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => { console.log(err); throw err; });
 }
 
 //
