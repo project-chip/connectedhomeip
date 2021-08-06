@@ -336,7 +336,7 @@ int main(int argc, char ** args)
         nullptr);
     if (err != CHIP_NO_ERROR)
     {
-        printf("Failed to create the shutdown timer. Kill with ^C. %" CHIP_ERROR_FORMAT "\n", ChipError::FormatError(err));
+        printf("Failed to create the shutdown timer. Kill with ^C. %" CHIP_ERROR_FORMAT "\n", err.Format());
     }
 
     DeviceLayer::PlatformMgr().RunEventLoop();
