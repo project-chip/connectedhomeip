@@ -56,8 +56,6 @@ CHIP_ERROR UserDirectedCommissioningClient::SendUDCMessage(TransportMgrBase * tr
 
 CHIP_ERROR UserDirectedCommissioningClient::EncodeUDCMessage(System::PacketBufferHandle && payload)
 {
-    CHIP_ERROR err;
-
     PayloadHeader payloadHeader;
     PacketHeader packetHeader;
 
@@ -73,7 +71,7 @@ CHIP_ERROR UserDirectedCommissioningClient::EncodeUDCMessage(System::PacketBuffe
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(payload));
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace UserDirectedCommissioning
