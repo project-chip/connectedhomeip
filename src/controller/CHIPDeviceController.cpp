@@ -849,7 +849,6 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
 
     mUdcServer->SetInstanceNameResolver(this);
     mUdcServer->SetUserConfirmationProvider(this);
-    printf("UDC Server Setup Complete\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     return CHIP_NO_ERROR;
 }

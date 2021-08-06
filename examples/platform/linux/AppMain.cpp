@@ -184,7 +184,6 @@ CHIP_ERROR InitCommissioner()
     ReturnErrorOnFailure(gCommissioner.SetUdpListenPort(CHIP_PORT + 2));
     ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(CHIP_PORT + 3));
     ReturnErrorOnFailure(gCommissioner.Init(localId, params));
-    ReturnErrorOnFailure(gCommissioner.ServiceEvents());
 
     return CHIP_NO_ERROR;
 }
