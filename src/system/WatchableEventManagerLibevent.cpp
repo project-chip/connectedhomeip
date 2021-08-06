@@ -78,7 +78,6 @@ CHIP_ERROR WatchableEventManager::Init(System::Layer & systemLayer)
 
     mEventBase    = event_base_new();
     mTimeoutEvent = evtimer_new(mEventBase, TimeoutCallbackHandler, event_self_cbarg());
-    ChipLogError(chipSystemLayer, "XXX Init mTimeoutEvent←%p", mTimeoutEvent);
     mActiveSockets = nullptr;
     mSystemLayer   = &systemLayer;
 

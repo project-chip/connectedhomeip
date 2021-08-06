@@ -125,7 +125,6 @@ CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, Timers:
     {
         (void) mTimerList.Add(timer);
         dispatch_source_t timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatchQueue);
-        ChipLogProgress(DeviceLayer, "XXX StartTimer using dispatch queue %p source %p", dispatchQueue, timerSource);
         if (timerSource == nullptr)
         {
             chipDie();
@@ -142,7 +141,6 @@ CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, Timers:
         dispatch_resume(timerSource);
         return CHIP_NO_ERROR;
     }
-    ChipLogProgress(DeviceLayer, "XXX StartTimer NOT using dispatch queue");
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
     if (mTimerList.Add(timer) == timer)
@@ -163,12 +161,9 @@ void WatchableEventManager::CancelTimer(Timers::OnCompleteFunct onComplete, void
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     if (timer->mTimerSource != nullptr)
     {
-        ChipLogProgress(DeviceLayer, "XXX CancelTimer source %p", timer->mTimerSource);
         dispatch_source_cancel(timer->mTimerSource);
         dispatch_release(timer->mTimerSource);
     }
-    else
-        ChipLogProgress(DeviceLayer, "XXX CancelTimer NO timer source");
 #endif
 
     timer->Release();
@@ -186,14 +181,12 @@ CHIP_ERROR WatchableEventManager::ScheduleWork(Timers::OnCompleteFunct onComplet
     dispatch_queue_t dispatchQueue = GetDispatchQueue();
     if (dispatchQueue)
     {
-        ChipLogProgress(DeviceLayer, "XXX ScheduleWork using dispatch queue %p", dispatchQueue);
         (void) mTimerList.Add(timer);
         dispatch_async(dispatchQueue, ^{
             this->HandleTimerComplete(timer);
         });
         return CHIP_NO_ERROR;
     }
-    ChipLogProgress(DeviceLayer, "XXX ScheduleWork NOT using dispatch queue");
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
     if (mTimerList.Add(timer) == timer)
