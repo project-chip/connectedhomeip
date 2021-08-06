@@ -850,6 +850,7 @@ NS_ASSUME_NONNULL_BEGIN
                 timeoutMs:(uint32_t)timeoutMs
           responseHandler:(ResponseHandler)responseHandler;
 
+- (void)readAttributeFeatureMapWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
