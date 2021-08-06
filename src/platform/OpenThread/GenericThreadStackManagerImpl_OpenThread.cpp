@@ -1364,7 +1364,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
     // each entry consists of txt_entry_size (1B) + txt_entry_key + "=" + txt_entry_data
     uint8_t txtBuffer[kMaxDnsServiceTxtEntriesNumber + kTotalDnsServiceTxtBufferSize];
     otDnsServiceInfo serviceInfo;
-    uint16_t index = 0;
+    uint16_t index          = 0;
     bool wasAnythingBrowsed = false;
 
     if (ThreadStackMgrImpl().mDnsBrowseCallback == nullptr)
