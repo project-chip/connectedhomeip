@@ -20,9 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libUserDirectedCommissioningTests"
 
-  test_sources = [
-    "TestUdcMessages.cpp",
-  ]
+  test_sources = [ "TestUdcMessages.cpp" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
