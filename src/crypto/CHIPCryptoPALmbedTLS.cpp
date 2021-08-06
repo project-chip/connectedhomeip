@@ -242,7 +242,8 @@ CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
     mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
 
     // Back-up context as we are about to finalize the hash to extract digest.
-    mbedtls_sha256_context previous_ctx = *context;
+    mbedtls_sha256_context previous_ctx;
+    mbedtls_sha256_clone(&previous_ctx, context);
 
     // Pad + compute digest, then finalize context. It is restored next line to continue.
     CHIP_ERROR result = Finish(out_buffer);
