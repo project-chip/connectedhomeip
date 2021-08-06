@@ -67,7 +67,10 @@ function asReadTypeLength(type)
     return typeResolver.then(types => (types.find(type => type)).size);
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => { console.log(err); throw err; });
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise)
 }
 
@@ -118,7 +121,10 @@ function asReadType(type)
     })
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => { console.log(err); throw err; });
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise)
 }
 
@@ -282,7 +288,10 @@ function asPrintFormat(type)
     })
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => { console.log(err); throw err; });
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise)
 }
 

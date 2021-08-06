@@ -55,7 +55,10 @@ function asTypeMinValue(type)
     })
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => { console.log(err); throw err; });
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise);
 }
 
@@ -87,7 +90,10 @@ function asTypeMaxValue(type)
     })
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => { console.log(err); throw err; });
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise);
 }
 
