@@ -719,11 +719,11 @@ EmberAfStatus SetCurrentGroup(chip::EndpointId endpoint, uint16_t currentGroup)
     return emberAfWriteServerAttribute(endpoint, Scenes::Id, Ids::CurrentGroup, (uint8_t *) &currentGroup,
                                        ZCL_INT16U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetSceneValid(chip::EndpointId endpoint, uint8_t * sceneValid)
+EmberAfStatus GetSceneValid(chip::EndpointId endpoint, bool * sceneValid)
 {
     return emberAfReadServerAttribute(endpoint, Scenes::Id, Ids::SceneValid, (uint8_t *) sceneValid, sizeof(*sceneValid));
 }
-EmberAfStatus SetSceneValid(chip::EndpointId endpoint, uint8_t sceneValid)
+EmberAfStatus SetSceneValid(chip::EndpointId endpoint, bool sceneValid)
 {
     return emberAfWriteServerAttribute(endpoint, Scenes::Id, Ids::SceneValid, (uint8_t *) &sceneValid, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
@@ -741,11 +741,11 @@ EmberAfStatus SetNameSupport(chip::EndpointId endpoint, uint8_t nameSupport)
 
 namespace OnOff {
 namespace Attributes {
-EmberAfStatus GetOnOff(chip::EndpointId endpoint, uint8_t * onOff)
+EmberAfStatus GetOnOff(chip::EndpointId endpoint, bool * onOff)
 {
     return emberAfReadServerAttribute(endpoint, OnOff::Id, Ids::OnOff, (uint8_t *) onOff, sizeof(*onOff));
 }
-EmberAfStatus SetOnOff(chip::EndpointId endpoint, uint8_t onOff)
+EmberAfStatus SetOnOff(chip::EndpointId endpoint, bool onOff)
 {
     return emberAfWriteServerAttribute(endpoint, OnOff::Id, Ids::OnOff, (uint8_t *) &onOff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
@@ -795,12 +795,12 @@ EmberAfStatus SetSampleMfgSpecificAttribute0x00010x1040(chip::EndpointId endpoin
     return emberAfWriteServerAttribute(endpoint, OnOff::Id, Ids::SampleMfgSpecificAttribute0x00010x1040,
                                        (uint8_t *) &sampleMfgSpecificAttribute0x00010x1040, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetGlobalSceneControl(chip::EndpointId endpoint, uint8_t * globalSceneControl)
+EmberAfStatus GetGlobalSceneControl(chip::EndpointId endpoint, bool * globalSceneControl)
 {
     return emberAfReadServerAttribute(endpoint, OnOff::Id, Ids::GlobalSceneControl, (uint8_t *) globalSceneControl,
                                       sizeof(*globalSceneControl));
 }
-EmberAfStatus SetGlobalSceneControl(chip::EndpointId endpoint, uint8_t globalSceneControl)
+EmberAfStatus SetGlobalSceneControl(chip::EndpointId endpoint, bool globalSceneControl)
 {
     return emberAfWriteServerAttribute(endpoint, OnOff::Id, Ids::GlobalSceneControl, (uint8_t *) &globalSceneControl,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
@@ -1049,12 +1049,12 @@ EmberAfStatus SetValidUntilTime(chip::EndpointId endpoint, /* TYPE WARNING: utc 
 
 namespace BinaryInputBasic {
 namespace Attributes {
-EmberAfStatus GetOutOfService(chip::EndpointId endpoint, uint8_t * outOfService)
+EmberAfStatus GetOutOfService(chip::EndpointId endpoint, bool * outOfService)
 {
     return emberAfReadServerAttribute(endpoint, BinaryInputBasic::Id, Ids::OutOfService, (uint8_t *) outOfService,
                                       sizeof(*outOfService));
 }
-EmberAfStatus SetOutOfService(chip::EndpointId endpoint, uint8_t outOfService)
+EmberAfStatus SetOutOfService(chip::EndpointId endpoint, bool outOfService)
 {
     return emberAfWriteServerAttribute(endpoint, BinaryInputBasic::Id, Ids::OutOfService, (uint8_t *) &outOfService,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
@@ -1068,12 +1068,12 @@ EmberAfStatus SetPolarity(chip::EndpointId endpoint, uint8_t polarity)
     return emberAfWriteServerAttribute(endpoint, BinaryInputBasic::Id, Ids::Polarity, (uint8_t *) &polarity,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetPresentValue(chip::EndpointId endpoint, uint8_t * presentValue)
+EmberAfStatus GetPresentValue(chip::EndpointId endpoint, bool * presentValue)
 {
     return emberAfReadServerAttribute(endpoint, BinaryInputBasic::Id, Ids::PresentValue, (uint8_t *) presentValue,
                                       sizeof(*presentValue));
 }
-EmberAfStatus SetPresentValue(chip::EndpointId endpoint, uint8_t presentValue)
+EmberAfStatus SetPresentValue(chip::EndpointId endpoint, bool presentValue)
 {
     return emberAfWriteServerAttribute(endpoint, BinaryInputBasic::Id, Ids::PresentValue, (uint8_t *) &presentValue,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
@@ -1123,12 +1123,12 @@ EmberAfStatus SetTotalProfileNum(chip::EndpointId endpoint, uint8_t totalProfile
     return emberAfWriteServerAttribute(endpoint, PowerProfile::Id, Ids::TotalProfileNum, (uint8_t *) &totalProfileNum,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetMultipleScheduling(chip::EndpointId endpoint, uint8_t * multipleScheduling)
+EmberAfStatus GetMultipleScheduling(chip::EndpointId endpoint, bool * multipleScheduling)
 {
     return emberAfReadServerAttribute(endpoint, PowerProfile::Id, Ids::MultipleScheduling, (uint8_t *) multipleScheduling,
                                       sizeof(*multipleScheduling));
 }
-EmberAfStatus SetMultipleScheduling(chip::EndpointId endpoint, uint8_t multipleScheduling)
+EmberAfStatus SetMultipleScheduling(chip::EndpointId endpoint, bool multipleScheduling)
 {
     return emberAfWriteServerAttribute(endpoint, PowerProfile::Id, Ids::MultipleScheduling, (uint8_t *) &multipleScheduling,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
@@ -1143,12 +1143,12 @@ EmberAfStatus SetEnergyFormatting(chip::EndpointId endpoint, uint8_t energyForma
     return emberAfWriteServerAttribute(endpoint, PowerProfile::Id, Ids::EnergyFormatting, (uint8_t *) &energyFormatting,
                                        ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetEnergyRemote(chip::EndpointId endpoint, uint8_t * energyRemote)
+EmberAfStatus GetEnergyRemote(chip::EndpointId endpoint, bool * energyRemote)
 {
     return emberAfReadServerAttribute(endpoint, PowerProfile::Id, Ids::EnergyRemote, (uint8_t *) energyRemote,
                                       sizeof(*energyRemote));
 }
-EmberAfStatus SetEnergyRemote(chip::EndpointId endpoint, uint8_t energyRemote)
+EmberAfStatus SetEnergyRemote(chip::EndpointId endpoint, bool energyRemote)
 {
     return emberAfWriteServerAttribute(endpoint, PowerProfile::Id, Ids::EnergyRemote, (uint8_t *) &energyRemote,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
@@ -1327,21 +1327,21 @@ EmberAfStatus SetSoftwareVersion(chip::EndpointId endpoint, uint32_t softwareVer
     return emberAfWriteServerAttribute(endpoint, Basic::Id, Ids::SoftwareVersion, (uint8_t *) &softwareVersion,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetLocalConfigDisabled(chip::EndpointId endpoint, uint8_t * localConfigDisabled)
+EmberAfStatus GetLocalConfigDisabled(chip::EndpointId endpoint, bool * localConfigDisabled)
 {
     return emberAfReadServerAttribute(endpoint, Basic::Id, Ids::LocalConfigDisabled, (uint8_t *) localConfigDisabled,
                                       sizeof(*localConfigDisabled));
 }
-EmberAfStatus SetLocalConfigDisabled(chip::EndpointId endpoint, uint8_t localConfigDisabled)
+EmberAfStatus SetLocalConfigDisabled(chip::EndpointId endpoint, bool localConfigDisabled)
 {
     return emberAfWriteServerAttribute(endpoint, Basic::Id, Ids::LocalConfigDisabled, (uint8_t *) &localConfigDisabled,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetReachable(chip::EndpointId endpoint, uint8_t * reachable)
+EmberAfStatus GetReachable(chip::EndpointId endpoint, bool * reachable)
 {
     return emberAfReadServerAttribute(endpoint, Basic::Id, Ids::Reachable, (uint8_t *) reachable, sizeof(*reachable));
 }
-EmberAfStatus SetReachable(chip::EndpointId endpoint, uint8_t reachable)
+EmberAfStatus SetReachable(chip::EndpointId endpoint, bool reachable)
 {
     return emberAfWriteServerAttribute(endpoint, Basic::Id, Ids::Reachable, (uint8_t *) &reachable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
@@ -2140,12 +2140,12 @@ EmberAfStatus SetPHYRate(chip::EndpointId endpoint, uint8_t pHYRate)
     return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, Ids::PHYRate, (uint8_t *) &pHYRate,
                                        ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetFullDuplex(chip::EndpointId endpoint, uint8_t * fullDuplex)
+EmberAfStatus GetFullDuplex(chip::EndpointId endpoint, bool * fullDuplex)
 {
     return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, Ids::FullDuplex, (uint8_t *) fullDuplex,
                                       sizeof(*fullDuplex));
 }
-EmberAfStatus SetFullDuplex(chip::EndpointId endpoint, uint8_t fullDuplex)
+EmberAfStatus SetFullDuplex(chip::EndpointId endpoint, bool fullDuplex)
 {
     return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, Ids::FullDuplex, (uint8_t *) &fullDuplex,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
@@ -2200,12 +2200,12 @@ EmberAfStatus SetOverrunCount(chip::EndpointId endpoint, uint64_t overrunCount)
     return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, Ids::OverrunCount, (uint8_t *) &overrunCount,
                                        ZCL_INT64U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetCarrierDetect(chip::EndpointId endpoint, uint8_t * carrierDetect)
+EmberAfStatus GetCarrierDetect(chip::EndpointId endpoint, bool * carrierDetect)
 {
     return emberAfReadServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, Ids::CarrierDetect, (uint8_t *) carrierDetect,
                                       sizeof(*carrierDetect));
 }
-EmberAfStatus SetCarrierDetect(chip::EndpointId endpoint, uint8_t carrierDetect)
+EmberAfStatus SetCarrierDetect(chip::EndpointId endpoint, bool carrierDetect)
 {
     return emberAfWriteServerAttribute(endpoint, EthernetNetworkDiagnostics::Id, Ids::CarrierDetect, (uint8_t *) &carrierDetect,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
@@ -2254,11 +2254,11 @@ EmberAfStatus SetSoftwareVersion(chip::EndpointId endpoint, uint32_t softwareVer
     return emberAfWriteServerAttribute(endpoint, BridgedDeviceBasic::Id, Ids::SoftwareVersion, (uint8_t *) &softwareVersion,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetReachable(chip::EndpointId endpoint, uint8_t * reachable)
+EmberAfStatus GetReachable(chip::EndpointId endpoint, bool * reachable)
 {
     return emberAfReadServerAttribute(endpoint, BridgedDeviceBasic::Id, Ids::Reachable, (uint8_t *) reachable, sizeof(*reachable));
 }
-EmberAfStatus SetReachable(chip::EndpointId endpoint, uint8_t reachable)
+EmberAfStatus SetReachable(chip::EndpointId endpoint, bool reachable)
 {
     return emberAfWriteServerAttribute(endpoint, BridgedDeviceBasic::Id, Ids::Reachable, (uint8_t *) &reachable,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
@@ -2400,12 +2400,12 @@ EmberAfStatus SetLockType(chip::EndpointId endpoint, uint8_t lockType)
 {
     return emberAfWriteServerAttribute(endpoint, DoorLock::Id, Ids::LockType, (uint8_t *) &lockType, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetActuatorEnabled(chip::EndpointId endpoint, uint8_t * actuatorEnabled)
+EmberAfStatus GetActuatorEnabled(chip::EndpointId endpoint, bool * actuatorEnabled)
 {
     return emberAfReadServerAttribute(endpoint, DoorLock::Id, Ids::ActuatorEnabled, (uint8_t *) actuatorEnabled,
                                       sizeof(*actuatorEnabled));
 }
-EmberAfStatus SetActuatorEnabled(chip::EndpointId endpoint, uint8_t actuatorEnabled)
+EmberAfStatus SetActuatorEnabled(chip::EndpointId endpoint, bool actuatorEnabled)
 {
     return emberAfWriteServerAttribute(endpoint, DoorLock::Id, Ids::ActuatorEnabled, (uint8_t *) &actuatorEnabled,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
@@ -2557,12 +2557,12 @@ EmberAfStatus SetMinRfidCodeLength(chip::EndpointId endpoint, uint8_t minRfidCod
     return emberAfWriteServerAttribute(endpoint, DoorLock::Id, Ids::MinRfidCodeLength, (uint8_t *) &minRfidCodeLength,
                                        ZCL_INT8U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetEnableLogging(chip::EndpointId endpoint, uint8_t * enableLogging)
+EmberAfStatus GetEnableLogging(chip::EndpointId endpoint, bool * enableLogging)
 {
     return emberAfReadServerAttribute(endpoint, DoorLock::Id, Ids::EnableLogging, (uint8_t *) enableLogging,
                                       sizeof(*enableLogging));
 }
-EmberAfStatus SetEnableLogging(chip::EndpointId endpoint, uint8_t enableLogging)
+EmberAfStatus SetEnableLogging(chip::EndpointId endpoint, bool enableLogging)
 {
     return emberAfWriteServerAttribute(endpoint, DoorLock::Id, Ids::EnableLogging, (uint8_t *) &enableLogging,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
@@ -2625,42 +2625,42 @@ EmberAfStatus SetDefaultConfigurationRegister(chip::EndpointId endpoint, uint16_
     return emberAfWriteServerAttribute(endpoint, DoorLock::Id, Ids::DefaultConfigurationRegister,
                                        (uint8_t *) &defaultConfigurationRegister, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetEnableLocalProgramming(chip::EndpointId endpoint, uint8_t * enableLocalProgramming)
+EmberAfStatus GetEnableLocalProgramming(chip::EndpointId endpoint, bool * enableLocalProgramming)
 {
     return emberAfReadServerAttribute(endpoint, DoorLock::Id, Ids::EnableLocalProgramming, (uint8_t *) enableLocalProgramming,
                                       sizeof(*enableLocalProgramming));
 }
-EmberAfStatus SetEnableLocalProgramming(chip::EndpointId endpoint, uint8_t enableLocalProgramming)
+EmberAfStatus SetEnableLocalProgramming(chip::EndpointId endpoint, bool enableLocalProgramming)
 {
     return emberAfWriteServerAttribute(endpoint, DoorLock::Id, Ids::EnableLocalProgramming, (uint8_t *) &enableLocalProgramming,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetEnableOneTouchLocking(chip::EndpointId endpoint, uint8_t * enableOneTouchLocking)
+EmberAfStatus GetEnableOneTouchLocking(chip::EndpointId endpoint, bool * enableOneTouchLocking)
 {
     return emberAfReadServerAttribute(endpoint, DoorLock::Id, Ids::EnableOneTouchLocking, (uint8_t *) enableOneTouchLocking,
                                       sizeof(*enableOneTouchLocking));
 }
-EmberAfStatus SetEnableOneTouchLocking(chip::EndpointId endpoint, uint8_t enableOneTouchLocking)
+EmberAfStatus SetEnableOneTouchLocking(chip::EndpointId endpoint, bool enableOneTouchLocking)
 {
     return emberAfWriteServerAttribute(endpoint, DoorLock::Id, Ids::EnableOneTouchLocking, (uint8_t *) &enableOneTouchLocking,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetEnableInsideStatusLed(chip::EndpointId endpoint, uint8_t * enableInsideStatusLed)
+EmberAfStatus GetEnableInsideStatusLed(chip::EndpointId endpoint, bool * enableInsideStatusLed)
 {
     return emberAfReadServerAttribute(endpoint, DoorLock::Id, Ids::EnableInsideStatusLed, (uint8_t *) enableInsideStatusLed,
                                       sizeof(*enableInsideStatusLed));
 }
-EmberAfStatus SetEnableInsideStatusLed(chip::EndpointId endpoint, uint8_t enableInsideStatusLed)
+EmberAfStatus SetEnableInsideStatusLed(chip::EndpointId endpoint, bool enableInsideStatusLed)
 {
     return emberAfWriteServerAttribute(endpoint, DoorLock::Id, Ids::EnableInsideStatusLed, (uint8_t *) &enableInsideStatusLed,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetEnablePrivacyModeButton(chip::EndpointId endpoint, uint8_t * enablePrivacyModeButton)
+EmberAfStatus GetEnablePrivacyModeButton(chip::EndpointId endpoint, bool * enablePrivacyModeButton)
 {
     return emberAfReadServerAttribute(endpoint, DoorLock::Id, Ids::EnablePrivacyModeButton, (uint8_t *) enablePrivacyModeButton,
                                       sizeof(*enablePrivacyModeButton));
 }
-EmberAfStatus SetEnablePrivacyModeButton(chip::EndpointId endpoint, uint8_t enablePrivacyModeButton)
+EmberAfStatus SetEnablePrivacyModeButton(chip::EndpointId endpoint, bool enablePrivacyModeButton)
 {
     return emberAfWriteServerAttribute(endpoint, DoorLock::Id, Ids::EnablePrivacyModeButton, (uint8_t *) &enablePrivacyModeButton,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
@@ -2685,22 +2685,22 @@ EmberAfStatus SetUserCodeTemporaryDisableTime(chip::EndpointId endpoint, uint8_t
     return emberAfWriteServerAttribute(endpoint, DoorLock::Id, Ids::UserCodeTemporaryDisableTime,
                                        (uint8_t *) &userCodeTemporaryDisableTime, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetSendPinOverTheAir(chip::EndpointId endpoint, uint8_t * sendPinOverTheAir)
+EmberAfStatus GetSendPinOverTheAir(chip::EndpointId endpoint, bool * sendPinOverTheAir)
 {
     return emberAfReadServerAttribute(endpoint, DoorLock::Id, Ids::SendPinOverTheAir, (uint8_t *) sendPinOverTheAir,
                                       sizeof(*sendPinOverTheAir));
 }
-EmberAfStatus SetSendPinOverTheAir(chip::EndpointId endpoint, uint8_t sendPinOverTheAir)
+EmberAfStatus SetSendPinOverTheAir(chip::EndpointId endpoint, bool sendPinOverTheAir)
 {
     return emberAfWriteServerAttribute(endpoint, DoorLock::Id, Ids::SendPinOverTheAir, (uint8_t *) &sendPinOverTheAir,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetRequirePinForRfOperation(chip::EndpointId endpoint, uint8_t * requirePinForRfOperation)
+EmberAfStatus GetRequirePinForRfOperation(chip::EndpointId endpoint, bool * requirePinForRfOperation)
 {
     return emberAfReadServerAttribute(endpoint, DoorLock::Id, Ids::RequirePinForRfOperation, (uint8_t *) requirePinForRfOperation,
                                       sizeof(*requirePinForRfOperation));
 }
-EmberAfStatus SetRequirePinForRfOperation(chip::EndpointId endpoint, uint8_t requirePinForRfOperation)
+EmberAfStatus SetRequirePinForRfOperation(chip::EndpointId endpoint, bool requirePinForRfOperation)
 {
     return emberAfWriteServerAttribute(endpoint, DoorLock::Id, Ids::RequirePinForRfOperation, (uint8_t *) &requirePinForRfOperation,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);
@@ -6650,11 +6650,11 @@ EmberAfStatus SetApplicationStatus(chip::EndpointId endpoint, uint8_t applicatio
 
 namespace TestCluster {
 namespace Attributes {
-EmberAfStatus GetBoolean(chip::EndpointId endpoint, uint8_t * boolean)
+EmberAfStatus GetBoolean(chip::EndpointId endpoint, bool * boolean)
 {
     return emberAfReadServerAttribute(endpoint, TestCluster::Id, Ids::Boolean, (uint8_t *) boolean, sizeof(*boolean));
 }
-EmberAfStatus SetBoolean(chip::EndpointId endpoint, uint8_t boolean)
+EmberAfStatus SetBoolean(chip::EndpointId endpoint, bool boolean)
 {
     return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Ids::Boolean, (uint8_t *) &boolean, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
@@ -6773,11 +6773,11 @@ EmberAfStatus SetEnum16(chip::EndpointId endpoint, uint16_t enum16)
 {
     return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Ids::Enum16, (uint8_t *) &enum16, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
-EmberAfStatus GetUnsupported(chip::EndpointId endpoint, uint8_t * unsupported)
+EmberAfStatus GetUnsupported(chip::EndpointId endpoint, bool * unsupported)
 {
     return emberAfReadServerAttribute(endpoint, TestCluster::Id, Ids::Unsupported, (uint8_t *) unsupported, sizeof(*unsupported));
 }
-EmberAfStatus SetUnsupported(chip::EndpointId endpoint, uint8_t unsupported)
+EmberAfStatus SetUnsupported(chip::EndpointId endpoint, bool unsupported)
 {
     return emberAfWriteServerAttribute(endpoint, TestCluster::Id, Ids::Unsupported, (uint8_t *) &unsupported,
                                        ZCL_BOOLEAN_ATTRIBUTE_TYPE);

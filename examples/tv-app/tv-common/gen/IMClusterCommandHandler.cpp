@@ -1026,7 +1026,7 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
         {
         case Clusters::ContentLauncher::Commands::Ids::LaunchContent: {
             expectArgumentCount = 2;
-            uint8_t autoPlay;
+            bool autoPlay;
             const uint8_t * data;
             bool argExists[2];
 
@@ -3451,7 +3451,7 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
             uint32_t currentVersion;
             uint8_t protocolsSupported;
             const uint8_t * location;
-            uint8_t requestorCanConsent;
+            bool requestorCanConsent;
             chip::ByteSpan metadataForProvider;
             bool argExists[9];
 

@@ -171,7 +171,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeProductLabelWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeSerialNumberWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeLocalConfigDisabledWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeLocalConfigDisabledWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeLocalConfigDisabledWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeReachableWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
@@ -184,9 +184,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPBinaryInputBasic : CHIPCluster
 
 - (void)readAttributeOutOfServiceWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeOutOfServiceWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOutOfServiceWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributePresentValueWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributePresentValueWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributePresentValueWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
 - (void)configureAttributePresentValueWithMinInterval:(uint16_t)minInterval
                                           maxInterval:(uint16_t)maxInterval
                                       responseHandler:(ResponseHandler)responseHandler;
@@ -459,7 +459,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPContentLauncher : CHIPCluster
 
-- (void)launchContent:(uint8_t)autoPlay data:(NSString *)data responseHandler:(ResponseHandler)responseHandler;
+- (void)launchContent:(bool)autoPlay data:(NSString *)data responseHandler:(ResponseHandler)responseHandler;
 - (void)launchURL:(NSString *)contentURL displayString:(NSString *)displayString responseHandler:(ResponseHandler)responseHandler;
 
 - (void)readAttributeAcceptsHeaderListWithResponseHandler:(ResponseHandler)responseHandler;
@@ -871,7 +871,7 @@ NS_ASSUME_NONNULL_BEGIN
          currentVersion:(uint32_t)currentVersion
      protocolsSupported:(uint8_t)protocolsSupported
                location:(NSString *)location
-    requestorCanConsent:(uint8_t)requestorCanConsent
+    requestorCanConsent:(bool)requestorCanConsent
     metadataForProvider:(NSData *)metadataForProvider
         responseHandler:(ResponseHandler)responseHandler;
 
@@ -1143,7 +1143,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testUnknownCommand:(ResponseHandler)responseHandler;
 
 - (void)readAttributeBooleanWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeBooleanWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeBooleanWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeBitmap8WithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBitmap8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeBitmap16WithResponseHandler:(ResponseHandler)responseHandler;
@@ -1184,7 +1184,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeLongCharStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeLongCharStringWithValue:(NSString *)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeUnsupportedWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)writeAttributeUnsupportedWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeUnsupportedWithValue:(bool)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

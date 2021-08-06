@@ -896,7 +896,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_Basic_LocalConfigDisabled(ch
 
 chip::ChipError::StorageType chip_ime_WriteAttribute_Basic_LocalConfigDisabled(chip::Controller::Device * device,
                                                                                chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                               uint8_t value)
+                                                                               bool value)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::BasicCluster cluster;
@@ -938,7 +938,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_BinaryInputBasic_OutOfServic
 
 chip::ChipError::StorageType chip_ime_WriteAttribute_BinaryInputBasic_OutOfService(chip::Controller::Device * device,
                                                                                    chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                                   uint8_t value)
+                                                                                   bool value)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::BinaryInputBasicCluster cluster;
@@ -971,7 +971,7 @@ chip::ChipError::StorageType chip_ime_ConfigureAttribute_BinaryInputBasic_Presen
 
 chip::ChipError::StorageType chip_ime_WriteAttribute_BinaryInputBasic_PresentValue(chip::Controller::Device * device,
                                                                                    chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                                   uint8_t value)
+                                                                                   bool value)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::BinaryInputBasicCluster cluster;
@@ -2137,7 +2137,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_ColorControl_ClusterRevision
 
 chip::ChipError::StorageType chip_ime_AppendCommand_ContentLauncher_LaunchContent(chip::Controller::Device * device,
                                                                                   chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                                  uint8_t autoPlay, const uint8_t * data,
+                                                                                  bool autoPlay, const uint8_t * data,
                                                                                   uint32_t data_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
@@ -3542,7 +3542,7 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_No
 chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t vendorId, uint16_t productId,
     uint16_t imageType, uint16_t hardwareVersion, uint32_t currentVersion, uint8_t protocolsSupported, const uint8_t * location,
-    uint32_t location_Len, uint8_t requestorCanConsent, const uint8_t * metadataForProvider, uint32_t metadataForProvider_Len)
+    uint32_t location_Len, bool requestorCanConsent, const uint8_t * metadataForProvider, uint32_t metadataForProvider_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
@@ -4563,8 +4563,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_Boolean(chip::Co
 }
 
 chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_Boolean(chip::Controller::Device * device,
-                                                                         chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                         uint8_t value)
+                                                                         chip::EndpointId ZCLendpointId, chip::GroupId, bool value)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::TestClusterCluster cluster;
@@ -4968,7 +4967,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_TestCluster_Unsupported(chip
 
 chip::ChipError::StorageType chip_ime_WriteAttribute_TestCluster_Unsupported(chip::Controller::Device * device,
                                                                              chip::EndpointId ZCLendpointId, chip::GroupId,
-                                                                             uint8_t value)
+                                                                             bool value)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::TestClusterCluster cluster;

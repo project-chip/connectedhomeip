@@ -4050,7 +4050,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
             const uint8_t * imageURI;
             uint32_t softwareVersion;
             chip::ByteSpan updateToken;
-            uint8_t userConsentNeeded;
+            bool userConsentNeeded;
             chip::ByteSpan metadataForRequestor;
             bool argExists[7];
 

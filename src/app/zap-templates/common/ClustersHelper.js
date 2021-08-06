@@ -145,6 +145,8 @@ function asPutLength(zclType)
 {
   const type = ChipTypesHelper.asBasicType(zclType);
   switch (type) {
+  case 'bool':
+    return '8';
   case 'int8_t':
   case 'int16_t':
   case 'int32_t':
@@ -163,6 +165,8 @@ function asPutCastType(zclType)
 {
   const type = ChipTypesHelper.asBasicType(zclType);
   switch (type) {
+  case 'bool':
+    return 'uint8_t';
   case 'int8_t':
   case 'int16_t':
   case 'int32_t':
