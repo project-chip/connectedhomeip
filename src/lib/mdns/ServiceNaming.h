@@ -36,6 +36,7 @@ constexpr char kOperationalProtocol[]          = "_tcp";
 constexpr char kCommissionProtocol[]           = "_udp";
 constexpr char kLocalDomain[]                  = "local";
 constexpr size_t kOperationalServiceNamePrefix = 16 + 1 + 16; // 2 * 64-bit value in HEX + hyphen
+constexpr size_t kCommissionServiceNamePrefix  = 16;
 
 // each includes space for a null terminator, which becomes a . when the names are appended.
 constexpr size_t kMaxCommisisonableServiceNameSize =
