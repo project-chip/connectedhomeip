@@ -2983,7 +2983,7 @@ void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
 void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
 {
     CHIP_ERROR err;
-    uint8_t buf[2048];
+    uint8_t buf[2048] = { 0 };
     TLVReader reader;
 
     reader.Init(buf, sizeof(buf));

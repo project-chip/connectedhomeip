@@ -79,6 +79,13 @@ public:
     CHIP_ERROR GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen);
     CHIP_ERROR GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen);
     CHIP_ERROR GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen);
+    CHIP_ERROR GetDeviceDACCertificate(uint8_t * buf, size_t bufSize, size_t & dacLen);
+    CHIP_ERROR GetDevicePAICertificate(uint8_t * buf, size_t bufSize, size_t & paiLen);
+    CHIP_ERROR GetDevicePAACertificate(const uint8_t * skid, size_t skidLen, uint8_t * buf, size_t bufSize, size_t & paaLen);
+    CHIP_ERROR GetDeviceCertificationDeclaration(uint8_t * buf, size_t bufSize, size_t & certDeclLen);
+    CHIP_ERROR GetDeviceAttestationSignature(const uint8_t * attestationElements, size_t attestationElementsSize,
+                                             const uint8_t * attestationChallenge, size_t attestationChallengeSize, uint8_t * buf,
+                                             size_t bufSize, size_t & signatureLen);
     CHIP_ERROR GetManufacturerDeviceId(uint64_t & deviceId);
     CHIP_ERROR GetManufacturerDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen);
     CHIP_ERROR GetManufacturerDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen);
@@ -327,6 +334,37 @@ inline CHIP_ERROR ConfigurationManager::GetDeviceIntermediateCACerts(uint8_t * b
 inline CHIP_ERROR ConfigurationManager::GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen)
 {
     return static_cast<ImplClass *>(this)->_GetDevicePrivateKey(buf, bufSize, keyLen);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetDeviceDACCertificate(uint8_t * buf, size_t bufSize, size_t & dacLen)
+{
+    return static_cast<ImplClass *>(this)->_GetDeviceDACCertificate(buf, bufSize, dacLen);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetDevicePAICertificate(uint8_t * buf, size_t bufSize, size_t & paiLen)
+{
+    return static_cast<ImplClass *>(this)->_GetDevicePAICertificate(buf, bufSize, paiLen);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetDevicePAACertificate(const uint8_t * skid, size_t skidLen, uint8_t * buf, size_t bufSize,
+                                                                size_t & paaLen)
+{
+    return static_cast<ImplClass *>(this)->_GetDevicePAACertificate(skid, skidLen, buf, bufSize, paaLen);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetDeviceCertificationDeclaration(uint8_t * buf, size_t bufSize, size_t & certDeclLen)
+{
+    return static_cast<ImplClass *>(this)->_GetDeviceCertificationDeclaration(buf, bufSize, certDeclLen);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetDeviceAttestationSignature(const uint8_t * attestationElements,
+                                                                      size_t attestationElementsSize,
+                                                                      const uint8_t * attestationChallenge,
+                                                                      size_t attestationChallengeSize, uint8_t * buf,
+                                                                      size_t bufSize, size_t & signatureLen)
+{
+    return static_cast<ImplClass *>(this)->_GetDeviceAttestationSignature(
+        attestationElements, attestationElementsSize, attestationChallenge, attestationChallengeSize, buf, bufSize, signatureLen);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetManufacturerDeviceId(uint64_t & deviceId)

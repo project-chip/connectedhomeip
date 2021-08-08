@@ -77,6 +77,13 @@ public:
     CHIP_ERROR _GetDeviceCertificate(uint8_t * buf, size_t bufSize, size_t & certLen);
     CHIP_ERROR _GetDeviceIntermediateCACerts(uint8_t * buf, size_t bufSize, size_t & certsLen);
     CHIP_ERROR _GetDevicePrivateKey(uint8_t * buf, size_t bufSize, size_t & keyLen);
+    CHIP_ERROR _GetDeviceDACCertificate(uint8_t * buf, size_t bufSize, size_t & dacLen);
+    CHIP_ERROR _GetDevicePAICertificate(uint8_t * buf, size_t bufSize, size_t & paiLen);
+    CHIP_ERROR _GetDevicePAACertificate(const uint8_t * skid, size_t skidLen, uint8_t * buf, size_t bufSize, size_t & paaLen);
+    CHIP_ERROR _GetDeviceCertificationDeclaration(uint8_t * buf, size_t bufSize, size_t & certDeclLen);
+    CHIP_ERROR _GetDeviceAttestationSignature(const uint8_t * attestationElements, size_t attestationElementsSize,
+                                              const uint8_t * attestationChallenge, size_t attestationChallengeSize, uint8_t * buf,
+                                              size_t bufSize, size_t & signatureLen);
 #if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
     CHIP_ERROR _StoreDeviceId(uint64_t deviceId);
     CHIP_ERROR _StoreDeviceCertificate(const uint8_t * cert, size_t certLen);
