@@ -14,16 +14,16 @@ class ChipClusters:
 
 {{#chip_client_clusters}}
     _{{asDelimitedMacro name}}_CLUSTER_INFO = {
-            "clusterName": "{{asCamelCased name false}}",
+            "clusterName": "{{asUpperCamelCase name}}",
             "clusterId": {{asHex code 8}},
             "commands": {
 {{#chip_cluster_commands}}
             {{asHex code 8}}: {
                     "commandId": {{asHex code 8}},
-                    "commandName": "{{asCamelCased name false}}",
+                    "commandName": "{{asUpperCamelCase name}}",
                     "args": {
 {{#chip_cluster_command_arguments}}
-                        "{{asCamelCased label}}": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
+                        "{{asLowerCamelCase label}}": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
 {{/chip_cluster_command_arguments}}
                     },
                 },
@@ -32,7 +32,7 @@ class ChipClusters:
             "attributes": {
 {{#chip_server_cluster_attributes}}
                 {{asHex code 8}}: {
-                    "attributeName": "{{asCamelCased name false}}",
+                    "attributeName": "{{asUpperCamelCase name}}",
                     "attributeId": {{asHex code 8}},
                     "type": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
                     {{#if isReportableAttribute}}
@@ -55,7 +55,7 @@ class ChipClusters:
 
     _CLUSTER_NAME_DICT = {
 {{#chip_client_clusters}}
-        "{{asCamelCased name false}}": _{{asDelimitedMacro name}}_CLUSTER_INFO,
+        "{{asUpperCamelCase name}}": _{{asDelimitedMacro name}}_CLUSTER_INFO,
 {{/chip_client_clusters}}
     }
 
@@ -117,14 +117,14 @@ class ChipClusters:
 
 {{#chip_client_clusters}}
 {{#chip_cluster_commands}}
-    def Cluster{{asCamelCased clusterName false}}_Command{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int{{#chip_cluster_command_arguments}}, {{asCamelCased label}}: {{asPythonType chipType}}{{/chip_cluster_command_arguments}}):
+    def Cluster{{asUpperCamelCase clusterName}}_Command{{asUpperCamelCase name}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int{{#chip_cluster_command_arguments}}, {{asLowerCamelCase label}}: {{asPythonType chipType}}{{/chip_cluster_command_arguments}}):
 {{#chip_cluster_command_arguments}}
 {{#if (isCharString type)}}
-        {{asCamelCased label}} = {{asCamelCased label}}.encode("utf-8") + b'\x00'
+        {{asLowerCamelCase label}} = {{asLowerCamelCase label}}.encode("utf-8") + b'\x00'
 {{/if}}
 {{/chip_cluster_command_arguments}}
-        return self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(
-                device, ZCLendpoint, ZCLgroupid{{#chip_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isString type)}}, len({{asCamelCased label}}){{/if}}{{/chip_cluster_command_arguments}}
+        return self._chipLib.chip_ime_AppendCommand_{{asUpperCamelCase clusterName}}_{{asUpperCamelCase name}}(
+                device, ZCLendpoint, ZCLgroupid{{#chip_cluster_command_arguments}}, {{asLowerCamelCase label}}{{#if (isString type)}}, len({{asLowerCamelCase label}}){{/if}}{{/chip_cluster_command_arguments}}
         )
 {{/chip_cluster_commands}}
 {{/chip_client_clusters}}
@@ -133,18 +133,18 @@ class ChipClusters:
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
-    def Cluster{{asCamelCased parent.name false}}_ReadAttribute{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(device, ZCLendpoint, ZCLgroupid)
+    def Cluster{{asUpperCamelCase parent.name}}_ReadAttribute{{asUpperCamelCase name}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(device, ZCLendpoint, ZCLgroupid)
 {{#if isReportableAttribute}}
-    def Cluster{{asCamelCased parent.name false}}_ConfigureAttribute{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
-        return self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(device, ZCLendpoint, minInterval, maxInterval, change)
+    def Cluster{{asUpperCamelCase parent.name}}_ConfigureAttribute{{asUpperCamelCase name}}(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(device, ZCLendpoint, minInterval, maxInterval, change)
 {{/if}}
 {{#if isWritableAttribute}}
-    def Cluster{{asCamelCased parent.name false}}_WriteAttribute{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: {{ asPythonType chipType }}):
+    def Cluster{{asUpperCamelCase parent.name}}_WriteAttribute{{asUpperCamelCase name}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: {{ asPythonType chipType }}):
 {{#if (isCharString type)}}
         value = value.encode("utf-8") + b'\x00'
 {{/if}}
-        return self._chipLib.chip_ime_WriteAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(device, ZCLendpoint, ZCLgroupid, value{{#if (isString type)}}, len(value){{/if}})
+        return self._chipLib.chip_ime_WriteAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(device, ZCLendpoint, ZCLgroupid, value{{#if (isString type)}}, len(value){{/if}})
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
@@ -159,25 +159,25 @@ class ChipClusters:
         self._chipLib.chip_ime_SetFailureResponseDelegate.argtypes = [ChipClusters.FAILURE_DELEGATE]
         self._chipLib.chip_ime_SetFailureResponseDelegate.res = None
 {{#chip_client_clusters}}
-        # Cluster {{asCamelCased name false}}
+        # Cluster {{asUpperCamelCase name}}
 {{#chip_cluster_commands}}
-        # Cluster {{asCamelCased clusterName false}} Command {{asCamelCased name false}}
-        self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16{{#chip_cluster_command_arguments}}{{#if (isString type)}}, ctypes.c_char_p, ctypes.c_uint32{{else}}, ctypes.{{asPythonCType chipType}}{{/if}}{{/chip_cluster_command_arguments}}]
-        self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
+        # Cluster {{asUpperCamelCase clusterName}} Command {{asUpperCamelCase name}}
+        self._chipLib.chip_ime_AppendCommand_{{asUpperCamelCase clusterName}}_{{asUpperCamelCase name}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16{{#chip_cluster_command_arguments}}{{#if (isString type)}}, ctypes.c_char_p, ctypes.c_uint32{{else}}, ctypes.{{asPythonCType chipType}}{{/if}}{{/chip_cluster_command_arguments}}]
+        self._chipLib.chip_ime_AppendCommand_{{asUpperCamelCase clusterName}}_{{asUpperCamelCase name}}.restype = ctypes.c_uint32
 {{/chip_cluster_commands}}
 {{#chip_server_cluster_attributes}}
-        # Cluster {{asCamelCased parent.name false}} ReadAttribute {{asCamelCased name false}}
-        self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
+        # Cluster {{asUpperCamelCase parent.name}} ReadAttribute {{asUpperCamelCase name}}
+        self._chipLib.chip_ime_ReadAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.restype = ctypes.c_uint32
 {{#if isReportableAttribute}}
-        # Cluster {{asCamelCased parent.name false}} ConfigureAttribute {{asCamelCased name false}}
-        self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16{{#if isAnalog}}, ctypes.{{asPythonCType chipType}}{{/if}}]
-        self._chipLib.chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
+        # Cluster {{asUpperCamelCase parent.name}} ConfigureAttribute {{asUpperCamelCase name}}
+        self._chipLib.chip_ime_ConfigureAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16{{#if isAnalog}}, ctypes.{{asPythonCType chipType}}{{/if}}]
+        self._chipLib.chip_ime_ConfigureAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.restype = ctypes.c_uint32
 {{/if}}
 {{#if isWritableAttribute}}
-        # Cluster {{asCamelCased parent.name false}} WriteAttribute {{asCamelCased name false}}
-        self._chipLib.chip_ime_WriteAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, {{#if (isString type)}}ctypes.c_char_p, ctypes.c_uint32{{else}}ctypes.{{asPythonCType chipType}}{{/if}}]
-        self._chipLib.chip_ime_WriteAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
+        # Cluster {{asUpperCamelCase parent.name}} WriteAttribute {{asUpperCamelCase name}}
+        self._chipLib.chip_ime_WriteAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, {{#if (isString type)}}ctypes.c_char_p, ctypes.c_uint32{{else}}ctypes.{{asPythonCType chipType}}{{/if}}]
+        self._chipLib.chip_ime_WriteAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}.restype = ctypes.c_uint32
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
