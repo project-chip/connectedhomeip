@@ -284,13 +284,8 @@ ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::De
 
 ChipError::StorageType pychip_DeviceController_DiscoverAllCommissionableNodes(chip::Controller::DeviceCommissioner * devCtrl)
 {
-<<<<<<< HEAD
     Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, static_cast<uint16_t>(0));
-    return ChipError::AsInteger(devCtrl->DiscoverCommissionableNodes(filter));
-=======
-    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kNone, (uint16_t) 0);
     return devCtrl->DiscoverCommissionableNodes(filter).AsInteger();
->>>>>>> f446fd2ceef6ff6828596123407f9bdca040d853
 }
 
 ChipError::StorageType
