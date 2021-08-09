@@ -37,14 +37,10 @@ class MessagingContext
 {
 public:
     MessagingContext() :
-        mInitialized(false),
-        mPeer(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingPeerToLocal(GetLocalKeyId(), GetPeerKeyId()),
-        mPairingLocalToPeer(GetPeerKeyId(), GetLocalKeyId())
+        mInitialized(false), mPeer(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)),
+        mPairingPeerToLocal(GetLocalKeyId(), GetPeerKeyId()), mPairingLocalToPeer(GetPeerKeyId(), GetLocalKeyId())
     {}
-    ~MessagingContext()
-    {
-        VerifyOrDie(mInitialized == false);
-    }
+    ~MessagingContext() { VerifyOrDie(mInitialized == false); }
 
     /// Initialize the underlying layers and test suite pointer
     CHIP_ERROR Init(nlTestSuite * suite, TransportMgrBase * transport, IOContext * io);
@@ -96,7 +92,7 @@ private:
     SecureSessionMgr mSecureSessionMgr;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
-    IOContext *mIOContext;
+    IOContext * mIOContext;
 
     NodeId mSourceNodeId      = 123654;
     NodeId mDestinationNodeId = 111222333;
