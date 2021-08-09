@@ -18,9 +18,11 @@
 #pragma once
 
 #include <cstdint>
+#include <limits>
 
 #include "lib/support/logging/CHIPLogging.h"
 #include <core/CHIPError.h>
+#include <core/Optional.h>
 #include <core/PeerId.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
@@ -28,6 +30,8 @@
 
 namespace chip {
 namespace Mdns {
+
+constexpr uint32_t kUndefinedRetryInterval = std::numeric_limits<uint32_t>::max();
 
 struct ResolvedNodeData
 {
@@ -43,13 +47,25 @@ struct ResolvedNodeData
 #endif // CHIP_PROGRESS_LOGGING
     }
 
+    Optional<uint32_t> GetMrpRetryIntervalIdle() const
+    {
+        return mMrpRetryIntervalIdle != kUndefinedRetryInterval ? Optional<uint32_t>{ mMrpRetryIntervalIdle }
+                                                                : Optional<uint32_t>{};
+    }
+
+    Optional<uint32_t> GetMrpRetryIntervalActive() const
+    {
+        return mMrpRetryIntervalActive != kUndefinedRetryInterval ? Optional<uint32_t>{ mMrpRetryIntervalActive }
+                                                                  : Optional<uint32_t>{};
+    }
+
     PeerId mPeerId;
     Inet::IPAddress mAddress         = Inet::IPAddress::Any;
     Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;
     uint16_t mPort                   = 0;
     bool mSupportsTcp                = false;
-    uint32_t mMrpRetryIntervalIdle   = 0;
-    uint32_t mMrpRetryIntervalActive = 0;
+    uint32_t mMrpRetryIntervalIdle   = kUndefinedRetryInterval;
+    uint32_t mMrpRetryIntervalActive = kUndefinedRetryInterval;
 };
 
 constexpr size_t kMaxDeviceNameLen         = 32;
@@ -75,10 +91,14 @@ struct DiscoveredNodeData
     char deviceName[kMaxDeviceNameLen + 1];
     uint8_t rotatingId[kMaxRotatingIdLen];
     size_t rotatingIdLen;
-    char pairingInstruction[kMaxPairingInstructionLen + 1];
     uint16_t pairingHint;
+    char pairingInstruction[kMaxPairingInstructionLen + 1];
+    bool supportsTcp;
+    uint32_t mrpRetryIntervalIdle;
+    uint32_t mrpRetryIntervalActive;
     int numIPs;
     Inet::IPAddress ipAddress[kMaxIPAddresses];
+
     void Reset()
     {
         memset(hostName, 0, sizeof(hostName));
@@ -93,8 +113,11 @@ struct DiscoveredNodeData
         memset(rotatingId, 0, sizeof(rotatingId));
         rotatingIdLen = 0;
         memset(pairingInstruction, 0, sizeof(pairingInstruction));
-        pairingHint = 0;
-        numIPs      = 0;
+        pairingHint            = 0;
+        supportsTcp            = false;
+        mrpRetryIntervalIdle   = kUndefinedRetryInterval;
+        mrpRetryIntervalActive = kUndefinedRetryInterval;
+        numIPs                 = 0;
         for (int i = 0; i < kMaxIPAddresses; ++i)
         {
             ipAddress[i] = chip::Inet::IPAddress::Any;
@@ -103,6 +126,17 @@ struct DiscoveredNodeData
     DiscoveredNodeData() { Reset(); }
     bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
+
+    Optional<uint32_t> GetMrpRetryIntervalIdle() const
+    {
+        return mrpRetryIntervalIdle != kUndefinedRetryInterval ? Optional<uint32_t>{ mrpRetryIntervalIdle } : Optional<uint32_t>{};
+    }
+
+    Optional<uint32_t> GetMrpRetryIntervalActive() const
+    {
+        return mrpRetryIntervalActive != kUndefinedRetryInterval ? Optional<uint32_t>{ mrpRetryIntervalActive }
+                                                                 : Optional<uint32_t>{};
+    }
 };
 
 enum class DiscoveryFilterType : uint8_t

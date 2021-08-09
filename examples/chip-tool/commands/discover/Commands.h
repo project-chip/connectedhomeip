@@ -49,15 +49,17 @@ public:
         ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Address: %s, Port: %" PRIu16, nodeData.mPeerId.GetNodeId(),
                         addrBuffer, nodeData.mPort);
 
-        if (nodeData.mMrpRetryIntervalIdle != 0)
-            ChipLogProgress(chipTool, "   MRP retry interval (idle): %" PRIu32 "ms", nodeData.mMrpRetryIntervalIdle);
+        auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
 
-        if (nodeData.mMrpRetryIntervalActive != 0)
-            ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms", nodeData.mMrpRetryIntervalActive);
+        if (retryInterval.HasValue())
+            ChipLogProgress(chipTool, "   MRP retry interval (idle): %" PRIu32 "ms", retryInterval.Value());
 
-        if (nodeData.mSupportsTcp)
-            ChipLogProgress(chipTool, "   Supports TCP: yes");
+        retryInterval = nodeData.GetMrpRetryIntervalActive();
 
+        if (retryInterval.HasValue())
+            ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms", retryInterval.Value());
+
+        ChipLogProgress(chipTool, "   Supports TCP: %s\n", nodeData.mSupportsTcp ? "yes" : "no");
         SetCommandExitStatus(CHIP_NO_ERROR);
     }
 

@@ -38,6 +38,7 @@ static constexpr size_t kMaxMacSize = 8;
 // Operational node TXT entries
 static constexpr size_t kTxtRetryIntervalIdleMaxLength   = 7; // [CRI] 0-3600000
 static constexpr size_t kTxtRetryIntervalActiveMaxLength = 7; // [CRA] 0-3600000
+static constexpr size_t kMaxRetryInterval                = 3600000;
 
 // Commissionable/commissioner node TXT entries
 static constexpr size_t kKeyDiscriminatorMaxLength      = 5;

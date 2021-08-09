@@ -19,12 +19,14 @@
 
 #include <algorithm>
 #include <cctype>
+#include <climits>
 #include <cstdio>
 #include <inttypes.h>
 #include <limits>
 #include <stdlib.h>
 #include <string.h>
 
+#include <mdns/Advertiser.h>
 #include <mdns/Resolver.h>
 #include <support/BytesToHex.h>
 #include <support/CHIPMemString.h>
@@ -57,18 +59,30 @@ bool IsKey(const ByteSpan & key, const char * desired)
     return true;
 }
 
-uint32_t MakeU32FromAsciiDecimal(const ByteSpan & val)
+uint32_t MakeU32FromAsciiDecimal(const ByteSpan & val, uint32_t defaultValue = 0)
 {
+    // +1 because `digits10` means the number of decimal digits that fit in `uint32_t`,
+    // not how many digits are enough to represent any `uint32_t`
+    // +1 for null-terminator
     char nullTerminatedValue[std::numeric_limits<uint32_t>::digits10 + 2];
 
+    // value is too long to store `uint32_t`
     if (val.size() >= sizeof(nullTerminatedValue))
-    {
-        return 0;
-    }
+        return defaultValue;
+
+    // value contains leading zeros
+    if (val.size() > 1 && *val.data() == static_cast<uint8_t>('0'))
+        return defaultValue;
 
     Platform::CopyString(nullTerminatedValue, sizeof(nullTerminatedValue), val);
-    unsigned long num = strtoul(nullTerminatedValue, nullptr, 10);
-    return CanCastTo<uint32_t>(num) ? static_cast<uint32_t>(num) : 0;
+
+    char * endPtr;
+    unsigned long num = strtoul(nullTerminatedValue, &endPtr, 10);
+
+    if (endPtr > nullTerminatedValue && *endPtr == '\0' && num != ULONG_MAX && CanCastTo<uint32_t>(num))
+        return static_cast<uint32_t>(num);
+
+    return defaultValue;
 }
 
 uint16_t MakeU16FromAsciiDecimal(const ByteSpan & val)
@@ -121,7 +135,7 @@ uint16_t GetVendor(const ByteSpan & value)
     return MakeU16FromAsciiDecimal(ByteSpan(value.data(), plussign));
 }
 
-uint16_t GetLongDisriminator(const ByteSpan & value)
+uint16_t GetLongDiscriminator(const ByteSpan & value)
 {
     return MakeU16FromAsciiDecimal(value);
 }
@@ -160,6 +174,16 @@ uint16_t GetPairingHint(const ByteSpan & value)
 void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction)
 {
     Platform::CopyString(pairingInstruction, kMaxPairingInstructionLen + 1, value);
+}
+
+uint32_t GetRetryInterval(const ByteSpan & value)
+{
+    const auto retryInterval = MakeU32FromAsciiDecimal(value, kUndefinedRetryInterval);
+
+    if (retryInterval != kUndefinedRetryInterval && retryInterval <= kMaxRetryInterval)
+        return retryInterval;
+
+    return kUndefinedRetryInterval;
 }
 
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
@@ -226,7 +250,7 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredN
     switch (keyType)
     {
     case Internal::TxtFieldKey::kLongDiscriminator:
-        nodeData.longDiscriminator = Internal::GetLongDisriminator(val);
+        nodeData.longDiscriminator = Internal::GetLongDiscriminator(val);
         break;
     case Internal::TxtFieldKey::kVendorProduct:
         nodeData.vendorId  = Internal::GetVendor(val);
@@ -253,6 +277,15 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredN
     case Internal::TxtFieldKey::kPairingHint:
         nodeData.pairingHint = Internal::GetPairingHint(val);
         break;
+    case Internal::TxtFieldKey::kMrpRetryIntervalIdle:
+        nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(val);
+        break;
+    case Internal::TxtFieldKey::kMrpRetryIntervalActive:
+        nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(val);
+        break;
+    case Internal::TxtFieldKey::kTcpSupport:
+        nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(val);
+        break;
     default:
         break;
     }
@@ -263,10 +296,10 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedN
     switch (Internal::GetTxtFieldKey(key))
     {
     case Internal::TxtFieldKey::kMrpRetryIntervalIdle:
-        nodeData.mMrpRetryIntervalIdle = Internal::MakeU32FromAsciiDecimal(value);
+        nodeData.mMrpRetryIntervalIdle = Internal::GetRetryInterval(value);
         break;
     case Internal::TxtFieldKey::kMrpRetryIntervalActive:
-        nodeData.mMrpRetryIntervalActive = Internal::MakeU32FromAsciiDecimal(value);
+        nodeData.mMrpRetryIntervalActive = Internal::GetRetryInterval(value);
         break;
     case Internal::TxtFieldKey::kTcpSupport:
         nodeData.mSupportsTcp = Internal::MakeBoolFromAsciiDecimal(value);

@@ -145,12 +145,12 @@ void TestGetLongDiscriminator(nlTestSuite * inSuite, void * inContext)
 {
     char ld[64];
     sprintf(ld, "1234");
-    NL_TEST_ASSERT(inSuite, GetLongDisriminator(GetSpan(ld)) == 1234);
+    NL_TEST_ASSERT(inSuite, GetLongDiscriminator(GetSpan(ld)) == 1234);
 
     // overflow a uint16
     sprintf(ld, "%" PRIu32, static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
     printf("ld = %s\n", ld);
-    NL_TEST_ASSERT(inSuite, GetLongDisriminator(GetSpan(ld)) == 0);
+    NL_TEST_ASSERT(inSuite, GetLongDiscriminator(GetSpan(ld)) == 0);
 }
 
 void TestGetAdditionalPairing(nlTestSuite * inSuite, void * inContext)
@@ -292,7 +292,9 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
 {
 
     if (node.longDiscriminator != 0 || node.vendorId != 0 || node.productId != 0 || node.additionalPairing != 0 ||
-        node.commissioningMode != 0 || node.deviceType != 0 || node.rotatingIdLen != 0 || node.pairingHint != 0)
+        node.commissioningMode != 0 || node.deviceType != 0 || node.rotatingIdLen != 0 || node.pairingHint != 0 ||
+        node.mrpRetryIntervalIdle != kUndefinedRetryInterval || node.mrpRetryIntervalActive != kUndefinedRetryInterval ||
+        node.supportsTcp)
     {
         return false;
     }
@@ -398,109 +400,185 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
 bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
 {
     return nodeData.mPeerId == PeerId{} && nodeData.mAddress == Inet::IPAddress::Any && nodeData.mPort == 0 &&
-        nodeData.mMrpRetryIntervalIdle == 0 && nodeData.mMrpRetryIntervalActive == 0 && !nodeData.mSupportsTcp;
+        nodeData.mMrpRetryIntervalIdle == kUndefinedRetryInterval && nodeData.mMrpRetryIntervalActive == kUndefinedRetryInterval &&
+        !nodeData.mSupportsTcp;
+}
+
+void ResetRetryIntervalIdle(DiscoveredNodeData & nodeData)
+{
+    nodeData.mrpRetryIntervalIdle = kUndefinedRetryInterval;
+}
+
+void ResetRetryIntervalIdle(ResolvedNodeData & nodeData)
+{
+    nodeData.mMrpRetryIntervalIdle = kUndefinedRetryInterval;
+}
+
+void ResetRetryIntervalActive(DiscoveredNodeData & nodeData)
+{
+    nodeData.mrpRetryIntervalActive = kUndefinedRetryInterval;
+}
+
+void ResetRetryIntervalActive(ResolvedNodeData & nodeData)
+{
+    nodeData.mMrpRetryIntervalActive = kUndefinedRetryInterval;
 }
 
 // Test CRI
+template <class NodeData>
 void TxtFieldMrpRetryIntervalIdle(nlTestSuite * inSuite, void * inContext)
 {
     char key[4];
-    char val[8];
-    ResolvedNodeData nodeData;
+    char val[16];
+    NodeData nodeData;
 
     // Minimum
     sprintf(key, "CRI");
     sprintf(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalIdle == 1);
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 1);
 
     // Maximum
     sprintf(key, "CRI");
     sprintf(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalIdle == 3600000);
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 3600000);
 
     // Test no other fields were populated
-    nodeData.mMrpRetryIntervalIdle = 0;
+    ResetRetryIntervalIdle(nodeData);
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
-    // Invalid CRI => fallback to 0
+    // Invalid CRI - negative value
     sprintf(key, "CRI");
     sprintf(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalIdle == 0);
+    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
-    // Invalid CRI => fallback to 0
+    // Invalid CRI - greater than maximum
     sprintf(key, "CRI");
-    sprintf(val, "asdf");
+    sprintf(val, "3600001");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalIdle == 0);
+    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
+
+    // Invalid CRI - much greater than maximum
+    sprintf(key, "CRI");
+    sprintf(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
+
+    // Invalid CRI - hexadecimal value
+    sprintf(key, "CRI");
+    sprintf(val, "0x20");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
+
+    // Invalid CRI - leading zeros
+    sprintf(key, "CRI");
+    sprintf(val, "0700");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
+
+    // Invalid CRI - text at the end
+    sprintf(key, "CRI");
+    sprintf(val, "123abc");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 }
 
 // Test CRA
+template <class NodeData>
 void TxtFieldMrpRetryIntervalActive(nlTestSuite * inSuite, void * inContext)
 {
     char key[4];
-    char val[8];
-    ResolvedNodeData nodeData;
+    char val[16];
+    NodeData nodeData;
 
     // Minimum
     sprintf(key, "CRA");
     sprintf(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalActive == 1);
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 1);
 
     // Maximum
     sprintf(key, "CRA");
     sprintf(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalActive == 3600000);
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 3600000);
 
     // Test no other fields were populated
-    nodeData.mMrpRetryIntervalActive = 0;
+    ResetRetryIntervalActive(nodeData);
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
-    // Invalid CRI => fallback to 0
+    // Invalid CRA - negative value
     sprintf(key, "CRA");
     sprintf(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalActive == 0);
+    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
-    // Invalid CRI => fallback to 0
+    // Invalid CRA - greater than maximum
     sprintf(key, "CRA");
-    sprintf(val, "asdf");
+    sprintf(val, "3600001");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.mMrpRetryIntervalActive == 0);
+    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
+
+    // Invalid CRA - much greater than maximum
+    sprintf(key, "CRA");
+    sprintf(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
+
+    // Invalid CRA - hexadecimal value
+    sprintf(key, "CRA");
+    sprintf(val, "0x20");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
+
+    // Invalid CRA - leading zeros
+    sprintf(key, "CRA");
+    sprintf(val, "0700");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
+
+    // Invalid CRA - text at the end
+    sprintf(key, "CRA");
+    sprintf(val, "123abc");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 }
 
 // Test T (TCP support)
+template <class NodeData, bool(NodeData::*supportsTcp)>
 void TxtFieldTcpSupport(nlTestSuite * inSuite, void * inContext)
 {
     char key[4];
     char val[8];
-    ResolvedNodeData nodeData;
+    NodeData nodeData;
 
     // True
     sprintf(key, "T");
     sprintf(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.mSupportsTcp);
+    NL_TEST_ASSERT(inSuite, nodeData.*supportsTcp);
 
     // Test no other fields were populated
-    nodeData.mSupportsTcp = false;
+    nodeData.*supportsTcp = false;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
     // False
     sprintf(key, "T");
     sprintf(val, "0");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.mSupportsTcp);
+    NL_TEST_ASSERT(inSuite, nodeData.*supportsTcp == false);
 
     // Invalid value, stil false
     sprintf(key, "T");
     sprintf(val, "asdf");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.mSupportsTcp);
+    NL_TEST_ASSERT(inSuite, nodeData.*supportsTcp == false);
 }
 
 const nlTest sTests[] = {
@@ -517,10 +595,13 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TxtFieldPairingHint", TestGetPairingHint),                                  //
     NL_TEST_DEF("TxtFieldPairingInstruction", TestGetPairingInstruction),                    //
     NL_TEST_DEF("TxtFieldFillDiscoveredNodeDataFromTxt", TestFillDiscoveredNodeDataFromTxt), //
-    NL_TEST_DEF("TxtFieldMrpRetryIntervalIdle", TxtFieldMrpRetryIntervalIdle),               //
-    NL_TEST_DEF("TxtFieldMrpRetryIntervalActive", TxtFieldMrpRetryIntervalActive),           //
-    NL_TEST_DEF("TxtFieldTcpSupport", TxtFieldTcpSupport),                                   //
-    NL_TEST_SENTINEL()                                                                       //
+    NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalIdle", TxtFieldMrpRetryIntervalIdle<DiscoveredNodeData>),
+    NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalActive", TxtFieldMrpRetryIntervalActive<DiscoveredNodeData>),
+    NL_TEST_DEF("TxtDiscoveredFieldTcpSupport", (TxtFieldTcpSupport<DiscoveredNodeData, &DiscoveredNodeData::supportsTcp>) ),
+    NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalIdle", TxtFieldMrpRetryIntervalIdle<ResolvedNodeData>),
+    NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalActive", TxtFieldMrpRetryIntervalActive<ResolvedNodeData>),
+    NL_TEST_DEF("TxtResolvedFieldTcpSupport", (TxtFieldTcpSupport<ResolvedNodeData, &ResolvedNodeData::mSupportsTcp>) ),
+    NL_TEST_SENTINEL()
 };
 
 } // namespace
