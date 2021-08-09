@@ -130,7 +130,7 @@ static void OnAccountLoginClusterGetSetupPINResponse(void * context, uint8_t * s
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnApplicationLauncherClusterLaunchAppResponse(void * context, uint8_t * data)
+static void OnApplicationLauncherClusterLaunchAppResponse(void * context, uint8_t status, uint8_t * data)
 {
     ChipLogProgress(chipTool, "ApplicationLauncherClusterLaunchAppResponse");
 
@@ -154,7 +154,7 @@ static void OnContentLauncherClusterLaunchURLResponse(void * context, uint8_t * 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterClearAllPinsResponse(void * context)
+static void OnDoorLockClusterClearAllPinsResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterClearAllPinsResponse");
 
@@ -162,7 +162,7 @@ static void OnDoorLockClusterClearAllPinsResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterClearAllRfidsResponse(void * context)
+static void OnDoorLockClusterClearAllRfidsResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterClearAllRfidsResponse");
 
@@ -170,7 +170,7 @@ static void OnDoorLockClusterClearAllRfidsResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterClearHolidayScheduleResponse(void * context)
+static void OnDoorLockClusterClearHolidayScheduleResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterClearHolidayScheduleResponse");
 
@@ -178,7 +178,7 @@ static void OnDoorLockClusterClearHolidayScheduleResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterClearPinResponse(void * context)
+static void OnDoorLockClusterClearPinResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterClearPinResponse");
 
@@ -186,7 +186,7 @@ static void OnDoorLockClusterClearPinResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterClearRfidResponse(void * context)
+static void OnDoorLockClusterClearRfidResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterClearRfidResponse");
 
@@ -194,7 +194,7 @@ static void OnDoorLockClusterClearRfidResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterClearWeekdayScheduleResponse(void * context)
+static void OnDoorLockClusterClearWeekdayScheduleResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterClearWeekdayScheduleResponse");
 
@@ -202,7 +202,7 @@ static void OnDoorLockClusterClearWeekdayScheduleResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterClearYeardayScheduleResponse(void * context)
+static void OnDoorLockClusterClearYeardayScheduleResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterClearYeardayScheduleResponse");
 
@@ -210,7 +210,7 @@ static void OnDoorLockClusterClearYeardayScheduleResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterGetHolidayScheduleResponse(void * context, uint8_t scheduleId, uint32_t localStartTime,
+static void OnDoorLockClusterGetHolidayScheduleResponse(void * context, uint8_t scheduleId, uint8_t status, uint32_t localStartTime,
                                                         uint32_t localEndTime, uint8_t operatingModeDuringHoliday)
 {
     ChipLogProgress(chipTool, "DoorLockClusterGetHolidayScheduleResponse");
@@ -252,8 +252,9 @@ static void OnDoorLockClusterGetUserTypeResponse(void * context, uint16_t userId
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterGetWeekdayScheduleResponse(void * context, uint8_t scheduleId, uint16_t userId, uint8_t daysMask,
-                                                        uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+static void OnDoorLockClusterGetWeekdayScheduleResponse(void * context, uint8_t scheduleId, uint16_t userId, uint8_t status,
+                                                        uint8_t daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour,
+                                                        uint8_t endMinute)
 {
     ChipLogProgress(chipTool, "DoorLockClusterGetWeekdayScheduleResponse");
 
@@ -261,7 +262,7 @@ static void OnDoorLockClusterGetWeekdayScheduleResponse(void * context, uint8_t 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterGetYeardayScheduleResponse(void * context, uint8_t scheduleId, uint16_t userId,
+static void OnDoorLockClusterGetYeardayScheduleResponse(void * context, uint8_t scheduleId, uint16_t userId, uint8_t status,
                                                         uint32_t localStartTime, uint32_t localEndTime)
 {
     ChipLogProgress(chipTool, "DoorLockClusterGetYeardayScheduleResponse");
@@ -270,7 +271,7 @@ static void OnDoorLockClusterGetYeardayScheduleResponse(void * context, uint8_t 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterLockDoorResponse(void * context)
+static void OnDoorLockClusterLockDoorResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterLockDoorResponse");
 
@@ -278,7 +279,7 @@ static void OnDoorLockClusterLockDoorResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterSetHolidayScheduleResponse(void * context)
+static void OnDoorLockClusterSetHolidayScheduleResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterSetHolidayScheduleResponse");
 
@@ -286,7 +287,7 @@ static void OnDoorLockClusterSetHolidayScheduleResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterSetPinResponse(void * context)
+static void OnDoorLockClusterSetPinResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterSetPinResponse");
 
@@ -294,7 +295,7 @@ static void OnDoorLockClusterSetPinResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterSetRfidResponse(void * context)
+static void OnDoorLockClusterSetRfidResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterSetRfidResponse");
 
@@ -302,7 +303,7 @@ static void OnDoorLockClusterSetRfidResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterSetUserTypeResponse(void * context)
+static void OnDoorLockClusterSetUserTypeResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterSetUserTypeResponse");
 
@@ -310,7 +311,7 @@ static void OnDoorLockClusterSetUserTypeResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterSetWeekdayScheduleResponse(void * context)
+static void OnDoorLockClusterSetWeekdayScheduleResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterSetWeekdayScheduleResponse");
 
@@ -318,7 +319,7 @@ static void OnDoorLockClusterSetWeekdayScheduleResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterSetYeardayScheduleResponse(void * context)
+static void OnDoorLockClusterSetYeardayScheduleResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterSetYeardayScheduleResponse");
 
@@ -326,7 +327,7 @@ static void OnDoorLockClusterSetYeardayScheduleResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterUnlockDoorResponse(void * context)
+static void OnDoorLockClusterUnlockDoorResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterUnlockDoorResponse");
 
@@ -334,7 +335,7 @@ static void OnDoorLockClusterUnlockDoorResponse(void * context)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnDoorLockClusterUnlockWithTimeoutResponse(void * context)
+static void OnDoorLockClusterUnlockWithTimeoutResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "DoorLockClusterUnlockWithTimeoutResponse");
 
@@ -366,7 +367,7 @@ static void OnGeneralCommissioningClusterSetRegulatoryConfigResponse(void * cont
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnGroupsClusterAddGroupResponse(void * context, uint16_t groupId)
+static void OnGroupsClusterAddGroupResponse(void * context, uint8_t status, uint16_t groupId)
 {
     ChipLogProgress(chipTool, "GroupsClusterAddGroupResponse");
 
@@ -383,7 +384,7 @@ static void OnGroupsClusterGetGroupMembershipResponse(void * context, uint8_t ca
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnGroupsClusterRemoveGroupResponse(void * context, uint16_t groupId)
+static void OnGroupsClusterRemoveGroupResponse(void * context, uint8_t status, uint16_t groupId)
 {
     ChipLogProgress(chipTool, "GroupsClusterRemoveGroupResponse");
 
@@ -391,7 +392,7 @@ static void OnGroupsClusterRemoveGroupResponse(void * context, uint16_t groupId)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnGroupsClusterViewGroupResponse(void * context, uint16_t groupId, uint8_t * groupName)
+static void OnGroupsClusterViewGroupResponse(void * context, uint8_t status, uint16_t groupId, uint8_t * groupName)
 {
     ChipLogProgress(chipTool, "GroupsClusterViewGroupResponse");
 
@@ -407,7 +408,7 @@ static void OnIdentifyClusterIdentifyQueryResponse(void * context, uint16_t time
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnKeypadInputClusterSendKeyResponse(void * context)
+static void OnKeypadInputClusterSendKeyResponse(void * context, uint8_t status)
 {
     ChipLogProgress(chipTool, "KeypadInputClusterSendKeyResponse");
 
@@ -578,9 +579,10 @@ static void OnOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponse(void * 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnOtaSoftwareUpdateProviderClusterQueryImageResponse(void * context, uint32_t delayedActionTime, uint8_t * imageURI,
-                                                                 uint32_t softwareVersion, chip::ByteSpan updateToken,
-                                                                 bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
+static void OnOtaSoftwareUpdateProviderClusterQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime,
+                                                                 uint8_t * imageURI, uint32_t softwareVersion,
+                                                                 chip::ByteSpan updateToken, bool userConsentNeeded,
+                                                                 chip::ByteSpan metadataForRequestor)
 {
     ChipLogProgress(chipTool, "OtaSoftwareUpdateProviderClusterQueryImageResponse");
 
@@ -614,7 +616,7 @@ static void OnOperationalCredentialsClusterSetFabricResponse(void * context, chi
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnScenesClusterAddSceneResponse(void * context, uint16_t groupId, uint8_t sceneId)
+static void OnScenesClusterAddSceneResponse(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId)
 {
     ChipLogProgress(chipTool, "ScenesClusterAddSceneResponse");
 
@@ -622,7 +624,8 @@ static void OnScenesClusterAddSceneResponse(void * context, uint16_t groupId, ui
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnScenesClusterGetSceneMembershipResponse(void * context, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
+static void OnScenesClusterGetSceneMembershipResponse(void * context, uint8_t status, uint8_t capacity, uint16_t groupId,
+                                                      uint8_t sceneCount,
                                                       /* TYPE WARNING: array array defaults to */ uint8_t * sceneList)
 {
     ChipLogProgress(chipTool, "ScenesClusterGetSceneMembershipResponse");
@@ -631,7 +634,7 @@ static void OnScenesClusterGetSceneMembershipResponse(void * context, uint8_t ca
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnScenesClusterRemoveAllScenesResponse(void * context, uint16_t groupId)
+static void OnScenesClusterRemoveAllScenesResponse(void * context, uint8_t status, uint16_t groupId)
 {
     ChipLogProgress(chipTool, "ScenesClusterRemoveAllScenesResponse");
 
@@ -639,7 +642,7 @@ static void OnScenesClusterRemoveAllScenesResponse(void * context, uint16_t grou
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnScenesClusterRemoveSceneResponse(void * context, uint16_t groupId, uint8_t sceneId)
+static void OnScenesClusterRemoveSceneResponse(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId)
 {
     ChipLogProgress(chipTool, "ScenesClusterRemoveSceneResponse");
 
@@ -647,7 +650,7 @@ static void OnScenesClusterRemoveSceneResponse(void * context, uint16_t groupId,
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnScenesClusterStoreSceneResponse(void * context, uint16_t groupId, uint8_t sceneId)
+static void OnScenesClusterStoreSceneResponse(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId)
 {
     ChipLogProgress(chipTool, "ScenesClusterStoreSceneResponse");
 
@@ -655,8 +658,8 @@ static void OnScenesClusterStoreSceneResponse(void * context, uint16_t groupId, 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnScenesClusterViewSceneResponse(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
-                                             uint8_t * sceneName,
+static void OnScenesClusterViewSceneResponse(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId,
+                                             uint16_t transitionTime, uint8_t * sceneName,
                                              /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
 {
     ChipLogProgress(chipTool, "ScenesClusterViewSceneResponse");
@@ -675,7 +678,7 @@ static void OnTvChannelClusterChangeChannelResponse(void * context,
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
-static void OnTargetNavigatorClusterNavigateTargetResponse(void * context, uint8_t * data)
+static void OnTargetNavigatorClusterNavigateTargetResponse(void * context, uint8_t status, uint8_t * data)
 {
     ChipLogProgress(chipTool, "TargetNavigatorClusterNavigateTargetResponse");
 

@@ -960,7 +960,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * data)
+    static void CallbackFn(void * context, uint8_t status, uint8_t * data)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -979,10 +979,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr.jniValue());
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), dataStr.jniValue());
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1172,7 +1172,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1189,10 +1189,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1240,7 +1240,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1257,10 +1257,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1309,7 +1309,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1326,10 +1326,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1377,7 +1377,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1394,10 +1394,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1445,7 +1445,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1462,10 +1462,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1514,7 +1514,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1531,10 +1531,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1583,7 +1583,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1600,10 +1600,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1652,7 +1652,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime,
+    static void CallbackFn(void * context, uint8_t scheduleId, uint8_t status, uint32_t localStartTime, uint32_t localEndTime,
                            uint8_t operatingModeDuringHoliday)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
@@ -1670,11 +1670,12 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IJJI)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIJJI)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(scheduleId), static_cast<jlong>(localStartTime),
-                            static_cast<jlong>(localEndTime), static_cast<jint>(operatingModeDuringHoliday));
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(scheduleId), static_cast<jint>(status),
+                            static_cast<jlong>(localStartTime), static_cast<jlong>(localEndTime),
+                            static_cast<jint>(operatingModeDuringHoliday));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2007,7 +2008,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour,
+    static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint8_t status, uint8_t daysMask, uint8_t startHour,
                            uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
@@ -2025,12 +2026,12 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIIIIII)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIIIIIII)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(scheduleId), static_cast<jint>(userId),
-                            static_cast<jint>(daysMask), static_cast<jint>(startHour), static_cast<jint>(startMinute),
-                            static_cast<jint>(endHour), static_cast<jint>(endMinute));
+                            static_cast<jint>(status), static_cast<jint>(daysMask), static_cast<jint>(startHour),
+                            static_cast<jint>(startMinute), static_cast<jint>(endHour), static_cast<jint>(endMinute));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2079,7 +2080,8 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime)
+    static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint8_t status, uint32_t localStartTime,
+                           uint32_t localEndTime)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2096,11 +2098,11 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIJJ)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIIJJ)V", &javaMethod);
         SuccessOrExit(err);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(scheduleId), static_cast<jint>(userId),
-                            static_cast<jlong>(localStartTime), static_cast<jlong>(localEndTime));
+                            static_cast<jint>(status), static_cast<jlong>(localStartTime), static_cast<jlong>(localEndTime));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2148,7 +2150,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2165,10 +2167,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2217,7 +2219,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2234,10 +2236,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2285,7 +2287,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2302,10 +2304,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2353,7 +2355,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2370,10 +2372,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2421,7 +2423,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2438,10 +2440,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2490,7 +2492,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2507,10 +2509,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2559,7 +2561,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2576,10 +2578,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2627,7 +2629,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2644,10 +2646,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2696,7 +2698,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2713,10 +2715,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2977,7 +2979,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t groupId)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2994,10 +2996,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId));
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jint>(groupId));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -3118,7 +3120,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t groupId)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3135,10 +3137,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId));
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jint>(groupId));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -3186,7 +3188,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t * groupName)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t * groupName)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3205,10 +3207,11 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), groupNameStr.jniValue());
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jint>(groupId),
+                            groupNameStr.jniValue());
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -3324,7 +3327,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3341,10 +3344,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -4791,7 +4794,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
+    static void CallbackFn(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
                            chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
@@ -4813,8 +4816,8 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err =
-            JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(JLjava/lang/String;J[BZ[B)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IJLjava/lang/String;J[BZ[B)V",
+                                                      &javaMethod);
         SuccessOrExit(err);
 
         updateTokenArr = env->NewByteArray(updateToken.size());
@@ -4829,9 +4832,9 @@ public:
                                 reinterpret_cast<const jbyte *>(metadataForRequestor.data()));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(delayedActionTime), imageURIStr.jniValue(),
-                            static_cast<jlong>(softwareVersion), updateTokenArr, static_cast<jboolean>(userConsentNeeded),
-                            metadataForRequestorArr);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jlong>(delayedActionTime),
+                            imageURIStr.jniValue(), static_cast<jlong>(softwareVersion), updateTokenArr,
+                            static_cast<jboolean>(userConsentNeeded), metadataForRequestorArr);
 
         env->DeleteLocalRef(updateTokenArr);
         env->DeleteLocalRef(metadataForRequestorArr);
@@ -5116,7 +5119,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5133,10 +5136,11 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(III)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), static_cast<jint>(sceneId));
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jint>(groupId),
+                            static_cast<jint>(sceneId));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -5185,7 +5189,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
+    static void CallbackFn(void * context, uint8_t status, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
                            /* TYPE WARNING: array array defaults to */ uint8_t * sceneList)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
@@ -5203,11 +5207,11 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(III)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIII)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(capacity), static_cast<jint>(groupId),
-                            static_cast<jint>(sceneCount)
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jint>(capacity),
+                            static_cast<jint>(groupId), static_cast<jint>(sceneCount)
                             // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
                             // Conversion from this type to Java is not properly implemented yet
         );
@@ -5258,7 +5262,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t groupId)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5275,10 +5279,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId));
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jint>(groupId));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -5326,7 +5330,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5343,10 +5347,11 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(III)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), static_cast<jint>(sceneId));
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jint>(groupId),
+                            static_cast<jint>(sceneId));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -5394,7 +5399,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5411,10 +5416,11 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(III)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), static_cast<jint>(sceneId));
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jint>(groupId),
+                            static_cast<jint>(sceneId));
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -5462,8 +5468,8 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                           /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
+                           uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5482,11 +5488,11 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(groupId), static_cast<jint>(sceneId),
-                            static_cast<jint>(transitionTime), sceneNameStr.jniValue()
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jint>(groupId),
+                            static_cast<jint>(sceneId), static_cast<jint>(transitionTime), sceneNameStr.jniValue()
                             // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
                             // Conversion from this type to Java is not properly implemented yet
         );
@@ -5611,7 +5617,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * data)
+    static void CallbackFn(void * context, uint8_t status, uint8_t * data)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5630,10 +5636,10 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr.jniValue());
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), dataStr.jniValue());
 
     exit:
         if (err != CHIP_NO_ERROR)
