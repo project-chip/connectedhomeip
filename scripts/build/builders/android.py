@@ -52,11 +52,16 @@ class AndroidBuilder(Builder):
       if k not in os.environ:
         raise Exception('Environment %s missing, cannot build android libraries' % k)
 
+    # SDK manager must be runnable to 'accept licenses'
     sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'tools', 'bin', 'sdkmanager')
-
     if not (os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)):
       raise Exception("'%s' is not executable by the current user" % sdk_manager)
-      
+
+    # In order to accept a license, the licenses folder is updated with the hash of the
+    # accepted license
+    licenses = os.path.join(os.environ['ANDROID_HOME'], 'licenses')
+    if not os.access(licenses, os.W_OK):
+      raise Exception("'%s' is writable by the current user (needed to accept licenses)" % licenses)
 
 
   def generate(self):
@@ -82,12 +87,21 @@ class AndroidBuilder(Builder):
   def build(self):
     self._Execute(['ninja', '-C', self.output_dir], title='Building JNI ' + self.identifier)
 
+    # NOTE: the following IDE-specific build instructions are NOT used:
+    #  - "rsync -a out/"android_$TARGET_CPU"/lib/*.jar src/android/CHIPTool/app/libs"
+    #    => using the 'ninjaOutputDir' project property instead to take the jar files directly
+    #       from the output
+    #  - "rsync -a out/"android_$TARGET_CPU"/lib/jni/* src/android/CHIPTool/app/src/main/jniLib"
+    #    => JNI libraries not used by the build taks (TODO: is this true? APK?)
+
+    self._Execute(['src/android/CHIPTool/gradlew', '-p', 'src/android/CHIPTool', '-PchipSdkJarDir=%s' % os.path.join(self.output_dir, 'lib'),
+    '-PbuildDir=%s' % self.output_dir, 'build'], title='Building APP ' + self.identifier)
+
   def jni_output_libs(self):
     """Get a dictionary of JNI-required files."""
     items = {}
 
     scan_root = os.path.join(self.output_dir, 'lib', 'jni')
-
     for root, dirs, files in os.walk(scan_root):
       dir_name = root[len(scan_root) + 1:]
       for file_name in files:
