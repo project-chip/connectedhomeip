@@ -72,9 +72,9 @@ performing over-the-air Device Firmware Upgrade using Bluetooth LE.
 ### Bluetooth LE advertising
 
 To commission the device onto a CHIP network, the device must be discoverable
-over Bluetooth LE that starts automatically upon the device startup, but only for a predefined
-period of time (15 minutes by default). If the Bluetooth LE advertising times out, you can re-enable
-it manually using **Button 4**.
+over Bluetooth LE that starts automatically upon the device startup, but only
+for a predefined period of time (15 minutes by default). If the Bluetooth LE
+advertising times out, you can re-enable it manually using **Button 4**.
 
 ### Bluetooth LE rendezvous
 
