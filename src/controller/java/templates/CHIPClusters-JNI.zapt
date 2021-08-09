@@ -316,7 +316,7 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
             env->DeleteGlobalRef(javaCallbackRef);
         };
 
-        static void CallbackFn(void * context{{#chip_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_cluster_response_arguments}})
+        static void CallbackFn(void * context{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}})
         {
             StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
             CHIP_ERROR err = CHIP_NO_ERROR;
@@ -325,14 +325,12 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
             jmethodID javaMethod;
             CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback * cppCallback = nullptr;
             {{#chip_cluster_response_arguments}}
-            {{#unless (isStrEqual label "status")}}
             {{#if (isOctetString type)}}
             jbyteArray {{asSymbol label}}Arr;
             {{else if (isShortString type)}}
             // ByteSpan is not properly returned yet, temporarily use empty string
             UtfString {{asSymbol label}}Str(env, "");
             {{/if}}
-            {{/unless}}
             {{/chip_cluster_response_arguments}}
 
             VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
@@ -343,11 +341,10 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
             javaCallbackRef = cppCallback->javaCallbackRef;
             VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#chip_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}{{#if isArray}}{{else if (isOctetString type)}}[B{{else if (isShortString type)}}Ljava/lang/String;{{else}}{{asJniSignature type}}{{/if}}{{/unless}}{{/chip_cluster_response_arguments}})V", &javaMethod);
+            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#chip_cluster_response_arguments}}{{#if isArray}}{{else if (isOctetString type)}}[B{{else if (isShortString type)}}Ljava/lang/String;{{else}}{{asJniSignature type}}{{/if}}{{/chip_cluster_response_arguments}})V", &javaMethod);
             SuccessOrExit(err);
 
             {{#chip_cluster_response_arguments}}
-            {{#unless (isStrEqual label "status")}}
             {{#if (isOctetString type)}}
             {{asSymbol label}}Arr = env->NewByteArray({{asSymbol label}}.size());
             VerifyOrExit({{asSymbol label}}Arr != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -355,12 +352,10 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
             env->SetByteArrayRegion({{asSymbol label}}Arr, 0, {{asSymbol label}}.size(), reinterpret_cast<const jbyte *>({{asSymbol label}}.data()));
             VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
             {{/if}}
-            {{/unless}}
             {{/chip_cluster_response_arguments}}
 
             env->CallVoidMethod(javaCallbackRef, javaMethod
                 {{#chip_cluster_response_arguments}}
-                {{#unless (isStrEqual label "status")}}
                 {{#if isArray}}
                 // {{asSymbol label}}: {{asUnderlyingZclType type}}
                 // Conversion from this type to Java is not properly implemented yet
@@ -371,16 +366,13 @@ class CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Ca
                 {{else}}
                 , static_cast<{{asJniBasicTypeForZclType type}}>({{asSymbol label}})
                 {{/if}}
-                {{/unless}}
                 {{/chip_cluster_response_arguments}}
             );
 
             {{#chip_cluster_response_arguments}}
-            {{#unless (isStrEqual label "status")}}
             {{#if (isOctetString type)}}
             env->DeleteLocalRef({{asSymbol label}}Arr);
             {{/if}}
-            {{/unless}}
             {{/chip_cluster_response_arguments}}
 
         exit:

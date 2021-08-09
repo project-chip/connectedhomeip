@@ -69,7 +69,7 @@ typedef void (*ReadReportingConfigurationReceivedCallback)(void* context, uint16
 // Cluster Specific Response Callbacks
 {{#chip_client_clusters}}
 {{#chip_cluster_responses}}
-typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#chip_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_cluster_response_arguments}});
+typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}});
 {{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 {{/if}}
