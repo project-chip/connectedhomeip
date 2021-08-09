@@ -56,9 +56,6 @@ class BLEManagerImpl final : public BLEManager,
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsFastAdvertisingEnabled(void);
-#if 0
-    CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
-#endif
     bool _IsAdvertising(void);
     CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);

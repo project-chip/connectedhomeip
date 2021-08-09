@@ -53,6 +53,11 @@ void appError(int err)
         ;
 }
 
+void appError(CHIP_ERROR error)
+{
+    appError(static_cast<int>(error.AsInteger()));
+}
+
 // ================================================================================
 // FreeRTOS Callbacks
 // ================================================================================
@@ -66,7 +71,6 @@ extern "C" void vApplicationIdleHook(void)
 // ================================================================================
 int main(void)
 {
-    int ret = CHIP_ERROR_SENTINEL;
     init_p6Platform();
 
     P6_LOG("==================================================\r\n");
@@ -77,7 +81,7 @@ int main(void)
     chip::Platform::MemoryInit();
     // chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
-    ret = PlatformMgr().InitChipStack();
+    CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
         P6_LOG("PlatformMgr().InitChipStack() failed");

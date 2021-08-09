@@ -24,6 +24,7 @@ COPY --from=android /opt/android/android-ndk-r21b /opt/android/android-ndk-r21b
 COPY --from=mbedos /opt/mbed-os /opt/mbed-os
 COPY --from=mbedos /opt/mbed-os-toolchain/ /opt/mbed-os-toolchain/
 COPY --from=mbedos /opt/openocd/ /opt/openocd/
+
 COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
 
 COPY --from=telink /opt/zephyrproject /opt/telink/zephyrproject

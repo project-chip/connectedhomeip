@@ -149,10 +149,8 @@
         "-I./libs/wifi-host-driver/WiFi_Host_Driver/src/bus_protocols",
         "-I./libs/wifi-host-driver/WiFi_Host_Driver/src/include",
         "-I./libs/wifi-mw-core",
-        "-I./libs/wifi-mw-core/configs",
         "-I./libs/wifi-mw-core/lwip-whd-port",
-        "-I./libs/wifi-mw-core/lwip-whd-port/COMPONENT_FREERTOS",
-        "-I./libs/wifi-mw-core/lwip-whd-port/COMPONENT_FREERTOS/arch"
+        "-I./libs/wifi-mw-core/lwip-whd-port/COMPONENT_FREERTOS"
     ],
     "defines": [
         "-DMBEDTLS_USER_CONFIG_FILE=<mbedtls_user_config.h>",
@@ -397,7 +395,6 @@
         "./libs/wifi-mw-core/lwip-whd-port/cy_lwip.c",
         "./libs/wifi-mw-core/lwip-whd-port/cy_lwip_dhcp_server.c",
         "./libs/clib-support/TOOLCHAIN_GCC_ARM/cy_newlib_freertos.c",
-        "./libs/clib-support/TOOLCHAIN_GCC_ARM/cy_newlib_freertos.c",
         "./libs/TARGET_CY8CKIT-062S2-43012/bluetooth/cybsp_bt_config.c",
         "./libs/TARGET_CY8CKIT-062S2-43012/cybsp.c",
         "./libs/TARGET_CY8CKIT-062S2-43012/COMPONENT_BSP_DESIGN_MODUS/GeneratedSource/cycfg.c",
@@ -495,12 +492,10 @@
         "./libs/wifi-host-driver/WiFi_Host_Driver/resources/firmware/COMPONENT_43012/43012C0-mfgtest_bin.c",
         "./libs/wifi-host-driver/WiFi_Host_Driver/resources/firmware/COMPONENT_43012/43012C0-mfgtest_clm_blob.c",
         "./libs/wifi-host-driver/WiFi_Host_Driver/resources/firmware/COMPONENT_43012/43012C0_bin.c",
-        "./libs/wifi-host-driver/WiFi_Host_Driver/resources/firmware/COMPONENT_43012/43012C0_clm_blob.c",
-        "./libs/wifi-mw-core/lwip-whd-port/COMPONENT_FREERTOS/arch/sys_arch.c"
+        "./libs/wifi-host-driver/WiFi_Host_Driver/resources/firmware/COMPONENT_43012/43012C0_clm_blob.c"
     ],
     "cxx_source": [],
     "asm_source": [
-        "./libs/mtb-pdl-cat1/drivers/source/TOOLCHAIN_GCC_ARM/cy_syslib_gcc.S",
         "./libs/mtb-pdl-cat1/drivers/source/TOOLCHAIN_GCC_ARM/cy_syslib_gcc.S",
         "./libs/TARGET_CY8CKIT-062S2-43012/COMPONENT_CM4/TOOLCHAIN_GCC_ARM/startup_psoc6_02_cm4.S"
     ],

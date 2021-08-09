@@ -18,12 +18,4 @@
 /*******************************************************************************/
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void init_p6Platform(void);
-
-#ifdef __cplusplus
-}
-#endif

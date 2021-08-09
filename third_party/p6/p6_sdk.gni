@@ -26,16 +26,10 @@ if (is_debug) {
 } else {
   debug_str = "Release"
 }
-mtb_json = exec_script("$p6_sdk_build_root/p6_sdk/make_gni.py",
-                       [
-                         "${p6_board}",
-                         "-c",
-                         debug_str,
-                         "-t",
-                         "GCC_ARM",
-                       ],
-                       "json",
-                       [])
+
+mtb_json = read_file(
+        "$p6_sdk_build_root/p6_sdk/build/${p6_board}/$debug_str/GCC_ARM.json",
+        "json")
 
 # Defines an p6 SDK build target.
 #

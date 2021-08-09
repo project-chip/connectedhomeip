@@ -50,11 +50,11 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
 
     if (*value)
     {
-        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::LOCK_ACTION);
+        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::Action::kLock);
     }
     else
     {
-        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::UNLOCK_ACTION);
+        BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::Action::kUnlock);
     }
 }
 

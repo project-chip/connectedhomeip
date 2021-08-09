@@ -27,7 +27,7 @@ BoltLockManager BoltLockManager::sLock;
 
 TimerHandle_t sLockTimer;
 
-int BoltLockManager::Init()
+CHIP_ERROR BoltLockManager::Init()
 {
     // Create FreeRTOS sw timer for lock timer.
     sLockTimer = xTimerCreate("lockTmr",        // Just a text name, not used by the RTOS kernel
@@ -40,10 +40,10 @@ int BoltLockManager::Init()
     if (sLockTimer == NULL)
     {
         P6_LOG("sLockTimer timer create failed");
-        appError(CHIP_ERROR_SENTINEL);
+        appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
-    mState              = kState_LockingCompleted;
+    mState              = State::kState_LockingCompleted;
     mAutoLockTimerArmed = false;
     mAutoRelock         = false;
     mAutoLockDuration   = 0;
@@ -59,12 +59,12 @@ void BoltLockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Ca
 
 bool BoltLockManager::IsActionInProgress()
 {
-    return (mState == kState_LockingInitiated || mState == kState_UnlockingInitiated);
+    return (mState == State::kState_LockingInitiated || mState == State::kState_UnlockingInitiated);
 }
 
 bool BoltLockManager::IsUnlocked()
 {
-    return (mState == kState_UnlockingCompleted);
+    return (mState == State::kState_UnlockingCompleted);
 }
 
 void BoltLockManager::EnableAutoRelock(bool aOn)
@@ -77,28 +77,28 @@ void BoltLockManager::SetAutoLockDuration(uint32_t aDurationInSecs)
     mAutoLockDuration = aDurationInSecs;
 }
 
-bool BoltLockManager::InitiateAction(int32_t aActor, Action_t aAction)
+bool BoltLockManager::InitiateAction(int32_t aActor, Action aAction)
 {
     bool action_initiated = false;
-    State_t new_state;
+    State new_state;
 
     // Initiate Lock/Unlock Action only when the previous one is complete.
-    if (mState == kState_LockingCompleted && aAction == UNLOCK_ACTION)
+    if (mState == State::kState_LockingCompleted && aAction == Action::kUnlock)
     {
         action_initiated = true;
 
-        new_state = kState_UnlockingInitiated;
+        new_state = State::kState_UnlockingInitiated;
     }
-    else if (mState == kState_UnlockingCompleted && aAction == LOCK_ACTION)
+    else if (mState == State::kState_UnlockingCompleted && aAction == Action::kLock)
     {
         action_initiated = true;
 
-        new_state = kState_LockingInitiated;
+        new_state = State::kState_LockingInitiated;
     }
 
     if (action_initiated)
     {
-        if (mAutoLockTimerArmed && new_state == kState_LockingInitiated)
+        if (mAutoLockTimerArmed && new_state == State::kState_LockingInitiated)
         {
             // If auto lock timer has been armed and someone initiates locking,
             // cancel the timer and continue as normal.
@@ -135,7 +135,7 @@ void BoltLockManager::StartTimer(uint32_t aTimeoutMs)
     if (xTimerChangePeriod(sLockTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
     {
         P6_LOG("sLockTimer timer start() failed");
-        appError(CHIP_ERROR_SENTINEL);
+        appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
 
@@ -144,7 +144,7 @@ void BoltLockManager::CancelTimer(void)
     if (xTimerStop(sLockTimer, 0) == pdFAIL)
     {
         P6_LOG("Lock timer timer stop() failed");
-        appError(CHIP_ERROR_SENTINEL);
+        appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
 
@@ -185,34 +185,34 @@ void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
 
     P6_LOG("Auto Re-Lock has been triggered!");
 
-    lock->InitiateAction(actor, LOCK_ACTION);
+    lock->InitiateAction(actor, Action::kLock);
 }
 
 void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 {
-    Action_t actionCompleted = INVALID_ACTION;
+    Action actionCompleted = Action::KInvalid;
 
     BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
 
-    if (lock->mState == kState_LockingInitiated)
+    if (lock->mState == State::kState_LockingInitiated)
     {
-        lock->mState    = kState_LockingCompleted;
-        actionCompleted = LOCK_ACTION;
+        lock->mState    = State::kState_LockingCompleted;
+        actionCompleted = Action::kLock;
     }
-    else if (lock->mState == kState_UnlockingInitiated)
+    else if (lock->mState == State::kState_UnlockingInitiated)
     {
-        lock->mState    = kState_UnlockingCompleted;
-        actionCompleted = UNLOCK_ACTION;
+        lock->mState    = State::kState_UnlockingCompleted;
+        actionCompleted = Action::kUnlock;
     }
 
-    if (actionCompleted != INVALID_ACTION)
+    if (actionCompleted != Action::KInvalid)
     {
         if (lock->mActionCompleted_CB)
         {
             lock->mActionCompleted_CB(actionCompleted);
         }
 
-        if (lock->mAutoRelock && actionCompleted == UNLOCK_ACTION)
+        if (lock->mAutoRelock && actionCompleted == Action::kUnlock)
         {
             // Start the timer for auto relock
             lock->StartTimer(lock->mAutoLockDuration * 1000);

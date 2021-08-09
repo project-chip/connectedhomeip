@@ -46,10 +46,6 @@
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
 
-static wifi_config_t wifi_conf;
-static wifi_mode_t WiFiMode;
-static bool wcm_init_done;
-
 /** ping delay - in milliseconds */
 #ifndef PING_DELAY
 #define PING_DELAY 2000
@@ -79,13 +75,18 @@ static bool wcm_init_done;
 /* Enable Ping via Socket API or RAW API */
 #define PING_USE_SOCKETS 1
 
+namespace {
+wifi_config_t wifi_conf;
+wifi_mode_t WiFiMode;
+bool wcm_init_done;
 /* ping variables */
-static const ip_addr_t * ping_target;
-static u16_t ping_seq_num;
-static u32_t ping_time;
+const ip_addr_t * ping_target;
+u16_t ping_seq_num;
+u32_t ping_time;
 #if !PING_USE_SOCKETS
-static struct raw_pcb * ping_pcb;
+struct raw_pcb * ping_pcb;
 #endif /* PING_USE_SOCKETS */
+} // namespace
 
 typedef struct
 {
@@ -241,11 +242,13 @@ cy_rslt_t P6Utils::p6_wifi_get_config(wifi_interface_t interface, wifi_config_t 
 
 CHIP_ERROR P6Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    cy_rslt_t result = CY_RSLT_SUCCESS;
     wifi_config_t stationConfig;
 
-    err = p6_wifi_get_config(WIFI_IF_STA, &stationConfig);
-    SuccessOrExit(err);
+    result = p6_wifi_get_config(WIFI_IF_STA, &stationConfig);
+    VerifyOrExit(result == CY_RSLT_SUCCESS, err = CHIP_ERROR_INTERNAL);
+
     ChipLogProgress(DeviceLayer, "GetWiFiStationProvision");
     VerifyOrExit(strlen((const char *) stationConfig.sta.ssid) != 0, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -270,7 +273,8 @@ exit:
 
 CHIP_ERROR P6Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    cy_rslt_t result = CY_RSLT_SUCCESS;
     wifi_config_t wifiConfig;
     ChipLogProgress(DeviceLayer, "SetWiFiStationProvision");
     char wifiSSID[kMaxWiFiSSIDLength + 1];
@@ -296,10 +300,11 @@ CHIP_ERROR P6Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo & 
     populate_wifi_config_t(&wifiConfig, WIFI_IF_STA, (cy_wcm_ssid_t *) wifiSSID, (cy_wcm_passphrase_t *) netInfo.WiFiKey);
 
     // Configure the P6 WiFi interface.
-    err = p6_wifi_set_config(WIFI_IF_STA, &wifiConfig);
-    if (err != CHIP_NO_ERROR)
+    result = p6_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+    if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "p6_wifi_set_config() failed ");
+        err = CHIP_ERROR_INTERNAL;
     }
     SuccessOrExit(err);
 

@@ -159,15 +159,16 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val)
 
 CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
 {
-    CHIP_ERROR err;
     cy_wcm_associated_ap_info_t ap_info;
+    cy_rslt_t result = CY_RSLT_SUCCESS;
 
-    err = cy_wcm_get_associated_ap_info(&ap_info);
-    if (err != CY_RSLT_SUCCESS)
+    result = cy_wcm_get_associated_ap_info(&ap_info);
+    if (result != CY_RSLT_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "cy_wcm_get_associated_ap_info failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "cy_wcm_get_associated_ap_info failed: %d", (int) result);
+        SuccessOrExit(CHIP_ERROR_INTERNAL);
     }
-    SuccessOrExit(err);
+
     ChipLogProgress(DeviceLayer,
                     "Wifi-Telemetry\n"
                     "BSSID: %02x:%02x:%02x:%02x:%02x:%02x\n"
@@ -184,6 +185,7 @@ exit:
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err                  = CHIP_NO_ERROR;
+    cy_rslt_t result                = CY_RSLT_SUCCESS;
     mLastStationConnectFailTime     = 0;
     mLastAPDemandTime               = 0;
     mWiFiStationMode                = kWiFiStationMode_Disabled;
@@ -210,10 +212,11 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
         memcpy(wifiConfig.sta.password, CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD,
                min(strlen(CHIP_DEVICE_CONFIG_DEFAULT_STA_PASSWORD), sizeof(wifiConfig.sta.password)));
         wifiConfig.sta.security = CHIP_DEVICE_CONFIG_DEFAULT_STA_SECURITY;
-        err                     = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifiConfig);
-        if (err != CY_RSLT_SUCCESS)
+        result                  = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_STA, &wifiConfig);
+        if (result != CY_RSLT_SUCCESS)
         {
-            ChipLogError(DeviceLayer, "p6_wifi_set_config() failed: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "p6_wifi_set_config() failed: %d", (int) result);
+            SuccessOrExit(CHIP_ERROR_INTERNAL);
         }
         err = CHIP_NO_ERROR;
     }
@@ -324,6 +327,7 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t wifiConfig;
+    cy_rslt_t result = CY_RSLT_SUCCESS;
 
     memset(&wifiConfig.ap, 0, sizeof(wifi_config_ap_t));
     snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
@@ -336,14 +340,16 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     wifiConfig.ap.ip_settings.gateway    = ap_mode_ip_settings.gateway;
 
     ChipLogProgress(DeviceLayer, "Configuring WiFi AP: SSID %s, channel %u", wifiConfig.ap.ssid, wifiConfig.ap.channel);
-    err = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_AP, &wifiConfig);
-    if (err != CY_RSLT_SUCCESS)
+    result = Internal::P6Utils::p6_wifi_set_config(WIFI_IF_AP, &wifiConfig);
+    if (result != CY_RSLT_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "p6_wifi_set_config(WIFI_IF_AP) failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "p6_wifi_set_config(WIFI_IF_AP) failed: %d", (int) result);
+        err = CHIP_ERROR_INTERNAL;
+        SuccessOrExit(err);
     }
-    SuccessOrExit(err);
+
     err = Internal::P6Utils::p6_start_ap();
-    if (err != CY_RSLT_SUCCESS)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "p6_start_ap failed: %s", chip::ErrorStr(err));
     }

@@ -21,9 +21,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPPlatformMemory.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include <assert.h>
 #include <string.h>
 #if CHIP_ENABLE_OPENTHREAD
@@ -58,7 +55,3 @@ void init_p6Platform(void)
     /* Initialize retarget-io to use the debug UART port */
     cy_retarget_io_init(CYBSP_DEBUG_UART_TX, CYBSP_DEBUG_UART_RX, CY_RETARGET_IO_BAUDRATE);
 }
-
-#ifdef __cplusplus
-}
-#endif

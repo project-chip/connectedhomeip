@@ -790,10 +790,6 @@ void BLEManagerImpl::SetAdvertisingData(void)
     uint8_t service_data[9];
     uint8_t * p = service_data;
 
-#if 0
-    uint8_t *rpa = wiced_btm_get_private_bda();
-#endif
-
     // Initialize the CHIP BLE Device Identification Information block that will be sent as payload
     // within the BLE service advertisement data.
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
@@ -822,10 +818,6 @@ void BLEManagerImpl::SetAdvertisingData(void)
     {
         localDeviceNameLen = strlen(sInstance.mDeviceName);
     }
-
-#if 0
-    ChipLogProgress(DeviceLayer, "SetAdvertisingData: RPA: %02X%02X%02X%02X%02X%02X", rpa[0], rpa[1], rpa[2], rpa[3], rpa[4], rpa[5]);
-#endif
 
     /* First element is the advertisment flags */
     adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_FLAG;
@@ -864,7 +856,7 @@ void BLEManagerImpl::SetAdvertisingData(void)
     wiced_bt_ble_set_raw_scan_response_data(num_elem, adv_elem);
 
 exit:
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SetAdvertisingData err:%ld", err);
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SetAdvertisingData err:%s", ErrorStr(err));
 }
 
 BLEManagerImpl::CHIPoBLEConState * BLEManagerImpl::AllocConnectionState(uint16_t conId)

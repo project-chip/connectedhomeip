@@ -24,9 +24,11 @@
 
 #include "MTBKeyValueStore.h"
 
-static cyhal_flash_block_info_t block_info;
-static cyhal_flash_t flash_obj;
-static mtb_kvstore_bd_t block_device;
+namespace {
+cyhal_flash_block_info_t block_info;
+cyhal_flash_t flash_obj;
+mtb_kvstore_bd_t block_device;
+} // namespace
 
 cy_rslt_t mtb_key_value_store_init(mtb_kvstore_t * kvstore_obj)
 {

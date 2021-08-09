@@ -27,46 +27,48 @@
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 
+#include <core/CHIPError.h>
+
 class BoltLockManager
 {
 public:
-    enum Action_t
+    enum class Action
     {
-        LOCK_ACTION = 0,
-        UNLOCK_ACTION,
+        kLock = 0,
+        kUnlock,
 
-        INVALID_ACTION
-    } Action;
+        KInvalid
+    };
 
-    enum State_t
+    enum class State
     {
         kState_LockingInitiated = 0,
         kState_LockingCompleted,
         kState_UnlockingInitiated,
         kState_UnlockingCompleted,
-    } State;
+    };
 
-    int Init();
+    CHIP_ERROR Init();
     bool IsUnlocked();
     void EnableAutoRelock(bool aOn);
     void SetAutoLockDuration(uint32_t aDurationInSecs);
     bool IsActionInProgress();
-    bool InitiateAction(int32_t aActor, Action_t aAction);
+    bool InitiateAction(int32_t aActor, Action aAction);
 
-    typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
-    typedef void (*Callback_fn_completed)(Action_t);
+    typedef void (*Callback_fn_initiated)(Action, int32_t aActor);
+    typedef void (*Callback_fn_completed)(Action);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
 
 private:
     friend BoltLockManager & BoltLockMgr(void);
-    State_t mState;
+    State mState = State::kState_LockingCompleted;
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
 
-    bool mAutoRelock;
-    uint32_t mAutoLockDuration;
-    bool mAutoLockTimerArmed;
+    bool mAutoRelock           = false;
+    uint32_t mAutoLockDuration = 0;
+    bool mAutoLockTimerArmed   = false;
 
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);

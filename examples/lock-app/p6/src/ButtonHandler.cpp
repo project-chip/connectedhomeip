@@ -20,17 +20,20 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 
-#define BUTTON_COUNT 2
+namespace {
+constexpr int kButtonCount = 2;
 
-TimerHandle_t buttonTimers[BUTTON_COUNT]; // FreeRTOS timers used for debouncing
+TimerHandle_t buttonTimers[kButtonCount]; // FreeRTOS timers used for debouncing
 // buttons. Array to hold handles to
 // the created timers.
+
+} // namespace
 
 void ButtonHandler::Init(void)
 {
     GpioInit();
     // Create FreeRTOS sw timers for debouncing buttons.
-    for (uint8_t i = 0; i < BUTTON_COUNT; i++)
+    for (uint8_t i = 0; i < kButtonCount; i++)
     {
         buttonTimers[i] = xTimerCreate("BtnTmr",                      // Just a text name, not used by the RTOS kernel
                                        APP_BUTTON_DEBOUNCE_PERIOD_MS, // timer period
