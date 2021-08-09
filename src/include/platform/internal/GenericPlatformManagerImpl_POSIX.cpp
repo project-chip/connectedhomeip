@@ -125,7 +125,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEve
 {
     mChipEventQueue.Push(*event);
 
-    SystemLayer.WatchableEvents().Signal(); // Trigger wake select on CHIP thread
+    SystemLayer.WatchableEventsManager().Signal(); // Trigger wake select on CHIP thread
 }
 
 template <class ImplClass>
@@ -160,7 +160,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
 
     Impl()->LockChipStack();
 
-    System::WatchableEventManager & watchState = SystemLayer.WatchableEvents();
+    System::WatchableEventManager & watchState = SystemLayer.WatchableEventsManager();
     watchState.EventLoopBegins();
     do
     {
@@ -255,7 +255,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StopEventLoopTask()
         // SystemLayer.
         //
         Impl()->LockChipStack();
-        SystemLayer.WatchableEvents().Signal();
+        SystemLayer.WatchableEventsManager().Signal();
         Impl()->UnlockChipStack();
 
         pthread_mutex_lock(&mStateLock);

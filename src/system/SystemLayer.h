@@ -88,13 +88,13 @@ public:
     CHIP_ERROR StartTimer(uint32_t aMilliseconds, Timers::OnCompleteFunct aComplete, void * aAppState);
     void CancelTimer(Timers::OnCompleteFunct aOnComplete, void * aAppState);
     CHIP_ERROR ScheduleWork(Timers::OnCompleteFunct aComplete, void * aAppState);
-    WatchableEventManager & WatchableEvents() { return mWatchableEvents; }
+    WatchableEventManager & WatchableEventsManager() { return mWatchableEventsManager; }
 
     Clock & GetClock() { return mClock; }
 
 private:
     LayerState mLayerState;
-    WatchableEventManager mWatchableEvents;
+    WatchableEventManager mWatchableEventsManager;
     Clock mClock;
 
     // Copy and assignment NOT DEFINED

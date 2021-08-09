@@ -243,7 +243,7 @@ CHIP_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = SystemLayer().WatchableEvents().GetDispatchQueue();
+    dispatch_queue_t dispatchQueue = SystemLayer().WatchableEventsManager().GetDispatchQueue();
     if (dispatchQueue != nullptr)
     {
         unsigned long fd = static_cast<unsigned long>(mSocket.GetFD());
@@ -843,7 +843,7 @@ void TCPEndPoint::EnableReceive()
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     // Wake the thread waiting for I/O so that it can include the socket.
-    SystemLayer().WatchableEvents().Signal();
+    SystemLayer().WatchableEventsManager().Signal();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
@@ -2204,8 +2204,8 @@ err_t TCPEndPoint::LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, 
 
         // Post callback to HandleConnectComplete.
         conErr = chip::System::MapErrorLwIP(lwipErr);
-        if (lSystemLayer.WatchableEvents().PostEvent(*ep, kInetEvent_TCPConnectComplete,
-                                                     static_cast<uintptr_t>(conErr.AsInteger())) != CHIP_NO_ERROR)
+        if (lSystemLayer.WatchableEventsManager().PostEvent(*ep, kInetEvent_TCPConnectComplete,
+                                                            static_cast<uintptr_t>(conErr.AsInteger())) != CHIP_NO_ERROR)
             res = ERR_ABRT;
     }
     else
@@ -2270,7 +2270,7 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
             tcp_err(tpcb, LwIPHandleError);
 
             // Post a callback to the HandleConnectionReceived() function, passing it the new end point.
-            if (lSystemLayer.WatchableEvents().PostEvent(*listenEP, kInetEvent_TCPConnectionReceived, (uintptr_t) conEP) !=
+            if (lSystemLayer.WatchableEventsManager().PostEvent(*listenEP, kInetEvent_TCPConnectionReceived, (uintptr_t) conEP) !=
                 CHIP_NO_ERROR)
             {
                 err = CHIP_ERROR_CONNECTION_ABORTED;
@@ -2281,7 +2281,8 @@ err_t TCPEndPoint::LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tpc
 
         // Otherwise, there was an error accepting the connection, so post a callback to the HandleError function.
         else
-            lSystemLayer.WatchableEvents().PostEvent(*listenEP, kInetEvent_TCPError, static_cast<uintptr_t>(err.AsInteger()));
+            lSystemLayer.WatchableEventsManager().PostEvent(*listenEP, kInetEvent_TCPError,
+                                                            static_cast<uintptr_t>(err.AsInteger()));
     }
     else
         err = CHIP_ERROR_CONNECTION_ABORTED;
@@ -2307,7 +2308,7 @@ err_t TCPEndPoint::LwIPHandleDataReceived(void * arg, struct tcp_pcb * tpcb, str
         chip::System::Layer & lSystemLayer = ep->SystemLayer();
 
         // Post callback to HandleDataReceived.
-        if (lSystemLayer.WatchableEvents().PostEvent(*ep, kInetEvent_TCPDataReceived, (uintptr_t) p) != CHIP_NO_ERROR)
+        if (lSystemLayer.WatchableEventsManager().PostEvent(*ep, kInetEvent_TCPDataReceived, (uintptr_t) p) != CHIP_NO_ERROR)
             res = ERR_ABRT;
     }
     else
@@ -2329,7 +2330,7 @@ err_t TCPEndPoint::LwIPHandleDataSent(void * arg, struct tcp_pcb * tpcb, u16_t l
         chip::System::Layer & lSystemLayer = ep->SystemLayer();
 
         // Post callback to HandleDataReceived.
-        if (lSystemLayer.WatchableEvents().PostEvent(*ep, kInetEvent_TCPDataSent, (uintptr_t) len) != CHIP_NO_ERROR)
+        if (lSystemLayer.WatchableEventsManager().PostEvent(*ep, kInetEvent_TCPDataSent, (uintptr_t) len) != CHIP_NO_ERROR)
             res = ERR_ABRT;
     }
     else
@@ -2358,7 +2359,7 @@ void TCPEndPoint::LwIPHandleError(void * arg, err_t lwipErr)
 
         // Post callback to HandleError.
         CHIP_ERROR err = chip::System::MapErrorLwIP(lwipErr);
-        lSystemLayer.WatchableEvents().PostEvent(*ep, kInetEvent_TCPError, static_cast<uintptr_t>(err.AsInteger()));
+        lSystemLayer.WatchableEventsManager().PostEvent(*ep, kInetEvent_TCPError, static_cast<uintptr_t>(err.AsInteger()));
     }
 }
 

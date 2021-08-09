@@ -77,6 +77,10 @@ public:
     void Lock();   /**< Acquire the mutual exclusion lock, blocking the current thread indefinitely if necessary. */
     void Unlock(); /**< Release the mutual exclusion lock (can block on some systems until scheduler completes). */
 
+    // Synonyms for compatibility with std::lock_guard.
+    void lock() { Lock(); }
+    void unlock() { Unlock(); }
+
 private:
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     pthread_mutex_t mPOSIXMutex;
@@ -96,16 +100,6 @@ private:
 
     Mutex(const Mutex &) = delete;
     Mutex & operator=(const Mutex &) = delete;
-};
-
-class ScopedMutexLock
-{
-public:
-    ScopedMutexLock(Mutex & mutex) : mMutex(mutex) { mutex.Lock(); }
-    ~ScopedMutexLock() { mMutex.Unlock(); }
-
-private:
-    Mutex & mMutex;
 };
 
 inline Mutex::Mutex() {}

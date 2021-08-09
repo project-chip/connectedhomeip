@@ -35,7 +35,7 @@ Layer::Layer() : mLayerState(kLayerState_NotInitialized) {}
 CHIP_ERROR Layer::Init()
 {
     VerifyOrReturnError(State() == kLayerState_NotInitialized, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mWatchableEvents.Init(*this));
+    ReturnErrorOnFailure(mWatchableEventsManager.Init(*this));
     this->mLayerState = kLayerState_Initialized;
     return CHIP_NO_ERROR;
 }
@@ -43,7 +43,7 @@ CHIP_ERROR Layer::Init()
 CHIP_ERROR Layer::Shutdown()
 {
     VerifyOrReturnError(State() == kLayerState_Initialized, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mWatchableEvents.Shutdown());
+    ReturnErrorOnFailure(mWatchableEventsManager.Shutdown());
     this->mLayerState = kLayerState_NotInitialized;
     return CHIP_NO_ERROR;
 }
@@ -69,7 +69,7 @@ CHIP_ERROR Layer::Shutdown()
 CHIP_ERROR Layer::StartTimer(uint32_t aDelayMilliseconds, Timers::OnCompleteFunct aComplete, void * aAppState)
 {
     VerifyOrReturnError(State() == kLayerState_Initialized, CHIP_ERROR_INCORRECT_STATE);
-    return mWatchableEvents.StartTimer(aDelayMilliseconds, aComplete, aAppState);
+    return mWatchableEventsManager.StartTimer(aDelayMilliseconds, aComplete, aAppState);
 }
 
 /**
@@ -88,7 +88,7 @@ CHIP_ERROR Layer::StartTimer(uint32_t aDelayMilliseconds, Timers::OnCompleteFunc
 void Layer::CancelTimer(Timers::OnCompleteFunct aOnComplete, void * aAppState)
 {
     VerifyOrReturn(this->State() == kLayerState_Initialized);
-    return mWatchableEvents.CancelTimer(aOnComplete, aAppState);
+    return mWatchableEventsManager.CancelTimer(aOnComplete, aAppState);
 }
 
 /**
@@ -127,7 +127,7 @@ CHIP_ERROR Layer::ScheduleWork(Timers::OnCompleteFunct aComplete, void * aAppSta
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(State() == kLayerState_Initialized, CHIP_ERROR_INCORRECT_STATE);
-    return mWatchableEvents.ScheduleWork(aComplete, aAppState);
+    return mWatchableEventsManager.ScheduleWork(aComplete, aAppState);
 }
 
 } // namespace System

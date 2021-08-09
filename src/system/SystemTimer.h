@@ -43,6 +43,10 @@
 #include <dispatch/dispatch.h>
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
+#include <mutex>
+#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
+
 namespace chip {
 namespace System {
 
@@ -52,7 +56,7 @@ typedef void (*OnCompleteFunct)(Layer * aLayer, void * appState, CHIP_ERROR aErr
 
 } // namespace Timers
 
-#if CHIP_SYSTEM_CONFIG_NUM_TIMERS
+#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
 /**
  * This is an Object-pool based class that System::Layer implementations can use to assist in providing timer functions.
@@ -86,42 +90,42 @@ public:
         CHIP_ERROR Init();
         bool Empty() const
         {
-            ScopedMutexLock lock(mMutex);
+            std::lock_guard<Mutex> lock(mMutex);
             return mHead == nullptr;
         }
         Timer * Add(Timer * add)
         {
-            ScopedMutexLock lock(mMutex);
+            std::lock_guard<Mutex> lock(mMutex);
             return List::Add(add);
         }
         Timer * Remove(Timer * remove)
         {
-            ScopedMutexLock lock(mMutex);
+            std::lock_guard<Mutex> lock(mMutex);
             return List::Remove(remove);
         }
         Timer * Remove(Timers::OnCompleteFunct onComplete, void * appState)
         {
-            ScopedMutexLock lock(mMutex);
+            std::lock_guard<Mutex> lock(mMutex);
             return List::Remove(onComplete, appState);
         }
         Timer * PopEarliest()
         {
-            ScopedMutexLock lock(mMutex);
+            std::lock_guard<Mutex> lock(mMutex);
             return List::PopEarliest();
         }
         Timer * PopIfEarlier(Clock::MonotonicMilliseconds t)
         {
-            ScopedMutexLock lock(mMutex);
+            std::lock_guard<Mutex> lock(mMutex);
             return List::PopIfEarlier(t);
         }
         Timer * ExtractEarlier(Clock::MonotonicMilliseconds t)
         {
-            ScopedMutexLock lock(mMutex);
+            std::lock_guard<Mutex> lock(mMutex);
             return List::ExtractEarlier(t);
         }
         Timer * Earliest() const
         {
-            ScopedMutexLock lock(mMutex);
+            std::lock_guard<Mutex> lock(mMutex);
             return mHead;
         }
 
@@ -160,7 +164,7 @@ private:
     Timer & operator=(const Timer &) = delete;
 };
 
-#endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
+#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
 } // namespace System
 } // namespace chip
