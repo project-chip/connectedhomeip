@@ -51,6 +51,11 @@ class AndroidBuilder(Builder):
     for k in ['ANDROID_NDK_HOME', 'ANDROID_HOME']:
       if k not in os.environ:
         raise Exception('Environment %s missing, cannot build android libraries' % k)
+
+    sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'tools', 'bin', 'sdkmanager')
+
+    if not (os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)):
+      raise Exception("'%s' is not executable by the current user" % sdk_manager)
       
 
 
@@ -70,9 +75,12 @@ class AndroidBuilder(Builder):
         
         self._Execute(['gn', 'gen', '--check', '--fail-on-unused-args', self.output_dir, args], title='Generating ' + self.identifier)
 
+        self._Execute(['bash', '-c', 'yes | %s/tools/bin/sdkmanager --licenses >/dev/null' % os.environ['ANDROID_HOME']],
+          title='Accepting NDK licenses')
+
 
   def build(self):
-    self._Execute(['ninja', '-C', self.output_dir], title='Building ' + self.identifier)
+    self._Execute(['ninja', '-C', self.output_dir], title='Building JNI ' + self.identifier)
 
   def jni_output_libs(self):
     """Get a dictionary of JNI-required files."""
