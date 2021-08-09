@@ -4094,21 +4094,15 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
                 case 3:
                     TLVUnpackError = aDataTlv.Get(softwareVersion);
                     break;
-                case 4: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    updateToken          = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 4:
+                    TLVUnpackError = aDataTlv.Get(updateToken);
+                    break;
                 case 5:
                     TLVUnpackError = aDataTlv.Get(userConsentNeeded);
                     break;
-                case 6: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    metadataForRequestor = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 6:
+                    TLVUnpackError = aDataTlv.Get(metadataForRequestor);
+                    break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
@@ -4221,12 +4215,9 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
                 case 1:
                     TLVUnpackError = aDataTlv.Get(FabricIndex);
                     break;
-                case 2: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    DebugText            = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 2:
+                    TLVUnpackError = aDataTlv.Get(DebugText);
+                    break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
@@ -4284,18 +4275,12 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    NOCSRElements        = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
-                case 1: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    AttestationSignature = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(NOCSRElements);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(AttestationSignature);
+                    break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");

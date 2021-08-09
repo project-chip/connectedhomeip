@@ -184,8 +184,12 @@ function asPutCastType(zclType)
 
 function asChipCallback(item)
 {
-  if (StringHelper.isString(item.type)) {
-    return { name : 'String', type : 'const chip::ByteSpan' };
+  if (StringHelper.isOctetString(item.type)) {
+    return { name : 'OctetString', type : 'const chip::ByteSpan' };
+  }
+
+  if (StringHelper.isCharString(item.type)) {
+    return { name : 'CharString', type : 'const chip::ByteSpan' };
   }
 
   if (ListHelper.isList(item.type)) {

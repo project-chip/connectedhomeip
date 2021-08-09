@@ -250,10 +250,7 @@ class CHIPBooleanAttributeCallback : public Callback::Callback<BooleanAttributeC
 {
 public:
     CHIPBooleanAttributeCallback(jobject javaCallback, bool keepAlive = false) :
-        Callback::Callback<BooleanAttributeCallback>(CallbackFn, this)
-
-        ,
-        keepAlive(keepAlive)
+        Callback::Callback<BooleanAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -296,13 +293,69 @@ public:
         jmethodID javaMethod;
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Z)V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jboolean>(value));
     }
 
 private:
     jobject javaCallbackRef;
+    bool keepAlive;
+};
 
+class CHIPCharStringAttributeCallback : public Callback::Callback<CharStringAttributeCallback>
+{
+public:
+    CHIPCharStringAttributeCallback(jobject javaCallback, bool keepAlive = false) :
+        Callback::Callback<CharStringAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+
+    static void maybeDestroy(CHIPCharStringAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            delete callback;
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::ByteSpan value)
+    {
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+        std::unique_ptr<CHIPCharStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+            reinterpret_cast<CHIPCharStringAttributeCallback *>(context), maybeDestroy);
+
+        // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+        jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
+        VerifyOrReturn(javaCallbackRef != nullptr,
+                       ChipLogDetail(Zcl, "Early return from attribute callback since Java callback is null"));
+
+        jmethodID javaMethod;
+
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
+
+        UtfString valueStr(env, value);
+        env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
+    }
+
+private:
+    jobject javaCallbackRef;
     bool keepAlive;
 };
 
@@ -310,10 +363,7 @@ class CHIPInt8sAttributeCallback : public Callback::Callback<Int8sAttributeCallb
 {
 public:
     CHIPInt8sAttributeCallback(jobject javaCallback, bool keepAlive = false) :
-        Callback::Callback<Int8sAttributeCallback>(CallbackFn, this)
-
-        ,
-        keepAlive(keepAlive)
+        Callback::Callback<Int8sAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -356,13 +406,11 @@ public:
         jmethodID javaMethod;
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(value));
     }
 
 private:
     jobject javaCallbackRef;
-
     bool keepAlive;
 };
 
@@ -370,10 +418,7 @@ class CHIPInt8uAttributeCallback : public Callback::Callback<Int8uAttributeCallb
 {
 public:
     CHIPInt8uAttributeCallback(jobject javaCallback, bool keepAlive = false) :
-        Callback::Callback<Int8uAttributeCallback>(CallbackFn, this)
-
-        ,
-        keepAlive(keepAlive)
+        Callback::Callback<Int8uAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -416,13 +461,11 @@ public:
         jmethodID javaMethod;
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(value));
     }
 
 private:
     jobject javaCallbackRef;
-
     bool keepAlive;
 };
 
@@ -430,10 +473,7 @@ class CHIPInt16sAttributeCallback : public Callback::Callback<Int16sAttributeCal
 {
 public:
     CHIPInt16sAttributeCallback(jobject javaCallback, bool keepAlive = false) :
-        Callback::Callback<Int16sAttributeCallback>(CallbackFn, this)
-
-        ,
-        keepAlive(keepAlive)
+        Callback::Callback<Int16sAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -476,13 +516,11 @@ public:
         jmethodID javaMethod;
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(value));
     }
 
 private:
     jobject javaCallbackRef;
-
     bool keepAlive;
 };
 
@@ -490,10 +528,7 @@ class CHIPInt16uAttributeCallback : public Callback::Callback<Int16uAttributeCal
 {
 public:
     CHIPInt16uAttributeCallback(jobject javaCallback, bool keepAlive = false) :
-        Callback::Callback<Int16uAttributeCallback>(CallbackFn, this)
-
-        ,
-        keepAlive(keepAlive)
+        Callback::Callback<Int16uAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -536,13 +571,11 @@ public:
         jmethodID javaMethod;
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(I)V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(value));
     }
 
 private:
     jobject javaCallbackRef;
-
     bool keepAlive;
 };
 
@@ -550,10 +583,7 @@ class CHIPInt32sAttributeCallback : public Callback::Callback<Int32sAttributeCal
 {
 public:
     CHIPInt32sAttributeCallback(jobject javaCallback, bool keepAlive = false) :
-        Callback::Callback<Int32sAttributeCallback>(CallbackFn, this)
-
-        ,
-        keepAlive(keepAlive)
+        Callback::Callback<Int32sAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -596,13 +626,11 @@ public:
         jmethodID javaMethod;
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(J)V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(value));
     }
 
 private:
     jobject javaCallbackRef;
-
     bool keepAlive;
 };
 
@@ -610,10 +638,7 @@ class CHIPInt32uAttributeCallback : public Callback::Callback<Int32uAttributeCal
 {
 public:
     CHIPInt32uAttributeCallback(jobject javaCallback, bool keepAlive = false) :
-        Callback::Callback<Int32uAttributeCallback>(CallbackFn, this)
-
-        ,
-        keepAlive(keepAlive)
+        Callback::Callback<Int32uAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -656,13 +681,11 @@ public:
         jmethodID javaMethod;
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(J)V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(value));
     }
 
 private:
     jobject javaCallbackRef;
-
     bool keepAlive;
 };
 
@@ -670,10 +693,7 @@ class CHIPInt64sAttributeCallback : public Callback::Callback<Int64sAttributeCal
 {
 public:
     CHIPInt64sAttributeCallback(jobject javaCallback, bool keepAlive = false) :
-        Callback::Callback<Int64sAttributeCallback>(CallbackFn, this)
-
-        ,
-        keepAlive(keepAlive)
+        Callback::Callback<Int64sAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -716,13 +736,11 @@ public:
         jmethodID javaMethod;
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(J)V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(value));
     }
 
 private:
     jobject javaCallbackRef;
-
     bool keepAlive;
 };
 
@@ -730,10 +748,7 @@ class CHIPInt64uAttributeCallback : public Callback::Callback<Int64uAttributeCal
 {
 public:
     CHIPInt64uAttributeCallback(jobject javaCallback, bool keepAlive = false) :
-        Callback::Callback<Int64uAttributeCallback>(CallbackFn, this)
-
-        ,
-        keepAlive(keepAlive)
+        Callback::Callback<Int64uAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -776,21 +791,19 @@ public:
         jmethodID javaMethod;
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(J)V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jlong>(value));
     }
 
 private:
     jobject javaCallbackRef;
-
     bool keepAlive;
 };
 
-class CHIPStringAttributeCallback : public Callback::Callback<StringAttributeCallback>
+class CHIPOctetStringAttributeCallback : public Callback::Callback<OctetStringAttributeCallback>
 {
 public:
-    CHIPStringAttributeCallback(jobject javaCallback, bool octetString, bool keepAlive = false) :
-        Callback::Callback<StringAttributeCallback>(CallbackFn, this), octetString(octetString), keepAlive(keepAlive)
+    CHIPOctetStringAttributeCallback(jobject javaCallback, bool keepAlive = false) :
+        Callback::Callback<OctetStringAttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         if (env == nullptr)
@@ -805,7 +818,7 @@ public:
         }
     }
 
-    static void maybeDestroy(CHIPStringAttributeCallback * callback)
+    static void maybeDestroy(CHIPOctetStringAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
@@ -822,8 +835,8 @@ public:
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
         VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-        std::unique_ptr<CHIPStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-            reinterpret_cast<CHIPStringAttributeCallback *>(context), maybeDestroy);
+        std::unique_ptr<CHIPOctetStringAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+            reinterpret_cast<CHIPOctetStringAttributeCallback *>(context), maybeDestroy);
 
         // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
         jobject javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -832,30 +845,18 @@ public:
 
         jmethodID javaMethod;
 
-        if (cppCallback.get()->octetString)
-        {
-            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
-            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
 
-            jbyteArray valueArr = env->NewByteArray(value.size());
-            env->ExceptionClear();
-            env->SetByteArrayRegion(valueArr, 0, value.size(), reinterpret_cast<const jbyte *>(value.data()));
+        jbyteArray valueArr = env->NewByteArray(value.size());
+        env->ExceptionClear();
+        env->SetByteArrayRegion(valueArr, 0, value.size(), reinterpret_cast<const jbyte *>(value.data()));
 
-            env->CallVoidMethod(javaCallbackRef, javaMethod, valueArr);
-        }
-        else
-        {
-            err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
-            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
-
-            UtfString valueStr(env, value);
-            env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
-        }
+        env->CallVoidMethod(javaCallbackRef, javaMethod, valueArr);
     }
 
 private:
     jobject javaCallbackRef;
-    bool octetString;
     bool keepAlive;
 };
 
@@ -8132,7 +8133,7 @@ exit:
 JNI_METHOD(void, ApplicationBasicCluster, readVendorNameAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -8207,7 +8208,7 @@ JNI_METHOD(void, ApplicationBasicCluster, readApplicationNameAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -8282,7 +8283,7 @@ JNI_METHOD(void, ApplicationBasicCluster, readApplicationIdAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -9240,7 +9241,7 @@ JNI_METHOD(void, BasicCluster, readInteractionModelVersionAttribute)(JNIEnv * en
 JNI_METHOD(void, BasicCluster, readVendorNameAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -9314,7 +9315,7 @@ JNI_METHOD(void, BasicCluster, readVendorIDAttribute)(JNIEnv * env, jobject self
 JNI_METHOD(void, BasicCluster, readProductNameAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -9388,7 +9389,7 @@ JNI_METHOD(void, BasicCluster, readProductIDAttribute)(JNIEnv * env, jobject sel
 JNI_METHOD(void, BasicCluster, readUserLabelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -9465,7 +9466,7 @@ JNI_METHOD(void, BasicCluster, writeUserLabelAttribute)
 JNI_METHOD(void, BasicCluster, readLocationAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -9579,7 +9580,7 @@ JNI_METHOD(void, BasicCluster, readHardwareVersionAttribute)(JNIEnv * env, jobje
 JNI_METHOD(void, BasicCluster, readHardwareVersionStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -9653,7 +9654,7 @@ JNI_METHOD(void, BasicCluster, readSoftwareVersionAttribute)(JNIEnv * env, jobje
 JNI_METHOD(void, BasicCluster, readSoftwareVersionStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -9690,7 +9691,7 @@ JNI_METHOD(void, BasicCluster, readSoftwareVersionStringAttribute)(JNIEnv * env,
 JNI_METHOD(void, BasicCluster, readManufacturingDateAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -9727,7 +9728,7 @@ JNI_METHOD(void, BasicCluster, readManufacturingDateAttribute)(JNIEnv * env, job
 JNI_METHOD(void, BasicCluster, readPartNumberAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -9764,7 +9765,7 @@ JNI_METHOD(void, BasicCluster, readPartNumberAttribute)(JNIEnv * env, jobject se
 JNI_METHOD(void, BasicCluster, readProductURLAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -9801,7 +9802,7 @@ JNI_METHOD(void, BasicCluster, readProductURLAttribute)(JNIEnv * env, jobject se
 JNI_METHOD(void, BasicCluster, readProductLabelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -9838,7 +9839,7 @@ JNI_METHOD(void, BasicCluster, readProductLabelAttribute)(JNIEnv * env, jobject 
 JNI_METHOD(void, BasicCluster, readSerialNumberAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -10403,7 +10404,7 @@ JNI_METHOD(jlong, BridgedDeviceBasicCluster, initWithDevice)(JNIEnv * env, jobje
 JNI_METHOD(void, BridgedDeviceBasicCluster, readVendorNameAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -10478,7 +10479,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readProductNameAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -10515,7 +10516,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readProductNameAttribute)
 JNI_METHOD(void, BridgedDeviceBasicCluster, readUserLabelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -10631,7 +10632,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readHardwareVersionStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -10707,7 +10708,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readSoftwareVersionStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -10745,7 +10746,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readManufacturingDateAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -10782,7 +10783,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readManufacturingDateAttribute)
 JNI_METHOD(void, BridgedDeviceBasicCluster, readPartNumberAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -10819,7 +10820,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readPartNumberAttribute)(JNIEnv * en
 JNI_METHOD(void, BridgedDeviceBasicCluster, readProductURLAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -10857,7 +10858,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readProductLabelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -10895,7 +10896,7 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, readSerialNumberAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -12142,7 +12143,7 @@ JNI_METHOD(void, ColorControlCluster, readDriftCompensationAttribute)
 JNI_METHOD(void, ColorControlCluster, readCompensationTextAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -17154,7 +17155,7 @@ exit:
 JNI_METHOD(void, GeneralCommissioningCluster, readFabricIdAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, true);
+    CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -23299,7 +23300,7 @@ JNI_METHOD(void, TvChannelCluster, readTvChannelListAttribute)(JNIEnv * env, job
 JNI_METHOD(void, TvChannelCluster, readTvChannelLineupAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, true);
+    CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -23336,7 +23337,7 @@ JNI_METHOD(void, TvChannelCluster, readTvChannelLineupAttribute)(JNIEnv * env, j
 JNI_METHOD(void, TvChannelCluster, readCurrentTvChannelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, true);
+    CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -25064,7 +25065,7 @@ JNI_METHOD(void, TestClusterCluster, writeEnum16Attribute)
 JNI_METHOD(void, TestClusterCluster, readOctetStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, true);
+    CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -25254,7 +25255,7 @@ JNI_METHOD(void, TestClusterCluster, readListStructOctetStringAttribute)
 JNI_METHOD(void, TestClusterCluster, readLongOctetStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, true);
+    CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -25331,7 +25332,7 @@ JNI_METHOD(void, TestClusterCluster, writeLongOctetStringAttribute)
 JNI_METHOD(void, TestClusterCluster, readCharStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -25408,7 +25409,7 @@ JNI_METHOD(void, TestClusterCluster, writeCharStringAttribute)
 JNI_METHOD(void, TestClusterCluster, readLongCharStringAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -26778,7 +26779,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readNetworkNameAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, true);
+    CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -26892,7 +26893,7 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, readMeshLocalPrefixAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, true);
+    CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -29032,7 +29033,7 @@ JNI_METHOD(jlong, WakeOnLanCluster, initWithDevice)(JNIEnv * env, jobject self, 
 JNI_METHOD(void, WakeOnLanCluster, readWakeOnLanMacAddressAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, false);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -29160,7 +29161,7 @@ exit:
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, readBssidAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPStringAttributeCallback * onSuccess = new CHIPStringAttributeCallback(callback, true);
+    CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());

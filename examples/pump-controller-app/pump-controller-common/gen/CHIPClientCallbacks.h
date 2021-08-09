@@ -46,7 +46,8 @@ typedef void (*Int32uAttributeCallback)(void * context, uint32_t value);
 typedef void (*Int32sAttributeCallback)(void * context, int32_t value);
 typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
 typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
-typedef void (*StringAttributeCallback)(void * context, const chip::ByteSpan value);
+typedef void (*OctetStringAttributeCallback)(void * context, const chip::ByteSpan value);
+typedef void (*CharStringAttributeCallback)(void * context, const chip::ByteSpan value);
 typedef void (*AttributeResponseFilter)(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
                                         chip::Callback::Cancelable * onFailure);
 
@@ -75,10 +76,6 @@ void BasicAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelabl
         cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
     }
 }
-
-template <>
-void BasicAttributeFilter<StringAttributeCallback>(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
-                                                   chip::Callback::Cancelable * onFailure);
 
 typedef void (*ReadReportingConfigurationReportedCallback)(void * context, uint16_t minInterval, uint16_t maxInterval);
 typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint16_t timeout);
