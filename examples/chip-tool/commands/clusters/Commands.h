@@ -12987,6 +12987,7 @@ private:
 | * UpdateWiFiNetwork                                                 |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -13371,6 +13372,40 @@ public:
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
         new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadNetworkCommissioningFeatureMap : public ModelCommand
+{
+public:
+    ReadNetworkCommissioningFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadNetworkCommissioningFeatureMap()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -24564,6 +24599,7 @@ void registerClusterNetworkCommissioning(Commands & commands)
         make_unique<NetworkCommissioningUpdateThreadNetwork>(),               //
         make_unique<NetworkCommissioningUpdateWiFiNetwork>(),                 //
         make_unique<DiscoverNetworkCommissioningAttributes>(),                //
+        make_unique<ReadNetworkCommissioningFeatureMap>(),                    //
         make_unique<ReadNetworkCommissioningClusterRevision>(),               //
     };
 

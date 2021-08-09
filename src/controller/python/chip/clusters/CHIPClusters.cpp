@@ -3513,6 +3513,16 @@ chip::ChipError::StorageType chip_ime_AppendCommand_NetworkCommissioning_UpdateW
         .AsInteger();
 }
 
+chip::ChipError::StorageType chip_ime_ReadAttribute_NetworkCommissioning_FeatureMap(chip::Controller::Device * device,
+                                                                                    chip::EndpointId ZCLendpointId,
+                                                                                    chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::NetworkCommissioningCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeFeatureMap(gInt32uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision(chip::Controller::Device * device,
                                                                                          chip::EndpointId ZCLendpointId,
                                                                                          chip::GroupId /* ZCLgroupId */)
