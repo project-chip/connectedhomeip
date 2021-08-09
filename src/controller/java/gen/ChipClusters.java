@@ -278,7 +278,7 @@ public class ChipClusters {
         String applicationId);
 
     public interface LaunchAppResponseCallback {
-      void onSuccess(String data);
+      void onSuccess(int status, String data);
 
       void onError(Exception error);
     }
@@ -2122,50 +2122,54 @@ public class ChipClusters {
         String pin);
 
     public interface ClearAllPinsResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface ClearAllRfidsResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface ClearHolidayScheduleResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface ClearPinResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface ClearRfidResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface ClearWeekdayScheduleResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface ClearYeardayScheduleResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface GetHolidayScheduleResponseCallback {
       void onSuccess(
-          int scheduleId, long localStartTime, long localEndTime, int operatingModeDuringHoliday);
+          int scheduleId,
+          int status,
+          long localStartTime,
+          long localEndTime,
+          int operatingModeDuringHoliday);
 
       void onError(Exception error);
     }
@@ -2205,6 +2209,7 @@ public class ChipClusters {
       void onSuccess(
           int scheduleId,
           int userId,
+          int status,
           int daysMask,
           int startHour,
           int startMinute,
@@ -2215,61 +2220,62 @@ public class ChipClusters {
     }
 
     public interface GetYeardayScheduleResponseCallback {
-      void onSuccess(int scheduleId, int userId, long localStartTime, long localEndTime);
+      void onSuccess(
+          int scheduleId, int userId, int status, long localStartTime, long localEndTime);
 
       void onError(Exception error);
     }
 
     public interface LockDoorResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface SetHolidayScheduleResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface SetPinResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface SetRfidResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface SetUserTypeResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface SetWeekdayScheduleResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface SetYeardayScheduleResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface UnlockDoorResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface UnlockWithTimeoutResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
@@ -2812,7 +2818,7 @@ public class ChipClusters {
         long chipClusterPtr, ViewGroupResponseCallback callback, int groupId);
 
     public interface AddGroupResponseCallback {
-      void onSuccess(int groupId);
+      void onSuccess(int status, int groupId);
 
       void onError(Exception error);
     }
@@ -2827,13 +2833,13 @@ public class ChipClusters {
     }
 
     public interface RemoveGroupResponseCallback {
-      void onSuccess(int groupId);
+      void onSuccess(int status, int groupId);
 
       void onError(Exception error);
     }
 
     public interface ViewGroupResponseCallback {
-      void onSuccess(int groupId, String groupName);
+      void onSuccess(int status, int groupId, String groupName);
 
       void onError(Exception error);
     }
@@ -2917,7 +2923,7 @@ public class ChipClusters {
     private native void sendKey(long chipClusterPtr, SendKeyResponseCallback callback, int keyCode);
 
     public interface SendKeyResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
@@ -3578,6 +3584,7 @@ public class ChipClusters {
 
     public interface QueryImageResponseCallback {
       void onSuccess(
+          int status,
           long delayedActionTime,
           String imageURI,
           long softwareVersion,
@@ -4134,13 +4141,13 @@ public class ChipClusters {
         long chipClusterPtr, ViewSceneResponseCallback callback, int groupId, int sceneId);
 
     public interface AddSceneResponseCallback {
-      void onSuccess(int groupId, int sceneId);
+      void onSuccess(int status, int groupId, int sceneId);
 
       void onError(Exception error);
     }
 
     public interface GetSceneMembershipResponseCallback {
-      void onSuccess(int capacity, int groupId, int sceneCount
+      void onSuccess(int status, int capacity, int groupId, int sceneCount
           // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
           // Conversion from this type to Java is not properly implemented yet
           );
@@ -4149,25 +4156,25 @@ public class ChipClusters {
     }
 
     public interface RemoveAllScenesResponseCallback {
-      void onSuccess(int groupId);
+      void onSuccess(int status, int groupId);
 
       void onError(Exception error);
     }
 
     public interface RemoveSceneResponseCallback {
-      void onSuccess(int groupId, int sceneId);
+      void onSuccess(int status, int groupId, int sceneId);
 
       void onError(Exception error);
     }
 
     public interface StoreSceneResponseCallback {
-      void onSuccess(int groupId, int sceneId);
+      void onSuccess(int status, int groupId, int sceneId);
 
       void onError(Exception error);
     }
 
     public interface ViewSceneResponseCallback {
-      void onSuccess(int groupId, int sceneId, int transitionTime, String sceneName
+      void onSuccess(int status, int groupId, int sceneId, int transitionTime, String sceneName
           // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
           // Conversion from this type to Java is not properly implemented yet
           );
@@ -4388,7 +4395,7 @@ public class ChipClusters {
         long chipClusterPtr, NavigateTargetResponseCallback callback, int target, String data);
 
     public interface NavigateTargetResponseCallback {
-      void onSuccess(String data);
+      void onSuccess(int status, String data);
 
       void onError(Exception error);
     }

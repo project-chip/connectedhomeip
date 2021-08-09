@@ -792,9 +792,7 @@ bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}
 {
     ChipLogProgress(Zcl, "{{asCamelCased name false}}:");
     {{#chip_cluster_response_arguments}}
-    {{#if (isStrEqual label "status")}}
-    LogStatus(status);
-    {{else if (isOctetString type)}}
+    {{#if (isOctetString type)}}
     ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", {{asSymbol label}}.size());
     {{else if (isCharString type)}}
     // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
@@ -806,19 +804,8 @@ bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}
 
     GET_CLUSTER_RESPONSE_CALLBACKS("{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback");
 
-    {{#chip_cluster_response_arguments}}
-    {{#if (isStrEqual label "status")}}
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        Callback::Callback<DefaultFailureCallback> * cb = Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, status);
-        return true;
-    }
-    {{/if}}
-    {{/chip_cluster_response_arguments}}
-
     Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback> * cb = Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext{{#chip_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asSymbol label}}{{/unless}}{{/chip_cluster_response_arguments}});
+    cb->mCall(cb->mContext{{#chip_cluster_response_arguments}}, {{asSymbol label}}{{/chip_cluster_response_arguments}});
     return true;
 }
 

@@ -496,13 +496,14 @@ public:
 
     ~CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t * data)
+    static void CallbackFn(void * context, uint8_t status, uint8_t * data)
     {
         CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge * callback
             = reinterpret_cast<CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"data" : [NSString stringWithFormat:@"%s", data],
                 });
                 callback->Cancel();
@@ -594,13 +595,15 @@ public:
 
     ~CHIPDoorLockClusterClearAllPinsResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterClearAllPinsResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterClearAllPinsResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -624,13 +627,15 @@ public:
 
     ~CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -654,13 +659,15 @@ public:
 
     ~CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -683,13 +690,15 @@ public:
 
     ~CHIPDoorLockClusterClearPinResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterClearPinResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterClearPinResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -712,13 +721,15 @@ public:
 
     ~CHIPDoorLockClusterClearRfidResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterClearRfidResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterClearRfidResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -742,13 +753,15 @@ public:
 
     ~CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -772,13 +785,15 @@ public:
 
     ~CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -802,8 +817,8 @@ public:
 
     ~CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge() {};
 
-    static void CallbackFn(
-        void * context, uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime, uint8_t operatingModeDuringHoliday)
+    static void CallbackFn(void * context, uint8_t scheduleId, uint8_t status, uint32_t localStartTime, uint32_t localEndTime,
+        uint8_t operatingModeDuringHoliday)
     {
         CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge *>(context);
@@ -811,6 +826,7 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"scheduleId" : [NSNumber numberWithUnsignedChar:scheduleId],
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"localStartTime" : [NSNumber numberWithUnsignedLong:localStartTime],
                     @"localEndTime" : [NSNumber numberWithUnsignedLong:localEndTime],
                     @"operatingModeDuringHoliday" : [NSNumber numberWithUnsignedChar:operatingModeDuringHoliday],
@@ -977,7 +993,7 @@ public:
 
     ~CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour,
+    static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint8_t status, uint8_t daysMask, uint8_t startHour,
         uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
     {
         CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge * callback
@@ -987,6 +1003,7 @@ public:
                 callback->mHandler(nil, @ {
                     @"scheduleId" : [NSNumber numberWithUnsignedChar:scheduleId],
                     @"userId" : [NSNumber numberWithUnsignedShort:userId],
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"daysMask" : [NSNumber numberWithUnsignedChar:daysMask],
                     @"startHour" : [NSNumber numberWithUnsignedChar:startHour],
                     @"startMinute" : [NSNumber numberWithUnsignedChar:startMinute],
@@ -1016,7 +1033,8 @@ public:
 
     ~CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime)
+    static void CallbackFn(
+        void * context, uint8_t scheduleId, uint16_t userId, uint8_t status, uint32_t localStartTime, uint32_t localEndTime)
     {
         CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge *>(context);
@@ -1025,6 +1043,7 @@ public:
                 callback->mHandler(nil, @ {
                     @"scheduleId" : [NSNumber numberWithUnsignedChar:scheduleId],
                     @"userId" : [NSNumber numberWithUnsignedShort:userId],
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"localStartTime" : [NSNumber numberWithUnsignedLong:localStartTime],
                     @"localEndTime" : [NSNumber numberWithUnsignedLong:localEndTime],
                 });
@@ -1050,13 +1069,15 @@ public:
 
     ~CHIPDoorLockClusterLockDoorResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterLockDoorResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterLockDoorResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -1080,13 +1101,15 @@ public:
 
     ~CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -1109,13 +1132,15 @@ public:
 
     ~CHIPDoorLockClusterSetPinResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterSetPinResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterSetPinResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -1138,13 +1163,15 @@ public:
 
     ~CHIPDoorLockClusterSetRfidResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterSetRfidResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterSetRfidResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -1167,13 +1194,15 @@ public:
 
     ~CHIPDoorLockClusterSetUserTypeResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterSetUserTypeResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterSetUserTypeResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -1197,13 +1226,15 @@ public:
 
     ~CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -1227,13 +1258,15 @@ public:
 
     ~CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -1256,13 +1289,15 @@ public:
 
     ~CHIPDoorLockClusterUnlockDoorResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterUnlockDoorResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -1286,13 +1321,15 @@ public:
 
     ~CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -1414,13 +1451,14 @@ public:
 
     ~CHIPGroupsClusterAddGroupResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint16_t groupId)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId)
     {
         CHIPGroupsClusterAddGroupResponseCallbackBridge * callback
             = reinterpret_cast<CHIPGroupsClusterAddGroupResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
                 });
                 callback->Cancel();
@@ -1481,13 +1519,14 @@ public:
 
     ~CHIPGroupsClusterRemoveGroupResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint16_t groupId)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId)
     {
         CHIPGroupsClusterRemoveGroupResponseCallbackBridge * callback
             = reinterpret_cast<CHIPGroupsClusterRemoveGroupResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
                 });
                 callback->Cancel();
@@ -1512,13 +1551,14 @@ public:
 
     ~CHIPGroupsClusterViewGroupResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t * groupName)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t * groupName)
     {
         CHIPGroupsClusterViewGroupResponseCallbackBridge * callback
             = reinterpret_cast<CHIPGroupsClusterViewGroupResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
                     @"groupName" : [NSString stringWithFormat:@"%s", groupName],
                 });
@@ -1576,13 +1616,15 @@ public:
 
     ~CHIPKeypadInputClusterSendKeyResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context)
+    static void CallbackFn(void * context, uint8_t status)
     {
         CHIPKeypadInputClusterSendKeyResponseCallbackBridge * callback
             = reinterpret_cast<CHIPKeypadInputClusterSendKeyResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -2261,7 +2303,7 @@ public:
 
     ~CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
+    static void CallbackFn(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
         chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
     {
         CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge * callback
@@ -2269,6 +2311,7 @@ public:
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"delayedActionTime" : [NSNumber numberWithUnsignedLong:delayedActionTime],
                     @"imageURI" : [NSString stringWithFormat:@"%s", imageURI],
                     @"softwareVersion" : [NSNumber numberWithUnsignedLong:softwareVersion],
@@ -2397,13 +2440,14 @@ public:
 
     ~CHIPScenesClusterAddSceneResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId)
     {
         CHIPScenesClusterAddSceneResponseCallbackBridge * callback
             = reinterpret_cast<CHIPScenesClusterAddSceneResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
                     @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
                 });
@@ -2430,7 +2474,7 @@ public:
 
     ~CHIPScenesClusterGetSceneMembershipResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
+    static void CallbackFn(void * context, uint8_t status, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
         /* TYPE WARNING: array array defaults to */ uint8_t * sceneList)
     {
         CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * callback
@@ -2438,6 +2482,7 @@ public:
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"capacity" : [NSNumber numberWithUnsignedChar:capacity],
                     @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
                     @"sceneCount" : [NSNumber numberWithUnsignedChar:sceneCount],
@@ -2467,13 +2512,14 @@ public:
 
     ~CHIPScenesClusterRemoveAllScenesResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint16_t groupId)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId)
     {
         CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * callback
             = reinterpret_cast<CHIPScenesClusterRemoveAllScenesResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
                 });
                 callback->Cancel();
@@ -2498,13 +2544,14 @@ public:
 
     ~CHIPScenesClusterRemoveSceneResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId)
     {
         CHIPScenesClusterRemoveSceneResponseCallbackBridge * callback
             = reinterpret_cast<CHIPScenesClusterRemoveSceneResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
                     @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
                 });
@@ -2530,13 +2577,14 @@ public:
 
     ~CHIPScenesClusterStoreSceneResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId)
     {
         CHIPScenesClusterStoreSceneResponseCallbackBridge * callback
             = reinterpret_cast<CHIPScenesClusterStoreSceneResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
                     @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
                 });
@@ -2562,14 +2610,15 @@ public:
 
     ~CHIPScenesClusterViewSceneResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-        /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
+        uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
     {
         CHIPScenesClusterViewSceneResponseCallbackBridge * callback
             = reinterpret_cast<CHIPScenesClusterViewSceneResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
                     @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
                     @"transitionTime" : [NSNumber numberWithUnsignedShort:transitionTime],
@@ -2634,13 +2683,14 @@ public:
 
     ~CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t * data)
+    static void CallbackFn(void * context, uint8_t status, uint8_t * data)
     {
         CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge * callback
             = reinterpret_cast<CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
+                    @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"data" : [NSString stringWithFormat:@"%s", data],
                 });
                 callback->Cancel();
