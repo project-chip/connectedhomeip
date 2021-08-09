@@ -22,7 +22,10 @@
  */
 
 #pragma once
+#include <memory>
 
+#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
