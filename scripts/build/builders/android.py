@@ -39,53 +39,63 @@ class AndroidBoard(Enum):
 
 class AndroidBuilder(Builder):
 
-  def __init__(self,
-               root,
-               runner,
-               output_prefix: str,
-               board: AndroidBoard):
+  def __init__(self, root, runner, output_prefix: str, board: AndroidBoard):
     super(AndroidBuilder, self).__init__(root, runner, output_prefix)
     self.board = board
 
   def validate_build_environment(self):
     for k in ['ANDROID_NDK_HOME', 'ANDROID_HOME']:
       if k not in os.environ:
-        raise Exception('Environment %s missing, cannot build android libraries' % k)
+        raise Exception(
+            'Environment %s missing, cannot build android libraries' % k)
 
     # SDK manager must be runnable to 'accept licenses'
-    sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'tools', 'bin', 'sdkmanager')
+    sdk_manager = os.path.join(os.environ['ANDROID_HOME'], 'tools', 'bin',
+                               'sdkmanager')
     if not (os.path.isfile(sdk_manager) and os.access(sdk_manager, os.X_OK)):
-      raise Exception("'%s' is not executable by the current user" % sdk_manager)
+      raise Exception("'%s' is not executable by the current user" %
+                      sdk_manager)
 
     # In order to accept a license, the licenses folder is updated with the hash of the
     # accepted license
     licenses = os.path.join(os.environ['ANDROID_HOME'], 'licenses')
     if not os.access(licenses, os.W_OK):
-      raise Exception("'%s' is writable by the current user (needed to accept licenses)" % licenses)
-
+      raise Exception(
+          "'%s' is writable by the current user (needed to accept licenses)" %
+          licenses)
 
   def generate(self):
     if not os.path.exists(self.output_dir):
-        # NRF does a in-place update  of SDK tools
-        if not self._runner.dry_run:
-          self.validate_build_environment()
+      # NRF does a in-place update  of SDK tools
+      if not self._runner.dry_run:
+        self.validate_build_environment()
 
-        gn_args = {}
-        gn_args['target_os'] = 'android'
-        gn_args['target_cpu'] = self.board.TargetCpuName()
-        gn_args['android_ndk_root'] = os.environ['ANDROID_NDK_HOME']
-        gn_args['android_sdk_root'] = os.environ['ANDROID_HOME']
+      gn_args = {}
+      gn_args['target_os'] = 'android'
+      gn_args['target_cpu'] = self.board.TargetCpuName()
+      gn_args['android_ndk_root'] = os.environ['ANDROID_NDK_HOME']
+      gn_args['android_sdk_root'] = os.environ['ANDROID_HOME']
 
-        args = '--args=%s' % (' '.join(['%s="%s"' % (key, shlex.quote(value)) for key,value in gn_args.items()]))
-        
-        self._Execute(['gn', 'gen', '--check', '--fail-on-unused-args', self.output_dir, args], title='Generating ' + self.identifier)
+      args = '--args=%s' % (' '.join([
+          '%s="%s"' % (key, shlex.quote(value))
+          for key, value in gn_args.items()
+      ]))
 
-        self._Execute(['bash', '-c', 'yes | %s/tools/bin/sdkmanager --licenses >/dev/null' % os.environ['ANDROID_HOME']],
-          title='Accepting NDK licenses')
+      self._Execute([
+          'gn', 'gen', '--check', '--fail-on-unused-args', self.output_dir, args
+      ],
+                    title='Generating ' + self.identifier)
 
+      self._Execute([
+          'bash', '-c',
+          'yes | %s/tools/bin/sdkmanager --licenses >/dev/null' %
+          os.environ['ANDROID_HOME']
+      ],
+                    title='Accepting NDK licenses')
 
   def build(self):
-    self._Execute(['ninja', '-C', self.output_dir], title='Building JNI ' + self.identifier)
+    self._Execute(['ninja', '-C', self.output_dir],
+                  title='Building JNI ' + self.identifier)
 
     # NOTE: the following IDE-specific build instructions are NOT used:
     #  - "rsync -a out/"android_$TARGET_CPU"/lib/*.jar src/android/CHIPTool/app/libs"
@@ -94,10 +104,20 @@ class AndroidBuilder(Builder):
 
     # JNILibs will be copied as long as they reside in src/main/jniLibs/ABI:
     #    https://developer.android.com/studio/projects/gradle-external-native-builds#jniLibs
-    self._Execute(['bash', '-c', "rsync -a %s/lib/jni/* %s/src/android/CHIPTool/app/src/main/jniLibs/" % (self.output_dir, self.root)], title='Prepare Native libs ' + self.identifier)
+    self._Execute([
+        'bash', '-c',
+        'rsync -a %s/lib/jni/* %s/src/android/CHIPTool/app/src/main/jniLibs/' %
+        (self.output_dir, self.root)
+    ],
+                  title='Prepare Native libs ' + self.identifier)
 
     # App compilation
-    self._Execute(['src/android/CHIPTool/gradlew', '-p', 'src/android/CHIPTool', '-PchipSdkJarDir=%s' % os.path.join(self.output_dir, 'lib'), '-PbuildDir=%s' % self.output_dir, 'build'], title='Building APP ' + self.identifier)
+    self._Execute([
+        'src/android/CHIPTool/gradlew', '-p', 'src/android/CHIPTool',
+        '-PchipSdkJarDir=%s' % os.path.join(self.output_dir, 'lib'),
+        '-PbuildDir=%s' % self.output_dir, 'build'
+    ],
+                  title='Building APP ' + self.identifier)
 
   def jni_output_libs(self):
     """Get a dictionary of JNI-required files."""
@@ -111,13 +131,18 @@ class AndroidBuilder(Builder):
 
     return items
 
-
   def outputs(self):
-    outputs ={
-      'CHIPController.jar': os.path.join(self.output_dir, 'lib', 'CHIPController.jar'),
-      'SetupPayloadParser.jar': os.path.join(self.output_dir, 'lib', 'SetupPayloadParser.jar'),
-      'ChipTool-debug.apk': os.path.join(self.output_dir, 'outputs', 'apk',  'debug', 'app-debug.apk'),
-      'ChipTool-release-unsigned.apk': os.path.join(self.output_dir, 'outputs', 'apk', 'release', 'app-release-unsigned.apk'),
+    outputs = {
+        'CHIPController.jar':
+            os.path.join(self.output_dir, 'lib', 'CHIPController.jar'),
+        'SetupPayloadParser.jar':
+            os.path.join(self.output_dir, 'lib', 'SetupPayloadParser.jar'),
+        'ChipTool-debug.apk':
+            os.path.join(self.output_dir, 'outputs', 'apk', 'debug',
+                         'app-debug.apk'),
+        'ChipTool-release-unsigned.apk':
+            os.path.join(self.output_dir, 'outputs', 'apk', 'release',
+                         'app-release-unsigned.apk'),
     }
 
     outputs.update(self.jni_output_libs())
