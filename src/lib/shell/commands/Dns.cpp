@@ -40,6 +40,7 @@ public:
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\n",
                         ChipLogValueX64(nodeData.mPeerId.GetFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
+        streamer_printf(streamer_get(), "   Hostname: %s\n", nodeData.mHostName);
         streamer_printf(streamer_get(), "   IP address: %s\n", nodeData.mAddress.ToString(ipAddressBuf));
         streamer_printf(streamer_get(), "   Port: %" PRIu16 "\n", nodeData.mPort);
 

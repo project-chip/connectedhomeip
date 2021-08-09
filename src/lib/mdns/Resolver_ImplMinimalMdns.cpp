@@ -27,7 +27,7 @@
 #include <mdns/minimal/QueryBuilder.h>
 #include <mdns/minimal/RecordData.h>
 #include <mdns/minimal/core/FlatAllocatedQName.h>
-
+#include <support/CHIPMemString.h>
 #include <support/logging/CHIPLogging.h>
 
 // MDNS servers will receive all broadcast packets over the network.
@@ -122,6 +122,12 @@ void PacketDataReporter::OnHeader(ConstHeaderRef & header)
 
 void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
 {
+    mdns::Minimal::SerializedQNameIterator it = srv.GetName();
+    if (it.Next())
+    {
+        Platform::CopyString(mNodeData.mHostName, it.Value());
+    }
+
     if (!name.Next())
     {
 #ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
@@ -148,7 +154,7 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
     if (it.Next())
     {
-        strncpy(mDiscoveredNodeData.hostName, it.Value(), sizeof(DiscoveredNodeData::hostName));
+        Platform::CopyString(mDiscoveredNodeData.hostName, it.Value());
     }
     if (name.Next())
     {

@@ -31,6 +31,8 @@
 namespace chip {
 namespace Mdns {
 
+// Largest host name is 64-bits in hex.
+static constexpr int kMaxHostNameSize      = 16;
 constexpr uint32_t kUndefinedRetryInterval = std::numeric_limits<uint32_t>::max();
 
 struct ResolvedNodeData
@@ -60,20 +62,19 @@ struct ResolvedNodeData
     }
 
     PeerId mPeerId;
-    Inet::IPAddress mAddress         = Inet::IPAddress::Any;
-    Inet::InterfaceId mInterfaceId   = INET_NULL_INTERFACEID;
-    uint16_t mPort                   = 0;
-    bool mSupportsTcp                = false;
-    uint32_t mMrpRetryIntervalIdle   = kUndefinedRetryInterval;
-    uint32_t mMrpRetryIntervalActive = kUndefinedRetryInterval;
+    Inet::IPAddress mAddress             = Inet::IPAddress::Any;
+    Inet::InterfaceId mInterfaceId       = INET_NULL_INTERFACEID;
+    uint16_t mPort                       = 0;
+    char mHostName[kMaxHostNameSize + 1] = {};
+    bool mSupportsTcp                    = false;
+    uint32_t mMrpRetryIntervalIdle       = kUndefinedRetryInterval;
+    uint32_t mMrpRetryIntervalActive     = kUndefinedRetryInterval;
 };
 
 constexpr size_t kMaxDeviceNameLen         = 32;
 constexpr size_t kMaxRotatingIdLen         = 50;
 constexpr size_t kMaxPairingInstructionLen = 128;
 
-// Largest host name is 64-bits in hex.
-static constexpr int kMaxHostNameSize     = 16;
 static constexpr int kMaxInstanceNameSize = 16;
 struct DiscoveredNodeData
 {

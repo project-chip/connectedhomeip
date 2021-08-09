@@ -539,6 +539,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
         return;
     }
 
+    Platform::CopyString(nodeData.mHostName, result->mHostName);
     nodeData.mInterfaceId = result->mInterface;
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
