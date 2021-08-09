@@ -91,11 +91,13 @@ class AndroidBuilder(Builder):
     #  - "rsync -a out/"android_$TARGET_CPU"/lib/*.jar src/android/CHIPTool/app/libs"
     #    => using the 'ninjaOutputDir' project property instead to take the jar files directly
     #       from the output
-    #  - "rsync -a out/"android_$TARGET_CPU"/lib/jni/* src/android/CHIPTool/app/src/main/jniLib"
-    #    => JNI libraries not used by the build taks (TODO: is this true? APK?)
 
-    self._Execute(['src/android/CHIPTool/gradlew', '-p', 'src/android/CHIPTool', '-PchipSdkJarDir=%s' % os.path.join(self.output_dir, 'lib'),
-    '-PbuildDir=%s' % self.output_dir, 'build'], title='Building APP ' + self.identifier)
+    # JNILibs will be copied as long as they reside in src/main/jniLibs/ABI:
+    #    https://developer.android.com/studio/projects/gradle-external-native-builds#jniLibs
+    self._Execute(['bash', '-c', "rsync -a %s/lib/jni/* %s/src/android/CHIPTool/app/src/main/jniLibs/" % (self.output_dir, self.root)], title='Prepare Native libs ' + self.identifier)
+
+    # App compilation
+    self._Execute(['src/android/CHIPTool/gradlew', '-p', 'src/android/CHIPTool', '-PchipSdkJarDir=%s' % os.path.join(self.output_dir, 'lib'), '-PbuildDir=%s' % self.output_dir, 'build'], title='Building APP ' + self.identifier)
 
   def jni_output_libs(self):
     """Get a dictionary of JNI-required files."""
@@ -114,6 +116,8 @@ class AndroidBuilder(Builder):
     outputs ={
       'CHIPController.jar': os.path.join(self.output_dir, 'lib', 'CHIPController.jar'),
       'SetupPayloadParser.jar': os.path.join(self.output_dir, 'lib', 'SetupPayloadParser.jar'),
+      'ChipTool-debug.apk': os.path.join(self.output_dir, 'outputs', 'apk',  'debug', 'app-debug.apk'),
+      'ChipTool-release-unsigned.apk': os.path.join(self.output_dir, 'outputs', 'apk', 'release', 'app-release-unsigned.apk'),
     }
 
     outputs.update(self.jni_output_libs())
