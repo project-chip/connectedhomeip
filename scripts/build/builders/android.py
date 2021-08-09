@@ -61,7 +61,7 @@ class AndroidBuilder(Builder):
     licenses = os.path.join(os.environ['ANDROID_HOME'], 'licenses')
     if not os.access(licenses, os.W_OK):
       raise Exception(
-          "'%s' is writable by the current user (needed to accept licenses)" %
+          "'%s' is NOT writable by the current user (needed to accept licenses)" %
           licenses)
 
   def generate(self):
