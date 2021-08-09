@@ -41,6 +41,7 @@
 namespace {
 chip::TransportMgrBase gTransportManager;
 chip::Test::LoopbackTransport gLoopback;
+chip::Test::IOContext gIOContext;
 
 using TestContext = chip::Test::MessagingContext;
 TestContext sContext;
@@ -346,20 +347,13 @@ nlTestSuite sSuite =
 
 int Initialize(void * aContext)
 {
-    CHIP_ERROR err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
-
-    gTransportManager.Init(&gLoopback);
+    // Initialize System memory and resources
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gTransportManager.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
 
     auto * ctx = static_cast<TestContext *>(aContext);
-    err        = ctx->Init(&sSuite, &gTransportManager);
-    if (err != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
+    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportManager, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
     gTransportManager.SetSecureSessionMgr(&ctx->GetSecureSessionManager());
     return SUCCESS;
@@ -368,6 +362,7 @@ int Initialize(void * aContext)
 int Finalize(void * aContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    gIOContext.Shutdown();
     chip::Platform::MemoryShutdown();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }

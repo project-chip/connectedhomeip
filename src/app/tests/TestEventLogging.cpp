@@ -315,6 +315,8 @@ int TestEventLogging()
     InitializeEventLogging();
     nlTestRunner(&theSuite, nullptr);
 
+    gSystemLayer.Shutdown();
+
     return (nlTestRunnerStats(&theSuite));
 }
 
