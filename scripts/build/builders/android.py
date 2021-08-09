@@ -113,7 +113,8 @@ class AndroidBuilder(Builder):
 
     # App compilation
     self._Execute([
-        'src/android/CHIPTool/gradlew', '-p', 'src/android/CHIPTool',
+        '%s/src/android/CHIPTool/gradlew' % self.root, '-p',
+        '%s/src/android/CHIPTool' % self.root,
         '-PchipSdkJarDir=%s' % os.path.join(self.output_dir, 'lib'),
         '-PbuildDir=%s' % self.output_dir, 'build'
     ],
