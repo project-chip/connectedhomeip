@@ -74,7 +74,7 @@ DLL_EXPORT const char * ErrorStr(CHIP_ERROR err)
     }
     if (err == CHIP_NO_ERROR)
     {
-        (void) snprintf(formattedError, formattedSpace, "No Error");
+        (void) snprintf(formattedError, formattedSpace, CHIP_NO_ERROR_STRING);
         return sErrorStr;
     }
 
@@ -82,7 +82,7 @@ DLL_EXPORT const char * ErrorStr(CHIP_ERROR err)
 
     if (err == CHIP_NO_ERROR)
     {
-        return "No Error";
+        return CHIP_NO_ERROR_STRING;
     }
 
 #endif // CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
