@@ -267,7 +267,18 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     switch (static_cast<Transport::Type>(serializable.mDeviceTransport))
     {
     case Transport::Type::kUdp:
-        mDeviceAddress = Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+        if (IsOperationalCertProvisioned())
+        {
+            mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
+        }
+        else
+        {
+#endif
+            mDeviceAddress = Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+        }
+#endif
         break;
     case Transport::Type::kBle:
         mDeviceAddress = Transport::PeerAddress::BLE();
@@ -523,6 +534,11 @@ bool Device::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
     return true;
 }
 
+bool Device::HasCachedAddress()
+{
+    return mDeviceAddress.GetIPAddress() != Inet::IPAddress::Any;
+}
+
 void Device::OperationalCertProvisioned()
 {
     VerifyOrReturn(!mDeviceOperationalCertProvisioned,
@@ -560,11 +576,20 @@ CHIP_ERROR Device::WarmupCASESession()
     return CHIP_NO_ERROR;
 }
 
-void Device::OnSessionEstablishmentError(CHIP_ERROR error)
+template <typename T>
+void Device::ClearConnectionCallbacks(Callback::CallbackDeque & dequeue)
 {
-    mState = ConnectionState::NotConnected;
-    mIDAllocator->Free(mCASESession.GetLocalKeyId());
+    Cancelable ready;
+    dequeue.DequeueAll(ready);
+    while (ready.mNext != &ready)
+    {
+        Callback::Callback<T> * cb = Callback::Callback<T>::FromCancelable(ready.mNext);
+        cb->Cancel();
+    }
+}
 
+void Device::CancelConnectionHandlers(CHIP_ERROR error)
+{
     Cancelable ready;
     mConnectionFailure.DequeueAll(ready);
     while (ready.mNext != &ready)
@@ -575,6 +600,14 @@ void Device::OnSessionEstablishmentError(CHIP_ERROR error)
         cb->Cancel();
         cb->mCall(cb->mContext, GetDeviceId(), error);
     }
+    ClearConnectionCallbacks<OnDeviceConnected>(mConnectionSuccess);
+}
+
+void Device::OnSessionEstablishmentError(CHIP_ERROR error)
+{
+    mState = ConnectionState::NotConnected;
+    mIDAllocator->Free(mCASESession.GetLocalKeyId());
+    CancelConnectionHandlers(error);
 }
 
 void Device::OnSessionEstablished()
@@ -599,6 +632,32 @@ void Device::OnSessionEstablished()
         cb->Cancel();
         cb->mCall(cb->mContext, this);
     }
+    ClearConnectionCallbacks<OnDeviceConnectionFailure>(mConnectionFailure);
+}
+
+void Device::EnqueueConnectionHandlersIfNeeded(Callback::Callback<OnDeviceConnected> * onConnection,
+                                               Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+{
+    if (IsOperationalCertProvisioned())
+    {
+        ChipLogError(Controller, "Queuing up connection handlers");
+        if (onConnection != nullptr)
+        {
+            mConnectionSuccess.Enqueue(onConnection->Cancel());
+        }
+
+        if (onFailure != nullptr)
+        {
+            mConnectionFailure.Enqueue(onFailure->Cancel());
+        }
+    }
+    else
+    {
+        if (onConnection != nullptr)
+        {
+            onConnection->mCall(onConnection->mContext, this);
+        }
+    }
 }
 
 CHIP_ERROR Device::EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
@@ -609,25 +668,7 @@ CHIP_ERROR Device::EstablishConnectivity(Callback::Callback<OnDeviceConnected> *
 
     if (loadedSecureSession)
     {
-        if (IsOperationalCertProvisioned())
-        {
-            if (onConnection != nullptr)
-            {
-                mConnectionSuccess.Enqueue(onConnection->Cancel());
-            }
-
-            if (onFailure != nullptr)
-            {
-                mConnectionFailure.Enqueue(onFailure->Cancel());
-            }
-        }
-        else
-        {
-            if (onConnection != nullptr)
-            {
-                onConnection->mCall(onConnection->mContext, this);
-            }
-        }
+        EnqueueConnectionHandlersIfNeeded(onConnection, onFailure);
     }
 
     return CHIP_NO_ERROR;
@@ -685,8 +726,8 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
     {
         AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback, aTlvDataFilter);
     }
-    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
-    // use the seqNum.
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here
+    // we use the seqNum.
     CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
         GetDeviceId(), 0, &mSecureSession, nullptr /*event path params list*/, 0, &aPath, 1, 0 /* event number */,
         seqNum /* application context */);

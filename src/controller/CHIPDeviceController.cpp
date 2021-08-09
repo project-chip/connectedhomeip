@@ -496,8 +496,21 @@ CHIP_ERROR DeviceController::GetConnectedDevice(NodeId deviceId, Callback::Callb
         return CHIP_NO_ERROR;
     }
 
-    err = device->EstablishConnectivity(onConnection, onFailure);
-    SuccessOrExit(err);
+    if (device->HasCachedAddress())
+    {
+        ChipLogProgress(Controller, "Found cached address for DeviceId: %" PRIu64, deviceId);
+        err = device->EstablishConnectivity(onConnection, onFailure);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        ChipLogProgress(Controller, "Triggering a mDNS Node ID resolution to get address info for DeviceId : %" PRIu64, deviceId);
+        // TODO: The Fabric ID to be used here needs to come from the operational certificate
+        Mdns::Resolver::Instance().ResolveNodeId(PeerId().SetFabricId(0).SetNodeId(deviceId),
+                                                 Inet::IPAddressType::kIPAddressType_Any);
+        // wait for a nodeID resolution but register the callbacks
+        device->EnqueueConnectionHandlersIfNeeded(onConnection, onFailure);
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -764,6 +777,11 @@ void DeviceController::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nod
 
     PersistDevice(device);
 
+    // attempt to establish connectivity with this newly resolved NodeID
+    ChipLogError(Controller, "Establishing Connectivity for newly resolved NodeId: %" PRIu64, device->GetDeviceId());
+    err = device->EstablishConnectivity(nullptr, nullptr);
+    SuccessOrExit(err);
+
 exit:
 
     if (mDeviceAddressUpdateDelegate != nullptr)
@@ -776,7 +794,15 @@ exit:
 void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
 {
     ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    Device * device = nullptr;
 
+    err = GetDevice(peer.GetNodeId(), &device);
+    SuccessOrExit(err);
+    ChipLogError(Controller, "Cancelling all connection handlers for NodeID: %" PRIu64, device->GetDeviceId());
+    device->CancelConnectionHandlers(CHIP_ERROR_NOT_CONNECTED);
+
+exit:
     if (mDeviceAddressUpdateDelegate != nullptr)
     {
         mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(peer.GetNodeId(), error);

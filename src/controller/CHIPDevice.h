@@ -50,6 +50,10 @@
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#include <mdns/Resolver.h>
+#endif
+
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
 #include <transport/raw/BLE.h>
@@ -166,6 +170,14 @@ public:
      * @return true, if the IP address and port were filled in the out parameters, false otherwise
      */
     bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const;
+
+    /**
+     * @brief Returns whether or not the device has a valid address that can be used for IP connectivity
+     *        regardless of whether a secure session has been established yet.
+     *
+     * @return true, if the Device has a cached IPAddress that not equal to IPAddr::ANY, false otherwise
+     */
+    bool HasCachedAddress();
 
     /**
      * @brief
@@ -411,6 +423,31 @@ public:
     CHIP_ERROR EstablishConnectivity(Callback::Callback<OnDeviceConnected> * onConnection,
                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
+    /*
+     * This function can be called to register callbacks for when a secure session is ready.
+     *
+     * If the device doesn't have operational credentials, and is under commissioning process,
+     * PASE keys will be used for secure session.
+     *
+     * If the device has been commissioned and has operational credentials, callbacks will be queued up.
+     *
+     * On establishing the session, the callback function `onConnection` will be called. If the
+     * session setup fails, `onFailure` will be called.
+     *
+     * If the session already exists, `onConnection` will be called immediately.
+     */
+    void EnqueueConnectionHandlersIfNeeded(Callback::Callback<OnDeviceConnected> * onConnection,
+                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+
+    /**
+     * @brief
+     * This function allows cancelling all pending connection callbacks on a Device object.
+     *
+     * @param[in] error This is the reason for cancelling the connection handlers and is passed
+     *                  to all the failure callbacks.
+     */
+    void CancelConnectionHandlers(CHIP_ERROR error);
+
 private:
     enum class ConnectionState
     {
@@ -485,6 +522,9 @@ private:
      */
 
     CHIP_ERROR WarmupCASESession();
+
+    template <typename T>
+    void ClearConnectionCallbacks(Callback::CallbackDeque & dequeue);
 
     static void OnOpenPairingWindowSuccessResponse(void * context);
     static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
