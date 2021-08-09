@@ -27,6 +27,7 @@ class Platform(IntEnum):
     EFR32 = auto()
     NRF = auto()
     ANDROID = auto()
+    TELINK = auto()
 
     @property
     def ArgName(self):
@@ -59,6 +60,9 @@ class Board(IntEnum):
     # NRF platform
     NRF52840 = auto()
     NRF5340 = auto()
+
+  # Telink platform
+  TLSR9518ADK80D = auto()
 
     # Android platform
     ARM = auto()

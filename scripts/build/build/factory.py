@@ -24,6 +24,7 @@ from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
 from builders.host import HostBuilder, HostApp
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgBuilder
+from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 
 from .targets import Application, Board, Platform
 
@@ -87,6 +88,7 @@ _MATCHERS = {
     Platform.EFR32: Matcher(Efr32Builder),
     Platform.NRF: Matcher(NrfConnectBuilder),
     Platform.ANDROID: Matcher(AndroidBuilder),
+    Platform.TELINK: Matcher(TelinkBuilder),
 }
 
 # Matrix of what can be compiled and what build options are required
@@ -127,6 +129,9 @@ _MATCHERS[Platform.NRF].AcceptBoard(Board.NRF52840, board=NrfBoard.NRF52840)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.LOCK, app=NrfApp.LOCK)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.LIGHT, app=NrfApp.LIGHT)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.SHELL, app=NrfApp.SHELL)
+
+_MATCHERS[Platform.TELINK].AcceptBoard(Board.TLSR9518ADK80D, board=TelinkBoard.TLSR9518ADK80D)
+_MATCHERS[Platform.TELINK].AcceptApplication(Application.LIGHT, app=TelinkApp.LIGHT)
 
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM, board=AndroidBoard.ARM)
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM64, board=AndroidBoard.ARM64)
