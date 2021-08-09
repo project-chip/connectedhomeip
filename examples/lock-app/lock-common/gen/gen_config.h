@@ -29,6 +29,7 @@
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
+#define EMBER_AF_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
@@ -42,6 +43,11 @@
 #define EMBER_AF_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
+
+// Use this macro to check if the server side of the AdministratorCommissioning cluster is included
+#define ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING_SERVER
+#define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING
 
 // Use this macro to check if the server side of the Basic cluster is included
 #define ZCL_USING_BASIC_CLUSTER_SERVER
@@ -73,7 +79,7 @@
 #define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING_SERVER
 #define EMBER_AF_PLUGIN_NETWORK_COMMISSIONING
 
-// Use this macro to check if the server side of the On/off cluster is included
+// Use this macro to check if the server side of the On/Off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ON_OFF_SERVER
 #define EMBER_AF_PLUGIN_ON_OFF

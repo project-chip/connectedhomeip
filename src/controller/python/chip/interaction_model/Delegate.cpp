@@ -64,7 +64,7 @@ CHIP_ERROR PythonInteractionModelDelegate::CommandResponseError(const CommandSen
 {
     if (commandResponseErrorFunct != nullptr)
     {
-        commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), ChipError::AsInteger(aError));
+        commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), aError.AsInteger());
     }
     if (aError != CHIP_NO_ERROR)
     {
@@ -154,10 +154,10 @@ static_assert(std::is_same<uint32_t, chip::ChipError::StorageType>::value, "pyth
 chip::ChipError::StorageType pychip_InteractionModel_GetCommandSenderHandle(uint64_t * commandSender)
 {
     chip::app::CommandSender * commandSenderObj = nullptr;
-    VerifyOrReturnError(commandSender != nullptr, chip::ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&commandSenderObj);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, chip::ChipError::AsInteger(err));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
     *commandSender = reinterpret_cast<uint64_t>(commandSenderObj);
-    return chip::ChipError::AsInteger(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR.AsInteger();
 }
 }

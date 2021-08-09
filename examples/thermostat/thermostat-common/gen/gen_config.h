@@ -30,6 +30,7 @@
 
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_AUDIO_OUTPUT_CLUSTER_SERVER_ENDPOINT_COUNT (1)
@@ -83,6 +84,11 @@
 #define ZCL_USING_ACCOUNT_LOGIN_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ACCOUNT_LOGIN_SERVER
 #define EMBER_AF_PLUGIN_ACCOUNT_LOGIN
+
+// Use this macro to check if the server side of the AdministratorCommissioning cluster is included
+#define ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING_SERVER
+#define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING
 
 // Use this macro to check if the server side of the Application Basic cluster is included
 #define ZCL_USING_APPLICATION_BASIC_CLUSTER_SERVER
@@ -244,7 +250,7 @@
 #define EMBER_AF_PLUGIN_OCCUPANCY_SENSING_SERVER
 #define EMBER_AF_PLUGIN_OCCUPANCY_SENSING
 
-// Use this macro to check if the server side of the On/off cluster is included
+// Use this macro to check if the server side of the On/Off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_ON_OFF_SERVER
 #define EMBER_AF_PLUGIN_ON_OFF

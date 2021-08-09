@@ -131,7 +131,7 @@
 #define ZCL_SCENE_NAME_SUPPORT_ATTRIBUTE_ID (0x0004)
 #define ZCL_LAST_CONFIGURED_BY_ATTRIBUTE_ID (0x0005)
 
-// Attribute ids for cluster: On/off
+// Attribute ids for cluster: On/Off
 
 // Client attributes
 
@@ -463,6 +463,12 @@
 #define ZCL_NUMBER_OF_POSITIONS_ATTRIBUTE_ID (0x0000)
 #define ZCL_CURRENT_POSITION_ATTRIBUTE_ID (0x0001)
 #define ZCL_MULTI_PRESS_MAX_ATTRIBUTE_ID (0x0002)
+
+// Attribute ids for cluster: AdministratorCommissioning
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Operational Credentials
 

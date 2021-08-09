@@ -207,19 +207,19 @@ typedef struct _NeighborTable
     int8_t LastRssi;
     uint8_t FrameErrorRate;
     uint8_t MessageErrorRate;
-    uint8_t RxOnWhenIdle;
-    uint8_t FullThreadDevice;
-    uint8_t FullNetworkData;
-    uint8_t IsChild;
+    bool RxOnWhenIdle;
+    bool FullThreadDevice;
+    bool FullNetworkData;
+    bool IsChild;
 } EmberAfNeighborTable;
 
 // Struct for NetworkInterfaceType
 typedef struct _NetworkInterfaceType
 {
     chip::ByteSpan Name;
-    uint8_t FabricConnected;
-    uint8_t OffPremiseServicesReachableIPv4;
-    uint8_t OffPremiseServicesReachableIPv6;
+    bool FabricConnected;
+    bool OffPremiseServicesReachableIPv4;
+    bool OffPremiseServicesReachableIPv6;
     chip::ByteSpan HardwareAddress;
     uint8_t Type;
 } EmberAfNetworkInterfaceType;
@@ -234,18 +234,18 @@ typedef struct _Notification
 // Struct for OperationalDatasetComponents
 typedef struct _OperationalDatasetComponents
 {
-    uint8_t ActiveTimestampPresent;
-    uint8_t PendingTimestampPresent;
-    uint8_t MasterKeyPresent;
-    uint8_t NetworkNamePresent;
-    uint8_t ExtendedPanIdPresent;
-    uint8_t MeshLocalPrefixPresent;
-    uint8_t DelayPresent;
-    uint8_t PanIdPresent;
-    uint8_t ChannelPresent;
-    uint8_t PskcPresent;
-    uint8_t SecurityPolicyPresent;
-    uint8_t ChannelMaskPresent;
+    bool ActiveTimestampPresent;
+    bool PendingTimestampPresent;
+    bool MasterKeyPresent;
+    bool NetworkNamePresent;
+    bool ExtendedPanIdPresent;
+    bool MeshLocalPrefixPresent;
+    bool DelayPresent;
+    bool PanIdPresent;
+    bool ChannelPresent;
+    bool PskcPresent;
+    bool SecurityPolicyPresent;
+    bool ChannelMaskPresent;
 } EmberAfOperationalDatasetComponents;
 
 // Struct for PowerProfileRecord
@@ -253,7 +253,7 @@ typedef struct _PowerProfileRecord
 {
     uint8_t powerProfileId;
     uint8_t energyPhaseId;
-    uint8_t powerProfileRemoteControl;
+    bool powerProfileRemoteControl;
     uint8_t powerProfileState;
 } EmberAfPowerProfileRecord;
 
@@ -313,8 +313,8 @@ typedef struct _RouteTable
     uint8_t LQIIn;
     uint8_t LQIOut;
     uint8_t Age;
-    uint8_t Allocated;
-    uint8_t LinkEstablished;
+    bool Allocated;
+    bool LinkEstablished;
 } EmberAfRouteTable;
 
 // Struct for SceneExtensionAttributeInfo

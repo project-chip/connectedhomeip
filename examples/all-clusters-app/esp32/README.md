@@ -257,3 +257,27 @@ If you wish to see the actual effect of the commands on `ESP32-DevKitC`,
 `ESP32-WROVER-KIT_V4.1`, you will have to connect an external LED to GPIO
 `STATUS_LED_GPIO_NUM`. For `ESP32C3-DevKitM`, the on-board LED will show the
 actual effect of the commands.
+
+## Using the RPC console
+
+Enable RPCs in the build using menuconfig:
+
+    $ idf.py menuconfig
+
+Enable the RPC library:
+
+    Component config → CHIP Core → General Options → Enable Pigweed PRC library
+
+After flashing a build with RPCs enabled you can use the rpc console to send
+commands to the device.
+
+Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
+
+Start the console
+
+    python -m chip_rpc.console --device /dev/ttyUSB0
+
+From within the console you can then invoke rpcs:
+
+    rpcs.chip.rpc.Wifi.Connect(ssid=b"MySSID", secret=b"MyPASSWORD")
+    rpcs.chip.rpc.Wifi.GetIP6Address()

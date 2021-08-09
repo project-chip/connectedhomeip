@@ -272,6 +272,9 @@ class ChipDeviceController(object):
         else:
             raise self._ChipStack.ErrorToException(res)
 
+    def GetClusterHandler(self):
+        return self._Cluster
+
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         device = c_void_p(None)
         # We should really use pychip_GetConnectedDeviceByNodeId and do the

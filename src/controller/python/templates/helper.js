@@ -26,6 +26,8 @@ function asPythonType(zclType)
 {
   const type = ChipTypesHelper.asBasicType(zclType);
   switch (type) {
+  case 'bool':
+    return 'bool';
   case 'int8_t':
   case 'int16_t':
   case 'int32_t':
@@ -47,6 +49,7 @@ function asPythonCType(zclType)
 {
   const type = ChipTypesHelper.asBasicType(zclType);
   switch (type) {
+  case 'bool':
   case 'int8_t':
   case 'int16_t':
   case 'int32_t':

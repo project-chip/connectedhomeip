@@ -919,7 +919,7 @@
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterOff() emberAfFillExternalBuffer(mask,                                                                            \
+        OffClusterOff() emberAfFillExternalBuffer(mask,                                                                            \
                                                                                                                                    \
                                                   ZCL_OFF_COMMAND_ID, "", );
 
@@ -929,7 +929,7 @@
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterOn() emberAfFillExternalBuffer(mask,                                                                             \
+        OffClusterOn() emberAfFillExternalBuffer(mask,                                                                             \
                                                                                                                                    \
                                                  ZCL_ON_COMMAND_ID, "", );
 
@@ -939,7 +939,7 @@
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterToggle() emberAfFillExternalBuffer(mask,                                                                         \
+        OffClusterToggle() emberAfFillExternalBuffer(mask,                                                                         \
                                                                                                                                    \
                                                      ZCL_TOGGLE_COMMAND_ID, "", );
 
@@ -951,7 +951,7 @@
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterOffWithEffect(EffectId, EffectVariant)                                                                           \
+        OffClusterOffWithEffect(EffectId, EffectVariant)                                                                           \
             emberAfFillExternalBuffer(mask,                                                                                        \
                                                                                                                                    \
                                       ZCL_OFF_WITH_EFFECT_COMMAND_ID, "uu", EffectId, EffectVariant);
@@ -962,7 +962,7 @@
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterOnWithRecallGlobalScene() emberAfFillExternalBuffer(mask,                                                        \
+        OffClusterOnWithRecallGlobalScene() emberAfFillExternalBuffer(mask,                                                        \
                                                                                                                                    \
                                                                       ZCL_ON_WITH_RECALL_GLOBAL_SCENE_COMMAND_ID, "", );
 
@@ -975,7 +975,7 @@
  */
 #define emberAfFillCommandOn                                                                                                       \
     /                                                                                                                              \
-        offClusterOnWithTimedOff(OnOffControl, OnTime, OffWaitTime)                                                                \
+        OffClusterOnWithTimedOff(OnOffControl, OnTime, OffWaitTime)                                                                \
             emberAfFillExternalBuffer(mask,                                                                                        \
                                                                                                                                    \
                                       ZCL_ON_WITH_TIMED_OFF_COMMAND_ID, "uuu", OnOffControl, OnTime, OffWaitTime);
@@ -1736,20 +1736,18 @@
  * @param imageType INT16U
  * @param hardwareVersion INT16U
  * @param currentVersion INT32U
- * @param protocolsSupported OTADownloadProtocol []
- * @param protocolsSupportedLen int
+ * @param protocolsSupported OTADownloadProtocol
  * @param location CHAR_STRING
  * @param requestorCanConsent BOOLEAN
  * @param metadataForProvider OCTET_STRING
  */
 #define emberAfFillCommandOTA                                                                                                      \
     Software Update ProviderClusterQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported, \
-                                              protocolsSupportedLen, location, requestorCanConsent, metadataForProvider)           \
+                                              location, requestorCanConsent, metadataForProvider)                                  \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_QUERY_IMAGE_COMMAND_ID, "uuuuubuuu", vendorId, productId, imageType, hardwareVersion,        \
-                                  currentVersion, protocolsSupported, protocolsSupportedLen, location, requestorCanConsent,        \
-                                  metadataForProvider);
+                                  ZCL_QUERY_IMAGE_COMMAND_ID, "uuuuuuuuu", vendorId, productId, imageType, hardwareVersion,        \
+                                  currentVersion, protocolsSupported, location, requestorCanConsent, metadataForProvider);
 
 /** @brief Command description for ApplyUpdateRequest
  *
@@ -2210,6 +2208,42 @@
     Device BasicClusterReachableChanged() emberAfFillExternalBuffer(mask,                                                          \
                                                                                                                                    \
                                                                     ZCL_REACHABLE_CHANGED_COMMAND_ID, "", );
+
+/** @brief Command description for OpenCommissioningWindow
+ *
+ * Command: OpenCommissioningWindow
+ * @param CommissioningTimeout INT16U
+ * @param PAKEVerifier OCTET_STRING
+ * @param Discriminator INT16U
+ * @param Iterations INT32U
+ * @param Salt OCTET_STRING
+ * @param PasscodeID INT16U
+ */
+#define emberAfFillCommandAdministratorCommissioningClusterOpenCommissioningWindow(CommissioningTimeout, PAKEVerifier,             \
+                                                                                   Discriminator, Iterations, Salt, PasscodeID)    \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_OPEN_COMMISSIONING_WINDOW_COMMAND_ID, "uuuuuu", CommissioningTimeout, PAKEVerifier,              \
+                              Discriminator, Iterations, Salt, PasscodeID);
+
+/** @brief Command description for OpenBasicCommissioningWindow
+ *
+ * Command: OpenBasicCommissioningWindow
+ * @param CommissioningTimeout INT16U
+ */
+#define emberAfFillCommandAdministratorCommissioningClusterOpenBasicCommissioningWindow(CommissioningTimeout)                      \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_OPEN_BASIC_COMMISSIONING_WINDOW_COMMAND_ID, "u", CommissioningTimeout);
+
+/** @brief Command description for RevokeCommissioning
+ *
+ * Command: RevokeCommissioning
+ */
+#define emberAfFillCommandAdministratorCommissioningClusterRevokeCommissioning()                                                   \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_REVOKE_COMMISSIONING_COMMAND_ID, "", );
 
 /** @brief Command description for SetFabric
  *

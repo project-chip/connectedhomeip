@@ -101,6 +101,8 @@ public:
     // Implementation of ResponderDelegate
     void AddResponse(const ResourceRecord & record) override;
 
+    void SetServer(ServerBase * server) { mServer = server; }
+
 private:
     CHIP_ERROR FlushReply();
     CHIP_ERROR PrepareNewReplyPacket();

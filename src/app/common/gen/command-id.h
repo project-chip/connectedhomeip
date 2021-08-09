@@ -86,7 +86,7 @@
 #define ZCL_COPY_SCENE_COMMAND_ID (0x42)
 #define ZCL_COPY_SCENE_RESPONSE_COMMAND_ID (0x42)
 
-// Commands for cluster: On/off
+// Commands for cluster: On/Off
 #define ZCL_OFF_COMMAND_ID (0x00)
 #define ZCL_SAMPLE_MFG_SPECIFIC_OFF_WITH_TRANSITION_COMMAND_ID (0x00)
 #define ZCL_ON_COMMAND_ID (0x01)
@@ -221,6 +221,11 @@
 #define ZCL_SHUT_DOWN_COMMAND_ID (0x01)
 #define ZCL_LEAVE_COMMAND_ID (0x02)
 #define ZCL_REACHABLE_CHANGED_COMMAND_ID (0x03)
+
+// Commands for cluster: AdministratorCommissioning
+#define ZCL_OPEN_COMMISSIONING_WINDOW_COMMAND_ID (0x00)
+#define ZCL_OPEN_BASIC_COMMISSIONING_WINDOW_COMMAND_ID (0x01)
+#define ZCL_REVOKE_COMMISSIONING_COMMAND_ID (0x02)
 
 // Commands for cluster: Operational Credentials
 #define ZCL_SET_FABRIC_COMMAND_ID (0x00)

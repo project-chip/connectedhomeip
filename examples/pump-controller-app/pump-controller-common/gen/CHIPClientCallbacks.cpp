@@ -29,7 +29,6 @@
 #include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPEncoding.h>
-#include <support/BytesToHex.h>
 #include <support/SafeInt.h>
 #include <support/TypeTraits.h>
 #include <support/logging/CHIPLogging.h>
@@ -382,21 +381,6 @@ static void LogIMStatus(Protocols::InteractionModel::ProtocolCode status)
     }
 }
 
-void LogStringAttribute(const uint8_t * string, const uint32_t length, const bool isHumanReadable)
-{
-    if (isHumanReadable)
-    {
-        ChipLogProgress(Zcl, "  value: %.*s", length, string);
-        return;
-    }
-
-    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-    if (CHIP_NO_ERROR == Encoding::BytesToUppercaseHexString(&string[0], length, &buffer[0], CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE))
-    {
-        ChipLogProgress(Zcl, "  value: %s", buffer);
-    }
-}
-
 // Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
@@ -445,40 +429,6 @@ bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfSta
     }
 
     return true;
-}
-
-template <>
-void BasicAttributeFilter<StringAttributeCallback>(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
-                                                   chip::Callback::Cancelable * onFailure)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    const uint8_t * val;
-    uint32_t len;
-
-    if (data->GetType() != chip::TLV::kTLVType_ByteString && data->GetType() != chip::TLV::kTLVType_UTF8String)
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    else
-    {
-        err = data->GetDataPtr(val);
-        len = data->GetLength();
-    }
-
-    if (CHIP_NO_ERROR == err)
-    {
-        LogStringAttribute(val, len, data->GetType() == chip::TLV::kTLVType_UTF8String);
-
-        chip::Callback::Callback<StringAttributeCallback> * cb =
-            chip::Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccess);
-        cb->mCall(cb->mContext, chip::ByteSpan(val, len));
-    }
-    else
-    {
-        chip::Callback::Callback<DefaultFailureCallback> * cb =
-            chip::Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailure);
-        cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-    }
 }
 
 bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
@@ -879,9 +829,18 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
             }
 
             CHECK_MESSAGE_LENGTH(length);
-            Callback::Callback<StringAttributeCallback> * cb =
-                Callback::Callback<StringAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, chip::ByteSpan(message, length));
+            if (attributeType == 0x41)
+            {
+                Callback::Callback<OctetStringAttributeCallback> * cb =
+                    Callback::Callback<OctetStringAttributeCallback>::FromCancelable(onReportCallback);
+                cb->mCall(cb->mContext, chip::ByteSpan(message, length));
+            }
+            else
+            {
+                Callback::Callback<CharStringAttributeCallback> * cb =
+                    Callback::Callback<CharStringAttributeCallback>::FromCancelable(onReportCallback);
+                cb->mCall(cb->mContext, chip::ByteSpan(message, length));
+            }
             break;
         }
 
@@ -900,9 +859,18 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
             }
 
             CHECK_MESSAGE_LENGTH(length);
-            Callback::Callback<StringAttributeCallback> * cb =
-                Callback::Callback<StringAttributeCallback>::FromCancelable(onReportCallback);
-            cb->mCall(cb->mContext, chip::ByteSpan(message, length));
+            if (attributeType == 0x43)
+            {
+                Callback::Callback<OctetStringAttributeCallback> * cb =
+                    Callback::Callback<OctetStringAttributeCallback>::FromCancelable(onReportCallback);
+                cb->mCall(cb->mContext, chip::ByteSpan(message, length));
+            }
+            else
+            {
+                Callback::Callback<CharStringAttributeCallback> * cb =
+                    Callback::Callback<CharStringAttributeCallback>::FromCancelable(onReportCallback);
+                cb->mCall(cb->mContext, chip::ByteSpan(message, length));
+            }
             break;
         }
 

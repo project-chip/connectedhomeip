@@ -348,7 +348,7 @@ static void updateEnrollState(EndpointId endpoint, bool enrolled)
     emberAfIasZoneClusterPrintln("IAS Zone Server State: %pEnrolled", (enrolled ? "" : "NOT "));
 }
 
-bool emberAfIasZoneClusterZoneEnrollResponseCallback(chip::EndpointId aEndpoint, chip::app::CommandHandler * commandObj,
+bool emberAfIasZoneClusterZoneEnrollResponseCallback(EndpointId aEndpoint, app::CommandHandler * commandObj,
                                                      uint8_t enrollResponseCode, uint8_t zoneId)
 {
     EndpointId endpoint;

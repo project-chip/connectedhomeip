@@ -589,7 +589,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyMinimul failed: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyMinimul failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
@@ -1218,15 +1218,18 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveAllSrpServices()
 {
-    CHIP_ERROR error;
+    CHIP_ERROR error = CHIP_NO_ERROR;
 
     Impl()->LockThreadStack();
-    const otSrpClientService * services = otSrpClientGetServices(mOTInst);
 
-    // In case of empty list just return with no error
-    VerifyOrExit(services != nullptr, error = CHIP_NO_ERROR);
+    for (typename SrpClient::Service & service : mSrpClient.mServices)
+    {
+        if (!service.IsUsed())
+            continue;
 
-    error = MapOpenThreadError(otSrpClientRemoveHostAndServices(mOTInst, false));
+        error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &service.mService));
+        SuccessOrExit(error);
+    }
 
 exit:
     Impl()->UnlockThreadStack();

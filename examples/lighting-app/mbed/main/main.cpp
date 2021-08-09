@@ -34,7 +34,8 @@ using namespace ::chip::DeviceLayer;
 
 int main()
 {
-    int ret = 0;
+    int ret        = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
 #ifdef MBED_CONF_MBED_TRACE_ENABLE
     mbed_trace_init();
@@ -52,25 +53,29 @@ int main()
         goto exit;
     }
 
-    ret = chip::Platform::MemoryInit();
-    if (ret != CHIP_NO_ERROR)
+    err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Platform::MemoryInit() failed");
+        ret = EXIT_FAILURE;
         goto exit;
     }
 
     ChipLogProgress(NotSpecified, "Init CHIP Stack\r\n");
-    ret = PlatformMgr().InitChipStack();
-    if (ret != CHIP_NO_ERROR)
+    err = PlatformMgr().InitChipStack();
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "PlatformMgr().InitChipStack() failed");
+        ret = EXIT_FAILURE;
+        goto exit;
     }
 
     ChipLogProgress(NotSpecified, "Starting CHIP task");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
+    err = PlatformMgr().StartEventLoopTask();
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "PlatformMgr().StartEventLoopTask() failed");
+        ret = EXIT_FAILURE;
         goto exit;
     }
 

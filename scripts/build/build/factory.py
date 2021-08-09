@@ -17,7 +17,7 @@ import os
 from typing import Set
 
 from builders.builder import Builder
-from builders.linux import LinuxBuilder
+from builders.host import HostBuilder, HostApp
 from builders.qpg import QpgBuilder
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
@@ -79,7 +79,7 @@ class Matcher():
 
 # Builds a list of acceptable application/board combination for every platform
 _MATCHERS = {
-    Platform.LINUX: Matcher(LinuxBuilder),
+    Platform.HOST: Matcher(HostBuilder),
     Platform.ESP32: Matcher(Esp32Builder),
     Platform.QPG: Matcher(QpgBuilder),
     Platform.EFR32: Matcher(Efr32Builder),
@@ -88,15 +88,21 @@ _MATCHERS = {
 
 # Matrix of what can be compiled and what build options are required
 # by such compilation
-_MATCHERS[Platform.LINUX].AcceptApplication(Application.ALL_CLUSTERS)
-_MATCHERS[Platform.LINUX].AcceptBoard(Board.NATIVE)
+_MATCHERS[Platform.HOST].AcceptBoard(Board.NATIVE)
+_MATCHERS[Platform.HOST].AcceptApplication(Application.ALL_CLUSTERS, app=HostApp.ALL_CLUSTERS)
+_MATCHERS[Platform.HOST].AcceptApplication(Application.CHIP_TOOL, app=HostApp.CHIP_TOOL)
 
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.DEVKITC, board=Esp32Board.DevKitC)
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.M5STACK, board=Esp32Board.M5Stack)
+_MATCHERS[Platform.ESP32].AcceptBoard(Board.C3DEVKIT, board=Esp32Board.C3DevKit)
 _MATCHERS[Platform.ESP32].AcceptApplication(
     Application.ALL_CLUSTERS, app=Esp32App.ALL_CLUSTERS)
 _MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
+    Application.SHELL, Board.DEVKITC, app=Esp32App.SHELL)
+_MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
     Application.LOCK, Board.DEVKITC, app=Esp32App.LOCK)
+_MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
+    Application.BRIDGE, Board.DEVKITC, app=Esp32App.BRIDGE)
 
 _MATCHERS[Platform.QPG].AcceptApplication(Application.LOCK)
 _MATCHERS[Platform.QPG].AcceptBoard(Board.QPG6100)
@@ -126,19 +132,15 @@ class BuilderFactory:
   def Create(self, platform: Platform, board: Board, app: Application):
     """Creates a builder object for the specified arguments. """
 
-    identifier = '%s-%s-%s' % (platform.name.lower(), board.name.lower(),
-                               app.name.lower())
-
-    output_directory = os.path.join(self.output_prefix, identifier)
     builder = _MATCHERS[platform].Create(
         self.runner,
         board,
         app,
         self.repository_path,
-        output_dir=output_directory)
+        output_prefix=self.output_prefix)
 
     if builder:
-      builder.identifier = identifier
+      builder.SetIdentifier(platform.name.lower(), board.name.lower(), app.name.lower())
 
     return builder
 

@@ -101,6 +101,7 @@ COMPONENT_ADD_INCLUDEDIRS +=   $(REL_OUTPUT_DIR)/src/include \
 COMPONENT_OWNBUILDTARGET 	 = 1
 COMPONENT_OWNCLEANTARGET 	 = 1
 
+is_debug ?= true
 
 # ==================================================
 # Build Rules

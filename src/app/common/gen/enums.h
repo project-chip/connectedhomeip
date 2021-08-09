@@ -1377,6 +1377,14 @@ enum EmberAfStartUpOnOffValue : uint8_t
     EMBER_ZCL_START_UP_ON_OFF_VALUE_SET_TO_PREVIOUS = 255,
 };
 
+// Enum for StatusCode
+enum EmberAfStatusCode : uint8_t
+{
+    EMBER_ZCL_STATUS_CODE_SUCCESS       = 0,
+    EMBER_ZCL_STATUS_CODE_BUSY          = 1,
+    EMBER_ZCL_STATUS_CODE_GENERAL_ERROR = 2,
+};
+
 // Enum for StepMode
 enum EmberAfStepMode : uint8_t
 {

@@ -86,7 +86,7 @@ void WatchableEventManager::Signal()
     CHIP_ERROR status = mWakeEvent.Notify();
     if (status != CHIP_NO_ERROR)
     {
-        ChipLogError(chipSystemLayer, "System wake event notify failed: %" CHIP_ERROR_FORMAT, ChipError::FormatError(status));
+        ChipLogError(chipSystemLayer, "System wake event notify failed: %" CHIP_ERROR_FORMAT, status.Format());
     }
 }
 

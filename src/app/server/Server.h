@@ -20,6 +20,7 @@
 #include <app/server/AppDelegate.h>
 #include <inet/InetConfig.h>
 #include <messaging/ExchangeMgr.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <transport/FabricTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
@@ -71,8 +72,18 @@ enum class PairingWindowAdvertisement
 
 } // namespace chip
 
+constexpr uint16_t kNoCommissioningTimeout = UINT16_MAX;
+
 /**
  * Open the pairing window using default configured parameters.
  */
-CHIP_ERROR OpenDefaultPairingWindow(chip::ResetFabrics resetFabrics,
+CHIP_ERROR OpenDefaultPairingWindow(chip::ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds = kNoCommissioningTimeout,
                                     chip::PairingWindowAdvertisement advertisementMode = chip::PairingWindowAdvertisement::kBle);
+
+CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
+                                          chip::PASEVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
+                                          uint16_t passcodeID);
+
+void ClosePairingWindow();
+
+bool IsPairingWindowOpen();

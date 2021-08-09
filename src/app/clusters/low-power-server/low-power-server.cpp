@@ -25,9 +25,11 @@
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
+using namespace chip;
+
 bool lowPowerClusterSleep();
 
-bool emberAfLowPowerClusterSleepCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command)
+bool emberAfLowPowerClusterSleepCallback(EndpointId endpoint, app::CommandHandler * command)
 {
     bool success         = lowPowerClusterSleep();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;

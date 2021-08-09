@@ -30,7 +30,6 @@ static_library("controller") {
     "EmptyDataModelHandler.cpp",
     "ExampleOperationalCredentialsIssuer.cpp",
     "ExampleOperationalCredentialsIssuer.h",
-    "data_model/gen/chip-zcl-zpro-codec-api.h",
   ]
 
   cflags = [ "-Wconversion" ]

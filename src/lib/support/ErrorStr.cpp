@@ -59,7 +59,7 @@ DLL_EXPORT const char * ErrorStr(CHIP_ERROR err)
     char * formattedError   = sErrorStr;
     uint16_t formattedSpace = sizeof(sErrorStr);
 
-#if CHIP_CONFIG_ERROR_CLASS && CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
+#if CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
 
     const char * const file = err.GetFile();
     if (file != nullptr)
@@ -74,18 +74,18 @@ DLL_EXPORT const char * ErrorStr(CHIP_ERROR err)
     }
     if (err == CHIP_NO_ERROR)
     {
-        (void) snprintf(formattedError, formattedSpace, "No Error");
+        (void) snprintf(formattedError, formattedSpace, CHIP_NO_ERROR_STRING);
         return sErrorStr;
     }
 
-#else // CHIP_CONFIG_ERROR_CLASS && CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
+#else // CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
 
     if (err == CHIP_NO_ERROR)
     {
-        return "No Error";
+        return CHIP_NO_ERROR_STRING;
     }
 
-#endif // CHIP_CONFIG_ERROR_CLASS && CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
+#endif // CHIP_CONFIG_ERROR_SOURCE && !CHIP_CONFIG_SHORT_ERROR_STR
 
     // Search the registered error formatter for one that will format the given
     // error code.
@@ -169,11 +169,11 @@ DLL_EXPORT void FormatError(char * buf, uint16_t bufSize, const char * subsys, C
 
     if (subsys == NULL)
     {
-        (void) snprintf(buf, bufSize, "Error " CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, ChipError::AsInteger(err));
+        (void) snprintf(buf, bufSize, "Error " CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, err.AsInteger());
     }
     else
     {
-        (void) snprintf(buf, bufSize, "Error %s:" CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, subsys, ChipError::AsInteger(err));
+        (void) snprintf(buf, bufSize, "Error %s:" CHIP_CONFIG_SHORT_FORM_ERROR_VALUE_FORMAT, subsys, err.AsInteger());
     }
 
 #else // CHIP_CONFIG_SHORT_ERROR_STR
@@ -192,7 +192,7 @@ DLL_EXPORT void FormatError(char * buf, uint16_t bufSize, const char * subsys, C
         descSep = "";
     }
 
-    (void) snprintf(buf, bufSize, "%s%sError 0x%08" PRIX32 "%s%s", subsys, subsysSep, ChipError::AsInteger(err), descSep, desc);
+    (void) snprintf(buf, bufSize, "%s%sError 0x%08" PRIX32 "%s%s", subsys, subsysSep, err.AsInteger(), descSep, desc);
 
 #endif // CHIP_CONFIG_SHORT_ERROR_STR
 }

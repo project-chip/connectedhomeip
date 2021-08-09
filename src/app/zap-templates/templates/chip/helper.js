@@ -17,8 +17,9 @@
 
 // Import helpers from zap core
 const zapPath      = '../../../../../third_party/zap/repo/src-electron/';
-const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const templateUtil = require(zapPath + 'generator/template-util.js');
+const zclHelper    = require(zapPath + 'generator/helper-zcl.js');
+const iteratorUtil = require(zapPath + 'util/iterator-util.js');
 
 const { Clusters, asBlocks, asPromise } = require('../../common/ClustersHelper.js');
 const StringHelper                      = require('../../common/StringHelper.js');
@@ -74,6 +75,18 @@ function checkIsChipType(context, name)
   throwErrorIfUndefined(context, errorMsg, [ type ]);
 
   return type;
+}
+
+function getCommands(methodName)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
+  return clusterSide == 'client' ? Clusters.getClientCommands(clusterName) : Clusters.getServerCommands(clusterName);
+}
+
+function getResponses(methodName)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
+  return clusterSide == 'client' ? Clusters.getClientResponses(clusterName) : Clusters.getServerResponses(clusterName);
 }
 
 /**
@@ -162,71 +175,67 @@ function chip_server_global_responses(options)
 }
 
 /**
- * Creates block iterator over the server side cluster command
- * for a given cluster.
+ * Creates block iterator over the cluster commands for a given cluster/side.
  *
- * This function is meant to be used inside a {{#chip_server_clusters}}
+ * This function is meant to be used inside a {{#chip_*_clusters}}
  * block. It will throw otherwise.
  *
  * @param {*} options
  */
-function chip_server_cluster_commands(options)
+function chip_cluster_commands(options)
 {
-  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, 'chip_server_cluster_commands');
-  return asBlocks.call(this, Clusters.getClientCommands(clusterName), options);
+  const commands = getCommands.call(this, 'chip_cluster_commands');
+
+  return asBlocks.call(this, commands, options);
 }
 
 /**
- * Creates block iterator over the server side cluster responses
- * for a given cluster.
+ * Creates block iterator over the cluster responses for a given cluster/side.
  *
- * This function is meant to be used inside a {{#chip_server_clusters}}
+ * This function is meant to be used inside a {{#chip_*_clusters}}
  * block. It will throw otherwise.
  *
  * @param {*} options
  */
-function chip_server_cluster_responses(options)
+function chip_cluster_responses(options)
 {
-  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, 'chip_server_cluster_response');
-  return asBlocks.call(this, Clusters.getServerResponses(clusterName), options);
+  const responses = getResponses.call(this, 'chip_cluster_responses');
+
+  return asBlocks.call(this, responses, options);
 }
 
 /**
- * Creates block iterator over the server side cluster command arguments
- * for a given command.
+ * Creates block iterator over the current command arguments for a given cluster/side.
  *
- * This function is meant to be used inside a {{#chip_server_cluster_commands}}
+ * This function is meant to be used inside a {{#chip_cluster_commands}}
  * block. It will throw otherwise.
  *
  * @param {*} options
  */
-function chip_server_cluster_command_arguments(options)
+function chip_cluster_command_arguments(options)
 {
-  const commandId                    = checkIsInsideCommandBlock(this, 'chip_server_cluster_command_arguments');
-  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this.parent, 'chip_server_cluster_command_arguments');
+  const commandId = checkIsInsideCommandBlock(this, 'chip_cluster_command_arguments');
+  const commands  = getCommands.call(this.parent, 'chip_cluster_commands_argments');
 
   const filter = command => command.id == commandId;
-  const promise          = Clusters.getClientCommands(clusterName).then(commands => commands.find(filter).arguments);
-  return asBlocks.call(this, promise, options);
+  return asBlocks.call(this, commands.then(items => items.find(filter).arguments), options);
 }
 
 /**
- * Creates block iterator over the server side cluster response arguments
- * for a given command.
+ * Creates block iterator over the current response arguments for a given cluster/side.
  *
- * This function is meant to be used inside a {{#chip_server_cluster_responses}}
+ * This function is meant to be used inside a {{#chip_cluster_responses}}
  * block. It will throw otherwise.
  *
  * @param {*} options
  */
-function chip_server_cluster_response_arguments(options)
+function chip_cluster_response_arguments(options)
 {
-  const commandId                    = checkIsInsideCommandBlock(this, 'chip_server_cluster_response_arguments');
-  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this.parent, 'chip_server_cluster_response_arguments');
+  const commandId = checkIsInsideCommandBlock(this, 'chip_cluster_response_arguments');
+  const responses = getResponses.call(this.parent, 'chip_cluster_responses_argments');
 
   const filter = command => command.id == commandId;
-  const promise          = Clusters.getServerResponses(clusterName).then(commands => commands.find(filter).arguments);
-  return asBlocks.call(this, promise, options);
+  return asBlocks.call(this, responses.then(items => items.find(filter).arguments), options);
 }
 
 /**
@@ -240,9 +249,10 @@ function chip_server_cluster_response_arguments(options)
 function chip_server_has_list_attributes(options)
 {
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_has_list_attributes');
+  const attributes      = Clusters.getServerAttributes(clusterName);
 
   const filter = attribute => attribute.isList;
-  return asPromise.call(this, Clusters.getServerAttributes(clusterName).then(attributes => attributes.find(filter)));
+  return asPromise.call(this, attributes.then(items => items.find(filter)));
 }
 
 /**
@@ -256,9 +266,10 @@ function chip_server_has_list_attributes(options)
 function chip_client_has_list_attributes(options)
 {
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_client_has_list_attributes');
+  const attributes      = Clusters.getClientAttributes(clusterName);
 
   const filter = attribute => attribute.isList;
-  return asPromise.call(this, Clusters.getClientAttributes(clusterName).then(attributes => attributes.find(filter)));
+  return asPromise.call(this, attributes.then(items => items.find(filter)));
 }
 
 /**
@@ -272,8 +283,10 @@ function chip_client_has_list_attributes(options)
  */
 function chip_server_cluster_attributes(options)
 {
-  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, 'chip_server_cluster_attributes');
-  return asBlocks.call(this, Clusters.getServerAttributes(clusterName), options);
+  const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_cluster_attributes');
+  const attributes      = Clusters.getServerAttributes(clusterName);
+
+  return asBlocks.call(this, attributes, options);
 }
 
 function chip_attribute_list_entryTypes(options)
@@ -282,20 +295,42 @@ function chip_attribute_list_entryTypes(options)
   return templateUtil.collectBlocks(this.items, options, this);
 }
 
+/**
+ * Creates block iterator over commands for a given cluster that have the
+ * following properties:
+ *
+ * 1) Are not manufacturer-specific (to exclude MfgSpecificPing)
+ * 2) Are available in the isCommandAvailable sense.
+ */
+function chip_available_cluster_commands(options)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, 'chip_available_cluster_commands');
+  let promise                        = iteratorUtil.all_user_cluster_commands_helper.call(this, options)
+                    .then(endpointCommands => endpointCommands.filter(command => {
+                      return command.clusterName == clusterName
+                          && zclHelper.isCommandAvailable(
+                              clusterSide, command.incoming, command.outgoing, command.commandSource, command.name)
+                          && /* exclude MfgSpecificPing */ !command.mfgCode;
+                    }))
+                    .then(filteredCommands => templateUtil.collectBlocks(filteredCommands, options, this));
+  return promise;
+}
+
 //
 // Module exports
 //
-exports.chip_clusters                          = chip_clusters;
-exports.chip_has_clusters                      = chip_has_clusters;
-exports.chip_client_clusters                   = chip_client_clusters;
-exports.chip_has_client_clusters               = chip_has_client_clusters;
-exports.chip_server_clusters                   = chip_server_clusters;
-exports.chip_has_server_clusters               = chip_has_server_clusters;
-exports.chip_server_cluster_commands           = chip_server_cluster_commands;
-exports.chip_server_cluster_command_arguments  = chip_server_cluster_command_arguments
-exports.chip_server_global_responses           = chip_server_global_responses;
-exports.chip_server_cluster_responses          = chip_server_cluster_responses;
-exports.chip_server_cluster_response_arguments = chip_server_cluster_response_arguments
-exports.chip_attribute_list_entryTypes         = chip_attribute_list_entryTypes;
-exports.chip_server_cluster_attributes         = chip_server_cluster_attributes;
-exports.chip_server_has_list_attributes        = chip_server_has_list_attributes;
+exports.chip_clusters                   = chip_clusters;
+exports.chip_has_clusters               = chip_has_clusters;
+exports.chip_client_clusters            = chip_client_clusters;
+exports.chip_has_client_clusters        = chip_has_client_clusters;
+exports.chip_server_clusters            = chip_server_clusters;
+exports.chip_has_server_clusters        = chip_has_server_clusters;
+exports.chip_cluster_commands           = chip_cluster_commands;
+exports.chip_cluster_command_arguments  = chip_cluster_command_arguments;
+exports.chip_server_global_responses    = chip_server_global_responses;
+exports.chip_cluster_responses          = chip_cluster_responses;
+exports.chip_cluster_response_arguments = chip_cluster_response_arguments
+exports.chip_attribute_list_entryTypes  = chip_attribute_list_entryTypes;
+exports.chip_server_cluster_attributes  = chip_server_cluster_attributes;
+exports.chip_server_has_list_attributes = chip_server_has_list_attributes;
+exports.chip_available_cluster_commands = chip_available_cluster_commands;

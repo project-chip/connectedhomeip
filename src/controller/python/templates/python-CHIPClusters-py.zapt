@@ -6,41 +6,34 @@ import ctypes
 from chip.ChipStack import *
 from chip.exceptions import *
 
-'''
-TODO(#4511): This file only sends cluster commands, should add more functions.
-'''
-
 __all__ = ["ChipClusters"]
 
 class ChipClusters:
     SUCCESS_DELEGATE = ctypes.CFUNCTYPE(None)
     FAILURE_DELEGATE = ctypes.CFUNCTYPE(None, ctypes.c_uint8)
 
-    def __init__(self, chipstack):
-        self._ChipStack = chipstack
-
-    def ListClusterCommands(self):
-        return {
 {{#chip_client_clusters}}
-            "{{asCamelCased name false}}": {
-{{#chip_server_cluster_commands}}
-                "{{asCamelCased name false}}": {
-{{#chip_server_cluster_command_arguments}}
-                    "{{asCamelCased label}}": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
-{{/chip_server_cluster_command_arguments}}
+    _{{asDelimitedMacro name}}_CLUSTER_INFO = {
+            "clusterName": "{{asCamelCased name false}}",
+            "clusterId": {{asHex code 8}},
+            "commands": {
+{{#chip_cluster_commands}}
+            {{asHex code 8}}: {
+                    "commandId": {{asHex code 8}},
+                    "commandName": "{{asCamelCased name false}}",
+                    "args": {
+{{#chip_cluster_command_arguments}}
+                        "{{asCamelCased label}}": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
+{{/chip_cluster_command_arguments}}
+                    },
                 },
-{{/chip_server_cluster_commands}}
+{{/chip_cluster_commands}}
             },
-{{/chip_client_clusters}}
-        }
-
-    def ListClusterAttributes(self):
-        return {
-{{#chip_client_clusters}}
-            "{{asCamelCased name false}}": {
+            "attributes": {
 {{#chip_server_cluster_attributes}}
-                "{{asCamelCased name false}}": {
-                    "attributeId": {{asHex code 4}},
+                {{asHex code 8}}: {
+                    "attributeName": "{{asCamelCased name false}}",
+                    "attributeId": {{asHex code 8}},
                     "type": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
                     {{#if isReportableAttribute}}
                     "reportable": True,
@@ -51,8 +44,42 @@ class ChipClusters:
                 },
 {{/chip_server_cluster_attributes}}
             },
+    }
 {{/chip_client_clusters}}
-        }
+
+    _CLUSTER_ID_DICT = {
+{{#chip_client_clusters}}
+    {{asHex code 8}}: _{{asDelimitedMacro name}}_CLUSTER_INFO,
+{{/chip_client_clusters}}
+    }
+
+    _CLUSTER_NAME_DICT = {
+{{#chip_client_clusters}}
+        "{{asCamelCased name false}}": _{{asDelimitedMacro name}}_CLUSTER_INFO,
+{{/chip_client_clusters}}
+    }
+
+    def __init__(self, chipstack):
+        self._ChipStack = chipstack
+
+    def GetClusterInfoById(self, cluster_id: int):
+        data = ChipClusters._CLUSTER_ID_DICT.get(cluster_id, None)
+        if not data:
+            raise UnknownCluster(cluster_id)
+        return data
+
+    def ListClusterInfo(self):
+        return ChipClusters._CLUSTER_NAME_DICT
+
+    def ListClusterCommands(self):
+        return { clusterName: {
+            command["commandName"]: command["args"] for command in clusterInfo["commands"].values()
+        } for clusterName, clusterInfo in ChipClusters._CLUSTER_NAME_DICT.items() }
+
+    def ListClusterAttributes(self):
+        return { clusterName: {
+            attribute["attributeName"]: attribute for attribute in clusterInfo["attributes"].values()
+        } for clusterName, clusterInfo in ChipClusters._CLUSTER_NAME_DICT.items() }
 
     def SendCommand(self, device: ctypes.c_void_p, cluster: str, command: str, endpoint: int, groupid: int, args, imEnabled):
         func = getattr(self, "Cluster{}_Command{}".format(cluster, command), None)
@@ -89,17 +116,17 @@ class ChipClusters:
     # Cluster commands
 
 {{#chip_client_clusters}}
-{{#chip_server_cluster_commands}}
-    def Cluster{{asCamelCased clusterName false}}_Command{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}: {{asPythonType chipType}}{{/chip_server_cluster_command_arguments}}):
-{{#chip_server_cluster_command_arguments}}
+{{#chip_cluster_commands}}
+    def Cluster{{asCamelCased clusterName false}}_Command{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int{{#chip_cluster_command_arguments}}, {{asCamelCased label}}: {{asPythonType chipType}}{{/chip_cluster_command_arguments}}):
+{{#chip_cluster_command_arguments}}
 {{#if (isCharString type)}}
         {{asCamelCased label}} = {{asCamelCased label}}.encode("utf-8") + b'\x00'
 {{/if}}
-{{/chip_server_cluster_command_arguments}}
+{{/chip_cluster_command_arguments}}
         return self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(
-                device, ZCLendpoint, ZCLgroupid{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isString type)}}, len({{asCamelCased label}}){{/if}}{{/chip_server_cluster_command_arguments}}
+                device, ZCLendpoint, ZCLgroupid{{#chip_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isString type)}}, len({{asCamelCased label}}){{/if}}{{/chip_cluster_command_arguments}}
         )
-{{/chip_server_cluster_commands}}
+{{/chip_cluster_commands}}
 {{/chip_client_clusters}}
 
     # Cluster attributes
@@ -133,11 +160,11 @@ class ChipClusters:
         self._chipLib.chip_ime_SetFailureResponseDelegate.res = None
 {{#chip_client_clusters}}
         # Cluster {{asCamelCased name false}}
-{{#chip_server_cluster_commands}}
+{{#chip_cluster_commands}}
         # Cluster {{asCamelCased clusterName false}} Command {{asCamelCased name false}}
-        self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16{{#chip_server_cluster_command_arguments}}{{#if (isString type)}}, ctypes.c_char_p, ctypes.c_uint32{{else}}, ctypes.{{asPythonCType chipType}}{{/if}}{{/chip_server_cluster_command_arguments}}]
+        self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16{{#chip_cluster_command_arguments}}{{#if (isString type)}}, ctypes.c_char_p, ctypes.c_uint32{{else}}, ctypes.{{asPythonCType chipType}}{{/if}}{{/chip_cluster_command_arguments}}]
         self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
-{{/chip_server_cluster_commands}}
+{{/chip_cluster_commands}}
 {{#chip_server_cluster_attributes}}
         # Cluster {{asCamelCased parent.name false}} ReadAttribute {{asCamelCased name false}}
         self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

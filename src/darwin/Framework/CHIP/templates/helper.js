@@ -28,6 +28,7 @@ const StringHelper    = require('../../../../../src/app/zap-templates/common/Str
 function asExpectedEndpointForCluster(clusterName)
 {
   switch (clusterName) {
+  case 'AdministratorCommissioning':
   case 'Basic':
   case 'Descriptor':
   case 'GeneralCommissioning':
@@ -77,6 +78,8 @@ function asObjectiveCNumberType(label, type, asLowerCased)
         .then(zclType => {
           const basicType = ChipTypesHelper.asBasicType(zclType);
           switch (basicType) {
+          case 'bool':
+            return 'Bool';
           case 'uint8_t':
             return 'UnsignedChar';
           case 'uint16_t':

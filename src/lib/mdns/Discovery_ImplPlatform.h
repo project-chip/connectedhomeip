@@ -36,8 +36,11 @@ class DiscoveryImplPlatform : public ServiceAdvertiser, public Resolver
 public:
     CHIP_ERROR Init();
 
+    /// Starts the service advertiser if not yet started. Otherwise, removes all existing services.
     CHIP_ERROR Start(Inet::InetLayer * inetLayer, uint16_t port) override;
-    CHIP_ERROR StartResolver(Inet::InetLayer * inetLayer, uint16_t port) override { return Start(inetLayer, port); }
+
+    /// Starts the service resolver if not yet started
+    CHIP_ERROR StartResolver(Inet::InetLayer * inetLayer, uint16_t port) override { return Init(); }
 
     /// Advertises the CHIP node as an operational node
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;

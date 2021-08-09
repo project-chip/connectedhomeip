@@ -49,16 +49,6 @@
 #include <app/reporting/Engine.h>
 #include <app/util/basic-types.h>
 
-// TODO: Make number of command/read/write client/handler configurable
-#define CHIP_MAX_NUM_COMMAND_HANDLER 4
-#define CHIP_MAX_NUM_COMMAND_SENDER 4
-#define CHIP_MAX_NUM_READ_CLIENT 4
-#define CHIP_MAX_NUM_READ_HANDLER 4
-#define CHIP_MAX_REPORTS_IN_FLIGHT 4
-#define IM_SERVER_MAX_NUM_PATH_GROUPS 8
-#define CHIP_MAX_NUM_WRITE_CLIENT 4
-#define CHIP_MAX_NUM_WRITE_HANDLER 4
-
 namespace chip {
 namespace app {
 
@@ -191,14 +181,17 @@ private:
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
-    CommandHandler mCommandHandlerObjs[CHIP_MAX_NUM_COMMAND_HANDLER];
-    CommandSender mCommandSenderObjs[CHIP_MAX_NUM_COMMAND_SENDER];
-    ReadClient mReadClients[CHIP_MAX_NUM_READ_CLIENT];
-    ReadHandler mReadHandlers[CHIP_MAX_NUM_READ_HANDLER];
-    WriteClient mWriteClients[CHIP_MAX_NUM_WRITE_CLIENT];
-    WriteHandler mWriteHandlers[CHIP_MAX_NUM_WRITE_HANDLER];
+
+    // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
+    // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.
+    CommandHandler mCommandHandlerObjs[CHIP_IM_MAX_NUM_COMMAND_HANDLER];
+    CommandSender mCommandSenderObjs[CHIP_IM_MAX_NUM_COMMAND_SENDER];
+    ReadClient mReadClients[CHIP_IM_MAX_NUM_READ_CLIENT];
+    ReadHandler mReadHandlers[CHIP_IM_MAX_NUM_READ_HANDLER];
+    WriteClient mWriteClients[CHIP_IM_MAX_NUM_WRITE_CLIENT];
+    WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
-    ClusterInfo mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS];
+    ClusterInfo mClusterInfoPool[CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS];
     ClusterInfo * mpNextAvailableClusterInfo = nullptr;
 };
 

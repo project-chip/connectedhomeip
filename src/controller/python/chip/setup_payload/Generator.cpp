@@ -55,16 +55,16 @@ extern "C" ChipError::StorageType pychip_SetupPayload_PrintOnboardingCodes(uint3
         break;
     default:
         ChipLogError(SetupPayload, "Invalid Custom Flow");
-        return ChipError::AsInteger(CHIP_ERROR_INVALID_ARGUMENT);
+        return CHIP_ERROR_INVALID_ARGUMENT.AsInteger();
     }
 
     CHIP_ERROR err = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, ChipError::AsInteger(err));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
     ChipLogProgress(SetupPayload, "Manual pairing code: [%s]", manualPairingCode.c_str());
 
     err = QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, ChipError::AsInteger(err));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
     ChipLogProgress(SetupPayload, "SetupQRCode: [%s]", QRCode.c_str());
 
-    return ChipError::AsInteger(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR.AsInteger();
 }

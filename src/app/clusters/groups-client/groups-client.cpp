@@ -50,14 +50,14 @@
 
 using namespace chip;
 
-bool emberAfGroupsClusterAddGroupResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, GroupId groupId)
+bool emberAfGroupsClusterAddGroupResponseCallback(app::CommandHandler * commandObj, uint8_t status, GroupId groupId)
 {
     emberAfGroupsClusterPrintln("RX: AddGroupResponse 0x%x, 0x%2x", status, groupId);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
-bool emberAfGroupsClusterViewGroupResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, GroupId groupId,
+bool emberAfGroupsClusterViewGroupResponseCallback(app::CommandHandler * commandObj, uint8_t status, GroupId groupId,
                                                    uint8_t * groupName)
 {
     emberAfGroupsClusterPrint("RX: ViewGroupResponse 0x%x, 0x%2x, \"", status, groupId);
@@ -67,8 +67,8 @@ bool emberAfGroupsClusterViewGroupResponseCallback(chip::app::CommandHandler * c
     return true;
 }
 
-bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::app::CommandHandler * commandObj, uint8_t capacity,
-                                                            uint8_t groupCount, uint8_t * groupList)
+bool emberAfGroupsClusterGetGroupMembershipResponseCallback(app::CommandHandler * commandObj, uint8_t capacity, uint8_t groupCount,
+                                                            uint8_t * groupList)
 {
     uint8_t i;
     emberAfGroupsClusterPrint("RX: GetGroupMembershipResponse 0x%x, 0x%x,", capacity, groupCount);
@@ -81,7 +81,7 @@ bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::app::CommandHa
     return true;
 }
 
-bool emberAfGroupsClusterRemoveGroupResponseCallback(chip::app::CommandHandler * commandObj, uint8_t status, GroupId groupId)
+bool emberAfGroupsClusterRemoveGroupResponseCallback(app::CommandHandler * commandObj, uint8_t status, GroupId groupId)
 {
     emberAfGroupsClusterPrintln("RX: RemoveGroupResponse 0x%x, 0x%2x", status, groupId);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);

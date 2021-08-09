@@ -89,6 +89,8 @@ function asReadType(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return 'Int8u';
       case 'int8_t':
         return 'Int8s';
       case 'uint8_t':
@@ -127,7 +129,7 @@ function asReadType(type)
 
 // List of all cluster with generated functions
 var endpointClusterWithInit = [
-  'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/off', 'Level Control', 'Color Control', 'IAS Zone',
+  'Basic', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/Off', 'Level Control', 'Color Control', 'IAS Zone',
   'Pump Configuration and Control'
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
@@ -252,6 +254,8 @@ function asPrintFormat(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return '%d';
       case 'int8_t':
         return '%" PRId8 "';
       case 'uint8_t':

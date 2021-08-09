@@ -1,0 +1,221 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.2.15. [TC-CC-7.1 to 7.4] Enhanced Color Controls
+
+config:
+    cluster: "Color Control"
+    endpoint: 1
+
+tests:
+    - label: "Turn on light for color control tests"
+      cluster: "On/Off"
+      command: "on"
+
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Enhanced Move To Hue command"
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "enhancedHue"
+                value: 1025
+              - name: "direction"
+                value: 0
+              - name: "transitionTime"
+                value: 1
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label:
+          "Check Remaining time attribute value matched the value sent by the
+          last command"
+      command: "readAttribute"
+      attribute: "remaining time"
+      response:
+          value: 1
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 1025
+
+    - label: "Enhanced Move Hue Down command "
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 3
+              - name: "rate"
+                value: 5
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Enhanced Move Hue Stop command"
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Check EnhancedCurrentHue attribute value changed to a lower Hue"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: -1
+
+    - label: "Enhanced Move Hue Up command"
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 1
+              - name: "rate"
+                value: 50
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Enhanced Move Hue Stop command"
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Check EnhancedCurrentHue attribute value changed to a higher Hue"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: -1
+
+    - label: "Enhanced Step Hue Up command"
+      command: "EnhancedStepHue"
+      arguments:
+          values:
+              - name: "stepMode"
+                value: 0
+              - name: "stepSize"
+                value: 50
+              - name: "transitionTime"
+                value: 1
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 1075
+
+    - label: "Enhanced Step Hue Down command"
+      command: "EnhancedStepHue"
+      arguments:
+          values:
+              - name: "stepMode"
+                value: 1
+              - name: "stepSize"
+                value: 75
+              - name: "transitionTime"
+                value: 1
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 1000
+
+    - label: "Enhanced move to hue and saturation command"
+      command: "EnhancedMoveToHueAndSaturation"
+      arguments:
+          values:
+              - name: "enhancedHue"
+                value: 1200
+              - name: "saturation"
+                value: 90
+              - name: "transitionTime"
+                value: 10
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 1200
+
+    - label:
+          "Check Saturation attribute value matched the value sent by the last
+          command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          value: 90
+
+    - label: "Turn off light that we turned on"
+      cluster: "On/Off"
+      command: "off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

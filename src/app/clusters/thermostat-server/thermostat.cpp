@@ -45,33 +45,31 @@ void emberAfThermostatClusterServerInitCallback(void)
     // or should this just be the responsibility of the thermostat application?
 }
 
-bool emberAfThermostatClusterClearWeeklyScheduleCallback(chip::app::CommandHandler * commandObj)
+bool emberAfThermostatClusterClearWeeklyScheduleCallback(app::CommandHandler * commandObj)
 {
     // TODO
     return false;
 }
-bool emberAfThermostatClusterGetRelayStatusLogCallback(chip::app::CommandHandler * commandObj)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterGetWeeklyScheduleCallback(chip::app::CommandHandler * commandObj, uint8_t daysToReturn,
-                                                       uint8_t modeToReturn)
+bool emberAfThermostatClusterGetRelayStatusLogCallback(app::CommandHandler * commandObj)
 {
     // TODO
     return false;
 }
 
-bool emberAfThermostatClusterSetWeeklyScheduleCallback(chip::app::CommandHandler * commandObj,
-                                                       uint8_t numberOfTransitionsForSequence, uint8_t daysOfWeekForSequence,
-                                                       uint8_t modeForSequence, uint8_t * payload)
+bool emberAfThermostatClusterGetWeeklyScheduleCallback(app::CommandHandler * commandObj, uint8_t daysToReturn, uint8_t modeToReturn)
 {
     // TODO
     return false;
 }
 
-bool emberAfThermostatClusterSetpointRaiseLowerCallback(chip::app::CommandHandler * commandObj, uint8_t mode, int8_t amount)
+bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * commandObj, uint8_t numberOfTransitionsForSequence,
+                                                       uint8_t daysOfWeekForSequence, uint8_t modeForSequence, uint8_t * payload)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * commandObj, uint8_t mode, int8_t amount)
 {
     bool result             = false;
     EndpointId endpoint     = 1;                            // Hard code to 1 for now/
