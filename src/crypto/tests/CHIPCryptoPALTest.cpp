@@ -1246,21 +1246,21 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
 
 static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
 {
-    static uint8_t csr[kMAX_CSR_Length];
+    uint8_t csr[kMAX_CSR_Length];
     size_t length = sizeof(csr);
 
-    static Test_P256Keypair keypair;
+    Test_P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, keypair.NewCertificateSigningRequest(csr, length) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, length > 0);
 
-    static P256PublicKey pubkey;
+    P256PublicKey pubkey;
     CHIP_ERROR err = VerifyCertificateSigningRequest(csr, length, pubkey);
     if (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, pubkey.Length() == kP256_PublicKey_Length);
-        NL_TEST_ASSERT(inSuite, memcmp(pubkey, keypair.Pubkey(), pubkey.Length()) == 0);
+        NL_TEST_ASSERT(inSuite, memcmp(pubkey.ConstBytes(), keypair.Pubkey().ConstBytes(), pubkey.Length()) == 0);
 
         // Let's corrupt the CSR buffer and make sure it fails to verify
         csr[length - 2] = (uint8_t)(csr[length - 2] + 1);
@@ -1687,6 +1687,68 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsRan == numOfTestVectors);
 }
 
+static void TestCompressedFabricIdentifier(nlTestSuite * inSuite, void * inContext)
+{
+    // Data from spec test vector (see Operational Discovery section)
+    const uint8_t kRootPublicKey[65] = {
+        0x04, 0x4a, 0x9f, 0x42, 0xb1, 0xca, 0x48, 0x40, 0xd3, 0x72, 0x92, 0xbb, 0xc7, 0xf6, 0xa7, 0xe1, 0x1e,
+        0x22, 0x20, 0x0c, 0x97, 0x6f, 0xc9, 0x00, 0xdb, 0xc9, 0x8a, 0x7a, 0x38, 0x3a, 0x64, 0x1c, 0xb8, 0x25,
+        0x4a, 0x2e, 0x56, 0xd4, 0xe2, 0x95, 0xa8, 0x47, 0x94, 0x3b, 0x4e, 0x38, 0x97, 0xc4, 0xa7, 0x73, 0xe9,
+        0x30, 0x27, 0x7b, 0x4d, 0x9f, 0xbe, 0xde, 0x8a, 0x05, 0x26, 0x86, 0xbf, 0xac, 0xfa,
+    };
+    P256PublicKey root_public_key(kRootPublicKey);
+
+    constexpr uint64_t kFabricId = 0x2906C908D115D362;
+
+    const uint8_t kExpectedCompressedFabricIdentifier[8] = {
+        0x87, 0xe1, 0xb0, 0x04, 0xe2, 0x35, 0xa1, 0x30,
+    };
+    static_assert(sizeof(kExpectedCompressedFabricIdentifier) == kCompressedFabricIdentifierSize,
+                  "Expected compressed fabric identifier must the correct size");
+
+    uint8_t compressed_fabric_id[kCompressedFabricIdentifierSize];
+    MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
+    ClearSecretData(compressed_fabric_id, sizeof(compressed_fabric_id));
+
+    CHIP_ERROR error = GenerateCompressedFabricId(root_public_key, kFabricId, compressed_fabric_id_span);
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, compressed_fabric_id_span.size() == kCompressedFabricIdentifierSize);
+    NL_TEST_ASSERT(inSuite,
+                   0 ==
+                       memcmp(compressed_fabric_id_span.data(), kExpectedCompressedFabricIdentifier,
+                              sizeof(kExpectedCompressedFabricIdentifier)));
+
+    // Test bigger input buffer than needed
+    uint8_t compressed_fabric_id_large[3 * kCompressedFabricIdentifierSize];
+    MutableByteSpan compressed_fabric_id_large_span(compressed_fabric_id_large);
+    ClearSecretData(compressed_fabric_id_large, sizeof(compressed_fabric_id_large));
+
+    error = GenerateCompressedFabricId(root_public_key, kFabricId, compressed_fabric_id_large_span);
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, compressed_fabric_id_large_span.size() == kCompressedFabricIdentifierSize);
+    NL_TEST_ASSERT(inSuite,
+                   0 ==
+                       memcmp(compressed_fabric_id_large_span.data(), kExpectedCompressedFabricIdentifier,
+                              sizeof(kExpectedCompressedFabricIdentifier)));
+
+    // Test smaller buffer than needed
+    MutableByteSpan compressed_fabric_id_small_span(compressed_fabric_id, kCompressedFabricIdentifierSize - 1);
+    error = GenerateCompressedFabricId(root_public_key, kFabricId, compressed_fabric_id_small_span);
+    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Test invalid public key
+    const uint8_t kInvalidRootPublicKey[65] = {
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    };
+    P256PublicKey invalid_root_public_key(kInvalidRootPublicKey);
+
+    error = GenerateCompressedFabricId(invalid_root_public_key, kFabricId, compressed_fabric_id_span);
+    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
+}
+
 #if CHIP_CRYPTO_OPENSSL
 static void TestX509_PKCS7Extraction(nlTestSuite * inSuite, void * inContext)
 {
@@ -1730,7 +1792,7 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
         err = ExtractPubkeyFromX509Cert(cert, publicKey);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, memcmp(publicKey, certPubkey, certPubkeyLen) == 0);
+        NL_TEST_ASSERT(inSuite, memcmp(publicKey.ConstBytes(), certPubkey, certPubkeyLen) == 0);
     }
 }
 #endif // CHIP_CRYPTO_OPENSSL
@@ -1793,6 +1855,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2p_spake2p PointLoad/PointWrite", TestSPAKE2P_spake2p_PointLoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p PointIsValid", TestSPAKE2P_spake2p_PointIsValid),
     NL_TEST_DEF("Test Spake2+ against RFC test vectors", TestSPAKE2P_RFC),
+    NL_TEST_DEF("Test compressed fabric identifier", TestCompressedFabricIdentifier),
 #if CHIP_CRYPTO_OPENSSL
     NL_TEST_DEF("Test x509 Certificate Extraction from PKCS7", TestX509_PKCS7Extraction),
     NL_TEST_DEF("Test Pubkey Extraction from x509 Certificate", TestPubkey_x509Extraction),

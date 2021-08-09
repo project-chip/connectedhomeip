@@ -108,7 +108,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/inc",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/inc",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/include",
-      "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager",
       "${efr32_sdk_root}/platform/bootloader",
     ]
 
@@ -156,8 +155,6 @@ template("efr32_sdk") {
       "SL_SUPRESS_DEPRECATION_WARNINGS_SDK_3_1",
       "CHIP_KVS_SECTOR_COUNT=4",
       "CHIP_KVS_BASE_SECTOR_INDEX=((FLASH_SIZE/FLASH_PAGE_SIZE)-(CHIP_KVS_SECTOR_COUNT))",
-      "__HEAP_SIZE=0",
-      "SL_STACK_SIZE=0",
       "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
     ]
 
@@ -224,7 +221,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/hardware/kit/common/drivers/udelay.c",
       "${efr32_sdk_root}/platform/bootloader/plugin/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
-      "${efr32_sdk_root}/platform/common/toolchain/src/sl_memory.c",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default.c",
@@ -269,7 +265,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
       "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",
-      "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager/sl_malloc.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/aes.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/aesni.c",
       "${efr32_sdk_root}/util/third_party/crypto/mbedtls/library/arc4.c",

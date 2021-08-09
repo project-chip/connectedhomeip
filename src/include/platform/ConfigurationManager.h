@@ -26,6 +26,7 @@
 
 #include <cstdint>
 
+#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/PersistedStorage.h>
 
 namespace chip {

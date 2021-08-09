@@ -187,8 +187,8 @@ EmberAfStatus GetCurrentScene(chip::EndpointId endpoint, uint8_t * currentScene)
 EmberAfStatus SetCurrentScene(chip::EndpointId endpoint, uint8_t currentScene);
 EmberAfStatus GetCurrentGroup(chip::EndpointId endpoint, uint16_t * currentGroup); // int16u
 EmberAfStatus SetCurrentGroup(chip::EndpointId endpoint, uint16_t currentGroup);
-EmberAfStatus GetSceneValid(chip::EndpointId endpoint, uint8_t * sceneValid); // boolean
-EmberAfStatus SetSceneValid(chip::EndpointId endpoint, uint8_t sceneValid);
+EmberAfStatus GetSceneValid(chip::EndpointId endpoint, bool * sceneValid); // boolean
+EmberAfStatus SetSceneValid(chip::EndpointId endpoint, bool sceneValid);
 EmberAfStatus GetNameSupport(chip::EndpointId endpoint, uint8_t * nameSupport); // bitmap8
 EmberAfStatus SetNameSupport(chip::EndpointId endpoint, uint8_t nameSupport);
 } // namespace Attributes
@@ -196,8 +196,8 @@ EmberAfStatus SetNameSupport(chip::EndpointId endpoint, uint8_t nameSupport);
 
 namespace OnOff {
 namespace Attributes {
-EmberAfStatus GetOnOff(chip::EndpointId endpoint, uint8_t * onOff); // boolean
-EmberAfStatus SetOnOff(chip::EndpointId endpoint, uint8_t onOff);
+EmberAfStatus GetOnOff(chip::EndpointId endpoint, bool * onOff); // boolean
+EmberAfStatus SetOnOff(chip::EndpointId endpoint, bool onOff);
 EmberAfStatus GetSampleMfgSpecificAttribute0x00000x1002(chip::EndpointId endpoint,
                                                         uint16_t * sampleMfgSpecificAttribute0x00000x1002); // int16u
 EmberAfStatus SetSampleMfgSpecificAttribute0x00000x1002(chip::EndpointId endpoint, uint16_t sampleMfgSpecificAttribute0x00000x1002);
@@ -210,8 +210,8 @@ EmberAfStatus SetSampleMfgSpecificAttribute0x00010x1002(chip::EndpointId endpoin
 EmberAfStatus GetSampleMfgSpecificAttribute0x00010x1040(chip::EndpointId endpoint,
                                                         uint16_t * sampleMfgSpecificAttribute0x00010x1040); // int16u
 EmberAfStatus SetSampleMfgSpecificAttribute0x00010x1040(chip::EndpointId endpoint, uint16_t sampleMfgSpecificAttribute0x00010x1040);
-EmberAfStatus GetGlobalSceneControl(chip::EndpointId endpoint, uint8_t * globalSceneControl); // boolean
-EmberAfStatus SetGlobalSceneControl(chip::EndpointId endpoint, uint8_t globalSceneControl);
+EmberAfStatus GetGlobalSceneControl(chip::EndpointId endpoint, bool * globalSceneControl); // boolean
+EmberAfStatus SetGlobalSceneControl(chip::EndpointId endpoint, bool globalSceneControl);
 EmberAfStatus GetOnTime(chip::EndpointId endpoint, uint16_t * onTime); // int16u
 EmberAfStatus SetOnTime(chip::EndpointId endpoint, uint16_t onTime);
 EmberAfStatus GetOffWaitTime(chip::EndpointId endpoint, uint16_t * offWaitTime); // int16u
@@ -287,12 +287,12 @@ EmberAfStatus SetValidUntilTime(chip::EndpointId endpoint, /* TYPE WARNING: utc 
 
 namespace BinaryInputBasic {
 namespace Attributes {
-EmberAfStatus GetOutOfService(chip::EndpointId endpoint, uint8_t * outOfService); // boolean
-EmberAfStatus SetOutOfService(chip::EndpointId endpoint, uint8_t outOfService);
+EmberAfStatus GetOutOfService(chip::EndpointId endpoint, bool * outOfService); // boolean
+EmberAfStatus SetOutOfService(chip::EndpointId endpoint, bool outOfService);
 EmberAfStatus GetPolarity(chip::EndpointId endpoint, uint8_t * polarity); // enum8
 EmberAfStatus SetPolarity(chip::EndpointId endpoint, uint8_t polarity);
-EmberAfStatus GetPresentValue(chip::EndpointId endpoint, uint8_t * presentValue); // boolean
-EmberAfStatus SetPresentValue(chip::EndpointId endpoint, uint8_t presentValue);
+EmberAfStatus GetPresentValue(chip::EndpointId endpoint, bool * presentValue); // boolean
+EmberAfStatus SetPresentValue(chip::EndpointId endpoint, bool presentValue);
 EmberAfStatus GetReliability(chip::EndpointId endpoint, uint8_t * reliability); // enum8
 EmberAfStatus SetReliability(chip::EndpointId endpoint, uint8_t reliability);
 EmberAfStatus GetStatusFlags(chip::EndpointId endpoint, uint8_t * statusFlags); // bitmap8
@@ -306,12 +306,12 @@ namespace PowerProfile {
 namespace Attributes {
 EmberAfStatus GetTotalProfileNum(chip::EndpointId endpoint, uint8_t * totalProfileNum); // int8u
 EmberAfStatus SetTotalProfileNum(chip::EndpointId endpoint, uint8_t totalProfileNum);
-EmberAfStatus GetMultipleScheduling(chip::EndpointId endpoint, uint8_t * multipleScheduling); // boolean
-EmberAfStatus SetMultipleScheduling(chip::EndpointId endpoint, uint8_t multipleScheduling);
+EmberAfStatus GetMultipleScheduling(chip::EndpointId endpoint, bool * multipleScheduling); // boolean
+EmberAfStatus SetMultipleScheduling(chip::EndpointId endpoint, bool multipleScheduling);
 EmberAfStatus GetEnergyFormatting(chip::EndpointId endpoint, uint8_t * energyFormatting); // bitmap8
 EmberAfStatus SetEnergyFormatting(chip::EndpointId endpoint, uint8_t energyFormatting);
-EmberAfStatus GetEnergyRemote(chip::EndpointId endpoint, uint8_t * energyRemote); // boolean
-EmberAfStatus SetEnergyRemote(chip::EndpointId endpoint, uint8_t energyRemote);
+EmberAfStatus GetEnergyRemote(chip::EndpointId endpoint, bool * energyRemote); // boolean
+EmberAfStatus SetEnergyRemote(chip::EndpointId endpoint, bool energyRemote);
 EmberAfStatus GetScheduleMode(chip::EndpointId endpoint, uint8_t * scheduleMode); // bitmap8
 EmberAfStatus SetScheduleMode(chip::EndpointId endpoint, uint8_t scheduleMode);
 } // namespace Attributes
@@ -364,10 +364,10 @@ EmberAfStatus GetHardwareVersion(chip::EndpointId endpoint, uint16_t * hardwareV
 EmberAfStatus SetHardwareVersion(chip::EndpointId endpoint, uint16_t hardwareVersion);
 EmberAfStatus GetSoftwareVersion(chip::EndpointId endpoint, uint32_t * softwareVersion); // int32u
 EmberAfStatus SetSoftwareVersion(chip::EndpointId endpoint, uint32_t softwareVersion);
-EmberAfStatus GetLocalConfigDisabled(chip::EndpointId endpoint, uint8_t * localConfigDisabled); // boolean
-EmberAfStatus SetLocalConfigDisabled(chip::EndpointId endpoint, uint8_t localConfigDisabled);
-EmberAfStatus GetReachable(chip::EndpointId endpoint, uint8_t * reachable); // boolean
-EmberAfStatus SetReachable(chip::EndpointId endpoint, uint8_t reachable);
+EmberAfStatus GetLocalConfigDisabled(chip::EndpointId endpoint, bool * localConfigDisabled); // boolean
+EmberAfStatus SetLocalConfigDisabled(chip::EndpointId endpoint, bool localConfigDisabled);
+EmberAfStatus GetReachable(chip::EndpointId endpoint, bool * reachable); // boolean
+EmberAfStatus SetReachable(chip::EndpointId endpoint, bool reachable);
 } // namespace Attributes
 } // namespace Basic
 
@@ -553,8 +553,8 @@ namespace EthernetNetworkDiagnostics {
 namespace Attributes {
 EmberAfStatus GetPHYRate(chip::EndpointId endpoint, uint8_t * pHYRate); // enum8
 EmberAfStatus SetPHYRate(chip::EndpointId endpoint, uint8_t pHYRate);
-EmberAfStatus GetFullDuplex(chip::EndpointId endpoint, uint8_t * fullDuplex); // boolean
-EmberAfStatus SetFullDuplex(chip::EndpointId endpoint, uint8_t fullDuplex);
+EmberAfStatus GetFullDuplex(chip::EndpointId endpoint, bool * fullDuplex); // boolean
+EmberAfStatus SetFullDuplex(chip::EndpointId endpoint, bool fullDuplex);
 EmberAfStatus GetPacketRxCount(chip::EndpointId endpoint, uint64_t * packetRxCount); // int64u
 EmberAfStatus SetPacketRxCount(chip::EndpointId endpoint, uint64_t packetRxCount);
 EmberAfStatus GetPacketTxCount(chip::EndpointId endpoint, uint64_t * packetTxCount); // int64u
@@ -565,8 +565,8 @@ EmberAfStatus GetCollisionCount(chip::EndpointId endpoint, uint64_t * collisionC
 EmberAfStatus SetCollisionCount(chip::EndpointId endpoint, uint64_t collisionCount);
 EmberAfStatus GetOverrunCount(chip::EndpointId endpoint, uint64_t * overrunCount); // int64u
 EmberAfStatus SetOverrunCount(chip::EndpointId endpoint, uint64_t overrunCount);
-EmberAfStatus GetCarrierDetect(chip::EndpointId endpoint, uint8_t * carrierDetect); // boolean
-EmberAfStatus SetCarrierDetect(chip::EndpointId endpoint, uint8_t carrierDetect);
+EmberAfStatus GetCarrierDetect(chip::EndpointId endpoint, bool * carrierDetect); // boolean
+EmberAfStatus SetCarrierDetect(chip::EndpointId endpoint, bool carrierDetect);
 EmberAfStatus GetTimeSinceReset(chip::EndpointId endpoint, uint64_t * timeSinceReset); // int64u
 EmberAfStatus SetTimeSinceReset(chip::EndpointId endpoint, uint64_t timeSinceReset);
 } // namespace Attributes
@@ -580,8 +580,8 @@ EmberAfStatus GetHardwareVersion(chip::EndpointId endpoint, uint16_t * hardwareV
 EmberAfStatus SetHardwareVersion(chip::EndpointId endpoint, uint16_t hardwareVersion);
 EmberAfStatus GetSoftwareVersion(chip::EndpointId endpoint, uint32_t * softwareVersion); // int32u
 EmberAfStatus SetSoftwareVersion(chip::EndpointId endpoint, uint32_t softwareVersion);
-EmberAfStatus GetReachable(chip::EndpointId endpoint, uint8_t * reachable); // boolean
-EmberAfStatus SetReachable(chip::EndpointId endpoint, uint8_t reachable);
+EmberAfStatus GetReachable(chip::EndpointId endpoint, bool * reachable); // boolean
+EmberAfStatus SetReachable(chip::EndpointId endpoint, bool reachable);
 } // namespace Attributes
 } // namespace BridgedDeviceBasic
 
@@ -631,8 +631,8 @@ EmberAfStatus GetLockState(chip::EndpointId endpoint, uint8_t * lockState); // e
 EmberAfStatus SetLockState(chip::EndpointId endpoint, uint8_t lockState);
 EmberAfStatus GetLockType(chip::EndpointId endpoint, uint8_t * lockType); // enum8
 EmberAfStatus SetLockType(chip::EndpointId endpoint, uint8_t lockType);
-EmberAfStatus GetActuatorEnabled(chip::EndpointId endpoint, uint8_t * actuatorEnabled); // boolean
-EmberAfStatus SetActuatorEnabled(chip::EndpointId endpoint, uint8_t actuatorEnabled);
+EmberAfStatus GetActuatorEnabled(chip::EndpointId endpoint, bool * actuatorEnabled); // boolean
+EmberAfStatus SetActuatorEnabled(chip::EndpointId endpoint, bool actuatorEnabled);
 EmberAfStatus GetDoorState(chip::EndpointId endpoint, uint8_t * doorState); // enum8
 EmberAfStatus SetDoorState(chip::EndpointId endpoint, uint8_t doorState);
 EmberAfStatus GetDoorOpenEvents(chip::EndpointId endpoint, uint32_t * doorOpenEvents); // int32u
@@ -666,8 +666,8 @@ EmberAfStatus GetMaxRfidCodeLength(chip::EndpointId endpoint, uint8_t * maxRfidC
 EmberAfStatus SetMaxRfidCodeLength(chip::EndpointId endpoint, uint8_t maxRfidCodeLength);
 EmberAfStatus GetMinRfidCodeLength(chip::EndpointId endpoint, uint8_t * minRfidCodeLength); // int8u
 EmberAfStatus SetMinRfidCodeLength(chip::EndpointId endpoint, uint8_t minRfidCodeLength);
-EmberAfStatus GetEnableLogging(chip::EndpointId endpoint, uint8_t * enableLogging); // boolean
-EmberAfStatus SetEnableLogging(chip::EndpointId endpoint, uint8_t enableLogging);
+EmberAfStatus GetEnableLogging(chip::EndpointId endpoint, bool * enableLogging); // boolean
+EmberAfStatus SetEnableLogging(chip::EndpointId endpoint, bool enableLogging);
 EmberAfStatus GetLedSettings(chip::EndpointId endpoint, uint8_t * ledSettings); // int8u
 EmberAfStatus SetLedSettings(chip::EndpointId endpoint, uint8_t ledSettings);
 EmberAfStatus GetAutoRelockTime(chip::EndpointId endpoint, uint32_t * autoRelockTime); // int32u
@@ -680,22 +680,22 @@ EmberAfStatus GetSupportedOperatingModes(chip::EndpointId endpoint, uint16_t * s
 EmberAfStatus SetSupportedOperatingModes(chip::EndpointId endpoint, uint16_t supportedOperatingModes);
 EmberAfStatus GetDefaultConfigurationRegister(chip::EndpointId endpoint, uint16_t * defaultConfigurationRegister); // bitmap16
 EmberAfStatus SetDefaultConfigurationRegister(chip::EndpointId endpoint, uint16_t defaultConfigurationRegister);
-EmberAfStatus GetEnableLocalProgramming(chip::EndpointId endpoint, uint8_t * enableLocalProgramming); // boolean
-EmberAfStatus SetEnableLocalProgramming(chip::EndpointId endpoint, uint8_t enableLocalProgramming);
-EmberAfStatus GetEnableOneTouchLocking(chip::EndpointId endpoint, uint8_t * enableOneTouchLocking); // boolean
-EmberAfStatus SetEnableOneTouchLocking(chip::EndpointId endpoint, uint8_t enableOneTouchLocking);
-EmberAfStatus GetEnableInsideStatusLed(chip::EndpointId endpoint, uint8_t * enableInsideStatusLed); // boolean
-EmberAfStatus SetEnableInsideStatusLed(chip::EndpointId endpoint, uint8_t enableInsideStatusLed);
-EmberAfStatus GetEnablePrivacyModeButton(chip::EndpointId endpoint, uint8_t * enablePrivacyModeButton); // boolean
-EmberAfStatus SetEnablePrivacyModeButton(chip::EndpointId endpoint, uint8_t enablePrivacyModeButton);
+EmberAfStatus GetEnableLocalProgramming(chip::EndpointId endpoint, bool * enableLocalProgramming); // boolean
+EmberAfStatus SetEnableLocalProgramming(chip::EndpointId endpoint, bool enableLocalProgramming);
+EmberAfStatus GetEnableOneTouchLocking(chip::EndpointId endpoint, bool * enableOneTouchLocking); // boolean
+EmberAfStatus SetEnableOneTouchLocking(chip::EndpointId endpoint, bool enableOneTouchLocking);
+EmberAfStatus GetEnableInsideStatusLed(chip::EndpointId endpoint, bool * enableInsideStatusLed); // boolean
+EmberAfStatus SetEnableInsideStatusLed(chip::EndpointId endpoint, bool enableInsideStatusLed);
+EmberAfStatus GetEnablePrivacyModeButton(chip::EndpointId endpoint, bool * enablePrivacyModeButton); // boolean
+EmberAfStatus SetEnablePrivacyModeButton(chip::EndpointId endpoint, bool enablePrivacyModeButton);
 EmberAfStatus GetWrongCodeEntryLimit(chip::EndpointId endpoint, uint8_t * wrongCodeEntryLimit); // int8u
 EmberAfStatus SetWrongCodeEntryLimit(chip::EndpointId endpoint, uint8_t wrongCodeEntryLimit);
 EmberAfStatus GetUserCodeTemporaryDisableTime(chip::EndpointId endpoint, uint8_t * userCodeTemporaryDisableTime); // int8u
 EmberAfStatus SetUserCodeTemporaryDisableTime(chip::EndpointId endpoint, uint8_t userCodeTemporaryDisableTime);
-EmberAfStatus GetSendPinOverTheAir(chip::EndpointId endpoint, uint8_t * sendPinOverTheAir); // boolean
-EmberAfStatus SetSendPinOverTheAir(chip::EndpointId endpoint, uint8_t sendPinOverTheAir);
-EmberAfStatus GetRequirePinForRfOperation(chip::EndpointId endpoint, uint8_t * requirePinForRfOperation); // boolean
-EmberAfStatus SetRequirePinForRfOperation(chip::EndpointId endpoint, uint8_t requirePinForRfOperation);
+EmberAfStatus GetSendPinOverTheAir(chip::EndpointId endpoint, bool * sendPinOverTheAir); // boolean
+EmberAfStatus SetSendPinOverTheAir(chip::EndpointId endpoint, bool sendPinOverTheAir);
+EmberAfStatus GetRequirePinForRfOperation(chip::EndpointId endpoint, bool * requirePinForRfOperation); // boolean
+EmberAfStatus SetRequirePinForRfOperation(chip::EndpointId endpoint, bool requirePinForRfOperation);
 EmberAfStatus GetZigbeeSecurityLevel(chip::EndpointId endpoint, uint8_t * zigbeeSecurityLevel); // enum8
 EmberAfStatus SetZigbeeSecurityLevel(chip::EndpointId endpoint, uint8_t zigbeeSecurityLevel);
 EmberAfStatus GetAlarmMask(chip::EndpointId endpoint, uint16_t * alarmMask); // bitmap16
@@ -1830,8 +1830,8 @@ EmberAfStatus SetApplicationStatus(chip::EndpointId endpoint, uint8_t applicatio
 
 namespace TestCluster {
 namespace Attributes {
-EmberAfStatus GetBoolean(chip::EndpointId endpoint, uint8_t * boolean); // boolean
-EmberAfStatus SetBoolean(chip::EndpointId endpoint, uint8_t boolean);
+EmberAfStatus GetBoolean(chip::EndpointId endpoint, bool * boolean); // boolean
+EmberAfStatus SetBoolean(chip::EndpointId endpoint, bool boolean);
 EmberAfStatus GetBitmap8(chip::EndpointId endpoint, uint8_t * bitmap8); // bitmap8
 EmberAfStatus SetBitmap8(chip::EndpointId endpoint, uint8_t bitmap8);
 EmberAfStatus GetBitmap16(chip::EndpointId endpoint, uint16_t * bitmap16); // bitmap16
@@ -1860,8 +1860,8 @@ EmberAfStatus GetEnum8(chip::EndpointId endpoint, uint8_t * enum8); // enum8
 EmberAfStatus SetEnum8(chip::EndpointId endpoint, uint8_t enum8);
 EmberAfStatus GetEnum16(chip::EndpointId endpoint, uint16_t * enum16); // enum16
 EmberAfStatus SetEnum16(chip::EndpointId endpoint, uint16_t enum16);
-EmberAfStatus GetUnsupported(chip::EndpointId endpoint, uint8_t * unsupported); // boolean
-EmberAfStatus SetUnsupported(chip::EndpointId endpoint, uint8_t unsupported);
+EmberAfStatus GetUnsupported(chip::EndpointId endpoint, bool * unsupported); // boolean
+EmberAfStatus SetUnsupported(chip::EndpointId endpoint, bool unsupported);
 } // namespace Attributes
 } // namespace TestCluster
 

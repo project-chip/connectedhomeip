@@ -91,6 +91,15 @@ inline void CopyString(char * dest, size_t destLength, ByteSpan source)
 }
 
 /**
+ * Convenience method for CopyString to auto-detect destination size.
+ */
+template <size_t N>
+inline void CopyString(char (&dest)[N], ByteSpan source)
+{
+    CopyString(dest, N, source);
+}
+
+/**
  * This function copies a C-style string to memory newly allocated by Platform::MemoryAlloc().
  *
  * @param[in]  string           String to be copied.

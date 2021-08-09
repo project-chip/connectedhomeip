@@ -145,6 +145,8 @@ function asPutLength(zclType)
 {
   const type = ChipTypesHelper.asBasicType(zclType);
   switch (type) {
+  case 'bool':
+    return '8';
   case 'int8_t':
   case 'int16_t':
   case 'int32_t':
@@ -163,6 +165,8 @@ function asPutCastType(zclType)
 {
   const type = ChipTypesHelper.asBasicType(zclType);
   switch (type) {
+  case 'bool':
+    return 'uint8_t';
   case 'int8_t':
   case 'int16_t':
   case 'int32_t':
@@ -180,8 +184,12 @@ function asPutCastType(zclType)
 
 function asChipCallback(item)
 {
-  if (StringHelper.isString(item.type)) {
-    return { name : 'String', type : 'const chip::ByteSpan' };
+  if (StringHelper.isOctetString(item.type)) {
+    return { name : 'OctetString', type : 'const chip::ByteSpan' };
+  }
+
+  if (StringHelper.isCharString(item.type)) {
+    return { name : 'CharString', type : 'const chip::ByteSpan' };
   }
 
   if (ListHelper.isList(item.type)) {

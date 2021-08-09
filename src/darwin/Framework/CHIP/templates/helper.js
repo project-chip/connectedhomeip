@@ -78,6 +78,8 @@ function asObjectiveCNumberType(label, type, asLowerCased)
         .then(zclType => {
           const basicType = ChipTypesHelper.asBasicType(zclType);
           switch (basicType) {
+          case 'bool':
+            return 'Bool';
           case 'uint8_t':
             return 'UnsignedChar';
           case 'uint16_t':

@@ -104,7 +104,7 @@ static void sendResponse(const char * responseName, ContentLaunchResponse launch
 }
 
 bool emberAfContentLauncherClusterLaunchContentCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
-                                                        unsigned char autoplay, unsigned char * data)
+                                                        bool autoplay, unsigned char * data)
 {
 
     string dataString(reinterpret_cast<char *>(data));

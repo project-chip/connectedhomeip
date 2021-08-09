@@ -36,6 +36,7 @@ constexpr char kOperationalProtocol[]          = "_tcp";
 constexpr char kCommissionProtocol[]           = "_udp";
 constexpr char kLocalDomain[]                  = "local";
 constexpr size_t kOperationalServiceNamePrefix = 16 + 1 + 16; // 2 * 64-bit value in HEX + hyphen
+constexpr size_t kCommissionServiceNamePrefix  = 16;
 
 // each includes space for a null terminator, which becomes a . when the names are appended.
 constexpr size_t kMaxCommisisonableServiceNameSize =
@@ -52,7 +53,10 @@ constexpr size_t kMaxOperationalServiceNameSize =
 /// builds the MDNS advertising name for a given fabric + nodeid pair
 CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peerId);
 
-/// Inverse of MakeInstanceName
+/// Inverse of MakeInstanceName.  Will return errors on non-spec-compliant ids,
+/// _except_ for allowing lowercase hex, not just the spec-defined uppercase
+/// hex.  The part of "name" up to the first '.' (or end of string, whichever
+/// comes first) is parsed as a FABRICID-NODEID.
 CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId);
 
 /// Generates the host name that a CHIP device is to use for a given unique

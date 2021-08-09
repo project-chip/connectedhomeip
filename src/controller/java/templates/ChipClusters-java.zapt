@@ -96,7 +96,6 @@ public class ChipClusters {
     public interface {{asCamelCased name false}}Callback {
       void onSuccess(
 {{#chip_cluster_response_arguments}}
-{{#unless (isStrEqual label "status")}}
 {{#if isArray}}
       // {{asSymbol label}}: {{asUnderlyingZclType type}}
       // Conversion from this type to Java is not properly implemented yet
@@ -107,7 +106,6 @@ public class ChipClusters {
 {{else}}
       {{omitCommaForFirstNonStatusCommand parent.id index}}{{asJavaBasicTypeForZclType type false}} {{asSymbol label}}
 {{/if}}
-{{/unless}}
 {{/chip_cluster_response_arguments}}
       );
       

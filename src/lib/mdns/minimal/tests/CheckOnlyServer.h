@@ -27,6 +27,8 @@
 #include <mdns/minimal/Server.h>
 #include <mdns/minimal/records/Ptr.h>
 #include <mdns/minimal/records/Srv.h>
+#include <mdns/minimal/records/Txt.h>
+#include <support/CHIPMemString.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemMutex.h>
 
@@ -36,21 +38,53 @@ namespace mdns {
 namespace Minimal {
 namespace test {
 
-class CheckOnlyServer : public ServerBase, public ParserDelegate
+constexpr QNamePart kIgnoreQNameParts[] = { "IGNORE", "THIS" };
+namespace {
+bool StringMatches(const BytesRange & br, const char * str)
+{
+    return br.Size() == strlen(str) && memcmp(str, br.Start(), br.Size()) == 0;
+}
+
+template <size_t N>
+void MakePrintableName(char (&location)[N], SerializedQNameIterator name)
+{
+    auto buf = chip::Encoding::BigEndian::BufferWriter(reinterpret_cast<uint8_t *>(&location[0]), N);
+    while (name.Next())
+    {
+        buf.Put(name.Value());
+        buf.Put(".");
+    }
+    buf.Put('\0');
+}
+
+template <size_t N>
+void MakePrintableName(char (&location)[N], FullQName name)
+{
+    auto buf = chip::Encoding::BigEndian::BufferWriter(reinterpret_cast<uint8_t *>(&location[0]), N);
+    for (size_t i = 0; i < name.nameCount; ++i)
+    {
+        buf.Put(name.names[i]);
+        buf.Put(".");
+    }
+    buf.Put('\0');
+}
+
+} // namespace
+
+class CheckOnlyServer : public ServerBase, public ParserDelegate, public TxtRecordDelegate
 {
 public:
     CheckOnlyServer(nlTestSuite * inSuite) : ServerBase(nullptr, 0), mInSuite(inSuite) { Reset(); }
     CheckOnlyServer() : ServerBase(nullptr, 0), mInSuite(nullptr) { Reset(); }
     ~CheckOnlyServer() {}
 
+    // Parser delegates
     void OnHeader(ConstHeaderRef & header) override
     {
-        if (mInSuite != nullptr)
-        {
-            NL_TEST_ASSERT(mInSuite, header.GetFlags().IsResponse());
-            NL_TEST_ASSERT(mInSuite, header.GetFlags().IsValidMdns());
-            mTotalRecords += header.GetAnswerCount() + header.GetAdditionalCount();
-        }
+        NL_TEST_ASSERT(mInSuite, header.GetFlags().IsResponse());
+        NL_TEST_ASSERT(mInSuite, header.GetFlags().IsValidMdns());
+        mTotalRecords += header.GetAnswerCount() + header.GetAdditionalCount();
+
         if (!header.GetFlags().IsTruncated())
         {
             NL_TEST_ASSERT(mInSuite, mTotalRecords == GetNumExpectedRecords());
@@ -60,61 +94,127 @@ public:
 
     void OnResource(ResourceType type, const ResourceData & data) override
     {
-        bool recordIsExpected = false;
-        for (size_t i = 0; i < kMaxExpectedRecords; ++i)
+        SerializedQNameIterator target;
+        switch (data.GetType())
         {
-            if (mExpectedRecord[i] == nullptr || mFoundRecord[i] == true)
+        case QType::PTR:
+            ParsePtrRecord(data.GetData(), data.GetData(), &target);
+            break;
+        case QType::SRV: {
+            SrvRecord srv;
+            bool srvParseOk = srv.Parse(data.GetData(), data.GetData());
+            NL_TEST_ASSERT(mInSuite, srvParseOk);
+            if (!srvParseOk)
+            {
+                return;
+            }
+            target = srv.GetName();
+            break;
+        }
+        default:
+            break;
+        }
+
+        bool recordIsExpected = false;
+        for (auto & info : mExpectedRecordInfo)
+        {
+            if (info.record == nullptr || info.found)
             {
                 continue;
             }
-            // For now, types and names are sufficient for checking that the response sender is sending out the correct records.
-            if (data.GetType() == mExpectedRecord[i]->GetType() && data.GetName() == mExpectedRecord[i]->GetName())
+
+            if (data.GetType() == info.record->GetType() &&
+                (info.record->GetName() == kIgnoreQname || data.GetName() == info.record->GetName()) &&
+                (info.target == kIgnoreQname || target == info.target))
             {
-                if (data.GetType() == QType::PTR)
+                if (data.GetType() == QType::TXT)
                 {
-                    // Check that the internal values are the same
-                    SerializedQNameIterator dataTarget;
-                    ParsePtrRecord(data.GetData(), data.GetData(), &dataTarget);
-                    const PtrResourceRecord * expectedPtr = static_cast<const PtrResourceRecord *>(mExpectedRecord[i]);
-                    if (dataTarget == expectedPtr->GetPtr())
+                    // First parse out the expected record to see what keys/values we have.
+                    ClearTxtRecords();
+                    const TxtResourceRecord * expectedTxt = static_cast<const TxtResourceRecord *>(info.record);
+                    for (size_t t = 0; t < expectedTxt->GetNumEntries(); ++t)
                     {
-                        mFoundRecord[i]  = true;
-                        recordIsExpected = true;
-                        break;
+                        bool ok = AddExpectedTxtRecord(expectedTxt->GetEntries()[t]);
+                        NL_TEST_ASSERT(mInSuite, ok);
                     }
-                }
-                else if (data.GetType() == QType::SRV)
-                {
-                    SrvRecord srv;
-                    bool srvParseOk = srv.Parse(data.GetData(), data.GetData());
-                    if (mInSuite != nullptr)
+                    ParseTxtRecord(data.GetData(), this);
+                    if (CheckTxtRecordMatches())
                     {
-                        NL_TEST_ASSERT(mInSuite, srvParseOk == true);
-                    }
-                    const SrvResourceRecord * expectedSrv = static_cast<const SrvResourceRecord *>(mExpectedRecord[i]);
-                    if (srvParseOk && srv.GetName() == expectedSrv->GetServerName() && srv.GetPort() == expectedSrv->GetPort())
-                    {
-                        mFoundRecord[i]  = true;
+                        info.found       = true;
                         recordIsExpected = true;
                         break;
                     }
                 }
                 else
                 {
-                    mFoundRecord[i]  = true;
+                    info.found       = true;
                     recordIsExpected = true;
                     break;
                 }
             }
         }
-        if (mInSuite != nullptr)
+        NL_TEST_ASSERT(mInSuite, recordIsExpected);
+        if (!recordIsExpected)
         {
-            NL_TEST_ASSERT(mInSuite, recordIsExpected);
+            char nameStr[64];
+            char targetStr[64];
+            SerializedQNameIterator dataTarget;
+            SerializedQNameIterator it = data.GetName();
+            MakePrintableName(nameStr, it);
+            switch (data.GetType())
+            {
+            case QType::PTR:
+                ParsePtrRecord(data.GetData(), data.GetData(), &dataTarget);
+                break;
+            case QType::SRV: {
+                SrvRecord srv;
+                if (srv.Parse(data.GetData(), data.GetData()))
+                {
+                    dataTarget = srv.GetName();
+                }
+                break;
+            }
+            default:
+                break;
+            }
+            MakePrintableName(targetStr, dataTarget);
+            ChipLogError(Discovery, "Received unexpected record of type %u: %s %s", static_cast<uint16_t>(data.GetType()), nameStr,
+                         targetStr);
         }
     }
 
     void OnQuery(const QueryData & data) override {}
 
+    // TxtRecordDelegate
+    void OnRecord(const BytesRange & name, const BytesRange & value) override
+    {
+        for (size_t i = 0; i < mNumExpectedTxtRecords; ++i)
+        {
+            if (StringMatches(name, mExpectedTxt[i].key) && StringMatches(value, mExpectedTxt[i].val))
+            {
+                mExpectedTxt[i].found = true;
+                break;
+            }
+        }
+        mNumReceivedTxtRecords++;
+    }
+    bool CheckTxtRecordMatches()
+    {
+        if (mNumReceivedTxtRecords != mNumExpectedTxtRecords)
+        {
+            return false;
+        }
+        for (size_t i = 0; i < mNumExpectedTxtRecords; ++i)
+        {
+            if (!mExpectedTxt[i].found)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // ServerBase overrides
     CHIP_ERROR
     DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                chip::Inet::InterfaceId interface) override
@@ -128,48 +228,92 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void AddExpectedRecord(ResourceRecord * record)
+    // Functions used for controlling testing.
+    void AddExpectedRecord(PtrResourceRecord * ptr)
     {
-        for (size_t i = 0; i < kMaxExpectedRecords; ++i)
+        RecordInfo * info = AddExpectedRecordBase(ptr);
+        if (info == nullptr)
         {
-            if (mExpectedRecord[i] == nullptr)
-            {
-                mExpectedRecord[i] = record;
-                mFoundRecord[i]    = false;
-                return;
-            }
+            return;
         }
+        info->target = ptr->GetPtr();
+    }
+    void AddExpectedRecord(SrvResourceRecord * srv)
+    {
+        RecordInfo * info = AddExpectedRecordBase(srv);
+        NL_TEST_ASSERT(mInSuite, info != nullptr);
+        if (info == nullptr)
+        {
+            return;
+        }
+        info->target = srv->GetServerName();
+    }
+    void AddExpectedRecord(TxtResourceRecord * txt)
+    {
+        RecordInfo * info = AddExpectedRecordBase(txt);
+        NL_TEST_ASSERT(mInSuite, info != nullptr);
+        if (info == nullptr)
+        {
+            return;
+        }
+        info->target = kIgnoreQname;
     }
     bool GetSendCalled() { return mSendCalled; }
     bool GetHeaderFound() { return mHeaderFound; }
     void SetTestSuite(nlTestSuite * suite) { mInSuite = suite; }
     void Reset()
     {
-        for (size_t i = 0; i < kMaxExpectedRecords; ++i)
+        for (auto & info : mExpectedRecordInfo)
         {
-            mExpectedRecord[i] = nullptr;
-            mFoundRecord[i]    = false;
+            info.record = nullptr;
+            info.found  = false;
         }
         mHeaderFound  = false;
         mSendCalled   = false;
         mTotalRecords = 0;
+        ClearTxtRecords();
     }
 
 private:
     nlTestSuite * mInSuite;
-    static constexpr size_t kMaxExpectedRecords           = 10;
-    ResourceRecord * mExpectedRecord[kMaxExpectedRecords] = {};
-    bool mFoundRecord[kMaxExpectedRecords];
-    bool mHeaderFound = false;
-    bool mSendCalled  = false;
-    int mTotalRecords = 0;
+    static constexpr size_t kMaxExpectedRecords = 10;
+    struct RecordInfo
+    {
+        ResourceRecord * record;
+        bool found = false;
+        FullQName target;
+    };
+    RecordInfo mExpectedRecordInfo[kMaxExpectedRecords];
+    struct KV
+    {
+        static constexpr size_t kMaxKey = 10;
+        static constexpr size_t kMaxVal = 128; // max pairing instruction len + 1
+        char key[kMaxKey + 1]           = "";
+        char val[kMaxVal + 1]           = "";
+        bool found                      = false;
+        bool operator==(const KV & rhs) const { return strcmp(key, rhs.key) == 0 && strcmp(val, rhs.val) == 0; }
+        void Clear()
+        {
+            memset(key, 0, sizeof(key));
+            memset(val, 0, sizeof(val));
+            found = false;
+        }
+    };
+    static constexpr size_t kMaxExpectedTxt = 10;
+    KV mExpectedTxt[kMaxExpectedTxt];
+    size_t mNumExpectedTxtRecords = 0;
+    size_t mNumReceivedTxtRecords = 0;
+    bool mHeaderFound             = false;
+    bool mSendCalled              = false;
+    int mTotalRecords             = 0;
+    FullQName kIgnoreQname        = FullQName(kIgnoreQNameParts);
 
-    int GetNumExpectedRecords()
+    int GetNumExpectedRecords() const
     {
         int num = 0;
-        for (size_t i = 0; i < kMaxExpectedRecords; ++i)
+        for (auto & info : mExpectedRecordInfo)
         {
-            if (mExpectedRecord[i] != nullptr)
+            if (info.record != nullptr)
             {
                 ++num;
             }
@@ -182,13 +326,64 @@ private:
         {
             return;
         }
-        for (size_t i = 0; i < kMaxExpectedRecords; ++i)
+        for (auto & info : mExpectedRecordInfo)
         {
-            if (mExpectedRecord[i] != nullptr)
+            if (info.record == nullptr)
             {
-                NL_TEST_ASSERT(mInSuite, mFoundRecord[i] == true);
+                continue;
+            }
+            NL_TEST_ASSERT(mInSuite, info.found == true);
+            if (!info.found)
+            {
+                char name[64];
+                char target[64];
+                MakePrintableName(name, info.record->GetName());
+                MakePrintableName(target, info.target);
+                ChipLogError(Discovery, "Did not receive expected record of type %u : %s %s",
+                             static_cast<uint16_t>(info.record->GetType()), name, target);
             }
         }
+    }
+    void ClearTxtRecords()
+    {
+        for (auto & kv : mExpectedTxt)
+        {
+            kv.Clear();
+        }
+        mNumExpectedTxtRecords = 0;
+        mNumReceivedTxtRecords = 0;
+    }
+    bool AddExpectedTxtRecord(const char * const entry)
+    {
+        if (mNumExpectedTxtRecords == kMaxExpectedTxt)
+        {
+            return false;
+        }
+        size_t lenKey      = strlen(entry);
+        const char * equal = strchr(entry, '=');
+        if (equal != nullptr)
+        {
+            chip::Platform::CopyString(mExpectedTxt[mNumExpectedTxtRecords].val, (equal + 1));
+            lenKey = static_cast<size_t>(equal - entry);
+        }
+        chip::ByteSpan key = chip::ByteSpan(reinterpret_cast<const uint8_t *>(entry), lenKey);
+        chip::Platform::CopyString(mExpectedTxt[mNumExpectedTxtRecords++].key, key);
+
+        return true;
+    }
+
+    RecordInfo * AddExpectedRecordBase(ResourceRecord * record)
+    {
+        for (auto & info : mExpectedRecordInfo)
+        {
+            if (info.record == nullptr)
+            {
+                info.record = record;
+                info.found  = false;
+                return &info;
+            }
+        }
+        return nullptr;
     }
 };
 

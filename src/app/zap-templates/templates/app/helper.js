@@ -89,6 +89,8 @@ function asReadType(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return 'Int8u';
       case 'int8_t':
         return 'Int8s';
       case 'uint8_t':
@@ -252,6 +254,8 @@ function asPrintFormat(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return '%d';
       case 'int8_t':
         return '%" PRId8 "';
       case 'uint8_t':

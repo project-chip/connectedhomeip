@@ -59,6 +59,7 @@ enum ArgumentType
     Number_int32,
     Number_int64,
     CharString,
+    Boolean,
     OctetString,
     Attribute,
     Address
@@ -131,6 +132,10 @@ public:
      */
     size_t AddArgument(const char * name, chip::ByteSpan * value);
     size_t AddArgument(const char * name, AddressWithInterface * out);
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, bool * out)
+    {
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Boolean);
+    }
     size_t AddArgument(const char * name, int64_t min, uint64_t max, int8_t * out)
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int8);

@@ -19,6 +19,24 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
+
+  # Link options that provide a replacement for dynamic memory operations in standard
+  # library with the FreeRTOS malloc in platform code.
+  ldflags = [
+    # memory allocation -- these must be re-entrant and do locking
+    "-Wl,--wrap=malloc",
+    "-Wl,--wrap=free",
+    "-Wl,--wrap=realloc",
+    "-Wl,--wrap=calloc",
+    "-Wl,--wrap=MemoryAlloc",
+
+    # Wrap these in case internal newlib call them (e.g. strdup will)
+    # directly call _malloc_r)
+    "-Wl,--wrap=_malloc_r",
+    "-Wl,--wrap=_realloc_r",
+    "-Wl,--wrap=_free_r",
+    "-Wl,--wrap=_calloc_r",
+  ]
 }
 
 source_set("openthread_core_config_efr32_chip_examples") {

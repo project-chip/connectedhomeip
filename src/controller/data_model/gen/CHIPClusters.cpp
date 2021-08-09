@@ -407,7 +407,7 @@ CHIP_ERROR ApplicationBasicCluster::ReadAttributeVendorName(Callback::Cancelable
     attributePath.mFieldId    = 0x00000000;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR ApplicationBasicCluster::ReadAttributeVendorId(Callback::Cancelable * onSuccessCallback,
@@ -431,7 +431,7 @@ CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationName(Callback::Cance
     attributePath.mFieldId    = 0x00000002;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR ApplicationBasicCluster::ReadAttributeProductId(Callback::Cancelable * onSuccessCallback,
@@ -455,7 +455,7 @@ CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationId(Callback::Cancela
     attributePath.mFieldId    = 0x00000005;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR ApplicationBasicCluster::ReadAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback,
@@ -945,7 +945,7 @@ CHIP_ERROR BasicCluster::ReadAttributeVendorName(Callback::Cancelable * onSucces
     attributePath.mFieldId    = 0x00000001;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeVendorID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -968,7 +968,7 @@ CHIP_ERROR BasicCluster::ReadAttributeProductName(Callback::Cancelable * onSucce
     attributePath.mFieldId    = 0x00000003;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeProductID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -990,7 +990,7 @@ CHIP_ERROR BasicCluster::ReadAttributeUserLabel(Callback::Cancelable * onSuccess
     attributePath.mFieldId    = 0x00000005;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1022,7 +1022,7 @@ CHIP_ERROR BasicCluster::ReadAttributeLocation(Callback::Cancelable * onSuccessC
     attributePath.mFieldId    = 0x00000006;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::WriteAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1067,7 +1067,7 @@ CHIP_ERROR BasicCluster::ReadAttributeHardwareVersionString(Callback::Cancelable
     attributePath.mFieldId    = 0x00000008;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback,
@@ -1091,7 +1091,7 @@ CHIP_ERROR BasicCluster::ReadAttributeSoftwareVersionString(Callback::Cancelable
     attributePath.mFieldId    = 0x0000000A;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback,
@@ -1103,7 +1103,7 @@ CHIP_ERROR BasicCluster::ReadAttributeManufacturingDate(Callback::Cancelable * o
     attributePath.mFieldId    = 0x0000000B;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributePartNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -1114,7 +1114,7 @@ CHIP_ERROR BasicCluster::ReadAttributePartNumber(Callback::Cancelable * onSucces
     attributePath.mFieldId    = 0x0000000C;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeProductURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -1125,7 +1125,7 @@ CHIP_ERROR BasicCluster::ReadAttributeProductURL(Callback::Cancelable * onSucces
     attributePath.mFieldId    = 0x0000000D;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeProductLabel(Callback::Cancelable * onSuccessCallback,
@@ -1137,7 +1137,7 @@ CHIP_ERROR BasicCluster::ReadAttributeProductLabel(Callback::Cancelable * onSucc
     attributePath.mFieldId    = 0x0000000E;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeSerialNumber(Callback::Cancelable * onSuccessCallback,
@@ -1149,7 +1149,7 @@ CHIP_ERROR BasicCluster::ReadAttributeSerialNumber(Callback::Cancelable * onSucc
     attributePath.mFieldId    = 0x0000000F;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback,
@@ -1165,7 +1165,7 @@ CHIP_ERROR BasicCluster::ReadAttributeLocalConfigDisabled(Callback::Cancelable *
 }
 
 CHIP_ERROR BasicCluster::WriteAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint8_t localConfigDisabled)
+                                                           Callback::Cancelable * onFailureCallback, bool localConfigDisabled)
 {
     COMMAND_HEADER("WriteBasicLocalConfigDisabled", Basic::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -1223,7 +1223,7 @@ CHIP_ERROR BinaryInputBasicCluster::ReadAttributeOutOfService(Callback::Cancelab
 }
 
 CHIP_ERROR BinaryInputBasicCluster::WriteAttributeOutOfService(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint8_t outOfService)
+                                                               Callback::Cancelable * onFailureCallback, bool outOfService)
 {
     COMMAND_HEADER("WriteBinaryInputBasicOutOfService", BinaryInputBasic::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -1248,7 +1248,7 @@ CHIP_ERROR BinaryInputBasicCluster::ReadAttributePresentValue(Callback::Cancelab
 }
 
 CHIP_ERROR BinaryInputBasicCluster::WriteAttributePresentValue(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint8_t presentValue)
+                                                               Callback::Cancelable * onFailureCallback, bool presentValue)
 {
     COMMAND_HEADER("WriteBinaryInputBasicPresentValue", BinaryInputBasic::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -1461,7 +1461,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeVendorName(Callback::Cancelab
     attributePath.mFieldId    = 0x00000001;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeVendorID(Callback::Cancelable * onSuccessCallback,
@@ -1485,7 +1485,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeProductName(Callback::Cancela
     attributePath.mFieldId    = 0x00000003;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeUserLabel(Callback::Cancelable * onSuccessCallback,
@@ -1497,7 +1497,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeUserLabel(Callback::Cancelabl
     attributePath.mFieldId    = 0x00000005;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BridgedDeviceBasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback,
@@ -1542,7 +1542,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeHardwareVersionString(Callbac
     attributePath.mFieldId    = 0x00000008;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback,
@@ -1566,7 +1566,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeSoftwareVersionString(Callbac
     attributePath.mFieldId    = 0x0000000A;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback,
@@ -1578,7 +1578,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeManufacturingDate(Callback::C
     attributePath.mFieldId    = 0x0000000B;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributePartNumber(Callback::Cancelable * onSuccessCallback,
@@ -1590,7 +1590,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributePartNumber(Callback::Cancelab
     attributePath.mFieldId    = 0x0000000C;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeProductURL(Callback::Cancelable * onSuccessCallback,
@@ -1602,7 +1602,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeProductURL(Callback::Cancelab
     attributePath.mFieldId    = 0x0000000D;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeProductLabel(Callback::Cancelable * onSuccessCallback,
@@ -1614,7 +1614,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeProductLabel(Callback::Cancel
     attributePath.mFieldId    = 0x0000000E;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeSerialNumber(Callback::Cancelable * onSuccessCallback,
@@ -1626,7 +1626,7 @@ CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeSerialNumber(Callback::Cancel
     attributePath.mFieldId    = 0x0000000F;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeReachable(Callback::Cancelable * onSuccessCallback,
@@ -2775,7 +2775,7 @@ CHIP_ERROR ColorControlCluster::ReadAttributeCompensationText(Callback::Cancelab
     attributePath.mFieldId    = 0x00000006;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR ColorControlCluster::ReadAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
@@ -3504,7 +3504,7 @@ CHIP_ERROR ColorControlCluster::ReadAttributeClusterRevision(Callback::Cancelabl
 
 // ContentLauncher Cluster Commands
 CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t autoPlay, chip::ByteSpan data)
+                                                 bool autoPlay, chip::ByteSpan data)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
@@ -5346,7 +5346,7 @@ CHIP_ERROR GeneralCommissioningCluster::ReadAttributeFabricId(Callback::Cancelab
     attributePath.mFieldId    = 0x00000000;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<OctetStringAttributeCallback>);
 }
 
 CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
@@ -7508,6 +7508,18 @@ CHIP_ERROR NetworkCommissioningCluster::DiscoverAttributes(Callback::Cancelable 
     COMMAND_FOOTER();
 }
 
+CHIP_ERROR NetworkCommissioningCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x0000FFFC;
+    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
 CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback)
 {
@@ -7615,7 +7627,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
                                                         Callback::Cancelable * onFailureCallback, uint16_t vendorId,
                                                         uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
                                                         uint32_t currentVersion, uint8_t protocolsSupported,
-                                                        chip::ByteSpan location, uint8_t requestorCanConsent,
+                                                        chip::ByteSpan location, bool requestorCanConsent,
                                                         chip::ByteSpan metadataForProvider)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
@@ -9558,7 +9570,7 @@ CHIP_ERROR TvChannelCluster::ReadAttributeTvChannelLineup(Callback::Cancelable *
     attributePath.mFieldId    = 0x00000001;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<OctetStringAttributeCallback>);
 }
 
 CHIP_ERROR TvChannelCluster::ReadAttributeCurrentTvChannel(Callback::Cancelable * onSuccessCallback,
@@ -9570,7 +9582,7 @@ CHIP_ERROR TvChannelCluster::ReadAttributeCurrentTvChannel(Callback::Cancelable 
     attributePath.mFieldId    = 0x00000002;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<OctetStringAttributeCallback>);
 }
 
 CHIP_ERROR TvChannelCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
@@ -9962,7 +9974,7 @@ CHIP_ERROR TestClusterCluster::ReadAttributeBoolean(Callback::Cancelable * onSuc
 }
 
 CHIP_ERROR TestClusterCluster::WriteAttributeBoolean(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint8_t boolean)
+                                                     Callback::Cancelable * onFailureCallback, bool boolean)
 {
     COMMAND_HEADER("WriteTestClusterBoolean", TestCluster::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -10333,7 +10345,7 @@ CHIP_ERROR TestClusterCluster::ReadAttributeOctetString(Callback::Cancelable * o
     attributePath.mFieldId    = 0x00000019;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<OctetStringAttributeCallback>);
 }
 
 CHIP_ERROR TestClusterCluster::WriteAttributeOctetString(Callback::Cancelable * onSuccessCallback,
@@ -10402,7 +10414,7 @@ CHIP_ERROR TestClusterCluster::ReadAttributeLongOctetString(Callback::Cancelable
     attributePath.mFieldId    = 0x0000001D;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<OctetStringAttributeCallback>);
 }
 
 CHIP_ERROR TestClusterCluster::WriteAttributeLongOctetString(Callback::Cancelable * onSuccessCallback,
@@ -10436,7 +10448,7 @@ CHIP_ERROR TestClusterCluster::ReadAttributeCharString(Callback::Cancelable * on
     attributePath.mFieldId    = 0x0000001E;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR TestClusterCluster::WriteAttributeCharString(Callback::Cancelable * onSuccessCallback,
@@ -10469,7 +10481,7 @@ CHIP_ERROR TestClusterCluster::ReadAttributeLongCharString(Callback::Cancelable 
     attributePath.mFieldId    = 0x0000001F;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR TestClusterCluster::WriteAttributeLongCharString(Callback::Cancelable * onSuccessCallback,
@@ -10506,7 +10518,7 @@ CHIP_ERROR TestClusterCluster::ReadAttributeUnsupported(Callback::Cancelable * o
 }
 
 CHIP_ERROR TestClusterCluster::WriteAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, uint8_t unsupported)
+                                                         Callback::Cancelable * onFailureCallback, bool unsupported)
 {
     COMMAND_HEADER("WriteTestClusterUnsupported", TestCluster::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -11131,7 +11143,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeNetworkName(Callback::C
     attributePath.mFieldId    = 0x00000002;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<OctetStringAttributeCallback>);
 }
 
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributePanId(Callback::Cancelable * onSuccessCallback,
@@ -11167,7 +11179,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeMeshLocalPrefix(Callbac
     attributePath.mFieldId    = 0x00000005;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<OctetStringAttributeCallback>);
 }
 
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeOverrunCount(Callback::Cancelable * onSuccessCallback,
@@ -11848,7 +11860,7 @@ CHIP_ERROR WakeOnLanCluster::ReadAttributeWakeOnLanMacAddress(Callback::Cancelab
     attributePath.mFieldId    = 0x00000000;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
 CHIP_ERROR WakeOnLanCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
@@ -11922,7 +11934,7 @@ CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeBssid(Callback::Cancelabl
     attributePath.mFieldId    = 0x00000000;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<StringAttributeCallback>);
+                                             BasicAttributeFilter<OctetStringAttributeCallback>);
 }
 
 CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeSecurityType(Callback::Cancelable * onSuccessCallback,

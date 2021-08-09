@@ -1,5 +1,5 @@
 {
-  "featureLevel": 39,
+  "featureLevel": 45,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -512,7 +512,7 @@
           ]
         },
         {
-          "name": "On/off",
+          "name": "On/Off",
           "code": 6,
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
@@ -563,7 +563,7 @@
           ]
         },
         {
-          "name": "On/off",
+          "name": "On/Off",
           "code": 6,
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
@@ -3102,7 +3102,7 @@
           ],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "client",
@@ -3128,7 +3128,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "cluster revision",
+              "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
               "side": "server",
@@ -5927,7 +5927,7 @@
       "deviceTypeProfileId": 2457,
       "clusters": [
         {
-          "name": "On/off",
+          "name": "On/Off",
           "code": 6,
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
@@ -5978,7 +5978,7 @@
           ]
         },
         {
-          "name": "On/off",
+          "name": "On/Off",
           "code": 6,
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
@@ -6787,7 +6787,7 @@
       "deviceTypeProfileId": 2457,
       "clusters": [
         {
-          "name": "On/off",
+          "name": "On/Off",
           "code": 6,
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
@@ -6838,7 +6838,7 @@
           ]
         },
         {
-          "name": "On/off",
+          "name": "On/Off",
           "code": 6,
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
@@ -8323,6 +8323,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 36
     }
-  ],
-  "log": []
+  ]
 }

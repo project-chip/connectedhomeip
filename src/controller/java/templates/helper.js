@@ -180,7 +180,7 @@ function omitCommaForFirstNonStatusCommand(id, index)
                     .catch(err => console.log(err))
                     .then((result) => {
                       // Currently, we omit array types, so don't count it as a valid non-status command.
-                      let firstNonStatusCommandIndex = result.findIndex((command) => command.label != "status" && !command.isArray);
+                      let firstNonStatusCommandIndex = result.findIndex((command) => !command.isArray);
                       if (firstNonStatusCommandIndex == -1 || firstNonStatusCommandIndex != index) {
                         return ", ";
                       }
