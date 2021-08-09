@@ -23,6 +23,7 @@
  */
 
 #pragma once
+#include <stdint.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -292,6 +293,9 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 #include <ble/BleConfig.h>
+#include <inet/InetLayer.h>
+#include <system/SystemEvent.h>
+#include <system/SystemObject.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {

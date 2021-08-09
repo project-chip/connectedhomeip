@@ -168,24 +168,18 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 case 0:
                     TLVUnpackError = aDataTlv.Get(CommissioningTimeout);
                     break;
-                case 1: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    PAKEVerifier         = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(PAKEVerifier);
+                    break;
                 case 2:
                     TLVUnpackError = aDataTlv.Get(Discriminator);
                     break;
                 case 3:
                     TLVUnpackError = aDataTlv.Get(Iterations);
                     break;
-                case 4: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    Salt                 = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 4:
+                    TLVUnpackError = aDataTlv.Get(Salt);
+                    break;
                 case 5:
                     TLVUnpackError = aDataTlv.Get(PasscodeID);
                     break;
@@ -490,12 +484,9 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    operationalDataset   = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(operationalDataset);
+                    break;
                 case 1:
                     TLVUnpackError = aDataTlv.Get(breadcrumb);
                     break;
@@ -561,18 +552,12 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    ssid                 = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
-                case 1: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    credentials          = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(ssid);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(credentials);
+                    break;
                 case 2:
                     TLVUnpackError = aDataTlv.Get(breadcrumb);
                     break;
@@ -637,12 +622,9 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    networkID            = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(networkID);
+                    break;
                 case 1:
                     TLVUnpackError = aDataTlv.Get(breadcrumb);
                     break;
@@ -707,12 +689,9 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    networkID            = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(networkID);
+                    break;
                 case 1:
                     TLVUnpackError = aDataTlv.Get(breadcrumb);
                     break;
@@ -836,12 +815,9 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    NetworkID            = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(NetworkID);
+                    break;
                 case 1:
                     TLVUnpackError = aDataTlv.Get(Breadcrumb);
                     break;
@@ -906,12 +882,9 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    ssid                 = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(ssid);
+                    break;
                 case 1:
                     TLVUnpackError = aDataTlv.Get(breadcrumb);
                     break;
@@ -976,12 +949,9 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    operationalDataset   = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(operationalDataset);
+                    break;
                 case 1:
                     TLVUnpackError = aDataTlv.Get(breadcrumb);
                     break;
@@ -1047,18 +1017,12 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    ssid                 = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
-                case 1: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    credentials          = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(ssid);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(credentials);
+                    break;
                 case 2:
                     TLVUnpackError = aDataTlv.Get(breadcrumb);
                     break;
@@ -1171,18 +1135,12 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    NOCArray             = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
-                case 1: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    IPKValue             = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(NOCArray);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(IPKValue);
+                    break;
                 case 2:
                     TLVUnpackError = aDataTlv.Get(CaseAdminNode);
                     break;
@@ -1245,12 +1203,9 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    RootCertificate      = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(RootCertificate);
+                    break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
@@ -1307,12 +1262,9 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data = nullptr;
-                    TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                    CSRNonce             = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(CSRNonce);
+                    break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
@@ -1440,12 +1392,9 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
                 }
                 switch (currentDecodeTagId)
                 {
-                case 0: {
-                    const uint8_t * data  = nullptr;
-                    TLVUnpackError        = aDataTlv.GetDataPtr(data);
-                    TrustedRootIdentifier = chip::ByteSpan(data, aDataTlv.GetLength());
-                }
-                break;
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(TrustedRootIdentifier);
+                    break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");

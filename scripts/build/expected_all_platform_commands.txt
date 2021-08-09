@@ -2,7 +2,7 @@
 gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/linux {out}/{real_platform}-native-all_clusters
 
 # Generating {real_platform}-native-chip_tool
-gn gen --check --fail-on-unused-args --root=/TEST/BUILD/ROOT/examples/chip-tool /OUTPUT/DIR/{real_platform}-native-chip_tool
+gn gen --check --fail-on-unused-args --root=/TEST/BUILD/ROOT/examples/chip-tool {out}/{real_platform}-native-chip_tool
 
 # Generating qpg-qpg6100-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
@@ -20,6 +20,21 @@ cd -
 # Generating esp32-devkitc-lock
 cd "{root}"
 bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/lock-app/esp32 -B {out}/esp32-devkitc-lock reconfigure'
+cd -
+
+# Generating esp32-devkitc-shell
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/shell/esp32 -B {out}/esp32-devkitc-shell reconfigure'
+cd -
+
+# Generating esp32-devkitc-bridge
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge reconfigure'
+cd -
+
+# Generating esp32-c3devkit-all_clusters
+cd "{root}"
+bash -c 'source $IDF_PATH/export.sh; idf.py -D SDKCONFIG_DEFAULTS='"'"'sdkconfig_c3devkit.defaults'"'"' -C examples/all-clusters-app/esp32 -B {out}/esp32-c3devkit-all_clusters reconfigure'
 cd -
 
 # Generating efr32-brd4161a-light
@@ -78,6 +93,15 @@ bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-all_clust
 
 # Building esp32-devkitc-lock
 bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-lock'"'"''
+
+# Building esp32-devkitc-shell
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-shell'"'"''
+
+# Building esp32-devkitc-bridge
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-bridge'"'"''
+
+# Building esp32-c3devkit-all_clusters
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-c3devkit-all_clusters'"'"''
 
 # Building efr32-brd4161a-light
 ninja -C {out}/efr32-brd4161a-light

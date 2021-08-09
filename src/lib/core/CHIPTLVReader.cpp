@@ -255,6 +255,15 @@ CHIP_ERROR TLVReader::Get(double & v)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TLVReader::Get(ByteSpan & v)
+{
+    const uint8_t * val;
+    ReturnErrorOnFailure(GetDataPtr(val));
+    v = ByteSpan(val, GetLength());
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, uint32_t bufSize)
 {
     if (!TLVTypeIsString(ElementType()))

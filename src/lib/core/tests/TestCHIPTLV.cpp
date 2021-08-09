@@ -2405,6 +2405,35 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, bufsize) == 0);
 }
 
+void CheckCHIPTLVByteSpan(nlTestSuite * inSuite, void * inContext)
+{
+    const size_t bufSize  = 14;
+    uint8_t bytesBuffer[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05 };
+    uint8_t backingStore[bufSize];
+    TLVWriter writer;
+    TLVReader reader;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    writer.Init(backingStore, sizeof(backingStore));
+
+    ByteSpan writerSpan(bytesBuffer, sizeof(bytesBuffer));
+    err = writer.Put(ProfileTag(TestProfile_1, 1), writerSpan);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = writer.Finalize();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    reader.Init(backingStore, writer.GetLengthWritten());
+    err = reader.Next();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    chip::ByteSpan readerSpan;
+    err = reader.Get(readerSpan);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, memcmp(readerSpan.data(), bytesBuffer, sizeof(bytesBuffer)) == 0);
+}
+
 void CheckCHIPTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufsize = 40; // large enough s.t. 2 elements fit, 3rd causes eviction
@@ -3809,6 +3838,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("CHIP TLV Printf",                     CheckCHIPTLVPutStringF),
     NL_TEST_DEF("CHIP TLV Printf, Circular TLV buf",   CheckCHIPTLVPutStringFCircular),
     NL_TEST_DEF("CHIP TLV Skip non-contiguous",        CheckCHIPTLVSkipCircular),
+    NL_TEST_DEF("CHIP TLV ByteSpan",                   CheckCHIPTLVByteSpan),
     NL_TEST_DEF("CHIP TLV Check reserve",              CheckCloseContainerReserve),
     NL_TEST_DEF("CHIP TLV Reader Fuzz Test",           TLVReaderFuzzTest),
 

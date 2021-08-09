@@ -1,0 +1,2 @@
+# Mark all files in the "gen" folders as auto-generated to hide them in diffs
+**/gen/** linguist-generated
