@@ -136,11 +136,18 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
+  group("fake_platform_tests") {
+    if (chip_link_tests) {
+      deps = [ "//src:fake_platform_tests_run"]
+    }
+  }
+
   group("check") {
     if (chip_link_tests) {
       deps = [
         "//scripts/build:build_examples.tests",
         "//src:tests_run",
+        "//:fake_platform_tests"
       ]
     }
   }
@@ -250,6 +257,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the k32w shell app example.
     enable_k32w_shell_app_build = enable_k32w_builds
+
+    enable_fake_tests = (enable_default_builds && host_os == "linux")
   }
 
   if (enable_host_clang_build) {
@@ -285,6 +294,12 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     chip_build("android_x86") {
       toolchain = "${build_root}/toolchain/android:android_x86"
+    }
+  }
+
+  if (enable_fake_tests) {
+    chip_build("fake_platform") {
+      toolchain = "${build_root}/toolchain/host:fake_${host_cpu}_gcc"
     }
   }
 
@@ -492,6 +507,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
     if (enable_host_gcc_mbedtls_build) {
       deps += [ ":check_host_gcc_mbedtls" ]
+    }
+    if (enable_fake_tests) {
+      deps += [ ":check_fake_platform" ]
     }
   }
 }

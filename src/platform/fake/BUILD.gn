@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,9 +11,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build_overrides/chip.gni")
+
 import("${chip_root}/src/platform/device.gni")
-declare_args() {
-  # Build CHIP tools.
-  chip_build_tools = current_os != "freertos" && current_os != "android" && chip_device_platform != "fake"
+
+assert(chip_device_platform == "fake")
+
+static_library("fake") {
+  sources = [
+    "CHIPDevicePlatformEvent.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "MdnsImpl.cpp",
+  ]
+  public_deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/lib/mdns:platform_header",
+  ]
 }
