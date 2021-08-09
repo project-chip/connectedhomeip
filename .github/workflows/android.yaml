@@ -15,8 +15,8 @@
 name: Android
 
 on:
-    push:
-    pull_request:
+    workflow_dispatch:
+    # NOTE: not enabled in push/pull_request as this check is available in GCP
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
