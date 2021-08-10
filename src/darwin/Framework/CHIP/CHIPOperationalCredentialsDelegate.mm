@@ -112,7 +112,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadKeysFromKeyChain()
 {
     const NSDictionary * query = @{
         (id) kSecClass : (id) kSecClassGenericPassword,
-        (id) kSecAttrService : kCHIPCAKeyLabel,
+        (id) kSecAttrService : kCHIPCAKeyChainLabel,
         (id) kSecAttrSynchronizable : @YES,
         (id) kSecReturnData : @YES,
     };
@@ -170,7 +170,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::StoreKeysInKeyChain(NSData * keyp
 {
     const NSDictionary * addParams = @{
         (id) kSecClass : (id) kSecClassGenericPassword,
-        (id) kSecAttrService : kCHIPCAKeyLabel,
+        (id) kSecAttrService : kCHIPCAKeyChainLabel,
         (id) kSecAttrSynchronizable : @YES,
         (id) kSecValueData : [keypairData base64EncodedDataWithOptions:0],
     };
@@ -188,22 +188,23 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::StoreKeysInKeyChain(NSData * keyp
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateKeys()
 {
-    SecKeyRef publicKey;
-    SecKeyRef privateKey;
+    SecKeyRef publicKey = nil;
+    SecKeyRef privateKey = nil;
 
     CHIP_LOG_ERROR("Generating keys for the CA");
     OSStatus status = noErr;
 
-    const NSDictionary * keygenParams = @ {
+    const NSDictionary * keygenParams = @{
         (id) kSecAttrKeyType : mKeyType,
         (id) kSecAttrKeySizeInBits : mKeySize,
-        (id) kSecAttrLabel : kCHIPCAKeyLabel,
+        (id) kSecAttrLabel : kCHIPCAKeyGenLabel,
         (id) kSecAttrApplicationTag : kCHIPCAKeyTag,
+        (id) kSecAttrIsPermanent : @NO,
     };
 
     status = SecKeyGeneratePair((__bridge CFDictionaryRef) keygenParams, &publicKey, &privateKey);
     if (status != noErr || publicKey == nil || privateKey == nil) {
-        NSLog(@"Failed in keygen");
+        NSLog(@"Failed in keygen. status %d, pubkey %p, privkey %p", status, publicKey, privateKey);
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -228,7 +229,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
 
     const NSDictionary * deleteParams = @{
         (id) kSecClass : (id) kSecClassGenericPassword,
-        (id) kSecAttrService : kCHIPCAKeyLabel,
+        (id) kSecAttrService : kCHIPCAKeyChainLabel,
         (id) kSecAttrSynchronizable : @YES,
     };
 
