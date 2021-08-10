@@ -40,6 +40,26 @@ android {
             }
         }
     }
+
+    if (rootProject.ext.matterFromSource) {
+        sourceSets {
+            main {
+                java.srcDirs = [
+                        'src/main/java/',
+                        '../../../setup_payload/java/src',
+                        '../../../controller/java/gen',
+                        '../../../controller/java/src',
+                ]
+            }
+        }
+
+        externalNativeBuild {
+            cmake {
+                path file('../../../../out/android_as/CMakeLists.txt')
+                version '3.10.2'
+            }
+        }
+    }
 }
 
 dependencies {
@@ -48,13 +68,14 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
-    // local in-source-tree copy of the dependencies. Useful for IDE compilation
-    implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
+    if(!rootProject.ext.matterFromSource) {
+        // local in-source-tree copy of the dependencies. Useful for IDE compilation
+        implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
 
-    // build time dependencies
-    if (project.hasProperty("chipSdkJarDir")) {
-       println "Compiling using custom sdk jar file directory: ${chipSdkJarDir}"
-       implementation fileTree(dir: "${chipSdkJarDir}", include: ["*.jar", "*.so"])
+        // build time dependencies
+        if (project.hasProperty("chipSdkJarDir")) {
+           println "Compiling using custom sdk jar file directory: ${chipSdkJarDir}"
+           implementation fileTree(dir: "${chipSdkJarDir}", include: ["*.jar", "*.so"])
     }
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
