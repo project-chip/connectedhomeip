@@ -146,7 +146,6 @@ else
     if [[ -z "$p6_board_selected" ]]; then
         p6_sdk_args="p6_board=\"CY8CKIT-062S2-43012\""
     fi
-    extra_args+=" $p6_sdk_args enable_default_builds=false"
 fi
 
 # K32W SDK setup

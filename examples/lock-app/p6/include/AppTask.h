@@ -72,15 +72,15 @@ private:
 
     enum class Function
     {
-        kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 0,
-        kFunction_StartBleAdv    = 1,
-        kFunction_FactoryReset   = 2,
+        kNoneSelected   = 0,
+        kSoftwareUpdate = 0,
+        kStartBleAdv    = 1,
+        kFactoryReset   = 2,
 
-        kFunction_Invalid
+        kInvalid
     };
 
-    Function mFunction              = Function::kFunction_Invalid;
+    Function mFunction              = Function::kInvalid;
     bool mFunctionTimerActive       = false;
     bool mSyncClusterToButtonAction = false;
 

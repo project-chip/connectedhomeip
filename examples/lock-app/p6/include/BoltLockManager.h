@@ -42,10 +42,10 @@ public:
 
     enum class State
     {
-        kState_LockingInitiated = 0,
-        kState_LockingCompleted,
-        kState_UnlockingInitiated,
-        kState_UnlockingCompleted,
+        kLockingInitiated = 0,
+        kLockingCompleted,
+        kUnlockingInitiated,
+        kUnlockingCompleted,
     };
 
     CHIP_ERROR Init();
@@ -61,7 +61,7 @@ public:
 
 private:
     friend BoltLockManager & BoltLockMgr(void);
-    State mState = State::kState_LockingCompleted;
+    State mState = State::kLockingCompleted;
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;

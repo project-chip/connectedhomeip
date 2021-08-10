@@ -63,7 +63,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
             *read_bytes_size = static_cast<size_t>(actual_size);
         }
 
-        return _convert_cy_rslt_to_chip(result);
+        return ConvertCyResultToChip(result);
     }
 
     if ((actual_size > value_size) || (offset_bytes != 0))
@@ -96,7 +96,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     if (result != CY_RSLT_SUCCESS)
     {
-        return _convert_cy_rslt_to_chip(result);
+        return ConvertCyResultToChip(result);
     }
 
     if (local_value != value)
@@ -122,7 +122,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
         *read_bytes_size = static_cast<size_t>(size);
     }
 
-    return _convert_cy_rslt_to_chip(result);
+    return ConvertCyResultToChip(result);
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
@@ -133,7 +133,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     }
 
     cy_rslt_t result = mtb_kvstore_write(&kvstore_obj, key, static_cast<const uint8_t *>(value), value_size);
-    return _convert_cy_rslt_to_chip(result);
+    return ConvertCyResultToChip(result);
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
@@ -144,10 +144,10 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     }
 
     cy_rslt_t result = mtb_kvstore_delete(&kvstore_obj, key);
-    return _convert_cy_rslt_to_chip(result);
+    return ConvertCyResultToChip(result);
 }
 
-CHIP_ERROR KeyValueStoreManagerImpl::_convert_cy_rslt_to_chip(cy_rslt_t err) const
+CHIP_ERROR KeyValueStoreManagerImpl::ConvertCyResultToChip(cy_rslt_t err) const
 {
     switch (err)
     {

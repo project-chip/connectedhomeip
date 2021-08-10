@@ -43,7 +43,7 @@ CHIP_ERROR BoltLockManager::Init()
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
-    mState              = State::kState_LockingCompleted;
+    mState              = State::kLockingCompleted;
     mAutoLockTimerArmed = false;
     mAutoRelock         = false;
     mAutoLockDuration   = 0;
@@ -59,12 +59,12 @@ void BoltLockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Ca
 
 bool BoltLockManager::IsActionInProgress()
 {
-    return (mState == State::kState_LockingInitiated || mState == State::kState_UnlockingInitiated);
+    return (mState == State::kLockingInitiated || mState == State::kUnlockingInitiated);
 }
 
 bool BoltLockManager::IsUnlocked()
 {
-    return (mState == State::kState_UnlockingCompleted);
+    return (mState == State::kUnlockingCompleted);
 }
 
 void BoltLockManager::EnableAutoRelock(bool aOn)
@@ -83,22 +83,22 @@ bool BoltLockManager::InitiateAction(int32_t aActor, Action aAction)
     State new_state;
 
     // Initiate Lock/Unlock Action only when the previous one is complete.
-    if (mState == State::kState_LockingCompleted && aAction == Action::kUnlock)
+    if (mState == State::kLockingCompleted && aAction == Action::kUnlock)
     {
         action_initiated = true;
 
-        new_state = State::kState_UnlockingInitiated;
+        new_state = State::kUnlockingInitiated;
     }
-    else if (mState == State::kState_UnlockingCompleted && aAction == Action::kLock)
+    else if (mState == State::kUnlockingCompleted && aAction == Action::kLock)
     {
         action_initiated = true;
 
-        new_state = State::kState_LockingInitiated;
+        new_state = State::kLockingInitiated;
     }
 
     if (action_initiated)
     {
-        if (mAutoLockTimerArmed && new_state == State::kState_LockingInitiated)
+        if (mAutoLockTimerArmed && new_state == State::kLockingInitiated)
         {
             // If auto lock timer has been armed and someone initiates locking,
             // cancel the timer and continue as normal.
@@ -194,14 +194,14 @@ void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 
     BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
 
-    if (lock->mState == State::kState_LockingInitiated)
+    if (lock->mState == State::kLockingInitiated)
     {
-        lock->mState    = State::kState_LockingCompleted;
+        lock->mState    = State::kLockingCompleted;
         actionCompleted = Action::kLock;
     }
-    else if (lock->mState == State::kState_UnlockingInitiated)
+    else if (lock->mState == State::kUnlockingInitiated)
     {
-        lock->mState    = State::kState_UnlockingCompleted;
+        lock->mState    = State::kUnlockingCompleted;
         actionCompleted = Action::kUnlock;
     }
 

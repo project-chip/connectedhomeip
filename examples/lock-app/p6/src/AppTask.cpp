@@ -188,7 +188,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         // the LEDs at an even rate of 100ms.
         //
         // Otherwise, blink the LED ON for a very short time.
-        if (sAppTask.mFunction != Function::kFunction_FactoryReset)
+        if (sAppTask.mFunction != Function::kFactoryReset)
         {
             // Consider the system to be "fully connected" if it has service
             // connectivity
@@ -296,7 +296,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * event)
 
     // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
     // initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFunction_StartBleAdv)
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kStartBleAdv)
     {
         P6_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
@@ -304,7 +304,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * event)
         // cancel, if required.
         sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
-        sAppTask.mFunction = Function::kFunction_FactoryReset;
+        sAppTask.mFunction = Function::kFactoryReset;
 
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
@@ -314,10 +314,10 @@ void AppTask::FunctionTimerEventHandler(AppEvent * event)
         sStatusLED.Blink(500);
         sLockLED.Blink(500);
     }
-    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFunction_FactoryReset)
+    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFactoryReset)
     {
         // Actually trigger Factory Reset
-        sAppTask.mFunction = Function::kFunction_NoneSelected;
+        sAppTask.mFunction = Function::kNoneSelected;
         ConfigurationMgr().InitiateFactoryReset();
     }
 }
@@ -337,21 +337,21 @@ void AppTask::FunctionHandler(AppEvent * event)
     // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
     if (event->ButtonEvent.Action == APP_BUTTON_PRESSED)
     {
-        if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFunction_NoneSelected)
+        if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kNoneSelected)
         {
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-            sAppTask.mFunction = Function::kFunction_StartBleAdv;
+            sAppTask.mFunction = Function::kStartBleAdv;
         }
     }
     else
     {
         // If the button was released before factory reset got initiated, start Thread Network
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFunction_StartBleAdv)
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kStartBleAdv)
         {
             sAppTask.CancelTimer();
-            sAppTask.mFunction = Function::kFunction_NoneSelected;
+            sAppTask.mFunction = Function::kNoneSelected;
         }
-        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFunction_FactoryReset)
+        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFactoryReset)
         {
             // Set lock status LED back to show state of lock.
             sLockLED.Set(!BoltLockMgr().IsUnlocked());
@@ -360,7 +360,7 @@ void AppTask::FunctionHandler(AppEvent * event)
 
             // Change the function to none selected since factory reset has been
             // canceled.
-            sAppTask.mFunction = Function::kFunction_NoneSelected;
+            sAppTask.mFunction = Function::kNoneSelected;
 
             P6_LOG("Factory Reset has been Canceled");
         }

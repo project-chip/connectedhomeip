@@ -49,7 +49,7 @@ private:
 
     static KeyValueStoreManagerImpl sInstance;
 
-    CHIP_ERROR _convert_cy_rslt_to_chip(cy_rslt_t err) const;
+    CHIP_ERROR ConvertCyResultToChip(cy_rslt_t err) const;
 
     mtb_kvstore_t kvstore_obj;
     bool init_success = false;
