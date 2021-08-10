@@ -1722,7 +1722,7 @@ static bool computeNewHueValue(ColorHueTransitionState * p)
             {
                 if (p->isEnhancedHue)
                 {
-                    newHue = subtractEnhancedHue(p->finalEnhancedHue, p->initialEnhancedHue);
+                    newHue = subtractEnhancedHue(p->initialEnhancedHue, p->finalEnhancedHue);
                     newHue = subtractEnhancedHue(p->finalEnhancedHue, newHue);
 
                     p->initialEnhancedHue = p->finalEnhancedHue;
