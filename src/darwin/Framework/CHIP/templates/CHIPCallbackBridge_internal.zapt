@@ -1,0 +1,34 @@
+{{> header}}
+
+{{#if (chip_has_client_clusters)}}
+#import <Foundation/Foundation.h>
+#import "CHIPCallbackBridgeBase_internal.h"
+
+{{#>CHIPCallbackBridge header="1" partial-type=""            }}DefaultSuccessCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" partial-type="Octet_String"}}OctetStringAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" partial-type="Char_String" }}CharStringAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" partial-type="Boolean"     }}BooleanAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" partial-type="Int8u"       }}Int8uAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" partial-type="Int8s"       }}Int8sAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" partial-type="Int16u"      }}Int16uAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" partial-type="Int16s"      }}Int16sAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" partial-type="Int32u"      }}Int32uAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" partial-type="Int32s"      }}Int32sAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" partial-type="Int64u"      }}Int64uAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" partial-type="Int64s"      }}Int64sAttributeCallback{{/CHIPCallbackBridge}}
+
+{{#chip_client_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if isList}}
+{{#>CHIPCallbackBridge header="1" partial-type="List"        }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}ListAttributeCallback{{/CHIPCallbackBridge}}
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+
+{{#chip_client_clusters}}
+{{#chip_cluster_responses}}
+{{#>CHIPCallbackBridge header="1" partial-type="Command"     }}{{asUpperCamelCase ../../name}}Cluster{{asUpperCamelCase ../name}}Callback{{/CHIPCallbackBridge}}
+{{/chip_cluster_responses}}
+{{/chip_client_clusters}}
+
+{{/if}}
