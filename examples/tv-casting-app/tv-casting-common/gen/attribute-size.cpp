@@ -45,7 +45,8 @@ void copyListMember(uint8_t * dest, uint8_t * src, bool write, uint16_t * offset
     *offset = static_cast<uint16_t>(*offset + length);
 }
 
-uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src, int32_t index)
+uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src,
+                         int32_t index)
 {
     if (index == -1)
     {
@@ -58,12 +59,12 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         if (write)
         {
             // src is a pointer to native-endian uint16_t, dest is pointer to buffer that should hold little-endian value
-            emberAfCopyInt16u(dest, 0, *reinterpret_cast<uint16_t*>(src));
+            emberAfCopyInt16u(dest, 0, *reinterpret_cast<uint16_t *>(src));
         }
         else
         {
             // src is pointer to buffer holding little-endian value, dest is a pointer to native-endian uint16_t
-            *reinterpret_cast<uint16_t*>(dest) = emberAfGetInt16u(src, 0, kSizeLengthInBytes);
+            *reinterpret_cast<uint16_t *>(dest) = emberAfGetInt16u(src, 0, kSizeLengthInBytes);
         }
         return kSizeLengthInBytes;
     }
@@ -82,287 +83,358 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-            case 0x0000: // device list
+        case 0x0000: // device list
+        {
+            entryLength = 6;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 6;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                // Struct _DeviceType
-                _DeviceType * entry = reinterpret_cast<_DeviceType *>(write ? src : dest);
-                copyListMember(write ? dest : (uint8_t *)&entry->type, write ? (uint8_t *)&entry->type : src, write, &entryOffset, sizeof(entry->type)); // DEVTYPE_ID
-                copyListMember(write ? dest : (uint8_t *)&entry->revision, write ? (uint8_t *)&entry->revision : src, write, &entryOffset, sizeof(entry->revision)); // INT16U
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-            case 0x0001: // server list
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _DeviceType
+            _DeviceType * entry = reinterpret_cast<_DeviceType *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->type, write ? (uint8_t *) &entry->type : src, write, &entryOffset,
+                           sizeof(entry->type)); // DEVTYPE_ID
+            copyListMember(write ? dest : (uint8_t *) &entry->revision, write ? (uint8_t *) &entry->revision : src, write,
+                           &entryOffset, sizeof(entry->revision)); // INT16U
+            break;
+        }
+        case 0x0001: // server list
+        {
+            entryLength = 4;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 4;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-            case 0x0002: // client list
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
+            break;
+        }
+        case 0x0002: // client list
+        {
+            entryLength = 4;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 4;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-            case 0x0003: // parts list
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
+            break;
+        }
+        case 0x0003: // parts list
+        {
+            entryLength = 2;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 2;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                copyListMember(dest, src, write, &entryOffset, entryLength); // ENDPOINT_NO
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-      }
-      break;
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ENDPOINT_NO
+            break;
+        }
+        }
+        break;
     }
     case 0x0033: // General Diagnostics Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-            case 0x0000: // NetworkInterfaces
+        case 0x0000: // NetworkInterfaces
+        {
+            entryLength = 48;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 48;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                // Struct _NetworkInterfaceType
-                _NetworkInterfaceType * entry = reinterpret_cast<_NetworkInterfaceType *>(write ? src : dest);
-                chip::ByteSpan * NameSpan = &entry->Name; // OCTET_STRING
-                if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, 34, NameSpan) : ReadByteSpan(src + entryOffset, 34, NameSpan)))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + 34);
-                copyListMember(write ? dest : (uint8_t *)&entry->FabricConnected, write ? (uint8_t *)&entry->FabricConnected : src, write, &entryOffset, sizeof(entry->FabricConnected)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->OffPremiseServicesReachableIPv4, write ? (uint8_t *)&entry->OffPremiseServicesReachableIPv4 : src, write, &entryOffset, sizeof(entry->OffPremiseServicesReachableIPv4)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->OffPremiseServicesReachableIPv6, write ? (uint8_t *)&entry->OffPremiseServicesReachableIPv6 : src, write, &entryOffset, sizeof(entry->OffPremiseServicesReachableIPv6)); // BOOLEAN
-                chip::ByteSpan * HardwareAddressSpan = &entry->HardwareAddress; // OCTET_STRING
-                if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, 10, HardwareAddressSpan) : ReadByteSpan(src + entryOffset, 10, HardwareAddressSpan)))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + 10);
-                copyListMember(write ? dest : (uint8_t *)&entry->Type, write ? (uint8_t *)&entry->Type : src, write, &entryOffset, sizeof(entry->Type)); // ENUM8
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-      }
-      break;
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _NetworkInterfaceType
+            _NetworkInterfaceType * entry = reinterpret_cast<_NetworkInterfaceType *>(write ? src : dest);
+            chip::ByteSpan * NameSpan     = &entry->Name; // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 34, NameSpan) : ReadByteSpan(src + entryOffset, 34, NameSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 34);
+            copyListMember(write ? dest : (uint8_t *) &entry->FabricConnected, write ? (uint8_t *) &entry->FabricConnected : src,
+                           write, &entryOffset, sizeof(entry->FabricConnected)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->OffPremiseServicesReachableIPv4,
+                           write ? (uint8_t *) &entry->OffPremiseServicesReachableIPv4 : src, write, &entryOffset,
+                           sizeof(entry->OffPremiseServicesReachableIPv4)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->OffPremiseServicesReachableIPv6,
+                           write ? (uint8_t *) &entry->OffPremiseServicesReachableIPv6 : src, write, &entryOffset,
+                           sizeof(entry->OffPremiseServicesReachableIPv6)); // BOOLEAN
+            chip::ByteSpan * HardwareAddressSpan = &entry->HardwareAddress; // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 10, HardwareAddressSpan)
+                       : ReadByteSpan(src + entryOffset, 10, HardwareAddressSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 10);
+            copyListMember(write ? dest : (uint8_t *) &entry->Type, write ? (uint8_t *) &entry->Type : src, write, &entryOffset,
+                           sizeof(entry->Type)); // ENUM8
+            break;
+        }
+        }
+        break;
     }
     case 0xF004: // Group Key Management Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-            case 0x0000: // groups
+        case 0x0000: // groups
+        {
+            entryLength = 6;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 6;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                // Struct _GroupState
-                _GroupState * entry = reinterpret_cast<_GroupState *>(write ? src : dest);
-                copyListMember(write ? dest : (uint8_t *)&entry->VendorId, write ? (uint8_t *)&entry->VendorId : src, write, &entryOffset, sizeof(entry->VendorId)); // INT16U
-                copyListMember(write ? dest : (uint8_t *)&entry->VendorGroupId, write ? (uint8_t *)&entry->VendorGroupId : src, write, &entryOffset, sizeof(entry->VendorGroupId)); // INT16U
-                copyListMember(write ? dest : (uint8_t *)&entry->GroupKeySetIndex, write ? (uint8_t *)&entry->GroupKeySetIndex : src, write, &entryOffset, sizeof(entry->GroupKeySetIndex)); // INT16U
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-            case 0x0001: // group keys
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _GroupState
+            _GroupState * entry = reinterpret_cast<_GroupState *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
+                           &entryOffset, sizeof(entry->VendorId)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->VendorGroupId, write ? (uint8_t *) &entry->VendorGroupId : src, write,
+                           &entryOffset, sizeof(entry->VendorGroupId)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeySetIndex, write ? (uint8_t *) &entry->GroupKeySetIndex : src,
+                           write, &entryOffset, sizeof(entry->GroupKeySetIndex)); // INT16U
+            break;
+        }
+        case 0x0001: // group keys
+        {
+            entryLength = 31;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 31;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                // Struct _GroupKey
-                _GroupKey * entry = reinterpret_cast<_GroupKey *>(write ? src : dest);
-                copyListMember(write ? dest : (uint8_t *)&entry->VendorId, write ? (uint8_t *)&entry->VendorId : src, write, &entryOffset, sizeof(entry->VendorId)); // INT16U
-                copyListMember(write ? dest : (uint8_t *)&entry->GroupKeyIndex, write ? (uint8_t *)&entry->GroupKeyIndex : src, write, &entryOffset, sizeof(entry->GroupKeyIndex)); // INT16U
-                chip::ByteSpan * GroupKeyRootSpan = &entry->GroupKeyRoot; // OCTET_STRING
-                if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, 18, GroupKeyRootSpan) : ReadByteSpan(src + entryOffset, 18, GroupKeyRootSpan)))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + 18);
-                copyListMember(write ? dest : (uint8_t *)&entry->GroupKeyEpochStartTime, write ? (uint8_t *)&entry->GroupKeyEpochStartTime : src, write, &entryOffset, sizeof(entry->GroupKeyEpochStartTime)); // INT64U
-                copyListMember(write ? dest : (uint8_t *)&entry->GroupKeySecurityPolicy, write ? (uint8_t *)&entry->GroupKeySecurityPolicy : src, write, &entryOffset, sizeof(entry->GroupKeySecurityPolicy)); // GroupKeySecurityPolicy
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-      }
-      break;
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _GroupKey
+            _GroupKey * entry = reinterpret_cast<_GroupKey *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
+                           &entryOffset, sizeof(entry->VendorId)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeyIndex, write ? (uint8_t *) &entry->GroupKeyIndex : src, write,
+                           &entryOffset, sizeof(entry->GroupKeyIndex)); // INT16U
+            chip::ByteSpan * GroupKeyRootSpan = &entry->GroupKeyRoot;   // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 18, GroupKeyRootSpan)
+                       : ReadByteSpan(src + entryOffset, 18, GroupKeyRootSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 18);
+            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeyEpochStartTime,
+                           write ? (uint8_t *) &entry->GroupKeyEpochStartTime : src, write, &entryOffset,
+                           sizeof(entry->GroupKeyEpochStartTime)); // INT64U
+            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeySecurityPolicy,
+                           write ? (uint8_t *) &entry->GroupKeySecurityPolicy : src, write, &entryOffset,
+                           sizeof(entry->GroupKeySecurityPolicy)); // GroupKeySecurityPolicy
+            break;
+        }
+        }
+        break;
     }
     case 0x003E: // Operational Credentials Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-            case 0x0001: // fabrics list
+        case 0x0001: // fabrics list
+        {
+            entryLength = 52;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 52;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                // Struct _FabricDescriptor
-                _FabricDescriptor * entry = reinterpret_cast<_FabricDescriptor *>(write ? src : dest);
-                copyListMember(write ? dest : (uint8_t *)&entry->FabricId, write ? (uint8_t *)&entry->FabricId : src, write, &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
-                copyListMember(write ? dest : (uint8_t *)&entry->VendorId, write ? (uint8_t *)&entry->VendorId : src, write, &entryOffset, sizeof(entry->VendorId)); // INT16U
-                copyListMember(write ? dest : (uint8_t *)&entry->NodeId, write ? (uint8_t *)&entry->NodeId : src, write, &entryOffset, sizeof(entry->NodeId)); // NODE_ID
-                chip::ByteSpan * LabelSpan = &entry->Label; // OCTET_STRING
-                if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, 34, LabelSpan) : ReadByteSpan(src + entryOffset, 34, LabelSpan)))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + 34);
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-      }
-      break;
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _FabricDescriptor
+            _FabricDescriptor * entry = reinterpret_cast<_FabricDescriptor *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->FabricId, write ? (uint8_t *) &entry->FabricId : src, write,
+                           &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
+            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
+                           &entryOffset, sizeof(entry->VendorId)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->NodeId, write ? (uint8_t *) &entry->NodeId : src, write, &entryOffset,
+                           sizeof(entry->NodeId));      // NODE_ID
+            chip::ByteSpan * LabelSpan = &entry->Label; // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 34, LabelSpan) : ReadByteSpan(src + entryOffset, 34, LabelSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 34);
+            break;
+        }
+        }
+        break;
     }
     case 0x0035: // Thread Network Diagnostics Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-            case 0x0007: // NeighborTableList
+        case 0x0007: // NeighborTableList
+        {
+            entryLength = 31;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 31;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                // Struct _NeighborTable
-                _NeighborTable * entry = reinterpret_cast<_NeighborTable *>(write ? src : dest);
-                copyListMember(write ? dest : (uint8_t *)&entry->ExtAddress, write ? (uint8_t *)&entry->ExtAddress : src, write, &entryOffset, sizeof(entry->ExtAddress)); // INT64U
-                copyListMember(write ? dest : (uint8_t *)&entry->Age, write ? (uint8_t *)&entry->Age : src, write, &entryOffset, sizeof(entry->Age)); // INT32U
-                copyListMember(write ? dest : (uint8_t *)&entry->Rloc16, write ? (uint8_t *)&entry->Rloc16 : src, write, &entryOffset, sizeof(entry->Rloc16)); // INT16U
-                copyListMember(write ? dest : (uint8_t *)&entry->LinkFrameCounter, write ? (uint8_t *)&entry->LinkFrameCounter : src, write, &entryOffset, sizeof(entry->LinkFrameCounter)); // INT32U
-                copyListMember(write ? dest : (uint8_t *)&entry->MleFrameCounter, write ? (uint8_t *)&entry->MleFrameCounter : src, write, &entryOffset, sizeof(entry->MleFrameCounter)); // INT32U
-                copyListMember(write ? dest : (uint8_t *)&entry->LQI, write ? (uint8_t *)&entry->LQI : src, write, &entryOffset, sizeof(entry->LQI)); // INT8U
-                copyListMember(write ? dest : (uint8_t *)&entry->AverageRssi, write ? (uint8_t *)&entry->AverageRssi : src, write, &entryOffset, sizeof(entry->AverageRssi)); // INT8S
-                copyListMember(write ? dest : (uint8_t *)&entry->LastRssi, write ? (uint8_t *)&entry->LastRssi : src, write, &entryOffset, sizeof(entry->LastRssi)); // INT8S
-                copyListMember(write ? dest : (uint8_t *)&entry->FrameErrorRate, write ? (uint8_t *)&entry->FrameErrorRate : src, write, &entryOffset, sizeof(entry->FrameErrorRate)); // INT8U
-                copyListMember(write ? dest : (uint8_t *)&entry->MessageErrorRate, write ? (uint8_t *)&entry->MessageErrorRate : src, write, &entryOffset, sizeof(entry->MessageErrorRate)); // INT8U
-                copyListMember(write ? dest : (uint8_t *)&entry->RxOnWhenIdle, write ? (uint8_t *)&entry->RxOnWhenIdle : src, write, &entryOffset, sizeof(entry->RxOnWhenIdle)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->FullThreadDevice, write ? (uint8_t *)&entry->FullThreadDevice : src, write, &entryOffset, sizeof(entry->FullThreadDevice)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->FullNetworkData, write ? (uint8_t *)&entry->FullNetworkData : src, write, &entryOffset, sizeof(entry->FullNetworkData)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->IsChild, write ? (uint8_t *)&entry->IsChild : src, write, &entryOffset, sizeof(entry->IsChild)); // BOOLEAN
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-            case 0x0008: // RouteTableList
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _NeighborTable
+            _NeighborTable * entry = reinterpret_cast<_NeighborTable *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->ExtAddress, write ? (uint8_t *) &entry->ExtAddress : src, write,
+                           &entryOffset, sizeof(entry->ExtAddress)); // INT64U
+            copyListMember(write ? dest : (uint8_t *) &entry->Age, write ? (uint8_t *) &entry->Age : src, write, &entryOffset,
+                           sizeof(entry->Age)); // INT32U
+            copyListMember(write ? dest : (uint8_t *) &entry->Rloc16, write ? (uint8_t *) &entry->Rloc16 : src, write, &entryOffset,
+                           sizeof(entry->Rloc16)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->LinkFrameCounter, write ? (uint8_t *) &entry->LinkFrameCounter : src,
+                           write, &entryOffset, sizeof(entry->LinkFrameCounter)); // INT32U
+            copyListMember(write ? dest : (uint8_t *) &entry->MleFrameCounter, write ? (uint8_t *) &entry->MleFrameCounter : src,
+                           write, &entryOffset, sizeof(entry->MleFrameCounter)); // INT32U
+            copyListMember(write ? dest : (uint8_t *) &entry->LQI, write ? (uint8_t *) &entry->LQI : src, write, &entryOffset,
+                           sizeof(entry->LQI)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->AverageRssi, write ? (uint8_t *) &entry->AverageRssi : src, write,
+                           &entryOffset, sizeof(entry->AverageRssi)); // INT8S
+            copyListMember(write ? dest : (uint8_t *) &entry->LastRssi, write ? (uint8_t *) &entry->LastRssi : src, write,
+                           &entryOffset, sizeof(entry->LastRssi)); // INT8S
+            copyListMember(write ? dest : (uint8_t *) &entry->FrameErrorRate, write ? (uint8_t *) &entry->FrameErrorRate : src,
+                           write, &entryOffset, sizeof(entry->FrameErrorRate)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->MessageErrorRate, write ? (uint8_t *) &entry->MessageErrorRate : src,
+                           write, &entryOffset, sizeof(entry->MessageErrorRate)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->RxOnWhenIdle, write ? (uint8_t *) &entry->RxOnWhenIdle : src, write,
+                           &entryOffset, sizeof(entry->RxOnWhenIdle)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->FullThreadDevice, write ? (uint8_t *) &entry->FullThreadDevice : src,
+                           write, &entryOffset, sizeof(entry->FullThreadDevice)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->FullNetworkData, write ? (uint8_t *) &entry->FullNetworkData : src,
+                           write, &entryOffset, sizeof(entry->FullNetworkData)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->IsChild, write ? (uint8_t *) &entry->IsChild : src, write,
+                           &entryOffset, sizeof(entry->IsChild)); // BOOLEAN
+            break;
+        }
+        case 0x0008: // RouteTableList
+        {
+            entryLength = 18;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 18;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                // Struct _RouteTable
-                _RouteTable * entry = reinterpret_cast<_RouteTable *>(write ? src : dest);
-                copyListMember(write ? dest : (uint8_t *)&entry->ExtAddress, write ? (uint8_t *)&entry->ExtAddress : src, write, &entryOffset, sizeof(entry->ExtAddress)); // INT64U
-                copyListMember(write ? dest : (uint8_t *)&entry->Rloc16, write ? (uint8_t *)&entry->Rloc16 : src, write, &entryOffset, sizeof(entry->Rloc16)); // INT16U
-                copyListMember(write ? dest : (uint8_t *)&entry->RouterId, write ? (uint8_t *)&entry->RouterId : src, write, &entryOffset, sizeof(entry->RouterId)); // INT8U
-                copyListMember(write ? dest : (uint8_t *)&entry->NextHop, write ? (uint8_t *)&entry->NextHop : src, write, &entryOffset, sizeof(entry->NextHop)); // INT8U
-                copyListMember(write ? dest : (uint8_t *)&entry->PathCost, write ? (uint8_t *)&entry->PathCost : src, write, &entryOffset, sizeof(entry->PathCost)); // INT8U
-                copyListMember(write ? dest : (uint8_t *)&entry->LQIIn, write ? (uint8_t *)&entry->LQIIn : src, write, &entryOffset, sizeof(entry->LQIIn)); // INT8U
-                copyListMember(write ? dest : (uint8_t *)&entry->LQIOut, write ? (uint8_t *)&entry->LQIOut : src, write, &entryOffset, sizeof(entry->LQIOut)); // INT8U
-                copyListMember(write ? dest : (uint8_t *)&entry->Age, write ? (uint8_t *)&entry->Age : src, write, &entryOffset, sizeof(entry->Age)); // INT8U
-                copyListMember(write ? dest : (uint8_t *)&entry->Allocated, write ? (uint8_t *)&entry->Allocated : src, write, &entryOffset, sizeof(entry->Allocated)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->LinkEstablished, write ? (uint8_t *)&entry->LinkEstablished : src, write, &entryOffset, sizeof(entry->LinkEstablished)); // BOOLEAN
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-            case 0x003B: // SecurityPolicy
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _RouteTable
+            _RouteTable * entry = reinterpret_cast<_RouteTable *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->ExtAddress, write ? (uint8_t *) &entry->ExtAddress : src, write,
+                           &entryOffset, sizeof(entry->ExtAddress)); // INT64U
+            copyListMember(write ? dest : (uint8_t *) &entry->Rloc16, write ? (uint8_t *) &entry->Rloc16 : src, write, &entryOffset,
+                           sizeof(entry->Rloc16)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->RouterId, write ? (uint8_t *) &entry->RouterId : src, write,
+                           &entryOffset, sizeof(entry->RouterId)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->NextHop, write ? (uint8_t *) &entry->NextHop : src, write,
+                           &entryOffset, sizeof(entry->NextHop)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->PathCost, write ? (uint8_t *) &entry->PathCost : src, write,
+                           &entryOffset, sizeof(entry->PathCost)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->LQIIn, write ? (uint8_t *) &entry->LQIIn : src, write, &entryOffset,
+                           sizeof(entry->LQIIn)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->LQIOut, write ? (uint8_t *) &entry->LQIOut : src, write, &entryOffset,
+                           sizeof(entry->LQIOut)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->Age, write ? (uint8_t *) &entry->Age : src, write, &entryOffset,
+                           sizeof(entry->Age)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->Allocated, write ? (uint8_t *) &entry->Allocated : src, write,
+                           &entryOffset, sizeof(entry->Allocated)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->LinkEstablished, write ? (uint8_t *) &entry->LinkEstablished : src,
+                           write, &entryOffset, sizeof(entry->LinkEstablished)); // BOOLEAN
+            break;
+        }
+        case 0x003B: // SecurityPolicy
+        {
+            entryLength = 3;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 3;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                // Struct _SecurityPolicy
-                _SecurityPolicy * entry = reinterpret_cast<_SecurityPolicy *>(write ? src : dest);
-                copyListMember(write ? dest : (uint8_t *)&entry->RotationTime, write ? (uint8_t *)&entry->RotationTime : src, write, &entryOffset, sizeof(entry->RotationTime)); // INT16U
-                copyListMember(write ? dest : (uint8_t *)&entry->Flags, write ? (uint8_t *)&entry->Flags : src, write, &entryOffset, sizeof(entry->Flags)); // INT8U
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-            case 0x003D: // OperationalDatasetComponents
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _SecurityPolicy
+            _SecurityPolicy * entry = reinterpret_cast<_SecurityPolicy *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->RotationTime, write ? (uint8_t *) &entry->RotationTime : src, write,
+                           &entryOffset, sizeof(entry->RotationTime)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->Flags, write ? (uint8_t *) &entry->Flags : src, write, &entryOffset,
+                           sizeof(entry->Flags)); // INT8U
+            break;
+        }
+        case 0x003D: // OperationalDatasetComponents
+        {
+            entryLength = 12;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 12;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                // Struct _OperationalDatasetComponents
-                _OperationalDatasetComponents * entry = reinterpret_cast<_OperationalDatasetComponents *>(write ? src : dest);
-                copyListMember(write ? dest : (uint8_t *)&entry->ActiveTimestampPresent, write ? (uint8_t *)&entry->ActiveTimestampPresent : src, write, &entryOffset, sizeof(entry->ActiveTimestampPresent)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->PendingTimestampPresent, write ? (uint8_t *)&entry->PendingTimestampPresent : src, write, &entryOffset, sizeof(entry->PendingTimestampPresent)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->MasterKeyPresent, write ? (uint8_t *)&entry->MasterKeyPresent : src, write, &entryOffset, sizeof(entry->MasterKeyPresent)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->NetworkNamePresent, write ? (uint8_t *)&entry->NetworkNamePresent : src, write, &entryOffset, sizeof(entry->NetworkNamePresent)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->ExtendedPanIdPresent, write ? (uint8_t *)&entry->ExtendedPanIdPresent : src, write, &entryOffset, sizeof(entry->ExtendedPanIdPresent)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->MeshLocalPrefixPresent, write ? (uint8_t *)&entry->MeshLocalPrefixPresent : src, write, &entryOffset, sizeof(entry->MeshLocalPrefixPresent)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->DelayPresent, write ? (uint8_t *)&entry->DelayPresent : src, write, &entryOffset, sizeof(entry->DelayPresent)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->PanIdPresent, write ? (uint8_t *)&entry->PanIdPresent : src, write, &entryOffset, sizeof(entry->PanIdPresent)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->ChannelPresent, write ? (uint8_t *)&entry->ChannelPresent : src, write, &entryOffset, sizeof(entry->ChannelPresent)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->PskcPresent, write ? (uint8_t *)&entry->PskcPresent : src, write, &entryOffset, sizeof(entry->PskcPresent)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->SecurityPolicyPresent, write ? (uint8_t *)&entry->SecurityPolicyPresent : src, write, &entryOffset, sizeof(entry->SecurityPolicyPresent)); // BOOLEAN
-                copyListMember(write ? dest : (uint8_t *)&entry->ChannelMaskPresent, write ? (uint8_t *)&entry->ChannelMaskPresent : src, write, &entryOffset, sizeof(entry->ChannelMaskPresent)); // BOOLEAN
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-            case 0x003E: // ActiveNetworkFaultsList
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _OperationalDatasetComponents
+            _OperationalDatasetComponents * entry = reinterpret_cast<_OperationalDatasetComponents *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->ActiveTimestampPresent,
+                           write ? (uint8_t *) &entry->ActiveTimestampPresent : src, write, &entryOffset,
+                           sizeof(entry->ActiveTimestampPresent)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->PendingTimestampPresent,
+                           write ? (uint8_t *) &entry->PendingTimestampPresent : src, write, &entryOffset,
+                           sizeof(entry->PendingTimestampPresent)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->MasterKeyPresent, write ? (uint8_t *) &entry->MasterKeyPresent : src,
+                           write, &entryOffset, sizeof(entry->MasterKeyPresent)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->NetworkNamePresent,
+                           write ? (uint8_t *) &entry->NetworkNamePresent : src, write, &entryOffset,
+                           sizeof(entry->NetworkNamePresent)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->ExtendedPanIdPresent,
+                           write ? (uint8_t *) &entry->ExtendedPanIdPresent : src, write, &entryOffset,
+                           sizeof(entry->ExtendedPanIdPresent)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->MeshLocalPrefixPresent,
+                           write ? (uint8_t *) &entry->MeshLocalPrefixPresent : src, write, &entryOffset,
+                           sizeof(entry->MeshLocalPrefixPresent)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->DelayPresent, write ? (uint8_t *) &entry->DelayPresent : src, write,
+                           &entryOffset, sizeof(entry->DelayPresent)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->PanIdPresent, write ? (uint8_t *) &entry->PanIdPresent : src, write,
+                           &entryOffset, sizeof(entry->PanIdPresent)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->ChannelPresent, write ? (uint8_t *) &entry->ChannelPresent : src,
+                           write, &entryOffset, sizeof(entry->ChannelPresent)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->PskcPresent, write ? (uint8_t *) &entry->PskcPresent : src, write,
+                           &entryOffset, sizeof(entry->PskcPresent)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->SecurityPolicyPresent,
+                           write ? (uint8_t *) &entry->SecurityPolicyPresent : src, write, &entryOffset,
+                           sizeof(entry->SecurityPolicyPresent)); // BOOLEAN
+            copyListMember(write ? dest : (uint8_t *) &entry->ChannelMaskPresent,
+                           write ? (uint8_t *) &entry->ChannelMaskPresent : src, write, &entryOffset,
+                           sizeof(entry->ChannelMaskPresent)); // BOOLEAN
+            break;
+        }
+        case 0x003E: // ActiveNetworkFaultsList
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
             {
-                entryLength  = 1;
-                if (((index - 1) * entryLength) > (am->size - entryLength))
-                {
-                    ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
-                    return 0;
-                }
-                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-                copyListMember(dest, src, write, &entryOffset, entryLength); // NetworkFault
-                break;
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
             }
-      }
-      break;
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // NetworkFault
+            break;
+        }
+        }
+        break;
     }
     }
 
@@ -386,86 +458,87 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     case 0x001D: // Descriptor Cluster
         switch (attributeId)
         {
-            case 0x0000: // device list
+        case 0x0000: // device list
             // Struct _DeviceType
             entryLength = 6;
             break;
-            case 0x0001: // server list
+        case 0x0001: // server list
             // chip::ClusterId
             entryLength = 4;
             break;
-            case 0x0002: // client list
+        case 0x0002: // client list
             // chip::ClusterId
             entryLength = 4;
             break;
-            case 0x0003: // parts list
+        case 0x0003: // parts list
             // chip::EndpointId
             entryLength = 2;
             break;
         }
-    break;
+        break;
     case 0x0033: // General Diagnostics Cluster
         switch (attributeId)
         {
-            case 0x0000: // NetworkInterfaces
+        case 0x0000: // NetworkInterfaces
             // Struct _NetworkInterfaceType
             entryLength = 48;
             break;
         }
-    break;
+        break;
     case 0xF004: // Group Key Management Cluster
         switch (attributeId)
         {
-            case 0x0000: // groups
+        case 0x0000: // groups
             // Struct _GroupState
             entryLength = 6;
             break;
-            case 0x0001: // group keys
+        case 0x0001: // group keys
             // Struct _GroupKey
             entryLength = 31;
             break;
         }
-    break;
+        break;
     case 0x003E: // Operational Credentials Cluster
         switch (attributeId)
         {
-            case 0x0001: // fabrics list
+        case 0x0001: // fabrics list
             // Struct _FabricDescriptor
             entryLength = 52;
             break;
         }
-    break;
+        break;
     case 0x0035: // Thread Network Diagnostics Cluster
         switch (attributeId)
         {
-            case 0x0007: // NeighborTableList
+        case 0x0007: // NeighborTableList
             // Struct _NeighborTable
             entryLength = 31;
             break;
-            case 0x0008: // RouteTableList
+        case 0x0008: // RouteTableList
             // Struct _RouteTable
             entryLength = 18;
             break;
-            case 0x003B: // SecurityPolicy
+        case 0x003B: // SecurityPolicy
             // Struct _SecurityPolicy
             entryLength = 3;
             break;
-            case 0x003D: // OperationalDatasetComponents
+        case 0x003D: // OperationalDatasetComponents
             // Struct _OperationalDatasetComponents
             entryLength = 12;
             break;
-            case 0x003E: // ActiveNetworkFaultsList
+        case 0x003E: // ActiveNetworkFaultsList
             // uint8_t
             entryLength = 1;
             break;
         }
-    break;
+        break;
     }
 
     uint32_t totalSize = kSizeLengthInBytes + (entryCount * entryLength);
     if (!chip::CanCastTo<uint16_t>(totalSize))
     {
-        ChipLogError(Zcl, "Cluster " ChipLogFormatMEI ": Size of attribute " ChipLogFormatMEI " is too large.", ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
+        ChipLogError(Zcl, "Cluster " ChipLogFormatMEI ": Size of attribute " ChipLogFormatMEI " is too large.",
+                     ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
         return 0;
     }
 
