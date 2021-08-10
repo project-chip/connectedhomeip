@@ -58,11 +58,19 @@ class AndroidBuilder(Builder):
 
     # In order to accept a license, the licenses folder is updated with the hash of the
     # accepted license
-    licenses = os.path.join(os.environ['ANDROID_HOME'], 'licenses')
-    if not os.access(licenses, os.W_OK):
+    android_home = os.environ['ANDROID_HOME']
+    licenses = os.path.join(android_home, 'licenses')
+    if not os.path.exists(licenses):
+      # Initial install may not have licenses at all
+      if not os.access(android_home, os.W_OK):
+        raise Exception(
+            "'%s' is NOT writable by the current user (needed to create licenses folder for accept)"
+            % android_home)
+
+    elif not os.access(licenses, os.W_OK):
       raise Exception(
-          "'%s' is NOT writable by the current user (needed to accept licenses)" %
-          licenses)
+          "'%s' is NOT writable by the current user (needed to accept licenses)"
+          % licenses)
 
   def generate(self):
     if not os.path.exists(self.output_dir):
