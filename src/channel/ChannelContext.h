@@ -102,14 +102,14 @@ public:
     bool IsCasePairing();
 
     bool MatchesBuilder(const ChannelBuilder & builder);
-    bool MatchesSession(SecureSessionHandle session, SecureSessionMgr * ssm);
+    bool MatchesSession(SessionHandle session, SecureSessionMgr * ssm);
 
     // events of ResolveDelegate, propagated from ExchangeManager
     void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const Mdns::MdnsService & address);
 
     // events of SecureSessionManager, propagated from ExchangeManager
-    void OnNewConnection(SecureSessionHandle session);
-    void OnConnectionExpired(SecureSessionHandle session);
+    void OnNewConnection(SessionHandle session);
+    void OnConnectionExpired(SessionHandle session);
 
     // Pairing callbacks
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -144,8 +144,8 @@ private:
     struct ReadyVars
     {
         static constexpr const size_t VariantId = 2;
-        ReadyVars(SecureSessionHandle session) : mSession(session) {}
-        const SecureSessionHandle mSession;
+        ReadyVars(SessionHandle session) : mSession(session) {}
+        const SessionHandle mSession;
     };
 
     Variant<PrepareVars, ReadyVars> mStateVars;
@@ -157,7 +157,7 @@ private:
     void EnterPreparingState(const ChannelBuilder & builder);
     void ExitPreparingState();
 
-    void EnterReadyState(SecureSessionHandle session);
+    void EnterReadyState(SessionHandle session);
     void ExitReadyState();
 
     void EnterFailedState(CHIP_ERROR error);

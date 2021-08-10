@@ -121,7 +121,7 @@ bool ChannelContext::IsCasePairing()
     return mState == ChannelState::kPreparing && GetPrepareVars().mState == PrepareState::kCasePairing;
 }
 
-bool ChannelContext::MatchesSession(SecureSessionHandle session, SecureSessionMgr * ssm)
+bool ChannelContext::MatchesSession(SessionHandle session, SecureSessionMgr * ssm)
 {
     switch (mState)
     {
@@ -258,7 +258,7 @@ void ChannelContext::EnterCasePairingState()
     auto & prepare              = GetPrepareVars();
     prepare.mCasePairingSession = Platform::New<CASESession>();
 
-    ExchangeContext * ctxt = mExchangeManager->NewContext(SecureSessionHandle(), prepare.mCasePairingSession);
+    ExchangeContext * ctxt = mExchangeManager->NewContext(SessionHandle(), prepare.mCasePairingSession);
     VerifyOrReturn(ctxt != nullptr);
 
     // TODO: currently only supports IP/UDP paring
@@ -312,7 +312,7 @@ void ChannelContext::OnSessionEstablished()
     }
 }
 
-void ChannelContext::OnNewConnection(SecureSessionHandle session)
+void ChannelContext::OnNewConnection(SessionHandle session)
 {
     if (mState != ChannelState::kPreparing)
         return;
@@ -323,14 +323,14 @@ void ChannelContext::OnNewConnection(SecureSessionHandle session)
     EnterReadyState(session);
 }
 
-void ChannelContext::EnterReadyState(SecureSessionHandle session)
+void ChannelContext::EnterReadyState(SessionHandle session)
 {
     mState = ChannelState::kReady;
     mStateVars.Set<ReadyVars>(session);
     mChannelManager->NotifyChannelEvent(this, [](ChannelDelegate * delegate) { delegate->OnEstablished(); });
 }
 
-void ChannelContext::OnConnectionExpired(SecureSessionHandle session)
+void ChannelContext::OnConnectionExpired(SessionHandle session)
 {
     if (mState != ChannelState::kReady)
         return;

@@ -258,7 +258,7 @@ int main(int argc, char * argv[])
     err = EstablishSecureSession();
     SuccessOrExit(err);
 
-    err = gEchoClient.Init(&gExchangeManager, chip::SecureSessionHandle(chip::kTestDeviceNodeId, 0, gFabricIndex));
+    err = gEchoClient.Init(&gExchangeManager, chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex));
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.

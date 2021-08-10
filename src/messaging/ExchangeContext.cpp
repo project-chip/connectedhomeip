@@ -229,7 +229,7 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
     ec->mExchangeMgr->ReleaseContext(ec);
 }
 
-ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
+ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator,
                                  ExchangeDelegate * delegate)
 {
     VerifyOrDie(mExchangeMgr == nullptr);
@@ -297,8 +297,7 @@ ExchangeContext::~ExchangeContext()
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
 
-bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader,
-                                    const PayloadHeader & payloadHeader)
+bool ExchangeContext::MatchExchange(SessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader)
 {
     // A given message is part of a particular exchange if...
     return
@@ -307,7 +306,7 @@ bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHea
         (mExchangeId == payloadHeader.GetExchangeID())
 
         // AND The Session ID associated with the incoming message matches the Session ID associated with the exchange.
-        && (mSecureSession.GetPeerKeyId() == session.GetPeerKeyId())
+        && (mSecureSession.match(session))
 
         // AND The message was sent by an initiator and the exchange context is a responder (IsInitiator==false)
         //    OR The message was sent by a responder and the exchange context is an initiator (IsInitiator==true) (for the broadcast
@@ -322,7 +321,7 @@ void ExchangeContext::OnConnectionExpired()
     // connection state) value, because it's still referencing the now-expired
     // connection.  This will mean that no more messages can be sent via this
     // exchange, which seems fine given the semantics of connection expiration.
-    mSecureSession = SecureSessionHandle();
+    mSecureSession = SessionHandle();
 
     if (!IsResponseExpected())
     {

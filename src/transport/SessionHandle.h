@@ -21,31 +21,40 @@ namespace chip {
 
 class SecureSessionMgr;
 
-class SecureSessionHandle
+class SessionHandle
 {
 public:
-    SecureSessionHandle() : mPeerNodeId(kPlaceholderNodeId), mPeerKeyId(0), mFabric(Transport::kUndefinedFabricIndex) {}
-    SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId, FabricIndex fabric) :
-        mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId), mFabric(fabric)
+    SessionHandle() :
+        mPeerNodeId(kPlaceholderNodeId), mLocalKeyId(0), mPeerKeyId(0), mFabric(Transport::kUndefinedFabricIndex)
+    {}
+    SessionHandle(NodeId peerNodeId, uint16_t localKeyId, uint16_t peerKeyId, FabricIndex fabric) :
+        mPeerNodeId(peerNodeId), mLocalKeyId(localKeyId), mPeerKeyId(peerKeyId), mFabric(fabric)
     {}
 
     bool HasFabricIndex() const { return (mFabric != Transport::kUndefinedFabricIndex); }
     FabricIndex GetFabricIndex() const { return mFabric; }
     void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
 
-    bool operator==(const SecureSessionHandle & that) const
+    bool operator==(const SessionHandle & that) const
     {
         return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
     }
 
+    bool match(const SessionHandle & that) const
+    {
+        return mLocalKeyId == that.mLocalKeyId;
+    }    
+
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     uint16_t GetPeerKeyId() const { return mPeerKeyId; }
+    uint16_t GetLocalKeyId() const { return mLocalKeyId; }
 
 private:
     friend class SecureSessionMgr;
     NodeId mPeerNodeId;
+    uint16_t mLocalKeyId;
     uint16_t mPeerKeyId;
-    // TODO: Re-evaluate the storing of Fabric ID in SecureSessionHandle
+    // TODO: Re-evaluate the storing of Fabric ID in SessionHandle
     //       The Fabric ID will not be available for PASE and group sessions. So need
     //       to identify an approach that'll allow looking up the corresponding information for
     //       such sessions.
