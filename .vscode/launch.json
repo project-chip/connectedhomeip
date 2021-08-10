@@ -109,7 +109,15 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/out/debug/standalone/chip-tool",
-            "args": ["thermostat","set-weekly-schedule","1","47","1","0x54","1"],
+            "args": [
+                "thermostat",
+                "set-weekly-schedule",
+                "1",
+                "47",
+                "1",
+                "0x54",
+                "1"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
