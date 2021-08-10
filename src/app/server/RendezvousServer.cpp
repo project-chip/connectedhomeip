@@ -56,6 +56,8 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
             ChipLogError(Discovery, "Commissioning errored out with error %" CHIP_ERROR_FORMAT,
                          event->CommissioningComplete.status.Format());
         }
+        // reset all advertising
+        app::Mdns::StartServer(false, false);
         // TODO: Commissioning complete means we can finalize the fabric in our storage
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
@@ -94,6 +96,9 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
         ReturnErrorOnFailure(GetAdvertisementDelegate()->StartAdvertisement());
     }
 
+    // reset all advertising
+    app::Mdns::StartServer(true, true);
+
     mSessionMgr      = sessionMgr;
     mFabric          = fabric;
     mExchangeManager = exchangeManager;
@@ -128,6 +133,9 @@ void RendezvousServer::Cleanup()
     {
         GetAdvertisementDelegate()->StopAdvertisement();
     }
+
+    // reset all advertising
+    app::Mdns::StartServer(false, false);
 }
 
 void RendezvousServer::OnSessionEstablishmentError(CHIP_ERROR err)

@@ -20,6 +20,7 @@
  */
 
 #include <CommissioneeShellCommands.h>
+#include <app/server/Mdns.h>
 #include <app/server/Server.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
@@ -61,6 +62,9 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout,
                     "  sendudc <address> <port>   Send UDC message to address. Usage: commissionee sendudc 127.0.0.1 5543\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    streamer_printf(sout,
+                    "  restartmdns <commissioningMode> <additionalPairing>   Start Mdns with given settings. Usage: commissionee "
+                    "startmdns true true\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -84,6 +88,21 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         return error  = SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    else if (strcmp(argv[0], "restartmdns") == 0)
+    {
+        bool commissioningMode = false;
+        bool additionalPairing = false;
+        if (strcmp(argv[1], "true") == 0)
+        {
+            commissioningMode = true;
+            if (strcmp(argv[2], "true") == 0)
+            {
+                additionalPairing = true;
+            }
+        }
+        chip::app::Mdns::StartServer(commissioningMode, additionalPairing);
+        return CHIP_NO_ERROR;
+    }
     else
     {
         return CHIP_ERROR_INVALID_ARGUMENT;

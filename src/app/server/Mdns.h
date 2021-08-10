@@ -31,14 +31,16 @@ CHIP_ERROR AdvertiseOperational();
 CHIP_ERROR AdvertiseCommissioner();
 
 /// Set MDNS commissionable node advertisement
-CHIP_ERROR AdvertiseCommissionableNode();
+CHIP_ERROR AdvertiseCommissionableNode(bool commissioningMode, bool additionalCommissioning);
 
-/// Set MDNS advertisement
-// CHIP_ERROR Advertise(chip::Mdns::CommssionAdvertiseMode mode);
-CHIP_ERROR Advertise(bool commissionableNode);
+/// Overloaded utility method for commissioner and commissionable advertisement
+// This method is used for both commissioner discovery and commissionable node discovery since
+// they share many fields.
+CHIP_ERROR Advertise(bool commissionableNode, bool commissioningMode, bool additionalCommissioning);
 
 /// (Re-)starts the minmdns server
 void StartServer();
+void StartServer(bool commissioningMode, bool additionalCommissioning);
 
 CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 

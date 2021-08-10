@@ -122,28 +122,23 @@ CHIP_ERROR AdvertiseOperational()
 /// Set MDNS commissioner advertisement
 CHIP_ERROR AdvertiseCommisioner()
 {
-    return Advertise(false);
+    return Advertise(false, false, false);
 }
 
 /// Set MDNS commissionable node advertisement
-CHIP_ERROR AdvertiseCommissionableNode()
+CHIP_ERROR AdvertiseCommissionableNode(bool commissioningMode, bool additionalCommissioning)
 {
-    return Advertise(true);
+    return Advertise(true, commissioningMode, additionalCommissioning);
 }
 
-/// commissionableNode
-// CHIP_ERROR Advertise(chip::Mdns::CommssionAdvertiseMode mode)
-CHIP_ERROR Advertise(bool commissionableNode)
+/// Set MDNS commissioner advertisement or commissionable node advertisement
+CHIP_ERROR Advertise(bool commissionableNode, bool commissioningMode, bool additionalCommissioning)
 {
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
     advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Mdns::CommssionAdvertiseMode::kCommissionableNode
                                                                       : chip::Mdns::CommssionAdvertiseMode::kCommissioner);
 
-    // TODO: device can re-enter commissioning mode after being fully provisioned
-    // (additionalPairing == true)
-    bool notYetCommissioned = !DeviceLayer::ConfigurationMgr().IsFullyProvisioned();
-    bool additionalPairing  = false;
-    advertiseParameters.SetCommissioningMode(notYetCommissioned, additionalPairing);
+    advertiseParameters.SetCommissioningMode(commissioningMode, additionalCommissioning);
 
     char pairingInst[chip::Mdns::kKeyPairingInstructionMaxLength + 1];
 
@@ -195,7 +190,7 @@ CHIP_ERROR Advertise(bool commissionableNode)
     advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
 
-    if (notYetCommissioned)
+    if (!additionalCommissioning)
     {
         if (DeviceLayer::ConfigurationMgr().GetInitialPairingHint(value) != CHIP_NO_ERROR)
         {
@@ -247,22 +242,27 @@ CHIP_ERROR Advertise(bool commissionableNode)
 /// (Re-)starts the minmdns server
 void StartServer()
 {
-    ChipLogProgress(Discovery, "Start dns-sd server");
+    StartServer(false, false);
+}
+
+void StartServer(bool commissioningMode, bool additionalCommissioning)
+{
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
 
-    // TODO: advertise this only when really operational once we support both
-    // operational and commisioning advertising is supported.
+    // TODO: advertise all operational ids once we support multiple
     if (GetCurrentNodeId() != kUndefinedNodeId)
     {
+        ChipLogProgress(Discovery, "Start dns-sd server CM=%d, AC=%d", commissioningMode ? 1 : 0, additionalCommissioning ? 1 : 0);
         err = app::Mdns::AdvertiseOperational();
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-        err = app::Mdns::AdvertiseCommissionableNode();
-#endif
+        err = app::Mdns::AdvertiseCommissionableNode(commissioningMode, additionalCommissioning);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     }
     else
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
-        err = app::Mdns::AdvertiseCommissionableNode();
+        ChipLogProgress(Discovery, "Start dns-sd server - no current nodeId");
+        err = app::Mdns::AdvertiseCommissionableNode(true, false);
 #endif
     }
 
