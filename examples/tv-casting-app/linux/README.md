@@ -9,9 +9,9 @@ the TV.
 
 <hr>
 
-- [CHIP TV Casting App Example](#chip-tv-casting-app-example)
-  - [Building](#building)
-  - [Running the Complete Example on Linux](#running-the-complete-example-on-linux)
+-   [CHIP TV Casting App Example](#chip-tv-casting-app-example)
+    -   [Building](#building)
+    -   [Running the Complete Example on Linux](#running-the-complete-example-on-linux)
 
 <hr>
 
