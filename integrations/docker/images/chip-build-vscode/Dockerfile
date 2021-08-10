@@ -26,7 +26,10 @@ COPY --from=mbedos /opt/openocd/ /opt/openocd/
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
 # 'vscode' to accept licenses)
-RUN chmod -R a+w /opt/android/sdk/licenses
+RUN set -x \
+    && mkdir -p /opt/android/sdk/licenses \
+    && chmod -R a+w /opt/android/sdk/licenses \
+    && : # last line
 
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
