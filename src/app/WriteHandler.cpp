@@ -27,17 +27,17 @@ namespace chip {
 namespace app {
 CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
 {
-    VerifyOrReturnError(apDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    IgnoreUnusedVariable(apDelegate);
+    VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-    VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnLogError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     mMessageWriter.Init(std::move(packet));
-    ReturnErrorOnFailure(mWriteResponseBuilder.Init(&mMessageWriter));
+    ReturnLogErrorOnFailure(mWriteResponseBuilder.Init(&mMessageWriter));
 
     AttributeStatusList::Builder attributeStatusListBuilder = mWriteResponseBuilder.CreateAttributeStatusListBuilder();
-    ReturnErrorOnFailure(attributeStatusListBuilder.GetError());
+    ReturnLogErrorOnFailure(attributeStatusListBuilder.GetError());
 
     MoveToState(State::Initialized);
 

@@ -1160,6 +1160,18 @@ public:
     CHIP_ERROR PutBoolean(uint64_t tag, bool v);
 
     /**
+     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, bool v)
+     */
+    CHIP_ERROR Put(uint64_t tag, bool v)
+    {
+        /*
+         * In TLV, boolean values are encoded as standalone tags without actual values, so we have a seperate
+         * PutBoolean method.
+         */
+        return PutBoolean(tag, v);
+    }
+
+    /**
      * Encodes a TLV byte string value.
      *
      * @param[in]   tag             The TLV tag to be encoded with the value, or @p AnonymousTag if the
