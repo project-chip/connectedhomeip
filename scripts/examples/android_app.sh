@@ -41,4 +41,4 @@ gn gen --check --fail-on-unused-args out/"android_$TARGET_CPU" --args="target_os
 ninja -C out/"android_$TARGET_CPU" src/setup_payload/java src/controller/java default
 
 rsync -a out/"android_$TARGET_CPU"/lib/*.jar src/android/CHIPTool/app/libs
-rsync -a out/"android_$TARGET_CPU"/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs
+rsync -a out/"android_$TARGET_CPU"/lib/jni/* src/android/CHIPTool/app/libs/jniLibs
