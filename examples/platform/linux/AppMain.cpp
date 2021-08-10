@@ -184,8 +184,13 @@ CHIP_ERROR InitCommissioner()
     ReturnErrorOnFailure(gCommissioner.SetUdpListenPort(CHIP_PORT + 2));
     ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(CHIP_PORT + 3));
     ReturnErrorOnFailure(gCommissioner.Init(localId, params));
-    ReturnErrorOnFailure(gCommissioner.ServiceEvents());
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ShutdownCommissioner()
+{
+    gCommissioner.Shutdown();
     return CHIP_NO_ERROR;
 }
 
@@ -209,6 +214,11 @@ void ChipLinuxAppMainLoop()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    ShutdownCommissioner();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
 #if defined(ENABLE_CHIP_SHELL)
     shellThread.join();
 #endif

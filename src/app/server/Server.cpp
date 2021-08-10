@@ -588,27 +588,21 @@ CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress com
     }
     ChipLogDetail(AppServer, "instanceName=%s", nameBuffer);
 
-    // send UDC message 5 times per spec (no ACK on this message)
-    for (unsigned int i = 0; i < 5; i++)
+    chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
+    if (payloadBuf.IsNull())
     {
-        chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
-        if (payloadBuf.IsNull())
-        {
-            ChipLogError(AppServer, "Unable to allocate packet buffer\n");
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        ChipLogError(AppServer, "Unable to allocate packet buffer\n");
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
-        err = gUDCClient.SendUDCMessage(&gTransports, std::move(payloadBuf), commissioner);
-        if (err == CHIP_NO_ERROR)
-        {
-            ChipLogDetail(AppServer, "Send UDC request success");
-        }
-        else
-        {
-            ChipLogError(AppServer, "Send UDC request failed, err: %s\n", chip::ErrorStr(err));
-        }
-
-        sleep(1);
+    err = gUDCClient.SendUDCMessage(&gTransports, std::move(payloadBuf), commissioner);
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "Send UDC request success");
+    }
+    else
+    {
+        ChipLogError(AppServer, "Send UDC request failed, err: %s\n", chip::ErrorStr(err));
     }
     return err;
 }
