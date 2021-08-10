@@ -4,12 +4,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.chip.chiptool.setuppayloadscanner.CameraSourceView
-        android:id="@+id/camera_view"
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:orientation="vertical">
-    </com.google.chip.chiptool.setuppayloadscanner.CameraSourceView>
+        android:layout_height="wrap_content"
+        android:layout_weight="9">
+
+        <com.google.chip.chiptool.setuppayloadscanner.CameraSourceView
+            android:id="@+id/camera_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+	</com.google.chip.chiptool.setuppayloadscanner.CameraSourceView>
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/edit_qtcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:text="MT:YNJV793700A50324800"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/btn_qtcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Submit"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
 </LinearLayout>
