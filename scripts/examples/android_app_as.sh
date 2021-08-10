@@ -33,4 +33,4 @@ fi
 
 # Build shared CHIP libs
 source scripts/activate.sh
-gn gen --check --fail-on-unused-args out/"android_as" --args="target_os=\"android\" target_cpu=\"arm64\" android_ndk_root=\"$ANDROID_NDK_HOME\" android_sdk_root=\"$ANDROID_HOME\""  --ide=json --json-ide-script=//scripts/examples/gn_to_cmake.py
+gn gen --check --fail-on-unused-args out/"android_as" --args="target_os=\"android\" target_cpu=\"arm64\" android_ndk_root=\"$ANDROID_NDK_HOME\" android_sdk_root=\"$ANDROID_HOME\"" --ide=json --json-ide-script=//scripts/examples/gn_to_cmake.py
