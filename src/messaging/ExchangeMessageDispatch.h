@@ -41,7 +41,7 @@ public:
 
     CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
+    CHIP_ERROR SendMessage(SessionHandle session, uint16_t exchangeId, bool isInitiator,
                            ReliableMessageContext * reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
                            uint8_t type, System::PacketBufferHandle && message);
 
@@ -54,10 +54,9 @@ public:
      * @param message         The payload to be sent
      * @param preparedMessage The handle to hold the prepared message
      */
-    virtual CHIP_ERROR PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
-                                      System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage) = 0;
-    virtual CHIP_ERROR SendPreparedMessage(SecureSessionHandle session,
-                                           const EncryptedPacketBufferHandle & preparedMessage) const                       = 0;
+    virtual CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
+                                      EncryptedPacketBufferHandle & preparedMessage)                                         = 0;
+    virtual CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const = 0;
 
     virtual CHIP_ERROR OnMessageReceived(const Header::Flags & headerFlags, const PayloadHeader & payloadHeader, uint32_t messageId,
                                          const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,

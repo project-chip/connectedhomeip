@@ -335,7 +335,7 @@ protected:
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
-    uint16_t FindDeviceIndex(SecureSessionHandle session);
+    uint16_t FindDeviceIndex(SessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     void ReleaseDeviceById(NodeId remoteDeviceId);
@@ -373,8 +373,8 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
-    void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
 
     void ReleaseAllDevices();
 

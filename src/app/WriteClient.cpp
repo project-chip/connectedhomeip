@@ -247,7 +247,7 @@ void WriteClient::ClearState()
     MoveToState(State::Uninitialized);
 }
 
-CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession)
+CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle packet;
@@ -264,7 +264,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricInde
     // Create a new exchange context.
     if (apSecureSession == nullptr)
     {
-        mpExchangeCtx = mpExchangeMgr->NewContext(SecureSessionHandle(aNodeId, 0, aFabricIndex), this);
+        mpExchangeCtx = mpExchangeMgr->NewContext(SessionHandle(aNodeId, 0, 0, aFabricIndex), this);
     }
     else
     {
@@ -396,7 +396,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteClientHandle::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession)
+CHIP_ERROR WriteClientHandle::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession)
 {
     CHIP_ERROR err = mpWriteClient->SendWriteRequest(aNodeId, aFabricIndex, apSecureSession);
 

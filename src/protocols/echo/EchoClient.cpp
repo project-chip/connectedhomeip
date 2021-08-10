@@ -29,7 +29,7 @@ namespace chip {
 namespace Protocols {
 namespace Echo {
 
-CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SecureSessionHandle session)
+CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SessionHandle session)
 {
     // Error if already initialized.
     if (mExchangeMgr != nullptr)

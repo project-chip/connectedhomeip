@@ -257,7 +257,7 @@ public:
      *
      * @param session A handle to the secure session
      */
-    void OnNewConnection(SecureSessionHandle session);
+    void OnNewConnection(SessionHandle session);
 
     /**
      * @brief
@@ -267,7 +267,7 @@ public:
      *
      * @param session A handle to the secure session
      */
-    void OnConnectionExpired(SecureSessionHandle session);
+    void OnConnectionExpired(SessionHandle session);
 
     /**
      * @brief
@@ -345,9 +345,9 @@ public:
 
     NodeId GetDeviceId() const { return mDeviceId; }
 
-    bool MatchesSession(SecureSessionHandle session) const { return mSecureSession == session; }
+    bool MatchesSession(SessionHandle session) const { return mSecureSession == session; }
 
-    SecureSessionHandle GetSecureSession() const { return mSecureSession; }
+    SessionHandle GetSecureSession() const { return mSecureSession; }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
@@ -453,7 +453,7 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    SecureSessionHandle mSecureSession = {};
+    SessionHandle mSecureSession = {};
 
     uint8_t mSequenceNumber = 0;
 

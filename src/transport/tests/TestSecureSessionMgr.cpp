@@ -62,7 +62,7 @@ const char LARGE_PAYLOAD[kMaxAppMessageLen + 1] = "test message";
 class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SessionHandle session,
                            const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
                            System::PacketBufferHandle && msgBuf) override
     {
@@ -84,7 +84,7 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    void OnNewConnection(SecureSessionHandle session) override
+    void OnNewConnection(SessionHandle session) override
     {
         // Preset the MessageCounter
         if (NewConnectionHandlerCallCount == 0)
@@ -93,11 +93,11 @@ public:
             mLocalToRemoteSession = session;
         NewConnectionHandlerCallCount++;
     }
-    void OnConnectionExpired(SecureSessionHandle session) override {}
+    void OnConnectionExpired(SessionHandle session) override {}
 
     nlTestSuite * mSuite = nullptr;
-    SecureSessionHandle mRemoteToLocalSession;
-    SecureSessionHandle mLocalToRemoteSession;
+    SessionHandle mRemoteToLocalSession;
+    SessionHandle mLocalToRemoteSession;
     int ReceiveHandlerCallCount       = 0;
     int NewConnectionHandlerCallCount = 0;
 
@@ -164,7 +164,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
+    SessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
@@ -254,7 +254,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
+    SessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
@@ -328,7 +328,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
+    SessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
