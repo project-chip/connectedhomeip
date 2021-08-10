@@ -25,7 +25,7 @@ ext {
     // true to build SDK from source code and debug in Android Stduio
     // use scripts/examples/android_app_as.sh to preapre it
     // false to use SDK prebuilt by  scripts/examples/android_app.sh
-    matterFromSource = true
+    matterFromSource = false
 }
 
 task clean(type: Delete) {
