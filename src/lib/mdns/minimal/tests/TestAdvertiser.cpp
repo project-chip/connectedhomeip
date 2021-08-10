@@ -87,7 +87,7 @@ TxtResourceRecord txtOperational2       = TxtResourceRecord(kInstanceName2, kTxt
 // Commissionable node records and queries.
 const QNamePart kMatterCommissionableNodeQueryParts[3] = { "_matterc", "_udp", "local" };
 const QNamePart kLongSubPartsFullLen[]                 = { "_L4094", "_sub", "_matterc", "_udp", "local" };
-const QNamePart kShortSubPartsFullLen[]                = { "_S254", "_sub", "_matterc", "_udp", "local" };
+const QNamePart kShortSubPartsFullLen[]                = { "_S15", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kCmSubParts0[]                         = { "_C0", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kLongSubParts[]                        = { "_L22", "_sub", "_matterc", "_udp", "local" };
 const QNamePart kShortSubParts[]                       = { "_S2", "_sub", "_matterc", "_udp", "local" };
@@ -129,7 +129,7 @@ CommissionAdvertisingParameters commissionableNodeParamsSmall =
         .SetCommissionAdvertiseMode(CommssionAdvertiseMode::kCommissionableNode)
         .SetMac(ByteSpan(kMac))
         .SetLongDiscriminator(0xFFE)
-        .SetShortDiscriminator(0xFE)
+        .SetShortDiscriminator(0xF)
         .SetCommissioningMode(false, false);
 const QNamePart txtCommissionableNodeParamsSmallParts[] = { "CM=0", "D=4094" };
 FullQName txtCommissionableNodeParamsSmallName          = FullQName(txtCommissionableNodeParamsSmallParts);
