@@ -23,6 +23,14 @@ COPY --from=mbedos /opt/mbed-os /opt/mbed-os
 COPY --from=mbedos /opt/mbed-os-toolchain/ /opt/mbed-os-toolchain/
 COPY --from=mbedos /opt/openocd/ /opt/openocd/
 
+# Android license file "acceping" is done by writing license hashes
+# into the 'licenses' subfolder. This allows any user (in particular
+# 'vscode' to accept licenses)
+RUN set -x \
+    && mkdir -p /opt/android/sdk/licenses \
+    && chmod -R a+w /opt/android/sdk/licenses \
+    && : # last line
+
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
 ENV QEMU_ESP32_DIR=/opt/espressif/qemu
