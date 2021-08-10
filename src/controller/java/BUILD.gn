@@ -65,7 +65,7 @@ android_library("java") {
   ]
 
   sources = [
-    "gen/ChipClusters.java",
+    "gen/chip/devicecontroller/ChipClusters.java",
     "src/chip/devicecontroller/AndroidChipStack.java",
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
