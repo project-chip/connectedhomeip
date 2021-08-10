@@ -151,6 +151,9 @@ public:
     CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
                                         Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter);
 
+    CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
+                                         Callback::Cancelable * onFailureCallback);
+
     /**
      * @brief
      *   Send the command in internal command sender.

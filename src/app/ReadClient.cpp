@@ -30,7 +30,7 @@ namespace chip {
 namespace app {
 
 CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                            intptr_t aAppIdentifier)
+                            uint64_t aAppIdentifier)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.

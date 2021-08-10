@@ -28,6 +28,8 @@
 
 #include "chip-cert.h"
 
+#include <string>
+
 using namespace chip;
 using namespace chip::Credentials;
 using namespace chip::ASN1;
@@ -574,7 +576,8 @@ exit:
 }
 
 bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
-              uint32_t validDays, const FutureExtension * futureExts, uint8_t futureExtsCount, X509 * newCert, EVP_PKEY * newKey)
+              uint32_t validDays, int pathLen, const FutureExtension * futureExts, uint8_t futureExtsCount, X509 * newCert,
+              EVP_PKEY * newKey)
 {
     bool res = true;
 
@@ -615,23 +618,42 @@ bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP
         ReportOpenSSLErrorAndExit("X509_set_issuer_name", res = false);
     }
 
+    // Add basic constraints certificate extensions.
+    {
+        std::string basicConstraintsExt;
+
+        if (certType == kCertType_Node || certType == kCertType_FirmwareSigning)
+        {
+            basicConstraintsExt = "critical,CA:FALSE";
+        }
+        else
+        {
+            basicConstraintsExt = "critical,CA:TRUE";
+        }
+
+        if (pathLen != kPathLength_NotSpecified)
+        {
+            basicConstraintsExt.append(",pathlen:" + std::to_string(pathLen));
+        }
+
+        res = AddExtension(newCert, NID_basic_constraints, basicConstraintsExt.c_str());
+        VerifyTrueOrExit(res);
+    }
+
     // Add the appropriate certificate extensions.
     if (certType == kCertType_Node)
     {
-        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:FALSE") &&
-            AddExtension(newCert, NID_key_usage, "critical,digitalSignature") &&
+        res = AddExtension(newCert, NID_key_usage, "critical,digitalSignature") &&
             AddExtension(newCert, NID_ext_key_usage, "critical,clientAuth,serverAuth");
     }
     else if (certType == kCertType_FirmwareSigning)
     {
-        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:FALSE") &&
-            AddExtension(newCert, NID_key_usage, "critical,digitalSignature") &&
+        res = AddExtension(newCert, NID_key_usage, "critical,digitalSignature") &&
             AddExtension(newCert, NID_ext_key_usage, "critical,codeSigning");
     }
     else if (certType == kCertType_ICA || certType == kCertType_Root)
     {
-        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:TRUE") &&
-            AddExtension(newCert, NID_key_usage, "critical,keyCertSign,cRLSign");
+        res = AddExtension(newCert, NID_key_usage, "critical,keyCertSign,cRLSign");
     }
     VerifyTrueOrExit(res);
 
@@ -775,10 +797,15 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
         res = AddExtension(newCert, NID_basic_constraints, "critical,CA:FALSE") &&
             AddExtension(newCert, NID_key_usage, "critical,digitalSignature");
     }
-    // otherwise, it is PAI or PAA
+    else if (attCertType == kAttCertType_PAI)
+    {
+        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:TRUE,pathlen:0") &&
+            AddExtension(newCert, NID_key_usage, "critical,keyCertSign,cRLSign");
+    }
+    // otherwise, it is PAA
     else
     {
-        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:TRUE") &&
+        res = AddExtension(newCert, NID_basic_constraints, "critical,CA:TRUE,pathlen:1") &&
             AddExtension(newCert, NID_key_usage, "critical,keyCertSign,cRLSign");
     }
     VerifyTrueOrExit(res);

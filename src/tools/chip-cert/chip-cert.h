@@ -73,7 +73,8 @@ using chip::ASN1::OID;
 enum
 {
     kCertValidDays_Undefined               = 0,
-    kCertValidDays_NoWellDefinedExpiration = UINT32_MAX
+    kCertValidDays_NoWellDefinedExpiration = UINT32_MAX,
+    kPathLength_NotSpecified               = -1,
 };
 
 enum CertFormat
@@ -132,7 +133,7 @@ extern bool LoadChipCert(const char * fileName, bool isTrused, chip::Credentials
 extern bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt);
 
 extern bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
-                     uint32_t validDays, const FutureExtension * futureExts, uint8_t futureExtsCount, X509 * newCert,
+                     uint32_t validDays, int pathLen, const FutureExtension * futureExts, uint8_t futureExtsCount, X509 * newCert,
                      EVP_PKEY * newKey);
 extern bool ResignCert(X509 * cert, X509 * caCert, EVP_PKEY * caKey);
 
