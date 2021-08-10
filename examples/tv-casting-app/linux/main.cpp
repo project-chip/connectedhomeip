@@ -16,10 +16,14 @@
  *    limitations under the License.
  */
 
+#include <app/server/Mdns.h>
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/ConfigurationManager.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/CHIPMem.h>
+#include <transport/raw/PeerAddress.h>
 
 using namespace chip;
 
@@ -46,36 +50,27 @@ CHIP_ERROR RunTimedEventLoop(uint32_t aDelayMilliseconds)
     return CHIP_NO_ERROR;
 }
 
-void LogOnboardingPayload(chip::SetupPayload payload)
-{
-    ChipLogProgress(Zcl, "Onboarding Payload::");
-    ChipLogProgress(Zcl, "PIN: %u", payload.setUpPINCode);
-    ChipLogProgress(Zcl, "Discriminator: %u", payload.discriminator);
-    ChipLogProgress(Zcl, "Vendor ID: %u", payload.vendorID);
-    ChipLogProgress(Zcl, "Product ID: %u", payload.productID);
-}
-
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     int commissionerCount = 0, selectedCommissioner = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES;
-    chip::Controller::CommissionableNodeController mCommissionableNodeController;
+    chip::Controller::CommissionableNodeController commissionableNodeController;
     Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kDeviceType, TV_DEVICE_TYPE);
     chip::SetupPayload payload;
     SuccessOrExit(chip::Platform::MemoryInit());
     SuccessOrExit(chip::DeviceLayer::PlatformMgr().InitChipStack());
 
     // Discover commissioner TVs
-    SuccessOrExit(mCommissionableNodeController.DiscoverCommissioners(filter));
+    SuccessOrExit(commissionableNodeController.DiscoverCommissioners(filter));
     SuccessOrExit(RunTimedEventLoop(2 * 1000));
 
     // Display discovered commissioner TVs
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
-        const Mdns::DiscoveredNodeData * commissioner = mCommissionableNodeController.GetDiscoveredCommissioner(i);
+        const Mdns::DiscoveredNodeData * commissioner = commissionableNodeController.GetDiscoveredCommissioner(i);
         if (commissioner != nullptr)
         {
-            ChipLogProgress(Zcl, "Discovered Commisioner #%d", ++commissionerCount);
+            ChipLogProgress(Zcl, "Discovered Commissioner #%d", ++commissionerCount);
             commissioner->Log();
         }
     }
@@ -85,12 +80,33 @@ int main(int argc, char * argv[])
     VerifyOrExit(commissionerCount > 0, err = CHIP_NO_ERROR);
     ChipLogProgress(Zcl, "Choose a commissioner TV (by number# above) to request commissioning from: ");
     scanf("%d", &selectedCommissioner);
+    const Mdns::DiscoveredNodeData * commissioner;
+    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
+    {
+        commissioner = commissionableNodeController.GetDiscoveredCommissioner(i);
+        if (commissioner != nullptr && --selectedCommissioner == 0)
+        {
+            break;
+        }
+    }
+    if (selectedCommissioner != 0)
+    {
+        return 1;
+    }
 
-    // Initiate commissionning with selected commissioner TV
     SuccessOrExit(chip::DeviceLayer::PlatformMgr().InitChipStack());
-    SuccessOrExit(mCommissionableNodeController.RequestCommissioning(selectedCommissioner));
-    SuccessOrExit(mCommissionableNodeController.GetOnboardingPayload(payload));
-    LogOnboardingPayload(payload);
+
+    // Advertise self as Commissionable Node over mDNS
+    app::Mdns::AdvertiseCommissionableNode();
+
+    // Enter commissioning mode, open commissioning window
+    InitServer();
+
+    // Send User Directed commissioning request
+    SendUserDirectedCommissioningRequest(
+        chip::Transport::PeerAddress::UDP(commissioner->ipAddress[0], commissioner->port, *commissioner->mInterfaceId));
+
+    chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     SuccessOrExit(RunTimedEventLoop(3 * 60 * 1000));
 
     // TBD: Implement casting to TV

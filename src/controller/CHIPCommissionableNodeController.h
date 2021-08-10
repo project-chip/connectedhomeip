@@ -21,7 +21,6 @@
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <mdns/Resolver.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <setup_payload/SetupPayload.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -43,6 +42,13 @@ public:
 
     CHIP_ERROR DiscoverCommissioners(Mdns::DiscoveryFilter discoveryFilter = Mdns::DiscoveryFilter());
 
+    /**
+     * @return
+     *   Pointer to DiscoveredNodeData at index idx in the list of commissioners discovered
+     *   by the CHIPCommissionableNodeController, if the node is a valid node.
+     *   Otherwise, returns nullptr
+     *   See Resolver.h IsValid()
+     */
     const Mdns::DiscoveredNodeData * GetDiscoveredCommissioner(int idx);
 
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override
@@ -54,10 +60,6 @@ public:
     {
         ChipLogError(Controller, "Unsupported operation CommissionableNodeController::OnNodeIdResolutionFailed");
     }
-
-    CHIP_ERROR RequestCommissioning(int commissionerIdx);
-
-    CHIP_ERROR GetOnboardingPayload(chip::SetupPayload & aOnboardingPayload);
 
 protected:
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mDiscoveredCommissioners); }

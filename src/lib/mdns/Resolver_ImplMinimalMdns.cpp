@@ -78,6 +78,7 @@ public:
         mDelegate(delegate),
         mDiscoveryType(discoveryType), mPacketRange(packet)
     {
+        mInterfaceId           = interfaceId;
         mNodeData.mInterfaceId = interfaceId;
     }
 
@@ -95,6 +96,7 @@ private:
     DiscoveryType mDiscoveryType;
     ResolvedNodeData mNodeData;
     DiscoveredNodeData mDiscoveredNodeData;
+    chip::Inet::InterfaceId mInterfaceId;
     BytesRange mPacketRange;
 
     bool mValid       = false;
@@ -182,7 +184,9 @@ void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress &
     {
         return;
     }
-    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs++] = addr;
+    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs]    = addr;
+    mDiscoveredNodeData.mInterfaceId[mDiscoveredNodeData.numIPs] = mInterfaceId;
+    mDiscoveredNodeData.numIPs++;
 }
 
 bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)

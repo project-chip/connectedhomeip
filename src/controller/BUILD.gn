@@ -36,7 +36,6 @@ static_library("controller") {
 
   public_deps = [
     "${chip_root}/src/app",
-    "${chip_root}/src/app/server:server",
     "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/mdns",

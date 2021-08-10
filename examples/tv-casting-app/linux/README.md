@@ -9,9 +9,9 @@ the TV.
 
 <hr>
 
--   [CHIP TV Casting App Example](#chip-tv-casting-app-example)
-    -   [Building](#building)
-    -   [Running the Complete Example on Linux](#running-the-complete-example-on-linux)
+- [CHIP TV Casting App Example](#chip-tv-casting-app-example)
+  - [Building](#building)
+  - [Running the Complete Example on Linux](#running-the-complete-example-on-linux)
 
 <hr>
 
@@ -43,11 +43,11 @@ the TV.
 -   Pre-requisite: Build and run the tv-app
 
         $ cd ~/connectedhomeip/examples/tv-app/linux
-        $ sudo out/debug/chip-tv-app
+        $ out/debug/chip-tv-app
 
 -   Run the tv-casting-app
 
         $ cd ~/connectedhomeip/examples/tv-casting-app/linux
-        $ sudo out/debug/chip-tv-casting-app
+        $ out/debug/chip-tv-casting-app
 
     Follow the on-screen prompts on the tv-casting-app console
