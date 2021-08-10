@@ -41,6 +41,26 @@ android {
             }
         }
     }
+
+    if (rootProject.ext.matterFromSource) {
+        sourceSets {
+            main {
+                java.srcDirs = [
+                        'src/main/java/',
+                        '../../../setup_payload/java/src',
+                        '../../../controller/java/gen',
+                        '../../../controller/java/src',
+                ]
+            }
+        }
+
+        externalNativeBuild {
+            cmake {
+                path file('../../../../out/android_as/CMakeLists.txt')
+                version '3.10.2'
+            }
+        }
+    }
 }
 
 dependencies {
@@ -49,7 +69,10 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
-    implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
+    if(!rootProject.ext.matterFromSource) {
+        implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
+    }
+
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation "com.google.android.gms:play-services-vision:20.1.0"
