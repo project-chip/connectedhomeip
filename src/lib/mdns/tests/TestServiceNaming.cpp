@@ -120,11 +120,11 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S3") == 0);
 
-    filter.code = (1 << 8) - 1;
+    filter.code = (1 << 4) - 1;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S255") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S15") == 0);
 
-    filter.code = 1 << 8;
+    filter.code = 1 << 4;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) != CHIP_NO_ERROR);
 
     // Vendor tests
@@ -202,15 +202,14 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     filter.code = 3;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    printf("buffer: %s\n", buffer);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S3._sub._matterc") == 0);
 
-    filter.code = (1 << 8) - 1;
+    filter.code = (1 << 4) - 1;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S255._sub._matterc") == 0);
+    NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S15._sub._matterc") == 0);
 
-    filter.code = 1 << 8;
+    filter.code = 1 << 4;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) != CHIP_NO_ERROR);
 
