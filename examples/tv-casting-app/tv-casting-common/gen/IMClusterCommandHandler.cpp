@@ -443,7 +443,7 @@ wasHandled = emberAfGeneralCommissioningClusterArmFailSafeCallback(aEndpointId, 
             break;
         }
         case Clusters::GeneralCommissioning::Commands::Ids::CommissioningComplete: {
-        
+
         wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteCallback(aEndpointId, apCommandObj);
                     break;
         }
@@ -1029,7 +1029,7 @@ wasHandled = emberAfLevelControlClusterStopCallback(aEndpointId, apCommandObj, o
             break;
         }
         case Clusters::LevelControl::Commands::Ids::StopWithOnOff: {
-        
+
         wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(aEndpointId, apCommandObj);
                     break;
         }
@@ -2027,17 +2027,17 @@ void DispatchServerCommand(app::CommandHandler * apCommandObj, CommandId aComman
         switch (aCommandId)
         {
         case Clusters::OnOff::Commands::Ids::Off: {
-        
+
         wasHandled = emberAfOnOffClusterOffCallback(aEndpointId, apCommandObj);
                     break;
         }
         case Clusters::OnOff::Commands::Ids::On: {
-        
+
         wasHandled = emberAfOnOffClusterOnCallback(aEndpointId, apCommandObj);
                     break;
         }
         case Clusters::OnOff::Commands::Ids::Toggle: {
-        
+
         wasHandled = emberAfOnOffClusterToggleCallback(aEndpointId, apCommandObj);
                     break;
         }
@@ -2288,7 +2288,7 @@ wasHandled = emberAfOperationalCredentialsClusterOpCSRRequestCallback(aEndpointI
             break;
         }
         case Clusters::OperationalCredentials::Commands::Ids::RemoveAllFabrics: {
-        
+
         wasHandled = emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(aEndpointId, apCommandObj);
                     break;
         }

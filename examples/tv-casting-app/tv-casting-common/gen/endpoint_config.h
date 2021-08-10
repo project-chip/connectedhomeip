@@ -933,5 +933,3 @@ const EmberAfGenericClusterFunction chipFuncArrayLevelControlServer[] = {\
   /* Endpoint: 2, Cluster: Level Control (server) */ \
   { ZAP_REPORT_DIRECTION(REPORTED), 0x0002, 0x0008, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, {{ 0, 65344, 0 }} }, /* current level */ \
 }
-
-
