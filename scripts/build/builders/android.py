@@ -36,6 +36,16 @@ class AndroidBoard(Enum):
     else:
       raise Exception('Unknown board type: %r' % self)
 
+  def AbiName(self):
+    if self == AndroidBoard.ARM:
+      return 'armeabi-v7a'
+    elif self == AndroidBoard.ARM64:
+      return 'arm64-v8a'
+    elif self == AndroidBoard.X64:
+      return 'x86_64'
+    else:
+      raise Exception('Unknown board type: %r' % self)
+
 
 class AndroidBuilder(Builder):
 
@@ -112,12 +122,14 @@ class AndroidBuilder(Builder):
 
     # JNILibs will be copied as long as they reside in src/main/jniLibs/ABI:
     #    https://developer.android.com/studio/projects/gradle-external-native-builds#jniLibs
-    self._Execute([
-        'bash', '-c',
-        'rsync -a %s/lib/jni/* %s/src/android/CHIPTool/app/src/main/jniLibs/' %
-        (self.output_dir, self.root)
-    ],
-                  title='Prepare Native libs ' + self.identifier)
+
+    # We do NOT use python builtins for copy, so that the 'execution commands' are available
+    # when using dry run.
+    jnilibs_dir = os.path.join(self.root, 'src/android/CHIPTool/app/src/main/jniLibs', self.board.AbiName())
+    self._Execute(['mkdir', '-p', jnilibs_dir], title='Prepare Native libs ' + self.identifier)
+
+    for libName in ['libSetupPayloadParser.so', 'libCHIPController.so']:
+      self._Execute(['cp', os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(), libName), os.path.join(jnilibs_dir, libName)])
 
     # App compilation
     self._Execute([
@@ -127,18 +139,6 @@ class AndroidBuilder(Builder):
         '-PbuildDir=%s' % self.output_dir, 'build'
     ],
                   title='Building APP ' + self.identifier)
-
-  def jni_output_libs(self):
-    """Get a dictionary of JNI-required files."""
-    items = {}
-
-    scan_root = os.path.join(self.output_dir, 'lib', 'jni')
-    for root, dirs, files in os.walk(scan_root):
-      dir_name = root[len(scan_root) + 1:]
-      for file_name in files:
-        items[os.path.join(dir_name, file_name)] = os.path.join(root, file_name)
-
-    return items
 
   def build_outputs(self):
     outputs = {
@@ -152,6 +152,12 @@ class AndroidBuilder(Builder):
         'ChipTool-release-unsigned.apk':
             os.path.join(self.output_dir, 'outputs', 'apk', 'release',
                          'app-release-unsigned.apk'),
+
+        'jni/%s/libSetupPayloadParser.so' % self.board.AbiName(): 
+            os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(), 'libSetupPayloadParser.so'),
+
+        'jni/%s/libCHIPController.so' % self.board.AbiName(): 
+            os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(), 'libCHIPController.so'),
     }
 
     outputs.update(self.jni_output_libs())
