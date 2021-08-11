@@ -31,6 +31,12 @@
 
 namespace chip {
 
+CHIP_ERROR checkDecimalStringValidity(std::string decimalString, std::string & decimalStringWithoutCheckDigit);
+CHIP_ERROR checkCodeLengthValidity(const std::string & decimalString, bool isLongCode);
+CHIP_ERROR toNumber(const std::string & decimalString, uint32_t & dest);
+CHIP_ERROR readDigitsFromDecimalString(const std::string & decimalString, size_t & index, uint32_t & dest,
+                                       size_t numberOfCharsToRead);
+
 /**
  * @class ManualSetupPayloadParser
  * A class that can be used to convert a decimal encoded payload to a SetupPayload object

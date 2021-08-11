@@ -15,8 +15,6 @@
 import("//build_overrides/chip.gni")
 
 static_library("core") {
-  output_name = "libMdnsCore"
-  output_dir = "${root_out_dir}/lib"
   sources = [
     "BytesRange.h",
     "Constants.h",

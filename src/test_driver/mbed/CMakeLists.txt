@@ -13,7 +13,7 @@ configure_file(
 
 set(MBED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/mbed-os CACHE INTERNAL "")
 set(MBED_CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "")
-set(APP_TARGET chip-tests)
+set(APP_TARGET chip-mbed-unit-tests)
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
 add_subdirectory(${MBED_PATH} ./mbed_build)
@@ -63,24 +63,8 @@ if("WHD" IN_LIST MBED_TARGET_LABELS)
     )
 endif()
 
-set(CHIP_TESTS
-    -lCHIP_tests
-)
-
 # Link the *whole-archives* to keep the static test objects.
-target_link_options(${APP_TARGET} PUBLIC -Wl,--whole-archive ${CHIP_TESTS} -Wl,--no-whole-archive)
-
-# Add test libs.
-target_link_libraries(${APP_TARGET}
-        InetTestHelpers
-        NetworkTestHelpers
-        nlunit-test
-        ChipCertTestVectors
-        Mdns
-        MdnsCore
-        MinimalMdnsResponders
-        MinimalMdnsRecords
-)
+target_link_options(${APP_TARGET} PUBLIC -Wl,--whole-archive -lCHIP_tests -Wl,--no-whole-archive)
 
 mbed_set_post_build(${APP_TARGET})
 

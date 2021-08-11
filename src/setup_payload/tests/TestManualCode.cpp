@@ -34,15 +34,6 @@
 
 #include <math.h>
 
-// Import of hidden symbols
-namespace chip {
-CHIP_ERROR readDigitsFromDecimalString(const std::string & decimalString, size_t & index, uint32_t & dest,
-                                       size_t numberOfCharsToRead);
-CHIP_ERROR checkCodeLengthValidity(const std::string & decimalString, bool isLongCode);
-CHIP_ERROR toNumber(const std::string & decimalString, uint32_t & dest);
-CHIP_ERROR checkDecimalStringValidity(std::string decimalString, std::string & decimalStringWithoutCheckDigit);
-} // namespace chip
-
 using namespace chip;
 
 namespace {

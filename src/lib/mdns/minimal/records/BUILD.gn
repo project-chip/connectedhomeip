@@ -15,8 +15,6 @@
 import("//build_overrides/chip.gni")
 
 static_library("records") {
-  output_name = "libMinimalMdnsRecords"
-  output_dir = "${root_out_dir}/lib"
   sources = [
     "IP.cpp",
     "IP.h",

@@ -15,8 +15,6 @@
 import("//build_overrides/chip.gni")
 
 static_library("minimal") {
-  output_name = "libMdns"
-  output_dir = "${root_out_dir}/lib"
   sources = [
     "ActiveResolveAttempts.cpp",
     "ActiveResolveAttempts.h",
