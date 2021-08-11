@@ -754,13 +754,23 @@ void DeviceController::PersistNextKeyId()
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 void DeviceController::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    Device * device               = nullptr;
+    Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
 
     err = GetDevice(nodeData.mPeerId.GetNodeId(), &device);
     SuccessOrExit(err);
 
-    err = device->UpdateAddress(Transport::PeerAddress::UDP(nodeData.mAddress, nodeData.mPort, nodeData.mInterfaceId));
+    // Only use the mDNS resolution's InterfaceID for addresses that are IPv6 LLA.
+    // For all other addresses, we should rely on the device's routing table to route messages sent.
+    // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
+    // mDNS advertisements are not usually received on the same interface the peer is reachable on.
+    if (nodeData.mAddress.IsIPv6LinkLocal())
+    {
+        interfaceId = nodeData.mInterfaceId;
+    }
+
+    err = device->UpdateAddress(Transport::PeerAddress::UDP(nodeData.mAddress, nodeData.mPort, interfaceId));
     SuccessOrExit(err);
 
     PersistDevice(device);
