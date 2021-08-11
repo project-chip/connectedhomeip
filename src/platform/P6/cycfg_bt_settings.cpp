@@ -38,6 +38,10 @@
  *   Runtime Bluetooth stack configuration parameters.
  *
  *******************************************************************************/
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "cycfg_bt_settings.h"
 #include "cycfg_gap.h"
 
@@ -287,4 +291,8 @@ const wiced_bt_cfg_settings_t wiced_bt_cfg_settings =
         .ble_white_list_size                = CY_BT_WHITE_LIST_SIZE,                                      /* Maximum number of white list devices allowed. Cannot be more than 128 */
         .default_ble_power_level            = CY_BT_TX_POWER                                              /* Default LE power level */
     };
+#endif
+
+#ifdef __cplusplus
+}
 #endif

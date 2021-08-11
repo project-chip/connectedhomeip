@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include <stdbool.h>
 #include <stdint.h>
 
 #include "AppEvent.h"
@@ -36,7 +35,6 @@ public:
     {
         kLock = 0,
         kUnlock,
-
         KInvalid
     };
 

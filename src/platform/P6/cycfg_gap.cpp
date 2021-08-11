@@ -10,20 +10,20 @@ const uint8_t cy_bt_adv_packet_elem_2[16]          = { 0x5B, 0x19, 0xBA, 0xE4, 0
 wiced_bt_ble_advert_elem_t cy_bt_adv_packet_data[] = {
     /* Flags */
     {
-        .advert_type = BTM_BLE_ADVERT_TYPE_FLAG,
-        .len         = 1,
         .p_data      = (uint8_t *) cy_bt_adv_packet_elem_0,
+        .len         = 1,
+        .advert_type = BTM_BLE_ADVERT_TYPE_FLAG,
     },
     /* Complete local name */
     {
-        .advert_type = BTM_BLE_ADVERT_TYPE_NAME_COMPLETE,
-        .len         = 7,
         .p_data      = (uint8_t *) cy_bt_adv_packet_elem_1,
+        .len         = 7,
+        .advert_type = BTM_BLE_ADVERT_TYPE_NAME_COMPLETE,
     },
     /* Complete list of 128-bit UUIDs available */
     {
-        .advert_type = BTM_BLE_ADVERT_TYPE_128SRV_COMPLETE,
-        .len         = 16,
         .p_data      = (uint8_t *) cy_bt_adv_packet_elem_2,
+        .len         = 16,
+        .advert_type = BTM_BLE_ADVERT_TYPE_128SRV_COMPLETE,
     },
 };

@@ -119,8 +119,8 @@ private:
     BitFlags<Flags> mFlags;
     bool eventcallback;
 
-    static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError);
-    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError);
+    static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
+    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
     void DriveStationState(void);
     void DriveAPState(void);
     CHIP_ERROR ConfigureWiFiAP(void);

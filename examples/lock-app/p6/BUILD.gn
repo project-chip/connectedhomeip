@@ -30,7 +30,7 @@ declare_args() {
   chip_print_memory_usage = false
 
   # PIN code for PASE session establishment.
-  setup_pin_code = 12345678
+  setup_pin_code = 20202021
 }
 
 p6_sdk_sources("lock_app_sdk_sources") {
