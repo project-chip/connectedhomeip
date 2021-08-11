@@ -49,34 +49,30 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label:
-        "Check ColorLoopDirection Value"
+    - label: "Check ColorLoopDirection Value"
       command: "readAttribute"
       attribute: "color loop direction"
       response:
-        value: 1
+          value: 1
 
-    - label:
-        "Check ColorLoopTime Value"
+    - label: "Check ColorLoopTime Value"
       command: "readAttribute"
       attribute: "color loop time"
       response:
-        value: 100
+          value: 100
 
-    - label:
-        "Check ColorLoopStartEnhancedHue Value"
+    - label: "Check ColorLoopStartEnhancedHue Value"
       disabled: true
       command: "readAttribute"
       attribute: "color loop start enhancedHue"
       response:
-        value: 500
+          value: 500
 
-    - label:
-        "Check ColorLoopActive Value"
+    - label: "Check ColorLoopActive Value"
       command: "readAttribute"
       attribute: "color loop active"
       response:
-        value: 0
+          value: 0
 
     - label: "Color Loop Set Command - Start Color Loop"
       command: "ColorLoopSet"
@@ -97,12 +93,11 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label:
-        "Check ColorLoopActive Value"
+    - label: "Check ColorLoopActive Value"
       command: "readAttribute"
       attribute: "color loop active"
       response:
-        value: 1
+          value: 1
 
     - label: "Check EnhancedCurrentHue attribute value changed to a Higher Hue"
       disabled: true
@@ -133,19 +128,17 @@ tests:
       command: "readAttribute"
       attribute: "enhanced current hue"
 
-    - label:
-        "Check ColorLoopDirection Value"
+    - label: "Check ColorLoopDirection Value"
       command: "readAttribute"
       attribute: "color loop direction"
       response:
-        value: 0
+          value: 0
 
-    - label:
-        "Check ColorLoopTime Value"
+    - label: "Check ColorLoopTime Value"
       command: "readAttribute"
       attribute: "color loop time"
       response:
-        value: 3500
+          value: 3500
 
     - label: "Color Loop Set Command - Set direction while running"
       command: "ColorLoopSet"
@@ -166,9 +159,8 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label:
-        "Check ColorLoopActive Value"
+    - label: "Check ColorLoopActive Value"
       command: "readAttribute"
       attribute: "color loop active"
       response:
-        value: 0
+          value: 0
