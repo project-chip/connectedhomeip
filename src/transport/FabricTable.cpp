@@ -397,9 +397,7 @@ void FabricTable::ReleaseFabricIndex(FabricIndex fabricIndex)
 
 FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex)
 {
-    // FabricIndex 0 is reserved, and not assigned to commissioned fabrics.
-    // Valid FabricIndex range from (kMinValidFabricIndex .. CHIP_CONFIG_MAX_DEVICE_ADMINS + kMinValidFabricIndex)
-    if (fabricIndex >= kMinValidFabricIndex && fabricIndex < (CHIP_CONFIG_MAX_DEVICE_ADMINS + kMinValidFabricIndex))
+    if (fabricIndex >= kMinValidFabricIndex && fabricIndex <= kMaxValidFabricIndex)
     {
         return &mStates[fabricIndex - kMinValidFabricIndex];
     }
@@ -409,8 +407,8 @@ FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex)
 
 void FabricTable::Reset()
 {
-    static_assert(CHIP_CONFIG_MAX_DEVICE_ADMINS + kMinValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
-    for (FabricIndex i = kMinValidFabricIndex; i < (CHIP_CONFIG_MAX_DEVICE_ADMINS + kMinValidFabricIndex); i++)
+    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
+    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
     {
         FabricInfo * fabric = FindFabricWithIndex(i);
 
@@ -474,27 +472,49 @@ exit:
     return err;
 }
 
-CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex & assignedIndex)
+CHIP_ERROR FabricTable::SetFabricInfoIfIndexAvailable(FabricIndex index, FabricInfo & newFabric)
 {
-    static_assert(CHIP_CONFIG_MAX_DEVICE_ADMINS + kMinValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
-    for (FabricIndex i = kMinValidFabricIndex; i < (CHIP_CONFIG_MAX_DEVICE_ADMINS + kMinValidFabricIndex); i++)
-    {
-        FabricInfo * fabric = FindFabricWithIndex(i);
+    FabricInfo * fabric = FindFabricWithIndex(index);
 
-        if (fabric != nullptr && !fabric->IsInitialized())
+    if (fabric != nullptr && !fabric->IsInitialized())
+    {
+        fabric->SetEphemeralKey(newFabric.GetEphemeralKey());
+        fabric->SetRootCert(ByteSpan(newFabric.mRootCert, newFabric.mRootCertLen));
+        fabric->SetICACert(ByteSpan(newFabric.mICACert, newFabric.mICACertLen));
+        fabric->SetNOCCert(ByteSpan(newFabric.mNOCCert, newFabric.mNOCCertLen));
+        fabric->SetOperationalId(newFabric.mOperationalId);
+        fabric->SetVendorId(newFabric.GetVendorId());
+        fabric->SetFabricLabel(newFabric.GetFabricLabel());
+        FabricIndex assignedIndex = fabric->GetFabricIndex();
+        ChipLogProgress(Discovery, "Added new fabric at index: %d, Initialized: %d", assignedIndex, fabric->IsInitialized());
+        ChipLogProgress(Discovery, "Assigned fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,
+                        ChipLogValueX64(fabric->mOperationalId.GetFabricId()), ChipLogValueX64(fabric->mOperationalId.GetNodeId()));
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outputIndex)
+{
+    VerifyOrReturnError(outputIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
+    for (FabricIndex i = mNextAvailableFabricIndex; i <= kMaxValidFabricIndex; i++)
+    {
+        if (CHIP_NO_ERROR == SetFabricInfoIfIndexAvailable(i, newFabric))
         {
-            fabric->SetEphemeralKey(newFabric.GetEphemeralKey());
-            fabric->SetRootCert(ByteSpan(newFabric.mRootCert, newFabric.mRootCertLen));
-            fabric->SetICACert(ByteSpan(newFabric.mICACert, newFabric.mICACertLen));
-            fabric->SetNOCCert(ByteSpan(newFabric.mNOCCert, newFabric.mNOCCertLen));
-            fabric->SetOperationalId(newFabric.mOperationalId);
-            fabric->SetVendorId(newFabric.GetVendorId());
-            fabric->SetFabricLabel(newFabric.GetFabricLabel());
-            assignedIndex = fabric->GetFabricIndex();
-            ChipLogProgress(Discovery, "Added new fabric at index: %d, Initialized: %d", assignedIndex, fabric->IsInitialized());
-            ChipLogProgress(Discovery, "Assigned fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,
-                            ChipLogValueX64(fabric->mOperationalId.GetFabricId()),
-                            ChipLogValueX64(fabric->mOperationalId.GetNodeId()));
+            mNextAvailableFabricIndex = static_cast<FabricIndex>((i + 1) % UINT8_MAX);
+            *outputIndex              = i;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    for (FabricIndex i = kMinValidFabricIndex; i < kMaxValidFabricIndex; i++)
+    {
+        if (CHIP_NO_ERROR == SetFabricInfoIfIndexAvailable(i, newFabric))
+        {
+            mNextAvailableFabricIndex = static_cast<FabricIndex>((i + 1) % UINT8_MAX);
+            *outputIndex              = i;
             return CHIP_NO_ERROR;
         }
     }
@@ -528,8 +548,8 @@ exit:
 
 void FabricTable::DeleteAllFabrics()
 {
-    static_assert(CHIP_CONFIG_MAX_DEVICE_ADMINS + kMinValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
-    for (FabricIndex i = kMinValidFabricIndex; i < (CHIP_CONFIG_MAX_DEVICE_ADMINS + kMinValidFabricIndex); i++)
+    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
+    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
     {
         Delete(i);
     }

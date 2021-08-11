@@ -41,8 +41,9 @@
 namespace chip {
 namespace Transport {
 
-static constexpr FabricIndex kUndefinedFabricIndex    = UINT8_MAX;
+static constexpr FabricIndex kUndefinedFabricIndex    = 0;
 static constexpr FabricIndex kMinValidFabricIndex     = 1;
+static constexpr FabricIndex kMaxValidFabricIndex     = std::min(UINT8_MAX, CHIP_CONFIG_MAX_DEVICE_ADMINS);
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 // KVS store is sensitive to length of key strings, based on the underlying
@@ -333,7 +334,16 @@ public:
     CHIP_ERROR Delete(FabricIndex id);
     void DeleteAllFabrics();
 
-    CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex & assignedIndex);
+    /**
+     * Add the new fabric information to fabric table if the table has space to store
+     * more fabrics. CHIP_ERROR_NO_MEMORY error will be returned if the table is full.
+     *
+     * The provided information will get copied to internal data structures, and the caller
+     * can release the memory associated with input parameter after the call is complete.
+     *
+     * If the call is successful, the assigned fabric index is returned as output parameter.
+     */
+    CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
 
     void ReleaseFabricIndex(FabricIndex fabricId);
 
@@ -358,6 +368,10 @@ private:
 
     // TODO: Fabric table should be backed by a single backing store (attribute store), remove delegate callbacks #6419
     FabricTableDelegate * mDelegate = nullptr;
+
+    FabricIndex mNextAvailableFabricIndex = kMinValidFabricIndex;
+
+    CHIP_ERROR SetFabricInfoIfIndexAvailable(FabricIndex index, FabricInfo & fabric);
 };
 
 } // namespace Transport

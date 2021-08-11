@@ -382,7 +382,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, fabric.SetOperationalCertsFromCertArray(chipCertSpan) == CHIP_NO_ERROR);
 
     FabricIndex index;
-    fabricTable.AddNewFabric(fabric, index);
+    fabricTable.AddNewFabric(fabric, &index);
     fabricTable.Store(index);
     fabricTable.ReleaseFabricIndex(index);
 

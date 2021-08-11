@@ -228,6 +228,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoin
 
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     // TODO - Update RemoveFabric command to take FabricIndex as input parameter
+    //        The fix requires an update to cluster definition.
     //    CHIP_ERROR err       = GetGlobalFabricTable().Delete(fabricIndex);
     //    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
     // exit:
@@ -239,6 +240,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoin
 bool emberAfOperationalCredentialsClusterSetFabricCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint16_t VendorId)
 {
     // TODO - Delete SetFabric command as this is not spec compliant
+    ChipLogError(Zcl, "operational-credentials cluster received SetFabric command, which is not supported");
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
@@ -328,7 +330,8 @@ EmberAfNodeOperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
 // Up for discussion in Multi-Admin TT: chip-spec:#2891
 bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(EndpointId endpoint, app::CommandHandler * commandObj)
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Remove all Fabrics");
+    // TODO - Delete RemoveAll fabrics command as this is not spec compliant
+    ChipLogError(Zcl, "operational-credentials cluster received remove all fabric command, which is not supported");
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
@@ -348,16 +351,13 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app
 
     gFabricBeingCommissioned.SetVendorId(adminVendorId);
 
-    err = GetGlobalFabricTable().AddNewFabric(gFabricBeingCommissioned, fabricIndex);
+    err = GetGlobalFabricTable().AddNewFabric(gFabricBeingCommissioned, &fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     err = GetGlobalFabricTable().Store(fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    // We have a new operational identity and should start advertising it.  We
-    // can't just wait until we get network configuration commands, because we
-    // might be on the operational network already, in which case we are
-    // expected to be live with our new identity at this point.
+    // We might have a new operational identity, so we should start advertising it right away.
     chip::app::Mdns::AdvertiseOperational();
 
 exit:
@@ -380,7 +380,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(EndpointId endpoint, 
     CHIP_ERROR err          = CHIP_NO_ERROR;
     FabricIndex fabricIndex = 0;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has updated the Op Cert");
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: an administrator has updated the Op Cert");
 
     // Fetch current fabric
     FabricInfo * fabric = retrieveCurrentFabric();

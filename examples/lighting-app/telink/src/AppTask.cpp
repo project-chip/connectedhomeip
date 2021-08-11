@@ -99,7 +99,6 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
-    // Setup test pairing
     ret = AddTestCommissioning();
     if (ret != CHIP_NO_ERROR)
     {

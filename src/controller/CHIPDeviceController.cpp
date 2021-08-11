@@ -255,7 +255,7 @@ void DeviceController::OnLocalNOCChainGeneration(void * context, CHIP_ERROR stat
         SuccessOrExit(err);
     }
 
-    err = controller->mFabrics.AddNewFabric(newFabric, controller->mFabricIndex);
+    err = controller->mFabrics.AddNewFabric(newFabric, &controller->mFabricIndex);
     SuccessOrExit(err);
     ChipLogProgress(Controller, "Added new fabric %d", controller->mFabricIndex);
 
