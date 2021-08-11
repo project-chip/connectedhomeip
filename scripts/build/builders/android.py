@@ -101,7 +101,7 @@ class AndroidBuilder(Builder):
       ],
                     title='Accepting NDK licenses')
 
-  def build(self):
+  def _build(self):
     self._Execute(['ninja', '-C', self.output_dir],
                   title='Building JNI ' + self.identifier)
 
@@ -140,7 +140,7 @@ class AndroidBuilder(Builder):
 
     return items
 
-  def outputs(self):
+  def build_outputs(self):
     outputs = {
         'CHIPController.jar':
             os.path.join(self.output_dir, 'lib', 'CHIPController.jar'),
