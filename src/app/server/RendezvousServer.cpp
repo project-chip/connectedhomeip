@@ -57,8 +57,7 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
                          event->CommissioningComplete.status.Format());
         }
         // reset all advertising
-        BitFlags<app::Mdns::KeyValueFlags> flags;
-        app::Mdns::StartServer(flags);
+        app::Mdns::StartServer(app::Mdns::CommissioningMode::kDisabled);
         // TODO: Commissioning complete means we can finalize the fabric in our storage
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
@@ -100,9 +99,7 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
     // reset all advertising, indicating we are in commissioningMode
     // and we were put into this state via a command for additional commissioning
     // NOTE: when device has never been commissioned, Rendezvous will ensure AP is false
-    BitFlags<app::Mdns::KeyValueFlags> flags(app::Mdns::KeyValueFlags::kCommissioningMode,
-                                             app::Mdns::KeyValueFlags::kAdditionalCommissioning);
-    app::Mdns::StartServer(flags);
+    app::Mdns::StartServer(app::Mdns::CommissioningMode::kEnabledAsAdditionalCommissioning);
 
     mSessionMgr      = sessionMgr;
     mFabric          = fabric;
@@ -140,8 +137,7 @@ void RendezvousServer::Cleanup()
     }
 
     // reset all advertising
-    BitFlags<app::Mdns::KeyValueFlags> flags;
-    app::Mdns::StartServer(flags);
+    app::Mdns::StartServer(app::Mdns::CommissioningMode::kDisabled);
 }
 
 void RendezvousServer::OnSessionEstablishmentError(CHIP_ERROR err)

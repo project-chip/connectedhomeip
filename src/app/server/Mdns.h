@@ -25,12 +25,11 @@ namespace chip {
 namespace app {
 namespace Mdns {
 
-enum class KeyValueFlags : uint8_t
+enum class CommissioningMode
 {
-    // indicates whether CM (Commissioning Mode) flag should be set to 1
-    kCommissioningMode = 0x01,
-    // indicates whether AP (Additional Commissioning) flag should be set to 1
-    kAdditionalCommissioning = 0x02,
+    kDisabled,
+    kEnabled,
+    kEnabledAsAdditionalCommissioning
 };
 
 /// Start operational advertising
@@ -40,13 +39,17 @@ CHIP_ERROR AdvertiseOperational();
 CHIP_ERROR AdvertiseCommissioner();
 
 /// Set MDNS commissionable node advertisement
-CHIP_ERROR AdvertiseCommissionableNode(BitFlags<KeyValueFlags> flags);
+CHIP_ERROR AdvertiseCommissionableNode(CommissioningMode mode);
+
+/// (Re-)starts the minmdns server using default state
+// Commissioning mode is enabled if device has not yet been commissioned
+void StartServer();
 
 /// (Re-)starts the minmdns server
 //
 // NOTE: when device has never been commissioned, kAdditionalCommissioning flag will be ignored
 //
-void StartServer(BitFlags<KeyValueFlags> flags);
+void StartServer(CommissioningMode mode);
 
 CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 
