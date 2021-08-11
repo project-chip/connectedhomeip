@@ -203,16 +203,12 @@ void ProcessCommand(streamer_t * stream, char * destination)
 
     Transport::FabricTable fabrics;
     Transport::PeerAddress peerAddress;
-    Transport::FabricInfo * fabricInfo = nullptr;
 
     if (!chip::Inet::IPAddress::FromString(destination, gDestAddr))
     {
         streamer_printf(stream, "Invalid CHIP Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
-
-    fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, kTestControllerNodeId);
-    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)

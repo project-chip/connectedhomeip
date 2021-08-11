@@ -443,7 +443,13 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
     VerifyOrReturnError(Kcaorb != nullptr, CHIP_ERROR_INTERNAL);
 
     ReturnErrorOnFailure(PointWrite(XY, point_buffer, point_size));
-    ReturnErrorOnFailure(MacVerify(Kcaorb, hash_size / 2, in, in_len, point_buffer, point_size));
+
+    CHIP_ERROR err = MacVerify(Kcaorb, hash_size / 2, in, in_len, point_buffer, point_size);
+    if (err == CHIP_ERROR_INTERNAL)
+    {
+        ChipLogError(SecureChannel, "Failed to verify peer's MAC. This can happen when setup code is incorrect.");
+    }
+    ReturnErrorOnFailure(err);
 
     state = CHIP_SPAKE2P_STATE::KC;
     return CHIP_NO_ERROR;

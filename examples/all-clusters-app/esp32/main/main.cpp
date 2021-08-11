@@ -343,7 +343,7 @@ public:
         if (i == 0)
         {
             ConnectivityMgr().ClearWiFiStationProvision();
-            OpenDefaultPairingWindow(ResetFabrics::kYes);
+            OpenBasicCommissioningWindow(ResetFabrics::kYes);
         }
         else if (i == 1)
         {
@@ -352,7 +352,7 @@ public:
         else if (i == 2)
         {
             app::Mdns::AdvertiseCommissionableNode();
-            OpenDefaultPairingWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
+            OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
         }
     }
 

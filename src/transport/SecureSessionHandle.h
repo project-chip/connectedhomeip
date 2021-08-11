@@ -35,7 +35,7 @@ public:
 
     bool operator==(const SecureSessionHandle & that) const
     {
-        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId && mFabric == that.mFabric;
+        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
     }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }

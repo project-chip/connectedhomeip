@@ -320,15 +320,6 @@
                                     [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice
                                                                               endpoint:0
                                                                                  queue:dispatch_get_main_queue()];
-                                [cluster removeAllFabrics:^(NSError * error, NSDictionary * values) {
-                                    BOOL errorOccured = (error != nil);
-                                    NSString * resultString = errorOccured
-                                        ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
-                                        : @"Remove all fabrics success";
-                                    dispatch_async(dispatch_get_main_queue(), ^{
-                                        [self updateResult:resultString isError:errorOccured];
-                                    });
-                                }];
                             } else {
                                 [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]
                                            isError:YES];
@@ -416,28 +407,6 @@
                         [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
                     [self updateResult:[NSString stringWithFormat:@"removeFabric command sent for fabricID %@.", fabricId]
                                isError:NO];
-                    [cluster removeFabric:[fabricId unsignedLongLongValue]
-                                   nodeId:[nodeID unsignedLongLongValue]
-                                 vendorId:[vendorID unsignedShortValue]
-                          responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                              if (error) {
-                                  NSLog(@"Failed to remove fabric with error %@", error);
-                                  dispatch_async(dispatch_get_main_queue(), ^{
-                                      [self updateResult:[NSString
-                                                             stringWithFormat:@"Command removeFabric failed with error %@", error]
-                                                 isError:YES];
-                                      self->_removeFabricTextField.text = @"";
-                                  });
-                              } else {
-                                  NSLog(@"Succeeded removing fabric!");
-                                  dispatch_async(dispatch_get_main_queue(), ^{
-                                      self->_removeFabricTextField.text = @"";
-                                      [self updateResult:[NSString stringWithFormat:@"Command removeFabric succeeded to remove %@",
-                                                                   fabricId]
-                                                 isError:NO];
-                                  });
-                              }
-                          }];
                 } else {
                     [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"] isError:YES];
                 }

@@ -32,12 +32,6 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
 
     mFabrics.Reset();
 
-    chip::Transport::FabricInfo * srcNodeFabric = mFabrics.AssignFabricIndex(mSrcFabricIndex, GetSourceNodeId());
-    VerifyOrReturnError(srcNodeFabric != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    chip::Transport::FabricInfo * destNodeFabric = mFabrics.AssignFabricIndex(mDestFabricIndex, GetDestinationNodeId());
-    VerifyOrReturnError(destNodeFabric != nullptr, CHIP_ERROR_NO_MEMORY);
-
     ReturnErrorOnFailure(mSecureSessionMgr.Init(&GetSystemLayer(), transport, &mFabrics, &mMessageCounterManager));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));

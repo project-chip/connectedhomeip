@@ -103,7 +103,7 @@ private:
     SecurePairingUsingTestSecret mPairingLocalToPeer;
     Transport::FabricTable mFabrics;
     FabricIndex mSrcFabricIndex  = 0;
-    FabricIndex mDestFabricIndex = 1;
+    FabricIndex mDestFabricIndex = 0;
     Credentials::OperationalCredentialSet mOperationalCredentialSet;
 };
 
