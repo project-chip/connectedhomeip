@@ -37,17 +37,6 @@
 #define PTHREAD_NULL 0
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING && !defined(PTHREAD_NULL)
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
-namespace chip {
-namespace Mdns {
-void GetMdnsTimeout(timeval & timeout);
-void HandleMdnsTimeout();
-} // namespace Mdns
-} // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
 namespace chip {
 namespace System {
 
@@ -340,10 +329,6 @@ void WatchableEventManager::PrepareEvents()
     const Clock::MonotonicMilliseconds sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : 0;
     MillisecondsToTimeval(sleepTime, mNextTimeout);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
-    chip::Mdns::GetMdnsTimeout(mNextTimeout);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
     mMaxFd = -1;
     FD_ZERO(&mSelected.mReadSet);
     FD_ZERO(&mSelected.mWriteSet);
@@ -409,10 +394,6 @@ void WatchableEventManager::HandleEvents()
             }
         }
     }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
-    chip::Mdns::HandleMdnsTimeout();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = PTHREAD_NULL;

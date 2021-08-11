@@ -30,17 +30,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
-namespace chip {
-namespace Mdns {
-void GetMdnsTimeout(timeval & timeout);
-void HandleMdnsTimeout();
-} // namespace Mdns
-} // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
 #ifndef CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
 #define CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS 1
 #endif

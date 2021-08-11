@@ -29,6 +29,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <system/SystemLayer.h>
 
 using chip::Mdns::kMdnsTypeMaxSize;
 using chip::Mdns::MdnsServiceProtocol;
@@ -136,8 +137,6 @@ namespace Mdns {
 
 MdnsAvahi MdnsAvahi::sInstance;
 
-constexpr uint64_t kUsPerSec = 1000 * 1000;
-
 Poller::Poller()
 {
     mAvahiPoller.userdata         = this;
@@ -150,6 +149,7 @@ Poller::Poller()
     mAvahiPoller.timeout_update = TimeoutUpdate;
     mAvahiPoller.timeout_free   = TimeoutFree;
 
+    mEarliestTimeout = std::chrono::steady_clock::time_point();
     mWatchableEvents = &DeviceLayer::SystemLayer.WatchableEventsManager();
 }
 
@@ -239,9 +239,10 @@ steady_clock::time_point GetAbsTimeout(const struct timeval * timeout)
 
 AvahiTimeout * Poller::TimeoutNew(const struct timeval * timeout, AvahiTimeoutCallback callback, void * context)
 {
-
     mTimers.emplace_back(new AvahiTimeout{ GetAbsTimeout(timeout), callback, timeout != nullptr, context, this });
-    return mTimers.back().get();
+    AvahiTimeout * timer = mTimers.back().get();
+    SystemTimerUpdate(timer);
+    return timer;
 }
 
 void Poller::TimeoutUpdate(AvahiTimeout * timer, const struct timeval * timeout)
@@ -250,6 +251,7 @@ void Poller::TimeoutUpdate(AvahiTimeout * timer, const struct timeval * timeout)
     {
         timer->mAbsTimeout = GetAbsTimeout(timeout);
         timer->mEnabled    = true;
+        static_cast<Poller *>(timer->mPoller)->SystemTimerUpdate(timer);
     }
     else
     {
@@ -269,38 +271,17 @@ void Poller::TimeoutFree(AvahiTimeout & timer)
                   mTimers.end());
 }
 
-void Poller::GetTimeout(timeval & timeout)
+void Poller::SystemTimerCallback(System::Layer * layer, void * data)
 {
-    microseconds timeoutVal = seconds(timeout.tv_sec) + microseconds(timeout.tv_usec);
-
-    for (auto && timer : mTimers)
-    {
-        steady_clock::time_point absTimeout = timer->mAbsTimeout;
-        steady_clock::time_point now        = steady_clock::now();
-
-        if (!timer->mEnabled)
-        {
-            continue;
-        }
-        if (absTimeout < now)
-        {
-            timeoutVal = microseconds(0);
-            break;
-        }
-        else
-        {
-            timeoutVal = std::min(timeoutVal, duration_cast<microseconds>(absTimeout - now));
-        }
-    }
-
-    timeout.tv_sec  = static_cast<uint64_t>(timeoutVal.count()) / kUsPerSec;
-    timeout.tv_usec = static_cast<uint64_t>(timeoutVal.count()) % kUsPerSec;
+    static_cast<Poller *>(data)->HandleTimeout();
 }
 
 void Poller::HandleTimeout()
 {
+    mEarliestTimeout             = std::chrono::steady_clock::time_point();
     steady_clock::time_point now = steady_clock::now();
 
+    AvahiTimeout * earliest = nullptr;
     for (auto && timer : mTimers)
     {
         if (!timer->mEnabled)
@@ -311,6 +292,27 @@ void Poller::HandleTimeout()
         {
             timer->mCallback(timer.get(), timer->mContext);
         }
+        else
+        {
+            if ((earliest == nullptr) || (timer->mAbsTimeout < earliest->mAbsTimeout))
+            {
+                earliest = timer.get();
+            }
+        }
+    }
+    if (earliest)
+    {
+        SystemTimerUpdate(earliest);
+    }
+}
+
+void Poller::SystemTimerUpdate(AvahiTimeout * timer)
+{
+    if ((mEarliestTimeout == std::chrono::steady_clock::time_point()) || (timer->mAbsTimeout < mEarliestTimeout))
+    {
+        mEarliestTimeout = timer->mAbsTimeout;
+        auto msDelay     = std::chrono::duration_cast<std::chrono::milliseconds>(steady_clock::now() - mEarliestTimeout).count();
+        DeviceLayer::SystemLayer.StartTimer(msDelay, SystemTimerCallback, this);
     }
 }
 
@@ -751,16 +753,6 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
     avahi_service_resolver_free(resolver);
     chip::Platform::Delete(context);
-}
-
-void GetMdnsTimeout(timeval & timeout)
-{
-    MdnsAvahi::GetInstance().GetPoller().GetTimeout(timeout);
-}
-
-void HandleMdnsTimeout()
-{
-    MdnsAvahi::GetInstance().GetPoller().HandleTimeout();
 }
 
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)
