@@ -77,7 +77,7 @@ tests:
       attribute: "color loop active"
       response:
         value: 0
-    
+
     - label: "Color Loop Set Command - Start Color Loop"
       command: "ColorLoopSet"
       arguments:
