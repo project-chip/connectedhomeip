@@ -41,7 +41,14 @@ android {
         }
     }
 
-    if (rootProject.ext.matterFromSource) {
+    if (rootProject.ext.matterBuildSrcDir == null) {
+        sourceSets {
+            main {
+                jniLibs.srcDirs = ['libs/jniLibs']
+            }
+        }
+    }
+    else {
         sourceSets {
             main {
                 java.srcDirs = [
@@ -55,15 +62,8 @@ android {
 
         externalNativeBuild {
             cmake {
-                path file('../../../../out/android_as/CMakeLists.txt')
+                path file(rootProject.ext.matterBuildSrcDir + '/CMakeLists.txt')
                 version '3.10.2'
-            }
-        }
-    }
-    else {
-        sourceSets {
-            main {
-                jniLibs.srcDirs = ['libs/jniLibs']
             }
         }
     }
@@ -75,8 +75,8 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
-    if(!rootProject.ext.matterFromSource) {
-        // local in-source-tree copy of the dependencies. Useful for IDE compilation
+    if(rootProject.ext.matterBuildSrcDir == null) {
+         // local in-source-tree copy of the dependencies. Useful for IDE compilation
         implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
 
         // build time dependencies
