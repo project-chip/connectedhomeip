@@ -69,7 +69,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         return kSizeLengthInBytes;
     }
 
-    if (!chip::CanCastTo<uint16_t>(index))
+    if (!CanCastTo<uint16_t>(index))
     {
         ChipLogError(Zcl, "Index %" PRId32 " is invalid. Should be between 1 and 65534", index);
         return 0;
@@ -94,7 +94,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
             // Struct _NetworkInterfaceType
             _NetworkInterfaceType * entry = reinterpret_cast<_NetworkInterfaceType *>(write ? src : dest);
-            chip::ByteSpan * NameSpan     = &entry->Name; // OCTET_STRING
+            ByteSpan * NameSpan           = &entry->Name; // OCTET_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, NameSpan) : ReadByteSpan(src + entryOffset, 34, NameSpan)))
             {
@@ -110,7 +110,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             copyListMember(write ? dest : (uint8_t *) &entry->OffPremiseServicesReachableIPv6,
                            write ? (uint8_t *) &entry->OffPremiseServicesReachableIPv6 : src, write, &entryOffset,
                            sizeof(entry->OffPremiseServicesReachableIPv6)); // BOOLEAN
-            chip::ByteSpan * HardwareAddressSpan = &entry->HardwareAddress; // OCTET_STRING
+            ByteSpan * HardwareAddressSpan = &entry->HardwareAddress;       // OCTET_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 10, HardwareAddressSpan)
                        : ReadByteSpan(src + entryOffset, 10, HardwareAddressSpan)))
@@ -147,8 +147,8 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
                            &entryOffset, sizeof(entry->VendorId)); // INT16U
             copyListMember(write ? dest : (uint8_t *) &entry->NodeId, write ? (uint8_t *) &entry->NodeId : src, write, &entryOffset,
-                           sizeof(entry->NodeId));      // NODE_ID
-            chip::ByteSpan * LabelSpan = &entry->Label; // OCTET_STRING
+                           sizeof(entry->NodeId)); // NODE_ID
+            ByteSpan * LabelSpan = &entry->Label;  // OCTET_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, LabelSpan) : ReadByteSpan(src + entryOffset, 34, LabelSpan)))
             {
@@ -201,7 +201,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     }
 
     uint32_t totalSize = kSizeLengthInBytes + (entryCount * entryLength);
-    if (!chip::CanCastTo<uint16_t>(totalSize))
+    if (!CanCastTo<uint16_t>(totalSize))
     {
         ChipLogError(Zcl, "Cluster " ChipLogFormatMEI ": Size of attribute " ChipLogFormatMEI " is too large.",
                      ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
