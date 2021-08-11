@@ -231,7 +231,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(EndpointId aEndpointId, 
     {
     case EMBER_ZCL_SETPOINT_ADJUST_MODE_HEAT_AND_COOL_SETPOINTS: {
 
-    https: // github.com/CHIP-Specifications/connectedhomeip-spec/issues/3726
+        // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3726
         // Behavior is not specified if the device only contains one mode
         // and the both mode command is sent.
         // Implemented behavior is not perfect, but spec needs to be clear before changing the implementaion
