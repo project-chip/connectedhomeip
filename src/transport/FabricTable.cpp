@@ -485,8 +485,8 @@ CHIP_ERROR FabricTable::SetFabricInfoIfIndexAvailable(FabricIndex index, FabricI
         fabric->SetOperationalId(newFabric.mOperationalId);
         fabric->SetVendorId(newFabric.GetVendorId());
         fabric->SetFabricLabel(newFabric.GetFabricLabel());
-        FabricIndex assignedIndex = fabric->GetFabricIndex();
-        ChipLogProgress(Discovery, "Added new fabric at index: %d, Initialized: %d", assignedIndex, fabric->IsInitialized());
+        ChipLogProgress(Discovery, "Added new fabric at index: %d, Initialized: %d", fabric->GetFabricIndex(),
+                        fabric->IsInitialized());
         ChipLogProgress(Discovery, "Assigned fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,
                         ChipLogValueX64(fabric->mOperationalId.GetFabricId()), ChipLogValueX64(fabric->mOperationalId.GetNodeId()));
         return CHIP_NO_ERROR;
