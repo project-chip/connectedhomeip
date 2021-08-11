@@ -2,6 +2,18 @@ ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION}
 
 # ------------------------------------------------------------------------------
+# Add group/user for tizen
+ARG USER_NAME=tizen
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+ENV USER_HOME /home/$USER_NAME
+
+RUN set -x \
+    && groupadd -g $USER_GID $USER_NAME \
+    && useradd -m $USER_NAME -s /bin/bash -u $USER_UID -g $USER_GID -G sudo -l \
+    && : # last line
+
+# ------------------------------------------------------------------------------
 # Install toolchain
 RUN set -x \
     && apt-get update \
@@ -72,3 +84,8 @@ RUN set -x \
     && rm -rf data \
     && rm cross-arm-gcc-9.2_0.1.9_ubuntu-64.zip \
     && : # last line
+
+# ------------------------------------------------------------------------------
+# Switch to the non-root user
+USER $USER_NAME
+WORKDIR $USER_HOME
