@@ -64,6 +64,17 @@ jobs:
               with:
                   path: ${{ env.GITHUB_CACHE_PATH }}
                   key: ${{ runner.os }}-cirque-${{ steps.cirque-key.outputs.val }}
+                  restore-keys: |
+                    ${{ runner.os }}-cirque-
+
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: |
+                  integrations/docker/images/chip-build-cirque/run.sh \
+                    --env GITHUB_ACTION_RUN=1 \
+                    --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
+                    --volume /tmp:/tmp \
+                    -- scripts/build/gn_bootstrap.sh
 
             - name: Cirque Bootstrap
               timeout-minutes: 15
@@ -80,6 +91,18 @@ jobs:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
+            - name: Build Binaries
+              timeout-minutes: 15
+              run: |
+                  integrations/docker/images/chip-build-cirque/run.sh \
+                    --env GITHUB_ACTION_RUN=1 \
+                    --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
+                    --volume /tmp:/tmp \
+                    -- ./gn_build.sh \
+                    chip_build_tests=false \
+                    enable_host_gcc_build=true \
+                    enable_host_gcc_mbedtls_build=false \
+                    enable_host_clang_build = false
             - name: Run Tests
               timeout-minutes: 25
               run: |

@@ -92,6 +92,14 @@ jobs:
                   mkdir -p example_binaries/$BUILD_TYPE-build
                   cp examples/lock-app/esp32/build/chip-lock-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-lock-app.elf
+            - name: Build example Bridge App
+              timeout-minutes: 5
+              run: scripts/examples/esp_example.sh bridge-app
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/bridge-app/esp32/build/chip-bridge-app.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-bridge-app.elf
             - name: Build example Persistent Storage App
               timeout-minutes: 5
               run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults

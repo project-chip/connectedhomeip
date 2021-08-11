@@ -24,11 +24,14 @@ from .builder import Builder
 class Esp32Board(Enum):
   DevKitC = auto()
   M5Stack = auto()
+  C3DevKit = auto()
 
 
 class Esp32App(Enum):
   ALL_CLUSTERS = auto()
   LOCK = auto()
+  SHELL = auto()
+  BRIDGE = auto()
 
   @property
   def ExampleName(self):
@@ -36,6 +39,10 @@ class Esp32App(Enum):
       return 'all-clusters-app'
     elif self == Esp32App.LOCK:
       return 'lock-app'
+    elif self == Esp32App.SHELL:
+      return 'shell'
+    elif self == Esp32App.BRIDGE:
+      return 'bridge-app'
     else:
       raise Exception('Unknown app type: %r' % self)
 
@@ -45,6 +52,10 @@ class Esp32App(Enum):
       return 'chip-all-clusters-app'
     elif self == Esp32App.LOCK:
       return 'chip-lock-app'
+    elif self == Esp32App.SHELL:
+      return 'chip-shell'
+    elif self == Esp32App.BRIDGE:
+      return 'chip-bridge-app'
     else:
       raise Exception('Unknown app type: %r' % self)
 
@@ -58,6 +69,8 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App):
     return 'sdkconfig.defaults'
   elif board == Esp32Board.M5Stack:
     return 'sdkconfig_m5stack.defaults'
+  elif board == Esp32Board.C3DevKit:
+    return 'sdkconfig_c3devkit.defaults'
   else:
     raise Exception('Unknown board type')
 
@@ -67,10 +80,10 @@ class Esp32Builder(Builder):
   def __init__(self,
                root,
                runner,
-               output_dir: str,
+               output_prefix: str,
                board: Esp32Board = Esp32Board.M5Stack,
                app: Esp32App = Esp32App.ALL_CLUSTERS):
-    super(Esp32Builder, self).__init__(root, runner, output_dir)
+    super(Esp32Builder, self).__init__(root, runner, output_prefix)
     self.board = board
     self.app = app
 
@@ -97,13 +110,13 @@ class Esp32Builder(Builder):
     self._IdfEnvExecute(
         cmd, cwd=self.root, title='Generating ' + self.identifier)
 
-  def build(self):
+  def _build(self):
     logging.info('Compiling Esp32 at %s', self.output_dir)
 
     self._IdfEnvExecute(
         "ninja -C '%s'" % self.output_dir, title='Building ' + self.identifier)
 
-  def outputs(self):
+  def build_outputs(self):
     return {
         self.app.AppNamePrefix + '.elf':
             os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf'),

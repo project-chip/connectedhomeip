@@ -17,6 +17,7 @@
 bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfStatus status);
 bool IMReadReportAttributesResponseCallback(const chip::app::ReadClient * apReadClient, const chip::app::ClusterInfo & aPath,
                                             chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::ProtocolCode status);
+bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, EmberAfStatus status);
 
 // Global Response Callbacks
 typedef void (*DefaultSuccessCallback)(void * context);
@@ -30,7 +31,8 @@ typedef void (*Int32uAttributeCallback)(void * context, uint32_t value);
 typedef void (*Int32sAttributeCallback)(void * context, int32_t value);
 typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
 typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
-typedef void (*StringAttributeCallback)(void * context, const chip::ByteSpan value);
+typedef void (*OctetStringAttributeCallback)(void * context, const chip::ByteSpan value);
+typedef void (*CharStringAttributeCallback)(void * context, const chip::ByteSpan value);
 typedef void (*AttributeResponseFilter)(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess, chip::Callback::Cancelable * onFailure);
 
 /**
@@ -59,18 +61,14 @@ void BasicAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelabl
     }
 }
 
-template <>
-void BasicAttributeFilter<StringAttributeCallback>(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
-                                                   chip::Callback::Cancelable * onFailure);
-
 typedef void (*ReadReportingConfigurationReportedCallback)(void* context, uint16_t minInterval, uint16_t maxInterval);
 typedef void (*ReadReportingConfigurationReceivedCallback)(void* context, uint16_t timeout);
 
 // Cluster Specific Response Callbacks
 {{#chip_client_clusters}}
-{{#chip_server_cluster_responses}}
-typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#chip_server_cluster_response_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/chip_server_cluster_response_arguments}});
-{{/chip_server_cluster_responses}}
+{{#chip_cluster_responses}}
+typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}});
+{{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 {{/if}}
 

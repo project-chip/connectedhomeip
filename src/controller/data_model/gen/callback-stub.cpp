@@ -31,6 +31,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_ACCOUNT_LOGIN_CLUSTER_ID:
         emberAfAccountLoginClusterInitCallback(endpoint);
         break;
+    case ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_ID:
+        emberAfAdministratorCommissioningClusterInitCallback(endpoint);
+        break;
     case ZCL_APPLICATION_BASIC_CLUSTER_ID:
         emberAfApplicationBasicClusterInitCallback(endpoint);
         break;
@@ -160,6 +163,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_THERMOSTAT_CLUSTER_ID:
         emberAfThermostatClusterInitCallback(endpoint);
         break;
+    case ZCL_THERMOSTAT_UI_CONFIG_CLUSTER_ID:
+        emberAfThermostatUserInterfaceConfigurationClusterInitCallback(endpoint);
+        break;
     case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
@@ -179,6 +185,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 }
 
 void __attribute__((weak)) emberAfAccountLoginClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfAdministratorCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -394,6 +405,11 @@ void __attribute__((weak)) emberAfTestClusterClusterInitCallback(EndpointId endp
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfThermostatClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfThermostatUserInterfaceConfigurationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

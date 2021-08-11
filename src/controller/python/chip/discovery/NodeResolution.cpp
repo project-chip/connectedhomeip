@@ -62,7 +62,7 @@ public:
     {
         if (mFailureCallback != nullptr)
         {
-            mFailureCallback(peerId.GetFabricId(), peerId.GetNodeId(), ChipError::AsInteger(error));
+            mFailureCallback(peerId.GetFabricId(), peerId.GetNodeId(), error.AsInteger());
         }
         else
         {
@@ -105,5 +105,5 @@ extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, ui
                                                     chip::Inet::IPAddressType::kIPAddressType_Any);
     });
 
-    return ChipError::AsInteger(result);
+    return result.AsInteger();
 }

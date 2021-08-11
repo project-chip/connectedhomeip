@@ -169,6 +169,26 @@ inline bool TLVTypeIsString(TLVElementType type)
     return type >= TLVElementType::UTF8String_1ByteLength && type <= TLVElementType::ByteString_8ByteLength;
 }
 
+/**
+ * Returns true if the specified TLV type is a UTF8 string.
+ *
+ * @return @p true if the specified TLV type is a UTF8 string; otherwise @p false.
+ */
+inline bool TLVTypeIsUTF8String(TLVElementType type)
+{
+    return type >= TLVElementType::UTF8String_1ByteLength && type <= TLVElementType::UTF8String_8ByteLength;
+}
+
+/**
+ * Returns true if the specified TLV type is a byte string.
+ *
+ * @return @p true if the specified TLV type is a byte string; otherwise @p false.
+ */
+inline bool TLVTypeIsByteString(TLVElementType type)
+{
+    return type >= TLVElementType::ByteString_1ByteLength && type <= TLVElementType::ByteString_8ByteLength;
+}
+
 // TODO: move to private namespace
 inline TLVFieldSize GetTLVFieldSize(TLVElementType type)
 {

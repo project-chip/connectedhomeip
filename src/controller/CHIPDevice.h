@@ -30,6 +30,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
+#include <controller/data_model/gen/CHIPClientCallbacks.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <credentials/CHIPOperationalCredentials.h>
@@ -99,7 +100,10 @@ class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEsta
 {
 public:
     ~Device();
-    Device()               = default;
+    Device() :
+        mOpenPairingSuccessCallback(OnOpenPairingWindowSuccessResponse, this),
+        mOpenPairingFailureCallback(OnOpenPairingWindowFailureResponse, this)
+    {}
     Device(const Device &) = delete;
 
     enum class PairingWindowOption
@@ -146,6 +150,9 @@ public:
 
     CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
                                         Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter);
+
+    CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
+                                         Callback::Cancelable * onFailureCallback);
 
     /**
      * @brief
@@ -301,7 +308,7 @@ public:
      *
      * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload);
+    CHIP_ERROR OpenPairingWindow(uint16_t timeout, PairingWindowOption option, SetupPayload & setupPayload);
 
     /**
      *  In case there exists an open session to the device, mark it as expired.
@@ -339,6 +346,8 @@ public:
     NodeId GetDeviceId() const { return mDeviceId; }
 
     bool MatchesSession(SecureSessionHandle session) const { return mSecureSession == session; }
+
+    SecureSessionHandle GetSecureSession() const { return mSecureSession; }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
@@ -480,6 +489,9 @@ private:
 
     CHIP_ERROR WarmupCASESession();
 
+    static void OnOpenPairingWindowSuccessResponse(void * context);
+    static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
+
     uint16_t mListenPort;
 
     FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
@@ -502,8 +514,13 @@ private:
 
     SessionIDAllocator * mIDAllocator = nullptr;
 
+    uint16_t mPAKEVerifierID = 1;
+
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
+
+    Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
+    Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
 };
 
 /**

@@ -39,7 +39,8 @@ class Context:
 
   def SetupBuilders(self, platforms: Sequence[Platform],
                     boards: Sequence[Board],
-                    applications: Sequence[Application]):
+                    applications: Sequence[Application],
+                    enable_flashbundle: bool):
     """Configures internal builders for the given platform/board/app combination.
 
         Handles smart default selection, so that users only need to specify
@@ -53,9 +54,7 @@ class Context:
         ])
       else:
         # when nothing is specified, start with a default host build
-        # TODO: this is only for linux. Should be moved to 'HOST' as a platform
-        # to also support building on MacOS
-        platforms = [Platform.LINUX]
+        platforms = [Platform.HOST]
 
     # at this point, at least one of 'platforms' or 'boards' is non-empty
     if not boards:
@@ -88,7 +87,7 @@ class Context:
     for platform in sorted(platforms):
       for board in sorted(boards):
         for application in sorted(applications):
-          builder = self.builder_factory.Create(platform, board, application)
+          builder = self.builder_factory.Create(platform, board, application, enable_flashbundle=enable_flashbundle)
           if not builder:
             logging.debug('Builder not supported for tuple %s/%s/%s', platform,
                           board, application)
@@ -140,6 +139,15 @@ class Context:
 
     # any generated output was cleaned
     self.completed_steps.discard(BuildSteps.GENERATED)
+
+  def CreateArtifactArchives(self, directory: str):
+    logging.info('Copying build artifacts to %s', directory)
+    if not os.path.exists(directory):
+      os.makedirs(directory)
+    for builder in self.builders:
+      # FIXME: builder subdir...
+        builder.CompressArtifacts(os.path.join(
+            directory, f'{builder.identifier}.tar.gz'))
 
   def CopyArtifactsTo(self, path: str):
     logging.info('Copying build artifacts to %s', path)

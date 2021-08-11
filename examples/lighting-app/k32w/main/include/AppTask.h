@@ -40,7 +40,7 @@
 class AppTask
 {
 public:
-    int StartAppTask();
+    CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
     void PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t aAction);
@@ -51,7 +51,7 @@ public:
 private:
     friend AppTask & GetAppTask(void);
 
-    int Init();
+    CHIP_ERROR Init();
 
     static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(LightingManager::Action_t aAction);
@@ -87,8 +87,9 @@ private:
         kFunction_Invalid
     } Function;
 
-    Function_t mFunction;
-    bool mResetTimerActive;
+    Function_t mFunction            = kFunction_NoneSelected;
+    bool mResetTimerActive          = false;
+    bool mSyncClusterToButtonAction = false;
 
     static AppTask sAppTask;
 };

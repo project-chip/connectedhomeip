@@ -217,7 +217,7 @@ static void TestInetError(nlTestSuite * inSuite, void * inContext)
 
     err = MapErrorPOSIX(EPERM);
     NL_TEST_ASSERT(inSuite, DescribeErrorPOSIX(err));
-    NL_TEST_ASSERT(inSuite, ChipError::IsRange(ChipError::Range::kPOSIX, err));
+    NL_TEST_ASSERT(inSuite, err.IsRange(ChipError::Range::kPOSIX));
 }
 
 static void TestInetInterface(nlTestSuite * inSuite, void * inContext)

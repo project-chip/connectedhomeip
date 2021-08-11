@@ -259,7 +259,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Read attribute BOOLEAN Default Value Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -273,7 +273,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t booleanArgument = 1;
+    bool booleanArgument = 1;
     [cluster writeAttributeBooleanWithValue:booleanArgument
                             responseHandler:^(NSError * err, NSDictionary * values) {
                                 NSLog(@"Write attribute BOOLEAN True Error: %@", err);
@@ -296,7 +296,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Read attribute BOOLEAN True Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -310,7 +310,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t booleanArgument = 0;
+    bool booleanArgument = 0;
     [cluster writeAttributeBooleanWithValue:booleanArgument
                             responseHandler:^(NSError * err, NSDictionary * values) {
                                 NSLog(@"Write attribute BOOLEAN False Error: %@", err);
@@ -333,7 +333,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Read attribute BOOLEAN False Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2210,7 +2210,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         }
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2224,7 +2224,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t unsupportedArgument = 0;
+    bool unsupportedArgument = 0;
     [cluster writeAttributeUnsupportedWithValue:unsupportedArgument
                                 responseHandler:^(NSError * err, NSDictionary * values) {
                                     NSLog(@"Writeattribute UNSUPPORTED Error: %@", err);
@@ -2343,7 +2343,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"read the mandatory attribute: OnOff Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2361,7 +2361,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"reads back mandatory attribute: OnOff Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2379,7 +2379,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"read LT attribute: GlobalSceneControl Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -2580,7 +2580,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2615,7 +2615,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -2650,7 +2650,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2686,7 +2686,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after toggle command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -2722,7 +2722,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after toggle command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -2757,7 +2757,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -2792,7 +2792,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -3184,7 +3184,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -3217,25 +3217,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000003_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current hue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000004_MoveToHue
+- (void)testSendClusterTest_TC_CC_3_4_000003_MoveToHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move to hue longest distance command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3262,25 +3244,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000005_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current hue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000006_MoveToHue
+- (void)testSendClusterTest_TC_CC_3_4_000004_MoveToHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move to hue up command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3307,25 +3271,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000007_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current hue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000008_MoveToHue
+- (void)testSendClusterTest_TC_CC_3_4_000005_MoveToHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move to hue down command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3352,25 +3298,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000009_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current hue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000010_MoveHue
+- (void)testSendClusterTest_TC_CC_3_4_000006_MoveHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move hue up command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3395,25 +3323,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000011_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current hue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000012_MoveHue
+- (void)testSendClusterTest_TC_CC_3_4_000007_MoveHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move hue stop command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3438,25 +3348,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000013_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current hue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000014_MoveHue
+- (void)testSendClusterTest_TC_CC_3_4_000008_MoveHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move hue down command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3481,25 +3373,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000015_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current hue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000016_MoveHue
+- (void)testSendClusterTest_TC_CC_3_4_000009_MoveHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move hue stop command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3524,25 +3398,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000017_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current hue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000018_StepHue
+- (void)testSendClusterTest_TC_CC_3_4_000010_StepHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Step hue up command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3569,25 +3425,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000019_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current hue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000020_StepHue
+- (void)testSendClusterTest_TC_CC_3_4_000011_StepHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Step hue down command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3614,43 +3452,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000021_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current hue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000022_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check Saturation attribute value matched before any change"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentSaturationWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check Saturation attribute value matched before any change Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000023_MoveToSaturation
+- (void)testSendClusterTest_TC_CC_3_4_000012_MoveToSaturation
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move to saturation command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3675,25 +3477,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000024_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check Saturation attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentSaturationWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check Saturation attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000025_MoveSaturation
+- (void)testSendClusterTest_TC_CC_3_4_000013_MoveSaturation
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move saturation up command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3718,25 +3502,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000026_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check Saturation attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentSaturationWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check Saturation attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000027_MoveSaturation
+- (void)testSendClusterTest_TC_CC_3_4_000014_MoveSaturation
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move saturation down command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3761,25 +3527,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000028_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check Saturation attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentSaturationWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check Saturation attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000029_StepSaturation
+- (void)testSendClusterTest_TC_CC_3_4_000015_StepSaturation
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Step saturation up command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3806,25 +3554,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000030_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check Saturation attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentSaturationWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check Saturation attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000031_StepSaturation
+- (void)testSendClusterTest_TC_CC_3_4_000016_StepSaturation
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Step saturation down command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3851,25 +3581,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000032_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check Saturation attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentSaturationWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check Saturation attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000033_MoveToHueAndSaturation
+- (void)testSendClusterTest_TC_CC_3_4_000017_MoveToHueAndSaturation
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move To current hue and saturation command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3896,43 +3608,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000034_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current hue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current hue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000035_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check Saturation attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentSaturationWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check Saturation attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_3_4_000036_Off
+- (void)testSendClusterTest_TC_CC_3_4_000018_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3949,7 +3625,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_3_4_000037_ReadAttribute
+- (void)testSendClusterTest_TC_CC_3_4_000019_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -3961,7 +3637,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -3997,7 +3673,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -4030,43 +3706,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_5_000003_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current y attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentXWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current y attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_5_000004_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current x attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentYWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current x attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_5_000005_MoveColor
+- (void)testSendClusterTest_TC_CC_5_000003_MoveColor
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move Color command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4091,43 +3731,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_5_000006_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current x attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentXWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current x attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_5_000007_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current y attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentYWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current y attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_5_000008_StopMoveStep
+- (void)testSendClusterTest_TC_CC_5_000004_StopMoveStep
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Stop Move Step command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4148,43 +3752,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_5_000009_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current x attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentXWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current x attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_5_000010_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current y attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentYWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current y attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_5_000011_StepColor
+- (void)testSendClusterTest_TC_CC_5_000005_StepColor
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Step Color command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4211,43 +3779,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_5_000012_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current x attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentXWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current x attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_5_000013_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check current y attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentYWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check current y attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_5_000014_Off
+- (void)testSendClusterTest_TC_CC_5_000006_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4264,7 +3796,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_5_000015_ReadAttribute
+- (void)testSendClusterTest_TC_CC_5_000007_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4276,7 +3808,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -4312,7 +3844,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -4343,24 +3875,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_000003_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read current color temprature"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeColorTemperatureWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Read current color temprature Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_6_000004_MoveColorTemperature
+- (void)testSendClusterTest_TC_CC_6_000003_MoveColorTemperature
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move up color temperature command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4389,24 +3904,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_000005_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read current color temprature"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeColorTemperatureWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Read current color temprature Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_6_000006_MoveColorTemperature
+- (void)testSendClusterTest_TC_CC_6_000004_MoveColorTemperature
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Stop Color Temperature command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4435,24 +3933,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_000007_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read current color temprature"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeColorTemperatureWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Read current color temprature Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_6_000008_MoveColorTemperature
+- (void)testSendClusterTest_TC_CC_6_000005_MoveColorTemperature
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Move down color temperature command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4481,24 +3962,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_000009_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read current color temprature"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeColorTemperatureWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Read current color temprature Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_6_000010_StepColorTemperature
+- (void)testSendClusterTest_TC_CC_6_000006_StepColorTemperature
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Step up color temperature command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4529,24 +3993,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_000011_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read current color temprature"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeColorTemperatureWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Read current color temprature Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_6_000012_StepColorTemperature
+- (void)testSendClusterTest_TC_CC_6_000007_StepColorTemperature
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Step down color temperature command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4577,24 +4024,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_000013_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read current color temprature"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeColorTemperatureWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Read current color temprature Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_6_000014_Off
+- (void)testSendClusterTest_TC_CC_6_000008_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4611,7 +4041,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_6_000015_ReadAttribute
+- (void)testSendClusterTest_TC_CC_6_000009_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4623,7 +4053,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -4659,7 +4089,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is true after on command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertEqual([values[@"value"] boolValue], 1);
         [expectation fulfill];
     }];
 
@@ -4711,25 +4141,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_000004_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check EnhancedCurrentHue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeEnhancedCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_7_000005_EnhancedMoveHue
+- (void)testSendClusterTest_TC_CC_7_000004_EnhancedMoveHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Down command "];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4754,7 +4166,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_000006_EnhancedMoveHue
+- (void)testSendClusterTest_TC_CC_7_000005_EnhancedMoveHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Stop command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4779,7 +4191,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_000007_EnhancedMoveHue
+- (void)testSendClusterTest_TC_CC_7_000006_EnhancedMoveHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Up command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4804,7 +4216,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_000008_EnhancedMoveHue
+- (void)testSendClusterTest_TC_CC_7_000007_EnhancedMoveHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Move Hue Stop command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4829,7 +4241,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_000009_EnhancedStepHue
+- (void)testSendClusterTest_TC_CC_7_000008_EnhancedStepHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Step Hue Up command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4856,7 +4268,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_000010_EnhancedStepHue
+- (void)testSendClusterTest_TC_CC_7_000009_EnhancedStepHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced Step Hue Down command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4883,7 +4295,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_000011_EnhancedMoveToHueAndSaturation
+- (void)testSendClusterTest_TC_CC_7_000010_EnhancedMoveToHueAndSaturation
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Enhanced move to hue and saturation command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4910,43 +4322,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_000012_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check EnhancedCurrentHue attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeEnhancedCurrentHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check EnhancedCurrentHue attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_7_000013_ReadAttribute
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"Check Saturation attribute value matched the value sent by the last command"];
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeCurrentSaturationWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"Check Saturation attribute value matched the value sent by the last command Error: %@", err);
-
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_CC_7_000014_Off
+- (void)testSendClusterTest_TC_CC_7_000011_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4963,7 +4339,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_7_000015_ReadAttribute
+- (void)testSendClusterTest_TC_CC_7_000012_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4975,7 +4351,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
@@ -5257,6 +4633,80 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_TM_1_1_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTemperatureMeasurement * cluster = [[CHIPTemperatureMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 3);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TM_1_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTemperatureMeasurement * cluster = [[CHIPTemperatureMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 3);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_OCC_1_1_000000_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOccupancySensing * cluster = [[CHIPOccupancySensing alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"read the global attribute: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 2);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_OCC_1_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOccupancySensing * cluster = [[CHIPOccupancySensing alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"reads back global attribute: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 2);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterAccountLoginReadAttributeClusterRevisionWithResponseHandler
 {
     XCTestExpectation * expectation =
@@ -5269,6 +4719,27 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"AccountLogin ClusterRevision Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterAdministratorCommissioningReadAttributeClusterRevisionWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"AdministratorCommissioningReadAttributeClusterRevisionWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPAdministratorCommissioning * cluster = [[CHIPAdministratorCommissioning alloc] initWithDevice:device
+                                                                                             endpoint:0
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"AdministratorCommissioning ClusterRevision Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
@@ -5683,7 +5154,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     CHIPBinaryInputBasic * cluster = [[CHIPBinaryInputBasic alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t value = 0x00;
+    bool value = 0x00;
     [cluster writeAttributeOutOfServiceWithValue:value
                                  responseHandler:^(NSError * err, NSDictionary * values) {
                                      NSLog(@"BinaryInputBasic OutOfService Error: %@", err);
@@ -5721,7 +5192,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     CHIPBinaryInputBasic * cluster = [[CHIPBinaryInputBasic alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    uint8_t value = 0;
+    bool value = 0;
     [cluster writeAttributePresentValueWithValue:value
                                  responseHandler:^(NSError * err, NSDictionary * values) {
                                      NSLog(@"BinaryInputBasic PresentValue Error: %@", err);
@@ -8400,6 +7871,25 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterNetworkCommissioningReadAttributeFeatureMapWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"NetworkCommissioningReadAttributeFeatureMapWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPNetworkCommissioning * cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"NetworkCommissioning FeatureMap Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterNetworkCommissioningReadAttributeClusterRevisionWithResponseHandler
 {
     XCTestExpectation * expectation =
@@ -9767,6 +9257,159 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"Thermostat ClusterRevision Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterThermostatUserInterfaceConfigurationReadAttributeTemperatureDisplayModeWithResponseHandler
+{
+    XCTestExpectation * expectation = [self
+        expectationWithDescription:@"ThermostatUserInterfaceConfigurationReadAttributeTemperatureDisplayModeWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeTemperatureDisplayModeWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ThermostatUserInterfaceConfiguration TemperatureDisplayMode Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterThermostatUserInterfaceConfigurationWriteAttributeTemperatureDisplayModeWithValue
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ThermostatUserInterfaceConfigurationWriteAttributeTemperatureDisplayModeWithValue"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t value = 0x00;
+    [cluster writeAttributeTemperatureDisplayModeWithValue:value
+                                           responseHandler:^(NSError * err, NSDictionary * values) {
+                                               NSLog(@"ThermostatUserInterfaceConfiguration TemperatureDisplayMode Error: %@", err);
+                                               XCTAssertEqual(err.code, 0);
+                                               [expectation fulfill];
+                                           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterThermostatUserInterfaceConfigurationReadAttributeKeypadLockoutWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ThermostatUserInterfaceConfigurationReadAttributeKeypadLockoutWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeKeypadLockoutWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ThermostatUserInterfaceConfiguration KeypadLockout Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterThermostatUserInterfaceConfigurationWriteAttributeKeypadLockoutWithValue
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ThermostatUserInterfaceConfigurationWriteAttributeKeypadLockoutWithValue"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t value = 0x00;
+    [cluster writeAttributeKeypadLockoutWithValue:value
+                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                      NSLog(@"ThermostatUserInterfaceConfiguration KeypadLockout Error: %@", err);
+                                      XCTAssertEqual(err.code, 0);
+                                      [expectation fulfill];
+                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterThermostatUserInterfaceConfigurationReadAttributeScheduleProgrammingVisibilityWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:
+                  @"ThermostatUserInterfaceConfigurationReadAttributeScheduleProgrammingVisibilityWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeScheduleProgrammingVisibilityWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ThermostatUserInterfaceConfiguration ScheduleProgrammingVisibility Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterThermostatUserInterfaceConfigurationWriteAttributeScheduleProgrammingVisibilityWithValue
+{
+    XCTestExpectation * expectation = [self
+        expectationWithDescription:@"ThermostatUserInterfaceConfigurationWriteAttributeScheduleProgrammingVisibilityWithValue"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint8_t value = 0x00;
+    [cluster writeAttributeScheduleProgrammingVisibilityWithValue:value
+                                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                                      NSLog(@"ThermostatUserInterfaceConfiguration ScheduleProgrammingVisibility "
+                                                            @"Error: %@",
+                                                          err);
+                                                      XCTAssertEqual(err.code, 0);
+                                                      [expectation fulfill];
+                                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterThermostatUserInterfaceConfigurationReadAttributeClusterRevisionWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ThermostatUserInterfaceConfigurationReadAttributeClusterRevisionWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPThermostatUserInterfaceConfiguration * cluster = [[CHIPThermostatUserInterfaceConfiguration alloc] initWithDevice:device
+                                                                                                                 endpoint:1
+                                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"ThermostatUserInterfaceConfiguration ClusterRevision Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

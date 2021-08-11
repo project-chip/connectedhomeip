@@ -23,7 +23,8 @@ import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 assert(current_os == "freertos")
 
-efr32_project_dir = "${chip_root}/examples/window-app/efr32"
+project_dir = "${chip_root}/examples/window-app"
+efr32_project_dir = "${project_dir}/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
 
 declare_args() {
@@ -60,7 +61,6 @@ efr32_sdk("sdk") {
   defines = [
     "BOARD_ID=${efr32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
-    "SL_HEAP_SIZE=(16 * 1024)",
   ]
 }
 
@@ -70,14 +70,12 @@ efr32_executable("window_app") {
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/uart.c",
-    "src/AppEvent.cpp",
-    "src/AppTask.cpp",
-    "src/AppTimer.cpp",
-    "src/ButtonHandler.cpp",
-    "src/WindowCover.cpp",
-    "src/ZclCallbacks.cpp",
+    "${project_dir}/common/src/WindowApp.cpp",
+    "${project_dir}/common/src/ZclCallbacks.cpp",
+    "src/WindowAppImpl.cpp",
     "src/main.cpp",
   ]
 
@@ -93,7 +91,10 @@ efr32_executable("window_app") {
     "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
   ]
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${project_dir}/common/include",
+  ]
 
   defines = []
 

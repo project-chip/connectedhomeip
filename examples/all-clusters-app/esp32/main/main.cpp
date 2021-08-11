@@ -64,6 +64,10 @@
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/clusters/temperature-measurement-server/temperature-measurement-server.h>
 
+#if CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
+
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
@@ -348,7 +352,7 @@ public:
         else if (i == 2)
         {
             app::Mdns::AdvertiseCommissionableNode();
-            OpenDefaultPairingWindow(ResetFabrics::kYes, PairingWindowAdvertisement::kMdns);
+            OpenDefaultPairingWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
         }
     }
 
@@ -547,7 +551,7 @@ std::string createSetupPayload()
 
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "Couldn't get payload string %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+        ESP_LOGE(TAG, "Couldn't get payload string %" CHIP_ERROR_FORMAT, err.Format());
     }
     return result;
 };
@@ -593,6 +597,9 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();

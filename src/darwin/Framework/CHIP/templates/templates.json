@@ -18,6 +18,10 @@
         {
             "name": "test_cluster",
             "path": "partials/test_cluster.zapt"
+        },
+        {
+            "name": "CHIPCallbackBridge",
+            "path": "partials/CHIPCallbackBridge.zapt"
         }
     ],
     "templates": [

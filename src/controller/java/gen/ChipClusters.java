@@ -123,6 +123,65 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
+  public static class AdministratorCommissioningCluster extends BaseChipCluster {
+    public AdministratorCommissioningCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void openBasicCommissioningWindow(
+        DefaultClusterCallback callback, int commissioningTimeout) {
+      openBasicCommissioningWindow(chipClusterPtr, callback, commissioningTimeout);
+    }
+
+    public void openCommissioningWindow(
+        DefaultClusterCallback callback,
+        int commissioningTimeout,
+        byte[] pAKEVerifier,
+        int discriminator,
+        long iterations,
+        byte[] salt,
+        int passcodeID) {
+      openCommissioningWindow(
+          chipClusterPtr,
+          callback,
+          commissioningTimeout,
+          pAKEVerifier,
+          discriminator,
+          iterations,
+          salt,
+          passcodeID);
+    }
+
+    public void revokeCommissioning(DefaultClusterCallback callback) {
+      revokeCommissioning(chipClusterPtr, callback);
+    }
+
+    private native void openBasicCommissioningWindow(
+        long chipClusterPtr, DefaultClusterCallback callback, int commissioningTimeout);
+
+    private native void openCommissioningWindow(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int commissioningTimeout,
+        byte[] pAKEVerifier,
+        int discriminator,
+        long iterations,
+        byte[] salt,
+        int passcodeID);
+
+    private native void revokeCommissioning(long chipClusterPtr, DefaultClusterCallback callback);
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
   public static class ApplicationBasicCluster extends BaseChipCluster {
     public ApplicationBasicCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -219,7 +278,7 @@ public class ChipClusters {
         String applicationId);
 
     public interface LaunchAppResponseCallback {
-      void onSuccess(String data);
+      void onSuccess(int status, String data);
 
       void onError(Exception error);
     }
@@ -469,7 +528,7 @@ public class ChipClusters {
       readLocalConfigDisabledAttribute(chipClusterPtr, callback);
     }
 
-    public void writeLocalConfigDisabledAttribute(DefaultClusterCallback callback, int value) {
+    public void writeLocalConfigDisabledAttribute(DefaultClusterCallback callback, boolean value) {
       writeLocalConfigDisabledAttribute(chipClusterPtr, callback, value);
     }
 
@@ -539,7 +598,7 @@ public class ChipClusters {
         long chipClusterPtr, BooleanAttributeCallback callback);
 
     private native void writeLocalConfigDisabledAttribute(
-        long chipClusterPtr, DefaultClusterCallback callback, int value);
+        long chipClusterPtr, DefaultClusterCallback callback, boolean value);
 
     private native void readReachableAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
@@ -560,7 +619,7 @@ public class ChipClusters {
       readOutOfServiceAttribute(chipClusterPtr, callback);
     }
 
-    public void writeOutOfServiceAttribute(DefaultClusterCallback callback, int value) {
+    public void writeOutOfServiceAttribute(DefaultClusterCallback callback, boolean value) {
       writeOutOfServiceAttribute(chipClusterPtr, callback, value);
     }
 
@@ -568,7 +627,7 @@ public class ChipClusters {
       readPresentValueAttribute(chipClusterPtr, callback);
     }
 
-    public void writePresentValueAttribute(DefaultClusterCallback callback, int value) {
+    public void writePresentValueAttribute(DefaultClusterCallback callback, boolean value) {
       writePresentValueAttribute(chipClusterPtr, callback, value);
     }
 
@@ -584,13 +643,13 @@ public class ChipClusters {
         long chipClusterPtr, BooleanAttributeCallback callback);
 
     private native void writeOutOfServiceAttribute(
-        long chipClusterPtr, DefaultClusterCallback callback, int value);
+        long chipClusterPtr, DefaultClusterCallback callback, boolean value);
 
     private native void readPresentValueAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
 
     private native void writePresentValueAttribute(
-        long chipClusterPtr, DefaultClusterCallback callback, int value);
+        long chipClusterPtr, DefaultClusterCallback callback, boolean value);
 
     private native void readStatusFlagsAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -1643,7 +1702,8 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void launchContent(LaunchContentResponseCallback callback, int autoPlay, String data) {
+    public void launchContent(
+        LaunchContentResponseCallback callback, boolean autoPlay, String data) {
       launchContent(chipClusterPtr, callback, autoPlay, data);
     }
 
@@ -1653,7 +1713,7 @@ public class ChipClusters {
     }
 
     private native void launchContent(
-        long chipClusterPtr, LaunchContentResponseCallback callback, int autoPlay, String data);
+        long chipClusterPtr, LaunchContentResponseCallback callback, boolean autoPlay, String data);
 
     private native void launchURL(
         long chipClusterPtr,
@@ -2062,50 +2122,54 @@ public class ChipClusters {
         String pin);
 
     public interface ClearAllPinsResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface ClearAllRfidsResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface ClearHolidayScheduleResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface ClearPinResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface ClearRfidResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface ClearWeekdayScheduleResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface ClearYeardayScheduleResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface GetHolidayScheduleResponseCallback {
       void onSuccess(
-          int scheduleId, long localStartTime, long localEndTime, int operatingModeDuringHoliday);
+          int scheduleId,
+          int status,
+          long localStartTime,
+          long localEndTime,
+          int operatingModeDuringHoliday);
 
       void onError(Exception error);
     }
@@ -2145,6 +2209,7 @@ public class ChipClusters {
       void onSuccess(
           int scheduleId,
           int userId,
+          int status,
           int daysMask,
           int startHour,
           int startMinute,
@@ -2155,61 +2220,62 @@ public class ChipClusters {
     }
 
     public interface GetYeardayScheduleResponseCallback {
-      void onSuccess(int scheduleId, int userId, long localStartTime, long localEndTime);
+      void onSuccess(
+          int scheduleId, int userId, int status, long localStartTime, long localEndTime);
 
       void onError(Exception error);
     }
 
     public interface LockDoorResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface SetHolidayScheduleResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface SetPinResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface SetRfidResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface SetUserTypeResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface SetWeekdayScheduleResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface SetYeardayScheduleResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface UnlockDoorResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
 
     public interface UnlockWithTimeoutResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
@@ -2573,17 +2639,17 @@ public class ChipClusters {
 
     public static class NetworkInterfacesAttribute {
       public byte[] name;
-      public int fabricConnected;
-      public int offPremiseServicesReachableIPv4;
-      public int offPremiseServicesReachableIPv6;
+      public boolean fabricConnected;
+      public boolean offPremiseServicesReachableIPv4;
+      public boolean offPremiseServicesReachableIPv6;
       public byte[] hardwareAddress;
       public int type;
 
       public NetworkInterfacesAttribute(
           byte[] name,
-          int fabricConnected,
-          int offPremiseServicesReachableIPv4,
-          int offPremiseServicesReachableIPv6,
+          boolean fabricConnected,
+          boolean offPremiseServicesReachableIPv4,
+          boolean offPremiseServicesReachableIPv6,
           byte[] hardwareAddress,
           int type) {
         this.name = name;
@@ -2752,7 +2818,7 @@ public class ChipClusters {
         long chipClusterPtr, ViewGroupResponseCallback callback, int groupId);
 
     public interface AddGroupResponseCallback {
-      void onSuccess(int groupId);
+      void onSuccess(int status, int groupId);
 
       void onError(Exception error);
     }
@@ -2767,13 +2833,13 @@ public class ChipClusters {
     }
 
     public interface RemoveGroupResponseCallback {
-      void onSuccess(int groupId);
+      void onSuccess(int status, int groupId);
 
       void onError(Exception error);
     }
 
     public interface ViewGroupResponseCallback {
-      void onSuccess(int groupId, String groupName);
+      void onSuccess(int status, int groupId, String groupName);
 
       void onError(Exception error);
     }
@@ -2857,7 +2923,7 @@ public class ChipClusters {
     private native void sendKey(long chipClusterPtr, SendKeyResponseCallback callback, int keyCode);
 
     public interface SendKeyResponseCallback {
-      void onSuccess();
+      void onSuccess(int status);
 
       void onError(Exception error);
     }
@@ -3427,9 +3493,16 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -3462,7 +3535,7 @@ public class ChipClusters {
         long currentVersion,
         int protocolsSupported,
         String location,
-        int requestorCanConsent,
+        boolean requestorCanConsent,
         byte[] metadataForProvider) {
       queryImage(
           chipClusterPtr,
@@ -3500,7 +3573,7 @@ public class ChipClusters {
         long currentVersion,
         int protocolsSupported,
         String location,
-        int requestorCanConsent,
+        boolean requestorCanConsent,
         byte[] metadataForProvider);
 
     public interface ApplyUpdateRequestResponseCallback {
@@ -3511,11 +3584,12 @@ public class ChipClusters {
 
     public interface QueryImageResponseCallback {
       void onSuccess(
+          int status,
           long delayedActionTime,
           String imageURI,
           long softwareVersion,
           byte[] updateToken,
-          int userConsentNeeded,
+          boolean userConsentNeeded,
           byte[] metadataForRequestor);
 
       void onError(Exception error);
@@ -4067,13 +4141,13 @@ public class ChipClusters {
         long chipClusterPtr, ViewSceneResponseCallback callback, int groupId, int sceneId);
 
     public interface AddSceneResponseCallback {
-      void onSuccess(int groupId, int sceneId);
+      void onSuccess(int status, int groupId, int sceneId);
 
       void onError(Exception error);
     }
 
     public interface GetSceneMembershipResponseCallback {
-      void onSuccess(int capacity, int groupId, int sceneCount
+      void onSuccess(int status, int capacity, int groupId, int sceneCount
           // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
           // Conversion from this type to Java is not properly implemented yet
           );
@@ -4082,25 +4156,25 @@ public class ChipClusters {
     }
 
     public interface RemoveAllScenesResponseCallback {
-      void onSuccess(int groupId);
+      void onSuccess(int status, int groupId);
 
       void onError(Exception error);
     }
 
     public interface RemoveSceneResponseCallback {
-      void onSuccess(int groupId, int sceneId);
+      void onSuccess(int status, int groupId, int sceneId);
 
       void onError(Exception error);
     }
 
     public interface StoreSceneResponseCallback {
-      void onSuccess(int groupId, int sceneId);
+      void onSuccess(int status, int groupId, int sceneId);
 
       void onError(Exception error);
     }
 
     public interface ViewSceneResponseCallback {
-      void onSuccess(int groupId, int sceneId, int transitionTime, String sceneName
+      void onSuccess(int status, int groupId, int sceneId, int transitionTime, String sceneName
           // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
           // Conversion from this type to Java is not properly implemented yet
           );
@@ -4321,7 +4395,7 @@ public class ChipClusters {
         long chipClusterPtr, NavigateTargetResponseCallback callback, int target, String data);
 
     public interface NavigateTargetResponseCallback {
-      void onSuccess(String data);
+      void onSuccess(int status, String data);
 
       void onError(Exception error);
     }
@@ -4477,7 +4551,7 @@ public class ChipClusters {
       readBooleanAttribute(chipClusterPtr, callback);
     }
 
-    public void writeBooleanAttribute(DefaultClusterCallback callback, int value) {
+    public void writeBooleanAttribute(DefaultClusterCallback callback, boolean value) {
       writeBooleanAttribute(chipClusterPtr, callback, value);
     }
 
@@ -4642,7 +4716,7 @@ public class ChipClusters {
       readUnsupportedAttribute(chipClusterPtr, callback);
     }
 
-    public void writeUnsupportedAttribute(DefaultClusterCallback callback, int value) {
+    public void writeUnsupportedAttribute(DefaultClusterCallback callback, boolean value) {
       writeUnsupportedAttribute(chipClusterPtr, callback, value);
     }
 
@@ -4654,7 +4728,7 @@ public class ChipClusters {
         long chipClusterPtr, BooleanAttributeCallback callback);
 
     private native void writeBooleanAttribute(
-        long chipClusterPtr, DefaultClusterCallback callback, int value);
+        long chipClusterPtr, DefaultClusterCallback callback, boolean value);
 
     private native void readBitmap8Attribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -4765,7 +4839,7 @@ public class ChipClusters {
         long chipClusterPtr, BooleanAttributeCallback callback);
 
     private native void writeUnsupportedAttribute(
-        long chipClusterPtr, DefaultClusterCallback callback, int value);
+        long chipClusterPtr, DefaultClusterCallback callback, boolean value);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -4929,6 +5003,65 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
+  public static class ThermostatUserInterfaceConfigurationCluster extends BaseChipCluster {
+    public ThermostatUserInterfaceConfigurationCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void readTemperatureDisplayModeAttribute(IntegerAttributeCallback callback) {
+      readTemperatureDisplayModeAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeTemperatureDisplayModeAttribute(DefaultClusterCallback callback, int value) {
+      writeTemperatureDisplayModeAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readKeypadLockoutAttribute(IntegerAttributeCallback callback) {
+      readKeypadLockoutAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeKeypadLockoutAttribute(DefaultClusterCallback callback, int value) {
+      writeKeypadLockoutAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readScheduleProgrammingVisibilityAttribute(IntegerAttributeCallback callback) {
+      readScheduleProgrammingVisibilityAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeScheduleProgrammingVisibilityAttribute(
+        DefaultClusterCallback callback, int value) {
+      writeScheduleProgrammingVisibilityAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readTemperatureDisplayModeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeTemperatureDisplayModeAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readKeypadLockoutAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeKeypadLockoutAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readScheduleProgrammingVisibilityAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeScheduleProgrammingVisibilityAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
   public static class ThreadNetworkDiagnosticsCluster extends BaseChipCluster {
     public ThreadNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -4954,10 +5087,10 @@ public class ChipClusters {
       public int lastRssi;
       public int frameErrorRate;
       public int messageErrorRate;
-      public int rxOnWhenIdle;
-      public int fullThreadDevice;
-      public int fullNetworkData;
-      public int isChild;
+      public boolean rxOnWhenIdle;
+      public boolean fullThreadDevice;
+      public boolean fullNetworkData;
+      public boolean isChild;
 
       public NeighborTableListAttribute(
           long extAddress,
@@ -4970,10 +5103,10 @@ public class ChipClusters {
           int lastRssi,
           int frameErrorRate,
           int messageErrorRate,
-          int rxOnWhenIdle,
-          int fullThreadDevice,
-          int fullNetworkData,
-          int isChild) {
+          boolean rxOnWhenIdle,
+          boolean fullThreadDevice,
+          boolean fullNetworkData,
+          boolean isChild) {
         this.extAddress = extAddress;
         this.age = age;
         this.rloc16 = rloc16;
@@ -5006,8 +5139,8 @@ public class ChipClusters {
       public int lQIIn;
       public int lQIOut;
       public int age;
-      public int allocated;
-      public int linkEstablished;
+      public boolean allocated;
+      public boolean linkEstablished;
 
       public RouteTableListAttribute(
           long extAddress,
@@ -5018,8 +5151,8 @@ public class ChipClusters {
           int lQIIn,
           int lQIOut,
           int age,
-          int allocated,
-          int linkEstablished) {
+          boolean allocated,
+          boolean linkEstablished) {
         this.extAddress = extAddress;
         this.rloc16 = rloc16;
         this.routerId = routerId;
@@ -5056,32 +5189,32 @@ public class ChipClusters {
     }
 
     public static class OperationalDatasetComponentsAttribute {
-      public int activeTimestampPresent;
-      public int pendingTimestampPresent;
-      public int masterKeyPresent;
-      public int networkNamePresent;
-      public int extendedPanIdPresent;
-      public int meshLocalPrefixPresent;
-      public int delayPresent;
-      public int panIdPresent;
-      public int channelPresent;
-      public int pskcPresent;
-      public int securityPolicyPresent;
-      public int channelMaskPresent;
+      public boolean activeTimestampPresent;
+      public boolean pendingTimestampPresent;
+      public boolean masterKeyPresent;
+      public boolean networkNamePresent;
+      public boolean extendedPanIdPresent;
+      public boolean meshLocalPrefixPresent;
+      public boolean delayPresent;
+      public boolean panIdPresent;
+      public boolean channelPresent;
+      public boolean pskcPresent;
+      public boolean securityPolicyPresent;
+      public boolean channelMaskPresent;
 
       public OperationalDatasetComponentsAttribute(
-          int activeTimestampPresent,
-          int pendingTimestampPresent,
-          int masterKeyPresent,
-          int networkNamePresent,
-          int extendedPanIdPresent,
-          int meshLocalPrefixPresent,
-          int delayPresent,
-          int panIdPresent,
-          int channelPresent,
-          int pskcPresent,
-          int securityPolicyPresent,
-          int channelMaskPresent) {
+          boolean activeTimestampPresent,
+          boolean pendingTimestampPresent,
+          boolean masterKeyPresent,
+          boolean networkNamePresent,
+          boolean extendedPanIdPresent,
+          boolean meshLocalPrefixPresent,
+          boolean delayPresent,
+          boolean panIdPresent,
+          boolean channelPresent,
+          boolean pskcPresent,
+          boolean securityPolicyPresent,
+          boolean channelMaskPresent) {
         this.activeTimestampPresent = activeTimestampPresent;
         this.pendingTimestampPresent = pendingTimestampPresent;
         this.masterKeyPresent = masterKeyPresent;

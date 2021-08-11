@@ -133,7 +133,7 @@ extern "C" chip::ChipError::StorageType pychip_internal_Commissioner_Unpair(chip
 
     chip::python::ChipMainThreadScheduleAndWait([&]() { err = commissioner->UnpairDevice(remoteDeviceId); });
 
-    return chip::ChipError::AsInteger(err);
+    return err.AsInteger();
 }
 
 extern "C" chip::ChipError::StorageType
@@ -154,5 +154,5 @@ pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommis
         err = commissioner->PairDevice(remoteNodeId, params);
     });
 
-    return chip::ChipError::AsInteger(err);
+    return err.AsInteger();
 }

@@ -149,7 +149,7 @@ Poller::Poller()
     mAvahiPoller.timeout_update = TimeoutUpdate;
     mAvahiPoller.timeout_free   = TimeoutFree;
 
-    mWatchableEvents = &DeviceLayer::SystemLayer.WatchableEvents();
+    mWatchableEvents = &DeviceLayer::SystemLayer.WatchableEventsManager();
 }
 
 AvahiWatch * Poller::WatchNew(const struct AvahiPoll * poller, int fd, AvahiWatchEvent event, AvahiWatchCallback callback,
@@ -492,7 +492,7 @@ exit:
     }
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Avahi publish service failed: %" CHIP_ERROR_FORMAT, ChipError::FormatError(error));
+        ChipLogError(DeviceLayer, "Avahi publish service failed: %" CHIP_ERROR_FORMAT, error.Format());
     }
 
     return error;

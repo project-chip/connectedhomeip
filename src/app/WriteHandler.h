@@ -54,11 +54,6 @@ public:
     CHIP_ERROR Init(InteractionModelDelegate * apDelegate);
 
     /**
-     *  Shut down the ReadHandler. This terminates this instance
-     *  of the object and releases all held resources.
-     */
-    void Shutdown();
-    /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler
      *  guarantees that it will call Shutdown on itself when processing is done (including if OnWriteRequest
      *  returns an error).
@@ -99,6 +94,10 @@ private:
     void MoveToState(const State aTargetState);
     void ClearState();
     const char * GetStateStr() const;
+    /**
+     *  Clean up state when we are done sending the write response.
+     */
+    void Shutdown();
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponse::Builder mWriteResponseBuilder;

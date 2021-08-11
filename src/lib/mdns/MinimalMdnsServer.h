@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#pragma once
 #include <mdns/minimal/Server.h>
 
 namespace chip {
@@ -76,7 +76,17 @@ public:
     GlobalMinimalMdnsServer() { mServer.SetDelegate(this); }
 
     static GlobalMinimalMdnsServer & Instance();
-    static ServerType & Server() { return Instance().mServer; }
+    static mdns::Minimal::ServerBase & Server()
+    {
+        if (Instance().mReplacementServer != nullptr)
+        {
+            return *Instance().mReplacementServer;
+        }
+        else
+        {
+            return Instance().mServer;
+        }
+    }
 
     /// Calls Server().Listen() on all available interfaces
     CHIP_ERROR StartServer(chip::Inet::InetLayer * inetLayer, uint16_t port);
@@ -101,10 +111,13 @@ public:
         }
     }
 
+    void SetReplacementServer(mdns::Minimal::ServerBase * server) { mReplacementServer = server; }
+
 private:
     ServerType mServer;
-    MdnsPacketDelegate * mQueryDelegate    = nullptr;
-    MdnsPacketDelegate * mResponseDelegate = nullptr;
+    mdns::Minimal::ServerBase * mReplacementServer = nullptr;
+    MdnsPacketDelegate * mQueryDelegate            = nullptr;
+    MdnsPacketDelegate * mResponseDelegate         = nullptr;
 };
 
 } // namespace Mdns

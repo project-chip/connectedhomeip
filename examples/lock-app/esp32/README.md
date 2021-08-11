@@ -199,6 +199,17 @@ connect an external LED to GPIO.
 
 ## Using the RPC console
 
+Enable RPCs in the build using menuconfig:
+
+    $ idf.py menuconfig
+
+Enable the RPC library:
+
+    Component config → CHIP Core → General Options → Enable Pigweed PRC library
+
+After flashing a build with RPCs enabled you can use the rpc console to send
+commands to the device.
+
 Build or install the [rpc console](../../common/pigweed/rpc_console/README.md)
 
 Start the console

@@ -78,6 +78,12 @@ def ValidateRepoPath(context, parameter, value):
     help='What example application to build. Empty will find suitable applications.'
 )
 @click.option(
+    '--enable-flashbundle',
+    default=False,
+    is_flag=True,
+    help='Also generate the flashbundles for the app.'
+)
+@click.option(
     '--repo',
     default='.',
     callback=ValidateRepoPath,
@@ -104,7 +110,7 @@ def ValidateRepoPath(context, parameter, value):
     help='Where to write the dry run output')
 @click.pass_context
 def main(context, log_level, platform, board, app, repo, out_prefix, clean,
-         dry_run, dry_run_output):
+         dry_run, dry_run_output, enable_flashbundle):
   # Ensures somewhat pretty logging of what is going on
   coloredlogs.install(
       level=__LOG_LEVELS__[log_level],
@@ -132,7 +138,8 @@ before running this script.
   context.obj.SetupBuilders(
       platforms=[build.Platform.FromArgName(name) for name in platform],
       boards=[build.Board.FromArgName(name) for name in board],
-      applications=[build.Application.FromArgName(name) for name in app])
+      applications=[build.Application.FromArgName(name) for name in app],
+      enable_flashbundle=enable_flashbundle)
 
   if clean:
     context.obj.CleanOutputDirectories()
@@ -151,12 +158,20 @@ def cmd_generate(context):
     default=None,
     type=click.Path(file_okay=False, resolve_path=True),
     help='Prefix for the generated file output.')
+@click.option(
+    '--create-archives',
+    default=None,
+    type=click.Path(file_okay=False, resolve_path=True),
+    help='Prefix of compressed archives of the generated files.')
 @click.pass_context
-def cmd_build(context, copy_artifacts_to):
+def cmd_build(context, copy_artifacts_to, create_archives):
   context.obj.Build()
 
   if copy_artifacts_to:
     context.obj.CopyArtifactsTo(copy_artifacts_to)
+
+  if create_archives:
+    context.obj.CreateArtifactArchives(create_archives)
 
 
 if __name__ == '__main__':

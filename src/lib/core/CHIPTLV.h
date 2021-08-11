@@ -406,6 +406,18 @@ public:
     CHIP_ERROR Get(float & v);
 
     /**
+     * Get the value of the current element as a chip::ByteSpan
+     *
+     * @param[out]  v                       Receives the value associated with current TLV element.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV bytes array, or
+     *                                      the reader is not positioned on an element.
+     *
+     */
+    CHIP_ERROR Get(chip::ByteSpan & v);
+
+    /**
      * Get the value of the current byte or UTF8 string element.
      *
      * To determine the required input buffer size, call the GetLength() method before calling GetBytes().
@@ -1146,6 +1158,18 @@ public:
      *
      */
     CHIP_ERROR PutBoolean(uint64_t tag, bool v);
+
+    /**
+     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, bool v)
+     */
+    CHIP_ERROR Put(uint64_t tag, bool v)
+    {
+        /*
+         * In TLV, boolean values are encoded as standalone tags without actual values, so we have a seperate
+         * PutBoolean method.
+         */
+        return PutBoolean(tag, v);
+    }
 
     /**
      * Encodes a TLV byte string value.
@@ -2185,6 +2209,7 @@ public:
     CHIP_ERROR Get(uint64_t & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(float & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(double & v) { return mUpdaterReader.Get(v); }
+    CHIP_ERROR Get(chip::ByteSpan & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize) { return mUpdaterReader.GetBytes(buf, bufSize); }
     CHIP_ERROR DupBytes(uint8_t *& buf, uint32_t & dataLen) { return mUpdaterReader.DupBytes(buf, dataLen); }
     CHIP_ERROR GetString(char * buf, uint32_t bufSize) { return mUpdaterReader.GetString(buf, bufSize); }

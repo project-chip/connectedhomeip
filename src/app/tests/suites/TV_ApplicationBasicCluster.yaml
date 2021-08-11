@@ -26,39 +26,42 @@ tests:
               - name: "status"
                 value: 1
 
+    # TODO: Support chars validation
     - label: "Read attribute vendor name"
+      disabled: true
       command: "readAttribute"
       attribute: "vendor name"
+      response:
+          value: "exampleVendorName1"
 
-      # TODO: Support chars validation
-      # response:
-      #     value: "exampleVendorName1"
     - label: "Read attribute vendor id"
       command: "readAttribute"
       attribute: "vendor id"
       response:
           value: 1
 
+    # TODO: Support chars validation
     - label: "Read attribute name"
+      disabled: true
       command: "readAttribute"
       attribute: "application name"
+      response:
+          value: "exampleName1"
 
-      # TODO: Support chars validation
-      # response:
-      #     value: "exampleName1"
     - label: "Read attribute product id"
       command: "readAttribute"
       attribute: "product id"
       response:
           value: 1
 
+    # TODO: Support chars validation
     - label: "Read attribute id"
+      disabled: true
       command: "readAttribute"
       attribute: "application id"
+      response:
+          value: "appId"
 
-      # TODO: Support chars validation
-      # response:
-      #     value: "appId"
     - label: "Read attribute catalog vendor id"
       command: "readAttribute"
       attribute: "catalog vendor id"

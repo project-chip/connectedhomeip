@@ -57,6 +57,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <type_traits>
 
 // Test context
 using namespace chip::System;
@@ -80,16 +81,18 @@ public:
 private:
     enum
     {
-        kPoolSize = 122 // a multiple of kNumThreads, less than CHIP_SYS_STATS_COUNT_MAX
+        kPoolSize = 112 // a multiple of kNumThreads, less than CHIP_SYS_STATS_COUNT_MAX
     };
     static ObjectPool<TestObject, kPoolSize> sPool;
+    static_assert(kPoolSize < CHIP_SYS_STATS_COUNT_MAX, "kPoolSize is not less than CHIP_SYS_STATS_COUNT_MAX");
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     unsigned int mDelay;
 
     static constexpr int kNumThreads         = 16;
-    static constexpr int kLoopIterations     = 100000;
+    static constexpr int kLoopIterations     = 1000;
     static constexpr int kMaxDelayIterations = 3;
+    static_assert(kPoolSize % kNumThreads == 0, "kPoolSize is not a multiple of kNumThreads");
 
     void Delay(volatile unsigned int & aAccumulator);
     static void * CheckConcurrencyThread(void * aContext);
@@ -143,8 +146,6 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
         TestObject * lCreated = sPool.TryCreate(lLayer);
 
         NL_TEST_ASSERT(lContext.mTestSuite, lCreated != nullptr);
-        if (lCreated == nullptr)
-            continue;
         NL_TEST_ASSERT(lContext.mTestSuite, lCreated->IsRetained(lLayer));
         NL_TEST_ASSERT(lContext.mTestSuite, &(lCreated->SystemLayer()) == &lLayer);
 
@@ -359,7 +360,7 @@ void TestObject::CheckConcurrency(nlTestSuite * inSuite, void * aContext)
 void TestObject::CheckHighWatermarkConcurrency(nlTestSuite * inSuite, void * aContext)
 {
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-    for (unsigned int i = 0; i < 1000; i++)
+    for (unsigned int i = 0; i < 100; i++)
     {
         MultithreadedTest(inSuite, aContext, CheckHighWatermarkThread);
     }

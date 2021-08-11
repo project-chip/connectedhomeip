@@ -30,6 +30,7 @@
 
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_ACCOUNT_LOGIN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_ADMINISTRATOR_COMMISSIONING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_APPLICATION_BASIC_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_AUDIO_OUTPUT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -73,6 +74,7 @@
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEST_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_THERMOSTAT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_THERMOSTAT_UI_CONFIG_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WAKE_ON_LAN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -83,6 +85,10 @@
 // Use this macro to check if the client side of the Account Login cluster is included
 #define ZCL_USING_ACCOUNT_LOGIN_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_ACCOUNT_LOGIN_CLIENT
+
+// Use this macro to check if the client side of the AdministratorCommissioning cluster is included
+#define ZCL_USING_ADMINISTRATOR_COMMISSIONING_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_ADMINISTRATOR_COMMISSIONING_CLIENT
 
 // Use this macro to check if the client side of the Application Basic cluster is included
 #define ZCL_USING_APPLICATION_BASIC_CLUSTER_CLIENT
@@ -204,7 +210,7 @@
 #define ZCL_USING_OCCUPANCY_SENSING_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_OCCUPANCY_SENSING_CLIENT
 
-// Use this macro to check if the client side of the On/off cluster is included
+// Use this macro to check if the client side of the On/Off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_ON_OFF_CLIENT
 
@@ -255,6 +261,10 @@
 // Use this macro to check if the client side of the Thermostat cluster is included
 #define ZCL_USING_THERMOSTAT_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_THERMOSTAT_CLIENT
+
+// Use this macro to check if the client side of the Thermostat User Interface Configuration cluster is included
+#define ZCL_USING_THERMOSTAT_UI_CONFIG_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLIENT
 
 // Use this macro to check if the client side of the Thread Network Diagnostics cluster is included
 #define ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT

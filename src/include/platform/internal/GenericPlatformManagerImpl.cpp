@@ -254,8 +254,8 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToSystemLayer(const Chi
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Invoke the System Layer's event handler function.
-    err = SystemLayer.HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
-                                  event->ChipSystemLayerEvent.Argument);
+    err = SystemLayer.WatchableEventsManager().HandleEvent(*event->ChipSystemLayerEvent.Target, event->ChipSystemLayerEvent.Type,
+                                                           event->ChipSystemLayerEvent.Argument);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Error handling CHIP System Layer event (type %d): %s", event->Type, ErrorStr(err));

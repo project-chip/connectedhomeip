@@ -118,8 +118,6 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 
     CHIP_ERROR err;
 
-    ctx.GetInetLayer().SystemLayer()->Init();
-
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -135,8 +133,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     uint16_t payload_len = sizeof(PAYLOAD);
 
     callback.LargeMessageSent = false;
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -234,8 +230,6 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     callback.LargeMessageSent = false;
 
-    ctx.GetInetLayer().SystemLayer()->Init();
-
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
@@ -315,8 +309,6 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     uint16_t payload_len = sizeof(PAYLOAD);
 
     callback.LargeMessageSent = false;
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());

@@ -49,16 +49,6 @@
 #include <app/reporting/Engine.h>
 #include <app/util/basic-types.h>
 
-// TODO: Make number of command/read/write client/handler configurable
-#define CHIP_MAX_NUM_COMMAND_HANDLER 4
-#define CHIP_MAX_NUM_COMMAND_SENDER 4
-#define CHIP_MAX_NUM_READ_CLIENT 4
-#define CHIP_MAX_NUM_READ_HANDLER 4
-#define CHIP_MAX_REPORTS_IN_FLIGHT 4
-#define IM_SERVER_MAX_NUM_PATH_GROUPS 8
-#define CHIP_MAX_NUM_WRITE_CLIENT 4
-#define CHIP_MAX_NUM_WRITE_HANDLER 4
-
 namespace chip {
 namespace app {
 
@@ -125,18 +115,22 @@ public:
     CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession,
                                EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
                                AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
-                               EventNumber aEventNumber, intptr_t aAppIdentifier = 0);
+                               EventNumber aEventNumber, uint64_t aAppIdentifier = 0);
 
     /**
      *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
      *  see WriteClient documentation for lifetime handling.
+     *
+     *  The Write interaction is more like Invoke interaction (cluster specific commands) since it will include cluster specific
+     * payload, and may have the need to encode non-scalar values (like structs and arrays). Thus we use WriteClientHandle to
+     * prevent user's code from leaking WriteClients.
      *
      *  @param[out]    apWriteClient    A pointer to the WriteClient object.
      *
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no WriteClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR NewWriteClient(WriteClient ** const apWriteClient);
+    CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, uint64_t aApplicationIdentifier = 0);
 
     /**
      *  Get read client index in mReadClients
@@ -187,18 +181,21 @@ private:
      *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, intptr_t aAppIdentifier);
+    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, uint64_t aAppIdentifier);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
-    CommandHandler mCommandHandlerObjs[CHIP_MAX_NUM_COMMAND_HANDLER];
-    CommandSender mCommandSenderObjs[CHIP_MAX_NUM_COMMAND_SENDER];
-    ReadClient mReadClients[CHIP_MAX_NUM_READ_CLIENT];
-    ReadHandler mReadHandlers[CHIP_MAX_NUM_READ_HANDLER];
-    WriteClient mWriteClients[CHIP_MAX_NUM_WRITE_CLIENT];
-    WriteHandler mWriteHandlers[CHIP_MAX_NUM_WRITE_HANDLER];
+
+    // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
+    // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.
+    CommandHandler mCommandHandlerObjs[CHIP_IM_MAX_NUM_COMMAND_HANDLER];
+    CommandSender mCommandSenderObjs[CHIP_IM_MAX_NUM_COMMAND_SENDER];
+    ReadClient mReadClients[CHIP_IM_MAX_NUM_READ_CLIENT];
+    ReadHandler mReadHandlers[CHIP_IM_MAX_NUM_READ_HANDLER];
+    WriteClient mWriteClients[CHIP_IM_MAX_NUM_WRITE_CLIENT];
+    WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
-    ClusterInfo mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS];
+    ClusterInfo mClusterInfoPool[CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS];
     ClusterInfo * mpNextAvailableClusterInfo = nullptr;
 };
 

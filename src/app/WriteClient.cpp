@@ -29,7 +29,8 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
+CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                             uint64_t aApplicationIdentifier)
 {
     VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpExchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -50,6 +51,7 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mpExchangeMgr         = apExchangeMgr;
     mpDelegate            = apDelegate;
     mAttributeStatusIndex = 0;
+    mAppIdentifier        = aApplicationIdentifier;
     MoveToState(State::Initialized);
 
     return CHIP_NO_ERROR;
@@ -392,6 +394,23 @@ exit:
     if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
     {
         mpDelegate->WriteResponseProtocolError(this, mAttributeStatusIndex);
+    }
+    return err;
+}
+
+CHIP_ERROR WriteClientHandle::SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession)
+{
+    CHIP_ERROR err = mpWriteClient->SendWriteRequest(aNodeId, aFabricIndex, apSecureSession);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        // On success, the InteractionModelEngine will be responible to take care of the lifecycle of the WriteClient, so we release
+        // the WriteClient without closing it.
+        mpWriteClient = nullptr;
+    }
+    else
+    {
+        SetWriteClient(nullptr);
     }
     return err;
 }

@@ -59,6 +59,7 @@ enum : uint8_t
 TestContext sContext;
 
 TransportMgr<Test::LoopbackTransport> gTransportMgr;
+Test::IOContext gIOContext;
 
 class MockAppDelegate : public ExchangeDelegate
 {
@@ -250,20 +251,13 @@ nlTestSuite sSuite =
  */
 int Initialize(void * aContext)
 {
-    CHIP_ERROR err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-        return FAILURE;
+    // Initialize System memory and resources
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gTransportMgr.Init("LOOPBACK") == CHIP_NO_ERROR, FAILURE);
 
-    err = gTransportMgr.Init("LOOPBACK");
-    if (err != CHIP_NO_ERROR)
-        return FAILURE;
-
-    auto * ctx = reinterpret_cast<TestContext *>(aContext);
-    err        = ctx->Init(&sSuite, &gTransportMgr);
-    if (err != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
+    auto * ctx = static_cast<TestContext *>(aContext);
+    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
     return SUCCESS;
 }
@@ -274,6 +268,7 @@ int Initialize(void * aContext)
 int Finalize(void * aContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    gIOContext.Shutdown();
     chip::Platform::MemoryShutdown();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }

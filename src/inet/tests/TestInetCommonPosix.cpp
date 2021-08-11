@@ -455,9 +455,9 @@ void ServiceEvents(struct ::timeval & aSleepTime)
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    gSystemLayer.WatchableEvents().PrepareEventsWithTimeout(aSleepTime);
-    gSystemLayer.WatchableEvents().WaitForEvents();
-    gSystemLayer.WatchableEvents().HandleEvents();
+    gSystemLayer.WatchableEventsManager().PrepareEventsWithTimeout(aSleepTime);
+    gSystemLayer.WatchableEventsManager().WaitForEvents();
+    gSystemLayer.WatchableEventsManager().HandleEvents();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -469,7 +469,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
         {
             if (sRemainingSystemLayerEventDelay == 0)
             {
-                gSystemLayer.DispatchEvents();
+                gSystemLayer.WatchableEventsManager().DispatchEvents();
                 sRemainingSystemLayerEventDelay = gNetworkOptions.EventDelay;
             }
             else
@@ -478,7 +478,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
             // TODO: Currently timers are delayed by aSleepTime above. A improved solution would have a mechanism to reduce
             // aSleepTime according to the next timer.
 
-            gSystemLayer.HandlePlatformTimer();
+            gSystemLayer.WatchableEventsManager().HandlePlatformTimer();
         }
     }
 #if CHIP_TARGET_STYLE_UNIX

@@ -15,12 +15,13 @@
  *    limitations under the License.
  */
 
-const basePath = '../../../../';
-const testPath = 'src/app/tests/suites/';
-const zapPath  = basePath + 'third_party/zap/repo/';
-const YAML     = require(zapPath + 'node_modules/yaml');
-const fs       = require('fs');
-const path     = require('path');
+const basePath          = '../../../../';
+const testPath          = 'src/app/tests/suites/';
+const certificationPath = 'src/app/tests/suites/certification/';
+const zapPath           = basePath + 'third_party/zap/repo/';
+const YAML              = require(zapPath + 'node_modules/yaml');
+const fs                = require('fs');
+const path              = require('path');
 
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'src-electron/generator/template-util.js')
@@ -38,12 +39,19 @@ const kResponseName      = 'response';
 const kDisabledName      = 'disabled';
 const kResponseErrorName = 'error';
 
+function throwError(test, errorStr)
+{
+  console.error('Error in: ' + test.filename + '.yaml for test with label: "' + test.label + '"\n');
+  console.error(errorStr);
+  throw new Error();
+}
+
 function setDefault(test, name, defaultValue)
 {
   if (!(name in test)) {
     if (defaultValue == null) {
-      const errorStr = 'Test with label "' + test.label + '" does not have any "' + name + '" defined.';
-      throw new Error(errorStr);
+      const errorStr = 'Test does not have any "' + name + '" defined.';
+      throwError(test, errorStr);
     }
 
     test[name] = defaultValue;
@@ -83,8 +91,8 @@ function setDefaultArguments(test)
   }
 
   if (!('value' in test[kArgumentsName])) {
-    const errorStr = 'Test with label "' + test.label + '" does not have a "value" defined.';
-    throw new Error(errorStr);
+    const errorStr = 'Test does not have a "value" defined.';
+    throwError(test, errorStr);
   }
 
   test[kArgumentsName].values.push({ name : test.attribute, value : test[kArgumentsName].value });
@@ -102,23 +110,46 @@ function setDefaultResponse(test)
   const defaultResponseValues = [];
   setDefault(test[kResponseName], kValuesName, defaultResponseValues);
 
-  const defaultResponseConstraints = [];
+  const defaultResponseConstraints = {};
   setDefault(test[kResponseName], kConstraintsName, defaultResponseConstraints);
+
+  const hasResponseValue              = 'value' in test[kResponseName];
+  const hasResponseConstraints        = 'constraints' in test[kResponseName] && Object.keys(test[kResponseName].constraints).length;
+  const hasResponseValueOrConstraints = hasResponseValue || hasResponseConstraints;
+
+  if (test.isCommand && hasResponseValueOrConstraints) {
+    const errorStr = 'Test has a "value" or a "constraints" defined.\n' +
+        '\n' +
+        'Command should explicitly use the response argument name. Example: \n' +
+        '- label: "Send Test Specific Command"\n' +
+        '  command: "testSpecific"\n' +
+        '  response: \n' +
+        '    values: \n' +
+        '      - name: "returnValue"\n' +
+        '      - value: 7\n';
+    throwError(test, errorStr);
+  }
+
+  if (test.isWriteAttribute && hasResponseValueOrConstraints) {
+    const errorStr = 'Attribute write test has a "value" or a "constraints" defined.';
+    throwError(test, errorStr);
+  }
 
   if (!test.isReadAttribute) {
     return;
   }
 
-  if (!('value' in test[kResponseName]) && !('constraints' in test[kResponseName])) {
-    const errorStr = 'Test with label "' + test.label + '" does not have a "value" or a "constraints" defined.';
-    throw new Error(errorStr);
+  if (!hasResponseValueOrConstraints) {
+    console.log(test[kResponseName]);
+    const errorStr = 'Test does not have a "value" or a "constraints" defined.';
+    throwError(test, errorStr);
   }
 
-  if ('value' in test[kResponseName]) {
+  if (hasResponseValue) {
     test[kResponseName].values.push({ name : test.attribute, value : test[kResponseName].value });
   }
 
-  if ('constraints' in test[kResponseName]) {
+  if (hasResponseConstraints) {
     test[kResponseName].values.push({ name : test.attribute, constraints : test[kResponseName].constraints });
   }
 
@@ -141,12 +172,20 @@ function setDefaults(test, defaultConfig)
 
 function parse(filename)
 {
-  const filepath = path.resolve(__dirname, basePath + testPath + filename + '.yaml');
-  const data     = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
-  const yaml     = YAML.parse(data);
+  let filepath;
+  const isCertificationTest = filename.startsWith('Test_TC_');
+  if (isCertificationTest) {
+    filepath = path.resolve(__dirname, basePath + certificationPath + filename + '.yaml');
+  } else {
+    filepath = path.resolve(__dirname, basePath + testPath + filename + '.yaml');
+  }
+
+  const data = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
+  const yaml = YAML.parse(data);
 
   const defaultConfig = yaml.config || [];
   yaml.tests.forEach(test => {
+    test.filename = filename;
     test.testName = yaml.name;
     setDefaults(test, defaultConfig);
   });
@@ -175,39 +214,46 @@ function printErrorAndExit(context, msg)
 function assertCommandOrAttribute(context)
 {
   const clusterName = context.cluster;
-  let filterName;
-  let items;
-
-  if (context.isCommand) {
-    filterName = context.command;
-    items      = Clusters.getClientCommands(clusterName);
-  } else if (context.isAttribute) {
-    filterName = context.attribute;
-    items      = Clusters.getServerAttributes(clusterName);
-  } else {
-    printErrorAndExit(context, 'Unsupported command type: ', context);
-  }
-
-  return items.then(items => {
-    const filter = item => item.name.toLowerCase() == filterName.toLowerCase();
-    const item          = items.find(filter);
-    const itemType      = (context.isCommand ? 'Command' : 'Attribute');
-
-    // If the command or attribute is not found, it could be because of a typo in the test
-    // description, or an attribute name not matching the spec, or a wrongly configured zap
-    // file.
-    if (!item) {
-      const names = items.map(item => item.name);
-      printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" in: \n\t* ' + names.join('\n\t* '));
+  return Clusters.getClusters().then(clusters => {
+    if (!clusters.find(cluster => cluster.name == clusterName)) {
+      const names = clusters.map(item => item.name);
+      printErrorAndExit(context, 'Missing cluster "' + clusterName + '" in: \n\t* ' + names.join('\n\t* '));
     }
 
-    // If the command or attribute has been found but the response can not be found, it could be
-    // because of a wrongly configured cluster definition.
-    if (!item.response) {
-      printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" response');
+    let filterName;
+    let items;
+
+    if (context.isCommand) {
+      filterName = context.command;
+      items      = Clusters.getClientCommands(clusterName);
+    } else if (context.isAttribute) {
+      filterName = context.attribute;
+      items      = Clusters.getServerAttributes(clusterName);
+    } else {
+      printErrorAndExit(context, 'Unsupported command type: ', context);
     }
 
-    return item;
+    return items.then(items => {
+      const filter = item => item.name.toLowerCase() == filterName.toLowerCase();
+      const item          = items.find(filter);
+      const itemType      = (context.isCommand ? 'Command' : 'Attribute');
+
+      // If the command or attribute is not found, it could be because of a typo in the test
+      // description, or an attribute name not matching the spec, or a wrongly configured zap
+      // file.
+      if (!item) {
+        const names = items.map(item => item.name);
+        printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" in: \n\t* ' + names.join('\n\t* '));
+      }
+
+      // If the command or attribute has been found but the response can not be found, it could be
+      // because of a wrongly configured cluster definition.
+      if (!item.response) {
+        printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" response');
+      }
+
+      return item;
+    });
   });
 }
 
@@ -254,7 +300,7 @@ function chip_tests_item_parameters(options)
 
 function chip_tests_item_response_parameters(options)
 {
-  const responseValues = this.response.values;
+  const responseValues = this.response.values.slice();
 
   const promise = assertCommandOrAttribute(this).then(item => {
     const responseArgs = item.response.arguments;
@@ -262,8 +308,9 @@ function chip_tests_item_response_parameters(options)
     const responses = responseArgs.map(responseArg => {
       responseArg = JSON.parse(JSON.stringify(responseArg));
 
-      const expected = responseValues.find(value => value.name.toLowerCase() == responseArg.name.toLowerCase());
-      if (expected) {
+      const expectedIndex = responseValues.findIndex(value => value.name.toLowerCase() == responseArg.name.toLowerCase());
+      if (expectedIndex != -1) {
+        const expected = responseValues.splice(expectedIndex, 1)[0];
         if ('value' in expected) {
           responseArg.hasExpectedValue = true;
           responseArg.expectedValue    = expected.value;
@@ -274,6 +321,13 @@ function chip_tests_item_response_parameters(options)
           responseArg.expectedConstraints    = expected.constraints;
         }
       }
+
+      const unusedResponseValues = responseValues.filter(response => 'value' in response);
+      unusedResponseValues.forEach(unusedResponseValue => {
+        printErrorAndExit(this,
+            'Missing "' + unusedResponseValue.name + '" in response arguments list:\n\t* '
+                + responseArgs.map(response => response.name).join('\n\t* '));
+      });
 
       return responseArg;
     });

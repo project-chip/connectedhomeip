@@ -1927,30 +1927,29 @@
 #endif // CHIP_CONFIG_TEST
 
 /**
- *  @def CHIP_CONFIG_ERROR_CLASS
- *
- *  If 0, #CHIP_ERROR is an integer type, ::chip::ChipError::StorageType.
- *  If 1, #CHIP_ERROR is a class type, ::chip::ChipError.
- */
-#ifndef CHIP_CONFIG_ERROR_CLASS
-#define CHIP_CONFIG_ERROR_CLASS 0
-#endif // CHIP_CONFIG_ERROR_CLASS
-
-/**
  *  @def CHIP_CONFIG_ERROR_SOURCE
  *
- *  If asserted (1), and CHIP_CONFIG_ERROR_CLASS is also 1, then CHIP_ERROR constants
- *  will include the source location of their expansion.
+ *  If asserted (1), then CHIP_ERROR constants will include the source location of their expansion.
  */
 #ifndef CHIP_CONFIG_ERROR_SOURCE
 #define CHIP_CONFIG_ERROR_SOURCE 0
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
 /**
+ *  @def CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+ *
+ *  If asserted (1) along with CHIP_CONFIG_ERROR_SOURCE, then instances of CHIP_NO_ERROR will also include
+ *  the source location of their expansion. Otherwise, CHIP_NO_ERROR is excluded from source tracking.
+ */
+#ifndef CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
+#define CHIP_CONFIG_ERROR_SOURCE_NO_ERROR 1
+#endif // CHIP_CONFIG_ERROR_SOURCE
+
+/**
  *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
  *
- *  If 0, then ChipError::FormatError() returns an integer (ChipError::BaseType).
- *  If 1, then ChipError::FormatError() returns a const char *, from chip::ErrorStr().
+ *  If 0, then ChipError::Format() returns an integer (ChipError::StorageType).
+ *  If 1, then ChipError::Format() returns a const char *, from chip::ErrorStr().
  *  In either case, the macro CHIP_ERROR_FORMAT expands to a suitable printf format.
  */
 
@@ -2403,3 +2402,96 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MDNS_CACHE_SIZE
 #define CHIP_CONFIG_MDNS_CACHE_SIZE 20
 #endif
+/**
+ *  @name Interaction Model object pool configuration.
+ *
+ *  @brief
+ *    The following definitions sets the maximum number of corresponding interaction model object pool size.
+ *
+ *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
+ *      * #CHIP_IM_MAX_NUM_COMMAND_SENDER
+ *      * #CHIP_IM_MAX_NUM_READ_HANDLER
+ *      * #CHIP_IM_MAX_NUM_READ_CLIENT
+ *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
+ *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
+ *      * #CHIP_IM_MAX_NUM_WRITE_CLIENT
+ *
+ *  @{
+ */
+
+/**
+ * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER
+ *
+ * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
+ */
+#ifndef CHIP_IM_MAX_NUM_COMMAND_HANDLER
+#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_COMMAND_SENDER
+ *
+ * @brief Defines the maximum number of CommandSender, limits the number of active command transactions on client.
+ */
+#ifndef CHIP_IM_MAX_NUM_COMMAND_SENDER
+#define CHIP_IM_MAX_NUM_COMMAND_SENDER 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_READ_HANDLER
+ *
+ * @brief Defines the maximum number of ReadHandler, limits the number of active read transactions on server.
+ */
+#ifndef CHIP_IM_MAX_NUM_READ_HANDLER
+#define CHIP_IM_MAX_NUM_READ_HANDLER 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_READ_CLIENT
+ *
+ * @brief Defines the maximum number of ReadClient, limits the number of active read transactions on client.
+ */
+#ifndef CHIP_IM_MAX_NUM_READ_CLIENT
+#define CHIP_IM_MAX_NUM_READ_CLIENT 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_REPORTS_IN_FLIGHT
+ *
+ * @brief Defines the maximum number of Reports, limits the traffic of read and subscription transactions.
+ */
+#ifndef CHIP_IM_MAX_REPORTS_IN_FLIGHT
+#define CHIP_IM_MAX_REPORTS_IN_FLIGHT 4
+#endif
+
+/**
+ * @def CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ *
+ * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
+ */
+#ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 8
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
+ *
+ * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
+ */
+#ifndef CHIP_IM_MAX_NUM_WRITE_HANDLER
+#define CHIP_IM_MAX_NUM_WRITE_HANDLER 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_WRITE_CLIENT
+ *
+ * @brief Defines the maximum number of WriteClient, limits the number of active write transactions on client.
+ */
+#ifndef CHIP_IM_MAX_NUM_WRITE_CLIENT
+#define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
+#endif
+
+/**
+ * @}
+ */

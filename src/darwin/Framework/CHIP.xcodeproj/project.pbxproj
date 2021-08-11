@@ -30,7 +30,6 @@
 		1E85733126551A490050A4D9 /* chip-message-send.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85732126551A490050A4D9 /* chip-message-send.cpp */; };
 		1E85733426551A700050A4D9 /* reporting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85733226551A700050A4D9 /* reporting.cpp */; };
 		1E85733526551A700050A4D9 /* reporting-default-configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85733326551A700050A4D9 /* reporting-default-configuration.cpp */; };
-		1E85733726551AAE0050A4D9 /* encoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85733626551AAE0050A4D9 /* encoder.cpp */; };
 		1EB41B7B263C4CC60048E4C1 /* CHIPClustersTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */; };
 		1EC4CE5D25CC26E900D7304F /* CHIPClustersObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE5925CC26E900D7304F /* CHIPClustersObjc.mm */; };
 		1EC4CE6425CC276600D7304F /* CHIPClustersObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -108,7 +107,6 @@
 		1E85732126551A490050A4D9 /* chip-message-send.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "chip-message-send.cpp"; path = "../../../app/util/chip-message-send.cpp"; sourceTree = "<group>"; };
 		1E85733226551A700050A4D9 /* reporting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = reporting.cpp; path = ../../../app/reporting/reporting.cpp; sourceTree = "<group>"; };
 		1E85733326551A700050A4D9 /* reporting-default-configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "reporting-default-configuration.cpp"; path = "../../../app/reporting/reporting-default-configuration.cpp"; sourceTree = "<group>"; };
-		1E85733626551AAE0050A4D9 /* encoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = encoder.cpp; path = ../../../controller/data_model/gen/encoder.cpp; sourceTree = "<group>"; };
 		1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPClustersTests.m; sourceTree = "<group>"; };
 		1EC4CE5925CC26E900D7304F /* CHIPClustersObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CHIPClustersObjc.mm; path = gen/CHIPClustersObjc.mm; sourceTree = "<group>"; };
 		1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPClustersObjc.h; path = gen/CHIPClustersObjc.h; sourceTree = "<group>"; };
@@ -206,7 +204,6 @@
 		1EC4CE5825CC26AB00D7304F /* CHIPGeneratedFiles */ = {
 			isa = PBXGroup;
 			children = (
-				1E85733626551AAE0050A4D9 /* encoder.cpp */,
 				1E85730A265519AE0050A4D9 /* attribute-size.cpp */,
 				1E857307265519AE0050A4D9 /* callback-stub.cpp */,
 				1E857309265519AE0050A4D9 /* CHIPClusters.cpp */,
@@ -460,7 +457,6 @@
 				2C5EEEF7268A85C400CAE3D3 /* CHIPDeviceConnectionBridge.mm in Sources */,
 				2C222AD1255C620600E446B9 /* CHIPDevice.mm in Sources */,
 				1E857306265519720050A4D9 /* CHIPClientCallbacks.cpp in Sources */,
-				1E85733726551AAE0050A4D9 /* encoder.cpp in Sources */,
 				991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */,
 				B2E0D7B7245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.mm in Sources */,
 				1EC4CE5D25CC26E900D7304F /* CHIPClustersObjc.mm in Sources */,
@@ -598,6 +594,8 @@
 					"CHIP_DEVICE_LAYER_TARGET_NRF5=0",
 					"CHIP_DEVICE_LAYER_TARGET_EFR32=0",
 					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
+					"CHIP_SYSTEM_CONFIG_POSIX_LOCKING=0",
+					"CHIP_SYSTEM_CONFIG_NO_LOCKING=1",
 					"$(inherited)",
 				);
 				HEADER_SEARCH_PATHS = (
@@ -738,6 +736,8 @@
 					"CHIP_DEVICE_LAYER_TARGET_NRF5=0",
 					"CHIP_DEVICE_LAYER_TARGET_EFR32=0",
 					"CHIP_SYSTEM_CONFIG_USE_SOCKETS=1",
+					"CHIP_SYSTEM_CONFIG_POSIX_LOCKING=0",
+					"CHIP_SYSTEM_CONFIG_NO_LOCKING=1",
 					"$(inherited)",
 				);
 				HEADER_SEARCH_PATHS = (

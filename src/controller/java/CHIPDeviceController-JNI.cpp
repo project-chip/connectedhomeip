@@ -208,7 +208,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     if (sIOThread != PTHREAD_NULL)
     {
         sShutdown = true;
-        sSystemLayer.WatchableEvents().Signal();
+        sSystemLayer.WatchableEventsManager().Signal();
 
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         pthread_join(sIOThread, NULL);
@@ -564,7 +564,7 @@ struct NetworkCommissioningCtx
 void FinishCommissioning(NetworkCommissioningCtx * ctx, CHIP_ERROR err)
 {
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(ctx->mHandle);
-    wrapper->CallJavaMethod("onNetworkCommissioningComplete", static_cast<jint>(err));
+    wrapper->CallJavaMethod("onNetworkCommissioningComplete", static_cast<jint>(err.AsInteger()));
     delete ctx;
 }
 
@@ -651,7 +651,7 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "OpenPairingWindow failed: %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+        ChipLogError(Controller, "OpenPairingWindow failed: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
@@ -1060,7 +1060,7 @@ void * IOThreadMain(void * arg)
     // Lock the stack to prevent collisions with Java threads.
     pthread_mutex_lock(JniReferences::GetInstance().GetStackLock());
 
-    System::WatchableEventManager & watchState = sSystemLayer.WatchableEvents();
+    System::WatchableEventManager & watchState = sSystemLayer.WatchableEventsManager();
     watchState.EventLoopBegins();
 
     // Loop until we are told to exit.
@@ -1101,15 +1101,15 @@ void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName)
     else
     {
         const char * errStr;
-        switch (ChipError::AsInteger(cbErr))
+        switch (cbErr.AsInteger())
         {
-        case ChipError::AsInteger(CHIP_JNI_ERROR_TYPE_NOT_FOUND):
+        case CHIP_JNI_ERROR_TYPE_NOT_FOUND.AsInteger():
             errStr = "JNI type not found";
             break;
-        case ChipError::AsInteger(CHIP_JNI_ERROR_METHOD_NOT_FOUND):
+        case CHIP_JNI_ERROR_METHOD_NOT_FOUND.AsInteger():
             errStr = "JNI method not found";
             break;
-        case ChipError::AsInteger(CHIP_JNI_ERROR_FIELD_NOT_FOUND):
+        case CHIP_JNI_ERROR_FIELD_NOT_FOUND.AsInteger():
             errStr = "JNI field not found";
             break;
         default:
@@ -1143,18 +1143,18 @@ CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
     constructor = env->GetMethodID(sChipDeviceControllerExceptionCls, "<init>", "(ILjava/lang/String;)V");
     VerifyOrExit(constructor != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    switch (ChipError::AsInteger(inErr))
+    switch (inErr.AsInteger())
     {
-    case ChipError::AsInteger(CHIP_JNI_ERROR_TYPE_NOT_FOUND):
+    case CHIP_JNI_ERROR_TYPE_NOT_FOUND.AsInteger():
         errStr = "CHIP Device Controller Error: JNI type not found";
         break;
-    case ChipError::AsInteger(CHIP_JNI_ERROR_METHOD_NOT_FOUND):
+    case CHIP_JNI_ERROR_METHOD_NOT_FOUND.AsInteger():
         errStr = "CHIP Device Controller Error: JNI method not found";
         break;
-    case ChipError::AsInteger(CHIP_JNI_ERROR_FIELD_NOT_FOUND):
+    case CHIP_JNI_ERROR_FIELD_NOT_FOUND.AsInteger():
         errStr = "CHIP Device Controller Error: JNI field not found";
         break;
-    case ChipError::AsInteger(CHIP_JNI_ERROR_DEVICE_NOT_FOUND):
+    case CHIP_JNI_ERROR_DEVICE_NOT_FOUND.AsInteger():
         errStr = "CHIP Device Controller Error: Device not found";
         break;
     default:
@@ -1163,7 +1163,8 @@ CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx)
     }
     errStrObj = (errStr != NULL) ? env->NewStringUTF(errStr) : NULL;
 
-    outEx = (jthrowable) env->NewObject(sChipDeviceControllerExceptionCls, constructor, (jint) inErr, errStrObj);
+    outEx = (jthrowable) env->NewObject(sChipDeviceControllerExceptionCls, constructor, static_cast<jint>(inErr.AsInteger()),
+                                        errStrObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
