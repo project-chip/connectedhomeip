@@ -1,0 +1,118 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${efr32_sdk_build_root}/efr32_executable.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+import("$dir_pw_build/python.gni")
+import("$dir_pw_protobuf_compiler/proto.gni")
+
+import("//build_overrides/nlunit_test.gni")
+assert(current_os == "freertos")
+
+efr32_project_dir = "${chip_root}/src/test_driver/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/efr32"
+
+pw_proto_library("nl_test_service") {
+  sources = [ "${efr32_project_dir}/proto/nl_test.proto" ]
+  inputs = [ "${efr32_project_dir}/proto/nl_test.options" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "${efr32_project_dir}/proto"
+  prefix = "nl_test_service"
+}
+
+efr32_sdk("sdk") {
+  sources = [
+    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+  ]
+
+  include_dirs = [
+    "${chip_root}/src/platform/EFR32",
+    "${efr32_project_dir}/include",
+    "${examples_plat_dir}",
+    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
+  ]
+
+  defines = [
+    "BOARD_ID=${efr32_board}",
+    "EFR32_LOG_ENABLED=1",
+    "PW_RPC_ENABLED",
+  ]
+}
+
+efr32_executable("efr32_device_tests") {
+  output_name = "chip-efr32-device_tests.out"
+
+  defines = [ "PW_RPC_ENABLED" ]
+  sources = [
+    "${chip_root}/examples/common/pigweed/RpcService.cpp",
+    "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+    "${examples_plat_dir}/PigweedLogger.cpp",
+    "${examples_plat_dir}/heap_4_silabs.c",
+    "${examples_plat_dir}/init_efrPlatform.cpp",
+    "${examples_plat_dir}/uart.c",
+    "src/main.cpp",
+  ]
+
+  deps = [
+    ":nl_test_service.nanopb_rpc",
+    ":sdk",
+    "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+    "${chip_root}/examples/common/pigweed:system_rpc_server",
+    "${chip_root}/src:tests",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
+    "${nlunit_test_root}:nlunit-test",
+  ]
+
+  deps += pw_build_LINK_DEPS
+
+  include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
+
+  if (efr32_family == "efr32mg12") {
+    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG12P.ld"
+  } else if (efr32_family == "efr32mg21") {
+    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG21.ld"
+  }
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  output_dir = root_out_dir
+}
+
+group("efr32") {
+  deps = [
+    ":efr32_device_tests",
+    "${efr32_project_dir}/py:nl_test_runner.install",
+  ]
+}
+
+group("default") {
+  deps = [ ":efr32" ]
+}

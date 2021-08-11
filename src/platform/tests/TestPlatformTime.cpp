@@ -31,6 +31,7 @@
 #include <nlunit-test.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
+#include <support/UnitTestUtils.h>
 #include <system/SystemClock.h>
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -64,23 +65,6 @@ static const struct time_test_vector test_vector_system_time_us[] = {
 };
 
 // =================================
-//      OS-specific utils
-// =================================
-// TODO: Make tests OS agnostic
-
-#include <unistd.h>
-
-void test_os_sleep_us(uint64_t microsecs)
-{
-    usleep(static_cast<useconds_t>(microsecs));
-}
-
-void test_os_sleep_ms(uint64_t millisecs)
-{
-    test_os_sleep_us(millisecs * 1000);
-}
-
-// =================================
 //      Unit tests
 // =================================
 
@@ -99,7 +83,7 @@ static void TestDevice_GetMonotonicMicroseconds(nlTestSuite * inSuite, void * in
         Tdelay      = test_params->delay;
         Tstart      = GetMonotonicMicroseconds();
 
-        test_os_sleep_us(test_params->delay);
+        chip::test_utils::SleepMicros(test_params->delay);
 
         Tend   = GetMonotonicMicroseconds();
         Tdelta = Tend - Tstart;
@@ -130,7 +114,7 @@ static void TestDevice_GetMonotonicMilliseconds(nlTestSuite * inSuite, void * in
         Tdelay      = test_params->delay;
         Tstart      = GetMonotonicMilliseconds();
 
-        test_os_sleep_ms(test_params->delay);
+        chip::test_utils::SleepMillis(test_params->delay);
 
         Tend   = GetMonotonicMilliseconds();
         Tdelta = Tend - Tstart;

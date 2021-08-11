@@ -81,6 +81,7 @@ private:
     nlTestSuite * mSuite;
 };
 
+#if INET_CONFIG_ENABLE_IPV4
 void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
 {
     IPAddress ipAddress;
@@ -103,9 +104,12 @@ void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
 
     responder.AddAllResponses(&packetInfo, &acc);
 }
+#endif // INET_CONFIG_ENABLE_IPV4
 
 const nlTest sTests[] = {
+#if INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("TestPtrResponse", TestPtrResponse), //
+#endif                                               // INET_CONFIG_ENABLE_IPV4
     NL_TEST_SENTINEL()                               //
 };
 

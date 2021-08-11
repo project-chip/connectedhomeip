@@ -38,6 +38,7 @@
 #include <support/RandUtils.h>
 #include <support/ScopedBuffer.h>
 #include <support/UnitTestRegistration.h>
+#include <support/UnitTestUtils.h>
 
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -3722,12 +3723,12 @@ static CHIP_ERROR ReadFuzzedEncoding1(nlTestSuite * inSuite, TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-static time_t sFuzzTestDurationSecs = 5;
-static uint8_t sFixedFuzzMask       = 0;
+static uint64_t sFuzzTestDurationMillis = 5000;
+static uint8_t sFixedFuzzMask           = 0;
 
 static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
 {
-    time_t now, endTime;
+    uint64_t now, endTime;
     uint8_t fuzzedData[sizeof(Encoding1)];
 
     // clang-format off
@@ -3756,8 +3757,8 @@ static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
 
     memcpy(fuzzedData, Encoding1, sizeof(fuzzedData));
 
-    time(&now);
-    endTime = now + sFuzzTestDurationSecs + 1;
+    now     = chip::test_utils::TimeMonotonicMillis();
+    endTime = now + sFuzzTestDurationMillis + 1;
 
     srand(static_cast<unsigned int>(now));
 
@@ -3799,7 +3800,7 @@ static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
                 return;
             }
 
-            time(&now);
+            now = chip::test_utils::TimeMonotonicMillis();
             if (now >= endTime)
                 return;
 

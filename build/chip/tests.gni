@@ -28,6 +28,9 @@ declare_args() {
   # Build executables for running individual tests.
   chip_link_tests =
       chip_build_tests && (current_os == "linux" || current_os == "mac")
+
+  # Use source_set instead of static_lib for tests.
+  chip_build_test_static_libraries = chip_device_platform != "efr32"
 }
 
 declare_args() {

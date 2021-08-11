@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+import 'pw_protobuf_protos/common.proto';
+
+package chip.rpc;
+
+message TestSuiteStart {
+  // Name of the test suite to which this test case belongs.
+  string suite_name = 1;
+}
+
+message TestStep {
+  // Name of the test suite to which this test case belongs.
+  string suite_name = 1;
+  // True if the test step failed to complete successfully.
+  bool failed = 2;
+}
+
+message TestCaseResult {
+  // Name of the test suite to which this test case belongs.
+  string suite_name = 1;
+  // Name of the test case.
+  string test_case_name = 2;
+  // True if the test failed to complete successfully.
+  bool failed = 3;
+}
+
+message TestSuiteResults {
+  // Name of the test suite to which this test case belongs.
+  string suite_name = 1;
+  uint32 total_count = 2;
+  uint32 failed_count = 3;
+}
+
+message Event {
+  oneof type {
+    TestSuiteStart test_suite_start = 1;
+    TestStep test_suite_setup = 2;
+    TestStep test_suite_teardown = 3;
+
+    TestCaseResult test_case_run = 4;
+    TestStep test_case_initialize = 5;
+    TestStep test_case_terminate = 6;
+
+    TestSuiteResults test_suite_tests_run_summary = 7;
+    TestSuiteResults test_suite_asserts_summary = 8;
+  }
+};
+
+service NlTest {
+  // Runs registered tests, streaming back events as they occur.
+  rpc Run(pw.protobuf.Empty) returns (stream Event) {}
+}
