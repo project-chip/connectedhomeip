@@ -126,7 +126,7 @@ static void TestLwIPDNS(void)
 
     while (!Done)
     {
-        constexpr uint32_t kSleepTimeMilliseconds = 100;
+        constexpr uint32_t kSleepTimeMilliseconds = 10;
         ServiceNetwork(kSleepTimeMilliseconds);
     }
 

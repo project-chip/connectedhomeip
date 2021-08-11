@@ -134,7 +134,7 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     char testHostName4[260];
     IPAddress testDestAddr[1] = { IPAddress::Any };
     CHIP_ERROR err;
-    constexpr uint32_t kSleepTimeMilliseconds = 100;
+    constexpr uint32_t kSleepTimeMilliseconds = 10;
 
     memset(testHostName4, 'w', sizeof(testHostName4));
     testHostName4[259] = '\0';
