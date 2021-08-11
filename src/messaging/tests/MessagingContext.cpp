@@ -23,9 +23,12 @@
 namespace chip {
 namespace Test {
 
-CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport)
+CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport, IOContext * ioContext)
 {
-    ReturnErrorOnFailure(IOContext::Init(suite));
+    VerifyOrReturnError(mInitialized == false, CHIP_ERROR_INTERNAL);
+    mInitialized = true;
+
+    mIOContext = ioContext;
 
     mFabrics.Reset();
 
@@ -50,8 +53,12 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
 // Shutdown all layers, finalize operations
 CHIP_ERROR MessagingContext::Shutdown()
 {
+    VerifyOrReturnError(mInitialized == true, CHIP_ERROR_INTERNAL);
+    mInitialized = false;
+
     mExchangeManager.Shutdown();
-    return IOContext::Shutdown();
+    mSecureSessionMgr.Shutdown();
+    return CHIP_NO_ERROR;
 }
 
 SecureSessionHandle MessagingContext::GetSessionLocalToPeer()

@@ -154,6 +154,8 @@ int TestInteractionModelEngine()
 
     nlTestRunner(&theSuite, nullptr);
 
+    gSystemLayer.Shutdown();
+
     return (nlTestRunnerStats(&theSuite));
 }
 

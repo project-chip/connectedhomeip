@@ -33,16 +33,17 @@ namespace Test {
  * @brief The context of test cases for messaging layer. It wil initialize network layer and system layer, and create
  *        two secure sessions, connected with each other. Exchanges can be created for each secure session.
  */
-class MessagingContext : public IOContext
+class MessagingContext
 {
 public:
     MessagingContext() :
-        mPeer(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)), mPairingPeerToLocal(GetLocalKeyId(), GetPeerKeyId()),
-        mPairingLocalToPeer(GetPeerKeyId(), GetLocalKeyId())
+        mInitialized(false), mPeer(Transport::PeerAddress::UDP(GetAddress(), CHIP_PORT)),
+        mPairingPeerToLocal(GetLocalKeyId(), GetPeerKeyId()), mPairingLocalToPeer(GetPeerKeyId(), GetLocalKeyId())
     {}
+    ~MessagingContext() { VerifyOrDie(mInitialized == false); }
 
     /// Initialize the underlying layers and test suite pointer
-    CHIP_ERROR Init(nlTestSuite * suite, TransportMgrBase * transport);
+    CHIP_ERROR Init(nlTestSuite * suite, TransportMgrBase * transport, IOContext * io);
 
     // Shutdown all layers, finalize operations
     CHIP_ERROR Shutdown();
@@ -84,10 +85,14 @@ public:
 
     Credentials::OperationalCredentialSet & GetOperationalCredentialSet() { return mOperationalCredentialSet; }
 
+    System::Layer & GetSystemLayer() { return mIOContext->GetSystemLayer(); }
+
 private:
+    bool mInitialized;
     SecureSessionMgr mSecureSessionMgr;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
+    IOContext * mIOContext;
 
     NodeId mSourceNodeId      = 123654;
     NodeId mDestinationNodeId = 111222333;

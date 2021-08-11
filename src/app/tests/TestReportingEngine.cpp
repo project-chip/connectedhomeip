@@ -193,6 +193,8 @@ int TestReportingEngine()
 
     nlTestRunner(&theSuite, nullptr);
 
+    chip::gSystemLayer.Shutdown();
+
     return (nlTestRunnerStats(&theSuite));
 }
 
