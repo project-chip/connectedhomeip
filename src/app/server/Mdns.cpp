@@ -119,21 +119,14 @@ CHIP_ERROR AdvertiseOperational()
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
-/// Set MDNS commissioner advertisement
-CHIP_ERROR AdvertiseCommisioner()
+/// Overloaded utility method for commissioner and commissionable advertisement
+// This method is used for both commissioner discovery and commissionable node discovery since
+// they share many fields.
+CHIP_ERROR Advertise(bool commissionableNode, BitFlags<KeyValueFlags> flags)
 {
-    return Advertise(false, false, false);
-}
+    bool commissioningMode       = flags.Has(KeyValueFlags::kCommissioningMode);
+    bool additionalCommissioning = flags.Has(KeyValueFlags::kAdditionalCommissioning);
 
-/// Set MDNS commissionable node advertisement
-CHIP_ERROR AdvertiseCommissionableNode(bool commissioningMode, bool additionalCommissioning)
-{
-    return Advertise(true, commissioningMode, additionalCommissioning);
-}
-
-/// Set MDNS commissioner advertisement or commissionable node advertisement
-CHIP_ERROR Advertise(bool commissionableNode, bool commissioningMode, bool additionalCommissioning)
-{
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
     advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Mdns::CommssionAdvertiseMode::kCommissionableNode
                                                                       : chip::Mdns::CommssionAdvertiseMode::kCommissioner);
@@ -239,30 +232,43 @@ CHIP_ERROR Advertise(bool commissionableNode, bool commissioningMode, bool addit
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
-/// (Re-)starts the minmdns server
-void StartServer()
+/// Set MDNS commissioner advertisement
+CHIP_ERROR AdvertiseCommisioner()
 {
-    StartServer(false, false);
+    BitFlags<KeyValueFlags> flags;
+    return Advertise(false, flags);
 }
 
-void StartServer(bool commissioningMode, bool additionalCommissioning)
+/// Set MDNS commissionable node advertisement
+CHIP_ERROR AdvertiseCommissionableNode(BitFlags<KeyValueFlags> flags)
+{
+    return Advertise(true, flags);
+}
+
+/// (Re-)starts the minmdns server
+//
+// NOTE: when device has never been commissioned, kAdditionalCommissioning flag will be ignored
+//
+void StartServer(BitFlags<KeyValueFlags> flags)
 {
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
 
     // TODO: advertise all operational ids once we support multiple
     if (GetCurrentNodeId() != kUndefinedNodeId)
     {
-        ChipLogProgress(Discovery, "Start dns-sd server CM=%d, AC=%d", commissioningMode ? 1 : 0, additionalCommissioning ? 1 : 0);
+        ChipLogProgress(Discovery, "Start dns-sd server CM=%d, AC=%d", flags.Has(KeyValueFlags::kCommissioningMode) ? 1 : 0,
+                        flags.Has(KeyValueFlags::kAdditionalCommissioning) ? 1 : 0);
         err = app::Mdns::AdvertiseOperational();
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-        err = app::Mdns::AdvertiseCommissionableNode(commissioningMode, additionalCommissioning);
+        err = app::Mdns::AdvertiseCommissionableNode(flags);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     }
     else
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
         ChipLogProgress(Discovery, "Start dns-sd server - no current nodeId");
-        err = app::Mdns::AdvertiseCommissionableNode(true, false);
+        err = app::Mdns::AdvertiseCommissionableNode(
+            flags.Clear(KeyValueFlags::kAdditionalCommissioning).Set(KeyValueFlags::kCommissioningMode));
 #endif
     }
 

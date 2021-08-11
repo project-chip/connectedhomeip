@@ -90,17 +90,17 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     else if (strcmp(argv[0], "restartmdns") == 0)
     {
-        bool commissioningMode = false;
-        bool additionalPairing = false;
-        if (strcmp(argv[1], "true") == 0)
+        BitFlags<app::Mdns::KeyValueFlags> flags;
+        if ((argc > 1) && (strcmp(argv[1], "true") == 0))
         {
-            commissioningMode = true;
-            if (strcmp(argv[2], "true") == 0)
-            {
-                additionalPairing = true;
-            }
+            flags.Set(app::Mdns::KeyValueFlags::kCommissioningMode);
         }
-        chip::app::Mdns::StartServer(commissioningMode, additionalPairing);
+        if ((argc > 2) && (strcmp(argv[2], "true") == 0))
+        {
+            flags.Set(app::Mdns::KeyValueFlags::kAdditionalCommissioning);
+        }
+
+        chip::app::Mdns::StartServer(flags);
         return CHIP_NO_ERROR;
     }
     else

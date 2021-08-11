@@ -19,10 +19,19 @@
 
 #include <core/CHIPError.h>
 #include <stddef.h>
+#include <support/BitFlags.h>
 
 namespace chip {
 namespace app {
 namespace Mdns {
+
+enum class KeyValueFlags : uint8_t
+{
+    // indicates whether CM (Commissioning Mode) flag should be set to 1
+    kCommissioningMode = 0x01,
+    // indicates whether AP (Additional Commissioning) flag should be set to 1
+    kAdditionalCommissioning = 0x02,
+};
 
 /// Start operational advertising
 CHIP_ERROR AdvertiseOperational();
@@ -31,16 +40,13 @@ CHIP_ERROR AdvertiseOperational();
 CHIP_ERROR AdvertiseCommissioner();
 
 /// Set MDNS commissionable node advertisement
-CHIP_ERROR AdvertiseCommissionableNode(bool commissioningMode, bool additionalCommissioning);
-
-/// Overloaded utility method for commissioner and commissionable advertisement
-// This method is used for both commissioner discovery and commissionable node discovery since
-// they share many fields.
-CHIP_ERROR Advertise(bool commissionableNode, bool commissioningMode, bool additionalCommissioning);
+CHIP_ERROR AdvertiseCommissionableNode(BitFlags<KeyValueFlags> flags);
 
 /// (Re-)starts the minmdns server
-void StartServer();
-void StartServer(bool commissioningMode, bool additionalCommissioning);
+//
+// NOTE: when device has never been commissioned, kAdditionalCommissioning flag will be ignored
+//
+void StartServer(BitFlags<KeyValueFlags> flags);
 
 CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 
