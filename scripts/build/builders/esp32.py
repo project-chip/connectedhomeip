@@ -110,13 +110,13 @@ class Esp32Builder(Builder):
     self._IdfEnvExecute(
         cmd, cwd=self.root, title='Generating ' + self.identifier)
 
-  def build(self):
+  def _build(self):
     logging.info('Compiling Esp32 at %s', self.output_dir)
 
     self._IdfEnvExecute(
         "ninja -C '%s'" % self.output_dir, title='Building ' + self.identifier)
 
-  def outputs(self):
+  def build_outputs(self):
     return {
         self.app.AppNamePrefix + '.elf':
             os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf'),

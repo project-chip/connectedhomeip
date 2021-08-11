@@ -57,9 +57,6 @@ public:
     /// Type for encapsulated error values.
     using ValueType = StorageType;
 
-    // DO NOT USE. This is transitional and will be removed soon. Instead, use ChipError.
-    using ErrorType = ChipError;
-
     /// Integer `printf` format for errors. This is a C macro in order to allow for string literal concatenation.
 #define CHIP_ERROR_INTEGER_FORMAT PRIx32
 
@@ -182,10 +179,6 @@ public:
      */
     constexpr StorageType AsInteger() const { return mError; }
 
-    // DO NOT USE. This is transitional and will be removed soon. Instead of `AsInteger(status)` use `status.AsInteger()`.
-    static constexpr StorageType AsInteger(StorageType error) { return error; }
-    static constexpr StorageType AsInteger(ChipError error) { return error.mError; }
-
     /*
      * IsSuccess() is intended to support macros that can take either a ChipError or an integer error code.
      * The latter follows the C convention that a non-zero integer indicates an error.
@@ -223,18 +216,6 @@ public:
         return ErrorStr(*this);
     }
 
-#if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
-    // DO NOT USE. This is transitional and will be removed soon. Instead of `FormatError(status)` use `status.Format()`.
-    static FormatType FormatError(ChipError error)
-    {
-        extern const char * ErrorStr(ChipError);
-        return ErrorStr(error);
-    }
-#else  // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
-    // DO NOT USE. This is transitional and will be removed soon. Instead of `FormatError(status)` use `status.Format()`.
-    static FormatType FormatError(ChipError error) { return error.mError; }
-#endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
-
     /**
      * Test whether @a error belongs to the Range @a range.
      */
@@ -243,30 +224,15 @@ public:
         return (mError & MakeMask(kRangeStart, kRangeLength)) == MakeField(kRangeStart, static_cast<StorageType>(range));
     }
 
-    // DO NOT USE. This is transitional and will be removed soon. Instead of `IsRange(status)` use `status.IsRange()`.
-    static constexpr bool IsRange(Range range, ChipError error)
-    {
-        return (error.mError & MakeMask(kRangeStart, kRangeLength)) == MakeField(kRangeStart, static_cast<StorageType>(range));
-    }
-
     /**
      * Get the Range to which the @a error belongs.
      */
     constexpr Range GetRange() const { return static_cast<Range>(GetField(kRangeStart, kRangeLength, mError)); }
 
-    // DO NOT USE. This is transitional and will be removed soon. Instead of `GetRange(status)` use `status.GetRange()`.
-    static constexpr Range GetRange(ChipError error)
-    {
-        return static_cast<Range>(GetField(kRangeStart, kRangeLength, error.mError));
-    }
-
     /**
      * Get the encapsulated value of an @a error.
      */
     constexpr ValueType GetValue() const { return GetField(kValueStart, kValueLength, mError); }
-
-    // DO NOT USE. This is transitional and will be removed soon. Instead of `GetValue(status)` use `status.GetValue()`.
-    static constexpr ValueType GetValue(ChipError error) { return GetField(kValueStart, kValueLength, error.mError); }
 
     /**
      * Test whether type @a T can always be losslessly encapsulated in a CHIP_ERROR.
@@ -286,27 +252,12 @@ public:
         return CanEncapsulate<T>() || FitsInField(kValueLength, static_cast<ValueType>(value));
     }
 
-    // DO NOT USE. This is transitional and will be removed soon. Instead of `Encapsulate(r, v)` use `ChipError(r, v)`.
-    static constexpr ChipError Encapsulate(Range range, ValueType value)
-    {
-        StorageType e = MakeInteger(range, (value & MakeMask(0, kValueLength)));
-        return ChipError(e);
-    }
-
     /**
      * Test whether @a error is an SDK error belonging to the SdkPart @a part.
      */
     constexpr bool IsPart(SdkPart part) const
     {
         return (mError & (MakeMask(kRangeStart, kRangeLength) | MakeMask(kSdkPartStart, kSdkPartLength))) ==
-            (MakeField(kRangeStart, static_cast<StorageType>(Range::kSDK)) |
-             MakeField(kSdkPartStart, static_cast<StorageType>(part)));
-    }
-
-    // DO NOT USE. This is transitional and will be removed soon. Instead of `IsPart(status)` use `status.IsPart()`.
-    static constexpr bool IsPart(SdkPart part, ChipError error)
-    {
-        return (error.mError & (MakeMask(kRangeStart, kRangeLength) | MakeMask(kSdkPartStart, kSdkPartLength))) ==
             (MakeField(kRangeStart, static_cast<StorageType>(Range::kSDK)) |
              MakeField(kSdkPartStart, static_cast<StorageType>(part)));
     }

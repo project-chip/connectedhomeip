@@ -1948,8 +1948,8 @@
 /**
  *  @def CHIP_CONFIG_ERROR_FORMAT_AS_STRING
  *
- *  If 0, then .Format() returns an integer (ChipError::BaseType).
- *  If 1, then .Format() returns a const char *, from chip::ErrorStr().
+ *  If 0, then ChipError::Format() returns an integer (ChipError::StorageType).
+ *  If 1, then ChipError::Format() returns a const char *, from chip::ErrorStr().
  *  In either case, the macro CHIP_ERROR_FORMAT expands to a suitable printf format.
  */
 

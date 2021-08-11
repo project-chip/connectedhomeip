@@ -139,7 +139,7 @@ class BuilderFactory:
     self.repository_path = repository_path
     self.output_prefix = output_prefix
 
-  def Create(self, platform: Platform, board: Board, app: Application):
+  def Create(self, platform: Platform, board: Board, app: Application, enable_flashbundle: bool = False):
     """Creates a builder object for the specified arguments. """
 
     builder = _MATCHERS[platform].Create(
@@ -152,6 +152,7 @@ class BuilderFactory:
     if builder:
       builder.SetIdentifier(platform.name.lower(), board.name.lower(),
                             app.name.lower())
+      builder.enable_flashbundle(enable_flashbundle)
 
     return builder
 

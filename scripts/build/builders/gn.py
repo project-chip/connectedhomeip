@@ -46,6 +46,6 @@ class GnBuilder(Builder):
 
       self._Execute(cmd, title='Generating ' + self.identifier)
 
-  def build(self):
+  def _build(self):
     self._Execute(['ninja', '-C', self.output_dir],
                   title='Building ' + self.identifier)

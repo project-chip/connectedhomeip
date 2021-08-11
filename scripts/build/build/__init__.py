@@ -39,7 +39,8 @@ class Context:
 
   def SetupBuilders(self, platforms: Sequence[Platform],
                     boards: Sequence[Board],
-                    applications: Sequence[Application]):
+                    applications: Sequence[Application],
+                    enable_flashbundle: bool):
     """Configures internal builders for the given platform/board/app combination.
 
         Handles smart default selection, so that users only need to specify
@@ -86,7 +87,7 @@ class Context:
     for platform in sorted(platforms):
       for board in sorted(boards):
         for application in sorted(applications):
-          builder = self.builder_factory.Create(platform, board, application)
+          builder = self.builder_factory.Create(platform, board, application, enable_flashbundle=enable_flashbundle)
           if not builder:
             logging.debug('Builder not supported for tuple %s/%s/%s', platform,
                           board, application)

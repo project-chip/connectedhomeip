@@ -79,7 +79,7 @@ class Efr32Builder(GnBuilder):
     self.app = app
     self.gn_build_args = ['efr32_board="%s"' % board.GnArgName()]
 
-  def outputs(self):
+  def build_outputs(self):
     items = {
         '%s.out' % self.app.AppNamePrefix():
             os.path.join(self.output_dir, '%s.out' % self.app.AppNamePrefix()),

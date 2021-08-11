@@ -59,7 +59,7 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout, "  help                       Usage: commissionee <subcommand>\r\n");
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     streamer_printf(sout,
-                    "  sendudc <address> <port>   Send UDC message to address. Usage: commissionee sendudc 127.0.0.1 11100\r\n");
+                    "  sendudc <address> <port>   Send UDC message to address. Usage: commissionee sendudc 127.0.0.1 5543\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     streamer_printf(sout, "\r\n");
 

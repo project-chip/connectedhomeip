@@ -489,7 +489,8 @@ void ReliableMessageMgr::StartTimer()
             StopTimer();
             res = mSystemLayer->StartTimer((uint32_t) timerArmValue, Timeout, this);
 
-            VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager, "Cannot start ReliableMessageMgr::Timeout\n");
+            VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager,
+                               "Cannot start ReliableMessageMgr::Timeout %" CHIP_ERROR_FORMAT, res.Format());
             mCurrentTimerExpiry = timerExpiry;
 #if defined(RMP_TICKLESS_DEBUG)
         }

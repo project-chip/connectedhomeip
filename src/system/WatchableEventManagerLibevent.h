@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file declares an implementation of WatchableEvents using libevent.
+ *      This file declares an implementation of WatchableEventManager using libevent.
  */
 
 #pragma once
@@ -27,7 +27,14 @@
 #include <system/WatchableEventManager.h>
 #endif //  !INCLUDING_CHIP_SYSTEM_WATCHABLE_EVENT_MANAGER_CONFIG_FILE
 
+#include <system/WakeEvent.h>
+
 #include <event2/event.h>
+
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+#include <atomic>
+#include <pthread.h>
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
 namespace chip {
 
@@ -37,9 +44,16 @@ class WatchableEventManager
 {
 public:
     WatchableEventManager() : mActiveSockets(nullptr), mSystemLayer(nullptr), mEventBase(nullptr), mTimeoutEvent(nullptr) {}
+
+    // Core ‘overrides’.
     CHIP_ERROR Init(Layer & systemLayer);
     CHIP_ERROR Shutdown();
     void Signal();
+
+    // Timer ‘overrides’.
+    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, Timers::OnCompleteFunct onComplete, void * appState);
+    void CancelTimer(Timers::OnCompleteFunct onComplete, void * appState);
+    CHIP_ERROR ScheduleWork(Timers::OnCompleteFunct onComplete, void * appState) { return StartTimer(0, onComplete, appState); }
 
     void EventLoopBegins() {}
     void PrepareEvents();
@@ -60,13 +74,19 @@ private:
     friend class WatchableSocket;
     static void LibeventCallbackHandler(evutil_socket_t fd, short eventFlags, void * data);
     void RemoveFromQueueIfPresent(WatchableSocket * watcher);
+
     WatchableSocket * mActiveSockets; ///< List of sockets activated by libevent.
 
     Layer * mSystemLayer;
     event_base * mEventBase; ///< libevent shared state.
     event * mTimeoutEvent;
 
+    Timer::MutexedList mTimerList;
     WakeEvent mWakeEvent;
+
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+    std::atomic<pthread_t> mHandleSelectThread;
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 };
 
 } // namespace System

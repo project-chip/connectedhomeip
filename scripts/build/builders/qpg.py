@@ -26,7 +26,7 @@ class QpgBuilder(GnBuilder):
         runner=runner,
         output_prefix=output_prefix)
 
-  def outputs(self):
+  def build_outputs(self):
     return {
         'chip-qpg-lock-example.out':
             os.path.join(self.output_dir, 'chip-qpg6100-lock-example.out'),

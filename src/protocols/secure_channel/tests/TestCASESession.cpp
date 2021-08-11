@@ -55,6 +55,7 @@ using TestContext = chip::Test::MessagingContext;
 namespace {
 TransportMgrBase gTransportMgr;
 Test::LoopbackTransport gLoopback;
+chip::Test::IOContext gIOContext;
 
 OperationalCredentialSet commissionerDevOpCred;
 OperationalCredentialSet accessoryDevOpCred;
@@ -555,8 +556,9 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
 
     gTransportMgr.Init(&gLoopback);
+    ReturnErrorOnFailure(gIOContext.Init(&sSuite));
 
-    ReturnErrorOnFailure(ctx.Init(&sSuite, &gTransportMgr));
+    ReturnErrorOnFailure(ctx.Init(&sSuite, &gTransportMgr, &gIOContext));
 
     ctx.SetSourceNodeId(kPlaceholderNodeId);
     ctx.SetDestinationNodeId(kPlaceholderNodeId);
@@ -584,6 +586,7 @@ int CASE_TestSecurePairing_Setup(void * inContext)
 int CASE_TestSecurePairing_Teardown(void * inContext)
 {
     reinterpret_cast<TestContext *>(inContext)->Shutdown();
+    gIOContext.Shutdown();
     commissionerDevOpCred.Release();
     accessoryDevOpCred.Release();
     commissionerCertificateSet.Release();

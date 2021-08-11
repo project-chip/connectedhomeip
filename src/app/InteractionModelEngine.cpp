@@ -137,7 +137,7 @@ CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCom
     return CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, intptr_t aAppIdentifier)
+CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, uint64_t aAppIdentifier)
 {
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
@@ -158,9 +158,9 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClient ** const apWriteClient)
+CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, uint64_t aApplicationIdentifier)
 {
-    *apWriteClient = nullptr;
+    apWriteClient.SetWriteClient(nullptr);
 
     for (auto & writeClient : mWriteClients)
     {
@@ -169,8 +169,8 @@ CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClient ** const apWriteCl
             continue;
         }
 
-        ReturnErrorOnFailure(writeClient.Init(mpExchangeMgr, mpDelegate));
-        *apWriteClient = &writeClient;
+        ReturnLogErrorOnFailure(writeClient.Init(mpExchangeMgr, mpDelegate, aApplicationIdentifier));
+        apWriteClient.SetWriteClient(&writeClient);
         return CHIP_NO_ERROR;
     }
 
@@ -321,7 +321,7 @@ CHIP_ERROR InteractionModelEngine::SendReadRequest(NodeId aNodeId, FabricIndex a
                                                    EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
                                                    AttributePathParams * apAttributePathParamsList,
                                                    size_t aAttributePathParamsListSize, EventNumber aEventNumber,
-                                                   intptr_t aAppIdentifier)
+                                                   uint64_t aAppIdentifier)
 {
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
@@ -333,19 +333,6 @@ CHIP_ERROR InteractionModelEngine::SendReadRequest(NodeId aNodeId, FabricIndex a
         client->Shutdown();
     }
     return err;
-}
-
-CHIP_ERROR __attribute__((weak))
-WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
-{
-    ChipLogDetail(DataManagement,
-                  "Received Cluster Attribute: Cluster=" ChipLogFormatMEI " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx16
-                  " FieldId=%" PRIx32 " ListIndex=%" PRIx16,
-                  ChipLogValueMEI(aClusterInfo.mClusterId), ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId,
-                  aClusterInfo.mFieldId, aClusterInfo.mListIndex);
-    ChipLogError(DataManagement,
-                 "Default WriteSingleClusterData is called, this should be replaced by actual dispatched for cluster");
-    return CHIP_NO_ERROR;
 }
 
 uint16_t InteractionModelEngine::GetReadClientArrayIndex(const ReadClient * const apReadClient) const

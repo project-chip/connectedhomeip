@@ -254,7 +254,6 @@ if (chip_device_platform != "none") {
       "LockTracker.cpp",
       "PersistedStorage.cpp",
       "SystemEventSupport.cpp",
-      "SystemTimerSupport.cpp",
       "TestIdentity.cpp",
     ]
 

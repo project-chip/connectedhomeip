@@ -95,9 +95,9 @@ buildconfig_header("system_buildconfig") {
     ]
   }
 
+  defines += [ "CHIP_SYSTEM_WATCHABLE_EVENT_MANAGER_CONFIG_FILE=<system/WatchableEventManager${chip_system_config_event_loop}.h>" ]
   if (chip_system_config_use_sockets) {
-    defines += [ "CHIP_SYSTEM_WATCHABLE_EVENT_MANAGER_CONFIG_FILE=<system/WatchableEventManager${chip_system_config_sockets_event_loop}.h>" ]
-    defines += [ "CHIP_SYSTEM_WATCHABLE_SOCKET_CONFIG_FILE=<system/WatchableSocket${chip_system_config_sockets_event_loop}.h>" ]
+    defines += [ "CHIP_SYSTEM_WATCHABLE_SOCKET_CONFIG_FILE=<system/WatchableSocket${chip_system_config_event_loop}.h>" ]
   }
 }
 
@@ -152,8 +152,9 @@ static_library("system") {
     "TimeSource.h",
     "WakeEvent.cpp",
     "WakeEvent.h",
+    "WatchableEventManager${chip_system_config_event_loop}.cpp",
+    "WatchableEventManager${chip_system_config_event_loop}.h",
     "WatchableEventManager.h",
-    "WatchableSocket.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -168,12 +169,11 @@ static_library("system") {
 
   if (chip_system_config_use_sockets) {
     sources += [
-      "WatchableEventManager${chip_system_config_sockets_event_loop}.cpp",
-      "WatchableEventManager${chip_system_config_sockets_event_loop}.h",
-      "WatchableSocket${chip_system_config_sockets_event_loop}.cpp",
-      "WatchableSocket${chip_system_config_sockets_event_loop}.h",
+      "WatchableSocket${chip_system_config_event_loop}.cpp",
+      "WatchableSocket${chip_system_config_event_loop}.h",
+      "WatchableSocket.h",
     ]
-    if (chip_system_config_sockets_event_loop == "Libevent") {
+    if (chip_system_config_event_loop == "Libevent") {
       libs = [ "event" ]
     }
   }
