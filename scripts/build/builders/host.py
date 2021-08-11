@@ -54,7 +54,7 @@ class HostBuilder(GnBuilder):
     self.app_name = app.BinaryName()
     self.map_name = self.app_name + '.map'
 
-  def outputs(self):
+  def build_outputs(self):
     return {
         self.app_name: os.path.join(self.output_dir, self.app_name),
         self.map_name : os.path.join(self.output_dir, self.map_name)

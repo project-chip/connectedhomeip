@@ -46,6 +46,19 @@ class NrfApp(Enum):
     else:
       raise Exception('Unknown app type: %r' % self)
 
+  def _FlashBundlePrefix(self):
+    if self == NrfApp.LIGHT:
+      return 'chip-nrfconnect-lighting-example'
+    elif self == NrfApp.LOCK:
+      return 'chip-nrfconnect-lock-example'
+    elif self == NrfApp.SHELL:
+      return 'chip-nrfconnect-shell-example'
+    else:
+      raise Exception('Unknown app type: %r' % self)
+
+  def FlashBundleName(self):
+    '''Nrf build script will generate a file naming <project_name>.flashbundle.txt, go through the output dir to find the file and return it.'''
+    return self._FlashBundlePrefix() + '.flashbundle.txt'
 
 class NrfBoard(Enum):
   NRF52840 = auto()
@@ -109,13 +122,24 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}
         self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
 
-  def build(self):
+  def _build(self):
     logging.info('Compiling NrfConnect at %s', self.output_dir)
 
     self._Execute(['ninja', '-C', self.output_dir], title='Building ' + self.identifier)
 
-  def outputs(self):
+  def _generate_flashbundle(self):
+    logging.info(f'Generating flashbundle at {self.output_dir}')
+
+    self._Execute(['ninja', '-C', self.output_dir, 'flashing_script'], title='Generating flashable files of ' + self.identifier)
+
+  def build_outputs(self):
     return {
         '%s.elf' % self.app.AppNamePrefix(): os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
         '%s.map' % self.app.AppNamePrefix(): os.path.join(self.output_dir, 'zephyr', 'zephyr.map'),
     }
+
+  def flashbundle(self):
+    with open(os.path.join(self.output_dir, self.app.FlashBundleName()), 'r') as fp:
+      return {
+        l.strip(): os.path.join(self.output_dir, l.strip()) for l in fp.readlines() if l.strip()
+      }
