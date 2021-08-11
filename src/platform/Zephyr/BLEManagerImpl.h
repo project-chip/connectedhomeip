@@ -91,6 +91,7 @@ private:
         kAdvertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */
         kAdvertisingRefreshNeeded =
             0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
+        kChipoBleGattServiceRegister = 0x0020, /**< The system has currently CHIPoBLE GATT service registered. */
     };
 
     struct ServiceData;
