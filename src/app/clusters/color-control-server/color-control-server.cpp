@@ -1611,7 +1611,7 @@ static uint8_t addHue(uint8_t hue1, uint8_t hue2)
 
     if (hue16 > MAX_HUE_VALUE)
     {
-        hue16 = static_cast<uint16_t>(hue16 - UINT8_MAX);
+        hue16 = static_cast<uint16_t>(hue16 - MAX_HUE_VALUE - 1);
     }
 
     return ((uint8_t) hue16);
@@ -1624,7 +1624,7 @@ static uint8_t subtractHue(uint8_t hue1, uint8_t hue2)
     hue16 = ((uint16_t) hue1);
     if (hue2 > hue1)
     {
-        hue16 = static_cast<uint16_t>(hue16 + UINT8_MAX);
+        hue16 = static_cast<uint16_t>(hue16 + MAX_HUE_VALUE + 1);
     }
 
     hue16 = static_cast<uint16_t>(hue16 - static_cast<uint16_t>(hue2));
