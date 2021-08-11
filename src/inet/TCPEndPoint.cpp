@@ -577,7 +577,7 @@ void TCPEndPoint::StopConnectTimer()
     lSystemLayer.CancelTimer(TCPConnectTimeoutHandler, this);
 }
 
-void TCPEndPoint::TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+void TCPEndPoint::TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState)
 {
     TCPEndPoint * tcpEndPoint = reinterpret_cast<TCPEndPoint *>(aAppState);
 
@@ -1743,7 +1743,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
 }
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+void TCPEndPoint::TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState)
 {
     TCPEndPoint * tcpEndPoint = reinterpret_cast<TCPEndPoint *>(aAppState);
 

@@ -620,7 +620,7 @@ private:
 
     void OnSessionEstablishmentTimeout();
 
-    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, CHIP_ERROR aError);
+    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
     /* This function sends an OpCSR request to the device.
        The function does not hold a refernce to the device object.

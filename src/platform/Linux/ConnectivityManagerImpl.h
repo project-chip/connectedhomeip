@@ -158,7 +158,7 @@ private:
     void DriveAPState();
     CHIP_ERROR ConfigureWiFiAP();
     void ChangeWiFiAPState(WiFiAPState newState);
-    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError);
+    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
 #endif
 
     // ===== Members for internal use by the following friends.

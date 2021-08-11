@@ -366,7 +366,7 @@ void ExchangeContext::CancelResponseTimer()
     lSystemLayer->CancelTimer(HandleResponseTimeout, this);
 }
 
-void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState)
 {
     ExchangeContext * ec = reinterpret_cast<ExchangeContext *>(aAppState);
 

@@ -52,7 +52,7 @@ class PASETestLoopbackTransport : public Test::LoopbackTransport
         {
             chip::test_utils::SleepMillis(65);
             ReliableMessageMgr * rm = mContext->GetExchangeManager().GetReliableMessageMgr();
-            ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm, CHIP_NO_ERROR);
+            ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm);
         }
     }
 

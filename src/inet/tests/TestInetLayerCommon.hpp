@@ -145,7 +145,7 @@ extern bool HandleICMPv6DataReceived(chip::System::PacketBufferHandle && aBuffer
 
 // Timer Callback Handler
 
-extern void HandleSendTimerComplete(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
+extern void HandleSendTimerComplete(chip::System::Layer * aSystemLayer, void * aAppState);
 
 // Raw Endpoint Callback Handlers
 

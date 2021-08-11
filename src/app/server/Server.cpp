@@ -359,7 +359,7 @@ chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDC
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-void HandlePairingWindowTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+void HandlePairingWindowTimeout(System::Layer * aSystemLayer, void * aAppState)
 {
     ClosePairingWindow();
 }

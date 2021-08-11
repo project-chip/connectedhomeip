@@ -73,7 +73,7 @@ void HandleDNSResolveComplete(void * appState, CHIP_ERROR err, uint8_t addrCount
         printf("    DNS name resolution return no addresses\n");
 }
 
-void HandleTimer(Layer * aLayer, void * aAppState, CHIP_ERROR aError)
+void HandleTimer(Layer * aLayer, void * aAppState)
 {
     printf("    timer handler\n");
 }

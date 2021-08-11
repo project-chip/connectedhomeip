@@ -133,7 +133,7 @@ void Timer::HandleComplete()
 
     // Invoke the app's callback, if it's still valid.
     if (lOnComplete != nullptr)
-        lOnComplete(&lLayer, lAppState, CHIP_NO_ERROR);
+        lOnComplete(&lLayer, lAppState);
 }
 
 Timer * Timer::List::Add(Timer * add)

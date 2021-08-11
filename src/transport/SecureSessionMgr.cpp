@@ -506,7 +506,7 @@ void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionSt
     mTransportMgr->Disconnect(state.GetPeerAddress());
 }
 
-void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, CHIP_ERROR error)
+void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param)
 {
     SecureSessionMgr * mgr = reinterpret_cast<SecureSessionMgr *>(param);
 #if CHIP_CONFIG_SESSION_REKEYING
