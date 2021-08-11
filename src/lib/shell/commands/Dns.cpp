@@ -40,8 +40,21 @@ public:
     {
         streamer_printf(streamer_get(), "DNS resolve for " ChipLogFormatX64 "-" ChipLogFormatX64 " succeeded:\n",
                         ChipLogValueX64(nodeData.mPeerId.GetFabricId()), ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
+        streamer_printf(streamer_get(), "   Hostname: %s\n", nodeData.mHostName);
         streamer_printf(streamer_get(), "   IP address: %s\n", nodeData.mAddress.ToString(ipAddressBuf));
-        streamer_printf(streamer_get(), "   Port: %d\n", nodeData.mPort);
+        streamer_printf(streamer_get(), "   Port: %" PRIu16 "\n", nodeData.mPort);
+
+        auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
+
+        if (retryInterval.HasValue())
+            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\n", retryInterval.Value());
+
+        retryInterval = nodeData.GetMrpRetryIntervalActive();
+
+        if (retryInterval.HasValue())
+            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\n", retryInterval.Value());
+
+        streamer_printf(streamer_get(), "   Supports TCP: %s\n", nodeData.mSupportsTcp ? "yes" : "no");
     }
 
     void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override {}
@@ -61,6 +74,18 @@ public:
         streamer_printf(streamer_get(), "   Device type: %d\n", nodeData.deviceType);
         streamer_printf(streamer_get(), "   Device name: %s\n", nodeData.deviceName);
         streamer_printf(streamer_get(), "   Commissioning mode: %d\n", nodeData.commissioningMode);
+
+        auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
+
+        if (retryInterval.HasValue())
+            streamer_printf(streamer_get(), "   MRP retry interval (idle): %" PRIu32 "ms\n", retryInterval.Value());
+
+        retryInterval = nodeData.GetMrpRetryIntervalActive();
+
+        if (retryInterval.HasValue())
+            streamer_printf(streamer_get(), "   MRP retry interval (active): %" PRIu32 "ms\n", retryInterval.Value());
+
+        streamer_printf(streamer_get(), "   Supports TCP: %s\n", nodeData.supportsTcp ? "yes" : "no");
         streamer_printf(streamer_get(), "   IP addresses:\n");
         for (uint8_t i = 0; i < nodeData.kMaxIPAddresses; i++)
         {
