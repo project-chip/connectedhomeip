@@ -1,8 +1,8 @@
-## Build Documentation
+# Building Matter
 
-CHIP supports configuring the build with [GN](https://gn.googlesource.com/gn/),
-a fast and scalable meta-build system that generates inputs to
-[ninja](https://ninja-build.org/).
+Matter supports configuring the build with
+[GN](https://gn.googlesource.com/gn/), a fast and scalable meta-build system
+that generates inputs to [ninja](https://ninja-build.org/).
 
 Tested on:
 
@@ -19,9 +19,9 @@ Build system features:
 -   Introspection: `gn desc`
 -   Automatic formatting: `gn format`
 
-### Checking out the Code
+## Checking out the Matter code
 
-To check out the CHIP repository:
+To check out the Matter repository:
 
 ```
 git clone --recurse-submodules git@github.com:project-chip/connectedhomeip.git
@@ -33,11 +33,11 @@ If you already have a checkout, run the following command to sync submodules:
 git submodule update --init
 ```
 
-### Prerequisites
+## Prerequisites
 
 Before building, you'll need to install a few OS specific dependencies.
 
-#### How to install prerequisites on Linux
+### Installing prerequisites on Linux
 
 On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following:
@@ -48,7 +48,7 @@ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev \
      python3-pip unzip libgirepository1.0-dev libcairo2-dev
 ```
 
-#### How to install prerequisites on macOS
+### Installing prerequisites on macOS
 
 On macOS, first install Xcode from the Mac App Store. The remaining dependencies
 can be installed and satisfied using [Brew](https://brew.sh/):
@@ -71,7 +71,7 @@ OpenSSL installed by Brew.
 Note: If using MacPorts, `port install openssl` is sufficient to satisfy this
 dependency.
 
-#### How to install prerequisites on Raspberry Pi 4
+### Installing prerequisites on Raspberry Pi 4
 
 Using `rpi-imager`, install the Ubuntu _21.04_ 64-bit _server_ OS for arm64
 architectures on a micro SD card. This release will have bluez 5.55 or newer
@@ -89,8 +89,8 @@ sudo apt-get install pi-bluetooth
 You need to reboot your RPi after install `pi-bluetooth`.
 
 By default, wpa_supplicant is not allowed to update (overwrite) configuration,
-if you want chip app to be able to store the configuration changes permanently,
-we need to make the following changes.
+if you want the Matter app to be able to store the configuration changes
+permanently, we need to make the following changes.
 
 1. Edit the dbus-fi.w1.wpa_supplicant1.service file to use configuration file
    instead.
@@ -120,7 +120,7 @@ update_config=1
 
 Finally, reboot your RPi.
 
-### Build Preparation
+## Prepare for building
 
 Before running any other build command, the `scripts/activate.sh` environment
 setup script should be sourced at the top level. This script takes care of
@@ -141,7 +141,7 @@ source scripts/bootstrap.sh
 The `scripts/bootstrap.sh` script re-creates the environment from scratch, which
 is expensive, so avoid running it unless the environment is out of date.
 
-### Build for the Host OS (Linux or macOS)
+## Build for the host OS (Linux or macOS)
 
 This will build all sources, libraries, and tests for the host platform:
 
@@ -188,7 +188,7 @@ ninja: no work to do
 
 that means that the tests passed in a previous build.
 
-### Build Custom configuration
+## Build custom configuration
 
 The build is configured by setting build arguments. These are set by passing the
 `--args` option to `gn gen`, by running `gn args` on the output directory, or by
@@ -213,10 +213,10 @@ gn gen out/custom
 gn args --list out/custom
 ```
 
-### Build Examples
+## Build examples
 
-Examples can be built in two ways, as separate projects that add CHIP in the
-third_party directory, or in the top level CHIP project.
+Examples can be built in two ways, as separate projects that add Matter in the
+third_party directory, or in the top level Matter project.
 
 To build the `chip-shell` example as a separate project:
 
@@ -228,7 +228,7 @@ ninja -C out/debug
 
 To build it at the top level, see below under "Unified Builds".
 
-### Unified Builds
+## Unified builds
 
 To build a unified configuration that approximates the set of continuous builds:
 
@@ -282,7 +282,7 @@ Simplelink cc13x2_26x2 examples to the unified build, install the
 gn gen out/unified --args="target_os=\"all\" enable_ti_simplelink_builds=true ti_simplelink_sdk_root=\"/path/to/sdk\" ti_sysconfig_root=\"/path/to/sysconfig\""
 ```
 
-### Getting Help
+## Getting help
 
 GN has builtin help via
 
@@ -301,7 +301,7 @@ gn help toolchain
 Also see the
 [quick start guide](https://gn.googlesource.com/gn/+/master/docs/quick_start.md).
 
-### Introspection
+## Introspection
 
 GN has various introspection tools to help examine the build configuration.
 
@@ -352,7 +352,7 @@ gn desc out/host //src/lib outputs
 gn desc out/host //src/lib --format=json
 ```
 
-## Maintaining CHIP
+## Maintaining Matter
 
 If you make any change to the GN build system, the next build will regenerate
 the ninja files automatically. No need to do anything.
