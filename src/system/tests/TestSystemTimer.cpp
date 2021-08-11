@@ -53,9 +53,9 @@ using namespace chip::System;
 static void ServiceEvents(Layer & aLayer, ::timeval & aSleepTime)
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    aLayer.WatchableEvents().PrepareEventsWithTimeout(aSleepTime);
-    aLayer.WatchableEvents().WaitForEvents();
-    aLayer.WatchableEvents().HandleEvents();
+    aLayer.WatchableEventsManager().PrepareEventsWithTimeout(aSleepTime);
+    aLayer.WatchableEventsManager().WaitForEvents();
+    aLayer.WatchableEventsManager().HandleEvents();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -63,7 +63,7 @@ static void ServiceEvents(Layer & aLayer, ::timeval & aSleepTime)
     {
         // TODO: Currently timers are delayed by aSleepTime above. A improved solution would have a mechanism to reduce
         // aSleepTime according to the next timer.
-        aLayer.HandlePlatformTimer();
+        aLayer.WatchableEventsManager().HandlePlatformTimer();
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }

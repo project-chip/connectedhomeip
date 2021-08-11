@@ -246,7 +246,7 @@ CHIP_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = SystemLayer().GetDispatchQueue();
+    dispatch_queue_t dispatchQueue = SystemLayer().WatchableEventsManager().GetDispatchQueue();
     if (dispatchQueue != nullptr)
     {
         unsigned long fd = static_cast<unsigned long>(mSocket.GetFD());
