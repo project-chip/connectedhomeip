@@ -283,7 +283,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, cons
     return parseTLVFields(outPayload, tlvArray.Get(), tlvBytesLength);
 }
 
-std::string extractPayload(std::string inString)
+std::string ExtractPayload(std::string inString)
 {
     std::string chipSegment;
     char delimiter = '%';
@@ -328,7 +328,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     size_t indexToReadFrom = 0;
     uint64_t dest;
 
-    std::string payload = extractPayload(mBase38Representation);
+    std::string payload = ExtractPayload(mBase38Representation);
     VerifyOrReturnError(payload.length() != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(base38Decode(payload, buf));

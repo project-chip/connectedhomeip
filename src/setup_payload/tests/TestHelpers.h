@@ -30,14 +30,14 @@ namespace chip {
 const uint16_t kSmallBufferSizeInBytes   = 1;
 const uint16_t kDefaultBufferSizeInBytes = 512;
 
-const uint8_t kOptionalDefaultStringTag       = 2;
-const std::string kOptionalDefaultStringValue = "myData";
+const uint8_t kOptionalDefaultStringTag      = 2;
+constexpr char kOptionalDefaultStringValue[] = "myData";
 
 const uint8_t kOptionalDefaultIntTag    = 3;
 const uint32_t kOptionalDefaultIntValue = 12;
 
-const std::string kSerialNumberDefaultStringValue = "123456789";
-const uint32_t kSerialNumberDefaultUInt32Value    = 123456789;
+constexpr char kSerialNumberDefaultStringValue[] = "123456789";
+const uint32_t kSerialNumberDefaultUInt32Value   = 123456789;
 
 constexpr const char * kDefaultPayloadQRCode = "MT:R5L90MP500K64J00000";
 

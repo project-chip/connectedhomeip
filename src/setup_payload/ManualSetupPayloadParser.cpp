@@ -33,7 +33,7 @@
 
 namespace chip {
 
-CHIP_ERROR checkDecimalStringValidity(std::string decimalString, std::string & decimalStringWithoutCheckDigit)
+CHIP_ERROR CheckDecimalStringValidity(std::string decimalString, std::string & decimalStringWithoutCheckDigit)
 {
     if (decimalString.length() < 2)
     {
@@ -51,7 +51,7 @@ CHIP_ERROR checkDecimalStringValidity(std::string decimalString, std::string & d
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR checkCodeLengthValidity(const std::string & decimalString, bool isLongCode)
+CHIP_ERROR CheckCodeLengthValidity(const std::string & decimalString, bool isLongCode)
 {
     size_t expectedCharLength = isLongCode ? kManualSetupLongCodeCharLength : kManualSetupShortCodeCharLength;
     if (decimalString.length() != expectedCharLength)
@@ -63,7 +63,7 @@ CHIP_ERROR checkCodeLengthValidity(const std::string & decimalString, bool isLon
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR toNumber(const std::string & decimalString, uint32_t & dest)
+CHIP_ERROR ToNumber(const std::string & decimalString, uint32_t & dest)
 {
     uint32_t number = 0;
     for (char c : decimalString)
@@ -81,7 +81,7 @@ CHIP_ERROR toNumber(const std::string & decimalString, uint32_t & dest)
 }
 
 // Populate numberOfChars into dest from decimalString starting at startIndex (least significant digit = left-most digit)
-CHIP_ERROR readDigitsFromDecimalString(const std::string & decimalString, size_t & index, uint32_t & dest,
+CHIP_ERROR ReadDigitsFromDecimalString(const std::string & decimalString, size_t & index, uint32_t & dest,
                                        size_t numberOfCharsToRead)
 {
     if (decimalString.length() < numberOfCharsToRead || (numberOfCharsToRead + index > decimalString.length()))
@@ -92,7 +92,7 @@ CHIP_ERROR readDigitsFromDecimalString(const std::string & decimalString, size_t
 
     std::string decimalSubstring = decimalString.substr(index, numberOfCharsToRead);
     index += numberOfCharsToRead;
-    return toNumber(decimalSubstring, dest);
+    return ToNumber(decimalSubstring, dest);
 }
 
 CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
@@ -101,7 +101,7 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     SetupPayload payload;
     std::string representationWithoutCheckDigit;
 
-    result = checkDecimalStringValidity(mDecimalStringRepresentation, representationWithoutCheckDigit);
+    result = CheckDecimalStringValidity(mDecimalStringRepresentation, representationWithoutCheckDigit);
     if (result != CHIP_NO_ERROR)
     {
         return result;
@@ -110,26 +110,26 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     size_t stringOffset = 0;
     uint32_t chunk1, chunk2, chunk3;
 
-    result = readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, chunk1, kManualSetupCodeChunk1CharLength);
+    result = ReadDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, chunk1, kManualSetupCodeChunk1CharLength);
     if (result != CHIP_NO_ERROR)
     {
         return result;
     }
 
-    result = readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, chunk2, kManualSetupCodeChunk2CharLength);
+    result = ReadDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, chunk2, kManualSetupCodeChunk2CharLength);
     if (result != CHIP_NO_ERROR)
     {
         return result;
     }
 
-    result = readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, chunk3, kManualSetupCodeChunk3CharLength);
+    result = ReadDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, chunk3, kManualSetupCodeChunk3CharLength);
     if (result != CHIP_NO_ERROR)
     {
         return result;
     }
 
     bool isLongCode = ((chunk1 >> kManualSetupChunk1VidPidPresentBitPos) & 1) == 1;
-    result          = checkCodeLengthValidity(representationWithoutCheckDigit, isLongCode);
+    result          = CheckCodeLengthValidity(representationWithoutCheckDigit, isLongCode);
     if (result != CHIP_NO_ERROR)
     {
         return result;
@@ -162,7 +162,7 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     {
         uint32_t vendorID;
         result =
-            readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, vendorID, kManualSetupVendorIdCharLength);
+            ReadDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, vendorID, kManualSetupVendorIdCharLength);
         if (result != CHIP_NO_ERROR)
         {
             return result;
@@ -170,7 +170,7 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
         uint32_t productID;
         result =
-            readDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, productID, kManualSetupProductIdCharLength);
+            ReadDigitsFromDecimalString(representationWithoutCheckDigit, stringOffset, productID, kManualSetupProductIdCharLength);
         if (result != CHIP_NO_ERROR)
         {
             return result;
