@@ -51,12 +51,6 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::init(CHIPPersistentStorageDelegat
 
     CHIP_ERROR err = LoadKeysFromKeyChain();
 
-    // TODO - Remove use of deprecated storage for Darwin keys
-    if (err != CHIP_NO_ERROR) {
-        // Try loading the deprecated keys.
-        err = LoadDeprecatedKeysFromKeyChain();
-    }
-
     if (err != CHIP_NO_ERROR) {
         // Generate keys if keys could not be loaded
         err = GenerateKeys();
@@ -93,26 +87,11 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::SetIssuerID(CHIPPersistentStorage
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::ConvertToP256Keypair(NSData * keypairData)
-{
-    chip::Crypto::P256SerializedKeypair serialized;
-    if ([keypairData length] != serialized.Capacity()) {
-        NSLog(@"Keypair length %zu does not match expected length %zu", [keypairData length], serialized.Capacity());
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    std::memmove((uint8_t *) serialized, [keypairData bytes], [keypairData length]);
-    serialized.SetLength([keypairData length]);
-
-    CHIP_LOG_ERROR("Deserializing the key");
-    return mIssuerKey.Deserialize(serialized);
-}
-
 CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadKeysFromKeyChain()
 {
     const NSDictionary * query = @{
         (id) kSecClass : (id) kSecClassGenericPassword,
-        (id) kSecAttrService : kCHIPCAKeyLabel,
+        (id) kSecAttrService : kCHIPCAKeyChainLabel,
         (id) kSecAttrSynchronizable : @YES,
         (id) kSecReturnData : @YES,
     };
@@ -127,50 +106,37 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadKeysFromKeyChain()
     CHIP_LOG_ERROR("Found an existing keypair in the keychain");
     NSData * keyData = CFBridgingRelease(keyDataRef);
 
-    NSData * privateKey = [[NSData alloc] initWithBase64EncodedData:keyData options:0];
-    return ConvertToP256Keypair(privateKey);
-}
+    NSData * keypairData = [[NSData alloc] initWithBase64EncodedData:keyData options:0];
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadDeprecatedKeysFromKeyChain()
-{
-    SecKeyRef privateKey;
-
-    const NSDictionary * query = @ {
-        (id) kSecClass : (id) kSecClassKey,
-        (id) kSecAttrKeyType : mKeyType,
-        (id) kSecAttrKeySizeInBits : mKeySize,
-        (id) kSecAttrLabel : kCHIPCADeprecatedKeyLabel,
-        (id) kSecAttrApplicationTag : kCHIPCADeprecatedKeyTag,
-        (id) kSecReturnRef : (id) kCFBooleanTrue
-    };
-
-    OSStatus status = SecItemCopyMatching((CFDictionaryRef) query, (CFTypeRef *) &privateKey);
-    if (status == errSecItemNotFound || privateKey == nil) {
-        CHIP_LOG_ERROR("Did not find an existing key in the keychain");
-        return CHIP_ERROR_KEY_NOT_FOUND;
-    }
-
-    NSData * keypairData = (__bridge_transfer NSData *) SecKeyCopyExternalRepresentation(privateKey, nil);
-    if (keypairData == nil) {
-        NSLog(@"Failed in getting keypair data");
+    chip::Crypto::P256SerializedKeypair serialized;
+    if ([keypairData length] != serialized.Capacity()) {
+        NSLog(@"Keypair length %zu does not match expected length %zu", [keypairData length], serialized.Capacity());
         return CHIP_ERROR_INTERNAL;
     }
 
-    // Store the key in the new format, so that henceforth the deprecated key storage won't be needed
-    CHIP_ERROR errorCode = StoreKeysInKeyChain(keypairData);
+    std::memmove((uint8_t *) serialized, [keypairData bytes], [keypairData length]);
+    serialized.SetLength([keypairData length]);
+
+    CHIP_LOG_ERROR("Deserializing the key");
+    return mIssuerKey.Deserialize(serialized);
+}
+
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateKeys()
+{
+    CHIP_LOG_ERROR("Generating keys for the CA");
+    CHIP_ERROR errorCode = mIssuerKey.Initialize();
     if (errorCode != CHIP_NO_ERROR) {
         return errorCode;
     }
 
-    CHIP_LOG_ERROR("Found an existing keypair in deprecated format in the keychain");
-    return ConvertToP256Keypair(keypairData);
-}
+    chip::Crypto::P256SerializedKeypair serializedKey;
+    errorCode = mIssuerKey.Serialize(serializedKey);
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::StoreKeysInKeyChain(NSData * keypairData)
-{
+    NSData * keypairData = [NSData dataWithBytes:serializedKey.Bytes() length:serializedKey.Length()];
+
     const NSDictionary * addParams = @{
         (id) kSecClass : (id) kSecClassGenericPassword,
-        (id) kSecAttrService : kCHIPCAKeyLabel,
+        (id) kSecAttrService : kCHIPCAKeyChainLabel,
         (id) kSecAttrSynchronizable : @YES,
         (id) kSecValueData : [keypairData base64EncodedDataWithOptions:0],
     };
@@ -186,41 +152,6 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::StoreKeysInKeyChain(NSData * keyp
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateKeys()
-{
-    SecKeyRef publicKey;
-    SecKeyRef privateKey;
-
-    CHIP_LOG_ERROR("Generating keys for the CA");
-    OSStatus status = noErr;
-
-    const NSDictionary * keygenParams = @ {
-        (id) kSecAttrKeyType : mKeyType,
-        (id) kSecAttrKeySizeInBits : mKeySize,
-        (id) kSecAttrLabel : kCHIPCAKeyLabel,
-        (id) kSecAttrApplicationTag : kCHIPCAKeyTag,
-    };
-
-    status = SecKeyGeneratePair((__bridge CFDictionaryRef) keygenParams, &publicKey, &privateKey);
-    if (status != noErr || publicKey == nil || privateKey == nil) {
-        NSLog(@"Failed in keygen");
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    NSData * keypairData = (__bridge_transfer NSData *) SecKeyCopyExternalRepresentation(privateKey, nil);
-    if (keypairData == nil) {
-        NSLog(@"Failed in getting keypair data");
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    CHIP_ERROR errorCode = StoreKeysInKeyChain(keypairData);
-    if (errorCode != CHIP_NO_ERROR) {
-        return errorCode;
-    }
-
-    return ConvertToP256Keypair(keypairData);
-}
-
 CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
 {
     CHIP_LOG_ERROR("Deleting current CA keys");
@@ -228,7 +159,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
 
     const NSDictionary * deleteParams = @{
         (id) kSecClass : (id) kSecClassGenericPassword,
-        (id) kSecAttrService : kCHIPCAKeyLabel,
+        (id) kSecAttrService : kCHIPCAKeyChainLabel,
         (id) kSecAttrSynchronizable : @YES,
     };
 
