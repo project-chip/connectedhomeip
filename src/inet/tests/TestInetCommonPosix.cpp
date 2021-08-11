@@ -460,8 +460,9 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
         }
     }
 
+    // Start a timer (with a no-op callback) to ensure that WaitForEvents() does not block longer than aSleepTimeMilliseconds.
     gSystemLayer.StartTimer(
-        aSleepTimeMilliseconds, [](System::Layer *, void *, CHIP_ERROR) -> void {}, nullptr);
+        aSleepTimeMilliseconds, [](System::Layer *, void *) -> void {}, nullptr);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     gSystemLayer.WatchableEventsManager().PrepareEvents();
