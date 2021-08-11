@@ -1,48 +1,42 @@
-<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-
-    <FrameLayout
+    <com.google.chip.chiptool.setuppayloadscanner.CameraSourceView
+        android:id="@+id/camera_view"
         android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/edit_qtcode"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical" />
+
+    <Button
+        android:id="@+id/btn_qtcode"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="9">
-
-        <com.google.chip.chiptool.setuppayloadscanner.CameraSourceView
-            android:id="@+id/camera_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical">
-	</com.google.chip.chiptool.setuppayloadscanner.CameraSourceView>
-
-    </FrameLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:text="Submit"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/camera_view"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <EditText
-            android:id="@+id/edit_qtcode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="9"
-            android:text="MT:YNJV793700A50324800"
-            android:inputType="text" />
+    <EditText
+        android:id="@+id/edit_qtcode"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:padding="8dp"
+        android:text="MT:YNJV793700A50324800"
+        app:layout_constraintTop_toBottomOf="@id/camera_view"
+        app:layout_constraintEnd_toStartOf="@id/btn_qtcode"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <Button
-            android:id="@+id/btn_qtcode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Submit"
-            android:layout_weight="1"/>
-
-    </LinearLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
