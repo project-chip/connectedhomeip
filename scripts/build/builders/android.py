@@ -160,6 +160,4 @@ class AndroidBuilder(Builder):
             os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(), 'libCHIPController.so'),
     }
 
-    outputs.update(self.jni_output_libs())
-
     return outputs
