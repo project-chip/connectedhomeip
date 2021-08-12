@@ -85,7 +85,8 @@ class TestOnOffCluster(CHIPVirtualHome):
                 os.path.join(CHIP_REPO, "out/debug/standalone/chip-lighting-app")))
             server_ip_address.add(self.get_device_thread_ip(device_id))
 
-        chip_tool_path = os.path.join(CHIP_REPO, "out/debug/standalone/chip-tool")
+        chip_tool_path = os.path.join(
+            CHIP_REPO, "out/debug/standalone/chip-tool")
 
         command = chip_tool_path + " onoff {} 1"
 

@@ -47,6 +47,7 @@ __all__ = [
 
 ChipStackDLLBaseName = "_ChipDeviceCtrl.so"
 
+
 def _singleton(cls):
     instance = [None]
 
@@ -119,6 +120,7 @@ class ChipLogFormatter(logging.Formatter):
             timestampStr = "%s.%03ld" % (timestampStr, timestampUS / 1000)
         return timestampStr
 
+
 class AsyncCallableHandle:
     def __init__(self, callback):
         self._callback = callback
@@ -146,9 +148,12 @@ class AsyncCallableHandle:
                 raise self._exc
             return self._res
 
+
 _CompleteFunct = CFUNCTYPE(None, c_void_p, c_void_p)
-_ErrorFunct = CFUNCTYPE(None, c_void_p, c_void_p, c_ulong, POINTER(DeviceStatusStruct))
-_LogMessageFunct = CFUNCTYPE(None, c_int64, c_int64, c_char_p, c_uint8, c_char_p)
+_ErrorFunct = CFUNCTYPE(None, c_void_p, c_void_p,
+                        c_ulong, POINTER(DeviceStatusStruct))
+_LogMessageFunct = CFUNCTYPE(
+    None, c_int64, c_int64, c_char_p, c_uint8, c_char_p)
 _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 
 
@@ -226,14 +231,16 @@ class ChipStack(object):
         self.cbHandleChipThreadRun = HandleChipThreadRun
         self.cbHandleComplete = _CompleteFunct(HandleComplete)
         self.cbHandleError = _ErrorFunct(HandleError)
-        self.blockingCB = None  # set by other modules(BLE) that require service by thread while thread blocks.
+        # set by other modules(BLE) that require service by thread while thread blocks.
+        self.blockingCB = None
 
         # Initialize the chip library
         res = self._ChipStackLib.pychip_Stack_Init()
         if res != 0:
             raise self.ErrorToException(res)
 
-        res = self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle(bluetoothAdapter)
+        res = self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle(
+            bluetoothAdapter)
         if res != 0:
             raise self.ErrorToException(res)
 
@@ -333,7 +340,8 @@ class ChipStack(object):
         '''
         callObj = AsyncCallableHandle(callFunct)
         pythonapi.Py_IncRef(py_object(callObj))
-        res = self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread(self.cbHandleChipThreadRun, py_object(callObj))
+        res = self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread(
+            self.cbHandleChipThreadRun, py_object(callObj))
         if res != 0:
             pythonapi.Py_DecRef(py_object(callObj))
             raise self.ErrorToException(res)
@@ -350,7 +358,8 @@ class ChipStack(object):
                 )
             )
             sysErrorCode = (
-                devStatus.SysErrorCode if (devStatus.SysErrorCode != 0) else None
+                devStatus.SysErrorCode if (
+                    devStatus.SysErrorCode != 0) else None
             )
             if sysErrorCode != None:
                 msg = msg + " (system err %d)" % (sysErrorCode)
@@ -383,7 +392,8 @@ class ChipStack(object):
         # running script looking for an CHIP build directory containing the Chip Device
         # Manager DLL. This makes it possible to import and use the ChipDeviceMgr module
         # directly from a built copy of the CHIP source tree.
-        buildMachineGlob = "%s-*-%s*" % (platform.machine(), platform.system().lower())
+        buildMachineGlob = "%s-*-%s*" % (platform.machine(),
+                                         platform.system().lower())
         relDMDLLPathGlob = os.path.join(
             "build",
             buildMachineGlob,
@@ -426,11 +436,14 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_StatusReportToString.restype = c_char_p
             self._ChipStackLib.pychip_Stack_ErrorToString.argtypes = [c_uint32]
             self._ChipStackLib.pychip_Stack_ErrorToString.restype = c_char_p
-            self._ChipStackLib.pychip_Stack_SetLogFunct.argtypes = [_LogMessageFunct]
+            self._ChipStackLib.pychip_Stack_SetLogFunct.argtypes = [
+                _LogMessageFunct]
             self._ChipStackLib.pychip_Stack_SetLogFunct.restype = c_uint32
 
-            self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle.argtypes = [c_uint32]
+            self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle.argtypes = [
+                c_uint32]
             self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle.restype = c_uint32
 
-            self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread.argtypes = [_ChipThreadTaskRunnerFunct, py_object]
+            self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread.argtypes = [
+                _ChipThreadTaskRunnerFunct, py_object]
             self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread.restype = c_uint32

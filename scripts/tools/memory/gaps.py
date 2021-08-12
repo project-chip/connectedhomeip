@@ -88,7 +88,8 @@ def main(argv):
                 else:
                     section = e['elffile'].get_section_by_name(i.section)
                     data = section.data()
-                    limit = memdf.select.get_limit(config, 'section', i.section)
+                    limit = memdf.select.get_limit(
+                        config, 'section', i.section)
                     e['section'][i.section] = section
                     e['data'][i.section] = data
                     e['limit'][i.section] = limit
