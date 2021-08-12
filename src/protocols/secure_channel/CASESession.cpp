@@ -681,7 +681,12 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
 
     SuccessOrExit(err = decryptedDataTlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(decryptedDataTlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+
     responderOpCertLen = static_cast<size_t>(decryptedDataTlvReader.GetLength());
+    // We use `sizeof(responderOpCert)` rather than `responderOpCertLen` since GetBytes()
+    // validates that the destination buffer is large enough for the equivalent of GetLength().
+    // If we used untrusted `responderOpCertLen` directly, and a bad value was provided,
+    // it could overrun stack without being caught.
     SuccessOrExit(err = decryptedDataTlvReader.GetBytes(responderOpCert, sizeof(responderOpCert)));
 
     // Validate responder identity located in msg_r2_encrypted
@@ -926,7 +931,12 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
 
     SuccessOrExit(err = decryptedDataTlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(decryptedDataTlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
+
     initiatorOpCertLen = static_cast<size_t>(decryptedDataTlvReader.GetLength());
+    // We use `sizeof(initiatorOpCert)` rather than `initiatorOpCertLen` since GetBytes()
+    // validates that the destination buffer is large enough for the equivalent of GetLength().
+    // If we used untrusted `initiatorOpCertLen` directly, and a bad value was provided,
+    // it could overrun stack without being caught.
     SuccessOrExit(err = decryptedDataTlvReader.GetBytes(initiatorOpCert, sizeof(initiatorOpCert)));
 
     // Step 5/6
