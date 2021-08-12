@@ -43,9 +43,6 @@ class MdnsCache
 public:
     MdnsCache() : elementsUsed(CACHE_SIZE)
     {
-        nullPeerId.SetFabricId(kUndefinedFabricId);
-        nullPeerId.SetNodeId(kUndefinedNodeId);
-
         for (MdnsCacheEntry & e : mLookupTable)
         {
             // each unused entry decrements the count
