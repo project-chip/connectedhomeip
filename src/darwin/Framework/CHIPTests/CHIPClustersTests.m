@@ -94,7 +94,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [controller setListenPort:kLocalPort];
     [controller setPairingDelegate:pairing queue:callbackQueue];
 
-    BOOL started = [controller startup:nil];
+    BOOL started = [controller startup:nil vendorId:0];
     XCTAssertTrue(started);
 
     NSError * error;

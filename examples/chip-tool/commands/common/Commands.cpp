@@ -29,6 +29,7 @@
 
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/ScopedBuffer.h>
 
 void Commands::Register(const char * clusterName, commands_list commandsList)
 {
@@ -45,6 +46,10 @@ int Commands::Run(int argc, char ** argv)
     Command * command = nullptr;
     NodeId localId;
     NodeId remoteId;
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
 
     err = chip::Platform::MemoryInit();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err)));
@@ -74,8 +79,29 @@ int Commands::Run(int argc, char ** argv)
     err = mController.SetUdpListenPort(mStorage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
 
-    err = mController.Init(localId, initParams);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
+    VerifyOrExit(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
+
+    {
+        chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
+        chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+        chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+
+        chip::Crypto::P256Keypair ephemeralKey;
+        SuccessOrExit(err = ephemeralKey.Initialize());
+
+        err = mOpCredsIssuer.GenerateNOCChainAfterValidation(localId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
+        SuccessOrExit(err);
+
+        initParams.ephemeralKeypair = &ephemeralKey;
+        initParams.controllerRCAC   = rcacSpan;
+        initParams.controllerICAC   = icacSpan;
+        initParams.controllerNOC    = nocSpan;
+
+        err = mController.Init(initParams);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
+    }
 
 #if CONFIG_USE_SEPARATE_EVENTLOOP
     // ServiceEvents() calls StartEventLoopTask(), which is paired with the

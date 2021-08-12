@@ -34,6 +34,7 @@
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/CodeUtils.h>
+#include <support/Span.h>
 
 namespace chip {
 namespace Controller {
@@ -82,6 +83,12 @@ public:
      * On error no guarantees are made about the state of aNodeId.
      */
     static CHIP_ERROR GetRandomOperationalNodeId(NodeId * aNodeId);
+
+    /**
+     * This is a utility method that generates a operational certificate chain for the given public key.
+     */
+    CHIP_ERROR GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId, const Crypto::P256PublicKey & ephemeralKey,
+                                               MutableByteSpan & rcac, MutableByteSpan & icac, MutableByteSpan & noc);
 
 private:
     Crypto::P256Keypair mIssuer;
