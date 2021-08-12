@@ -17,13 +17,11 @@ import os
 from typing import Set
 
 from builders.builder import Builder
-
-from builders.android import AndroidBoard, AndroidBuilder
-from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
-from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
 from builders.host import HostBuilder, HostApp
-from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgBuilder
+from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
+from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
+from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 
 from .targets import Application, Board, Platform
 
@@ -86,16 +84,13 @@ _MATCHERS = {
     Platform.QPG: Matcher(QpgBuilder),
     Platform.EFR32: Matcher(Efr32Builder),
     Platform.NRF: Matcher(NrfConnectBuilder),
-    Platform.ANDROID: Matcher(AndroidBuilder),
 }
 
 # Matrix of what can be compiled and what build options are required
 # by such compilation
 _MATCHERS[Platform.HOST].AcceptBoard(Board.NATIVE)
-_MATCHERS[Platform.HOST].AcceptApplication(
-    Application.ALL_CLUSTERS, app=HostApp.ALL_CLUSTERS)
-_MATCHERS[Platform.HOST].AcceptApplication(
-    Application.CHIP_TOOL, app=HostApp.CHIP_TOOL)
+_MATCHERS[Platform.HOST].AcceptApplication(Application.ALL_CLUSTERS, app=HostApp.ALL_CLUSTERS)
+_MATCHERS[Platform.HOST].AcceptApplication(Application.CHIP_TOOL, app=HostApp.CHIP_TOOL)
 
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.DEVKITC, board=Esp32Board.DevKitC)
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.M5STACK, board=Esp32Board.M5Stack)
@@ -119,17 +114,12 @@ _MATCHERS[Platform.EFR32].AcceptApplication(Application.LOCK, app=Efr32App.LOCK)
 _MATCHERS[Platform.EFR32].AcceptApplication(
     Application.WINDOW_COVERING, app=Efr32App.WINDOW_COVERING)
 
+
 _MATCHERS[Platform.NRF].AcceptBoard(Board.NRF5340, board=NrfBoard.NRF5340)
 _MATCHERS[Platform.NRF].AcceptBoard(Board.NRF52840, board=NrfBoard.NRF52840)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.LOCK, app=NrfApp.LOCK)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.LIGHT, app=NrfApp.LIGHT)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.SHELL, app=NrfApp.SHELL)
-
-_MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM, board=AndroidBoard.ARM)
-_MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM64, board=AndroidBoard.ARM64)
-_MATCHERS[Platform.ANDROID].AcceptBoard(Board.X64, board=AndroidBoard.X64)
-_MATCHERS[Platform.ANDROID].AcceptApplication(Application.CHIP_TOOL)
-
 
 class BuilderFactory:
   """Creates application builders."""
@@ -150,8 +140,7 @@ class BuilderFactory:
         output_prefix=self.output_prefix)
 
     if builder:
-      builder.SetIdentifier(platform.name.lower(), board.name.lower(),
-                            app.name.lower())
+      builder.SetIdentifier(platform.name.lower(), board.name.lower(), app.name.lower())
       builder.enable_flashbundle(enable_flashbundle)
 
     return builder
