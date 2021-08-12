@@ -54,7 +54,7 @@ android {
                 java.srcDirs = [
                         'src/main/java/',
                         '../../../setup_payload/java/src',
-                        '../../../controller/java/gen',
+                        '../../../controller/java/zap-generated',
                         '../../../controller/java/src',
                 ]
             }
@@ -81,8 +81,9 @@ dependencies {
 
         // build time dependencies
         if (project.hasProperty("chipSdkJarDir")) {
-           println "Compiling using custom sdk jar file directory: ${chipSdkJarDir}"
-           implementation fileTree(dir: "${chipSdkJarDir}", include: ["*.jar", "*.so"])
+            println "Compiling using custom sdk jar file directory: ${chipSdkJarDir}"
+            implementation fileTree(dir: "${chipSdkJarDir}", include: ["*.jar", "*.so"])
+        }
     }
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
