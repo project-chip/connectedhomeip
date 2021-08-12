@@ -48,13 +48,15 @@ namespace TLV {
 
 using namespace chip::Encoding;
 
-NO_INLINE void TLVWriter::Init(uint8_t * buf, uint32_t maxLen)
+NO_INLINE void TLVWriter::Init(uint8_t * buf, size_t maxLen)
 {
-    mBackingStore = nullptr;
+    // TODO: Maybe we can just make mMaxLen, mLenWritten, mRemainingLen size_t instead?
+    uint32_t actualMaxLen = maxLen > UINT32_MAX ? UINT32_MAX : static_cast<uint32_t>(maxLen);
+    mBackingStore         = nullptr;
     mBufStart = mWritePoint = buf;
-    mRemainingLen           = maxLen;
+    mRemainingLen           = actualMaxLen;
     mLenWritten             = 0;
-    mMaxLen                 = maxLen;
+    mMaxLen                 = actualMaxLen;
     mContainerType          = kTLVType_NotSpecified;
     SetContainerOpen(false);
     SetCloseContainerReserved(true);
