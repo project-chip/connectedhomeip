@@ -17,23 +17,23 @@
 #include <support/Span.h>
 
 #pragma once
-namespace  {
-    /**
-    * @brief Create ZCL string from char
-    */
-    static CHIP_ERROR MakeZclCharString(chip::MutableByteSpan & buffer, const char * cString)
+namespace {
+/**
+ * @brief Create ZCL string from char
+ */
+static CHIP_ERROR MakeZclCharString(chip::MutableByteSpan & buffer, const char * cString)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    size_t len = strlen(cString);
+    if (strlen(cString) > 254)
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        size_t len = strlen(cString);
-        if (strlen(cString) > 254)
-        {
-            err = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG;
-            len = 254;
-        }
-
-        buffer.data()[0] = static_cast<uint8_t>(len);
-        memcpy(&buffer.data()[1], cString, len);
-        return err;
+        err = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG;
+        len = 254;
     }
+
+    buffer.data()[0] = static_cast<uint8_t>(len);
+    memcpy(&buffer.data()[1], cString, len);
+    return err;
 }
+} // namespace

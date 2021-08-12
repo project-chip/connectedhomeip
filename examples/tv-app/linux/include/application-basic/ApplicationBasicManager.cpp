@@ -66,8 +66,8 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
 
     MakeZclCharString(zclString, application->name);
     EmberAfStatus nameStatus =
-        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_NAME_ATTRIBUTE_ID,
-                                    zclString.data(), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_NAME_ATTRIBUTE_ID, zclString.data(),
+                                    ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (nameStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store name attribute.");
@@ -83,8 +83,8 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
 
     MakeZclCharString(zclString, application->id);
     EmberAfStatus idStatus =
-        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_ID_ATTRIBUTE_ID,
-                                    zclString.data(), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_ID_ATTRIBUTE_ID, zclString.data(),
+                                    ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (idStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store id attribute.");
