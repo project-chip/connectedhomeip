@@ -62,7 +62,7 @@ limitations under the License.
     <domain>General</domain>
     <name>TimeSync</name>
     <code>0x0038</code>
-    <define>TIME_CLUSTER</define>
+    <define>TIMESYNC_CLUSTER</define>
     <description>This cluster is used for time synchronization.</description>
 
     <attribute side="server" code="0x0001" define="UTC_TIME" type="INT64U" writable="false" default="" optional="false">UTCTime</attribute>
