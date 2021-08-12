@@ -26,6 +26,7 @@ class Platform(IntEnum):
   ESP32 = auto()
   EFR32 = auto()
   NRF = auto()
+  ANDROID = auto()
 
   @property
   def ArgName(self):
@@ -58,6 +59,11 @@ class Board(IntEnum):
   # NRF platform
   NRF52840 = auto()
   NRF5340 = auto()
+
+  # Android platform
+  ARM = auto()
+  ARM64 = auto()
+  X64 = auto()
 
   @property
   def ArgName(self):

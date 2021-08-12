@@ -49,7 +49,17 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
+
+
+    // local in-source-tree copy of the dependencies. Useful for IDE compilation
     implementation fileTree(dir: "libs", include: ["*.jar", "*.so"])
+
+    // build time dependencies
+    if (project.hasProperty("chipSdkJarDir")) {
+       println "Compiling using custom sdk jar file directory: ${chipSdkJarDir}"
+       implementation fileTree(dir: "${chipSdkJarDir}", include: ["*.jar", "*.so"])
+    }
+
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation "com.google.android.gms:play-services-vision:20.1.0"
