@@ -307,7 +307,8 @@ CHIP_ERROR CASESession::DeriveSecureSession(SecureSession & session, SecureSessi
 
 CHIP_ERROR CASESession::SendSigmaR1()
 {
-    size_t data_len = EstimateTLVStructOverhead(kSigmaParamRandomNumberSize + sizeof(uint16_t) + kSHA256_Hash_Length + kP256_PublicKey_Length, 4);
+    size_t data_len =
+        EstimateTLVStructOverhead(kSigmaParamRandomNumberSize + sizeof(uint16_t) + kSHA256_Hash_Length + kP256_PublicKey_Length, 4);
 
     System::PacketBufferTLVWriter tlvWriter;
     System::PacketBufferHandle msg_R1;
@@ -475,8 +476,8 @@ CHIP_ERROR CASESession::SendSigmaR2()
         SuccessOrExit(err);
 
         HKDF_sha_crypto mHKDF;
-        err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR2Info, kKDFInfoLength, sr2k,
-                            kAEADKeySize);
+        err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR2Info,
+                                kKDFInfoLength, sr2k, kAEADKeySize);
         SuccessOrExit(err);
     }
 
@@ -531,9 +532,8 @@ CHIP_ERROR CASESession::SendSigmaR2()
     SuccessOrExit(err);
 
     // Construct Sigma2 Msg
-    data_len = EstimateTLVStructOverhead(kSigmaParamRandomNumberSize + sizeof(uint16_t) +
-                                         kP256_PublicKey_Length + msg_r2_signed_enc_len + kTAGSize,
-                                         4);
+    data_len = EstimateTLVStructOverhead(
+        kSigmaParamRandomNumberSize + sizeof(uint16_t) + kP256_PublicKey_Length + msg_r2_signed_enc_len + kTAGSize, 4);
 
     msg_R2 = System::PacketBufferHandle::New(data_len);
     VerifyOrExit(!msg_R2.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -653,8 +653,8 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
         SuccessOrExit(err);
 
         HKDF_sha_crypto mHKDF;
-        err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), saltSpan.data(), saltSpan.size(),
-                                              kKDFSR2Info, kKDFInfoLength, sr2k, kAEADKeySize);
+        err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR2Info,
+                                kKDFInfoLength, sr2k, kAEADKeySize);
         SuccessOrExit(err);
     }
 
@@ -689,8 +689,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
     SuccessOrExit(err = Validate_and_RetrieveResponderID(ByteSpan(responderOpCert, responderOpCertLen), remoteCredential));
 
     // Construct msg_R2_Signed and validate the signature in msg_r2_encrypted
-    msg_r2_signed_len =
-        EstimateTLVStructOverhead(sizeof(uint16_t) + responderOpCertLen + kP256_PublicKey_Length * 2, 3);
+    msg_r2_signed_len = EstimateTLVStructOverhead(sizeof(uint16_t) + responderOpCertLen + kP256_PublicKey_Length * 2, 3);
 
     VerifyOrExit(msg_R2_Signed.Alloc(msg_r2_signed_len), err = CHIP_ERROR_NO_MEMORY);
 
@@ -908,7 +907,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
 
         HKDF_sha_crypto mHKDF;
         err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), saltSpan.data(), saltSpan.size(), kKDFSR3Info,
-                                 kKDFInfoLength, sr3k, kAEADKeySize);
+                                kKDFInfoLength, sr3k, kAEADKeySize);
         SuccessOrExit(err);
     }
 
@@ -936,8 +935,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
     SuccessOrExit(err = Validate_and_RetrieveResponderID(ByteSpan(initiatorOpCert, initiatorOpCertLen), remoteCredential));
 
     // Step 4 - Construct SigmaR3 TBS Data
-    msg_r3_signed_len =
-        EstimateTLVStructOverhead(sizeof(uint16_t) + initiatorOpCertLen + kP256_PublicKey_Length * 2, 3);
+    msg_r3_signed_len = EstimateTLVStructOverhead(sizeof(uint16_t) + initiatorOpCertLen + kP256_PublicKey_Length * 2, 3);
 
     VerifyOrExit(msg_R3_Signed.Alloc(msg_r3_signed_len), err = CHIP_ERROR_NO_MEMORY);
 
