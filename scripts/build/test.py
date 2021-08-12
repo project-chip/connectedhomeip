@@ -29,7 +29,6 @@ from typing import List
 
 SCRIPT_ROOT = os.path.dirname(__file__)
 
-
 def build_expected_output(root: str, out: str) -> List[str]:
   with open(
       os.path.join(SCRIPT_ROOT, 'expected_all_platform_commands.txt'),
