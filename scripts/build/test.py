@@ -44,6 +44,15 @@ def build_actual_output(root: str, out: str) -> List[str]:
 
   binary = os.path.join(SCRIPT_ROOT, 'build_examples.py')
 
+  runenv = {}
+  runenv.update(os.environ)
+  runenv.update({
+    'PW_PROJECT_ROOT': root,
+    'ANDROID_NDK_HOME': 'TEST_ANDROID_NDK_HOME',
+    'ANDROID_HOME': 'TEST_ANDROID_HOME',
+  })
+
+
   retval = subprocess.run(
       [
           binary, '--platform', 'all', '--log-level', 'FATAL', '--dry-run',
@@ -52,11 +61,8 @@ def build_actual_output(root: str, out: str) -> List[str]:
       stdout=subprocess.PIPE,
       check=True,
       encoding='UTF-8',
-      env={
-          'PW_PROJECT_ROOT': root,
-          'ANDROID_NDK_HOME': 'TEST_ANDROID_NDK_HOME',
-          'ANDROID_HOME': 'TEST_ANDROID_HOME',
-      })
+      env=runenv
+  )
 
   return [l + '\n' for l in retval.stdout.split('\n')]
 
