@@ -89,7 +89,8 @@ class BaseTestHelper:
             self.devCtrl.CloseSession(nodeid)
             return True
         except Exception as ex:
-            self.logger.exception(f"Failed to close sessions with device {nodeid}: {ex}")
+            self.logger.exception(
+                f"Failed to close sessions with device {nodeid}: {ex}")
             return False
 
     def TestNetworkCommissioning(self, nodeid: int, endpoint: int, group: int, dataset: str, network_id: str):
@@ -161,7 +162,8 @@ class BaseTestHelper:
                                                     endpoint=endpoint,
                                                     groupid=group)
                 if res is None:
-                    raise Exception("Read {} attribute: no value get".format(basic_attr))
+                    raise Exception(
+                        "Read {} attribute: no value get".format(basic_attr))
                 elif res.status != 0:
                     raise Exception(
                         "Read {} attribute: non-zero status code {}".format(basic_attr, res.status))

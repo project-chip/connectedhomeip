@@ -202,29 +202,30 @@ TEMPLATE = '''/*
 
 
 def main(argv):
-  parser = optparse.OptionParser()
+    parser = optparse.OptionParser()
 
-  parser.add_option('--output_file')
-  parser.add_option('--chip_major', type=int, default=0)
-  parser.add_option('--chip_minor', type=int, default=0)
-  parser.add_option('--chip_patch', type=int, default=0)
-  parser.add_option('--chip_extra', type=str, default='')
+    parser.add_option('--output_file')
+    parser.add_option('--chip_major', type=int, default=0)
+    parser.add_option('--chip_minor', type=int, default=0)
+    parser.add_option('--chip_patch', type=int, default=0)
+    parser.add_option('--chip_extra', type=str, default='')
 
-  options, _ = parser.parse_args(argv)
+    options, _ = parser.parse_args(argv)
 
-  template_args = {
-          'chip_major': options.chip_major,
-          'chip_minor': options.chip_minor,
-          'chip_patch': options.chip_patch,
-          'chip_extra': options.chip_extra,
-  }
+    template_args = {
+        'chip_major': options.chip_major,
+        'chip_minor': options.chip_minor,
+        'chip_patch': options.chip_patch,
+        'chip_extra': options.chip_extra,
+    }
 
-  template_args['chip_version'] = '%d.%d.%d%s' % (options.chip_major, options.chip_minor, options.chip_patch, options.chip_extra)
+    template_args['chip_version'] = '%d.%d.%d%s' % (
+        options.chip_major, options.chip_minor, options.chip_patch, options.chip_extra)
 
-  with open(options.output_file, 'w') as chip_version_file:
-      chip_version_file.write(TEMPLATE % template_args)
+    with open(options.output_file, 'w') as chip_version_file:
+        chip_version_file.write(TEMPLATE % template_args)
 
-  return 0
+    return 0
 
 
 if __name__ == '__main__':

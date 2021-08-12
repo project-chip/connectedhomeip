@@ -22,4 +22,4 @@
 
 """Provides Python APIs for CHIP."""
 
-__all__ = [ "IMDelegate" ]
+__all__ = ["IMDelegate"]

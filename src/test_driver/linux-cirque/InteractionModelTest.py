@@ -31,7 +31,8 @@ sh.setFormatter(
         '%(asctime)s [%(name)s] %(levelname)s %(message)s'))
 logger.addHandler(sh)
 
-CHIP_REPO = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "..", "..")
+CHIP_REPO = os.path.join(os.path.abspath(
+    os.path.dirname(__file__)), "..", "..", "..")
 
 DEVICE_CONFIG = {
     'device0': {
@@ -83,7 +84,9 @@ class TestInteractionModel(CHIPVirtualHome):
             self.execute_device_cmd(id, "CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex run -ex bt {}".format(
                 os.path.join(CHIP_REPO, "out/debug/linux_x64_gcc/chip-im-responder")))
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args "+ os.path.join(CHIP_REPO, "out/debug/linux_x64_gcc/chip-im-initiator") +" {}"
+        command = "gdb -return-child-result -q -ex run -ex bt --args " + \
+            os.path.join(
+                CHIP_REPO, "out/debug/linux_x64_gcc/chip-im-initiator") + " {}"
 
         for ip in resp_ips:
             ret = self.execute_device_cmd(
