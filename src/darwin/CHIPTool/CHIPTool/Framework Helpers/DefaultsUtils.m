@@ -70,7 +70,7 @@ CHIPDeviceController * InitializeCHIP(void)
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     dispatch_once(&onceToken, ^{
         storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        [controller startup:storage];
+        [controller startup:storage vendorId:0];
     });
 
     return controller;
