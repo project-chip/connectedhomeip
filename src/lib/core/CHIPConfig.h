@@ -2397,7 +2397,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @def CHIP_CONFIG_MDNS_CACHE_SIZE
  *
- * @brief 
+ * @brief
  *      Define the size of the MDNS cache
  *
  *      If CHIP_CONFIG_MDNS_CACHE_SIZE is 0, the builtin cache is not used.
