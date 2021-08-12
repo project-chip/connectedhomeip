@@ -208,7 +208,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
     ChipLogError(Inet, "yujuan: CheckMessageTest:208");
     gMockTransportMgrDelegate.FinalizeMessageTest(tcp, addr);
-    ChipLogError(Inet, "yujuan: CheckMessageTest:210");    
+    ChipLogError(Inet, "yujuan: CheckMessageTest:210");
 }
 
 #if INET_CONFIG_ENABLE_IPV4
