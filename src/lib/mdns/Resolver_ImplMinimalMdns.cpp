@@ -15,9 +15,8 @@
  *    limitations under the License.
  */
 
-#include "Resolver.h"
 #include "MdnsCache.h"
-
+#include "Resolver.h"
 
 #include <limits>
 

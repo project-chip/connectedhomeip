@@ -170,12 +170,16 @@ private:
     {
         for (MdnsCacheEntry & entry : mLookupTable)
         {
-            if (entry.peerId == peerId) {
-		if(entry.expiryTime < current_time) {
-	            MarkEntryUnused(entry);
-                    break;	// return nullptr
-		} else return &entry;
-	    }
+            if (entry.peerId == peerId)
+            {
+                if (entry.expiryTime < current_time)
+                {
+                    MarkEntryUnused(entry);
+                    break; // return nullptr
+                }
+                else
+                    return &entry;
+            }
             if (entry.peerId != nullPeerId && entry.expiryTime < current_time)
             {
                 MarkEntryUnused(entry);
