@@ -1472,6 +1472,14 @@ public class ChipClusters {
       readColorLoopTimeAttribute(chipClusterPtr, callback);
     }
 
+    public void readColorLoopStartEnhancedHueAttribute(IntegerAttributeCallback callback) {
+      readColorLoopStartEnhancedHueAttribute(chipClusterPtr, callback);
+    }
+
+    public void readColorLoopStoredEnhancedHueAttribute(IntegerAttributeCallback callback) {
+      readColorLoopStoredEnhancedHueAttribute(chipClusterPtr, callback);
+    }
+
     public void readColorCapabilitiesAttribute(IntegerAttributeCallback callback) {
       readColorCapabilitiesAttribute(chipClusterPtr, callback);
     }
@@ -1670,6 +1678,12 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readColorLoopTimeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readColorLoopStartEnhancedHueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readColorLoopStoredEnhancedHueAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readColorCapabilitiesAttribute(

@@ -374,6 +374,10 @@ public:
     CHIP_ERROR ReadAttributeColorLoopActive(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeColorLoopDirection(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeColorLoopTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeColorLoopStartEnhancedHue(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeColorLoopStoredEnhancedHue(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeColorCapabilities(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeColorTempPhysicalMin(Callback::Cancelable * onSuccessCallback,
                                                  Callback::Cancelable * onFailureCallback);
