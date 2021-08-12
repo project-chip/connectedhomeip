@@ -35,10 +35,20 @@ if [ -z "$TARGET_CPU" ]; then
     exit 1
 fi
 
-# Build shared CHIP libs
 source scripts/activate.sh
-gn gen --check --fail-on-unused-args out/"android_$TARGET_CPU" --args="target_os=\"android\" target_cpu=\"$TARGET_CPU\" android_ndk_root=\"$ANDROID_NDK_HOME\" android_sdk_root=\"$ANDROID_HOME\"" --ide=json --json-ide-script=//scripts/examples/gn_to_cmake.py
-ninja -C out/"android_$TARGET_CPU" src/setup_payload/java src/controller/java default
 
-rsync -a out/"android_$TARGET_CPU"/lib/*.jar src/android/CHIPTool/app/libs
-rsync -a out/"android_$TARGET_CPU"/lib/jni/* src/android/CHIPTool/app/libs/jniLibs
+if [ -z "$USE_IDE" ] || [ "$USE_IDE" -eq '0' ]; then
+    # Build shared CHIP libs
+    echo "build scripts"
+    gn gen --check --fail-on-unused-args out/"android_$TARGET_CPU" --args="target_os=\"android\" target_cpu=\"$TARGET_CPU\" android_ndk_root=\"$ANDROID_NDK_HOME\" android_sdk_root=\"$ANDROID_HOME\""
+    ninja -C out/"android_$TARGET_CPU" src/setup_payload/java src/controller/java default
+
+    rsync -a out/"android_$TARGET_CPU"/lib/*.jar src/android/CHIPTool/app/libs
+    rsync -a out/"android_$TARGET_CPU"/lib/jni/* src/android/CHIPTool/app/libs/jniLibs
+else
+    # Build Cmake for Android Stduio
+    echo "build ide"
+    gn gen --check --fail-on-unused-args out/"android_$TARGET_CPU" --args="target_os=\"android\" target_cpu=\"$TARGET_CPU\" android_ndk_root=\"$ANDROID_NDK_HOME\" android_sdk_root=\"$ANDROID_HOME\"" --ide=json --json-ide-script=//scripts/examples/gn_to_cmake.py
+fi
+
+
