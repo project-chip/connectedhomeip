@@ -27,12 +27,12 @@ static_library("fake") {
     "ConnectivityManagerImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
+    "MdnsImpl.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
-    "MdnsImpl.cpp",
   ]
   public_deps = [
-    "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/lib/mdns:platform_header",
+    "${chip_root}/src/platform:platform_base",
   ]
 }

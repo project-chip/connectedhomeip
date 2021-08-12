@@ -138,16 +138,16 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   group("fake_platform_tests") {
     if (chip_link_tests) {
-      deps = [ "//src:fake_platform_tests_run"]
+      deps = [ "//src:fake_platform_tests_run" ]
     }
   }
 
   group("check") {
     if (chip_link_tests) {
       deps = [
+        "//:fake_platform_tests",
         "//scripts/build:build_examples.tests",
         "//src:tests_run",
-        "//:fake_platform_tests"
       ]
     }
   }
@@ -258,7 +258,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Build the k32w shell app example.
     enable_k32w_shell_app_build = enable_k32w_builds
 
-    enable_fake_tests = (enable_default_builds && host_os == "linux")
+    enable_fake_tests = enable_default_builds && host_os == "linux"
   }
 
   if (enable_host_clang_build) {
