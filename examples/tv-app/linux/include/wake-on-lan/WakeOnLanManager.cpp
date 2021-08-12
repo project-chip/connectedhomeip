@@ -48,11 +48,12 @@ exit:
 
 void WakeOnLanManager::store(chip::EndpointId endpoint, char macAddress[32])
 {
-    uint8_t zclString[32];
-
+    uint8_t bufferMemory[32];
+    MutableByteSpan zclString(bufferMemory, 32);
+    MakeZclCharString(zclString, macAddress);
     EmberAfStatus macAddressStatus =
         emberAfWriteServerAttribute(endpoint, ZCL_WAKE_ON_LAN_CLUSTER_ID, ZCL_WAKE_ON_LAN_MAC_ADDRESS_ATTRIBUTE_ID,
-                                    MakeZclCharString(zclString, macAddress), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+                                    zclString.data(), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (macAddressStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store mac address attribute.");
