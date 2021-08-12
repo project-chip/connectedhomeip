@@ -25,13 +25,11 @@ using namespace ::chip;
 {
     if (self = [super init]) {
         Controller::ClusterBase * cppCluster = [self getCluster];
-        if (cppCluster == nullptr)
-        {
+        if (cppCluster == nullptr) {
             return nil;
         }
 
-        if (device == nullptr)
-        {
+        if (device == nullptr) {
             return nil;
         }
 
@@ -52,15 +50,13 @@ using namespace ::chip;
 
 - (chip::ByteSpan)asSpan:(id)value
 {
-  if ([value isKindOfClass:[NSData class]])
-  {
-      NSData * v = (NSData *) value;
-      return chip::ByteSpan((const uint8_t*)v.bytes, v.length);
-  }
-  else
-  {
-      NSString * v = (NSString *) value;
-      return chip::ByteSpan((const uint8_t*)[v dataUsingEncoding:NSUTF8StringEncoding].bytes, [v lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
-  }
+    if ([value isKindOfClass:[NSData class]]) {
+        NSData * v = (NSData *) value;
+        return chip::ByteSpan((const uint8_t *) v.bytes, v.length);
+    } else {
+        NSString * v = (NSString *) value;
+        return chip::ByteSpan((const uint8_t *) [v dataUsingEncoding:NSUTF8StringEncoding].bytes,
+            [v lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+    }
 }
 @end

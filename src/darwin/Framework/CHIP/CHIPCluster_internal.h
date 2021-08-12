@@ -21,8 +21,8 @@
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
 
-#import "gen/CHIPClustersObjc.h"
 #import "gen/CHIPClusters.h"
+#import "gen/CHIPClustersObjc.h"
 
 @interface CHIPCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
