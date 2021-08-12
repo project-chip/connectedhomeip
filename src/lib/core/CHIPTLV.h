@@ -438,7 +438,6 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize);
     CHIP_ERROR GetBytes(uint8_t * buf, size_t bufSize);
 
     /**
@@ -488,7 +487,6 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetString(char * buf, uint32_t bufSize);
     CHIP_ERROR GetString(char * buf, size_t bufSize);
 
     /**
@@ -2213,7 +2211,6 @@ public:
     CHIP_ERROR Get(double & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(chip::ByteSpan & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize) { return mUpdaterReader.GetBytes(buf, bufSize); }
-    CHIP_ERROR GetBytes(uint8_t * buf, size_t bufSize) { return GetBytes(buf, static_cast<uint32_t>(bufSize)); }
     CHIP_ERROR DupBytes(uint8_t *& buf, uint32_t & dataLen) { return mUpdaterReader.DupBytes(buf, dataLen); }
     CHIP_ERROR GetString(char * buf, uint32_t bufSize) { return mUpdaterReader.GetString(buf, bufSize); }
     CHIP_ERROR DupString(char *& buf) { return mUpdaterReader.DupString(buf); }
