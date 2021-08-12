@@ -35,7 +35,7 @@ void DiscoverCommissionersCommand::Shutdown()
         if (commissioner != nullptr)
         {
             ChipLogProgress(chipTool, "Discovered Commisioner #%d", commissionerCount);
-            commissioner->Log();
+            commissioner->LogDetail();
             commissionerCount++;
         }
     }

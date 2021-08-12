@@ -142,7 +142,7 @@ struct DiscoveredNodeData
                                                                  : Optional<uint32_t>{};
     }
 
-    void Log() const
+    void LogDetail() const
     {
         if (rotatingIdLen > 0)
         {
@@ -170,10 +170,6 @@ struct DiscoveredNodeData
         {
             ChipLogDetail(DiscoveryVerbose, "Long Discriminator: %u", longDiscriminator);
         }
-        if (!IsHost(""))
-        {
-            ChipLogDetail(DiscoveryVerbose, "Hostname: %s", hostName);
-        }
         if (additionalPairing > 0)
         {
             ChipLogDetail(DiscoveryVerbose, "Additional Pairing: %u", additionalPairing);
@@ -186,15 +182,16 @@ struct DiscoveredNodeData
         {
             ChipLogDetail(DiscoveryVerbose, "Pairing Hint: 0x%x", pairingHint);
         }
-        if (numIPs > 0)
+        if (!IsHost(""))
         {
-            for (int j = 0; j < numIPs; j++)
-            {
-                char ipAddressString[Inet::kMaxIPAddressStringLength];
-                ChipLogDetail(DiscoveryVerbose, "IP Address #%d: %s", j + 1,
-                              ipAddress[j].ToString(ipAddressString, sizeof(ipAddressString)));
-                (void) ipAddressString;
-            }
+            ChipLogDetail(DiscoveryVerbose, "Hostname: %s", hostName);
+        }
+        for (int j = 0; j < numIPs; j++)
+        {
+            char buf[Inet::kMaxIPAddressStringLength];
+            char * ipAddressOut = ipAddress[j].ToString(buf, sizeof(buf));
+            ChipLogDetail(DiscoveryVerbose, "IP Address #%d: %s", j + 1, ipAddressOut);
+            (void) ipAddressOut;
         }
         if (port > 0)
         {

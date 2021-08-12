@@ -472,7 +472,7 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, MdnsService * resu
     DiscoveredNodeData data;
     Platform::CopyString(data.hostName, result->mHostName);
 
-    if (result->mAddress.HasValue())
+    if (result->mAddress.HasValue() && data.numIPs < DiscoveredNodeData::kMaxIPAddresses)
     {
         data.ipAddress[data.numIPs]   = result->mAddress.Value();
         data.interfaceId[data.numIPs] = result->mInterface;

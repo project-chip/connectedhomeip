@@ -41,10 +41,11 @@ CHIP_ERROR RunTimedEventLoop(uint32_t aDelayMilliseconds)
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
-    int commissionerCount = 0, selectedCommissioner = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES;
+    int commissionerCount = 0, selectedCommissionerNumber = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES;
     chip::Controller::CommissionableNodeController commissionableNodeController;
     Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kDeviceType, TV_DEVICE_TYPE);
     chip::SetupPayload payload;
+    const Mdns::DiscoveredNodeData * selectedCommissioner;
     SuccessOrExit(chip::Platform::MemoryInit());
     SuccessOrExit(chip::DeviceLayer::PlatformMgr().InitChipStack());
 
@@ -59,25 +60,17 @@ int main(int argc, char * argv[])
         if (commissioner != nullptr)
         {
             ChipLogProgress(Zcl, "Discovered Commissioner #%d", ++commissionerCount);
-            commissioner->Log();
+            commissioner->LogDetail();
         }
     }
     ChipLogProgress(Zcl, "%d commissioner(s) discovered", commissionerCount);
+    VerifyOrExit(commissionerCount > 0, err = CHIP_NO_ERROR); // exit if no TV commissioners found
 
     // Accept user selection for commissioner TV
-    VerifyOrExit(commissionerCount > 0, err = CHIP_NO_ERROR);
     ChipLogProgress(Zcl, "Choose a commissioner TV (by number# above) to request commissioning from: ");
-    scanf("%d", &selectedCommissioner);
-    const Mdns::DiscoveredNodeData * commissioner;
-    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
-    {
-        commissioner = commissionableNodeController.GetDiscoveredCommissioner(i);
-        if (commissioner != nullptr && --selectedCommissioner == 0)
-        {
-            break;
-        }
-    }
-    VerifyOrExit(selectedCommissioner == 0, err = CHIP_ERROR_INVALID_ARGUMENT);
+    scanf("%d", &selectedCommissionerNumber);
+    selectedCommissioner = commissionableNodeController.GetDiscoveredCommissioner(selectedCommissionerNumber - 1);
+    VerifyOrExit(selectedCommissioner != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Enter commissioning mode, open commissioning window
     InitServer();
@@ -91,8 +84,8 @@ int main(int argc, char * argv[])
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     // Send User Directed commissioning request
-    SendUserDirectedCommissioningRequest(
-        chip::Transport::PeerAddress::UDP(commissioner->ipAddress[0], commissioner->port, commissioner->interfaceId[0]));
+    SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
+        selectedCommissioner->ipAddress[0], selectedCommissioner->port, selectedCommissioner->interfaceId[0]));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     SuccessOrExit(RunTimedEventLoop(3 * 60 * 1000));
