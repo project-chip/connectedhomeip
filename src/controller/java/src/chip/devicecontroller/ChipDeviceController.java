@@ -31,8 +31,8 @@ public class ChipDeviceController {
   private BluetoothGatt bleGatt;
   private CompletionListener completionListener;
 
-  public ChipDeviceController() {
-    deviceControllerPtr = newDeviceController();
+  public ChipDeviceController(KeyValueStoreManager manager, ServiceResolver resolver) {
+    deviceControllerPtr = newDeviceController(manager, resolver);
   }
 
   public void setCompletionListener(CompletionListener listener) {
@@ -228,7 +228,7 @@ public class ChipDeviceController {
     return isActive(deviceControllerPtr, deviceId);
   }
 
-  private native long newDeviceController();
+  private native long newDeviceController(KeyValueStoreManager manager, ServiceResolver resolver);
 
   private native void pairDevice(
       long deviceControllerPtr, long deviceId, int connectionId, long pinCode, byte[] csrNonce);
@@ -261,10 +261,6 @@ public class ChipDeviceController {
   private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
 
   private native boolean isActive(long deviceControllerPtr, long deviceId);
-
-  public static native void setKeyValueStoreManager(KeyValueStoreManager manager);
-
-  public static native void setServiceResolver(ServiceResolver resolver);
 
   public static native void handleServiceResolve(
       String instanceName,

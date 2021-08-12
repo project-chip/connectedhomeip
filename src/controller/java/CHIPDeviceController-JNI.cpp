@@ -225,7 +225,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     chip::Platform::MemoryShutdown();
 }
 
-JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
+JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject keyValueStoreManager, jobject serviceResolver)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -233,6 +233,10 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     long result                              = 0;
 
     ChipLogProgress(Controller, "newDeviceController() called");
+
+    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeWithObject(keyValueStoreManager);
+    using namespace chip::Mdns;
+    InitializeWithObject(serviceResolver);
 
     wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, JniReferences::GetInstance().GetStackLock(), kLocalDeviceId,
                                                           &sSystemLayer, &sInetLayer, &err);
@@ -255,19 +259,6 @@ exit:
     }
 
     return result;
-}
-
-JNI_METHOD(void, setKeyValueStoreManager)(JNIEnv * env, jclass self, jobject manager)
-{
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeWithObject(manager);
-}
-
-JNI_METHOD(void, setServiceResolver)(JNIEnv * env, jclass self, jobject resolver)
-{
-    using namespace chip::Mdns;
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    InitializeWithObject(resolver);
 }
 
 JNI_METHOD(void, handleServiceResolve)
