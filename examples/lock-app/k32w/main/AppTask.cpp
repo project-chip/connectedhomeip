@@ -487,13 +487,13 @@ void AppTask::BleHandler(AppEvent * aEvent)
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
-        if (OpenDefaultPairingWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
+        if (OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
         {
             K32W_LOG("Started BLE Advertising!");
         }
         else
         {
-            K32W_LOG("OpenDefaultPairingWindow() failed");
+            K32W_LOG("OpenBasicCommissioningWindow() failed");
         }
     }
 }

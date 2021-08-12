@@ -54,16 +54,13 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
     ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // TODO - Use PK of the root CA for the initiator to figure out the fabric.
-    mFabricIndex = ec->GetSecureSession().GetFabricIndex();
-
     // TODO - Use section [4.368] and definition of `Destination Identifier` to find fabric ID for CASE SigmaR1 message
-    //    ReturnErrorCodeIf(mFabricIndex == Transport::kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
-    mFabricIndex = 0;
+    mFabricIndex = kMinValidFabricIndex;
 
     Transport::FabricInfo * fabric = mFabrics->FindFabricWithIndex(mFabricIndex);
+    ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (fabric == nullptr)
+    if (!fabric->IsInitialized() || !fabric->AreCredentialsAvailable())
     {
         ReturnErrorOnFailure(mFabrics->LoadFromStorage(mFabricIndex));
         fabric = mFabrics->FindFabricWithIndex(mFabricIndex);
