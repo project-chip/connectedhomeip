@@ -26,5 +26,9 @@ chip_data_model("ota-provider-common") {
     "OTAProviderExample.cpp",
   ]
 
+  deps = [
+    "${chip_root}/src/protocols/bdx",
+  ]
+
   is_server = true
 }
