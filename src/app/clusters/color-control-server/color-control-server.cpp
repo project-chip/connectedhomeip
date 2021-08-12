@@ -45,11 +45,11 @@
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
+#include <app/common/gen/attributes/Accessors.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
-#include <app/common/gen/attributes/Accessors.h>
 
 using namespace chip;
 using namespace app::Clusters::ColorControl;
@@ -1502,17 +1502,17 @@ bool emberAfColorControlClusterStopMoveStepCallback(EndpointId aEndpoint, app::C
 
 static void startColorLoop(EndpointId endpoint, uint8_t startFromStartHue)
 {
-    uint8_t direction   = 0;
+    uint8_t direction = 0;
     Attributes::GetColorLoopDirection(endpoint, &direction);
 
-    uint16_t time       = 0x0019;
+    uint16_t time = 0x0019;
     Attributes::GetColorLoopTime(endpoint, &time);
 
     uint16_t currentHue = 0;
     Attributes::GetEnhancedCurrentHue(endpoint, &currentHue);
 
-    u_int16_t startHue  = 0x2300;
-    if(startFromStartHue)
+    u_int16_t startHue = 0x2300;
+    if (startFromStartHue)
     {
         Attributes::GetColorLoopStartEnhancedHue(endpoint, &startHue);
     }
