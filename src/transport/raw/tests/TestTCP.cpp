@@ -142,7 +142,7 @@ public:
 
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
-        mContext.DriveIOUntil(5000 /* ms */, [this]() { return mReceiveHandlerCallCount != 0; });
+        mContext.DriveIOUntil(1000 /* ms */, [this]() { return mReceiveHandlerCallCount != 0; });
         NL_TEST_ASSERT(mSuite, mReceiveHandlerCallCount == 1);
 
         SetCallback(nullptr);
@@ -150,9 +150,13 @@ public:
 
     void FinalizeMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
+        ChipLogError(Inet, "yujuan: FinalizeMessageTest:153");
+
         // Disconnect and wait for seeing peer close
         tcp.Disconnect(Transport::PeerAddress::TCP(addr));
-        mContext.DriveIOUntil(5000 /* ms */, [&tcp]() { return !tcp.HasActiveConnections(); });
+        ChipLogError(Inet, "yujuan: FinalizeMessageTest:157");
+
+        mContext.DriveIOUntil(1000 /* ms */, [&tcp]() { return !tcp.HasActiveConnections(); });
     }
 
     int mReceiveHandlerCallCount = 0;
@@ -182,6 +186,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 void CheckSimpleInitTest4(nlTestSuite * inSuite, void * inContext)
 {
     CheckSimpleInitTest(inSuite, inContext, kIPAddressType_IPv4);
+    ChipLogError(Inet, "yujuan: CheckSimpleInitTest4:185");
 }
 #endif
 
@@ -194,13 +199,16 @@ void CheckSimpleInitTest6(nlTestSuite * inSuite, void * inContext)
 
 void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress & addr)
 {
+    ChipLogError(Inet, "yujuan: CheckMessageTest:198");
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     TCPImpl tcp;
 
     MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite, ctx);
     gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
     gMockTransportMgrDelegate.SingleMessageTest(tcp, addr);
+    ChipLogError(Inet, "yujuan: CheckMessageTest:208");
     gMockTransportMgrDelegate.FinalizeMessageTest(tcp, addr);
+    ChipLogError(Inet, "yujuan: CheckMessageTest:210");    
 }
 
 #if INET_CONFIG_ENABLE_IPV4
