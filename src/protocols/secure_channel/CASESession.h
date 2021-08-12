@@ -235,13 +235,13 @@ private:
                                     MutableByteSpan & salt);
     CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID);
     CHIP_ERROR ConstructSaltSigmaR3(const ByteSpan & ipk, MutableByteSpan & salt);
-    CHIP_ERROR ConstructTBS2Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
-    CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
+    CHIP_ERROR ConstructTBS2Data(const ByteSpan & responderOpCert, uint8_t * tbsData, size_t & tbsDataLen);
+    CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, size_t & tbsDataLen);
     CHIP_ERROR RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk);
 
-    uint16_t EstimateTLVStructOverhead(uint16_t dataLen, uint16_t nFields)
+    constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields)
     {
-        return static_cast<uint16_t>(dataLen + sizeof(uint64_t) * nFields);
+        return dataLen + (sizeof(uint64_t) * nFields);
     }
 
     void SendErrorMsg(SigmaErrorType errorCode);

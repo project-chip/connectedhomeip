@@ -281,6 +281,11 @@ CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, uint32_t bufSize)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, size_t bufSize)
+{
+    return GetBytes(buf, static_cast<uint32_t>(bufSize));
+}
+
 CHIP_ERROR TLVReader::GetString(char * buf, uint32_t bufSize)
 {
     if (!TLVTypeIsString(ElementType()))
@@ -292,6 +297,11 @@ CHIP_ERROR TLVReader::GetString(char * buf, uint32_t bufSize)
     buf[mElemLenOrVal] = 0;
 
     return GetBytes(reinterpret_cast<uint8_t *>(buf), bufSize - 1);
+}
+
+CHIP_ERROR TLVReader::GetString(char * buf, size_t bufSize)
+{
+    return GetString(buf, static_cast<uint32_t>(bufSize));
 }
 
 CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
