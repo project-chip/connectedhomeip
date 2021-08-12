@@ -2,6 +2,30 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Build examples for platform",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "./scripts/build/build_examples.py --platform ${input:examplePlatform} build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
+            "label": "Build specific example (all compatible platforms)",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "./scripts/build/build_examples.py --app ${input:exampleApp} build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
             "label": "Main Build",
             "type": "shell",
             "command": "scripts/build/default.sh",
@@ -371,6 +395,36 @@
                 "BRD4180A"
             ],
             "default": "BRD4166A"
+        },
+        {
+            "type": "pickString",
+            "id": "examplePlatform",
+            "description": "Which platform would you like to build",
+            "options": [
+                "all",
+                "android",
+                "efr32",
+                "esp32",
+                "host",
+                "nrf",
+                "qpg"
+            ],
+            "default": "build"
+        }
+        {
+            "type": "pickString",
+            "id": "exampleApp",
+            "description": "Which example application would you like to build",
+            "options": [
+                "all-clusters",
+                "bridge",
+                "chip-tool",
+                "light",
+                "lock",
+                "shell",
+                "window-covering",
+            ],
+            "default": "build"
         }
     ]
 }
