@@ -19,7 +19,7 @@
             "target.features_add": ["BLE"],
             "target.extra_labels_add": ["CORDIO"],
             "led-active-state": 1,
-            "lock-button": "USER_BUTTON",
+            "lock-button": "BUTTON1",
             "function-button": "NC"
         },
         "CY8CPROTO_062_4343W": {

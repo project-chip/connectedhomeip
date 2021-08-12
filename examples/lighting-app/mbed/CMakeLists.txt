@@ -23,7 +23,7 @@ add_subdirectory(${MBED_PATH} ./mbed_build)
 
 add_subdirectory(mbed-os-posix-socket)
 
-if("wifi_ism43362" IN_LIST MBED_TARGET_LABELS)
+if(MBED_TARGET STREQUAL "DISCO_L475VG_IOT01A")
     add_subdirectory(wifi-ism43362)
 endif()
 
@@ -98,28 +98,16 @@ add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)
 
 mbed_configure_app_target(${APP_TARGET})
 
-mbed_set_mbed_target_linker_script(${APP_TARGET})
-
 project(${APP_TARGET})
 
-target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-mbedtls-cryptocell310 chip)
+target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)
 
-if("wifi_ism43362" IN_LIST MBED_TARGET_LABELS)
-    target_link_libraries(${APP_TARGET}
-            wifi-ism43362
-    )
+if(MBED_TARGET STREQUAL "DISCO_L475VG_IOT01A")
+    target_link_libraries(${APP_TARGET} wifi-ism43362)
 endif()
 
-if("BlueNRG_MS" IN_LIST MBED_TARGET_LABELS)
-    target_link_libraries(${APP_TARGET}
-            mbed-ble-blue_nrg
-    )
-endif()
-
-if("WHD" IN_LIST MBED_TARGET_LABELS)
-    target_link_libraries(${APP_TARGET}
-        mbed-cy_psoc6_common_network mbed-emac mbed-cy_psoc6_whd
-    )
+if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W")
+    target_link_libraries(${APP_TARGET} mbed-cy-psoc6-common-network)
 endif()
 
 if("capsense" IN_LIST MBED_TARGET_LABELS)
