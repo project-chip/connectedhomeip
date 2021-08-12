@@ -21,9 +21,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libMdnsFakePlatformTests"
   if (chip_device_platform == "fake") {
-    test_sources = [
-      "TestPlatform.cpp",
-    ]
+    test_sources = [ "TestPlatform.cpp" ]
     public_deps = [
       "${chip_root}/src/lib/mdns",
       "${nlunit_test_root}:nlunit-test",

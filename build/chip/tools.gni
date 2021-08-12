@@ -15,5 +15,6 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/device.gni")
 declare_args() {
   # Build CHIP tools.
-  chip_build_tools = current_os != "freertos" && current_os != "android" && chip_device_platform != "fake"
+  chip_build_tools = current_os != "freertos" && current_os != "android" &&
+                     chip_device_platform != "fake"
 }
