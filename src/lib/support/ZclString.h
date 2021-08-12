@@ -31,7 +31,7 @@ namespace  {
             err = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG;
             len = 254;
         }
-        
+
         buffer.data()[0] = static_cast<uint8_t>(len);
         memcpy(&buffer.data()[1], cString, len);
         return err;
