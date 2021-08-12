@@ -88,8 +88,9 @@ public:
                                                         chip::NodeId nodeId, chip::System::Layer * systemLayer,
                                                         chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure);
 
-    CHIP_ERROR GenerateNOCChainAfterValidation(chip::NodeId nodeId, chip::FabricId fabricId, const chip::Crypto::P256PublicKey & ephemeralKey,
-                                               chip::MutableByteSpan & rcac, chip::MutableByteSpan & icac, chip::MutableByteSpan & noc);
+    CHIP_ERROR GenerateNOCChainAfterValidation(chip::NodeId nodeId, chip::FabricId fabricId,
+                                               const chip::Crypto::P256PublicKey & ephemeralKey, chip::MutableByteSpan & rcac,
+                                               chip::MutableByteSpan & icac, chip::MutableByteSpan & noc);
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;

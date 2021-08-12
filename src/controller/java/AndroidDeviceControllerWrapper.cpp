@@ -161,7 +161,6 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
 
     ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, pubkey, rcacSpan, icacSpan, nocSpan));
 
-
     onCompletion->mCall(onCompletion->mContext, generateCert, ByteSpan(noc.Get(), nocLen), ByteSpan(),
                         ByteSpan(rcac.Get(), rootCertBufLen));
 
@@ -239,7 +238,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     Crypto::P256Keypair ephemeralKey;
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
-    ReturnErrorOnFailure(mOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(
+        mOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     initParams.ephemeralKeypair = &ephemeralKey;
     initParams.controllerRCAC   = rcacSpan;

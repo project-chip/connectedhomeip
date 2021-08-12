@@ -200,7 +200,8 @@ CHIP_ERROR InitCommissioner()
     chip::Crypto::P256Keypair ephemeralKey;
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
-    ReturnErrorOnFailure(mOpCredsIssuer.GenerateNOCChainAfterValidation(localId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(
+        mOpCredsIssuer.GenerateNOCChainAfterValidation(localId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     initParams.ephemeralKeypair = &ephemeralKey;
     initParams.controllerRCAC   = rcacSpan;
