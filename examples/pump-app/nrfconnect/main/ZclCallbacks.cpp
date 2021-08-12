@@ -34,27 +34,10 @@ using namespace ::chip::app::Clusters;
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
-    ChipLogProgress(Zcl, "%s: %" PRIx16 " " ChipLogFormatMEI " " ChipLogFormatMEI " %d", __FUNCTION__, endpoint,
-                    ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId), *value);
-    if (clusterId != OnOff::Id)
+    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::Ids::OnOff)
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-        return;
-    }
-
-    if (attributeId != OnOff::Attributes::Ids::OnOff)
-    {
-        ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-        return;
-    }
-
-    if (*value)
-    {
-        PumpMgr().InitiateAction(0, PumpManager::LOCK_ACTION);
-    }
-    else
-    {
-        PumpMgr().InitiateAction(0, PumpManager::UNLOCK_ACTION);
+        ChipLogProgress(Zcl, "Cluster OnOff: attribute OnOff set to %" PRIu8, *value);
+        PumpMgr().InitiateAction(0, *value ? PumpManager::LOCK_ACTION : PumpManager::UNLOCK_ACTION);
     }
 }
 
