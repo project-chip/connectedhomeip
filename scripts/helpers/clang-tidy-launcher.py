@@ -3,13 +3,14 @@
 import subprocess
 import sys
 
+
 def main():
     if len(sys.argv) < 2:
-        return 1;
+        return 1
 
     cc = sys.argv[1]
     if not cc.startswith("clang"):
-        return 0;
+        return 0
 
     command = ["clang-tidy"]
     clang_args = []
@@ -40,6 +41,7 @@ def main():
 
     clang_result = subprocess.run(sys.argv[1:])
     return clang_result.returncode
+
 
 if __name__ == "__main__":
     sys.exit(main())

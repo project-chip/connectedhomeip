@@ -5,6 +5,7 @@ FROM connectedhomeip/chip-build-android:${VERSION} AS android
 FROM connectedhomeip/chip-build-esp32-qemu:${VERSION} as esp32
 FROM connectedhomeip/chip-build-mbed-os:${VERSION} AS mbedos
 FROM connectedhomeip/chip-build-telink:${VERSION} AS telink
+FROM connectedhomeip/chip-build-infineon:${VERSION} AS p6
 FROM connectedhomeip/chip-build:${VERSION}
 
 # qemu-src copied over because qemu directory contains symlinks to the src
@@ -23,6 +24,8 @@ COPY --from=android /opt/android/android-ndk-r21b /opt/android/android-ndk-r21b
 COPY --from=mbedos /opt/mbed-os /opt/mbed-os
 COPY --from=mbedos /opt/mbed-os-toolchain/ /opt/mbed-os-toolchain/
 COPY --from=mbedos /opt/openocd/ /opt/openocd/
+
+COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
 
 COPY --from=telink /opt/zephyrproject /opt/telink/zephyrproject
 COPY --from=telink /opt/telink/telink_riscv_linux_toolchain /opt/telink/telink_riscv_linux_toolchain
@@ -60,3 +63,4 @@ ENV OPENOCD_PATH=/opt/openocd/
 ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_TOOLCHAIN_PATH=/opt/telink/telink_riscv_linux_toolchain/nds32le-elf-mculib-v5f/bin
+ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.3"

@@ -31,7 +31,7 @@ if (lwip_platform == "") {
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13x2_26x2" || lwip_platform == "efr32" ||
            lwip_platform == "k32w" || lwip_platform == "qpg" ||
-           lwip_platform == "mbed",
+           lwip_platform == "mbed" || lwip_platform == "p6",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -49,6 +49,8 @@ if (lwip_platform == "cc13x2_26x2") {
   import("//build_overrides/qpg_sdk.gni")
 } else if (lwip_platform == "k32w") {
   import("//build_overrides/k32w_sdk.gni")
+} else if (lwip_platform == "p6") {
+  import("//build_overrides/p6.gni")
 }
 
 buildconfig_header("lwip_buildconfig") {
@@ -125,5 +127,9 @@ if (current_os == "zephyr" || current_os == "mbed") {
       ":lwip_config",
       "${chip_root}/src:includes",
     ]
+
+    if (lwip_platform == "p6") {
+      public_configs += [ "${p6_sdk_build_root}:p6_sdk_config" ]
+    }
   }
 }

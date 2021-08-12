@@ -23,35 +23,44 @@ import subprocess
 import sys
 import urllib.request
 
-CHIP_ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '../../..'))
+CHIP_ROOT_DIR = os.path.realpath(
+    os.path.join(os.path.dirname(__file__), '../../..'))
+
 
 def checkPythonVersion():
     if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' + str(sys.version_info[0]))
+        print('Must use Python 3. Current version is ' +
+              str(sys.version_info[0]))
         exit(1)
+
 
 def checkFileExists(path):
     if not os.path.isfile(path):
         print('Error: ' + path + ' does not exists or is not a file.')
         exit(1)
 
+
 def checkDirExists(path):
     if not os.path.isdir(path):
         print('Error: ' + path + ' does not exists or is not a directory.')
         exit(1)
+
 
 def getFilePath(name):
     fullpath = os.path.join(CHIP_ROOT_DIR, name)
     checkFileExists(fullpath)
     return fullpath
 
+
 def getDirPath(name):
     fullpath = os.path.join(CHIP_ROOT_DIR, name)
     checkDirExists(fullpath)
     return fullpath
 
+
 def runArgumentsParser():
-    parser = argparse.ArgumentParser(description='Convert .zap files to the current zap version')
+    parser = argparse.ArgumentParser(
+        description='Convert .zap files to the current zap version')
     parser.add_argument('zap', help='Path to the application .zap file')
     args = parser.parse_args()
 
@@ -59,13 +68,16 @@ def runArgumentsParser():
 
     return zap_file
 
+
 def runConversion(zap_file):
     templates_file = getFilePath('src/app/zap-templates/app-templates.json')
     zcl_file = getFilePath('src/app/zap-templates/zcl/zcl.json')
 
     generator_dir = getDirPath('third_party/zap/repo')
     os.chdir(generator_dir)
-    subprocess.check_call(['node', './src-script/zap-convert.js', '-z', zcl_file, '-g', templates_file, '-o', zap_file, zap_file])
+    subprocess.check_call(['node', './src-script/zap-convert.js',
+                          '-z', zcl_file, '-g', templates_file, '-o', zap_file, zap_file])
+
 
 def main():
     checkPythonVersion()
@@ -73,6 +85,7 @@ def main():
 
     zap_file = runArgumentsParser()
     runConversion(zap_file)
+
 
 if __name__ == '__main__':
     main()

@@ -130,9 +130,9 @@ class Flasher(firmware_utils.Flasher):
     def reset(self):
         """Reset the device."""
         return self.run_tool(
-                'commander',
-                ['device', 'reset', self.DEVICE_ARGUMENTS],
-                name='Reset')
+            'commander',
+            ['device', 'reset', self.DEVICE_ARGUMENTS],
+            name='Reset')
 
     def actions(self):
         """Perform actions on the device according to self.option."""

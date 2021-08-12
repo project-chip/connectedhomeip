@@ -30,4 +30,3 @@ ThreadNetworkInfo = Struct(
     "NetworkName" / PaddedString(17, 'utf8'),
     "Channel" / Byte,
 )
-

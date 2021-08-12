@@ -39,6 +39,7 @@ restyle-paths() {
 }
 
 cd "$CHIP_ROOT"
-declare -a paths="($(git diff --ignore-submodules --name-only "${1:-master}"))"
+declare -a paths="($(git ls-tree -r master --name-only | grep -e '\.py$'))"
+# declare -a paths="($(git diff --ignore-submodules --name-only "${1:-master}"))"
 
 restyle-paths "${paths[@]}"

@@ -51,7 +51,6 @@ class LogPrinter:
         if log_line[0] in 'EWIV':
             self.severity = log_line[0]
 
-
     def Log(self, raw):
         """Converts raw bytes from serial output into python logging.
 
@@ -79,43 +78,44 @@ class LogPrinter:
 
 
 def main():
-  """Main task if executed standalone."""
-  parser = argparse.ArgumentParser(description='Output nicely colored logs from esp32')
+    """Main task if executed standalone."""
+    parser = argparse.ArgumentParser(
+        description='Output nicely colored logs from esp32')
 
-  parser.add_argument(
-      '--device',
-      default='/dev/ttyUSB0',
-      type=str,
-      help='What serial device to open.')
+    parser.add_argument(
+        '--device',
+        default='/dev/ttyUSB0',
+        type=str,
+        help='What serial device to open.')
 
-  parser.add_argument(
-      '--baudrate',
-      default=115200,
-      type=int,
-      help='Baudrate for the serial device.')
+    parser.add_argument(
+        '--baudrate',
+        default=115200,
+        type=int,
+        help='Baudrate for the serial device.')
 
-  parser.add_argument(
-      '--log-level',
-      default=logging.DEBUG,
-      type=lambda x: getattr(logging, x),
-      help='Log filtering to apply.')
+    parser.add_argument(
+        '--log-level',
+        default=logging.DEBUG,
+        type=lambda x: getattr(logging, x),
+        help='Log filtering to apply.')
 
-  args = parser.parse_args()
+    args = parser.parse_args()
 
-  # Ensures somewhat pretty logging of what is going on
-  logging.basicConfig(level=args.log_level);
-  coloredlogs.install(fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
+    # Ensures somewhat pretty logging of what is going on
+    logging.basicConfig(level=args.log_level)
+    coloredlogs.install(fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
 
-  logger = logging.getLogger(args.device)
-  logger.setLevel(args.log_level)
+    logger = logging.getLogger(args.device)
+    logger.setLevel(args.log_level)
 
-  printer = LogPrinter(logger)
-  ser = serial.Serial(args.device, args.baudrate)
-  while True:
-      data = ser.readline()
-      printer.Log(data)
+    printer = LogPrinter(logger)
+    ser = serial.Serial(args.device, args.baudrate)
+    while True:
+        data = ser.readline()
+        printer.Log(data)
 
 
 if __name__ == '__main__':
-  # execute only if run as a script
-  main()
+    # execute only if run as a script
+    main()
