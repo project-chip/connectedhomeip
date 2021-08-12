@@ -49,8 +49,10 @@
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
+#include <app/common/gen/attributes/Accessors.h>
 
 using namespace chip;
+using namespace app::Clusters::ColorControl;
 
 #define COLOR_TEMP_CONTROL emberAfPluginColorControlServerTempTransitionEventControl
 #define COLOR_XY_CONTROL emberAfPluginColorControlServerXyTransitionEventControl
@@ -82,18 +84,6 @@ enum
     TEMPERATURE_TO_HSV         = 0x20,
     TEMPERATURE_TO_CIE_XY      = 0x21,
     TEMPERATURE_TO_TEMPERATURE = 0x22
-};
-
-enum
-{
-    COLOR_LOOP_INACTIVE = 0,
-    COLOR_LOOP_ACTIVE   = 1
-};
-
-enum
-{
-    COLOR_LOOP_DIRECTION_DECREMENT = 0,
-    COLOR_LOOP_DIRECTION_INCREMENT = 1
 };
 
 EmberEventControl emberAfPluginColorControlServerTempTransitionEventControl;
@@ -279,59 +269,6 @@ static uint8_t readLevelControlCurrentLevel(EndpointId endpoint)
     return currentLevel;
 }
 
-static uint8_t readColorLoopActiveAttribute(EndpointId endpoint)
-{
-    uint8_t isColorControleActive;
-    EmberAfStatus status;
-
-    status = emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_ACTIVE_ATTRIBUTE_ID,
-                                        reinterpret_cast<uint8_t *>(&isColorControleActive), sizeof(uint8_t));
-
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        isColorControleActive = COLOR_LOOP_INACTIVE;
-    }
-
-    return isColorControleActive;
-}
-
-static uint16_t readColorLoopStoredEnhancedHueAttribute(EndpointId endpoint)
-{
-    uint16_t storedEnhancedHue;
-    emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                               ZCL_COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE_ATTRIBUTE_ID,
-                               reinterpret_cast<uint8_t *>(&storedEnhancedHue), sizeof(uint16_t));
-
-    return storedEnhancedHue;
-}
-
-static uint16_t readColorLoopStartEnhancedHueAttribute(EndpointId endpoint)
-{
-    uint16_t startHue;
-    emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE_ATTRIBUTE_ID,
-                               reinterpret_cast<uint8_t *>(&startHue), sizeof(uint16_t));
-
-    return startHue;
-}
-
-static uint8_t readColorLoopDirectionAttribute(EndpointId endpoint)
-{
-    uint8_t direction;
-    emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_DIRECTION_ATTRIBUTE_ID,
-                               reinterpret_cast<uint8_t *>(&direction), sizeof(uint8_t));
-
-    return direction;
-}
-
-static uint16_t readColorLoopTimeAttribute(EndpointId endpoint)
-{
-    uint16_t time;
-    emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_TIME_ATTRIBUTE_ID,
-                               reinterpret_cast<uint8_t *>(&time), sizeof(uint16_t));
-
-    return time;
-}
-
 static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTime)
 {
     emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_REMAINING_TIME_ATTRIBUTE_ID,
@@ -385,37 +322,6 @@ static void writeColorTemperature(EndpointId endpoint, uint16_t colorTemperature
                                 reinterpret_cast<uint8_t *>(&colorTemperature), ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
-static void writeColorLoopActiveAttribute(EndpointId endpoint, uint8_t isColorLoopActive)
-{
-    emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_ACTIVE_ATTRIBUTE_ID,
-                                reinterpret_cast<uint8_t *>(&isColorLoopActive), ZCL_INT8U_ATTRIBUTE_TYPE);
-}
-
-static void writeColorLoopDirectionAttribute(EndpointId endpoint, uint8_t direction)
-{
-    emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_DIRECTION_ATTRIBUTE_ID,
-                                reinterpret_cast<uint8_t *>(&direction), ZCL_INT8U_ATTRIBUTE_TYPE);
-}
-
-static void writeColorLoopTimeAttribute(EndpointId endpoint, uint16_t time)
-{
-    emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_TIME_ATTRIBUTE_ID,
-                                reinterpret_cast<uint8_t *>(&time), ZCL_INT16U_ATTRIBUTE_TYPE);
-}
-
-static void writeColorLoopStartEnhancedHueAttribute(EndpointId endpoint, uint16_t startEnhancedHue)
-{
-    emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                ZCL_COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE_ATTRIBUTE_ID,
-                                reinterpret_cast<uint8_t *>(&startEnhancedHue), ZCL_INT16U_ATTRIBUTE_TYPE);
-}
-
-static void writeColorLoopStoredEnhancedHueAttribute(EndpointId endpoint, uint16_t storedEnhancedHue)
-{
-    emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                ZCL_COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE_ATTRIBUTE_ID,
-                                reinterpret_cast<uint8_t *>(&storedEnhancedHue), ZCL_INT16U_ATTRIBUTE_TYPE);
-}
 // -------------------------------------------------------------------------
 // ****** callback section *******
 
@@ -1596,13 +1502,27 @@ bool emberAfColorControlClusterStopMoveStepCallback(EndpointId aEndpoint, app::C
 
 static void startColorLoop(EndpointId endpoint, uint8_t startFromStartHue)
 {
-    uint8_t direction   = readColorLoopDirectionAttribute(endpoint);
-    uint16_t time       = readColorLoopTimeAttribute(endpoint);
-    uint16_t currentHue = readEnhancedHue(endpoint);
-    u_int16_t startHue  = startFromStartHue ? readColorLoopStartEnhancedHueAttribute(endpoint) : currentHue;
+    uint8_t direction   = 0;
+    Attributes::GetColorLoopDirection(endpoint, &direction);
+    
+    uint16_t time       = 0x0019;
+    Attributes::GetColorLoopTime(endpoint, &time);
 
-    writeColorLoopStoredEnhancedHueAttribute(endpoint, currentHue);
-    writeColorLoopActiveAttribute(endpoint, COLOR_LOOP_ACTIVE);
+    uint16_t currentHue = 0;
+    Attributes::GetEnhancedCurrentHue(endpoint, &currentHue);
+
+    u_int16_t startHue  = 0x2300;
+    if(startFromStartHue)
+    {
+        Attributes::GetColorLoopStartEnhancedHue(endpoint, &startHue);
+    }
+    else
+    {
+        startHue = currentHue;
+    }
+
+    Attributes::SetColorLoopStoredEnhancedHue(endpoint, currentHue);
+    Attributes::SetColorLoopActive(endpoint, true);
 
     initHueSat(endpoint);
 
@@ -1611,7 +1531,7 @@ static void startColorLoop(EndpointId endpoint, uint8_t startFromStartHue)
     colorHueTransitionState.initialEnhancedHue = startHue;
     colorHueTransitionState.currentEnhancedHue = currentHue;
 
-    if (direction == COLOR_LOOP_DIRECTION_INCREMENT)
+    if (direction)
     {
         colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(startHue - 1);
     }
@@ -1645,13 +1565,15 @@ bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, 
         return true;
     }
 
-    isColorLoopActive = readColorLoopActiveAttribute(endpoint);
+    isColorLoopActive = 0;
+    Attributes::GetColorLoopActive(endpoint, &isColorLoopActive);
+
     deactiveColorLoop =
         (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_ACTION) && (action == EMBER_ZCL_COLOR_LOOP_ACTION_DEACTIVATE);
 
     if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_DIRECTION)
     {
-        writeColorLoopDirectionAttribute(endpoint, direction);
+        Attributes::SetColorLoopDirection(endpoint, direction);
 
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
@@ -1659,14 +1581,12 @@ bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, 
             colorHueTransitionState.up                 = direction;
             colorHueTransitionState.initialEnhancedHue = colorHueTransitionState.currentEnhancedHue;
 
-            if (direction == COLOR_LOOP_DIRECTION_INCREMENT)
+            if (direction)
             {
-                colorHueTransitionState.up               = COLOR_LOOP_DIRECTION_INCREMENT;
                 colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState.initialEnhancedHue - 1);
             }
             else
             {
-                colorHueTransitionState.up               = COLOR_LOOP_DIRECTION_DECREMENT;
                 colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState.initialEnhancedHue + 1);
             }
             colorHueTransitionState.stepsRemaining = colorHueTransitionState.stepsTotal;
@@ -1675,7 +1595,7 @@ bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, 
 
     if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_TIME)
     {
-        writeColorLoopTimeAttribute(endpoint, time);
+        Attributes::SetColorLoopTime(endpoint, time);
 
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
@@ -1686,7 +1606,7 @@ bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, 
 
     if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_START_HUE)
     {
-        writeColorLoopStartEnhancedHueAttribute(endpoint, startHue);
+        Attributes::SetColorLoopStartEnhancedHue(endpoint, startHue);
     }
 
     if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_ACTION)
@@ -1697,10 +1617,11 @@ bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, 
             {
                 stopAllColorTransitions();
 
-                writeColorLoopActiveAttribute(endpoint, COLOR_LOOP_INACTIVE);
+                Attributes::SetColorLoopActive(endpoint, false);
 
-                uint16_t storedEnhancedHue = readColorLoopStoredEnhancedHueAttribute(endpoint);
-                writeEnhancedHue(endpoint, storedEnhancedHue);
+                uint16_t storedEnhancedHue = 0;
+                Attributes::GetColorLoopStoredEnhancedHue(endpoint, &storedEnhancedHue);
+                Attributes::SetEnhancedCurrentHue(endpoint, storedEnhancedHue);
             }
             else
             {
@@ -1917,7 +1838,9 @@ static bool computeNewHueValue(ColorHueTransitionState * p)
         else
         {
             // Check if we are in a color loop. If not, we are in a moveHue
-            uint8_t isColorLoop = readColorLoopActiveAttribute(p->endpoint);
+            uint8_t isColorLoop = 0;
+            Attributes::GetColorLoopActive(p->endpoint, &isColorLoop);
+
             if (isColorLoop)
             {
                 p->currentEnhancedHue = p->initialEnhancedHue;
