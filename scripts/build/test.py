@@ -38,9 +38,15 @@ def build_expected_output(root: str, out: str) -> List[str]:
 
 def build_actual_output(root: str, out: str) -> List[str]:
     # Fake out that we have a project root
-    os.environ['PW_PROJECT_ROOT'] = root
-
     binary = os.path.join(SCRIPT_ROOT, 'build_examples.py')
+
+    runenv = {}
+    runenv.update(os.environ)
+    runenv.update({
+        'PW_PROJECT_ROOT': root,
+        'ANDROID_NDK_HOME': 'TEST_ANDROID_NDK_HOME',
+        'ANDROID_HOME': 'TEST_ANDROID_HOME',
+    })
 
     retval = subprocess.run([
         binary,
@@ -50,7 +56,7 @@ def build_actual_output(root: str, out: str) -> List[str]:
         '--repo', root,
         '--out-prefix', out,
         'build'
-    ], stdout=subprocess.PIPE, check=True, encoding='UTF-8')
+    ], stdout=subprocess.PIPE, check=True, encoding='UTF-8', env=runenv)
 
     return [l + '\n' for l in retval.stdout.split('\n')]
 
@@ -74,5 +80,5 @@ def main():
         sys.exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
