@@ -2397,38 +2397,6 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPOperationalCredentialsClusterSetFabricResponseCallbackBridge
-    : public Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback> {
-public:
-    CHIPOperationalCredentialsClusterSetFabricResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPOperationalCredentialsClusterSetFabricResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, chip::FabricId FabricId)
-    {
-        CHIPOperationalCredentialsClusterSetFabricResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPOperationalCredentialsClusterSetFabricResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"FabricId" : [NSNumber numberWithUnsignedLongLong:FabricId],
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
 class CHIPScenesClusterAddSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterAddSceneResponseCallback> {
 public:
     CHIPScenesClusterAddSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
@@ -13761,36 +13729,7 @@ private:
         responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)removeAllFabrics:(ResponseHandler)responseHandler
-{
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
-    if (!onSuccess) {
-        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
-    if (!onFailure) {
-        delete onSuccess;
-        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    __block CHIP_ERROR err;
-    dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.RemoveAllFabrics(onSuccess->Cancel(), onFailure->Cancel());
-    });
-
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
-    }
-}
-- (void)removeFabric:(uint64_t)fabricId
-              nodeId:(uint64_t)nodeId
-            vendorId:(uint16_t)vendorId
-     responseHandler:(ResponseHandler)responseHandler
+- (void)removeFabric:(uint8_t)fabricIndex responseHandler:(ResponseHandler)responseHandler
 {
     CHIPOperationalCredentialsClusterNOCResponseCallbackBridge * onSuccess
         = new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(responseHandler, [self callbackQueue]);
@@ -13808,7 +13747,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.RemoveFabric(onSuccess->Cancel(), onFailure->Cancel(), fabricId, nodeId, vendorId);
+        err = self.cppCluster.RemoveFabric(onSuccess->Cancel(), onFailure->Cancel(), fabricIndex);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -13844,33 +13783,6 @@ private:
         responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)setFabric:(uint16_t)vendorId responseHandler:(ResponseHandler)responseHandler
-{
-    CHIPOperationalCredentialsClusterSetFabricResponseCallbackBridge * onSuccess
-        = new CHIPOperationalCredentialsClusterSetFabricResponseCallbackBridge(responseHandler, [self callbackQueue]);
-    if (!onSuccess) {
-        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
-    if (!onFailure) {
-        delete onSuccess;
-        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    __block CHIP_ERROR err;
-    dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.SetFabric(onSuccess->Cancel(), onFailure->Cancel(), vendorId);
-    });
-
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
-    }
-}
 - (void)updateFabricLabel:(NSString *)label responseHandler:(ResponseHandler)responseHandler
 {
     CHIPOperationalCredentialsClusterNOCResponseCallbackBridge * onSuccess
@@ -13892,6 +13804,34 @@ private:
         err = self.cppCluster.UpdateFabricLabel(onSuccess->Cancel(), onFailure->Cancel(),
             chip::ByteSpan((const uint8_t *) [label dataUsingEncoding:NSUTF8StringEncoding].bytes,
                 [label lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)updateNOC:(NSData *)nOCArray responseHandler:(ResponseHandler)responseHandler
+{
+    CHIPOperationalCredentialsClusterNOCResponseCallbackBridge * onSuccess
+        = new CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.UpdateNOC(
+            onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) nOCArray.bytes, nOCArray.length));
     });
 
     if (err != CHIP_NO_ERROR) {

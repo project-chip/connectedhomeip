@@ -345,17 +345,15 @@ static constexpr CommandId RevokeCommissioning          = 0x00000002;
 namespace OperationalCredentials {
 namespace Commands {
 namespace Ids {
-static constexpr CommandId SetFabric                    = 0x00000000;
-static constexpr CommandId SetFabricResponse            = 0x00000001;
 static constexpr CommandId OpCSRRequest                 = 0x00000004;
 static constexpr CommandId OpCSRResponse                = 0x00000005;
 static constexpr CommandId AddNOC                       = 0x00000006;
+static constexpr CommandId UpdateNOC                    = 0x00000007;
 static constexpr CommandId NOCResponse                  = 0x00000008;
 static constexpr CommandId UpdateFabricLabel            = 0x00000009;
 static constexpr CommandId RemoveFabric                 = 0x0000000A;
-static constexpr CommandId RemoveAllFabrics             = 0x0000000B;
-static constexpr CommandId AddTrustedRootCertificate    = 0x000000A1;
-static constexpr CommandId RemoveTrustedRootCertificate = 0x000000A2;
+static constexpr CommandId AddTrustedRootCertificate    = 0x0000000B;
+static constexpr CommandId RemoveTrustedRootCertificate = 0x0000000C;
 } // namespace Ids
 } // namespace Commands
 } // namespace OperationalCredentials

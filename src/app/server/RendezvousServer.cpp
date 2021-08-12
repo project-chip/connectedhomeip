@@ -85,6 +85,7 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
     }
 #endif
 
+    ChipLogProgress(Discovery, "WaitForPairing(): HasAdvertisementDelegate %d", HasAdvertisementDelegate());
     if (HasAdvertisementDelegate())
     {
         ReturnErrorOnFailure(GetAdvertisementDelegate()->StartAdvertisement());
