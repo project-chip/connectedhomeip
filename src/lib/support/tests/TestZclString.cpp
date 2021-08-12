@@ -41,8 +41,9 @@ using namespace chip::Platform;
 
 static void TestZclStringLessThanMaximumSize(nlTestSuite * inSuite, void * inContext)
 {
+    uint8_t bufferMemory[256];
     // Init zcl string
-    uint8_t zclString[255];
+    MutableByteSpan zclString = MutableByteSpan(bufferMemory);
     // Init c string
     char * cString64 = static_cast<char *>(MemoryCalloc(1024, true));
     // Add random chars to c string
@@ -54,15 +55,16 @@ static void TestZclStringLessThanMaximumSize(nlTestSuite * inSuite, void * inCon
     // Memmory assert
     NL_TEST_ASSERT(inSuite, cString64 != nullptr);
     // ZCL String length assert
-    NL_TEST_ASSERT(inSuite, zclString[0] == 64);
+    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 64);
 
     chip::Platform::MemoryFree(cString64);
 }
 
 static void TestZclStringEqualsMaximumSize(nlTestSuite * inSuite, void * inContext)
 {
+    uint8_t bufferMemory[256];
     // Init zcl string
-    uint8_t zclString[255];
+    MutableByteSpan zclString = MutableByteSpan(bufferMemory);
     // Init c string
     char * cString254 = static_cast<char *>(MemoryCalloc(1024, true));
     // Add random chars to c string
@@ -74,15 +76,16 @@ static void TestZclStringEqualsMaximumSize(nlTestSuite * inSuite, void * inConte
     // Memmory assert
     NL_TEST_ASSERT(inSuite, cString254 != nullptr);
     // ZCL String length assert
-    NL_TEST_ASSERT(inSuite, zclString[0] == 254);
+    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 254);
 
     chip::Platform::MemoryFree(cString254);
 }
 
 static void TestZclStringBiggerThanMaximumSize(nlTestSuite * inSuite, void * inContext)
 {
+    uint8_t bufferMemory[256];
     // Init zcl string
-    uint8_t zclString[255];
+    MutableByteSpan zclString = MutableByteSpan(bufferMemory);
     // Init c string
     char * cString255 = static_cast<char *>(MemoryCalloc(1024, true));
     // Add random chars to c string
@@ -94,7 +97,7 @@ static void TestZclStringBiggerThanMaximumSize(nlTestSuite * inSuite, void * inC
     // Memmory assert
     NL_TEST_ASSERT(inSuite, cString255 != nullptr);
     // ZCL String length assert
-    NL_TEST_ASSERT(inSuite, zclString[0] == 254);
+    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 254);
 
     chip::Platform::MemoryFree(cString255);
 }

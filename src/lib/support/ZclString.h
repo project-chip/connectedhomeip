@@ -14,23 +14,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <support/Span.h>
 
 #pragma once
-namespace chip {
-
-/**
- * @brief Create ZCL string from char
- */
-static uint8_t * MakeZclCharString(uint8_t * zclString, const char * cString)
-{
-    size_t len = strlen(cString);
-    if (len > 254)
+namespace  {
+    /**
+    * @brief Create ZCL string from char
+    */
+    static CHIP_ERROR MakeZclCharString(chip::MutableByteSpan & buffer, const char * cString)
     {
-        len = 254;
-    }
-    zclString[0] = static_cast<uint8_t>(len);
-    memcpy(&zclString[1], cString, zclString[0]);
-    return zclString;
-}
+        CHIP_ERROR err = CHIP_NO_ERROR;
 
-} // namespace chip
+        size_t len = strlen(cString);
+        if (strlen(cString) > 254)
+        {
+            err = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG;
+            len = 254;
+        }
+        
+        buffer.data()[0] = static_cast<uint8_t>(len);
+        memcpy(&buffer.data()[1], cString, len);
+        return err;
+    }
+}
