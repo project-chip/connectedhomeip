@@ -222,26 +222,17 @@ void emberAfPluginOperationalCredentialsServerInitCallback(void)
 }
 
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                              FabricId fabricId, NodeId nodeId, uint16_t vendorId)
+                                                              FabricIndex fabricIndex)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    // TODO - Update RemoveFabric command to take FabricIndex as input parameter
-    //        The fix requires an update to cluster definition.
-    //    CHIP_ERROR err       = GetGlobalFabricTable().Delete(fabricIndex);
-    //    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
-    // exit:
+    CHIP_ERROR err       = GetGlobalFabricTable().Delete(fabricIndex);
+    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+exit:
     writeFabricsIntoFabricsListAttribute();
     emberAfSendImmediateDefaultResponse(status);
-    return true;
-}
-
-bool emberAfOperationalCredentialsClusterSetFabricCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint16_t VendorId)
-{
-    // TODO - Delete SetFabric command as this is not spec compliant
-    ChipLogError(Zcl, "operational-credentials cluster received SetFabric command, which is not supported");
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 

@@ -143,8 +143,6 @@ void BLEManagerImpl::DriveBLEState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogDetail(DeviceLayer, "In DriveBLEState");
-
     // Perform any initialization actions that must occur after the CHIP task is running.
     if (!mFlags.Has(Flags::kAsyncInitCompleted))
     {
@@ -359,7 +357,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
-        ChipLogDetail(DeviceLayer, "SetAdvertisingEnabled(%s)", val ? "true" : "false");
+        ChipLogDetail(DeviceLayer, "CHIPoBLE advertising set to %s", val ? "on" : "off");
 
         mFlags.Set(Flags::kAdvertisingEnabled, val);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);

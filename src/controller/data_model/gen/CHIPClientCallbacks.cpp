@@ -2596,20 +2596,6 @@ bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(EndpointId endpoi
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                   chip::FabricId FabricId)
-{
-    ChipLogProgress(Zcl, "SetFabricResponse:");
-    ChipLogProgress(Zcl, "  FabricId: %" PRIu64 "", FabricId);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterSetFabricResponseCallback");
-
-    Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback> * cb =
-        Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, FabricId);
-    return true;
-}
-
 bool emberAfScenesClusterAddSceneResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
                                                   uint16_t groupId, uint8_t sceneId)
 {

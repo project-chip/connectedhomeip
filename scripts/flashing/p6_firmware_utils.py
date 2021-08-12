@@ -94,6 +94,7 @@ P6_OPTIONS = {
     },
 }
 
+
 class Flasher(firmware_utils.Flasher):
     """Manage P6 flashing."""
 
@@ -145,6 +146,7 @@ class Flasher(firmware_utils.Flasher):
             return which("make")
         else:
             return tool
+
 
 if __name__ == '__main__':
     sys.exit(Flasher().flash_command(sys.argv))

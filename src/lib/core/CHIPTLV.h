@@ -114,7 +114,7 @@ public:
      * @param[in]   dataLen The length of the TLV data to be parsed.
      *
      */
-    void Init(const uint8_t * data, uint32_t dataLen);
+    void Init(const uint8_t * data, size_t dataLen);
 
     /**
      * Initializes a TLVReader object to read from a TLVBackingStore.
@@ -849,7 +849,7 @@ public:
      * @param[in]   maxLen  The maximum number of bytes that should be written to the output buffer.
      *
      */
-    void Init(uint8_t * buf, uint32_t maxLen);
+    void Init(uint8_t * buf, size_t maxLen);
 
     /**
      * Initializes a TLVWriter object to write into memory provided by a TLVBackingStore.
