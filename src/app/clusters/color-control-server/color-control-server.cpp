@@ -1504,7 +1504,7 @@ static void startColorLoop(EndpointId endpoint, uint8_t startFromStartHue)
 {
     uint8_t direction   = 0;
     Attributes::GetColorLoopDirection(endpoint, &direction);
-    
+
     uint16_t time       = 0x0019;
     Attributes::GetColorLoopTime(endpoint, &time);
 
