@@ -122,6 +122,8 @@ def ParseValueWithType(value, type):
         return value
     elif type == 'bytes':
         return ParseEncodedString(value)
+    elif type == 'bool':
+        return (value.upper() not in ['F', 'FALSE', '0'])
     else:
         raise ParsingError('cannot recognize type: {}'.format(type))
 

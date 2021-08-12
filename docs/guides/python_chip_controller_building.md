@@ -476,6 +476,8 @@ example, `networkId=hex:0123456789abcdef` (for
 `[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]`), `ssid=str:Test` (for
 `['T', 'e', 's', 't', 0x00]`).
 
+For boolean type, use `key=True` or `key=False`.
+
 ### `zcl ?`
 
 List available clusters:
@@ -557,6 +559,20 @@ Read the value of ZCL attribute. For example:
 ```
 chip-device-ctrl > zclread Basic VendorName 1234 1 0
 ```
+
+### `zclwrite <cluster> <attribute> <nodeid> <endpoint> <groupid> <value>`
+
+Write the value to a ZCL attribute. For example:
+
+```
+chip-device-ctrl > zclwrite TestCluster Int8u 1 1 0 1
+chip-device-ctrl > zclwrite TestCluster Boolean 1 1 0 True
+chip-device-ctrl > zclwrite TestCluster OctetString 1 1 0 str:123123
+chip-device-ctrl > zclwrite TestCluster CharString 1 1 0 233233
+```
+
+Note: The format of the value is the same as the format of argument values for
+ZCL cluster commands.
 
 ### `zclconfigure <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval> <Change>`
 
