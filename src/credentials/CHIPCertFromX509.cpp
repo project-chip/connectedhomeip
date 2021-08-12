@@ -732,10 +732,7 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
 
     TLVWriter writer;
 
-    // We can still generate the certificate if the output chip cert buffer is bigger than UINT32_MAX,
-    // since generated cert needs less space than UINT32_MAX.
-    uint32_t chipCertBufLen = (chipCertArray.size() > UINT32_MAX) ? UINT32_MAX : static_cast<uint32_t>(chipCertArray.size());
-    writer.Init(chipCertArray.data(), chipCertBufLen);
+    writer.Init(chipCertArray.data(), chipCertArray.size());
 
     TLVType outerContainer;
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag, kTLVType_Array, outerContainer));
@@ -767,7 +764,9 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
     ReturnErrorOnFailure(writer.EndContainer(outerContainer));
     ReturnErrorOnFailure(writer.Finalize());
 
-    ReturnErrorCodeIf(writer.GetLengthWritten() > chipCertBufLen, CHIP_ERROR_INTERNAL);
+    // This error return is a bit weird... if we already overran our buffer,
+    // then fail???
+    ReturnErrorCodeIf(writer.GetLengthWritten() > chipCertArray.size(), CHIP_ERROR_INTERNAL);
     chipCertArray.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
