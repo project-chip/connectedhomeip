@@ -67,7 +67,7 @@ typedef void (*ReadReportingConfigurationReceivedCallback)(void* context, uint16
 // Cluster Specific Response Callbacks
 {{#chip_client_clusters}}
 {{#chip_cluster_responses}}
-typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}});
+typedef void (*{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback)(void * context{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}});
 {{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 {{/if}}
@@ -76,8 +76,8 @@ typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name fals
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-void {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
-typedef void (*{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback)(void * context, uint16_t count, {{chipType}} * entries);
+void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback, chip::Callback::Cancelable * onFailureCallback);
+typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback)(void * context, uint16_t count, {{chipType}} * entries);
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}

@@ -782,7 +782,7 @@ static EmberAfStatus PrepareListFromTLV(TLV::TLVReader * tlvData, const uint8_t 
 {{#if (chip_server_has_list_attributes)}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-void {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     // TODO: Add actual support for array and lists.
     const uint8_t * message = nullptr;
@@ -824,7 +824,7 @@ void {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAtt
         {{/if}}
         {{/if}}
     }
-    Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback> * cb = Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback> * cb = Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
 
@@ -835,9 +835,9 @@ void {{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ListAtt
 
 {{#chip_client_clusters}}
 {{#chip_cluster_responses}}
-bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(EndpointId endpoint, app::CommandSender * commandObj{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}})
+bool emberAf{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback(EndpointId endpoint, app::CommandSender * commandObj{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}})
 {
-    ChipLogProgress(Zcl, "{{asCamelCased name false}}:");
+    ChipLogProgress(Zcl, "{{asUpperCamelCase name}}:");
     {{#chip_cluster_response_arguments}}
     {{#if (isOctetString type)}}
     ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", {{asSymbol label}}.size());
@@ -849,9 +849,9 @@ bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}
     {{/if}}
     {{/chip_cluster_response_arguments}}
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback");
 
-    Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback> * cb = Callback::Callback<{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback> * cb = Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext{{#chip_cluster_response_arguments}}, {{asSymbol label}}{{/chip_cluster_response_arguments}});
     return true;
 }

@@ -4,6 +4,7 @@
     "helpers": [
         "../../../../src/app/zap-templates/partials/helper.js",
         "../../../../src/app/zap-templates/common/StringHelper.js",
+        "../../../../src/app/zap-templates/templates/app/helper.js",
         "../../../../src/app/zap-templates/templates/chip/helper.js",
         "helper.js"
     ],
