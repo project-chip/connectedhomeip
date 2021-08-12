@@ -82,7 +82,7 @@ jobs:
                     examples/lighting-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-lighting-app-example \
                     /tmp/bloat_reports/
 
-            - name: Build unit test
+            - name: Build unit tests
               timeout-minutes: 10
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
 
@@ -93,8 +93,8 @@ jobs:
                      /tmp/output_binaries/$BUILD_TYPE-build/lock-app-$APP_TARGET-$APP_PROFILE.hex
                   cp examples/lighting-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-lighting-app-example.hex \
                      /tmp/output_binaries/$BUILD_TYPE-build/lighting-app-$APP_TARGET-$APP_PROFILE.hex
-                  cp src/test_driver/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-unit-test.hex \
-                     /tmp/output_binaries/$BUILD_TYPE-build/unit-test-$APP_TARGET-$APP_PROFILE.hex
+                  cp src/test_driver/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-unit-tests.hex \
+                     /tmp/output_binaries/$BUILD_TYPE-build/unit-tests-$APP_TARGET-$APP_PROFILE.hex
 
             - name: Binary artifacts suffix
               id: outsuffix
