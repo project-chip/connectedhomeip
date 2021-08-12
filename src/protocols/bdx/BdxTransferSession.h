@@ -190,17 +190,6 @@ public:
 
     /**
      * @brief
-     *   Reject a TransferInit message. Use Reset() to prepare this object for another transfer.
-     *
-     * @param reason A StatusCode indicating the reason for rejecting the transfer
-     *
-     * @return CHIP_ERROR The result of the preparation of a StatusReport message. May also indicate if the TransferSession object
-     *                    is unable to handle this request.
-     */
-    CHIP_ERROR RejectTransfer(StatusCode reason);
-
-    /**
-     * @brief
      *   Prepare a BlockQuery message. The Block counter will be populated automatically.
      *
      * @return CHIP_ERROR The result of the preparation of a BlockQuery message. May also indicate if the TransferSession object
