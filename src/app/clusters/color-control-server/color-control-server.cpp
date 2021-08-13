@@ -1527,7 +1527,7 @@ static void startColorLoop(EndpointId endpoint, uint8_t startFromStartHue)
 {
     uint8_t direction   = 0;
     Attributes::GetColorLoopDirection(endpoint, &direction);
-    
+
     uint16_t time       = 0x0019;
     Attributes::GetColorLoopTime(endpoint, &time);
 
@@ -1972,7 +1972,7 @@ void emberAfPluginColorControlServerHueSatTransitionEventHandler(void)
 static bool computeNewColor16uValue(Color16uTransitionState * p)
 {
     uint32_t newValue32u;
-  
+
     if (p->stepsRemaining == 0)
     {
         return false;
@@ -1994,7 +1994,7 @@ static bool computeNewColor16uValue(Color16uTransitionState * p)
         newValue32u /= ((uint32_t)(p->stepsTotal));
         p->currentValue = static_cast<uint16_t>(p->finalValue - static_cast<uint16_t>(newValue32u));
 
-        if(static_cast<uint16_t>(newValue32u) > p->finalValue 
+        if(static_cast<uint16_t>(newValue32u) > p->finalValue
         || p->currentValue > p->highLimit )
         {
             p->currentValue = p->highLimit;
