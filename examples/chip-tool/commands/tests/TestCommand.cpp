@@ -18,6 +18,8 @@
 
 #include "TestCommand.h"
 
+#include <thread>
+
 CHIP_ERROR TestCommand::Run()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -44,4 +46,18 @@ void TestCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, C
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
     command->SetCommandExitStatus(error);
+}
+
+CHIP_ERROR TestCommand::WaitForMs(unsigned int ms)
+{
+    void * context = this;
+    std::thread waitingThread([context, ms] {
+        std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+        auto * command = static_cast<TestCommand *>(context);
+        command->NextTest();
+    });
+
+    waitingThread.detach();
+
+    return CHIP_NO_ERROR;
 }

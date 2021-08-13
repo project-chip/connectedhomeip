@@ -35,6 +35,9 @@ public:
 
     virtual void NextTest() = 0;
 
+    /////////// GlobalCommands Interface /////////
+    CHIP_ERROR WaitForMs(unsigned int ms);
+
 protected:
     ChipDevice * mDevice;
 
