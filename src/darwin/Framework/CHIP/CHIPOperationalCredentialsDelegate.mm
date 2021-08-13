@@ -204,7 +204,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Byte
         = { 1, mIssuerId, validityStart, validityEnd, true, mNextFabricId, true, assignedId };
 
     TLVReader reader;
-    reader.Init(csrElements.data(), static_cast<uint32_t>(csrElements.size()));
+    reader.Init(csrElements);
 
     if (reader.GetType() == kTLVType_NotSpecified) {
         ReturnErrorOnFailure(reader.Next());

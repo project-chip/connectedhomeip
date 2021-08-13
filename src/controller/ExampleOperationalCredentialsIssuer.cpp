@@ -110,7 +110,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
 
     ChipLogProgress(Controller, "Verifying Certificate Signing Request");
     TLVReader reader;
-    reader.Init(csrElements.data(), static_cast<uint32_t>(csrElements.size()));
+    reader.Init(csrElements);
 
     if (reader.GetType() == kTLVType_NotSpecified)
     {

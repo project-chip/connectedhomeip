@@ -117,6 +117,28 @@ public:
     void Init(const uint8_t * data, size_t dataLen);
 
     /**
+     * Initializes a TLVReader object to read from a single input buffer
+     * represented as a span.
+     *
+     * @param[in]   data    A byte span to read from
+     *
+     */
+    void Init(const ByteSpan & data) { Init(data.data(), data.size()); }
+
+    /**
+     * Initializes a TLVReader object to read from a single input buffer
+     * represented as byte array.
+     *
+     * @param[in]   data    A byte buffer to read from
+     *
+     */
+    template <size_t N>
+    void Init(const uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
+
+    /**
      * Initializes a TLVReader object to read from a TLVBackingStore.
      *
      * Parsing begins at the backing store's start position and continues until the
@@ -850,6 +872,26 @@ public:
      *
      */
     void Init(uint8_t * buf, size_t maxLen);
+
+    /**
+     * Initializes a TLVWriter object to write into a single output buffer
+     * represented by a MutableSpan.  See documentation for the two-arg Init()
+     * form for details.
+     *
+     */
+    void Init(const MutableByteSpan & data) { Init(data.data(), data.size()); }
+
+    /**
+     * Initializes a TLVWriter object to write into a single output buffer
+     * represented by a fixed-size byte array.  See documentation for the
+     * two-arg Init() form for details.
+     *
+     */
+    template <size_t N>
+    void Init(uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
 
     /**
      * Initializes a TLVWriter object to write into memory provided by a TLVBackingStore.

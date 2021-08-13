@@ -732,7 +732,7 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
 
     TLVWriter writer;
 
-    writer.Init(chipCertArray.data(), chipCertArray.size());
+    writer.Init(chipCertArray);
 
     TLVType outerContainer;
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag, kTLVType_Array, outerContainer));
@@ -776,7 +776,7 @@ CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & no
 {
     TLVType outerContainerType;
     TLVReader reader;
-    reader.Init(opCertArray.data(), static_cast<uint32_t>(opCertArray.size()));
+    reader.Init(opCertArray);
 
     if (reader.GetType() == kTLVType_NotSpecified)
     {
