@@ -38,4 +38,4 @@ CHIP_ERROR MakeZclCharString(chip::MutableByteSpan & buffer, const char * cStrin
     return err;
 }
 
-}
+} // namespace chip
