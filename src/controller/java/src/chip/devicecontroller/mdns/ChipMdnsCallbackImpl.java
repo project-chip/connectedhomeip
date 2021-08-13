@@ -15,8 +15,14 @@
  *   limitations under the License.
  *
  */
-package chip.devicecontroller;
+package chip.devicecontroller.mdns;
 
-public interface ServiceResolver {
-  void resolve(String instanceName, String serviceType, long callbackHandle, long contextHandle);
+public class ChipMdnsCallbackImpl implements ChipMdnsCallback {
+  public native void handleServiceResolve(
+      String instanceName,
+      String serviceType,
+      String address,
+      int port,
+      long callbackHandle,
+      long contextHandle);
 }
