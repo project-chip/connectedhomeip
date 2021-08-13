@@ -1,7 +1,7 @@
 # Performing Device Firmware Upgrade in the nRF Connect examples
 
-Some examples for the development kits from Nordic Semiconductor
-support over-the-air Device Firmware Upgrade.
+Some examples for the development kits from Nordic Semiconductor support
+over-the-air Device Firmware Upgrade.
 
 Currently, the Bluetooth LE is the only available transport for performing the
 DFU operation and it uses nRF Connect SDK's
@@ -19,10 +19,13 @@ following steps:
     - [nRF Connect for Mobile](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Connect-for-mobile)
     - [nRF Toolbox](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Toolbox)
 
-2. Push the appropriate button on the device to enable the software update functionality (if it is not enabled by default) and start the Bluetooth LE advertising of SMP service.
-   See the user interface section in the example documentation to check the button number.
-3. Push the appropriate button on the device to start the Bluetooth LE advertising.
-   See the user interface section in the example documentation to check the button number.
+2. Push the appropriate button on the device to enable the software update
+   functionality (if it is not enabled by default) and start the Bluetooth LE
+   advertising of SMP service. See the user interface section in the example
+   documentation to check the button number.
+3. Push the appropriate button on the device to start the Bluetooth LE
+   advertising. See the user interface section in the example documentation to
+   check the button number.
 4. Follow the instructions about downloading the new image to a device on the
    [FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf52.html#fota-upgrades)
    page in the nRF Connect SDK documentation.
@@ -41,10 +44,13 @@ Complete the following steps to perform DFU using mcumgr:
 
 1. Install the tool by following the
    [mcumgr command line tool installation instructions](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#command-line-tool).
-2. Push the appropriate button on the device to enable the software update functionality (if it is not enabled by default) and start the Bluetooth LE advertising of SMP service.
-   See the user interface section in the example documentation to check the button number.
-3. Push the appropriate button on the device to start the Bluetooth LE advertising.
-   See the user interface section in the example documentation to check the button number.
+2. Push the appropriate button on the device to enable the software update
+   functionality (if it is not enabled by default) and start the Bluetooth LE
+   advertising of SMP service. See the user interface section in the example
+   documentation to check the button number.
+3. Push the appropriate button on the device to start the Bluetooth LE
+   advertising. See the user interface section in the example documentation to
+   check the button number.
 
 > **_NOTE:_** In all of the commands listed in the following steps, replace
 > `ble-hci-number` with the Bluetooth hci integer value (for example, `0`) and

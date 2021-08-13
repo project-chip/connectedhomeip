@@ -4,9 +4,10 @@ You can use [CHIPTool](../../src/android/CHIPTool/README.md) for Android
 smartphones to commission a Nordic Semiconductor device running an nRF Connect
 platform example onto a CHIP-enabled Thread network.
 
-This guide references the nRF52840 DK and the door lock example application based on the nRF Connect platform,
-but the instructions are also valid for the nRF Connect lighting example application
-and can be adapted to other platforms and applications as well.
+This guide references the nRF52840 DK and the door lock example application
+based on the nRF Connect platform, but the instructions are also valid for the
+nRF Connect lighting example application and can be adapted to other platforms
+and applications as well.
 
 <hr>
 
@@ -93,8 +94,8 @@ or the nRF52840 Dongle acting as the
 
 Build and program the example application onto your compatible device.
 
-For this guide, see the documentation for the door lock example application
-to learn how to build and program the example onto an nRF52840 DK.
+For this guide, see the documentation for the door lock example application to
+learn how to build and program the example onto an nRF52840 DK.
 
 <hr>
 
@@ -140,16 +141,18 @@ To prepare the accessory device for commissioning, complete the following steps:
     device. For details, see the
     [Using CLI in nRF Connect examples](nrfconnect_examples_cli.md) guide. This
     will grant you access to the application logs.
-2.  Hold the appropriate button on the accessory device for more than 6 s to trigger the
-    factory reset of the device. See the user interface section in the example documentation to check the button number.
+2.  Hold the appropriate button on the accessory device for more than 6 s to
+    trigger the factory reset of the device. See the user interface section in
+    the example documentation to check the button number.
 3.  Find a message similar to the following one in the application logs:
 
         I: 615 [SVR]Copy/paste the below URL in a browser to see the QR Code:
         I: 621 [SVR]https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 
 4.  Open the URL in a web browser to have the commissioning QR code generated.
-5.  Press the appropriate button on the device to start the Bluetooth LE advertising.
-    See the user interface section in the example documentation to check the button number.
+5.  Press the appropriate button on the device to start the Bluetooth LE
+    advertising. See the user interface section in the example documentation to
+    check the button number.
 
 <hr>
 
@@ -197,8 +200,8 @@ Check the IPv6 connectivity with the device using the following steps:
    be it the address or an error message, will be displayed at the bottom of the
    screen.
 
-2. Tap the following buttons to change the lock state of the nRF Connect door lock
-   example application referenced in this guide:
+2. Tap the following buttons to change the lock state of the nRF Connect door
+   lock example application referenced in this guide:
 
     - **ON** and **OFF** buttons lock and unlock the door, respectively.
     - **TOGGLE** changes the lock state to the opposite.

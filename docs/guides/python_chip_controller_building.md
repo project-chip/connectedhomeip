@@ -18,9 +18,11 @@ into the network and to communicate with it using the Zigbee Cluster Library
 
 ## Source files
 
-You can find source files of the Python CHIP Controller tool in the `src/controller/python` directory.
+You can find source files of the Python CHIP Controller tool in the
+`src/controller/python` directory.
 
-The tool uses the generic CHIP Device Controller library, available in the `src/controller` directory.
+The tool uses the generic CHIP Device Controller library, available in the
+`src/controller` directory.
 
 <hr>
 
@@ -118,9 +120,9 @@ on the device side and may be different for your accessory.
 
 ### Step 1: Prepare the Matter accessory.
 
-This tutorial is using the Matter Light Bulb example
-with the Bluetooth LE commissioning. However, you can adapt this procedure to
-other available Matter examples.
+This tutorial is using the Matter Light Bulb example with the Bluetooth LE
+commissioning. However, you can adapt this procedure to other available Matter
+examples.
 
 Build and program the device with the Matter accessory firmware by following the
 example's documentation.

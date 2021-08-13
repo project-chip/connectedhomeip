@@ -1,7 +1,9 @@
 # Using Python CHIP Controller advanced features
 
-This document extends the [basic documentation](python_chip_controller_building.md) of the Python CHIP Controller with the useful
-information when developing Python CHIP controller tool or Matter accessories on Linux.
+This document extends the
+[basic documentation](python_chip_controller_building.md) of the Python CHIP
+Controller with the useful information when developing Python CHIP controller
+tool or Matter accessories on Linux.
 
 <hr>
 

@@ -1,7 +1,7 @@
 # Using CLI in nRF Connect examples
 
-Some Matter examples for the development kits from Nordic Semiconductor
-include a command-line interface that allows access to application logs and
+Some Matter examples for the development kits from Nordic Semiconductor include
+a command-line interface that allows access to application logs and
 [Zephyr shell](https://docs.zephyrproject.org/1.13.0/subsystems/shell.html).
 
 ## Accessing the CLI console

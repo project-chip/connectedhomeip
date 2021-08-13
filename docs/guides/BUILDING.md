@@ -1,8 +1,8 @@
 # Building Matter
 
-Matter supports configuring the build with [GN](https://gn.googlesource.com/gn/),
-a fast and scalable meta-build system that generates inputs to
-[ninja](https://ninja-build.org/).
+Matter supports configuring the build with
+[GN](https://gn.googlesource.com/gn/), a fast and scalable meta-build system
+that generates inputs to [ninja](https://ninja-build.org/).
 
 Tested on:
 
@@ -89,8 +89,8 @@ sudo apt-get install pi-bluetooth
 You need to reboot your RPi after install `pi-bluetooth`.
 
 By default, wpa_supplicant is not allowed to update (overwrite) configuration,
-if you want the Matter app to be able to store the configuration changes permanently,
-we need to make the following changes.
+if you want the Matter app to be able to store the configuration changes
+permanently, we need to make the following changes.
 
 1. Edit the dbus-fi.w1.wpa_supplicant1.service file to use configuration file
    instead.

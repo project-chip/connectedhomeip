@@ -14,4 +14,6 @@ CHIPTool offers the following features:
 > :warning: Connection to the CHIP device's soft AP will be a manual step until
 > pairing is implemented.
 
-For information about how to build the application, see the [Building Android CHIPTool](../../../docs/guides/android_chiptool_building.md) guide.
+For information about how to build the application, see the
+[Building Android CHIPTool](../../../docs/guides/android_chiptool_building.md)
+guide.

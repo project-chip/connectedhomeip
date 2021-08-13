@@ -1,6 +1,7 @@
 # Building Android CHIPTool
 
-Android CHIPTool is an application for Android for commissioning and controlling CHIP accessory devices.
+Android CHIPTool is an application for Android for commissioning and controlling
+CHIP accessory devices.
 
 CHIPTool offers the following features:
 
@@ -23,7 +24,8 @@ CHIPTool offers the following features:
 
 ## Source files
 
-You can find source files of the Android CHIPTool application in the `src/android/CHIPTool` directory.
+You can find source files of the Android CHIPTool application in the
+`src/android/CHIPTool` directory.
 
 <hr>
 
