@@ -243,7 +243,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::parseTLVFields(SetupPayload & outPayload, u
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     TLV::TLVReader rootReader;
-    rootReader.Init(tlvDataStart, static_cast<uint32_t>(tlvDataLengthInBytes));
+    rootReader.Init(tlvDataStart, tlvDataLengthInBytes);
     ReturnErrorOnFailure(rootReader.Next());
 
     if (rootReader.GetType() != TLV::kTLVType_Structure)
