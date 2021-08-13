@@ -1769,6 +1769,7 @@ static void TestX509_PKCS7Extraction(nlTestSuite * inSuite, void * inContext)
     status = memcmp(certificate_blob_root, x509list[2], x509list[2].Length());
     NL_TEST_ASSERT(inSuite, status == 0);
 }
+#endif // CHIP_CRYPTO_OPENSSL
 
 static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
 {
@@ -1795,7 +1796,6 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(publicKey.ConstBytes(), certPubkey, certPubkeyLen) == 0);
     }
 }
-#endif // CHIP_CRYPTO_OPENSSL
 
 /**
  *   Test Suite. It lists all the test functions.

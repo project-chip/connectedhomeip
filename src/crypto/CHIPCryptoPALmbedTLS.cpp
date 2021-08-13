@@ -38,6 +38,7 @@
 #include <mbedtls/sha1.h>
 #include <mbedtls/sha256.h>
 #include <mbedtls/x509_csr.h>
+#include <mbedtls/x509_crt.h>
 
 #include <core/CHIPSafeCasts.h>
 #include <support/BufferWriter.h>
@@ -1205,7 +1206,29 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
 
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    mbedtls_x509_crt mbed_cert;
+    mbedtls_ecp_keypair * keypair = nullptr;
+    size_t pubkey_size = 0;
+
+    mbedtls_x509_crt_init(&mbed_cert);
+
+    int result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(certificate.data()), certificate.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    keypair = mbedtls_pk_ec(mbed_cert.pk);
+
+    // Copy the public key from the cert in raw point format
+    result = mbedtls_ecp_point_write_binary(&keypair->grp, &keypair->Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size,
+                                            Uint8::to_uchar(pubkey.Bytes()), pubkey.Length());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
+
+exit:
+    _log_mbedTLS_error(result);
+    mbedtls_x509_crt_free(&mbed_cert);
+
+    return error;
 }
 
 } // namespace Crypto
