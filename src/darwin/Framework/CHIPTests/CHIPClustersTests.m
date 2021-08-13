@@ -4358,7 +4358,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterTest_TC_CC_000000_On
+- (void)testSendClusterTest_TC_CC_8_000000_On
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn on light for color control tests"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4375,7 +4375,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_000001_ReadAttribute
+- (void)testSendClusterTest_TC_CC_8_000001_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is true after on command"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4393,7 +4393,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_000002_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_8_000002_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Color Loop Set Command - Set all Attributs"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4424,7 +4424,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_000003_ReadAttribute
+- (void)testSendClusterTest_TC_CC_8_000003_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check ColorLoopDirection Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4442,7 +4442,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_000004_ReadAttribute
+- (void)testSendClusterTest_TC_CC_8_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check ColorLoopTime Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4460,7 +4460,25 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_000005_ReadAttribute
+- (void)testSendClusterTest_TC_CC_8_000005_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check ColorLoopStartEnhancedHue Value"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeColorLoopStartEnhancedHueWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Check ColorLoopStartEnhancedHue Value Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] unsignedShortValue], 500);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_8_000006_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check ColorLoopActive Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4478,7 +4496,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_000006_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_8_000007_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Color Loop Set Command - Start Color Loop"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4509,7 +4527,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_000007_ReadAttribute
+- (void)testSendClusterTest_TC_CC_8_000008_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check ColorLoopActive Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4527,7 +4545,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_000008_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_8_000009_ColorLoopSet
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Color Loop Set Command - Set direction and time while running"];
@@ -4559,7 +4577,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_000009_ReadAttribute
+- (void)testSendClusterTest_TC_CC_8_000010_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check ColorLoopDirection Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4577,7 +4595,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_000010_ReadAttribute
+- (void)testSendClusterTest_TC_CC_8_000011_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check ColorLoopTime Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4595,7 +4613,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_000011_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_8_000012_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Color Loop Set Command - Set direction while running"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4626,7 +4644,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_000012_ReadAttribute
+- (void)testSendClusterTest_TC_CC_8_000013_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check ColorLoopDirection Value"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
@@ -4639,6 +4657,41 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
         XCTAssertEqual(err.code, 0);
         XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_8_000014_Off
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster off:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Turn off light that we turned on Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_8_000015_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPOnOff * cluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeOnOffWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Check on/off attribute value is false after off command Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"value"] boolValue], 0);
         [expectation fulfill];
     }];
 
