@@ -26,6 +26,7 @@ const path              = require('path');
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'src-electron/generator/template-util.js')
 
+const { TestUtil }                      = require('./ClusterTestUtil.js');
 const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
 
 const kClusterName       = 'cluster';
@@ -202,8 +203,6 @@ function parse(filename)
   return yaml;
 }
 
-// Templates Internal Utils
-
 function printErrorAndExit(context, msg)
 {
   console.log(context.testName, ': ', context.label);
@@ -211,10 +210,29 @@ function printErrorAndExit(context, msg)
   process.exit(1);
 }
 
+function getClusters()
+{
+  return Clusters.getClusters().then(clusters => {
+    const content = JSON.parse(JSON.stringify(clusters));
+    content.push(TestUtil);
+    return content;
+  });
+}
+
+function getCommands(clusterName)
+{
+  return (clusterName == TestUtil.name) ? Promise.resolve(TestUtil.commands) : Clusters.getClientCommands(clusterName);
+}
+
+function getAttributes(clusterName)
+{
+  return (clusterName == TestUtil.name) ? Promise.resolve(TestUtil.attributes) : Clusters.getServerAttributes(clusterName);
+}
+
 function assertCommandOrAttribute(context)
 {
   const clusterName = context.cluster;
-  return Clusters.getClusters().then(clusters => {
+  return getClusters().then(clusters => {
     if (!clusters.find(cluster => cluster.name == clusterName)) {
       const names = clusters.map(item => item.name);
       printErrorAndExit(context, 'Missing cluster "' + clusterName + '" in: \n\t* ' + names.join('\n\t* '));
@@ -225,10 +243,10 @@ function assertCommandOrAttribute(context)
 
     if (context.isCommand) {
       filterName = context.command;
-      items      = Clusters.getClientCommands(clusterName);
+      items      = getCommands(clusterName);
     } else if (context.isAttribute) {
       filterName = context.attribute;
-      items      = Clusters.getServerAttributes(clusterName);
+      items      = getAttributes(clusterName);
     } else {
       printErrorAndExit(context, 'Unsupported command type: ', context);
     }
@@ -270,6 +288,11 @@ function chip_tests(items, options)
 function chip_tests_items(options)
 {
   return templateUtil.collectBlocks(this.tests, options, this);
+}
+
+function isTestUtil(name)
+{
+  return name == TestUtil.name;
 }
 
 function chip_tests_item_parameters(options)
@@ -345,3 +368,4 @@ exports.chip_tests                          = chip_tests;
 exports.chip_tests_items                    = chip_tests_items;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
+exports.isTestUtil                          = isTestUtil;

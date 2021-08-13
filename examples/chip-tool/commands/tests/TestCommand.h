@@ -35,6 +35,9 @@ public:
 
     virtual void NextTest() = 0;
 
+    // TestUtil API
+    CHIP_ERROR WaitForMs(unsigned int ms);
+
 protected:
     ChipDevice * mDevice;
 
