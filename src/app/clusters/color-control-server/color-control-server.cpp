@@ -1556,8 +1556,6 @@ bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, 
                                                     uint16_t startHue, uint8_t optionsMask, uint8_t optionsOverride)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
-    uint8_t isColorLoopActive;
-    uint8_t deactiveColorLoop;
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1565,10 +1563,10 @@ bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, 
         return true;
     }
 
-    isColorLoopActive = 0;
+    uint8_t isColorLoopActive = 0;
     Attributes::GetColorLoopActive(endpoint, &isColorLoopActive);
 
-    deactiveColorLoop =
+    uint8_t deactiveColorLoop =
         (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_ACTION) && (action == EMBER_ZCL_COLOR_LOOP_ACTION_DEACTIVATE);
 
     if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_DIRECTION)
@@ -1600,7 +1598,18 @@ bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, 
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
         {
-            colorHueTransitionState.stepsTotal = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
+            colorHueTransitionState.stepsTotal         = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
+            colorHueTransitionState.initialEnhancedHue = colorHueTransitionState.currentEnhancedHue;
+
+            if (colorHueTransitionState.up)
+            {
+                colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState.initialEnhancedHue - 1);
+            }
+            else
+            {
+                colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState.initialEnhancedHue + 1);
+            }
+            colorHueTransitionState.stepsRemaining = colorHueTransitionState.stepsTotal;
         }
     }
 
