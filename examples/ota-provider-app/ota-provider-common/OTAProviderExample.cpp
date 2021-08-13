@@ -23,6 +23,7 @@
 #include <app/common/gen/command-id.h>
 #include <app/util/af.h>
 #include <protocols/secure_channel/PASESession.h> // For chip::kTestDeviceNodeId
+#include <support/CHIPMemString.h>
 #include <support/RandUtils.h>
 
 #include <string.h>
@@ -55,11 +56,10 @@ void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
 
 bool GenerateBdxUri(const Span<char> & fileDesignator, Span<char> outUri, size_t availableSize)
 {
-    const size_t kBdxPrefixLen          = 7;
-    const char bdxPrefix[kBdxPrefixLen] = "bdx://";
-    NodeId nodeId                       = kTestDeviceNodeId; // TODO: read this dynamically
-    size_t nodeIdHexStrLen              = sizeof(nodeId) * 2;
-    size_t expectedLength               = strlen(bdxPrefix) + nodeIdHexStrLen + fileDesignator.size();
+    const char bdxPrefix[] = "bdx://";
+    NodeId nodeId          = kTestDeviceNodeId; // TODO: read this dynamically
+    size_t nodeIdHexStrLen = sizeof(nodeId) * 2;
+    size_t expectedLength  = strlen(bdxPrefix) + nodeIdHexStrLen + fileDesignator.size();
 
     if (expectedLength >= availableSize)
     {
@@ -77,15 +77,15 @@ OTAProviderExample::OTAProviderExample()
     memset(mOTAFilePath, 0, kFilepathBufLen);
 }
 
-void OTAProviderExample::SetOTAFilePath(const char * path, size_t length)
+void OTAProviderExample::SetOTAFilePath(const char * path)
 {
-    if (length < kFilepathBufLen)
+    if (path != nullptr)
     {
-        strcpy(mOTAFilePath, path);
+        Platform::CopyString(mOTAFilePath, path);
     }
     else
     {
-        ChipLogError(SoftwareUpdate, "%s exceeds max length %zu", path, kFilepathBufLen);
+        memset(mOTAFilePath, 0, kFilepathBufLen);
     }
 }
 

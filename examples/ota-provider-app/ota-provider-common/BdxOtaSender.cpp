@@ -21,18 +21,22 @@
 #include <messaging/ExchangeContext.h>
 #include <protocols/bdx/BdxTransferSession.h>
 #include <support/BitFlags.h>
+#include <support/CHIPMemString.h>
 
 #include <fstream>
 
-#include <string.h>
-
 using namespace chip::bdx;
 
-void BdxOtaSender::SetFilepath(const char * path, size_t length)
+BdxOtaSender::BdxOtaSender()
+{
+    memset(mFilepath, 0, kFilepathMaxLength);
+}
+
+void BdxOtaSender::SetFilepath(const char * path)
 {
     if (path != nullptr)
     {
-        strcpy(mFilepath, path);
+        chip::Platform::CopyString(mFilepath, path);
     }
     else
     {
@@ -74,8 +78,6 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
                        ChipLogError(BDX, "%s: %s", __FUNCTION__, chip::ErrorStr(err)));
         break;
     }
-    break;
-        break;
     case TransferSession::OutputEventType::kQueryReceived: {
         TransferSession::BlockData blockData;
         uint16_t blockSize   = mTransfer.GetTransferBlockSize();
@@ -89,11 +91,17 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         }
 
         chip::System::PacketBufferHandle blockBuf = chip::System::PacketBufferHandle::New(bytesToRead);
+        if (blockBuf.IsNull())
+        {
+            // TODO: AbortTransfer() needs to support GeneralStatusCode failures as well as BDX specific errors.
+            mTransfer.AbortTransfer(StatusCode::kUnknown);
+        }
 
         std::ifstream otaFile(mFilepath, std::ifstream::in);
+        VerifyOrReturn(otaFile.good(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
         otaFile.seekg(mNumBytesSent);
         otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), bytesToRead);
-        VerifyOrReturn(otaFile, ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
+        VerifyOrReturn(otaFile.good(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
 
         blockData.Data   = blockBuf->Start();
         blockData.Length = otaFile.gcount();

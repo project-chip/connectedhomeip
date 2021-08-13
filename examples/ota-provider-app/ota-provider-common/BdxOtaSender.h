@@ -23,7 +23,9 @@
 class BdxOtaSender : public chip::bdx::Responder
 {
 public:
-    void SetFilepath(const char * path, size_t length);
+    BdxOtaSender();
+
+    void SetFilepath(const char * path);
 
 private:
     // Inherited from bdx::TransferFacilitator

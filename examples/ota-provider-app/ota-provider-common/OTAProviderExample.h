@@ -31,7 +31,7 @@ class OTAProviderExample : public OTAProviderDelegate
 public:
     OTAProviderExample();
 
-    void SetOTAFilePath(const char * path, size_t length);
+    void SetOTAFilePath(const char * path);
 
     // Inherited from OTAProviderDelegate
     EmberAfStatus HandleQueryImage(chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId,

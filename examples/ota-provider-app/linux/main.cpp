@@ -34,6 +34,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <unistd.h>
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -52,16 +53,13 @@ constexpr uint32_t kBdxPollFreqMs   = 500;
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
     bool retval = true;
-    std::ifstream ifs;
 
     switch (aIdentifier)
     {
-
     case kOptionFilepath:
-        ifs.open(aValue, std::ifstream::in);
-        if (!ifs.good())
+        if (0 == access(aValue, R_OK))
         {
-            PrintArgError("%s: failed to open %s\n", aProgram, aValue);
+            PrintArgError("%s: not permitted to read %s\n", aProgram, aValue);
             retval = false;
         }
         else
@@ -69,7 +67,6 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
             gOtaFilepath = aValue;
         }
         break;
-
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -122,13 +119,14 @@ int main(int argc, char * argv[])
 
     exchangeMgr = chip::ExchangeManager();
     err         = exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, &bdxServer);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, 1);
 
     ChipLogDetail(SoftwareUpdate, "using OTA file: %s", gOtaFilepath ? gOtaFilepath : "(none)");
 
     if (gOtaFilepath != nullptr)
     {
-        otaProvider.SetOTAFilePath(gOtaFilepath, strlen(gOtaFilepath));
-        bdxServer.SetFilepath(gOtaFilepath, strlen(gOtaFilepath));
+        otaProvider.SetOTAFilePath(gOtaFilepath);
+        bdxServer.SetFilepath(gOtaFilepath);
     }
 
     // TODO: is there any way to not hardcode the endpoint id?
