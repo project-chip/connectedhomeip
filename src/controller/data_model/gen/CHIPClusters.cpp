@@ -3463,6 +3463,30 @@ CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopTime(Callback::Cancelable 
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
+CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopStartEnhancedHue(Callback::Cancelable * onSuccessCallback,
+                                                                       Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00004005;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopStoredEnhancedHue(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00004006;
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
 CHIP_ERROR ColorControlCluster::ReadAttributeColorCapabilities(Callback::Cancelable * onSuccessCallback,
                                                                Callback::Cancelable * onFailureCallback)
 {

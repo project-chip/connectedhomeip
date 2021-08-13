@@ -4607,6 +4607,8 @@ private:
 | * ColorLoopActive                                                   | 0x4002 |
 | * ColorLoopDirection                                                | 0x4003 |
 | * ColorLoopTime                                                     | 0x4004 |
+| * ColorLoopStartEnhancedHue                                         | 0x4005 |
+| * ColorLoopStoredEnhancedHue                                        | 0x4006 |
 | * ColorCapabilities                                                 | 0x400A |
 | * ColorTempPhysicalMin                                              | 0x400B |
 | * ColorTempPhysicalMax                                              | 0x400C |
@@ -7611,6 +7613,74 @@ public:
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadAttributeColorLoopTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ColorLoopStartEnhancedHue
+ */
+class ReadColorControlColorLoopStartEnhancedHue : public ModelCommand
+{
+public:
+    ReadColorControlColorLoopStartEnhancedHue() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "color-loop-start-enhanced-hue");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadColorControlColorLoopStartEnhancedHue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ColorControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeColorLoopStartEnhancedHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ColorLoopStoredEnhancedHue
+ */
+class ReadColorControlColorLoopStoredEnhancedHue : public ModelCommand
+{
+public:
+    ReadColorControlColorLoopStoredEnhancedHue() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "color-loop-stored-enhanced-hue");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadColorControlColorLoopStoredEnhancedHue()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ColorControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeColorLoopStoredEnhancedHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -24230,6 +24300,8 @@ void registerClusterColorControl(Commands & commands)
         make_unique<ReadColorControlColorLoopActive>(),                 //
         make_unique<ReadColorControlColorLoopDirection>(),              //
         make_unique<ReadColorControlColorLoopTime>(),                   //
+        make_unique<ReadColorControlColorLoopStartEnhancedHue>(),       //
+        make_unique<ReadColorControlColorLoopStoredEnhancedHue>(),      //
         make_unique<ReadColorControlColorCapabilities>(),               //
         make_unique<ReadColorControlColorTempPhysicalMin>(),            //
         make_unique<ReadColorControlColorTempPhysicalMax>(),            //
