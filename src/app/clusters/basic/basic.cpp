@@ -42,7 +42,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     uint32_t firmwareRevision;
     char cString[65];
     uint8_t bufferMemory[65];
-    MutableByteSpan zclString(bufferMemory, 65);
+    MutableByteSpan zclString(bufferMemory);
 
     if (ConfigurationMgr().GetVendorName(cString, sizeof(cString)) == CHIP_NO_ERROR)
     {
