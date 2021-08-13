@@ -61,8 +61,8 @@ class Board(IntEnum):
     NRF52840 = auto()
     NRF5340 = auto()
 
-  # Telink platform
-  TLSR9518ADK80D = auto()
+    # Telink platform
+    TLSR9518ADK80D = auto()
 
     # Android platform
     ARM = auto()

@@ -87,12 +87,12 @@ west build -d {outdir} -b {board} {sourcedir}
         self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
 
-  def build(self):
+  def _build(self):
     logging.info('Compiling Telink at %s', self.output_dir)
 
     self._Execute(['ninja', '-C', self.output_dir], title='Building ' + self.identifier)
 
-  def outputs(self):
+  def build_outputs(self):
     return {
         '%s.elf' % self.app.AppNamePrefix(): os.path.join(self.output_dir, 'zephyr', 'zephyr.elf'),
         '%s.map' % self.app.AppNamePrefix(): os.path.join(self.output_dir, 'zephyr', 'zephyr.map'),
