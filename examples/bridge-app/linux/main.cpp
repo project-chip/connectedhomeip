@@ -218,11 +218,12 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 
     if (itemChangedMask & Device::kChanged_Name)
     {
-        MutableByteSpan zclName = MutableByteSpan();
-        MakeZclCharString(zclName, dev->GetName());
+        uint8_t zclName[kUserLabelSize];
+        MutableByteSpan zclNameSpan(zclName);
+        MakeZclCharString(zclNameSpan, dev->GetName());
         emberAfReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
                                                 ZCL_USER_LABEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, 0, ZCL_CHAR_STRING_ATTRIBUTE_TYPE,
-                                                zclName.data());
+                                                zclNameSpan.data());
     }
 
     if (itemChangedMask & Device::kChanged_Location)
@@ -251,7 +252,7 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     else if ((attributeId == ZCL_USER_LABEL_ATTRIBUTE_ID) && (maxReadLength == 32))
     {
         uint8_t bufferMemory[254];
-        MutableByteSpan zclString(bufferMemory, 254);
+        MutableByteSpan zclString(bufferMemory);
         MakeZclCharString(zclString, dev->GetName());
         buffer = zclString.data();
     }
