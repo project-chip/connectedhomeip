@@ -45,7 +45,7 @@ exit:
 void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * application)
 {
     uint8_t bufferMemory[64];
-    MutableByteSpan zclString(bufferMemory, 64);
+    MutableByteSpan zclString(bufferMemory);
 
     MakeZclCharString(zclString, application->vendorName);
     EmberAfStatus vendorNameStatus =

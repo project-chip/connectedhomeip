@@ -17,23 +17,13 @@
 #include <support/Span.h>
 
 #pragma once
-namespace {
+
+namespace chip {
+
 /**
- * @brief Create ZCL string from char
+ * @brief Create ZCL string from char. Char can be maximum 254 characters long. In case char is longer than 254 characters, 
+ *        this method store the data up to 254 characters. The rest will be deleted and error will be returned.
  */
-static CHIP_ERROR MakeZclCharString(chip::MutableByteSpan & buffer, const char * cString)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
+extern CHIP_ERROR MakeZclCharString(MutableByteSpan & buffer, const char * cString);
 
-    size_t len = strlen(cString);
-    if (strlen(cString) > 254)
-    {
-        err = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG;
-        len = 254;
-    }
-
-    buffer.data()[0] = static_cast<uint8_t>(len);
-    memcpy(&buffer.data()[1], cString, len);
-    return err;
-}
-} // namespace
+} // namespace chip

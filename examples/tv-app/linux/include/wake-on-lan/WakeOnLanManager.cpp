@@ -49,7 +49,7 @@ exit:
 void WakeOnLanManager::store(chip::EndpointId endpoint, char macAddress[32])
 {
     uint8_t bufferMemory[32];
-    MutableByteSpan zclString(bufferMemory, 32);
+    MutableByteSpan zclString(bufferMemory);
     MakeZclCharString(zclString, macAddress);
     EmberAfStatus macAddressStatus =
         emberAfWriteServerAttribute(endpoint, ZCL_WAKE_ON_LAN_CLUSTER_ID, ZCL_WAKE_ON_LAN_MAC_ADDRESS_ATTRIBUTE_ID,
