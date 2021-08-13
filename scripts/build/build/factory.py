@@ -130,8 +130,10 @@ _MATCHERS[Platform.NRF].AcceptApplication(Application.LOCK, app=NrfApp.LOCK)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.LIGHT, app=NrfApp.LIGHT)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.SHELL, app=NrfApp.SHELL)
 
-_MATCHERS[Platform.TELINK].AcceptBoard(Board.TLSR9518ADK80D, board=TelinkBoard.TLSR9518ADK80D)
-_MATCHERS[Platform.TELINK].AcceptApplication(Application.LIGHT, app=TelinkApp.LIGHT)
+_MATCHERS[Platform.TELINK].AcceptBoard(
+    Board.TLSR9518ADK80D, board=TelinkBoard.TLSR9518ADK80D)
+_MATCHERS[Platform.TELINK].AcceptApplication(
+    Application.LIGHT, app=TelinkApp.LIGHT)
 
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM, board=AndroidBoard.ARM)
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM64, board=AndroidBoard.ARM64)
