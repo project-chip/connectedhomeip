@@ -37,6 +37,6 @@ namespace Examples {
  */
 DeviceAttestationCredentialsAccessor * GetExampleDACAccessor();
 
-}  // namespace Examples
-}  // namespace Credentials
-}  // namespace chip
+} // namespace Examples
+} // namespace Credentials
+} // namespace chip

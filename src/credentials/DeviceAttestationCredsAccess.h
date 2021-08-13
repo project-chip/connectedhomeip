@@ -30,12 +30,12 @@ namespace Credentials {
 class DeviceAttestationCredentialsAccessor
 {
 public:
-    DeviceAttestationCredentialsAccessor() = default;
+    DeviceAttestationCredentialsAccessor()          = default;
     virtual ~DeviceAttestationCredentialsAccessor() = default;
 
     // Not copyable
-    DeviceAttestationCredentialsAccessor(const DeviceAttestationCredentialsAccessor&) = delete;
-    DeviceAttestationCredentialsAccessor& operator=(const DeviceAttestationCredentialsAccessor&) = delete;
+    DeviceAttestationCredentialsAccessor(const DeviceAttestationCredentialsAccessor &) = delete;
+    DeviceAttestationCredentialsAccessor & operator=(const DeviceAttestationCredentialsAccessor &) = delete;
 
     /**
      * @brief Get the Certification Declaration body. Updates `out_cd_buffer`'s size on success
@@ -115,7 +115,7 @@ DeviceAttestationCredentialsAccessor * GetDeviceAttestationCredentialsAccessor()
  *
  * @param[in] accessor the DeviceAttestationCredentialsAccessor to start returning with the getter
  */
-void SetDeviceAttestationCredentialsAccessor(DeviceAttestationCredentialsAccessor *accessor);
+void SetDeviceAttestationCredentialsAccessor(DeviceAttestationCredentialsAccessor * accessor);
 
-}  // namespace Credentials
-}  // namespace chip
+} // namespace Credentials
+} // namespace chip

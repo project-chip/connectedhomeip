@@ -33,32 +33,32 @@ class UnimplementedDACAccessor : public DeviceAttestationCredentialsAccessor
 public:
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & out_cd_buffer) override
     {
-        (void)out_cd_buffer;
+        (void) out_cd_buffer;
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     CHIP_ERROR GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer) override
     {
-        (void)out_firmware_info_buffer;
+        (void) out_firmware_info_buffer;
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer) override
     {
-        (void)out_dac_buffer;
+        (void) out_dac_buffer;
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) override
     {
-        (void)out_pai_buffer;
+        (void) out_pai_buffer;
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer) override
     {
-        (void)digest_to_sign;
-        (void)out_signature_buffer;
+        (void) digest_to_sign;
+        (void) out_signature_buffer;
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 };
@@ -67,24 +67,24 @@ public:
 // their provide their own.
 UnimplementedDACAccessor gDefaultDACAccessor;
 
-DeviceAttestationCredentialsAccessor *gDacAccessor = &gDefaultDACAccessor;
+DeviceAttestationCredentialsAccessor * gDacAccessor = &gDefaultDACAccessor;
 
-}  // namespace
+} // namespace
 
 DeviceAttestationCredentialsAccessor * GetDeviceAttestationCredentialsAccessor()
 {
-  return gDacAccessor;
+    return gDacAccessor;
 }
 
-void SetDeviceAttestationCredentialsAccessor(DeviceAttestationCredentialsAccessor *accessor)
+void SetDeviceAttestationCredentialsAccessor(DeviceAttestationCredentialsAccessor * accessor)
 {
-  if (accessor == nullptr)
-  {
-    return;
-  }
+    if (accessor == nullptr)
+    {
+        return;
+    }
 
-  gDacAccessor = accessor;
+    gDacAccessor = accessor;
 }
 
-}  // namespace Credentials
-}  // namespace chip
+} // namespace Credentials
+} // namespace chip

@@ -23,7 +23,6 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 
-
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
@@ -34,7 +33,7 @@ namespace Examples {
 namespace {
 
 // Helper to do common logic to all accessors
-CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan &out_buf)
+CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan & out_buf)
 {
     VerifyOrReturnError(IsSpanUsable(span_to_copy), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buf.size() >= span_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -111,7 +110,7 @@ CHIP_ERROR ExampleDACAccessor::GetDeviceAttestationCert(MutableByteSpan & out_da
         0x39, 0x2F, 0x07, 0xF1, 0x6D, 0x84, 0xFD, 0xCB, 0x52, 0xDB, 0xAF, 0x28, 0xD7, 0xD9
     };
 
-    return CopySpanToMutableSpan(ByteSpan{kDacCertificate}, out_dac_buffer);
+    return CopySpanToMutableSpan(ByteSpan{ kDacCertificate }, out_dac_buffer);
 }
 
 CHIP_ERROR ExampleDACAccessor::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
@@ -157,16 +156,15 @@ CHIP_ERROR ExampleDACAccessor::GetProductAttestationIntermediateCert(MutableByte
         0xC0, 0x6A, 0x35, 0x7E, 0xCA, 0xE9, 0x10, 0x6F, 0x79, 0x34, 0x75
     };
 
-    return CopySpanToMutableSpan(ByteSpan{kPaiCertificate}, out_pai_buffer);
+    return CopySpanToMutableSpan(ByteSpan{ kPaiCertificate }, out_pai_buffer);
 }
-
 
 CHIP_ERROR ExampleDACAccessor::GetCertificationDeclaration(MutableByteSpan & out_cd_buffer)
 {
     // TODO: We need a real example CD to be populated.
     constexpr uint8_t kCertificationDeclaration[128] = { 1 };
 
-    return CopySpanToMutableSpan(ByteSpan{kCertificationDeclaration}, out_cd_buffer);
+    return CopySpanToMutableSpan(ByteSpan{ kCertificationDeclaration }, out_cd_buffer);
 }
 
 CHIP_ERROR ExampleDACAccessor::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
@@ -190,16 +188,16 @@ CHIP_ERROR ExampleDACAccessor::SignWithDeviceAttestationKey(const ByteSpan & dig
     */
 
     constexpr uint8_t dac_private_key[] = { 0x05, 0xc6, 0xc3, 0xa8, 0x4d, 0xc6, 0x05, 0xcc, 0x3c, 0xc8, 0x05,
-                                        0x80, 0x09, 0xb0, 0x1b, 0x32, 0x9c, 0xf6, 0x0c, 0xf1, 0x59, 0x70,
-                                        0xc6, 0xa9, 0x0e, 0xad, 0xaa, 0xe2, 0xde, 0x49, 0x64, 0x9e };
+                                            0x80, 0x09, 0xb0, 0x1b, 0x32, 0x9c, 0xf6, 0x0c, 0xf1, 0x59, 0x70,
+                                            0xc6, 0xa9, 0x0e, 0xad, 0xaa, 0xe2, 0xde, 0x49, 0x64, 0x9e };
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
     // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
     constexpr uint8_t dac_public_key[] = { 0x04, 0x7a, 0x84, 0x58, 0xaf, 0xbb, 0x9b, 0xcd, 0x15, 0xe1, 0x9a, 0xdc, 0xd2,
-                                       0x66, 0xf6, 0x6c, 0x9c, 0x2f, 0x60, 0x7c, 0x74, 0x74, 0x7a, 0x35, 0xf8, 0x0f,
-                                       0x37, 0xe1, 0x18, 0x13, 0x3f, 0x80, 0xf1, 0x76, 0x01, 0x13, 0x27, 0x8f, 0x91,
-                                       0xf1, 0x5a, 0xa0, 0xf7, 0xf8, 0x79, 0x32, 0x09, 0x4f, 0xe6, 0x9f, 0xb7, 0x28,
-                                       0x68, 0xa8, 0x1e, 0x26, 0x97, 0x9b, 0x36, 0x8b, 0x33, 0xb5, 0x54, 0x31, 0x03 };
+                                           0x66, 0xf6, 0x6c, 0x9c, 0x2f, 0x60, 0x7c, 0x74, 0x74, 0x7a, 0x35, 0xf8, 0x0f,
+                                           0x37, 0xe1, 0x18, 0x13, 0x3f, 0x80, 0xf1, 0x76, 0x01, 0x13, 0x27, 0x8f, 0x91,
+                                           0xf1, 0x5a, 0xa0, 0xf7, 0xf8, 0x79, 0x32, 0x09, 0x4f, 0xe6, 0x9f, 0xb7, 0x28,
+                                           0x68, 0xa8, 0x1e, 0x26, 0x97, 0x9b, 0x36, 0x8b, 0x33, 0xb5, 0x54, 0x31, 0x03 };
 
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
@@ -208,13 +206,13 @@ CHIP_ERROR ExampleDACAccessor::SignWithDeviceAttestationKey(const ByteSpan & dig
     VerifyOrReturnError(IsSpanUsable(digest_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan{dac_private_key}, ByteSpan{dac_public_key}, keypair));
+    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan{ dac_private_key }, ByteSpan{ dac_public_key }, keypair));
     ReturnErrorOnFailure(keypair.ECDSA_sign_hash(digest_to_sign.data(), digest_to_sign.size(), signature));
 
-    return CopySpanToMutableSpan(ByteSpan{signature.ConstBytes(), signature.Length()}, out_signature_buffer);
+    return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, out_signature_buffer);
 }
 
-}  // namespace
+} // namespace
 
 DeviceAttestationCredentialsAccessor * GetExampleDACAccessor()
 {
@@ -223,6 +221,6 @@ DeviceAttestationCredentialsAccessor * GetExampleDACAccessor()
     return &example_dac_accessor;
 }
 
-}  // namespace Examples
-}  // namespace Credentials
-}  // namespace chip
+} // namespace Examples
+} // namespace Credentials
+} // namespace chip
