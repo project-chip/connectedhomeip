@@ -156,16 +156,16 @@ static CHIP_ERROR InitCredentialSets()
     ReturnErrorOnFailure(accessoryCertificateSet.Init(kStandardCertsCount));
 
     // Add the trusted root certificate to the certificate set.
-    ReturnErrorOnFailure(commissionerCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,
+    ReturnErrorOnFailure(commissionerCertificateSet.LoadCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len),
                                                              BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
 
-    ReturnErrorOnFailure(accessoryCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,
+    ReturnErrorOnFailure(accessoryCertificateSet.LoadCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len),
                                                           BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
 
-    ReturnErrorOnFailure(commissionerCertificateSet.LoadCert(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len,
+    ReturnErrorOnFailure(commissionerCertificateSet.LoadCert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len),
                                                              BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
 
-    ReturnErrorOnFailure(accessoryCertificateSet.LoadCert(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len,
+    ReturnErrorOnFailure(accessoryCertificateSet.LoadCert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len),
                                                           BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
 
     ReturnErrorOnFailure(commissionerDevOpCred.Init(&commissionerCertificateSet, 1));

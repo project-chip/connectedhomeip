@@ -700,8 +700,7 @@ exit:
     return err;
 }
 
-DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, uint8_t * chipCertBuf, uint32_t chipCertBufSize,
-                                                uint32_t & chipCertLen)
+CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & chipCert)
 {
     ASN1Reader reader;
     TLVWriter writer;
@@ -714,13 +713,13 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, uint8_t
 
     reader.Init(x509Cert.data(), static_cast<uint32_t>(x509Cert.size()));
 
-    writer.Init(chipCertBuf, chipCertBufSize);
+    writer.Init(chipCert);
 
     ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, issuer, subject, fabric));
 
     ReturnErrorOnFailure(writer.Finalize());
 
-    chipCertLen = writer.GetLengthWritten();
+    chipCert.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
 }
