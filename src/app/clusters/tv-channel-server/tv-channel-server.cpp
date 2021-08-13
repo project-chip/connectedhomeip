@@ -70,10 +70,9 @@ exit:
     }
 }
 
-bool emberAfTvChannelClusterChangeChannelCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t * match)
+bool emberAfTvChannelClusterChangeChannelCallback(EndpointId endpoint, app::CommandHandler * command, chip::ByteSpan match)
 {
-    // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string matchString(reinterpret_cast<char *>(match));
+    std::string matchString(reinterpret_cast<const char *>(match.data()), match.size());
     // TODO: Enable this once struct as param is supported
     // EmberAfTvChannelInfo channelInfo = tvChannelClusterChangeChannel(matchString);
     // sendResponse(command, channelInfo);

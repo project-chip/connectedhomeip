@@ -534,8 +534,8 @@ JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jlong de
 
 namespace {
 
-void OnAddNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText);
-void OnEnableNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText);
+void OnAddNetworkResponse(void * context, uint8_t errorCode, chip::ByteSpan debugText);
+void OnEnableNetworkResponse(void * context, uint8_t errorCode, chip::ByteSpan debugText);
 void OnNetworkCommissioningFailed(void * context, uint8_t errorCode);
 
 // Context used for processing "AddThreadNetwork" and "EnableNetwork" commands.
@@ -568,7 +568,7 @@ void FinishCommissioning(NetworkCommissioningCtx * ctx, CHIP_ERROR err)
     delete ctx;
 }
 
-void OnAddNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
+void OnAddNetworkResponse(void * context, uint8_t errorCode, chip::ByteSpan debugText)
 {
     NetworkCommissioningCtx * ctx            = static_cast<NetworkCommissioningCtx *>(context);
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(ctx->mHandle);
@@ -589,7 +589,7 @@ exit:
     }
 }
 
-void OnEnableNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText)
+void OnEnableNetworkResponse(void * context, uint8_t errorCode, chip::ByteSpan debugText)
 {
     NetworkCommissioningCtx * ctx = static_cast<NetworkCommissioningCtx *>(context);
     FinishCommissioning(ctx, CHIP_NO_ERROR);

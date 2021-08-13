@@ -74,10 +74,10 @@ bool emberAfMediaInputClusterHideInputStatusCallback(EndpointId endpoint, app::C
     return true;
 }
 
-bool emberAfMediaInputClusterRenameInputCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t input, uint8_t * name)
+bool emberAfMediaInputClusterRenameInputCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t input,
+                                                 chip::ByteSpan name)
 {
-    // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string nameString(reinterpret_cast<char *>(name));
+    std::string nameString(reinterpret_cast<const char *>(name.data()), name.size());
     bool success         = mediaInputClusterRenameInput(input, nameString);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);

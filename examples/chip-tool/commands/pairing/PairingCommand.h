@@ -121,8 +121,8 @@ public:
 
     /////////// Network Commissioning Callbacks /////////
     static void OnDefaultFailureResponse(void * context, uint8_t status);
-    static void OnAddNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText);
-    static void OnEnableNetworkResponse(void * context, uint8_t errorCode, uint8_t * debugText);
+    static void OnAddNetworkResponse(void * context, uint8_t errorCode, chip::ByteSpan debugText);
+    static void OnEnableNetworkResponse(void * context, uint8_t errorCode, chip::ByteSpan debugText);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);

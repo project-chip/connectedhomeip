@@ -147,8 +147,7 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
         {{#if (isOctetString type)}}
         ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entries[i].{{name}}.size());
         {{else if (isCharString type)}}
-        // Currently the generated code emits `uint8_t *` for CHAR_STRING, it needs to emits chip::ByteSpan
-        // ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", entries[i].{{name}}.size(), entries[i].{{name}}.data());
+        ChipLogProgress(Zcl, " {{asSymbol label}}: %.*s", static_cast<uint16_t>(entries[i].{{name}}.size()), entries[i].{{name}}.data());
         {{else}}
         ChipLogProgress(chipTool, "  {{name}}: {{asPrintFormat type}}", entries[i].{{name}});
         {{/if}}
@@ -157,7 +156,7 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
         {{#if (isOctetString type)}}
         ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", entries[i].size());
         {{else if (isCharString type)}}
-        ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", entries[i].size(), entries[i].data());
+        ChipLogProgress(Zcl, " {{asSymbol label}}: %.*s", static_cast<uint16_t>(entries[i].size()), entries[i].data());
         {{else}}
         ChipLogProgress(chipTool, "{{type}}[%" PRIu16 "]: {{asPrintFormat type}}", i, entries[i]);
         {{/if}}

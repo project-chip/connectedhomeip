@@ -21,6 +21,7 @@
 
 #include <core/CHIPEncoding.h>
 #include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
 #include <support/SafeInt.h>
 #include <transport/FabricTable.h>
 #if CHIP_CRYPTO_HSM
@@ -33,13 +34,9 @@ using namespace Crypto;
 
 namespace Transport {
 
-CHIP_ERROR FabricInfo::SetFabricLabel(const uint8_t * fabricLabel)
+CHIP_ERROR FabricInfo::SetFabricLabel(chip::ByteSpan label)
 {
-    const char * charFabricLabel = Uint8::to_const_char(fabricLabel);
-    size_t stringLength          = strnlen(charFabricLabel, kFabricLabelMaxLengthInBytes);
-    memcpy(mFabricLabel, charFabricLabel, stringLength);
-    mFabricLabel[stringLength] = '\0'; // Set null terminator
-
+    Platform::CopyString(mFabricLabel, sizeof(mFabricLabel), label);
     return CHIP_NO_ERROR;
 }
 
@@ -484,7 +481,8 @@ CHIP_ERROR FabricTable::SetFabricInfoIfIndexAvailable(FabricIndex index, FabricI
         fabric->SetNOCCert(ByteSpan(newFabric.mNOCCert, newFabric.mNOCCertLen));
         fabric->SetOperationalId(newFabric.mOperationalId);
         fabric->SetVendorId(newFabric.GetVendorId());
-        fabric->SetFabricLabel(newFabric.GetFabricLabel());
+        fabric->SetFabricLabel(chip::ByteSpan(
+            newFabric.GetFabricLabel(), strnlen(Uint8::to_const_char(newFabric.GetFabricLabel()), kFabricLabelMaxLengthInBytes)));
         ChipLogProgress(Discovery, "Added new fabric at index: %d, Initialized: %d", fabric->GetFabricIndex(),
                         fabric->IsInitialized());
         ChipLogProgress(Discovery, "Assigned fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,

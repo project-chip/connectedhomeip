@@ -217,7 +217,7 @@ void emAfPluginScenesServerPrintInfo(void)
 }
 
 bool emberAfScenesClusterAddSceneCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId, uint8_t sceneId,
-                                          uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets)
+                                          uint16_t transitionTime, chip::ByteSpan sceneName, uint8_t * extensionFieldSets)
 {
     return emberAfPluginScenesServerParseAddScene(commandObj, emberAfCurrentCommand(), groupId, sceneId, transitionTime, sceneName,
                                                   extensionFieldSets);
@@ -718,7 +718,7 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, 
 }
 
 bool emberAfPluginScenesServerParseAddScene(app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId,
-                                            uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+                                            uint8_t sceneId, uint16_t transitionTime, chip::ByteSpan sceneName,
                                             uint8_t * extensionFieldSets)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -726,15 +726,14 @@ bool emberAfPluginScenesServerParseAddScene(app::CommandHandler * commandObj, co
     EmberAfStatus status;
     bool enhanced                  = (cmd->commandId == ZCL_ENHANCED_ADD_SCENE_COMMAND_ID);
     uint16_t extensionFieldSetsLen = static_cast<uint16_t>(
-        cmd->bufLen -
-        (cmd->payloadStartIndex + sizeof(groupId) + sizeof(sceneId) + sizeof(transitionTime) + emberAfStringLength(sceneName) + 1));
+        cmd->bufLen - (cmd->payloadStartIndex + sizeof(groupId) + sizeof(sceneId) + sizeof(transitionTime) + sceneName.size() + 1));
     uint16_t extensionFieldSetsIndex = 0;
     EndpointId endpoint              = cmd->apsFrame->destinationEndpoint;
     uint8_t i, index = EMBER_AF_SCENE_TABLE_NULL_INDEX;
 
     emberAfScenesClusterPrint("RX: %pAddScene 0x%2x, 0x%x, 0x%2x, \"", (enhanced ? "Enhanced" : ""), groupId, sceneId,
                               transitionTime);
-    emberAfScenesClusterPrintString(sceneName);
+    emberAfScenesClusterPrintBuffer(sceneName.data(), static_cast<uint16_t>(sceneName.size()), false);
     emberAfScenesClusterPrint("\", ");
     emberAfScenesClusterPrintBuffer(extensionFieldSets, extensionFieldSetsLen, false);
     emberAfScenesClusterPrintln("");
@@ -783,7 +782,7 @@ bool emberAfPluginScenesServerParseAddScene(app::CommandHandler * commandObj, co
     }
 
 #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
-    emberAfCopyString(entry.name, sceneName, ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH);
+    Platform::CopyString(entry.name, ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH, sceneName);
 #endif
 
     // When adding a new scene, wipe out all of the extensions before parsing the

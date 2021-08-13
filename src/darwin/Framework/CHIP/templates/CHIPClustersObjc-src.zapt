@@ -53,7 +53,7 @@ public:
                   {{else if (isOctetString type)}}
                   @"{{asSymbol label}}": [NSData dataWithBytes:{{asSymbol label}}.data() length:{{asSymbol label}}.size()],
                   {{else if (isCharString type)}}
-                  @"{{asSymbol label}}": [NSString stringWithFormat:@"%s", {{asSymbol label}}],
+                  @"{{asSymbol label}}": [[NSString alloc] initWithBytes:{{asSymbol label}}.data() length:{{asSymbol label}}.size() encoding:NSUTF8StringEncoding],
                   {{else}}
                   @"{{asSymbol label}}": [NSNumber numberWith{{asObjectiveCNumberType label type false}}:{{asSymbol label}}],
                   {{/if}}
@@ -98,7 +98,7 @@ public:
                     {{#if (isOctetString type)}}
                     [NSData dataWithBytes:entries[i].{{name}}.data() length:entries[i].{{name}}.size()],
                     {{else}}
-                    [[NSString alloc] initWithBytes:entries[i].{{name}}+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i].{{name}}) encoding:NSUTF8StringEncoding],
+                    [[NSString alloc] initWithBytes:entries[i].{{name}}.data() length:entries[i].{{name}}.size() encoding:NSUTF8StringEncoding],
                     {{/if}}
                     {{else}}
                     [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entries[i].{{name}}],
@@ -111,7 +111,7 @@ public:
                 {{#if (isOctetString type)}}
                 values[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
                 {{else}}
-                values[i] = [[NSString alloc] initWithBytes:entries[i]+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i]) encoding:NSUTF8StringEncoding];
+                values[i] = [[NSString alloc] initWithBytes:entries[i].data() length:entries[i].size() encoding:NSUTF8StringEncoding];
                 {{/if}}
                 {{else}}
                 values[i] = [NSNumber numberWith{{asObjectiveCNumberType label type false}}:entries[i]];
@@ -220,7 +220,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_cluster_command_arguments}}, {{#if (isOctetString type)}}{{asUnderlyingZclType type}}((const uint8_t*){{asLowerCamelCase label}}.bytes, {{asLowerCamelCase label}}.length){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*)[{{asLowerCamelCase label}} dataUsingEncoding:NSUTF8StringEncoding].bytes, [{{asLowerCamelCase label}} lengthOfBytesUsingEncoding:NSUTF8StringEncoding]){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments}});
+        err = self.cppCluster.{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_cluster_command_arguments}}, {{#if (isString type)}}{{asUnderlyingZclType type}}((const uint8_t*){{#if (isOctetString type)}}{{asLowerCamelCase label}}.bytes, {{asLowerCamelCase label}}.length{{else}}[{{asLowerCamelCase label}} dataUsingEncoding:NSUTF8StringEncoding].bytes, [{{asLowerCamelCase label}} lengthOfBytesUsingEncoding:NSUTF8StringEncoding]{{/if}}){{else}}{{asLowerCamelCase label}}{{/if}}{{/chip_cluster_command_arguments}});
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -282,10 +282,10 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         {{#if (isOctetString type)}}
-        err = self.cppCluster.WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)value.bytes, value.length));
+        err = self.cppCluster.WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), {{asUnderlyingZclType type}}((const uint8_t*)value.bytes, value.length));
         {{else if (isCharString type)}}
         NSData * data = [value dataUsingEncoding:NSUTF8StringEncoding];
-        err = self.cppCluster.WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)data.bytes, data.length));
+        err = self.cppCluster.WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), {{asUnderlyingZclType type}}((const uint8_t*)data.bytes, data.length));
         {{else}}
         err = self.cppCluster.WriteAttribute{{asUpperCamelCase name}}(onSuccess->Cancel(), onFailure->Cancel(), value);
         {{/if}}

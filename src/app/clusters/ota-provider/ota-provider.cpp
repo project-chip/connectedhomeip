@@ -154,7 +154,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(EndpointId endpoi
                                                                uint16_t vendorId, uint16_t productId, uint16_t imageType,
                                                                uint16_t hardwareVersion, uint32_t currentVersion,
                                                                /* TODO(#8605): change this to list */ uint8_t protocolsSupported,
-                                                               uint8_t * location, bool clientCanConsent,
+                                                               chip::ByteSpan location, bool clientCanConsent,
                                                                ByteSpan metadataForProvider)
 {
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
@@ -167,11 +167,9 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(EndpointId endpoi
 
     ChipLogDetail(Zcl, "OTA Provider received QueryImage");
 
-    // TODO: (#7112) change location size checking once CHAR_STRING is supported
-    const uint8_t locationLen = emberAfStringLength(location);
-    if (locationLen != kLocationParamLength)
+    if (location.size() != kLocationParamLength)
     {
-        ChipLogError(Zcl, "expected location length %" PRIu8 ", got %" PRIu8, locationLen, kLocationParamLength);
+        ChipLogError(Zcl, "expected location length %zu, got %" PRIu8, location.size(), kLocationParamLength);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
     else if (metadataForProvider.size() > kMaxMetadataLen)
@@ -180,10 +178,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(EndpointId endpoi
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    ByteSpan locationSpan(location, locationLen);
-
     status = delegate->HandleQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
-                                        locationSpan, clientCanConsent, metadataForProvider);
+                                        location, clientCanConsent, metadataForProvider);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);

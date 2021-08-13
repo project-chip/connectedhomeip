@@ -276,8 +276,8 @@ class CHIP{{chipCallback.name}}AttributeCallback : public Callback::Callback<{{c
             err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
             VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
 
-            UtfString valueStr(env, value);
-            env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
+            jstring valueStr = env->NewString(reinterpret_cast<const jchar *>(value.data()), value.size());
+            env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr);
             {{/if}}
         }
 
@@ -327,8 +327,7 @@ class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callba
             {{#if (isOctetString type)}}
             jbyteArray {{asSymbol label}}Arr;
             {{else if (isShortString type)}}
-            // ByteSpan is not properly returned yet, temporarily use empty string
-            UtfString {{asSymbol label}}Str(env, "");
+            jstring {{asSymbol label}}Str;
             {{/if}}
             {{/chip_cluster_response_arguments}}
 
@@ -350,6 +349,10 @@ class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callba
             env->ExceptionClear();
             env->SetByteArrayRegion({{asSymbol label}}Arr, 0, {{asSymbol label}}.size(), reinterpret_cast<const jbyte *>({{asSymbol label}}.data()));
             VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            {{else if (isCharString type)}}
+            {{asSymbol label}}Str = env->NewString(reinterpret_cast<const jchar *>({{asSymbol label}}.data()), {{asSymbol label}}.size());
+            VerifyOrExit({{asSymbol label}}Str != nullptr, err = CHIP_ERROR_NO_MEMORY);
+            env->ExceptionClear();
             {{/if}}
             {{/chip_cluster_response_arguments}}
 
@@ -361,7 +364,7 @@ class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callba
                 {{else if (isOctetString type)}}
                 , {{asSymbol label}}Arr
                 {{else if (isShortString type)}}
-                , {{asSymbol label}}Str.jniValue()
+                , {{asSymbol label}}Str
                 {{else}}
                 , static_cast<{{asJniBasicTypeForZclType type}}>({{asSymbol label}})
                 {{/if}}
@@ -371,6 +374,8 @@ class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callba
             {{#chip_cluster_response_arguments}}
             {{#if (isOctetString type)}}
             env->DeleteLocalRef({{asSymbol label}}Arr);
+            {{else if (isCharString type)}}
+            env->DeleteLocalRef({{asSymbol label}}Str);
             {{/if}}
             {{/chip_cluster_response_arguments}}
 
@@ -458,7 +463,7 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
                 jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entries[i].{{name}}.size());
                 env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entries[i].{{name}}.size(), reinterpret_cast<const jbyte *>(entries[i].{{name}}.data()));
                 {{else if (isCharString type)}}
-                // Implement after ByteSpan is emitted instead of uint8_t *.
+                jstring {{asLowerCamelCase name}} = env->NewString(reinterpret_cast<const jchar *>(entries[i].{{name}}.data()), entries[i].{{name}}.size());
                 {{else}}
                 {{asJniBasicType type}} {{asLowerCamelCase name}} = entries[i].{{name}};
                 {{/if}}
@@ -477,7 +482,7 @@ class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCall
                 jbyteArray {{asLowerCamelCase name}} = env->NewByteArray(entries[i].size());
                 env->SetByteArrayRegion({{asLowerCamelCase name}}, 0, entries[i].size(), reinterpret_cast<const jbyte *>(entries[i].data()));
                 {{else if (isCharString type)}}
-                // Implement after ByteSpan is emitted instead of uint8_t *
+                jstring {{asLowerCamelCase name}} = env->NewString(reinterpret_cast<const jchar *>(entries[i].{{name}}.data()), entries[i].{{name}}.size());
                 {{else}}
                 jclass entryTypeCls;
                 JniReferences::GetInstance().GetClassRef(env, "java/lang/{{asJavaBasicTypeForZclType type true}}", entryTypeCls);

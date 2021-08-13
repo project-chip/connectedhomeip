@@ -237,7 +237,7 @@ exit:
 }
 
 bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                                   uint8_t * Label)
+                                                                   chip::ByteSpan label)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
 
@@ -249,7 +249,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(EndpointId en
     VerifyOrExit(fabric != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
     // Set Label on fabric
-    err = fabric->SetFabricLabel(Label);
+    err = fabric->SetFabricLabel(label);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
     // Persist updated fabric

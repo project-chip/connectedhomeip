@@ -18,8 +18,8 @@ limitations under the License.
   <domain name="CHIP"/>
 
   <struct name="LabelStruct">
-    <item name="label" type="OCTET_STRING" length="16"/> <!-- TODO: Change this to CHAR_STRING once it is supported #6112 -->
-    <item name="value" type="OCTET_STRING" length="16"/> <!-- TODO: Change this to CHAR_STRING once it is supported #6112 -->
+    <item name="label" type="CHAR_STRING" length="16"/>
+    <item name="value" type="CHAR_STRING" length="16"/>
   </struct>
 
   <cluster>

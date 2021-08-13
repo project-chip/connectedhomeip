@@ -104,10 +104,10 @@ static void sendResponse(const char * responseName, ContentLaunchResponse launch
 }
 
 bool emberAfContentLauncherClusterLaunchContentCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
-                                                        bool autoplay, unsigned char * data)
+                                                        bool autoplay, chip::ByteSpan data)
 {
 
-    string dataString(reinterpret_cast<char *>(data));
+    string dataString(reinterpret_cast<char const *>(data.data()), data.size());
     list<EmberAfContentLaunchParamater> parameterList;
     ContentLaunchResponse response = ContentLauncherManager().proxyLaunchContentRequest(parameterList, autoplay, dataString);
     sendResponse("LaunchContent", response, ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID);
@@ -115,10 +115,10 @@ bool emberAfContentLauncherClusterLaunchContentCallback(chip::EndpointId endpoin
 }
 
 bool emberAfContentLauncherClusterLaunchURLCallback(chip::EndpointId endpoint, chip::app::CommandHandler * command,
-                                                    unsigned char * contentUrl, unsigned char * displayString)
+                                                    chip::ByteSpan contentUrl, chip::ByteSpan displayString)
 {
-    string contentUrlString(reinterpret_cast<char *>(contentUrl));
-    string displayStringString(reinterpret_cast<char *>(displayString));
+    string contentUrlString(reinterpret_cast<char const *>(contentUrl.data()), contentUrl.size());
+    string displayStringString(reinterpret_cast<char const *>(displayString.data()), displayString.size());
     EmberAfContentLaunchBrandingInformation brandingInformation;
     ContentLaunchResponse response =
         ContentLauncherManager().proxyLaunchUrlRequest(contentUrlString, displayStringString, brandingInformation);

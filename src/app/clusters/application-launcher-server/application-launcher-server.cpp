@@ -34,13 +34,6 @@ using namespace chip;
 
 ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EmberAfApplicationLauncherApp application, std::string data);
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t *, uint8_t *)
-{
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
-}
-
 void sendResponse(app::CommandHandler * command, ApplicationLauncherResponse response)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
@@ -59,7 +52,7 @@ exit:
     }
 }
 
-EmberAfApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, uint8_t * applicationId)
+EmberAfApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, chip::ByteSpan applicationId)
 {
     EmberAfApplicationLauncherApp application = {};
     application.applicationId                 = applicationId;
@@ -67,13 +60,13 @@ EmberAfApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId
     return application;
 }
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t * requestData,
-                                                        uint16_t requestApplicationCatalogVendorId, uint8_t * requestApplicationId)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(EndpointId endpoint, app::CommandHandler * command,
+                                                        chip::ByteSpan requestData, uint16_t requestApplicationCatalogVendorId,
+                                                        chip::ByteSpan requestApplicationId)
 {
     EmberAfApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
-    // TODO: Char is not null terminated, verify this code once #7963 gets merged.
-    std::string reqestDataString(reinterpret_cast<char *>(requestData));
-    ApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);
+    std::string requestDataString(reinterpret_cast<const char *>(requestData.data()), requestData.size());
+    ApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, requestDataString);
     sendResponse(command, response);
     return true;
 }

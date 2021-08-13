@@ -26,6 +26,11 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/DeviceControlServer.h>
+#include <support/CHIPMemString.h>
+#include <support/Span.h>
+#include <support/logging/CHIPLogging.h>
+
+constexpr uint8_t kMaxCountryCodeLen = 2;
 
 using namespace chip;
 
@@ -47,11 +52,15 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(EndpointId 
 }
 
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(EndpointId endpoint, app::CommandHandler * commandObj,
-                                                                   uint8_t location, uint8_t * countryCode, uint64_t breadcrumb,
-                                                                   uint32_t timeoutMs)
+                                                                   uint8_t location, chip::ByteSpan countryCode,
+                                                                   uint64_t breadcrumb, uint32_t timeoutMs)
 {
+    char countryCodePtr[kMaxCountryCodeLen + 1];
+    Platform::CopyString(countryCodePtr, sizeof(countryCodePtr), countryCode);
+    countryCodePtr[kMaxCountryCodeLen] = '\0';
+
     CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().SetRegulatoryConfig(
-        location, reinterpret_cast<const char *>(countryCode), breadcrumb);
+        location, reinterpret_cast<const char *>(countryCodePtr), breadcrumb);
 
     emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
 

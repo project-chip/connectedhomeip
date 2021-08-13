@@ -81,8 +81,8 @@ extern EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[];
 #endif // Use tokens
 
 bool emberAfPluginScenesServerParseAddScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
-                                            chip::GroupId groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                                            uint8_t * extensionFieldSets);
+                                            chip::GroupId groupId, uint8_t sceneId, uint16_t transitionTime,
+                                            chip::ByteSpan sceneName, uint8_t * extensionFieldSets);
 bool emberAfPluginScenesServerParseViewScene(chip::app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd,
                                              chip::GroupId groupId, uint8_t sceneId);
 

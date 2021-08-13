@@ -50,21 +50,21 @@ exit:
 }
 
 bool emberAfAccountLoginClusterGetSetupPINCallback(EndpointId endpoint, app::CommandHandler * command,
-                                                   uint8_t * tempAccountIdentifier)
+                                                   chip::ByteSpan tempAccountIdentifier)
 {
-    // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));
+    std::string tempAccountIdentifierString(reinterpret_cast<char const *>(tempAccountIdentifier.data()),
+                                            tempAccountIdentifier.size());
     std::string responseSetupPin = accountLoginClusterGetSetupPin(tempAccountIdentifierString, emberAfCurrentEndpoint());
     sendResponse(command, responseSetupPin.c_str());
     return true;
 }
 
-bool emberAfAccountLoginClusterLoginCallback(EndpointId endpoint, app::CommandHandler * command, uint8_t * tempAccountIdentifier,
-                                             uint8_t * tempSetupPin)
+bool emberAfAccountLoginClusterLoginCallback(EndpointId endpoint, app::CommandHandler * command,
+                                             chip::ByteSpan tempAccountIdentifier, chip::ByteSpan tempSetupPin)
 {
-    // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string tempAccountIdentifierString(reinterpret_cast<char *>(tempAccountIdentifier));
-    std::string tempSetupPinString(reinterpret_cast<char *>(tempSetupPin));
+    std::string tempAccountIdentifierString(reinterpret_cast<char const *>(tempAccountIdentifier.data()),
+                                            tempAccountIdentifier.size());
+    std::string tempSetupPinString(reinterpret_cast<char const *>(tempSetupPin.data()), tempSetupPin.size());
     bool isLoggedIn      = accountLoginClusterIsUserLoggedIn(tempAccountIdentifierString, tempSetupPinString);
     EmberAfStatus status = isLoggedIn ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
     if (!isLoggedIn)
