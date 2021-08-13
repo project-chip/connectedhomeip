@@ -92,10 +92,15 @@ struct ControllerInitParams
 #endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 
+    /* The following keypair must correspond to the public key used for generating
+       controllerNOC. It's used by controller to establish CASE sessions with devices */
     Crypto::P256Keypair * ephemeralKeypair = nullptr;
+
+    /* The following certificates must be in x509 DER format */
     ByteSpan controllerNOC;
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
+
     uint16_t controllerVendorId;
 };
 
@@ -353,8 +358,6 @@ protected:
 
     FabricIndex mFabricIndex = 1;
     Transport::FabricTable mFabrics;
-
-    Crypto::P256Keypair mOperationalKey;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 

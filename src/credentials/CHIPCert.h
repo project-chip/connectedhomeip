@@ -36,6 +36,7 @@
 #include <lib/core/PeerId.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
+#include <support/Span.h>
 
 namespace chip {
 namespace Credentials {
@@ -718,14 +719,12 @@ enum CertificateIssuerLevel
  *
  * @param requestParams   Certificate request parameters.
  * @param issuerKeypair   The certificate signing key
- * @param x509CertBuf     Buffer to store signed certificate in X.509 DER format.
- * @param x509CertBufSize The size of the buffer to store converted certificate.
- * @param x509CertLen     The length of the converted certificate.
+ * @param x509Cert        Buffer to store signed certificate in X.509 DER format.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::P256Keypair & issuerKeypair, uint8_t * x509CertBuf,
-                           uint32_t x509CertBufSize, uint32_t & x509CertLen);
+CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::P256Keypair & issuerKeypair,
+                           MutableByteSpan & x509Cert);
 
 /**
  * @brief Generate a new X.509 DER encoded Intermediate CA certificate
@@ -734,15 +733,13 @@ CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::
  * @param subject         The requested subject ID
  * @param subjectPubkey   The public key of subject
  * @param issuerKeypair   The certificate signing key
- * @param x509CertBuf     Buffer to store signed certificate in X.509 DER format.
- * @param x509CertBufSize The size of the buffer to store converted certificate.
- * @param x509CertLen     The length of the converted certificate.
+ * @param x509Cert        Buffer to store signed certificate in X.509 DER format.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, uint64_t subject,
-                          const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair, uint8_t * x509CertBuf,
-                          uint32_t x509CertBufSize, uint32_t & x509CertLen);
+                          const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair,
+                          MutableByteSpan & x509Cert);
 
 /**
  * @brief Generate a new X.509 DER encoded Node operational certificate
@@ -751,15 +748,13 @@ CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, uint64_t 
  * @param issuerLevel     Indicates if the issuer is a root CA or an intermediate CA
  * @param subjectPubkey   The public key of subject
  * @param issuerKeypair   The certificate signing key
- * @param x509CertBuf     Buffer to store signed certificate in X.509 DER format.
- * @param x509CertBufSize The size of the buffer to store converted certificate.
- * @param x509CertLen     The length of the converted certificate.
+ * @param x509Cert        Buffer to store signed certificate in X.509 DER format.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParams, CertificateIssuerLevel issuerLevel,
                                       const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair,
-                                      uint8_t * x509CertBuf, uint32_t x509CertBufSize, uint32_t & x509CertLen);
+                                      MutableByteSpan & x509Cert);
 
 /**
  * @brief

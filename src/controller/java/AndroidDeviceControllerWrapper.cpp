@@ -61,15 +61,15 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
                                              argument);
 }
 
-CHIP_ERROR GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId, const Crypto::P256PublicKey & ephemeralKey,
-                                           MutableByteSpan & rcac, MutableByteSpan & icac, MutableByteSpan & noc)
+CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId,
+                                                                           const Crypto::P256PublicKey & ephemeralKey,
+                                                                           MutableByteSpan & rcac, MutableByteSpan & icac,
+                                                                           MutableByteSpan & noc)
 {
-    uint32_t nocLen = static_cast<uint32_t>(std::min(noc.size(), static_cast<size_t>(UINT32_MAX)));
     ChipLogProgress(Controller, "Generating NOC");
-    X509CertRequestParams noc_request = { 1, mIntermediateIssuerId, mNow, mNow + mValidity, true, fabricId, true, nodeId };
-    ReturnErrorOnFailure(NewNodeOperationalX509Cert(noc_request, CertificateIssuerLevel::kIssuerIsIntermediateCA, pubkey,
-                                                    mIntermediateIssuer, noc.data(), nocLen, nocLen));
-    noc.reduce_size(nocLen);
+    chip::Credentials::X509CertRequestParams noc_request = { 1, mIssuerId, mNow, mNow + mValidity, true, fabricId, true, nodeId };
+    ReturnErrorOnFailure(
+        NewNodeOperationalX509Cert(noc_request, chip::Credentials::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer, noc));
     icac.reduce_size(0);
 
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
@@ -83,11 +83,9 @@ CHIP_ERROR GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId, con
         return CHIP_NO_ERROR;
     }
 
-    uint32_t rcacLen = static_cast<uint32_t>(std::min(rcac.size(), static_cast<size_t>(UINT32_MAX)));
     ChipLogProgress(Controller, "Generating RCAC");
-    X509CertRequestParams rcac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
-    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac.data(), rcacLen, rcacLen));
-    rcac.reduce_size(rcacLen);
+    chip::Credentials::X509CertRequestParams rcac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac));
 
     VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
     PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
@@ -161,16 +159,14 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
 
     ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, pubkey, rcacSpan, icacSpan, nocSpan));
 
-
-    onCompletion->mCall(onCompletion->mContext, generateCert, ByteSpan(noc.Get(), nocLen), ByteSpan(),
-                        ByteSpan(rcac.Get(), rootCertBufLen));
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, ByteSpan(), rcacSpan);
 
     jbyteArray javaCsr;
     JniReferences::GetInstance().GetEnvForCurrentThread()->ExceptionClear();
     JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csrElements.data(),
                                                csrElements.size(), javaCsr);
     JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, javaCsr);
-    return generateCert;
+    return CHIP_NO_ERROR;
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,
@@ -239,7 +235,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     Crypto::P256Keypair ephemeralKey;
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
-    ReturnErrorOnFailure(mOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+    ReturnErrorOnFailure(
+        mOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     initParams.ephemeralKeypair = &ephemeralKey;
     initParams.controllerRCAC   = rcacSpan;

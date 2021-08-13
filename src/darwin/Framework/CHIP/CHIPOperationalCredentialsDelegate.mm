@@ -190,11 +190,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         return CHIP_ERROR_INTERNAL;
     }
 
-    uint32_t nocLen = static_cast<uint32_t>(std::min(noc.size(), static_cast<size_t>(UINT32_MAX)));
     X509CertRequestParams noc_request = { 1, mIssuerId, validityStart, validityEnd, true, fabricId, true, nodeId };
-    ReturnErrorOnFailure(NewNodeOperationalX509Cert(
-        noc_request, CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuerKey, noc.data(), nocLen, nocLen));
-    noc.reduce_size(nocLen);
+    ReturnErrorOnFailure(NewNodeOperationalX509Cert(noc_request, CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuerKey, noc));
     icac.reduce_size(0);
 
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
@@ -207,10 +204,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
         return CHIP_NO_ERROR;
     }
 
-    uint32_t rcacLen = static_cast<uint32_t>(std::min(rcac.size(), static_cast<size_t>(UINT32_MAX)));
     X509CertRequestParams rcac_request = { 0, mIssuerId, validityStart, validityEnd, true, fabricId, false, 0 };
-    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuerKey, rcac.data(), rcacLen, rcacLen));
-    rcac.reduce_size(rcacLen);
+    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuerKey, rcac));
 
     VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
     PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,

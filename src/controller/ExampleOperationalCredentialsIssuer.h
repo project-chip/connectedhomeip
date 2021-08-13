@@ -86,6 +86,8 @@ public:
 
     /**
      * This is a utility method that generates a operational certificate chain for the given public key.
+     * This method is expected to be called once all the checks (e.g. device attestation, CSR verification etc)
+     * have been completed, or not required (e.g. for self trusted devices such as commissioner apps).
      */
     CHIP_ERROR GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId, const Crypto::P256PublicKey & ephemeralKey,
                                                MutableByteSpan & rcac, MutableByteSpan & icac, MutableByteSpan & noc);
