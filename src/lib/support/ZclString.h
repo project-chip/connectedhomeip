@@ -21,7 +21,7 @@
 namespace chip {
 
 /**
- * @brief Create ZCL string from char. Char can be maximum 254 characters long. In case char is longer than 254 characters, 
+ * @brief Create ZCL string from char. Char can be maximum 254 characters long. In case char is longer than 254 characters,
  *        this method store the data up to 254 characters. The rest will be deleted and error will be returned.
  */
 extern CHIP_ERROR MakeZclCharString(MutableByteSpan & buffer, const char * cString);

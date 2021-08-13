@@ -220,9 +220,9 @@ int TestZclString_Teardown(void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestZclStringWhenBufferIsZero), NL_TEST_DEF_FN(TestZclStringLessThanMaximumSize_Length_64), 
-                                 NL_TEST_DEF_FN(TestZclStringEqualsMaximumSize), NL_TEST_DEF_FN(TestSizeZclStringBiggerThanMaximumSize_Length_255), 
-                                 NL_TEST_DEF_FN(TestSizeZclStringBiggerThanMaximumSize_Length_256), NL_TEST_DEF_FN(TestZclStringBiggerThanMaximumSize_Length_257), 
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestZclStringWhenBufferIsZero), NL_TEST_DEF_FN(TestZclStringLessThanMaximumSize_Length_64),
+                                 NL_TEST_DEF_FN(TestZclStringEqualsMaximumSize), NL_TEST_DEF_FN(TestSizeZclStringBiggerThanMaximumSize_Length_255),
+                                 NL_TEST_DEF_FN(TestSizeZclStringBiggerThanMaximumSize_Length_256), NL_TEST_DEF_FN(TestZclStringBiggerThanMaximumSize_Length_257),
                                  NL_TEST_SENTINEL() };
 
 int TestZclString(void)
