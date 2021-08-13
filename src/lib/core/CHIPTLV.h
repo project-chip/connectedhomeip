@@ -438,7 +438,7 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize);
+    CHIP_ERROR GetBytes(uint8_t * buf, size_t bufSize);
 
     /**
      * Allocates and returns a buffer containing the value of the current byte or UTF8 string.
@@ -487,7 +487,7 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetString(char * buf, uint32_t bufSize);
+    CHIP_ERROR GetString(char * buf, size_t bufSize);
 
     /**
      * Allocates and returns a buffer containing the null-terminated value of the current byte or UTF8
