@@ -700,8 +700,7 @@ exit:
     return err;
 }
 
-DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, uint8_t * chipCertBuf, uint32_t chipCertBufSize,
-                                                uint32_t & chipCertLen)
+CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & chipCert)
 {
     ASN1Reader reader;
     TLVWriter writer;
@@ -714,13 +713,17 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, uint8_t
 
     reader.Init(x509Cert.data(), static_cast<uint32_t>(x509Cert.size()));
 
-    writer.Init(chipCertBuf, chipCertBufSize);
+    // We can still generate the certificate if the output chip cert buffer is bigger than UINT32_MAX,
+    // since generated cert needs less space than UINT32_MAX.
+    uint32_t chipCertBufLen = (chipCert.size() > UINT32_MAX) ? UINT32_MAX : static_cast<uint32_t>(chipCert.size());
+    writer.Init(chipCert.data(), chipCertBufLen);
 
     ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, issuer, subject, fabric));
 
     ReturnErrorOnFailure(writer.Finalize());
 
-    chipCertLen = writer.GetLengthWritten();
+    ReturnErrorCodeIf(writer.GetLengthWritten() > chipCertBufLen, CHIP_ERROR_INTERNAL);
+    chipCert.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
 }
@@ -776,7 +779,7 @@ CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & no
 {
     TLVType outerContainerType;
     TLVReader reader;
-    reader.Init(opCertArray.data(), static_cast<uint32_t>(opCertArray.size()));
+    reader.Init(opCertArray.data(), opCertArray.size());
 
     if (reader.GetType() == kTLVType_NotSpecified)
     {

@@ -225,8 +225,7 @@ void DeviceController::OnLocalNOCChainGeneration(void * context, CHIP_ERROR stat
 
     constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
-
-    uint32_t chipCertLen = 0;
+    MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
 
     Transport::FabricInfo * fabric = nullptr;
 
@@ -235,10 +234,10 @@ void DeviceController::OnLocalNOCChainGeneration(void * context, CHIP_ERROR stat
 
     VerifyOrExit(chipCert.Alloc(chipCertAllocatedLen), err = CHIP_ERROR_NO_MEMORY);
 
-    err = ConvertX509CertToChipCert(rcac, chipCert.Get(), chipCertAllocatedLen, chipCertLen);
+    err = ConvertX509CertToChipCert(rcac, chipCertSpan);
     SuccessOrExit(err);
 
-    err = newFabric.SetRootCert(ByteSpan(chipCert.Get(), chipCertLen));
+    err = newFabric.SetRootCert(chipCertSpan);
     SuccessOrExit(err);
 
     if (icac.empty())
@@ -247,7 +246,7 @@ void DeviceController::OnLocalNOCChainGeneration(void * context, CHIP_ERROR stat
     }
 
     {
-        MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
+        chipCertSpan = MutableByteSpan(chipCert.Get(), chipCertAllocatedLen);
 
         err = ConvertX509CertsToChipCertArray(noc, icac, chipCertSpan);
         SuccessOrExit(err);
@@ -1313,12 +1312,8 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
     {
         MutableByteSpan rootCert = device->GetMutableNOCChain();
 
-        uint32_t certLen = (rootCert.size() > UINT32_MAX) ? UINT32_MAX : static_cast<uint32_t>(rootCert.size());
-
-        err = ConvertX509CertToChipCert(rcac, rootCert.data(), certLen, certLen);
+        err = ConvertX509CertToChipCert(rcac, rootCert);
         SuccessOrExit(err);
-
-        rootCert.reduce_size(certLen);
 
         err = commissioner->SendTrustedRootCertificate(device, rootCert);
         SuccessOrExit(err);

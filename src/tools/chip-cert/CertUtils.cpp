@@ -398,10 +398,7 @@ bool ReadCert(const char * fileName, X509 * cert)
 bool ReadCert(const char * fileName, X509 * cert, CertFormat & certFmt)
 {
     bool res          = true;
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    const uint8_t * p = nullptr;
     uint32_t certLen  = 0;
-    std::unique_ptr<uint8_t[]> x509CertBuf(new uint8_t[kMaxDERCertLength]);
     std::unique_ptr<uint8_t[]> certBuf;
 
     res = ReadFileIntoMem(fileName, nullptr, certLen);
@@ -419,6 +416,18 @@ bool ReadCert(const char * fileName, X509 * cert, CertFormat & certFmt)
         res = ReadCertPEM(fileName, cert);
         VerifyTrueOrExit(res);
     }
+    else if (certFmt == kCertFormat_X509_DER)
+    {
+        const uint8_t * outCert = certBuf.get();
+
+        VerifyOrReturnError(chip::CanCastTo<int>(certLen), false);
+
+        if (d2i_X509(&cert, &outCert, static_cast<int>(certLen)) == nullptr)
+        {
+            ReportOpenSSLErrorAndExit("d2i_X509", res = false);
+        }
+    }
+    // Otherwise, it is either CHIP TLV or CHIP TLV Base64 encoded.
     else
     {
         if (certFmt == kCertFormat_Chip_Base64)
@@ -427,23 +436,21 @@ bool ReadCert(const char * fileName, X509 * cert, CertFormat & certFmt)
             VerifyTrueOrExit(res);
         }
 
-        if (certFmt == kCertFormat_Chip_Base64 || certFmt == kCertFormat_Chip_Raw)
-        {
-            err = ConvertChipCertToX509Cert(ByteSpan(certBuf.get(), certLen), x509CertBuf.get(), kMaxDERCertLength, certLen);
-            if (err != CHIP_NO_ERROR)
-            {
-                fprintf(stderr, "Error converting certificate: %s\n", chip::ErrorStr(err));
-                ExitNow(res = false);
-            }
+        std::unique_ptr<uint8_t[]> x509CertBuf(new uint8_t[kMaxDERCertLength]);
+        MutableByteSpan x509Cert(x509CertBuf.get(), kMaxDERCertLength);
 
-            p = x509CertBuf.get();
-        }
-        else
+        CHIP_ERROR err = ConvertChipCertToX509Cert(ByteSpan(certBuf.get(), certLen), x509Cert);
+        if (err != CHIP_NO_ERROR)
         {
-            p = certBuf.get();
+            fprintf(stderr, "Error converting certificate: %s\n", chip::ErrorStr(err));
+            ExitNow(res = false);
         }
 
-        if (d2i_X509(&cert, &p, certLen) == nullptr)
+        const uint8_t * outCert = x509Cert.data();
+
+        VerifyOrReturnError(chip::CanCastTo<int>(x509Cert.size()), false);
+
+        if (d2i_X509(&cert, &outCert, static_cast<int>(x509Cert.size())) == nullptr)
         {
             ReportOpenSSLErrorAndExit("d2i_X509", res = false);
         }
@@ -453,12 +460,12 @@ exit:
     return res;
 }
 
-bool X509ToChipCert(X509 * cert, uint8_t * certBuf, uint32_t certBufSize, uint32_t & certLen)
+bool X509ToChipCert(X509 * cert, MutableByteSpan & chipCert)
 {
     bool res = true;
     CHIP_ERROR err;
     uint8_t * derCert = nullptr;
-    int32_t derCertLen;
+    int derCertLen;
 
     derCertLen = i2d_X509(cert, &derCert);
     if (derCertLen < 0)
@@ -466,9 +473,9 @@ bool X509ToChipCert(X509 * cert, uint8_t * certBuf, uint32_t certBufSize, uint32
         ReportOpenSSLErrorAndExit("i2d_X509", res = false);
     }
 
-    VerifyOrReturnError(chip::CanCastTo<uint32_t>(derCertLen), false);
+    VerifyOrReturnError(chip::CanCastTo<size_t>(derCertLen), false);
 
-    err = ConvertX509CertToChipCert(ByteSpan(derCert, static_cast<uint32_t>(derCertLen)), certBuf, certBufSize, certLen);
+    err = ConvertX509CertToChipCert(ByteSpan(derCert, static_cast<size_t>(derCertLen)), chipCert);
     if (err != CHIP_NO_ERROR)
     {
         fprintf(stderr, "ConvertX509CertToChipCert() failed\n%s\n", chip::ErrorStr(err));
@@ -479,18 +486,17 @@ exit:
     return res;
 }
 
-bool LoadChipCert(const char * fileName, bool isTrused, ChipCertificateSet & certSet, uint8_t * certBuf, uint32_t certBufSize)
+bool LoadChipCert(const char * fileName, bool isTrused, ChipCertificateSet & certSet, MutableByteSpan & chipCert)
 {
     bool res = true;
     CHIP_ERROR err;
-    uint32_t certLen;
     BitFlags<CertDecodeFlags> decodeFlags;
     std::unique_ptr<X509, void (*)(X509 *)> cert(X509_new(), &X509_free);
 
     res = ReadCert(fileName, cert.get());
     VerifyTrueOrExit(res);
 
-    res = X509ToChipCert(cert.get(), certBuf, certBufSize, certLen);
+    res = X509ToChipCert(cert.get(), chipCert);
     VerifyTrueOrExit(res);
 
     if (isTrused)
@@ -502,7 +508,7 @@ bool LoadChipCert(const char * fileName, bool isTrused, ChipCertificateSet & cer
         decodeFlags.Set(CertDecodeFlags::kGenerateTBSHash);
     }
 
-    err = certSet.LoadCert(certBuf, certLen, decodeFlags);
+    err = certSet.LoadCert(chipCert, decodeFlags);
     if (err != CHIP_NO_ERROR)
     {
         fprintf(stderr, "Error reading %s\n%s\n", fileName, chip::ErrorStr(err));
@@ -540,18 +546,19 @@ bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
     else if (certFmt == kCertFormat_Chip_Raw || certFmt == kCertFormat_Chip_Base64)
     {
         uint8_t * certToWrite      = nullptr;
-        uint32_t certToWriteLen    = 0;
-        uint32_t chipCertLen       = kMaxCHIPCertLength;
-        uint32_t chipCertBase64Len = BASE64_ENCODED_LEN(chipCertLen);
-        std::unique_ptr<uint8_t[]> chipCert(new uint8_t[chipCertLen]);
+        size_t certToWriteLen    = 0;
+        uint32_t chipCertBase64Len = BASE64_ENCODED_LEN(kMaxCHIPCertLength);
         std::unique_ptr<uint8_t[]> chipCertBase64(new uint8_t[chipCertBase64Len]);
+        uint8_t chipCertBuf[kMaxCHIPCertLength];
+        MutableByteSpan chipCert(chipCertBuf);
 
-        res = X509ToChipCert(cert, chipCert.get(), chipCertLen, chipCertLen);
+        res = X509ToChipCert(cert, chipCert);
         VerifyTrueOrExit(res);
 
         if (certFmt == kCertFormat_Chip_Base64)
         {
-            res = Base64Encode(chipCert.get(), chipCertLen, chipCertBase64.get(), chipCertBase64Len, chipCertBase64Len);
+            res = Base64Encode(chipCert.data(), static_cast<uint32_t>(chipCert.size()), chipCertBase64.get(), chipCertBase64Len,
+                               chipCertBase64Len);
             VerifyTrueOrExit(res);
 
             certToWrite    = chipCertBase64.get();
@@ -559,8 +566,8 @@ bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
         }
         else
         {
-            certToWrite    = chipCert.get();
-            certToWriteLen = chipCertLen;
+            certToWrite    = chipCert.data();
+            certToWriteLen = chipCert.size();
         }
 
         if (fwrite(certToWrite, 1, certToWriteLen, file) != certToWriteLen)

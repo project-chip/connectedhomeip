@@ -344,8 +344,9 @@ CHIP_ERROR CASESession::SendSigmaR1()
         FabricId fabricId;
         MutableByteSpan destinationIdSpan(destinationIdentifier);
 
-        ReturnErrorOnFailure(DecodeChipCert(mOpCredSet->GetDevOpCred(mTrustedRootId), mOpCredSet->GetDevOpCredLen(mTrustedRootId),
-                                            nodeOperationalCertificate));
+        ReturnErrorOnFailure(
+            DecodeChipCert(ByteSpan(mOpCredSet->GetDevOpCred(mTrustedRootId), mOpCredSet->GetDevOpCredLen(mTrustedRootId)),
+                           nodeOperationalCertificate));
         ReturnErrorOnFailure(nodeOperationalCertificate.mSubjectDN.GetCertFabricId(fabricId));
         // retrieve Fabric IPK
         MutableByteSpan ipkSpan(mIPK);
@@ -1052,8 +1053,9 @@ CHIP_ERROR CASESession::FindDestinationIdCandidate(const ByteSpan & destinationI
 
         trustedRootId = mOpCredSet->GetTrustedRootId(static_cast<uint16_t>(certChainIdx));
 
-        ReturnErrorOnFailure(DecodeChipCert(mOpCredSet->GetDevOpCred(trustedRootId), mOpCredSet->GetDevOpCredLen(trustedRootId),
-                                            nodeOperationalCertificate));
+        ReturnErrorOnFailure(
+            DecodeChipCert(ByteSpan(mOpCredSet->GetDevOpCred(trustedRootId), mOpCredSet->GetDevOpCredLen(trustedRootId)),
+                           nodeOperationalCertificate));
 
         ReturnErrorOnFailure(nodeOperationalCertificate.mSubjectDN.GetCertChipId(nodeId));
         ReturnErrorOnFailure(nodeOperationalCertificate.mSubjectDN.GetCertFabricId(fabricId));
@@ -1128,8 +1130,7 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const ByteSpan & respon
     ReturnErrorOnFailure(certSet.Init(3));
 
     Encoding::LittleEndian::BufferWriter bbuf(responderID, responderID.Length());
-    ReturnErrorOnFailure(certSet.LoadCert(responderOpCert.data(), static_cast<uint32_t>(responderOpCert.size()),
-                                          BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+    ReturnErrorOnFailure(certSet.LoadCert(responderOpCert, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
 
     bbuf.Put(certSet.GetCertSet()[0].mPublicKey.data(), certSet.GetCertSet()[0].mPublicKey.size());
 
@@ -1137,8 +1138,7 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const ByteSpan & respon
 
     // Validate responder identity located in msg_r2_encrypted
     ReturnErrorOnFailure(mOpCredSet->FindCertSet(mTrustedRootId)
-                             ->LoadCert(responderOpCert.data(), static_cast<uint32_t>(responderOpCert.size()),
-                                        BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+                             ->LoadCert(responderOpCert, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
 
     ReturnErrorOnFailure(SetEffectiveTime());
     // Locate the subject DN and key id that will be used as input the FindValidCert() method.

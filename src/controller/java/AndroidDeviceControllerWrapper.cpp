@@ -120,35 +120,37 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    uint32_t nocLen = 0;
+    MutableByteSpan nocCert(noc.Get(), kMaxCHIPDERCertLength);
 
     CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::Credentials::CertificateIssuerLevel::kIssuerIsRootCA,
-                                                         pubkey, mIssuer, noc.Get(), kMaxCHIPDERCertLength, nocLen);
+                                                         pubkey, mIssuer, nocCert);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
     ReturnErrorCodeIf(!rcac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan rootCert(rcac.Get(), kMaxCHIPDERCertLength);
     uint16_t rootCertBufLen = kMaxCHIPDERCertLength;
 
     PERSISTENT_KEY_OP(mNextFabricId, kOperationalCredentialsRootCertificateStorage, key,
-                      err = SyncGetKeyValue(key, rcac.Get(), rootCertBufLen));
+                      err = SyncGetKeyValue(key, rootCert.data(), rootCertBufLen));
     if (err != CHIP_NO_ERROR)
     {
         // Storage doesn't have an existing root certificate. Let's create one and add it to the storage.
         chip::Credentials::X509CertRequestParams rcac_request = { 0,    mIssuerId,     mNow,  mNow + mValidity,
                                                                   true, mNextFabricId, false, 0 };
 
-        uint32_t outCertLen = 0;
-        ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac.Get(), kMaxCHIPDERCertLength, outCertLen));
+        ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rootCert));
 
-        VerifyOrReturnError(CanCastTo<uint16_t>(outCertLen), CHIP_ERROR_INVALID_ARGUMENT);
-        rootCertBufLen = static_cast<uint16_t>(outCertLen);
+        VerifyOrReturnError(CanCastTo<uint16_t>(rootCert.size()), CHIP_ERROR_INVALID_ARGUMENT);
         PERSISTENT_KEY_OP(mNextFabricId, kOperationalCredentialsRootCertificateStorage, key,
-                          err = SyncSetKeyValue(key, rcac.Get(), rootCertBufLen));
+                          err = SyncSetKeyValue(key, rootCert.data(), static_cast<uint16_t>(rootCert.size())));
         ReturnErrorOnFailure(err);
     }
+    else
+    {
+        rootCert.reduce_size(rootCertBufLen);
+    }
 
-    onCompletion->mCall(onCompletion->mContext, generateCert, ByteSpan(noc.Get(), nocLen), ByteSpan(),
-                        ByteSpan(rcac.Get(), rootCertBufLen));
+    onCompletion->mCall(onCompletion->mContext, generateCert, nocCert, ByteSpan(), rootCert);
 
     jbyteArray javaCsr;
     JniReferences::GetInstance().GetEnvForCurrentThread()->ExceptionClear();
