@@ -20,7 +20,6 @@ from enum import Enum, auto
 
 from .builder import Builder
 
-
 class TelinkApp(Enum):
   LIGHT = auto()
   LOCK = auto()
@@ -29,20 +28,12 @@ class TelinkApp(Enum):
   def ExampleName(self):
     if self == TelinkApp.LIGHT:
       return 'lighting-app'
-    elif self == TelinkApp.LOCK:
-      return 'lock-app'
-    elif self == TelinkApp.SHELL:
-      return 'shell'
     else:
       raise Exception('Unknown app type: %r' % self)
 
   def AppNamePrefix(self):
     if self == TelinkApp.LIGHT:
       return 'chip-telink-lighting-example'
-    elif self == TelinkApp.LOCK:
-      return 'chip-telink-lock-example'
-    elif self == TelinkApp.SHELL:
-      return 'chip-telink-shell'
     else:
       raise Exception('Unknown app type: %r' % self)
 
