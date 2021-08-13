@@ -19,7 +19,6 @@ RUN /opt/ModusToolbox/tools_2.3/modus-shell/postinstall
 
 # NOTE: udev rules are NOT installed:
 #   /opt/ModusToolbox/tools_2.3/fw-loader/udev_rules/install_rules.sh
-
 # because docker containers do not support udev
 
 # ------------------------------------------------------------------------------
