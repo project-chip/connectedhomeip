@@ -365,13 +365,12 @@ CHIP_ERROR FabricInfo::GetCredentials(OperationalCredentialSet & credentials, Ch
     ReturnErrorOnFailure(certificates.Init(kMaxNumCertsInOpCreds));
 
     ReturnErrorOnFailure(
-        certificates.LoadCert(mRootCert, mRootCertLen,
-                              BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor).Set(CertDecodeFlags::kGenerateTBSHash)));
+        certificates.LoadCert(ByteSpan(mRootCert, mRootCertLen), BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
 
     if (mICACert != nullptr && mICACertLen > 0)
     {
         ReturnErrorOnFailure(
-            certificates.LoadCert(mICACert, mICACertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+            certificates.LoadCert(ByteSpan(mICACert, mICACertLen), BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
     }
 
     credentials.Release();
