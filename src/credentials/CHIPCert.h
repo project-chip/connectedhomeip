@@ -658,9 +658,9 @@ CHIP_ERROR ConvertX509CertsToChipCertArray(const ByteSpan & x509NOC, const ByteS
  *        NOC certificate must be provided.
  *        ICA certificate is optional. It will be omitted (nullptr, 0) if the CHIP certificate array contains only one entry.
  *
- * @param opCertArray Chip certificate array.
- * @param noc[out]    Node operational credentials certificate in CHIP format.
- * @param icac[out]   Intermediate CA certificate in CHIP format.
+ * @param[in]  opCertArray Chip certificate array.
+ * @param[out] noc         Node operational credentials certificate in CHIP format.
+ * @param[out] icac        Intermediate CA certificate in CHIP format.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/

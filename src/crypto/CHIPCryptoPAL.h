@@ -562,7 +562,7 @@ public:
      *
      * More data can be added before finish is called.
      *
-     * @param[inout] out_buffer Output buffer to receive the digest. `out_buffer` must
+     * @param[in,out] out_buffer Output buffer to receive the digest. `out_buffer` must
      * be at least `kSHA256_Hash_Length` bytes long. The `out_buffer` size
      * will be set to `kSHA256_Hash_Length` on success.
      *
@@ -574,7 +574,7 @@ public:
     /**
      * @brief Finalize the stream digest computation, getting the final digest.
      *
-     * @param[inout] out_buffer Output buffer to receive the digest. `out_buffer` must
+     * @param[in,out] out_buffer Output buffer to receive the digest. `out_buffer` must
      * be at least `kSHA256_Hash_Length` bytes long. The `out_buffer` size
      * will be set to `kSHA256_Hash_Length` on success.
      *

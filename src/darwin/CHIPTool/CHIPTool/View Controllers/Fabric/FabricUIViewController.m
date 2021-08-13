@@ -248,7 +248,7 @@
                             NSNumber * commissionedFabrics = [values objectForKey:@"value"];
                             NSString * stringResult =
                                 [NSString stringWithFormat:@"# commissioned fabrics: %@", commissionedFabrics];
-                            _commissionedFabricsLabel.text = stringResult;
+                            self->_commissionedFabricsLabel.text = stringResult;
                         });
                     }
                 }];
@@ -315,12 +315,7 @@
                   style:UIAlertActionStyleDefault
                 handler:^(UIAlertAction * action) {
                     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
-                            if (chipDevice) {
-                                CHIPOperationalCredentials * cluster =
-                                    [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice
-                                                                              endpoint:0
-                                                                                 queue:dispatch_get_main_queue()];
-                            } else {
+                            if (!chipDevice) {
                                 [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"]
                                            isError:YES];
                             }
@@ -398,13 +393,9 @@
         NSDictionary * fabricToRemove = [_fabricsList objectAtIndex:fabricIndex];
         NSLog(@"Request to remove %@", fabricToRemove);
         NSNumber * fabricId = [fabricToRemove objectForKey:@"FabricId"];
-        NSNumber * nodeID = [fabricToRemove objectForKey:@"NodeId"];
-        NSNumber * vendorID = [fabricToRemove objectForKey:@"VendorId"];
 
         if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
-                    CHIPOperationalCredentials * cluster =
-                        [[CHIPOperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
                     [self updateResult:[NSString stringWithFormat:@"removeFabric command sent for fabricID %@.", fabricId]
                                isError:NO];
                 } else {

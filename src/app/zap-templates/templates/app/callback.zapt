@@ -103,7 +103,6 @@ void emberAf{{asUpperCamelCase label}}ClusterClientManufacturerSpecificAttribute
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -116,7 +115,6 @@ void emberAf{{asUpperCamelCase label}}ClusterServerMessageSentCallback(const chi
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -418,7 +416,6 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
  * indicates that the message sent notification has been handled and should not
  * be handled by the application framework.
  *
- * @param type   Ver.: always
  * @param destination   Ver.: always
  * @param apsFrame   Ver.: always
  * @param msgLen   Ver.: always
