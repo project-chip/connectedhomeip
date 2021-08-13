@@ -58,6 +58,8 @@ using namespace app::Clusters::ColorControl;
 #define COLOR_XY_CONTROL emberAfPluginColorControlServerXyTransitionEventControl
 #define COLOR_HSV_CONTROL emberAfPluginColorControlServerHueSatTransitionEventControl
 
+//#define EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP 1
+
 // move mode
 enum
 {
@@ -314,12 +316,6 @@ static void writeColorY(EndpointId endpoint, uint16_t colorY)
 {
     emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
                                 reinterpret_cast<uint8_t *>(&colorY), ZCL_INT16U_ATTRIBUTE_TYPE);
-}
-
-static void writeColorTemperature(EndpointId endpoint, uint16_t colorTemperature)
-{
-    emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
-                                reinterpret_cast<uint8_t *>(&colorTemperature), ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 // -------------------------------------------------------------------------
@@ -1275,8 +1271,12 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(EndpointId aEndpoint
         return true;
     }
 
-    uint16_t tempPhysicalMin = readColorTemperatureMin(endpoint);
-    uint16_t tempPhysicalMax = readColorTemperatureMax(endpoint);
+    uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
+    Attributes::GetColorTempPhysicalMin(endpoint, &tempPhysicalMin);
+
+    uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
+    Attributes::GetColorTempPhysicalMax(endpoint, &tempPhysicalMax);
+
     uint16_t transitionTime;
 
     // New command.  Need to stop any active transitions.
@@ -1307,8 +1307,10 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(EndpointId aEndpoint
     handleModeSwitch(endpoint, COLOR_MODE_TEMPERATURE);
 
     // now, kick off the state machine.
-    colorTempTransitionState.initialValue = readColorTemperature(endpoint);
-    colorTempTransitionState.currentValue = readColorTemperature(endpoint);
+    colorTempTransitionState.initialValue = 0;
+    Attributes::GetColorTemperature(endpoint, &colorTempTransitionState.initialValue);
+    colorTempTransitionState.currentValue = colorTempTransitionState.initialValue;
+
     if (moveMode == MOVE_MODE_UP)
     {
         if (tempPhysicalMax > colorTemperatureMaximum)
@@ -1338,7 +1340,7 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(EndpointId aEndpoint
     colorTempTransitionState.lowLimit       = colorTemperatureMinimum;
     colorTempTransitionState.highLimit      = colorTemperatureMaximum;
 
-    writeRemainingTime(endpoint, transitionTime);
+    Attributes::SetRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
     emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
@@ -1360,8 +1362,11 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(EndpointId aEndpoint
         return true;
     }
 
-    uint16_t tempPhysicalMin = readColorTemperatureMin(endpoint);
-    uint16_t tempPhysicalMax = readColorTemperatureMax(endpoint);
+    uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
+    Attributes::GetColorTempPhysicalMin(endpoint, &tempPhysicalMin);
+
+    uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
+    Attributes::GetColorTempPhysicalMax(endpoint, &tempPhysicalMax);
 
     if (transitionTime == 0)
     {
@@ -1390,15 +1395,33 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(EndpointId aEndpoint
     handleModeSwitch(endpoint, COLOR_MODE_TEMPERATURE);
 
     // now, kick off the state machine.
-    colorTempTransitionState.initialValue = readColorTemperature(endpoint);
-    colorTempTransitionState.currentValue = readColorTemperature(endpoint);
+    colorTempTransitionState.initialValue = 0;
+    Attributes::GetColorTemperature(endpoint, &colorTempTransitionState.initialValue);
+    colorTempTransitionState.currentValue = colorTempTransitionState.initialValue;
+
     if (stepMode == MOVE_MODE_UP)
     {
-        colorTempTransitionState.finalValue = static_cast<uint16_t>(readColorTemperature(endpoint) + stepSize);
+        uint32_t finalValue32u = static_cast<uint32_t>(colorTempTransitionState.initialValue) + static_cast<uint32_t>(stepSize);
+        if(finalValue32u > UINT16_MAX)
+        {
+            colorTempTransitionState.finalValue = UINT16_MAX;
+        }
+        else
+        {
+            colorTempTransitionState.finalValue = static_cast<uint16_t>(finalValue32u);
+        }
     }
     else
     {
-        colorTempTransitionState.finalValue = static_cast<uint16_t>(readColorTemperature(endpoint) - stepSize);
+        uint32_t finalValue32u = static_cast<uint32_t>(colorTempTransitionState.initialValue) - static_cast<uint32_t>(stepSize);
+        if(finalValue32u > UINT16_MAX)
+        {
+            colorTempTransitionState.finalValue = 0;
+        }
+        else
+        {
+            colorTempTransitionState.finalValue = static_cast<uint16_t>(finalValue32u);
+        }
     }
     colorTempTransitionState.stepsRemaining = transitionTime;
     colorTempTransitionState.stepsTotal     = transitionTime;
@@ -1406,7 +1429,7 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(EndpointId aEndpoint
     colorTempTransitionState.lowLimit       = colorTemperatureMinimum;
     colorTempTransitionState.highLimit      = colorTemperatureMaximum;
 
-    writeRemainingTime(endpoint, transitionTime);
+    Attributes::SetRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
     emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
@@ -1547,7 +1570,7 @@ static void startColorLoop(EndpointId endpoint, uint8_t startFromStartHue)
     colorHueTransitionState.stepsTotal     = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
     colorHueTransitionState.endpoint       = endpoint;
 
-    writeRemainingTime(endpoint, MAX_INT16U_VALUE);
+    Attributes::SetRemainingTime(endpoint, MAX_INT16U_VALUE);
     emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 }
 
@@ -1949,7 +1972,7 @@ void emberAfPluginColorControlServerHueSatTransitionEventHandler(void)
 static bool computeNewColor16uValue(Color16uTransitionState * p)
 {
     uint32_t newValue32u;
-
+  
     if (p->stepsRemaining == 0)
     {
         return false;
@@ -1957,7 +1980,7 @@ static bool computeNewColor16uValue(Color16uTransitionState * p)
 
     (p->stepsRemaining)--;
 
-    writeRemainingTime(p->endpoint, p->stepsRemaining);
+    Attributes::SetRemainingTime(p->endpoint, p->stepsRemaining);
 
     // handle sign
     if (p->finalValue == p->currentValue)
@@ -1970,6 +1993,12 @@ static bool computeNewColor16uValue(Color16uTransitionState * p)
         newValue32u *= ((uint32_t)(p->stepsRemaining));
         newValue32u /= ((uint32_t)(p->stepsTotal));
         p->currentValue = static_cast<uint16_t>(p->finalValue - static_cast<uint16_t>(newValue32u));
+
+        if(static_cast<uint16_t>(newValue32u) > p->finalValue 
+        || p->currentValue > p->highLimit )
+        {
+            p->currentValue = p->highLimit;
+        }
     }
     else
     {
@@ -1977,6 +2006,12 @@ static bool computeNewColor16uValue(Color16uTransitionState * p)
         newValue32u *= ((uint32_t)(p->stepsRemaining));
         newValue32u /= ((uint32_t)(p->stepsTotal));
         p->currentValue = static_cast<uint16_t>(p->finalValue + static_cast<uint16_t>(newValue32u));
+
+        if( p->finalValue > UINT16_MAX - static_cast<uint16_t>(newValue32u)
+        || p->currentValue < p->lowLimit)
+        {
+            p->currentValue = p->lowLimit;
+        }
     }
 
     if (p->stepsRemaining == 0)
@@ -2066,7 +2101,7 @@ void emberAfPluginColorControlServerTempTransitionEventHandler(void)
         emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
     }
 
-    writeColorTemperature(colorTempTransitionState.endpoint, colorTempTransitionState.currentValue);
+    Attributes::SetColorTemperature(colorTempTransitionState.endpoint, colorTempTransitionState.currentValue);
 
     emberAfColorControlClusterPrintln("Color Temperature %d", colorTempTransitionState.currentValue);
 
