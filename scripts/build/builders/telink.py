@@ -23,8 +23,6 @@ from .builder import Builder
 
 class TelinkApp(Enum):
     LIGHT = auto()
-    LOCK = auto()
-    SHELL = auto()
 
     def ExampleName(self):
         if self == TelinkApp.LIGHT:
