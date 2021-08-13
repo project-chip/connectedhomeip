@@ -33,7 +33,6 @@
 #include <support/DLLUtil.h>
 #include <support/ReferenceCountedHandle.h>
 #include <support/TypeTraits.h>
-#include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {

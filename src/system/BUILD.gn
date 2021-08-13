@@ -96,9 +96,6 @@ buildconfig_header("system_buildconfig") {
   }
 
   defines += [ "CHIP_SYSTEM_WATCHABLE_EVENT_MANAGER_CONFIG_FILE=<system/WatchableEventManager${chip_system_config_event_loop}.h>" ]
-  if (chip_system_config_use_sockets) {
-    defines += [ "CHIP_SYSTEM_WATCHABLE_SOCKET_CONFIG_FILE=<system/WatchableSocket${chip_system_config_event_loop}.h>" ]
-  }
 }
 
 config("system_config") {
@@ -169,9 +166,7 @@ static_library("system") {
 
   if (chip_system_config_use_sockets) {
     sources += [
-      "WatchableSocket${chip_system_config_event_loop}.cpp",
-      "WatchableSocket${chip_system_config_event_loop}.h",
-      "WatchableSocket.h",
+      "SocketEvents.h",
     ]
     if (chip_system_config_event_loop == "Libevent") {
       libs = [ "event" ]

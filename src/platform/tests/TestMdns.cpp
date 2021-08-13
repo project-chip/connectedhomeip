@@ -150,6 +150,7 @@ int TestMdns()
             retVal = EXIT_FAILURE;
         }
     }
+    t.join();
     return retVal;
 }
 

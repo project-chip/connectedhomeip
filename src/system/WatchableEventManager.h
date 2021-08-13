@@ -57,7 +57,7 @@ class WatchableEventManager;
  */
 
 /**
- * @fn CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, Timers::OnCompleteFunct onComplete, void *
+ * @fn CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void *
  * appState)
  *
  * This method starts a one-shot timer.
@@ -76,7 +76,7 @@ class WatchableEventManager;
  */
 
 /**
- * @fn void WatchableEventManager::CancelTimer(Timers::OnCompleteFunct onComplete, void * appState)
+ * @fn void WatchableEventManager::CancelTimer(TimerCompleteCallback onComplete, void * appState)
  *
  * This method cancels a one-shot timer, started earlier through @p StartTimer().
  *
@@ -89,7 +89,7 @@ class WatchableEventManager;
  */
 
 /**
- * @fn CHIP_ERROR WatchableEventManager::ScheduleWork(Timers::OnCompleteFunct onComplete, void * appState)
+ * @fn CHIP_ERROR WatchableEventManager::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
  *
  * Schedules a function to be run as soon as possible on the CHIP thread.
  *

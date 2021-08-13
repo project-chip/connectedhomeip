@@ -30,6 +30,9 @@
 #include <system/WakeEvent.h>
 
 #include <event2/event.h>
+#include <list>
+#include <memory>
+#include <vector>
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <atomic>
@@ -43,7 +46,7 @@ namespace System {
 class WatchableEventManager
 {
 public:
-    WatchableEventManager() : mActiveSockets(nullptr), mSystemLayer(nullptr), mEventBase(nullptr), mTimeoutEvent(nullptr) {}
+    WatchableEventManager() : mSystemLayer(nullptr), mEventBase(nullptr), mMdnsTimeoutEvent(nullptr) {}
 
     // Core ‘overrides’.
     CHIP_ERROR Init(Layer & systemLayer);
@@ -51,10 +54,21 @@ public:
     void Signal();
 
     // Timer ‘overrides’.
-    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, Timers::OnCompleteFunct onComplete, void * appState);
-    void CancelTimer(Timers::OnCompleteFunct onComplete, void * appState);
-    CHIP_ERROR ScheduleWork(Timers::OnCompleteFunct onComplete, void * appState) { return StartTimer(0, onComplete, appState); }
+    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState);
+    void CancelTimer(TimerCompleteCallback onComplete, void * appState);
+    CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) { return StartTimer(0, onComplete, appState); }
 
+    // Socket watch ‘overrides’.
+    CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut);
+    CHIP_ERROR SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data);
+    CHIP_ERROR RequestCallbackOnPendingRead(SocketWatchToken token);
+    CHIP_ERROR RequestCallbackOnPendingWrite(SocketWatchToken token);
+    CHIP_ERROR ClearCallbackOnPendingRead(SocketWatchToken token);
+    CHIP_ERROR ClearCallbackOnPendingWrite(SocketWatchToken token);
+    CHIP_ERROR StopWatchingSocket(SocketWatchToken * tokenInOut);
+    SocketWatchToken InvalidSocketWatchToken() { return reinterpret_cast<SocketWatchToken>(nullptr); }
+
+    // Platform implementation.
     void EventLoopBegins() {}
     void PrepareEvents();
     void WaitForEvents();
@@ -63,27 +77,62 @@ public:
 
 private:
     /*
-     * In this implementation, libevent invokes LibeventCallbackHandler from beneath WaitForEvents(),
-     * which means that the CHIP stack is unlocked. LibeventCallbackHandler adds the WatchableSocket
-     * to a queue (implemented as a simple intrusive list to avoid dynamic memory allocation), and
-     * then HandleEvents() invokes the WatchableSocket callbacks.
+     * In this implementation, libevent invokes TimerCallbackHandler and SocketCallbackHandler from beneath WaitForEvents(),
+     * which means that the CHIP stack is unlocked. These handles add the LibeventTimer or SocketWatch respectively to a list,
+     * then HandleEvents() invokes the client callbacks.
      */
-    friend class WatchableSocket;
-    static void LibeventCallbackHandler(evutil_socket_t fd, short eventFlags, void * data);
-    void RemoveFromQueueIfPresent(WatchableSocket * watcher);
+    struct LibeventTimer
+    {
+        LibeventTimer(WatchableEventManager * layer, TimerCompleteCallback onComplete, void * data) :
+            mEventManager(layer), mOnComplete(onComplete), mCallbackData(data), mEvent(nullptr)
+        {}
+        ~LibeventTimer();
+        WatchableEventManager * mEventManager;
+        TimerCompleteCallback mOnComplete;
+        void * mCallbackData;
+        event * mEvent;
+    };
+    static void TimerCallbackHandler(evutil_socket_t fd, short eventFlags, void * data);
 
-    WatchableSocket * mActiveSockets; ///< List of sockets activated by libevent.
+    struct SocketWatch
+    {
+        SocketWatch(WatchableEventManager * layer, int fd) :
+            mEventManager(layer), mFD(fd), mCallback(nullptr), mCallbackData(0), mEvent(nullptr)
+        {}
+        ~SocketWatch();
+        WatchableEventManager * mEventManager;
+        int mFD;
+        SocketEvents mPendingIO;
+        SocketWatchCallback mCallback;
+        intptr_t mCallbackData;
+        event * mEvent;
+    };
+    CHIP_ERROR SetWatch(SocketWatchToken token, short eventFlags);
+    CHIP_ERROR ClearWatch(SocketWatchToken token, short eventFlags);
+    CHIP_ERROR UpdateWatch(SocketWatch * watch, short eventFlags);
+    static void SocketCallbackHandler(evutil_socket_t fd, short eventFlags, void * data);
 
     Layer * mSystemLayer;
     event_base * mEventBase; ///< libevent shared state.
-    event * mTimeoutEvent;
 
-    Timer::MutexedList mTimerList;
+    std::list<std::unique_ptr<LibeventTimer>> mTimers;
+    std::list<LibeventTimer *> mActiveTimers;
+    Mutex mTimerListMutex;
+
+    std::list<std::unique_ptr<SocketWatch>> mSocketWatches;
+    std::list<SocketWatch *> mActiveSocketWatches;
+
     WakeEvent mWakeEvent;
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     std::atomic<pthread_t> mHandleSelectThread;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+    static void MdnsTimeoutCallbackHandler(evutil_socket_t fd, short eventFlags, void * data);
+    void MdnsTimeoutCallbackHandler();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+    event * mMdnsTimeoutEvent;
 };
 
 } // namespace System

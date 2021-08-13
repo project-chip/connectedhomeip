@@ -34,7 +34,6 @@
 #include <support/Pool.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/SystemTimer.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {

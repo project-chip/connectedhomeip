@@ -688,11 +688,11 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     CHIP_ERROR GetSocket(IPAddressType addrType);
-    void HandlePendingIO();
+    void HandlePendingIO(System::SocketEvents events);
     void ReceiveData();
     void HandleIncomingConnection();
     CHIP_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
-    static void HandlePendingIO(System::WatchableSocket & socket);
+    static void HandlePendingIO(System::SocketEvents events, intptr_t data);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_source_t mReadableSource  = nullptr;

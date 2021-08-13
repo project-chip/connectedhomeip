@@ -56,9 +56,9 @@ public:
     void Signal();
 
     // Timer ‘overrides’.
-    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, Timers::OnCompleteFunct onComplete, void * appState);
-    void CancelTimer(Timers::OnCompleteFunct onComplete, void * appState);
-    CHIP_ERROR ScheduleWork(Timers::OnCompleteFunct onComplete, void * appState);
+    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState);
+    void CancelTimer(TimerCompleteCallback onComplete, void * appState);
+    CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState);
 
     // Platform implementation.
     // typedef CHIP_ERROR (*EventHandler)(Object & aTarget, EventType aEventType, uintptr_t aArgument);

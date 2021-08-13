@@ -34,17 +34,10 @@
 #include <pthread.h>
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-#include <support/BitFlags.h>
-#include <support/logging/CHIPLogging.h>
-#include <system/SystemTimer.h>
 #include <system/WakeEvent.h>
 
 namespace chip {
 namespace System {
-
-class Layer;
-class Timer;
-class WatchableSocket;
 
 class WatchableEventManager
 {
@@ -55,9 +48,19 @@ public:
     void Signal();
 
     // Timer ‘overrides’.
-    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, Timers::OnCompleteFunct onComplete, void * appState);
-    void CancelTimer(Timers::OnCompleteFunct onComplete, void * appState);
-    CHIP_ERROR ScheduleWork(Timers::OnCompleteFunct onComplete, void * appState);
+    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState);
+    void CancelTimer(TimerCompleteCallback onComplete, void * appState);
+    CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState);
+
+    // Socket watch ‘overrides’.
+    CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut);
+    CHIP_ERROR SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data);
+    CHIP_ERROR RequestCallbackOnPendingRead(SocketWatchToken token);
+    CHIP_ERROR RequestCallbackOnPendingWrite(SocketWatchToken token);
+    CHIP_ERROR ClearCallbackOnPendingRead(SocketWatchToken token);
+    CHIP_ERROR ClearCallbackOnPendingWrite(SocketWatchToken token);
+    CHIP_ERROR StopWatchingSocket(SocketWatchToken * tokenInOut);
+    SocketWatchToken InvalidSocketWatchToken() { return reinterpret_cast<SocketWatchToken>(nullptr); }
 
     // Platform implementation.
     void EventLoopBegins() {}
@@ -75,13 +78,22 @@ public:
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 protected:
-    friend class WatchableSocket;
+    static constexpr int kSocketWatchMax = (INET_CONFIG_ENABLE_RAW_ENDPOINT ? INET_CONFIG_NUM_RAW_ENDPOINTS : 0) +
+        (INET_CONFIG_ENABLE_TCP_ENDPOINT ? INET_CONFIG_NUM_TCP_ENDPOINTS : 0) +
+        (INET_CONFIG_ENABLE_UDP_ENDPOINT ? INET_CONFIG_NUM_UDP_ENDPOINTS : 0) +
+        (INET_CONFIG_ENABLE_DNS_RESOLVER ? INET_CONFIG_NUM_DNS_RESOLVERS : 0);
 
-    CHIP_ERROR SetRequest(int fd, fd_set * fds);
-    CHIP_ERROR ClearRequest(int fd, fd_set * fds);
+    struct SocketWatch
+    {
+        void Clear();
+        int mFD;
+        SocketEvents mPendingIO;
+        SocketWatchCallback mCallback;
+        intptr_t mCallbackData;
+    };
+    SocketWatch mSocketWatchPool[kSocketWatchMax];
 
-    Layer * mSystemLayer               = nullptr;
-    WatchableSocket * mAttachedSockets = nullptr;
+    Layer * mSystemLayer = nullptr;
     Timer::MutexedList mTimerList;
     timeval mNextTimeout;
 
@@ -92,7 +104,6 @@ protected:
         fd_set mWriteSet;
         fd_set mErrorSet;
     };
-    SelectSets mRequest;
     SelectSets mSelected;
     int mMaxFd;
 
@@ -108,11 +119,6 @@ protected:
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_queue_t mDispatchQueue;
 #endif
-
-private:
-    bool HasAnyRequest(int fd);
-    void MaybeLowerMaxFd();
-    void ResetRequests(int fd);
 };
 
 } // namespace System

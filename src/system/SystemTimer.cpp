@@ -79,7 +79,7 @@ namespace System {
 
 ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> Timer::sPool;
 
-Timer * Timer::New(System::Layer & systemLayer, uint32_t delayMilliseconds, Timers::OnCompleteFunct onComplete, void * appState)
+Timer * Timer::New(System::Layer & systemLayer, uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
 {
     Timer * timer = Timer::sPool.TryCreate(systemLayer);
     if (timer == nullptr)
@@ -100,7 +100,7 @@ Timer * Timer::New(System::Layer & systemLayer, uint32_t delayMilliseconds, Time
 
 void Timer::Clear()
 {
-    Timers::OnCompleteFunct lOnComplete = this->mOnComplete;
+    TimerCompleteCallback lOnComplete = this->mOnComplete;
 
     // Check if the timer is armed
     VerifyOrReturn(lOnComplete != nullptr);
@@ -112,14 +112,11 @@ void Timer::Clear()
     AppState = nullptr;
 }
 
-/**
- *  This method is called by the underlying timer mechanism provided by the platform when the timer fires.
- */
 void Timer::HandleComplete()
 {
     // Save information needed to perform the callback.
     Layer & lLayer                            = this->SystemLayer();
-    const Timers::OnCompleteFunct lOnComplete = this->mOnComplete;
+    const TimerCompleteCallback lOnComplete = this->mOnComplete;
     void * lAppState                          = this->AppState;
 
     // Check if timer is armed
@@ -191,7 +188,7 @@ Timer * Timer::List::Remove(Timer * remove)
     return mHead;
 }
 
-Timer * Timer::List::Remove(Timers::OnCompleteFunct aOnComplete, void * aAppState)
+Timer * Timer::List::Remove(TimerCompleteCallback aOnComplete, void * aAppState)
 {
     Timer * previous = nullptr;
     for (Timer * timer = mHead; timer != nullptr; timer = timer->mNextTimer)

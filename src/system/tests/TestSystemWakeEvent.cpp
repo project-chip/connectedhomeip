@@ -33,7 +33,6 @@
 #include <support/UnitTestRegistration.h>
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
-#include <system/WatchableSocket.h>
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 #include <pthread.h>
@@ -58,18 +57,19 @@ namespace {
 struct TestContext
 {
     ::chip::System::Layer mSystemLayer;
-    WatchableEventManager mWatchableEvents;
     WakeEvent mWakeEvent;
     fd_set mReadSet;
     fd_set mWriteSet;
     fd_set mErrorSet;
 
-    TestContext()
-    {
-        (void) mWatchableEvents.Init(mSystemLayer);
-        mWakeEvent.Open(mWatchableEvents);
+    TestContext() {
+        mSystemLayer.Init();
+        mWakeEvent.Open(mSystemLayer);
     }
-    ~TestContext() { mWakeEvent.Close(); }
+    ~TestContext() {
+        mWakeEvent.Close(mSystemLayer);
+        mSystemLayer.Shutdown();
+    }
 
     int SelectWakeEvent(timeval timeout = {})
     {
@@ -145,12 +145,12 @@ void TestBlockingSelect(nlTestSuite *, void *) {}
 void TestClose(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
-    lContext.mWakeEvent.Close();
+    lContext.mWakeEvent.Close(lContext.mSystemLayer);
 
     const auto notifFD = WakeEventTest::GetReadFD(lContext.mWakeEvent);
 
     // Check that Close() has cleaned up itself and reopen is possible
-    NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.Open(lContext.mWatchableEvents) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, lContext.mWakeEvent.Open(lContext.mSystemLayer) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, notifFD < 0);
 }
 } // namespace
@@ -172,13 +172,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-// clang-format off
-static nlTestSuite kTheSuite =
-{
-    "chip-system-wake-event",
-    sTests
-};
-// clang-format on
+static nlTestSuite kTheSuite = { "chip-system-wake-event", sTests };
 
 int TestSystemWakeEvent(void)
 {

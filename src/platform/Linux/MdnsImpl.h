@@ -34,12 +34,13 @@
 #include <avahi-common/watch.h>
 
 #include "lib/mdns/platform/Mdns.h"
-#include "system/WatchableSocket.h"
 
 struct AvahiWatch
 {
-    chip::System::WatchableSocket mSocket;
+    int mSocket;
+    chip::System::SocketWatchToken mSocketWatch;
     AvahiWatchCallback mCallback; ///< The function to be called when interested events happened on mFd.
+    AvahiWatchEvent mPendingIO;   ///< The pending events from the currently active or most recent callback.
     void * mContext;              ///< A pointer to application-specific context.
     void * mPoller;               ///< The poller created this watch.
 };
