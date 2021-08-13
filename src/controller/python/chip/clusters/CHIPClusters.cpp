@@ -4396,7 +4396,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_TvChannel_TvChannelLineup(ch
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::TvChannelCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeTvChannelLineup(gOctetStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+    return cluster.ReadAttributeTvChannelLineup(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
         .AsInteger();
 }
 
@@ -4407,7 +4407,7 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_TvChannel_CurrentTvChannel(c
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::TvChannelCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeCurrentTvChannel(gOctetStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+    return cluster.ReadAttributeCurrentTvChannel(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
         .AsInteger();
 }
 

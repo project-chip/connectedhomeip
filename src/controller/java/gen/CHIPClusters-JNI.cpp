@@ -350,8 +350,8 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess method"));
 
-        UtfString valueStr(env, value);
-        env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
+        jstring valueStr = env->NewString(reinterpret_cast<const jchar *>(value.data()), value.size());
+        env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr);
     }
 
 private:
@@ -890,7 +890,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * setupPIN)
+    static void CallbackFn(void * context, chip::ByteSpan setupPIN)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -898,8 +898,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPAccountLoginClusterGetSetupPINResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString setupPINStr(env, "");
+        jstring setupPINStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -912,7 +911,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, setupPINStr.jniValue());
+        setupPINStr = env->NewString(reinterpret_cast<const jchar *>(setupPIN.data()), setupPIN.size());
+        VerifyOrExit(setupPINStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, setupPINStr);
+
+        env->DeleteLocalRef(setupPINStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -961,7 +966,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t status, uint8_t * data)
+    static void CallbackFn(void * context, uint8_t status, chip::ByteSpan data)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -969,8 +974,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPApplicationLauncherClusterLaunchAppResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString dataStr(env, "");
+        jstring dataStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -983,7 +987,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), dataStr.jniValue());
+        dataStr = env->NewString(reinterpret_cast<const jchar *>(data.data()), data.size());
+        VerifyOrExit(dataStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), dataStr);
+
+        env->DeleteLocalRef(dataStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1032,7 +1042,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
+    static void CallbackFn(void * context, chip::ByteSpan data, uint8_t contentLaunchStatus)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1040,8 +1050,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPContentLauncherClusterLaunchContentResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString dataStr(env, "");
+        jstring dataStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -1054,7 +1063,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr.jniValue(), static_cast<jint>(contentLaunchStatus));
+        dataStr = env->NewString(reinterpret_cast<const jchar *>(data.data()), data.size());
+        VerifyOrExit(dataStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr, static_cast<jint>(contentLaunchStatus));
+
+        env->DeleteLocalRef(dataStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1103,7 +1118,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
+    static void CallbackFn(void * context, chip::ByteSpan data, uint8_t contentLaunchStatus)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1111,8 +1126,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPContentLauncherClusterLaunchURLResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString dataStr(env, "");
+        jstring dataStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -1125,7 +1139,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;I)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr.jniValue(), static_cast<jint>(contentLaunchStatus));
+        dataStr = env->NewString(reinterpret_cast<const jchar *>(data.data()), data.size());
+        VerifyOrExit(dataStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, dataStr, static_cast<jint>(contentLaunchStatus));
+
+        env->DeleteLocalRef(dataStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1725,7 +1745,7 @@ public:
     };
 
     static void CallbackFn(void * context, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType, uint8_t source,
-                           uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
+                           uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1733,8 +1753,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetLogRecordResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString pinStr(env, "");
+        jstring pinStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -1748,9 +1767,15 @@ public:
             JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IJIIIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
+        pinStr = env->NewString(reinterpret_cast<const jchar *>(pin.data()), pin.size());
+        VerifyOrExit(pinStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(logEntryId), static_cast<jlong>(timestamp),
                             static_cast<jint>(eventType), static_cast<jint>(source), static_cast<jint>(eventIdOrAlarmCode),
-                            static_cast<jint>(userId), pinStr.jniValue());
+                            static_cast<jint>(userId), pinStr);
+
+        env->DeleteLocalRef(pinStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1798,7 +1823,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin)
+    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1806,8 +1831,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetPinResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString pinStr(env, "");
+        jstring pinStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -1820,8 +1844,14 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
+        pinStr = env->NewString(reinterpret_cast<const jchar *>(pin.data()), pin.size());
+        VerifyOrExit(pinStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(userId), static_cast<jint>(userStatus),
-                            static_cast<jint>(userType), pinStr.jniValue());
+                            static_cast<jint>(userType), pinStr);
+
+        env->DeleteLocalRef(pinStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -1869,7 +1899,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid)
+    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan rfid)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1877,8 +1907,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPDoorLockClusterGetRfidResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString rfidStr(env, "");
+        jstring rfidStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -1891,8 +1920,14 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
+        rfidStr = env->NewString(reinterpret_cast<const jchar *>(rfid.data()), rfid.size());
+        VerifyOrExit(rfidStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(userId), static_cast<jint>(userStatus),
-                            static_cast<jint>(userType), rfidStr.jniValue());
+                            static_cast<jint>(userType), rfidStr);
+
+        env->DeleteLocalRef(rfidStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2768,7 +2803,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2776,8 +2811,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGeneralCommissioningClusterArmFailSafeResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        jstring debugTextStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -2790,7 +2824,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
+        debugTextStr = env->NewString(reinterpret_cast<const jchar *>(debugText.data()), debugText.size());
+        VerifyOrExit(debugTextStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr);
+
+        env->DeleteLocalRef(debugTextStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2839,7 +2879,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2847,8 +2887,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        jstring debugTextStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -2861,7 +2900,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
+        debugTextStr = env->NewString(reinterpret_cast<const jchar *>(debugText.data()), debugText.size());
+        VerifyOrExit(debugTextStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr);
+
+        env->DeleteLocalRef(debugTextStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -2910,7 +2955,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2918,8 +2963,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        jstring debugTextStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -2932,7 +2976,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
+        debugTextStr = env->NewString(reinterpret_cast<const jchar *>(debugText.data()), debugText.size());
+        VerifyOrExit(debugTextStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr);
+
+        env->DeleteLocalRef(debugTextStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -3189,7 +3239,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t * groupName)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, chip::ByteSpan groupName)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3197,8 +3247,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPGroupsClusterViewGroupResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString groupNameStr(env, "");
+        jstring groupNameStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -3211,8 +3260,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jint>(groupId),
-                            groupNameStr.jniValue());
+        groupNameStr = env->NewString(reinterpret_cast<const jchar *>(groupName.data()), groupName.size());
+        VerifyOrExit(groupNameStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jint>(groupId), groupNameStr);
+
+        env->DeleteLocalRef(groupNameStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -4151,7 +4205,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4159,8 +4213,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        jstring debugTextStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4173,7 +4226,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
+        debugTextStr = env->NewString(reinterpret_cast<const jchar *>(debugText.data()), debugText.size());
+        VerifyOrExit(debugTextStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr);
+
+        env->DeleteLocalRef(debugTextStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -4222,7 +4281,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4230,8 +4289,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        jstring debugTextStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4244,7 +4302,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
+        debugTextStr = env->NewString(reinterpret_cast<const jchar *>(debugText.data()), debugText.size());
+        VerifyOrExit(debugTextStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr);
+
+        env->DeleteLocalRef(debugTextStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -4293,7 +4357,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4301,8 +4365,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterDisableNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        jstring debugTextStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4315,7 +4378,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
+        debugTextStr = env->NewString(reinterpret_cast<const jchar *>(debugText.data()), debugText.size());
+        VerifyOrExit(debugTextStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr);
+
+        env->DeleteLocalRef(debugTextStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -4364,7 +4433,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4372,8 +4441,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterEnableNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        jstring debugTextStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4386,7 +4454,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
+        debugTextStr = env->NewString(reinterpret_cast<const jchar *>(debugText.data()), debugText.size());
+        VerifyOrExit(debugTextStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr);
+
+        env->DeleteLocalRef(debugTextStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -4435,7 +4509,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4443,8 +4517,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        jstring debugTextStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4457,7 +4530,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
+        debugTextStr = env->NewString(reinterpret_cast<const jchar *>(debugText.data()), debugText.size());
+        VerifyOrExit(debugTextStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr);
+
+        env->DeleteLocalRef(debugTextStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -4506,7 +4585,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText,
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText,
                            /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
                            /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
     {
@@ -4516,8 +4595,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterScanNetworksResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        jstring debugTextStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4530,12 +4608,18 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue()
+        debugTextStr = env->NewString(reinterpret_cast<const jchar *>(debugText.data()), debugText.size());
+        VerifyOrExit(debugTextStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr
                             // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
                             // Conversion from this type to Java is not properly implemented yet
                             // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
                             // Conversion from this type to Java is not properly implemented yet
         );
+
+        env->DeleteLocalRef(debugTextStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -4584,7 +4668,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4592,8 +4676,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        jstring debugTextStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4606,7 +4689,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
+        debugTextStr = env->NewString(reinterpret_cast<const jchar *>(debugText.data()), debugText.size());
+        VerifyOrExit(debugTextStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr);
+
+        env->DeleteLocalRef(debugTextStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -4655,7 +4744,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4663,8 +4752,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString debugTextStr(env, "");
+        jstring debugTextStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4677,7 +4765,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr.jniValue());
+        debugTextStr = env->NewString(reinterpret_cast<const jchar *>(debugText.data()), debugText.size());
+        VerifyOrExit(debugTextStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(errorCode), debugTextStr);
+
+        env->DeleteLocalRef(debugTextStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -4795,8 +4889,9 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-                           chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
+    static void CallbackFn(void * context, uint8_t status, uint32_t delayedActionTime, chip::ByteSpan imageURI,
+                           uint32_t softwareVersion, chip::ByteSpan updateToken, bool userConsentNeeded,
+                           chip::ByteSpan metadataForRequestor)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4804,8 +4899,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString imageURIStr(env, "");
+        jstring imageURIStr;
         jbyteArray updateTokenArr;
         jbyteArray metadataForRequestorArr;
 
@@ -4821,6 +4915,9 @@ public:
                                                       &javaMethod);
         SuccessOrExit(err);
 
+        imageURIStr = env->NewString(reinterpret_cast<const jchar *>(imageURI.data()), imageURI.size());
+        VerifyOrExit(imageURIStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
         updateTokenArr = env->NewByteArray(updateToken.size());
         VerifyOrExit(updateTokenArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
         env->ExceptionClear();
@@ -4834,9 +4931,10 @@ public:
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jlong>(delayedActionTime),
-                            imageURIStr.jniValue(), static_cast<jlong>(softwareVersion), updateTokenArr,
+                            imageURIStr, static_cast<jlong>(softwareVersion), updateTokenArr,
                             static_cast<jboolean>(userConsentNeeded), metadataForRequestorArr);
 
+        env->DeleteLocalRef(imageURIStr);
         env->DeleteLocalRef(updateTokenArr);
         env->DeleteLocalRef(metadataForRequestorArr);
 
@@ -4895,7 +4993,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPOperationalCredentialsClusterNOCResponseCallback * cppCallback = nullptr;
-        jbyteArray DebugTextArr;
+        jstring DebugTextStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -4905,19 +5003,17 @@ public:
         javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrExit(javaCallbackRef != nullptr, err = CHIP_NO_ERROR);
 
-        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(II[B)V", &javaMethod);
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        DebugTextArr = env->NewByteArray(DebugText.size());
-        VerifyOrExit(DebugTextArr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        DebugTextStr = env->NewString(reinterpret_cast<const jchar *>(DebugText.data()), DebugText.size());
+        VerifyOrExit(DebugTextStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
         env->ExceptionClear();
-        env->SetByteArrayRegion(DebugTextArr, 0, DebugText.size(), reinterpret_cast<const jbyte *>(DebugText.data()));
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(StatusCode), static_cast<jint>(FabricIndex),
-                            DebugTextArr);
+                            DebugTextStr);
 
-        env->DeleteLocalRef(DebugTextArr);
+        env->DeleteLocalRef(DebugTextStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -5401,7 +5497,7 @@ public:
     };
 
     static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
-                           uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
+                           chip::ByteSpan sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5409,8 +5505,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPScenesClusterViewSceneResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString sceneNameStr(env, "");
+        jstring sceneNameStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -5423,11 +5518,17 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(IIIILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
+        sceneNameStr = env->NewString(reinterpret_cast<const jchar *>(sceneName.data()), sceneName.size());
+        VerifyOrExit(sceneNameStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
         env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), static_cast<jint>(groupId),
-                            static_cast<jint>(sceneId), static_cast<jint>(transitionTime), sceneNameStr.jniValue()
+                            static_cast<jint>(sceneId), static_cast<jint>(transitionTime), sceneNameStr
                             // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
                             // Conversion from this type to Java is not properly implemented yet
         );
+
+        env->DeleteLocalRef(sceneNameStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -5549,7 +5650,7 @@ public:
         env->DeleteGlobalRef(javaCallbackRef);
     };
 
-    static void CallbackFn(void * context, uint8_t status, uint8_t * data)
+    static void CallbackFn(void * context, uint8_t status, chip::ByteSpan data)
     {
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5557,8 +5658,7 @@ public:
         jobject javaCallbackRef;
         jmethodID javaMethod;
         CHIPTargetNavigatorClusterNavigateTargetResponseCallback * cppCallback = nullptr;
-        // ByteSpan is not properly returned yet, temporarily use empty string
-        UtfString dataStr(env, "");
+        jstring dataStr;
 
         VerifyOrExit(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
 
@@ -5571,7 +5671,13 @@ public:
         err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(ILjava/lang/String;)V", &javaMethod);
         SuccessOrExit(err);
 
-        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), dataStr.jniValue());
+        dataStr = env->NewString(reinterpret_cast<const jchar *>(data.data()), data.size());
+        VerifyOrExit(dataStr != nullptr, err = CHIP_ERROR_NO_MEMORY);
+        env->ExceptionClear();
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, static_cast<jint>(status), dataStr);
+
+        env->DeleteLocalRef(dataStr);
 
     exit:
         if (err != CHIP_NO_ERROR)
@@ -5856,15 +5962,14 @@ public:
             ChipLogError(Zcl,
                          "Could not find class chip/devicecontroller/ChipClusters$AudioOutputCluster$AudioOutputListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(II[B)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(IILjava/lang/String;)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find AudioOutputListAttribute constructor"));
 
         for (uint16_t i = 0; i < count; i++)
         {
             jint index      = entries[i].index;
             jint outputType = entries[i].outputType;
-            jbyteArray name = env->NewByteArray(entries[i].name.size());
-            env->SetByteArrayRegion(name, 0, entries[i].name.size(), reinterpret_cast<const jbyte *>(entries[i].name.data()));
+            jstring name    = env->NewString(reinterpret_cast<const jchar *>(entries[i].name.data()), entries[i].name.size());
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, index, outputType, name);
             VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create AudioOutputListAttribute object"));
@@ -6365,15 +6470,13 @@ public:
             err == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$FixedLabelCluster$LabelListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "([B[B)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find LabelListAttribute constructor"));
 
         for (uint16_t i = 0; i < count; i++)
         {
-            jbyteArray label = env->NewByteArray(entries[i].label.size());
-            env->SetByteArrayRegion(label, 0, entries[i].label.size(), reinterpret_cast<const jbyte *>(entries[i].label.data()));
-            jbyteArray value = env->NewByteArray(entries[i].value.size());
-            env->SetByteArrayRegion(value, 0, entries[i].value.size(), reinterpret_cast<const jbyte *>(entries[i].value.data()));
+            jstring label = env->NewString(reinterpret_cast<const jchar *>(entries[i].label.data()), entries[i].label.size());
+            jstring value = env->NewString(reinterpret_cast<const jchar *>(entries[i].value.data()), entries[i].value.size());
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, label, value);
             VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create LabelListAttribute object"));
@@ -6451,13 +6554,12 @@ public:
                 Zcl,
                 "Could not find class chip/devicecontroller/ChipClusters$GeneralDiagnosticsCluster$NetworkInterfacesAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "([BZZZ[BI)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/String;ZZZ[BI)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find NetworkInterfacesAttribute constructor"));
 
         for (uint16_t i = 0; i < count; i++)
         {
-            jbyteArray name = env->NewByteArray(entries[i].Name.size());
-            env->SetByteArrayRegion(name, 0, entries[i].Name.size(), reinterpret_cast<const jbyte *>(entries[i].Name.data()));
+            jstring name = env->NewString(reinterpret_cast<const jchar *>(entries[i].Name.data()), entries[i].Name.size());
             jboolean fabricConnected                 = entries[i].FabricConnected;
             jboolean offPremiseServicesReachableIPv4 = entries[i].OffPremiseServicesReachableIPv4;
             jboolean offPremiseServicesReachableIPv6 = entries[i].OffPremiseServicesReachableIPv6;
@@ -6711,18 +6813,16 @@ public:
             err == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$MediaInputCluster$MediaInputListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(II[B[B)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(IILjava/lang/String;Ljava/lang/String;)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find MediaInputListAttribute constructor"));
 
         for (uint16_t i = 0; i < count; i++)
         {
-            jint index      = entries[i].index;
-            jint inputType  = entries[i].inputType;
-            jbyteArray name = env->NewByteArray(entries[i].name.size());
-            env->SetByteArrayRegion(name, 0, entries[i].name.size(), reinterpret_cast<const jbyte *>(entries[i].name.data()));
-            jbyteArray description = env->NewByteArray(entries[i].description.size());
-            env->SetByteArrayRegion(description, 0, entries[i].description.size(),
-                                    reinterpret_cast<const jbyte *>(entries[i].description.data()));
+            jint index     = entries[i].index;
+            jint inputType = entries[i].inputType;
+            jstring name   = env->NewString(reinterpret_cast<const jchar *>(entries[i].name.data()), entries[i].name.size());
+            jstring description =
+                env->NewString(reinterpret_cast<const jchar *>(entries[i].description.data()), entries[i].description.size());
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, index, inputType, name, description);
             VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create MediaInputListAttribute object"));
@@ -6799,16 +6899,15 @@ public:
             ChipLogError(
                 Zcl, "Could not find class chip/devicecontroller/ChipClusters$OperationalCredentialsCluster$FabricsListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(JIJ[B)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(JIJLjava/lang/String;)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find FabricsListAttribute constructor"));
 
         for (uint16_t i = 0; i < count; i++)
         {
-            jlong fabricId   = entries[i].FabricId;
-            jint vendorId    = entries[i].VendorId;
-            jlong nodeId     = entries[i].NodeId;
-            jbyteArray label = env->NewByteArray(entries[i].Label.size());
-            env->SetByteArrayRegion(label, 0, entries[i].Label.size(), reinterpret_cast<const jbyte *>(entries[i].Label.data()));
+            jlong fabricId = entries[i].FabricId;
+            jint vendorId  = entries[i].VendorId;
+            jlong nodeId   = entries[i].NodeId;
+            jstring label  = env->NewString(reinterpret_cast<const jchar *>(entries[i].Label.data()), entries[i].Label.size());
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricId, vendorId, nodeId, label);
             VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create FabricsListAttribute object"));
@@ -6883,21 +6982,19 @@ public:
             err == CHIP_NO_ERROR,
             ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$TvChannelCluster$TvChannelListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(II[B[B[B)V");
+        jmethodID attributeCtor =
+            env->GetMethodID(attributeClass, "<init>", "(IILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find TvChannelListAttribute constructor"));
 
         for (uint16_t i = 0; i < count; i++)
         {
             jint majorNumber = entries[i].majorNumber;
             jint minorNumber = entries[i].minorNumber;
-            jbyteArray name  = env->NewByteArray(entries[i].name.size());
-            env->SetByteArrayRegion(name, 0, entries[i].name.size(), reinterpret_cast<const jbyte *>(entries[i].name.data()));
-            jbyteArray callSign = env->NewByteArray(entries[i].callSign.size());
-            env->SetByteArrayRegion(callSign, 0, entries[i].callSign.size(),
-                                    reinterpret_cast<const jbyte *>(entries[i].callSign.data()));
-            jbyteArray affiliateCallSign = env->NewByteArray(entries[i].affiliateCallSign.size());
-            env->SetByteArrayRegion(affiliateCallSign, 0, entries[i].affiliateCallSign.size(),
-                                    reinterpret_cast<const jbyte *>(entries[i].affiliateCallSign.data()));
+            jstring name     = env->NewString(reinterpret_cast<const jchar *>(entries[i].name.data()), entries[i].name.size());
+            jstring callSign =
+                env->NewString(reinterpret_cast<const jchar *>(entries[i].callSign.data()), entries[i].callSign.size());
+            jstring affiliateCallSign = env->NewString(reinterpret_cast<const jchar *>(entries[i].affiliateCallSign.data()),
+                                                       entries[i].affiliateCallSign.size());
 
             jobject attributeObj =
                 env->NewObject(attributeClass, attributeCtor, majorNumber, minorNumber, name, callSign, affiliateCallSign);
@@ -6976,14 +7073,13 @@ public:
                 Zcl,
                 "Could not find class chip/devicecontroller/ChipClusters$TargetNavigatorCluster$TargetNavigatorListAttribute"));
         JniClass attributeJniClass(attributeClass);
-        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(I[B)V");
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(ILjava/lang/String;)V");
         VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find TargetNavigatorListAttribute constructor"));
 
         for (uint16_t i = 0; i < count; i++)
         {
             jint identifier = entries[i].identifier;
-            jbyteArray name = env->NewByteArray(entries[i].name.size());
-            env->SetByteArrayRegion(name, 0, entries[i].name.size(), reinterpret_cast<const jbyte *>(entries[i].name.data()));
+            jstring name    = env->NewString(reinterpret_cast<const jchar *>(entries[i].name.data()), entries[i].name.size());
 
             jobject attributeObj = env->NewObject(attributeClass, attributeCtor, identifier, name);
             VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create TargetNavigatorListAttribute object"));
@@ -23232,7 +23328,7 @@ JNI_METHOD(void, TvChannelCluster, readTvChannelListAttribute)(JNIEnv * env, job
 JNI_METHOD(void, TvChannelCluster, readTvChannelLineupAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -23269,7 +23365,7 @@ JNI_METHOD(void, TvChannelCluster, readTvChannelLineupAttribute)(JNIEnv * env, j
 JNI_METHOD(void, TvChannelCluster, readCurrentTvChannelAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
+    CHIPCharStringAttributeCallback * onSuccess = new CHIPCharStringAttributeCallback(callback);
     if (!onSuccess)
     {
         ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());

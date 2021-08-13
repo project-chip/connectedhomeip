@@ -118,7 +118,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                            sizeof(entry->index)); // INT8U
             copyListMember(write ? dest : (uint8_t *) &entry->outputType, write ? (uint8_t *) &entry->outputType : src, write,
                            &entryOffset, sizeof(entry->outputType)); // AudioOutputType
-            ByteSpan * nameSpan = &entry->name;                      // OCTET_STRING
+            ByteSpan * nameSpan = &entry->name;                      // CHAR_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, nameSpan) : ReadByteSpan(src + entryOffset, 34, nameSpan)))
             {
@@ -255,7 +255,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
             // Struct _NetworkInterfaceType
             _NetworkInterfaceType * entry = reinterpret_cast<_NetworkInterfaceType *>(write ? src : dest);
-            ByteSpan * NameSpan           = &entry->Name; // OCTET_STRING
+            ByteSpan * NameSpan           = &entry->Name; // CHAR_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, NameSpan) : ReadByteSpan(src + entryOffset, 34, NameSpan)))
             {
@@ -366,7 +366,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                            sizeof(entry->index)); // INT8U
             copyListMember(write ? dest : (uint8_t *) &entry->inputType, write ? (uint8_t *) &entry->inputType : src, write,
                            &entryOffset, sizeof(entry->inputType)); // MediaInputType
-            ByteSpan * nameSpan = &entry->name;                     // OCTET_STRING
+            ByteSpan * nameSpan = &entry->name;                     // CHAR_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, nameSpan) : ReadByteSpan(src + entryOffset, 34, nameSpan)))
             {
@@ -374,7 +374,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
             entryOffset                = static_cast<uint16_t>(entryOffset + 34);
-            ByteSpan * descriptionSpan = &entry->description; // OCTET_STRING
+            ByteSpan * descriptionSpan = &entry->description; // CHAR_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, descriptionSpan)
                        : ReadByteSpan(src + entryOffset, 34, descriptionSpan)))
@@ -410,7 +410,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                            &entryOffset, sizeof(entry->VendorId)); // INT16U
             copyListMember(write ? dest : (uint8_t *) &entry->NodeId, write ? (uint8_t *) &entry->NodeId : src, write, &entryOffset,
                            sizeof(entry->NodeId)); // NODE_ID
-            ByteSpan * LabelSpan = &entry->Label;  // OCTET_STRING
+            ByteSpan * LabelSpan = &entry->Label;  // CHAR_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, LabelSpan) : ReadByteSpan(src + entryOffset, 34, LabelSpan)))
             {
@@ -443,7 +443,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                            &entryOffset, sizeof(entry->majorNumber)); // INT16U
             copyListMember(write ? dest : (uint8_t *) &entry->minorNumber, write ? (uint8_t *) &entry->minorNumber : src, write,
                            &entryOffset, sizeof(entry->minorNumber)); // INT16U
-            ByteSpan * nameSpan = &entry->name;                       // OCTET_STRING
+            ByteSpan * nameSpan = &entry->name;                       // CHAR_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, nameSpan) : ReadByteSpan(src + entryOffset, 34, nameSpan)))
             {
@@ -451,7 +451,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
             entryOffset             = static_cast<uint16_t>(entryOffset + 34);
-            ByteSpan * callSignSpan = &entry->callSign; // OCTET_STRING
+            ByteSpan * callSignSpan = &entry->callSign; // CHAR_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, callSignSpan) : ReadByteSpan(src + entryOffset, 34, callSignSpan)))
             {
@@ -459,7 +459,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
             entryOffset                      = static_cast<uint16_t>(entryOffset + 34);
-            ByteSpan * affiliateCallSignSpan = &entry->affiliateCallSign; // OCTET_STRING
+            ByteSpan * affiliateCallSignSpan = &entry->affiliateCallSign; // CHAR_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, affiliateCallSignSpan)
                        : ReadByteSpan(src + entryOffset, 34, affiliateCallSignSpan)))
@@ -491,7 +491,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             _NavigateTargetTargetInfo * entry = reinterpret_cast<_NavigateTargetTargetInfo *>(write ? src : dest);
             copyListMember(write ? dest : (uint8_t *) &entry->identifier, write ? (uint8_t *) &entry->identifier : src, write,
                            &entryOffset, sizeof(entry->identifier)); // INT8U
-            ByteSpan * nameSpan = &entry->name;                      // OCTET_STRING
+            ByteSpan * nameSpan = &entry->name;                      // CHAR_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, nameSpan) : ReadByteSpan(src + entryOffset, 34, nameSpan)))
             {

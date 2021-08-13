@@ -464,14 +464,16 @@ public:
 
     ~CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t * setupPIN)
+    static void CallbackFn(void * context, chip::ByteSpan setupPIN)
     {
         CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge * callback
             = reinterpret_cast<CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
-                    @"setupPIN" : [NSString stringWithFormat:@"%s", setupPIN],
+                    @"setupPIN" : [[NSString alloc] initWithBytes:setupPIN.data()
+                                                           length:setupPIN.size()
+                                                         encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -496,7 +498,7 @@ public:
 
     ~CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t status, uint8_t * data)
+    static void CallbackFn(void * context, uint8_t status, chip::ByteSpan data)
     {
         CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge * callback
             = reinterpret_cast<CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge *>(context);
@@ -504,7 +506,7 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"status" : [NSNumber numberWithUnsignedChar:status],
-                    @"data" : [NSString stringWithFormat:@"%s", data],
+                    @"data" : [[NSString alloc] initWithBytes:data.data() length:data.size() encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -529,14 +531,14 @@ public:
 
     ~CHIPContentLauncherClusterLaunchContentResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
+    static void CallbackFn(void * context, chip::ByteSpan data, uint8_t contentLaunchStatus)
     {
         CHIPContentLauncherClusterLaunchContentResponseCallbackBridge * callback
             = reinterpret_cast<CHIPContentLauncherClusterLaunchContentResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
-                    @"data" : [NSString stringWithFormat:@"%s", data],
+                    @"data" : [[NSString alloc] initWithBytes:data.data() length:data.size() encoding:NSUTF8StringEncoding],
                     @"contentLaunchStatus" : [NSNumber numberWithUnsignedChar:contentLaunchStatus],
                 });
                 callback->Cancel();
@@ -562,14 +564,14 @@ public:
 
     ~CHIPContentLauncherClusterLaunchURLResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t * data, uint8_t contentLaunchStatus)
+    static void CallbackFn(void * context, chip::ByteSpan data, uint8_t contentLaunchStatus)
     {
         CHIPContentLauncherClusterLaunchURLResponseCallbackBridge * callback
             = reinterpret_cast<CHIPContentLauncherClusterLaunchURLResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
-                    @"data" : [NSString stringWithFormat:@"%s", data],
+                    @"data" : [[NSString alloc] initWithBytes:data.data() length:data.size() encoding:NSUTF8StringEncoding],
                     @"contentLaunchStatus" : [NSNumber numberWithUnsignedChar:contentLaunchStatus],
                 });
                 callback->Cancel();
@@ -855,7 +857,7 @@ public:
     ~CHIPDoorLockClusterGetLogRecordResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType, uint8_t source,
-        uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
+        uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin)
     {
         CHIPDoorLockClusterGetLogRecordResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterGetLogRecordResponseCallbackBridge *>(context);
@@ -868,7 +870,7 @@ public:
                     @"source" : [NSNumber numberWithUnsignedChar:source],
                     @"eventIdOrAlarmCode" : [NSNumber numberWithUnsignedChar:eventIdOrAlarmCode],
                     @"userId" : [NSNumber numberWithUnsignedShort:userId],
-                    @"pin" : [NSString stringWithFormat:@"%s", pin],
+                    @"pin" : [[NSString alloc] initWithBytes:pin.data() length:pin.size() encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -892,7 +894,7 @@ public:
 
     ~CHIPDoorLockClusterGetPinResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin)
+    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
     {
         CHIPDoorLockClusterGetPinResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterGetPinResponseCallbackBridge *>(context);
@@ -902,7 +904,7 @@ public:
                     @"userId" : [NSNumber numberWithUnsignedShort:userId],
                     @"userStatus" : [NSNumber numberWithUnsignedChar:userStatus],
                     @"userType" : [NSNumber numberWithUnsignedChar:userType],
-                    @"pin" : [NSString stringWithFormat:@"%s", pin],
+                    @"pin" : [[NSString alloc] initWithBytes:pin.data() length:pin.size() encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -926,7 +928,7 @@ public:
 
     ~CHIPDoorLockClusterGetRfidResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid)
+    static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan rfid)
     {
         CHIPDoorLockClusterGetRfidResponseCallbackBridge * callback
             = reinterpret_cast<CHIPDoorLockClusterGetRfidResponseCallbackBridge *>(context);
@@ -936,7 +938,7 @@ public:
                     @"userId" : [NSNumber numberWithUnsignedShort:userId],
                     @"userStatus" : [NSNumber numberWithUnsignedChar:userStatus],
                     @"userType" : [NSNumber numberWithUnsignedChar:userType],
-                    @"rfid" : [NSString stringWithFormat:@"%s", rfid],
+                    @"rfid" : [[NSString alloc] initWithBytes:rfid.data() length:rfid.size() encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1353,7 +1355,7 @@ public:
 
     ~CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge * callback
             = reinterpret_cast<CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge *>(context);
@@ -1361,7 +1363,9 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                    @"debugText" : [[NSString alloc] initWithBytes:debugText.data()
+                                                            length:debugText.size()
+                                                          encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1386,7 +1390,7 @@ public:
 
     ~CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge * callback
             = reinterpret_cast<CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge *>(context);
@@ -1394,7 +1398,9 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                    @"debugText" : [[NSString alloc] initWithBytes:debugText.data()
+                                                            length:debugText.size()
+                                                          encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1419,7 +1425,7 @@ public:
 
     ~CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge * callback
             = reinterpret_cast<CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge *>(context);
@@ -1427,7 +1433,9 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                    @"debugText" : [[NSString alloc] initWithBytes:debugText.data()
+                                                            length:debugText.size()
+                                                          encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1551,7 +1559,7 @@ public:
 
     ~CHIPGroupsClusterViewGroupResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t * groupName)
+    static void CallbackFn(void * context, uint8_t status, uint16_t groupId, chip::ByteSpan groupName)
     {
         CHIPGroupsClusterViewGroupResponseCallbackBridge * callback
             = reinterpret_cast<CHIPGroupsClusterViewGroupResponseCallbackBridge *>(context);
@@ -1560,7 +1568,9 @@ public:
                 callback->mHandler(nil, @ {
                     @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"groupName" : [NSString stringWithFormat:@"%s", groupName],
+                    @"groupName" : [[NSString alloc] initWithBytes:groupName.data()
+                                                            length:groupName.size()
+                                                          encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -2000,7 +2010,7 @@ public:
 
     ~CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge * callback
             = reinterpret_cast<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge *>(context);
@@ -2008,7 +2018,9 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                    @"debugText" : [[NSString alloc] initWithBytes:debugText.data()
+                                                            length:debugText.size()
+                                                          encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -2033,7 +2045,7 @@ public:
 
     ~CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge * callback
             = reinterpret_cast<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge *>(context);
@@ -2041,7 +2053,9 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                    @"debugText" : [[NSString alloc] initWithBytes:debugText.data()
+                                                            length:debugText.size()
+                                                          encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -2066,7 +2080,7 @@ public:
 
     ~CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge * callback
             = reinterpret_cast<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge *>(context);
@@ -2074,7 +2088,9 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                    @"debugText" : [[NSString alloc] initWithBytes:debugText.data()
+                                                            length:debugText.size()
+                                                          encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -2099,7 +2115,7 @@ public:
 
     ~CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge * callback
             = reinterpret_cast<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge *>(context);
@@ -2107,7 +2123,9 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                    @"debugText" : [[NSString alloc] initWithBytes:debugText.data()
+                                                            length:debugText.size()
+                                                          encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -2132,7 +2150,7 @@ public:
 
     ~CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge * callback
             = reinterpret_cast<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge *>(context);
@@ -2140,7 +2158,9 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                    @"debugText" : [[NSString alloc] initWithBytes:debugText.data()
+                                                            length:debugText.size()
+                                                          encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -2165,7 +2185,7 @@ public:
 
     ~CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText,
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText,
         /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
         /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
     {
@@ -2175,7 +2195,9 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                    @"debugText" : [[NSString alloc] initWithBytes:debugText.data()
+                                                            length:debugText.size()
+                                                          encoding:NSUTF8StringEncoding],
                     // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
                     // Conversion from this type to Objc is not properly implemented yet
                     // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
@@ -2204,7 +2226,7 @@ public:
 
     ~CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge * callback
             = reinterpret_cast<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge *>(context);
@@ -2212,7 +2234,9 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                    @"debugText" : [[NSString alloc] initWithBytes:debugText.data()
+                                                            length:debugText.size()
+                                                          encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -2237,7 +2261,7 @@ public:
 
     ~CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
+    static void CallbackFn(void * context, uint8_t errorCode, chip::ByteSpan debugText)
     {
         CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge * callback
             = reinterpret_cast<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge *>(context);
@@ -2245,7 +2269,9 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                    @"debugText" : [[NSString alloc] initWithBytes:debugText.data()
+                                                            length:debugText.size()
+                                                          encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -2303,8 +2329,8 @@ public:
 
     ~CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-        chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
+    static void CallbackFn(void * context, uint8_t status, uint32_t delayedActionTime, chip::ByteSpan imageURI,
+        uint32_t softwareVersion, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
     {
         CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge * callback
             = reinterpret_cast<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge *>(context);
@@ -2313,7 +2339,9 @@ public:
                 callback->mHandler(nil, @ {
                     @"status" : [NSNumber numberWithUnsignedChar:status],
                     @"delayedActionTime" : [NSNumber numberWithUnsignedLong:delayedActionTime],
-                    @"imageURI" : [NSString stringWithFormat:@"%s", imageURI],
+                    @"imageURI" : [[NSString alloc] initWithBytes:imageURI.data()
+                                                           length:imageURI.size()
+                                                         encoding:NSUTF8StringEncoding],
                     @"softwareVersion" : [NSNumber numberWithUnsignedLong:softwareVersion],
                     @"updateToken" : [NSData dataWithBytes:updateToken.data() length:updateToken.size()],
                     @"userConsentNeeded" : [NSNumber numberWithBool:userConsentNeeded],
@@ -2351,7 +2379,9 @@ public:
                 callback->mHandler(nil, @ {
                     @"StatusCode" : [NSNumber numberWithUnsignedChar:StatusCode],
                     @"FabricIndex" : [NSNumber numberWithUnsignedChar:FabricIndex],
-                    @"DebugText" : [NSData dataWithBytes:DebugText.data() length:DebugText.size()],
+                    @"DebugText" : [[NSString alloc] initWithBytes:DebugText.data()
+                                                            length:DebugText.size()
+                                                          encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -2579,7 +2609,7 @@ public:
     ~CHIPScenesClusterViewSceneResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
-        uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
+        chip::ByteSpan sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
     {
         CHIPScenesClusterViewSceneResponseCallbackBridge * callback
             = reinterpret_cast<CHIPScenesClusterViewSceneResponseCallbackBridge *>(context);
@@ -2590,7 +2620,9 @@ public:
                     @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
                     @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
                     @"transitionTime" : [NSNumber numberWithUnsignedShort:transitionTime],
-                    @"sceneName" : [NSString stringWithFormat:@"%s", sceneName],
+                    @"sceneName" : [[NSString alloc] initWithBytes:sceneName.data()
+                                                            length:sceneName.size()
+                                                          encoding:NSUTF8StringEncoding],
                     // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
                     // Conversion from this type to Objc is not properly implemented yet
                 });
@@ -2651,7 +2683,7 @@ public:
 
     ~CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t status, uint8_t * data)
+    static void CallbackFn(void * context, uint8_t status, chip::ByteSpan data)
     {
         CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge * callback
             = reinterpret_cast<CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge *>(context);
@@ -2659,7 +2691,7 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"status" : [NSNumber numberWithUnsignedChar:status],
-                    @"data" : [NSString stringWithFormat:@"%s", data],
+                    @"data" : [[NSString alloc] initWithBytes:data.data() length:data.size() encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
@@ -2793,7 +2825,9 @@ public:
             for (uint16_t i = 0; i < count; i++) {
                 values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedChar:entries[i].index],
                                                   @"index", [NSNumber numberWithUnsignedChar:entries[i].outputType], @"outputType",
-                                                  [NSData dataWithBytes:entries[i].name.data() length:entries[i].name.size()],
+                                                  [[NSString alloc] initWithBytes:entries[i].name.data()
+                                                                           length:entries[i].name.size()
+                                                                         encoding:NSUTF8StringEncoding],
                                                   @"name", nil];
             }
 
@@ -3042,9 +3076,14 @@ public:
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
-                values[i] = [[NSDictionary alloc]
-                    initWithObjectsAndKeys:[NSData dataWithBytes:entries[i].label.data() length:entries[i].label.size()], @"label",
-                    [NSData dataWithBytes:entries[i].value.data() length:entries[i].value.size()], @"value", nil];
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[[NSString alloc] initWithBytes:entries[i].label.data()
+                                                                                                  length:entries[i].label.size()
+                                                                                                encoding:NSUTF8StringEncoding],
+                                                  @"label",
+                                                  [[NSString alloc] initWithBytes:entries[i].value.data()
+                                                                           length:entries[i].value.size()
+                                                                         encoding:NSUTF8StringEncoding],
+                                                  @"value", nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -3081,8 +3120,10 @@ public:
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
                 values[i] = [[NSDictionary alloc]
-                    initWithObjectsAndKeys:[NSData dataWithBytes:entries[i].Name.data() length:entries[i].Name.size()], @"Name",
-                    [NSNumber numberWithBool:entries[i].FabricConnected], @"FabricConnected",
+                    initWithObjectsAndKeys:[[NSString alloc] initWithBytes:entries[i].Name.data()
+                                                                    length:entries[i].Name.size()
+                                                                  encoding:NSUTF8StringEncoding],
+                    @"Name", [NSNumber numberWithBool:entries[i].FabricConnected], @"FabricConnected",
                     [NSNumber numberWithBool:entries[i].OffPremiseServicesReachableIPv4], @"OffPremiseServicesReachableIPv4",
                     [NSNumber numberWithBool:entries[i].OffPremiseServicesReachableIPv6], @"OffPremiseServicesReachableIPv6",
                     [NSData dataWithBytes:entries[i].HardwareAddress.data() length:entries[i].HardwareAddress.size()],
@@ -3202,11 +3243,16 @@ public:
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
-                values[i] = [[NSDictionary alloc]
-                    initWithObjectsAndKeys:[NSNumber numberWithUnsignedChar:entries[i].index], @"index",
-                    [NSNumber numberWithUnsignedChar:entries[i].inputType], @"inputType",
-                    [NSData dataWithBytes:entries[i].name.data() length:entries[i].name.size()], @"name",
-                    [NSData dataWithBytes:entries[i].description.data() length:entries[i].description.size()], @"description", nil];
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedChar:entries[i].index],
+                                                  @"index", [NSNumber numberWithUnsignedChar:entries[i].inputType], @"inputType",
+                                                  [[NSString alloc] initWithBytes:entries[i].name.data()
+                                                                           length:entries[i].name.size()
+                                                                         encoding:NSUTF8StringEncoding],
+                                                  @"name",
+                                                  [[NSString alloc] initWithBytes:entries[i].description.data()
+                                                                           length:entries[i].description.size()
+                                                                         encoding:NSUTF8StringEncoding],
+                                                  @"description", nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -3245,7 +3291,9 @@ public:
                 values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedLongLong:entries[i].FabricId],
                                                   @"FabricId", [NSNumber numberWithUnsignedShort:entries[i].VendorId], @"VendorId",
                                                   [NSNumber numberWithUnsignedLongLong:entries[i].NodeId], @"NodeId",
-                                                  [NSData dataWithBytes:entries[i].Label.data() length:entries[i].Label.size()],
+                                                  [[NSString alloc] initWithBytes:entries[i].Label.data()
+                                                                           length:entries[i].Label.size()
+                                                                         encoding:NSUTF8StringEncoding],
                                                   @"Label", nil];
             }
 
@@ -3281,13 +3329,21 @@ public:
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
-                values[i] = [[NSDictionary alloc]
-                    initWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:entries[i].majorNumber], @"majorNumber",
-                    [NSNumber numberWithUnsignedShort:entries[i].minorNumber], @"minorNumber",
-                    [NSData dataWithBytes:entries[i].name.data() length:entries[i].name.size()], @"name",
-                    [NSData dataWithBytes:entries[i].callSign.data() length:entries[i].callSign.size()], @"callSign",
-                    [NSData dataWithBytes:entries[i].affiliateCallSign.data() length:entries[i].affiliateCallSign.size()],
-                    @"affiliateCallSign", nil];
+                values[i] =
+                    [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:entries[i].majorNumber],
+                                          @"majorNumber", [NSNumber numberWithUnsignedShort:entries[i].minorNumber], @"minorNumber",
+                                          [[NSString alloc] initWithBytes:entries[i].name.data()
+                                                                   length:entries[i].name.size()
+                                                                 encoding:NSUTF8StringEncoding],
+                                          @"name",
+                                          [[NSString alloc] initWithBytes:entries[i].callSign.data()
+                                                                   length:entries[i].callSign.size()
+                                                                 encoding:NSUTF8StringEncoding],
+                                          @"callSign",
+                                          [[NSString alloc] initWithBytes:entries[i].affiliateCallSign.data()
+                                                                   length:entries[i].affiliateCallSign.size()
+                                                                 encoding:NSUTF8StringEncoding],
+                                          @"affiliateCallSign", nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -3323,9 +3379,12 @@ public:
         if (callback && callback->mQueue) {
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
-                values[i] = [[NSDictionary alloc]
-                    initWithObjectsAndKeys:[NSNumber numberWithUnsignedChar:entries[i].identifier], @"identifier",
-                    [NSData dataWithBytes:entries[i].name.data() length:entries[i].name.size()], @"name", nil];
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedChar:entries[i].identifier],
+                                                  @"identifier",
+                                                  [[NSString alloc] initWithBytes:entries[i].name.data()
+                                                                           length:entries[i].name.size()
+                                                                         encoding:NSUTF8StringEncoding],
+                                                  @"name", nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -15340,8 +15399,8 @@ private:
 
 - (void)readAttributeTvChannelLineupWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPOctetStringAttributeCallbackBridge * onSuccess
-        = new CHIPOctetStringAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPCharStringAttributeCallbackBridge * onSuccess
+        = new CHIPCharStringAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -15368,8 +15427,8 @@ private:
 
 - (void)readAttributeCurrentTvChannelWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPOctetStringAttributeCallbackBridge * onSuccess
-        = new CHIPOctetStringAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    CHIPCharStringAttributeCallbackBridge * onSuccess
+        = new CHIPCharStringAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;

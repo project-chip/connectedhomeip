@@ -344,9 +344,9 @@ public class ChipClusters {
     public static class AudioOutputListAttribute {
       public int index;
       public int outputType;
-      public byte[] name;
+      public String name;
 
-      public AudioOutputListAttribute(int index, int outputType, byte[] name) {
+      public AudioOutputListAttribute(int index, int outputType, String name) {
         this.index = index;
         this.outputType = outputType;
         this.name = name;
@@ -2468,10 +2468,10 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public static class LabelListAttribute {
-      public byte[] label;
-      public byte[] value;
+      public String label;
+      public String value;
 
-      public LabelListAttribute(byte[] label, byte[] value) {
+      public LabelListAttribute(String label, String value) {
         this.label = label;
         this.value = value;
       }
@@ -2638,7 +2638,7 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public static class NetworkInterfacesAttribute {
-      public byte[] name;
+      public String name;
       public boolean fabricConnected;
       public boolean offPremiseServicesReachableIPv4;
       public boolean offPremiseServicesReachableIPv6;
@@ -2646,7 +2646,7 @@ public class ChipClusters {
       public int type;
 
       public NetworkInterfacesAttribute(
-          byte[] name,
+          String name,
           boolean fabricConnected,
           boolean offPremiseServicesReachableIPv4,
           boolean offPremiseServicesReachableIPv6,
@@ -3112,10 +3112,10 @@ public class ChipClusters {
     public static class MediaInputListAttribute {
       public int index;
       public int inputType;
-      public byte[] name;
-      public byte[] description;
+      public String name;
+      public String description;
 
-      public MediaInputListAttribute(int index, int inputType, byte[] name, byte[] description) {
+      public MediaInputListAttribute(int index, int inputType, String name, String description) {
         this.index = index;
         this.inputType = inputType;
         this.name = name;
@@ -3830,7 +3830,7 @@ public class ChipClusters {
         long chipClusterPtr, NOCResponseCallback callback, byte[] nOCArray);
 
     public interface NOCResponseCallback {
-      void onSuccess(int StatusCode, int FabricIndex, byte[] DebugText);
+      void onSuccess(int StatusCode, int FabricIndex, String DebugText);
 
       void onError(Exception error);
     }
@@ -3845,9 +3845,9 @@ public class ChipClusters {
       public long fabricId;
       public int vendorId;
       public long nodeId;
-      public byte[] label;
+      public String label;
 
-      public FabricsListAttribute(long fabricId, int vendorId, long nodeId, byte[] label) {
+      public FabricsListAttribute(long fabricId, int vendorId, long nodeId, String label) {
         this.fabricId = fabricId;
         this.vendorId = vendorId;
         this.nodeId = nodeId;
@@ -4309,16 +4309,16 @@ public class ChipClusters {
     public static class TvChannelListAttribute {
       public int majorNumber;
       public int minorNumber;
-      public byte[] name;
-      public byte[] callSign;
-      public byte[] affiliateCallSign;
+      public String name;
+      public String callSign;
+      public String affiliateCallSign;
 
       public TvChannelListAttribute(
           int majorNumber,
           int minorNumber,
-          byte[] name,
-          byte[] callSign,
-          byte[] affiliateCallSign) {
+          String name,
+          String callSign,
+          String affiliateCallSign) {
         this.majorNumber = majorNumber;
         this.minorNumber = minorNumber;
         this.name = name;
@@ -4337,11 +4337,11 @@ public class ChipClusters {
       readTvChannelListAttribute(chipClusterPtr, callback);
     }
 
-    public void readTvChannelLineupAttribute(OctetStringAttributeCallback callback) {
+    public void readTvChannelLineupAttribute(CharStringAttributeCallback callback) {
       readTvChannelLineupAttribute(chipClusterPtr, callback);
     }
 
-    public void readCurrentTvChannelAttribute(OctetStringAttributeCallback callback) {
+    public void readCurrentTvChannelAttribute(CharStringAttributeCallback callback) {
       readCurrentTvChannelAttribute(chipClusterPtr, callback);
     }
 
@@ -4353,10 +4353,10 @@ public class ChipClusters {
         long chipClusterPtr, TvChannelListAttributeCallback callback);
 
     private native void readTvChannelLineupAttribute(
-        long chipClusterPtr, OctetStringAttributeCallback callback);
+        long chipClusterPtr, CharStringAttributeCallback callback);
 
     private native void readCurrentTvChannelAttribute(
-        long chipClusterPtr, OctetStringAttributeCallback callback);
+        long chipClusterPtr, CharStringAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -4385,9 +4385,9 @@ public class ChipClusters {
 
     public static class TargetNavigatorListAttribute {
       public int identifier;
-      public byte[] name;
+      public String name;
 
-      public TargetNavigatorListAttribute(int identifier, byte[] name) {
+      public TargetNavigatorListAttribute(int identifier, String name) {
         this.identifier = identifier;
         this.name = name;
       }

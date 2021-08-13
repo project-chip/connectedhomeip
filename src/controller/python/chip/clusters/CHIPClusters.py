@@ -2556,12 +2556,12 @@ class ChipClusters:
                 0x00000001: {
                     "attributeName": "TvChannelLineup",
                     "attributeId": 0x00000001,
-                    "type": "bytes",
+                    "type": "str",
                 },
                 0x00000002: {
                     "attributeName": "CurrentTvChannel",
                     "attributeId": 0x00000002,
-                    "type": "bytes",
+                    "type": "str",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",

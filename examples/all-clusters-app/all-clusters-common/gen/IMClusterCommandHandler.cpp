@@ -2851,7 +2851,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         case Clusters::DoorLock::Commands::Ids::LockDoor: {
             expectArgumentCount = 1;
-            const uint8_t * PIN;
+            chip::ByteSpan PIN;
             bool argExists[1];
 
             memset(argExists, 0, sizeof argExists);
@@ -2882,8 +2882,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(PIN);
+                    TLVUnpackError = aDataTlv.Get(PIN);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -2904,7 +2903,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfDoorLockClusterLockDoorCallback(aEndpointId, apCommandObj, const_cast<uint8_t *>(PIN));
+                wasHandled = emberAfDoorLockClusterLockDoorCallback(aEndpointId, apCommandObj, PIN);
             }
             break;
         }
@@ -2984,7 +2983,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             uint16_t userId;
             uint8_t userStatus;
             uint8_t userType;
-            const uint8_t * pin;
+            chip::ByteSpan pin;
             bool argExists[4];
 
             memset(argExists, 0, sizeof argExists);
@@ -3024,8 +3023,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                     TLVUnpackError = aDataTlv.Get(userType);
                     break;
                 case 3:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(pin);
+                    TLVUnpackError = aDataTlv.Get(pin);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -3046,8 +3044,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfDoorLockClusterSetPinCallback(aEndpointId, apCommandObj, userId, userStatus, userType,
-                                                                  const_cast<uint8_t *>(pin));
+                wasHandled = emberAfDoorLockClusterSetPinCallback(aEndpointId, apCommandObj, userId, userStatus, userType, pin);
             }
             break;
         }
@@ -3056,7 +3053,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             uint16_t userId;
             uint8_t userStatus;
             uint8_t userType;
-            const uint8_t * id;
+            chip::ByteSpan id;
             bool argExists[4];
 
             memset(argExists, 0, sizeof argExists);
@@ -3096,8 +3093,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                     TLVUnpackError = aDataTlv.Get(userType);
                     break;
                 case 3:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(id);
+                    TLVUnpackError = aDataTlv.Get(id);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -3118,8 +3114,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfDoorLockClusterSetRfidCallback(aEndpointId, apCommandObj, userId, userStatus, userType,
-                                                                   const_cast<uint8_t *>(id));
+                wasHandled = emberAfDoorLockClusterSetRfidCallback(aEndpointId, apCommandObj, userId, userStatus, userType, id);
             }
             break;
         }
@@ -3341,7 +3336,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         case Clusters::DoorLock::Commands::Ids::UnlockDoor: {
             expectArgumentCount = 1;
-            const uint8_t * PIN;
+            chip::ByteSpan PIN;
             bool argExists[1];
 
             memset(argExists, 0, sizeof argExists);
@@ -3372,8 +3367,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(PIN);
+                    TLVUnpackError = aDataTlv.Get(PIN);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -3394,14 +3388,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfDoorLockClusterUnlockDoorCallback(aEndpointId, apCommandObj, const_cast<uint8_t *>(PIN));
+                wasHandled = emberAfDoorLockClusterUnlockDoorCallback(aEndpointId, apCommandObj, PIN);
             }
             break;
         }
         case Clusters::DoorLock::Commands::Ids::UnlockWithTimeout: {
             expectArgumentCount = 2;
             uint16_t timeoutInSeconds;
-            const uint8_t * pin;
+            chip::ByteSpan pin;
             bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
@@ -3435,8 +3429,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                     TLVUnpackError = aDataTlv.Get(timeoutInSeconds);
                     break;
                 case 1:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(pin);
+                    TLVUnpackError = aDataTlv.Get(pin);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -3457,8 +3450,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfDoorLockClusterUnlockWithTimeoutCallback(aEndpointId, apCommandObj, timeoutInSeconds,
-                                                                             const_cast<uint8_t *>(pin));
+                wasHandled = emberAfDoorLockClusterUnlockWithTimeoutCallback(aEndpointId, apCommandObj, timeoutInSeconds, pin);
             }
             break;
         }
@@ -3633,7 +3625,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         case Clusters::GeneralCommissioning::Commands::Ids::SetRegulatoryConfig: {
             expectArgumentCount = 4;
             uint8_t location;
-            const uint8_t * countryCode;
+            chip::ByteSpan countryCode;
             uint64_t breadcrumb;
             uint32_t timeoutMs;
             bool argExists[4];
@@ -3669,8 +3661,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                     TLVUnpackError = aDataTlv.Get(location);
                     break;
                 case 1:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(countryCode);
+                    TLVUnpackError = aDataTlv.Get(countryCode);
                     break;
                 case 2:
                     TLVUnpackError = aDataTlv.Get(breadcrumb);
@@ -3697,8 +3688,8 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
-                wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(
-                    aEndpointId, apCommandObj, location, const_cast<uint8_t *>(countryCode), breadcrumb, timeoutMs);
+                wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(aEndpointId, apCommandObj, location,
+                                                                                           countryCode, breadcrumb, timeoutMs);
             }
             break;
         }
@@ -3751,7 +3742,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         case Clusters::Groups::Commands::Ids::AddGroup: {
             expectArgumentCount = 2;
             uint16_t groupId;
-            const uint8_t * groupName;
+            chip::ByteSpan groupName;
             bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
@@ -3785,8 +3776,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                     TLVUnpackError = aDataTlv.Get(groupId);
                     break;
                 case 1:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(groupName);
+                    TLVUnpackError = aDataTlv.Get(groupName);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -3807,15 +3797,14 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfGroupsClusterAddGroupCallback(aEndpointId, apCommandObj, groupId, const_cast<uint8_t *>(groupName));
+                wasHandled = emberAfGroupsClusterAddGroupCallback(aEndpointId, apCommandObj, groupId, groupName);
             }
             break;
         }
         case Clusters::Groups::Commands::Ids::AddGroupIfIdentifying: {
             expectArgumentCount = 2;
             uint16_t groupId;
-            const uint8_t * groupName;
+            chip::ByteSpan groupName;
             bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
@@ -3849,8 +3838,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                     TLVUnpackError = aDataTlv.Get(groupId);
                     break;
                 case 1:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(groupName);
+                    TLVUnpackError = aDataTlv.Get(groupName);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -3871,8 +3859,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfGroupsClusterAddGroupIfIdentifyingCallback(aEndpointId, apCommandObj, groupId,
-                                                                               const_cast<uint8_t *>(groupName));
+                wasHandled = emberAfGroupsClusterAddGroupIfIdentifyingCallback(aEndpointId, apCommandObj, groupId, groupName);
             }
             break;
         }
@@ -5674,7 +5661,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             uint16_t hardwareVersion;
             uint32_t currentVersion;
             uint8_t protocolsSupported;
-            const uint8_t * location;
+            chip::ByteSpan location;
             bool requestorCanConsent;
             chip::ByteSpan metadataForProvider;
             bool argExists[9];
@@ -5725,8 +5712,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                     TLVUnpackError = aDataTlv.Get(protocolsSupported);
                     break;
                 case 6:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(location);
+                    TLVUnpackError = aDataTlv.Get(location);
                     break;
                 case 7:
                     TLVUnpackError = aDataTlv.Get(requestorCanConsent);
@@ -5755,7 +5741,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             {
                 wasHandled = emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
                     aEndpointId, apCommandObj, vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
-                    const_cast<uint8_t *>(location), requestorCanConsent, metadataForProvider);
+                    location, requestorCanConsent, metadataForProvider);
             }
             break;
         }
@@ -6172,7 +6158,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
         }
         case Clusters::OperationalCredentials::Commands::Ids::UpdateFabricLabel: {
             expectArgumentCount = 1;
-            const uint8_t * Label;
+            chip::ByteSpan Label;
             bool argExists[1];
 
             memset(argExists, 0, sizeof argExists);
@@ -6203,8 +6189,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(Label);
+                    TLVUnpackError = aDataTlv.Get(Label);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -6225,8 +6210,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(aEndpointId, apCommandObj,
-                                                                                           const_cast<uint8_t *>(Label));
+                wasHandled = emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(aEndpointId, apCommandObj, Label);
             }
             break;
         }
@@ -6339,7 +6323,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             uint16_t groupId;
             uint8_t sceneId;
             uint16_t transitionTime;
-            const uint8_t * sceneName;
+            chip::ByteSpan sceneName;
             /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets;
             bool argExists[5];
 
@@ -6380,8 +6364,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
                     TLVUnpackError = aDataTlv.Get(transitionTime);
                     break;
                 case 3:
-                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-                    TLVUnpackError = aDataTlv.GetDataPtr(sceneName);
+                    TLVUnpackError = aDataTlv.Get(sceneName);
                     break;
                 case 4:
                     // Just for compatibility, we will add array type support in IM later.
@@ -6407,7 +6390,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
                 wasHandled = emberAfScenesClusterAddSceneCallback(aEndpointId, apCommandObj, groupId, sceneId, transitionTime,
-                                                                  const_cast<uint8_t *>(sceneName), extensionFieldSets);
+                                                                  sceneName, extensionFieldSets);
             }
             break;
         }

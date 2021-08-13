@@ -2296,7 +2296,7 @@
  * Command: NOCResponse
  * @param StatusCode INT8U
  * @param FabricIndex INT8U
- * @param DebugText OCTET_STRING
+ * @param DebugText CHAR_STRING
  */
 #define emberAfFillCommandOperational                                                                                              \
     CredentialsClusterNOCResponse(StatusCode, FabricIndex, DebugText)                                                              \
