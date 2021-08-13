@@ -14,17 +14,17 @@ configure_file(
     @ONLY
 )
 
-set(MBED_PATH ${CMAKE_CURRENT_SOURCE_DIR}/mbed-os CACHE INTERNAL "")
+set(MBED_PATH $ENV{MBED_OS_PATH} CACHE INTERNAL "")
 set(MBED_CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "")
 set(APP_TARGET chip-mbed-lighting-app-example)
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
 add_subdirectory(${MBED_PATH} ./mbed_build)
 
-add_subdirectory(mbed-os-posix-socket)
+add_subdirectory($ENV{MBED_OS_POSIX_SOCKET_PATH} ./mbed_os_posix_socket_build)
 
 if(MBED_TARGET STREQUAL "DISCO_L475VG_IOT01A")
-    add_subdirectory(wifi-ism43362)
+    add_subdirectory($ENV{WIFI_ISM43362_PATH} ./wifi_ism43362_build)
 endif()
 
 add_executable(${APP_TARGET})

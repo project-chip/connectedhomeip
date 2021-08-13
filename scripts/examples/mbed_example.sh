@@ -34,29 +34,29 @@ PROFILE=release
 
 for i in "$@"; do
     case $i in
-        -a=* | --app=*)
-            APP="${i#*=}"
-            shift
-            ;;
-        -b=* | --board=*)
-            TARGET_BOARD="${i#*=}"
-            shift
-            ;;
-        -t=* | --toolchain=*)
-            TOOLCHAIN="${i#*=}"
-            shift
-            ;;
-        -p=* | --profile=*)
-            PROFILE="${i#*=}"
-            shift
-            ;;
-        -c=* | --command=*)
-            COMMAND="${i#*=}"
-            shift
-            ;;
-        *)
-            # unknown option
-            ;;
+    -a=* | --app=*)
+        APP="${i#*=}"
+        shift
+        ;;
+    -b=* | --board=*)
+        TARGET_BOARD="${i#*=}"
+        shift
+        ;;
+    -t=* | --toolchain=*)
+        TOOLCHAIN="${i#*=}"
+        shift
+        ;;
+    -p=* | --profile=*)
+        PROFILE="${i#*=}"
+        shift
+        ;;
+    -c=* | --command=*)
+        COMMAND="${i#*=}"
+        shift
+        ;;
+    *)
+        # unknown option
+        ;;
     esac
 done
 
@@ -100,26 +100,22 @@ if [[ "$COMMAND" == *"build"* ]]; then
     # Config directory setup
     MBED_CONFIG_PATH="$APP"/mbed/cmake_build/"$TARGET_BOARD"/develop/"$TOOLCHAIN"/
 
-    # Override Mbed OS path to development directory
-    MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
+    # Set Mbed OS path
+    export MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
 
-    # Create symlinks to mbed-os submodule
-    ln -sfTr "$MBED_OS_PATH" "$APP/mbed/mbed-os"
-
-    # Create symlinks to mbed-os-posix-socket submodule
-    MBED_OS_POSIX_SOCKET_PATH="$CHIP_ROOT"/third_party/mbed-os-posix-socket/repo
-    ln -sfTr "$MBED_OS_POSIX_SOCKET_PATH" "$APP/mbed/mbed-os-posix-socket"
+    # Set Mbed OS posix socket submodule path
+    export MBED_OS_POSIX_SOCKET_PATH="$CHIP_ROOT"/third_party/mbed-os-posix-socket/repo
 
     if [ "$TARGET_BOARD" == "DISCO_L475VG_IOT01A" ]; then
-        # Add the Mbed OS driver for the ISM43362 Wi-Fi module
-        WIFI_ISM43362_PATH="$CHIP_ROOT"/third_party/wifi-ism43362/repo
+        # Set ISM43362 Wi-Fi submodule path
+        export WIFI_ISM43362_PATH="$CHIP_ROOT"/third_party/wifi-ism43362/repo
 
         # Create symlinks to WIFI-ISM43362 submodule
         ln -sfTr "$WIFI_ISM43362_PATH" "$APP/mbed/wifi-ism43362"
     fi
 
     # Generate config file for selected target, toolchain and hardware
-    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/
+    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/ --mbed-os-path "$MBED_OS_PATH"
 
     # Remove old artifacts to force linking
     rm -rf "$BUILD_DIRECTORY/chip-"*
