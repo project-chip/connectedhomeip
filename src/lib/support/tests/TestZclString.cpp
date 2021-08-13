@@ -43,7 +43,7 @@ static void TestZclStringLessThanMaximumSize(nlTestSuite * inSuite, void * inCon
 {
     uint8_t bufferMemory[256];
     // Init zcl string
-    MutableByteSpan zclString = MutableByteSpan(bufferMemory);
+    MutableByteSpan zclString(bufferMemory);
     // Init c string
     char * cString64 = static_cast<char *>(MemoryCalloc(1024, true));
     // Add random chars to c string
@@ -56,6 +56,10 @@ static void TestZclStringLessThanMaximumSize(nlTestSuite * inSuite, void * inCon
     NL_TEST_ASSERT(inSuite, cString64 != nullptr);
     // ZCL String length assert
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 64);
+    // ZCL String data is not null
+    NL_TEST_ASSERT(inSuite, zclString.data() != NULL);
+    // ZCL String data does not hold empty string
+    NL_TEST_ASSERT(inSuite, zclString.data()[0] != '\0');
 
     chip::Platform::MemoryFree(cString64);
 }
@@ -64,7 +68,7 @@ static void TestZclStringEqualsMaximumSize(nlTestSuite * inSuite, void * inConte
 {
     uint8_t bufferMemory[256];
     // Init zcl string
-    MutableByteSpan zclString = MutableByteSpan(bufferMemory);
+    MutableByteSpan zclString(bufferMemory);
     // Init c string
     char * cString254 = static_cast<char *>(MemoryCalloc(1024, true));
     // Add random chars to c string
@@ -77,6 +81,10 @@ static void TestZclStringEqualsMaximumSize(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, cString254 != nullptr);
     // ZCL String length assert
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 254);
+    // ZCL String data is not null
+    NL_TEST_ASSERT(inSuite, zclString.data() != NULL);
+    // ZCL String data does not hold empty string
+    NL_TEST_ASSERT(inSuite, zclString.data()[0] != '\0');
 
     chip::Platform::MemoryFree(cString254);
 }
@@ -85,11 +93,11 @@ static void TestZclStringBiggerThanMaximumSize(nlTestSuite * inSuite, void * inC
 {
     uint8_t bufferMemory[256];
     // Init zcl string
-    MutableByteSpan zclString = MutableByteSpan(bufferMemory);
+    MutableByteSpan zclString(bufferMemory);
     // Init c string
     char * cString255 = static_cast<char *>(MemoryCalloc(1024, true));
     // Add random chars to c string
-    for (size_t i = 0; i < 255; i++)
+    for (size_t i = 0; i < 512; i++)
         cString255[i] = 'A';
 
     MakeZclCharString(zclString, cString255);
@@ -98,6 +106,10 @@ static void TestZclStringBiggerThanMaximumSize(nlTestSuite * inSuite, void * inC
     NL_TEST_ASSERT(inSuite, cString255 != nullptr);
     // ZCL String length assert
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 254);
+    // ZCL String data is not null
+    NL_TEST_ASSERT(inSuite, zclString.data() != NULL);
+    // ZCL String data does not hold empty string
+    NL_TEST_ASSERT(inSuite, zclString.data()[0] != '\0');
 
     chip::Platform::MemoryFree(cString255);
 }

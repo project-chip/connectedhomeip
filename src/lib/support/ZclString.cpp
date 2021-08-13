@@ -14,15 +14,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <support/Span.h>
 
-#pragma once
+#include "ZclString.h"
 
 namespace chip {
 
-/**
- * @brief Create ZCL string from char
- */
-extern CHIP_ERROR MakeZclCharString(chip::MutableByteSpan & buffer, const char * cString);
+constexpr int kBufferMaximumSize = 254;
 
-} // namespace chip
+CHIP_ERROR MakeZclCharString(chip::MutableByteSpan & buffer, const char * cString)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    size_t len = strlen(cString);
+    if (strlen(cString) > buffer.size())
+    {
+        err = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG;
+        // set pascal string length to a maximum of kBufferMaximumSize
+        len = buffer.size() > kBufferMaximumSize ? kBufferMaximumSize : buffer.size();
+    }
+
+    buffer.data()[0] = static_cast<uint8_t>(len);
+    memcpy(&buffer.data()[1], cString, len);
+    return err;
+}
+
+}
