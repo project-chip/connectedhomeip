@@ -158,6 +158,8 @@ cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libSetupPayloadParser.so {roo
 
 cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libCHIPController.so {root}/src/android/CHIPTool/app/src/main/jniLibs/armeabi-v7a/libCHIPController.so
 
+cp {out}/android-arm-chip_tool/lib/jni/armeabi-v7a/libc++_shared.so {root}/src/android/CHIPTool/app/src/main/jniLibs/armeabi-v7a/libc++_shared.so
+
 # Building APP android-arm-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-arm-chip_tool/lib -PbuildDir={out}/android-arm-chip_tool build
 
@@ -171,6 +173,8 @@ cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libSetupPayloadParser.so {roo
 
 cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libCHIPController.so {root}/src/android/CHIPTool/app/src/main/jniLibs/arm64-v8a/libCHIPController.so
 
+cp {out}/android-arm64-chip_tool/lib/jni/arm64-v8a/libc++_shared.so {root}/src/android/CHIPTool/app/src/main/jniLibs/arm64-v8a/libc++_shared.so
+
 # Building APP android-arm64-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-arm64-chip_tool/lib -PbuildDir={out}/android-arm64-chip_tool build
 
@@ -183,6 +187,8 @@ mkdir -p {root}/src/android/CHIPTool/app/src/main/jniLibs/x86_64
 cp {out}/android-x64-chip_tool/lib/jni/x86_64/libSetupPayloadParser.so {root}/src/android/CHIPTool/app/src/main/jniLibs/x86_64/libSetupPayloadParser.so
 
 cp {out}/android-x64-chip_tool/lib/jni/x86_64/libCHIPController.so {root}/src/android/CHIPTool/app/src/main/jniLibs/x86_64/libCHIPController.so
+
+cp {out}/android-x64-chip_tool/lib/jni/x86_64/libc++_shared.so {root}/src/android/CHIPTool/app/src/main/jniLibs/x86_64/libc++_shared.so
 
 # Building APP android-x64-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-x64-chip_tool/lib -PbuildDir={out}/android-x64-chip_tool build
