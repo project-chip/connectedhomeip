@@ -1856,9 +1856,9 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2p_spake2p PointIsValid", TestSPAKE2P_spake2p_PointIsValid),
     NL_TEST_DEF("Test Spake2+ against RFC test vectors", TestSPAKE2P_RFC),
     NL_TEST_DEF("Test compressed fabric identifier", TestCompressedFabricIdentifier),
+    NL_TEST_DEF("Test Pubkey Extraction from x509 Certificate", TestPubkey_x509Extraction),
 #if CHIP_CRYPTO_OPENSSL
     NL_TEST_DEF("Test x509 Certificate Extraction from PKCS7", TestX509_PKCS7Extraction),
-    NL_TEST_DEF("Test Pubkey Extraction from x509 Certificate", TestPubkey_x509Extraction),
 #endif // CHIP_CRYPTO_OPENSSL
     NL_TEST_SENTINEL()
 };

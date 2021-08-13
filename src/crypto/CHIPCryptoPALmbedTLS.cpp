@@ -37,8 +37,8 @@
 #include <mbedtls/pkcs5.h>
 #include <mbedtls/sha1.h>
 #include <mbedtls/sha256.h>
-#include <mbedtls/x509_crt.h>
 #include <mbedtls/x509_csr.h>
+#include <mbedtls/x509_crt.h>
 
 #include <core/CHIPSafeCasts.h>
 #include <support/BufferWriter.h>
@@ -804,10 +804,14 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     csr_length = out_length;
 
 exit:
-    keypair = nullptr;
     mbedtls_x509write_csr_free(&csr);
+
+    // TODO: Figure-out why the next 2 lines are OK. Valgrind complains or crash occurs if either is deleted.
+    // Oddly, the following `mbedtls_ecp_keypair_init` is needed to avoid a double-free
+    // with the following pk_free, which is needed.
     mbedtls_ecp_keypair_init(mbedtls_pk_ec(pk));
     mbedtls_pk_free(&pk);
+
     _log_mbedTLS_error(result);
     return error;
 }
@@ -1209,7 +1213,7 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
     CHIP_ERROR error = CHIP_NO_ERROR;
     mbedtls_x509_crt mbed_cert;
     mbedtls_ecp_keypair * keypair = nullptr;
-    size_t pubkey_size            = 0;
+    size_t pubkey_size = 0;
 
     mbedtls_x509_crt_init(&mbed_cert);
 
