@@ -27,6 +27,7 @@ class Platform(IntEnum):
     EFR32 = auto()
     NRF = auto()
     ANDROID = auto()
+    INFINEON = auto()
 
     @property
     def ArgName(self):
@@ -64,6 +65,9 @@ class Board(IntEnum):
     ARM = auto()
     ARM64 = auto()
     X64 = auto()
+
+    # Infineon board
+    P6BOARD = auto()
 
     @property
     def ArgName(self):

@@ -35,6 +35,7 @@ pw_python_package("build_examples") {
     "builders/efr32.py",
     "builders/esp32.py",
     "builders/host.py",
+    "builders/infineon.py",
     "builders/qpg.py",
     "runner/__init__.py",
     "runner/printonly.py",
