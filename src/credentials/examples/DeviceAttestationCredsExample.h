@@ -14,12 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file Accessor for examplary DeviceAttestationCredentialsAccessor to bootstrap
- *          new examples and platforms.
- */
-
 #pragma once
 
 #include <credentials/DeviceAttestationCredsAccess.h>

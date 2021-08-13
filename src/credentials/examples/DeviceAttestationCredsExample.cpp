@@ -14,11 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file Implementation of example device attestation credentials accessor
- */
-
 #include "DeviceAttestationCredsExample.h"
 
 #include <crypto/CHIPCryptoPAL.h>
