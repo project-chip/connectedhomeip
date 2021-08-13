@@ -397,8 +397,8 @@ bool ReadCert(const char * fileName, X509 * cert)
 
 bool ReadCert(const char * fileName, X509 * cert, CertFormat & certFmt)
 {
-    bool res          = true;
-    uint32_t certLen  = 0;
+    bool res         = true;
+    uint32_t certLen = 0;
     std::unique_ptr<uint8_t[]> certBuf;
 
     res = ReadFileIntoMem(fileName, nullptr, certLen);
@@ -546,7 +546,7 @@ bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
     else if (certFmt == kCertFormat_Chip_Raw || certFmt == kCertFormat_Chip_Base64)
     {
         uint8_t * certToWrite      = nullptr;
-        size_t certToWriteLen    = 0;
+        size_t certToWriteLen      = 0;
         uint32_t chipCertBase64Len = BASE64_ENCODED_LEN(kMaxCHIPCertLength);
         std::unique_ptr<uint8_t[]> chipCertBase64(new uint8_t[chipCertBase64Len]);
         uint8_t chipCertBuf[kMaxCHIPCertLength];
