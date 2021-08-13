@@ -226,7 +226,8 @@ function getCommands(clusterName)
 
 function getAttributes(clusterName)
 {
-  return (clusterName == GlobalCommands.name) ? Promise.resolve(GlobalCommands.attributes) : Clusters.getServerAttributes(clusterName);
+  return (clusterName == GlobalCommands.name) ? Promise.resolve(GlobalCommands.attributes)
+                                              : Clusters.getServerAttributes(clusterName);
 }
 
 function assertCommandOrAttribute(context)
