@@ -37,8 +37,8 @@
 #include <mbedtls/pkcs5.h>
 #include <mbedtls/sha1.h>
 #include <mbedtls/sha256.h>
-#include <mbedtls/x509_csr.h>
 #include <mbedtls/x509_crt.h>
+#include <mbedtls/x509_csr.h>
 
 #include <core/CHIPSafeCasts.h>
 #include <support/BufferWriter.h>
@@ -1209,7 +1209,7 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
     CHIP_ERROR error = CHIP_NO_ERROR;
     mbedtls_x509_crt mbed_cert;
     mbedtls_ecp_keypair * keypair = nullptr;
-    size_t pubkey_size = 0;
+    size_t pubkey_size            = 0;
 
     mbedtls_x509_crt_init(&mbed_cert);
 
