@@ -62,7 +62,7 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId,
-                                                                           const Crypto::P256PublicKey & ephemeralKey,
+                                                                           const Crypto::P256PublicKey & pubkey,
                                                                            MutableByteSpan & rcac, MutableByteSpan & icac,
                                                                            MutableByteSpan & noc)
 {
@@ -75,7 +75,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChainAfterValidation(NodeI
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
     CHIP_ERROR err      = CHIP_NO_ERROR;
     PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-                      err = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen));
+                      err = SyncGetKeyValue(key, rcac.data(), rcacBufLen));
     if (err == CHIP_NO_ERROR)
     {
         // Found root certificate in the storage.
@@ -89,7 +89,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChainAfterValidation(NodeI
 
     VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
     PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
-                      err = mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size())));
+                      err = SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size())));
 
     return err;
 }
@@ -223,20 +223,36 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     }
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
-    VerifyOrReturnError(noc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
+    if (!noc.Alloc(kMaxCHIPDERCertLength))
+    {
+        *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
+        return nullptr;
+    }
     MutableByteSpan nocSpan(noc.Get(), kMaxCHIPDERCertLength);
 
     MutableByteSpan icacSpan;
 
     Platform::ScopedMemoryBuffer<uint8_t> rcac;
-    VerifyOrReturnError(rcac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
+    if (!rcac.Alloc(kMaxCHIPDERCertLength))
+    {
+        *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
+        return nullptr;
+    }
     MutableByteSpan rcacSpan(rcac.Get(), kMaxCHIPDERCertLength);
 
     Crypto::P256Keypair ephemeralKey;
-    ReturnErrorOnFailure(ephemeralKey.Initialize());
+    *errInfoOnFailure = ephemeralKey.Initialize();
+    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
 
-    ReturnErrorOnFailure(
-        mOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+    *errInfoOnFailure =
+        mOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
+    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
 
     initParams.ephemeralKeypair = &ephemeralKey;
     initParams.controllerRCAC   = rcacSpan;
