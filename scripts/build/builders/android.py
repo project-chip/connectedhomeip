@@ -128,7 +128,7 @@ class AndroidBuilder(Builder):
     jnilibs_dir = os.path.join(self.root, 'src/android/CHIPTool/app/src/main/jniLibs', self.board.AbiName())
     self._Execute(['mkdir', '-p', jnilibs_dir], title='Prepare Native libs ' + self.identifier)
 
-    for libName in ['libSetupPayloadParser.so', 'libCHIPController.so']:
+    for libName in ['libSetupPayloadParser.so', 'libCHIPController.so', 'libc++_shared.so']:
       self._Execute(['cp', os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(), libName), os.path.join(jnilibs_dir, libName)])
 
     # App compilation
@@ -155,9 +155,10 @@ class AndroidBuilder(Builder):
 
         'jni/%s/libSetupPayloadParser.so' % self.board.AbiName(): 
             os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(), 'libSetupPayloadParser.so'),
-
         'jni/%s/libCHIPController.so' % self.board.AbiName(): 
             os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(), 'libCHIPController.so'),
+        'jni/%s/libc++_shared.so' % self.board.AbiName(): 
+            os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(), 'libc++_shared.so'),
     }
 
     return outputs
