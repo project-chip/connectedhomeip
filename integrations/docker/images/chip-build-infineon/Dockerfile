@@ -4,7 +4,7 @@ FROM connectedhomeip/chip-build:${VERSION}
 # ------------------------------------------------------------------------------
 # Install prerequisites
 RUN apt update -y \
- && apt install -y curl git make file libglib2.0-0 libusb-1.0-0 libncurses5 \
+ && apt install -y curl git make file libglib2.0-0 libusb-1.0-0 libncurses5 sudo \
  && apt clean
 
 # ------------------------------------------------------------------------------
@@ -15,8 +15,12 @@ RUN curl --fail --location --silent --show-error http://dlm.cypress.com.edgesuit
 
 # ------------------------------------------------------------------------------
 # Execute post-build scripts
-RUN bash -e /opt/ModusToolbox/tools_2.3/modus-shell/postinstall \
- && bash -e /opt/ModusToolbox/tools_2.3/fw-loader/udev_rules/install_rules.sh
+RUN /opt/ModusToolbox/tools_2.3/modus-shell/postinstall
+
+# NOTE: udev rules are NOT installed:
+#   /opt/ModusToolbox/tools_2.3/fw-loader/udev_rules/install_rules.sh
+
+# because docker containers do not support udev
 
 # ------------------------------------------------------------------------------
 # Set environment variable required by ModusToolbox application makefiles
