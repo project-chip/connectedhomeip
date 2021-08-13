@@ -30,7 +30,7 @@ CHIP_ERROR MakeZclCharString(MutableByteSpan & buffer, const char * cString)
         // We can't even put a 0 length in there.
         return CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG;
     }
-    size_t len = strlen(cString);
+    size_t len              = strlen(cString);
     size_t availableStorage = min(buffer.size() - 1, kBufferMaximumSize);
     if (len > availableStorage)
     {
