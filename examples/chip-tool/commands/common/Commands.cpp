@@ -91,6 +91,9 @@ int Commands::Run(int argc, char ** argv)
         chip::Crypto::P256Keypair ephemeralKey;
         SuccessOrExit(err = ephemeralKey.Initialize());
 
+        // TODO - OpCreds should only be generated for pairing command
+        //        store the credentials in persistent storage, and
+        //        generate when not available in the storage.
         err = mOpCredsIssuer.GenerateNOCChainAfterValidation(localId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
         SuccessOrExit(err);
 
