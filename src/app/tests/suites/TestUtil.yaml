@@ -23,6 +23,6 @@ tests:
       cluster: "TestUtil"
       command: "WaitForMs"
       arguments:
-        values:
-          - name: "ms"
-            value: 100
+          values:
+              - name: "ms"
+                value: 100
