@@ -357,7 +357,7 @@ void WatchableEventManager::HandleEvents()
             SocketEventsFromFDs(watchable->GetFD(), mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet));
     }
 
-    WatchableSocket * watchableSocket = mAttachedSockets; 
+    WatchableSocket * watchableSocket = mAttachedSockets;
     while (watchableSocket != nullptr)
     {
         WatchableSocket * watchable = watchableSocket;
