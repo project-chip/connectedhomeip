@@ -1213,8 +1213,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
-    CHIP_ERROR error;
-    ;
+    CHIP_ERROR error = CHIP_NO_ERROR;
     mbedtls_x509_crt mbed_cert;
     mbedtls_ecp_keypair * keypair = nullptr;
     size_t pubkey_size            = 0;
