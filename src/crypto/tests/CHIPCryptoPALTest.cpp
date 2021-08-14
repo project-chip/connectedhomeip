@@ -1797,7 +1797,7 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, memcmp(publicKey.ConstBytes(), certPubkey, certPubkeyLen) == 0);
     }
-#endif  // CHIP_DEVICE_LAYER_TARGET_ESP32 != 1
+#endif // CHIP_DEVICE_LAYER_TARGET_ESP32 != 1
 }
 
 /**
