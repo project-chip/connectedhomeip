@@ -361,7 +361,7 @@ void WatchableEventManager::HandleEvents()
     while (watchableSocket != nullptr)
     {
         WatchableSocket * watchable = watchableSocket;
-        watchableSocket = watchableSocket->mAttachedNext;
+        watchableSocket             = watchableSocket->mAttachedNext;
 
         if (watchable->mPendingIO.HasAny())
         {
