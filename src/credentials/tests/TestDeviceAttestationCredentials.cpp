@@ -39,6 +39,12 @@ constexpr uint8_t kExpectedDacPublicKey[] = { 0x04, 0x7a, 0x84, 0x58, 0xaf, 0xbb
                                               0xf1, 0x5a, 0xa0, 0xf7, 0xf8, 0x79, 0x32, 0x09, 0x4f, 0xe6, 0x9f, 0xb7, 0x28,
                                               0x68, 0xa8, 0x1e, 0x26, 0x97, 0x9b, 0x36, 0x8b, 0x33, 0xb5, 0x54, 0x31, 0x03 };
 
+constexpr uint8_t kExpectedPaiPublicKey[] = { 0x04, 0xca, 0x73, 0xce, 0x46, 0x41, 0xbf, 0x08, 0x3b, 0x4a, 0x33, 0x8d, 0xa0,
+                                              0x43, 0x1a, 0x0a, 0x32, 0x30, 0x7f, 0x66, 0xd1, 0x60, 0x57, 0x4b, 0x66, 0x12,
+                                              0x2f, 0x25, 0x06, 0xcf, 0x6a, 0xd3, 0x70, 0xe3, 0x7f, 0x65, 0xd6, 0x34, 0x7a,
+                                              0xe7, 0x97, 0xa1, 0x97, 0x26, 0x50, 0x50, 0x97, 0x6d, 0x34, 0xac, 0x7b, 0x63,
+                                              0x7b, 0x3b, 0xda, 0x0b, 0x5b, 0xd8, 0x43, 0xed, 0x8e, 0x5d, 0x5e, 0x9b, 0xf2 };
+
 } // namespace
 
 static void TestDACAccessorsExample_Accessors(nlTestSuite * inSuite, void * inContext)
@@ -62,19 +68,46 @@ static void TestDACAccessorsExample_Accessors(nlTestSuite * inSuite, void * inCo
     defaultAccessor = GetDeviceAttestationCredentialsAccessor();
     NL_TEST_ASSERT(inSuite, defaultAccessor == exampleDacAccessor);
 
-    // Make sure DAC is what we expect
+    // Make sure DAC is what we expect, by validating public key
     memset(der_cert_span.data(), 0, der_cert_span.size());
     err = exampleDacAccessor->GetDeviceAttestationCert(der_cert_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // Extract public key from DAC, prior to signature verification
     P256PublicKey dac_public_key;
     err = ExtractPubkeyFromX509Cert(der_cert_span, dac_public_key);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, dac_public_key.Length() == sizeof(kExpectedDacPublicKey));
     NL_TEST_ASSERT(inSuite, 0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey, sizeof(kExpectedDacPublicKey)));
 
-    // TODO: Test all other accessors
+    // Make sure PAI is what we expect, by validating public key
+    der_cert_span = MutableByteSpan{der_cert_span};
+    memset(der_cert_span.data(), 0, der_cert_span.size());
+    err = exampleDacAccessor->GetProductAttestationIntermediateCert(der_cert_span);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    P256PublicKey pai_public_key;
+    err = ExtractPubkeyFromX509Cert(der_cert_span, pai_public_key);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pai_public_key.Length() == sizeof(kExpectedPaiPublicKey));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(pai_public_key.ConstBytes(), kExpectedPaiPublicKey, sizeof(kExpectedPaiPublicKey)));
+
+    // Check for CD presence
+    uint8_t other_data_buf[256];
+    MutableByteSpan other_data_span(other_data_buf);
+    memset(other_data_span.data(), 0, other_data_span.size());
+
+    err = exampleDacAccessor->GetCertificationDeclaration(other_data_span);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, other_data_span.size() > 0);
+    NL_TEST_ASSERT(inSuite, other_data_span.data()[0] != 0);
+
+    // Check for firmware information presence
+    other_data_span = MutableByteSpan{other_data_buf};
+    memset(other_data_span.data(), 0, other_data_span.size());
+
+    err = exampleDacAccessor->GetFirmwareInformation(other_data_span);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, other_data_span.size() == 0);
 }
 
 static void TestDACAccessorsExample_Signature(nlTestSuite * inSuite, void * inContext)
