@@ -1237,7 +1237,7 @@ exit:
 
 #else
     (void) certificate;
-    (void) public_key;
+    (void) pubkey;
     CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 
