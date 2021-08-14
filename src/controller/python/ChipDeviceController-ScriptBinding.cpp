@@ -59,6 +59,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <support/ScopedBuffer.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -175,15 +176,39 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     CHIP_ERROR err = sOperationalCredentialsIssuer.Initialize(sStorageDelegate);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
+    chip::Crypto::P256Keypair ephemeralKey;
+    err = ephemeralKey.Initialize();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
+    ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
+    MutableByteSpan nocSpan(noc.Get(), kMaxCHIPDERCertLength);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
+    ReturnErrorCodeIf(!icac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
+    MutableByteSpan icacSpan(icac.Get(), kMaxCHIPDERCertLength);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
+    ReturnErrorCodeIf(!rcac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
+    MutableByteSpan rcacSpan(rcac.Get(), kMaxCHIPDERCertLength);
+
+    err = sOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(localDeviceId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan,
+                                                                        nocSpan);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+
     CommissionerInitParams initParams;
     initParams.storageDelegate                = &sStorageDelegate;
     initParams.mDeviceAddressUpdateDelegate   = &sDeviceAddressUpdateDelegate;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = &sOperationalCredentialsIssuer;
     initParams.imDelegate                     = &PythonInteractionModelDelegate::Instance();
+    initParams.ephemeralKeypair               = &ephemeralKey;
+    initParams.controllerRCAC                 = rcacSpan;
+    initParams.controllerICAC                 = icacSpan;
+    initParams.controllerNOC                  = nocSpan;
 
     (*outDevCtrl)->SetUdpListenPort(CHIP_PORT + 1);
-    err = (*outDevCtrl)->Init(localDeviceId, initParams);
+    err = (*outDevCtrl)->Init(initParams);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 
     return CHIP_NO_ERROR.AsInteger();
