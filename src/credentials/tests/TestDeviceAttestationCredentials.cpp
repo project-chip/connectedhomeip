@@ -80,7 +80,7 @@ static void TestDACAccessorsExample_Accessors(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, 0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey, sizeof(kExpectedDacPublicKey)));
 
     // Make sure PAI is what we expect, by validating public key
-    der_cert_span = MutableByteSpan{der_cert_span};
+    der_cert_span = MutableByteSpan{ der_cert_span };
     memset(der_cert_span.data(), 0, der_cert_span.size());
     err = exampleDacAccessor->GetProductAttestationIntermediateCert(der_cert_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -102,7 +102,7 @@ static void TestDACAccessorsExample_Accessors(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, other_data_span.data()[0] != 0);
 
     // Check for firmware information presence
-    other_data_span = MutableByteSpan{other_data_buf};
+    other_data_span = MutableByteSpan{ other_data_buf };
     memset(other_data_span.data(), 0, other_data_span.size());
 
     err = exampleDacAccessor->GetFirmwareInformation(other_data_span);
