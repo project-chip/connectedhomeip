@@ -490,7 +490,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
         TLV::TLVWriter tlvWriter;
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
-        tlvWriter.Init(msg_R2_Signed.Get(), static_cast<uint32_t>(msg_r2_signed_len));
+        tlvWriter.Init(msg_R2_Signed.Get(), msg_r2_signed_len);
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), mOpCredSet->GetDevOpCred(mTrustedRootId),
                                                mOpCredSet->GetDevOpCredLen(mTrustedRootId)));
@@ -515,7 +515,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
         TLV::TLVWriter tlvWriter;
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
-        tlvWriter.Init(msg_R2_Encrypted.Get(), static_cast<uint32_t>(msg_r2_signed_enc_len));
+        tlvWriter.Init(msg_R2_Encrypted.Get(), msg_r2_signed_enc_len);
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), mOpCredSet->GetDevOpCred(mTrustedRootId),
                                                mOpCredSet->GetDevOpCredLen(mTrustedRootId)));
@@ -674,7 +674,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
                                         kTBEData2_Nonce, kTBEDataNonceLength, msg_R2_Encrypted.Get()));
 
     decodeTagIdSeq = 0;
-    decryptedDataTlvReader.Init(msg_R2_Encrypted.Get(), static_cast<uint32_t>(msg_r2_encrypted_len));
+    decryptedDataTlvReader.Init(msg_R2_Encrypted.Get(), msg_r2_encrypted_len);
     containerType = TLV::kTLVType_Structure;
     SuccessOrExit(err = decryptedDataTlvReader.Next(containerType, TLV::AnonymousTag));
     SuccessOrExit(err = decryptedDataTlvReader.EnterContainer(containerType));
@@ -752,7 +752,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
         TLV::TLVWriter tlvWriter;
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
-        tlvWriter.Init(msg_R3_Signed.Get(), static_cast<uint32_t>(msg_r3_signed_len));
+        tlvWriter.Init(msg_R3_Signed.Get(), msg_r3_signed_len);
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), mOpCredSet->GetDevOpCred(mTrustedRootId),
                                                mOpCredSet->GetDevOpCredLen(mTrustedRootId)));
@@ -777,7 +777,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
         TLV::TLVWriter tlvWriter;
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
-        tlvWriter.Init(msg_R3_Encrypted.Get(), static_cast<uint32_t>(msg_r3_encrypted_len));
+        tlvWriter.Init(msg_R3_Encrypted.Get(), msg_r3_encrypted_len);
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), mOpCredSet->GetDevOpCred(mTrustedRootId),
                                                mOpCredSet->GetDevOpCredLen(mTrustedRootId)));
@@ -924,7 +924,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
                                         kTBEData3_Nonce, kTBEDataNonceLength, msg_R3_Encrypted.Get()));
 
     decodeTagIdSeq = 0;
-    decryptedDataTlvReader.Init(msg_R3_Encrypted.Get(), static_cast<uint32_t>(msg_r3_encrypted_len));
+    decryptedDataTlvReader.Init(msg_R3_Encrypted.Get(), msg_r3_encrypted_len);
     containerType = TLV::kTLVType_Structure;
     SuccessOrExit(err = decryptedDataTlvReader.Next(containerType, TLV::AnonymousTag));
     SuccessOrExit(err = decryptedDataTlvReader.EnterContainer(containerType));
@@ -1154,7 +1154,7 @@ CHIP_ERROR CASESession::ConstructTBS2Data(const ByteSpan & responderOpCert, uint
     TLV::TLVWriter tlvWriter;
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
-    tlvWriter.Init(tbsData, static_cast<uint32_t>(tbsDataLen));
+    tlvWriter.Init(tbsData, tbsDataLen);
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(
         tlvWriter.PutBytes(TLV::ContextTag(1), responderOpCert.data(), static_cast<uint32_t>(responderOpCert.size())));
@@ -1173,7 +1173,7 @@ CHIP_ERROR CASESession::ConstructTBS3Data(const ByteSpan & responderOpCert, uint
     TLV::TLVWriter tlvWriter;
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
-    tlvWriter.Init(tbsData, static_cast<uint32_t>(tbsDataLen));
+    tlvWriter.Init(tbsData, tbsDataLen);
     ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(
         tlvWriter.PutBytes(TLV::ContextTag(1), responderOpCert.data(), static_cast<uint32_t>(responderOpCert.size())));
