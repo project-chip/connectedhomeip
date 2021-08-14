@@ -1111,8 +1111,8 @@ static void TestChipCert_X509ToChipArrayErrorScenarios(nlTestSuite * inSuite, vo
     static uint8_t chipCertArrayBuf[kMaxCHIPCertLength * 2];
     MutableByteSpan chipCertArray(chipCertArrayBuf);
     // Test that NOC is mandatory
-    NL_TEST_ASSERT(
-        inSuite, ConvertX509CertsToChipCertArray(ByteSpan(), ica_cert_span, chipCertArray) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite,
+                   ConvertX509CertsToChipCertArray(ByteSpan(), ica_cert_span, chipCertArray) == CHIP_ERROR_INVALID_ARGUMENT);
 
     // Test that NOC issuer must match ICA
     NL_TEST_ASSERT(inSuite,
@@ -1121,8 +1121,9 @@ static void TestChipCert_X509ToChipArrayErrorScenarios(nlTestSuite * inSuite, vo
     X509CertRequestParams ica_params_wrong_fabric = { 1234, 0xabcdabcd, 631161876, 729942000, true, 0x9999, false, 0 };
 
     MutableByteSpan ica_cert_span1(ica_cert, sizeof(ica_cert));
-    NL_TEST_ASSERT(
-        inSuite, NewICAX509Cert(ica_params_wrong_fabric, 0xaabbccdd, ica_keypair.Pubkey(), keypair, ica_cert_span1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   NewICAX509Cert(ica_params_wrong_fabric, 0xaabbccdd, ica_keypair.Pubkey(), keypair, ica_cert_span1) ==
+                       CHIP_NO_ERROR);
     // Test that NOC fabric must match ICA fabric
     NL_TEST_ASSERT(inSuite,
                    ConvertX509CertsToChipCertArray(noc_cert_span, ica_cert_span, chipCertArray) == CHIP_ERROR_INVALID_ARGUMENT);
