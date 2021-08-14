@@ -39,7 +39,7 @@
 #include <mbedtls/sha256.h>
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
 #include <mbedtls/x509_crt.h>
-#endif  // defined(MBEDTLS_X509_CRT_PARSE_C)
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 #include <mbedtls/x509_csr.h>
 
 #include <core/CHIPSafeCasts.h>
@@ -1213,7 +1213,8 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
-    CHIP_ERROR error;;
+    CHIP_ERROR error;
+    ;
     mbedtls_x509_crt mbed_cert;
     mbedtls_ecp_keypair * keypair = nullptr;
     size_t pubkey_size            = 0;
@@ -1236,10 +1237,10 @@ exit:
     mbedtls_x509_crt_free(&mbed_cert);
 
 #else
-    (void)certificate;
-    (void)public_key;
+    (void) certificate;
+    (void) public_key;
     CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
-#endif  // defined(MBEDTLS_X509_CRT_PARSE_C)
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 
     return error;
 }
