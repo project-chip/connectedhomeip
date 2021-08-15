@@ -77,6 +77,15 @@ CHIP_ERROR WatchableEventManager::Shutdown()
     while ((timer = mTimerList.PopEarliest()) != nullptr)
     {
         timer->Clear();
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+        if (timer->mTimerSource != nullptr)
+        {
+            dispatch_source_cancel(timer->mTimerSource);
+            dispatch_release(timer->mTimerSource);
+        }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
         timer->Release();
     }
     mWakeEvent.Close();

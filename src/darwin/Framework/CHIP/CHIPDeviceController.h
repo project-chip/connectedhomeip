@@ -96,8 +96,9 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  * check if the stack needs to be started up.
  *
  * @param[in] storageDelegate The delegate for persistent storage
+ * @param[in] vendorId The vendor ID of the commissioner application
  */
-- (BOOL)startup:(nullable id<CHIPPersistentStorageDelegate>)storageDelegate;
+- (BOOL)startup:(nullable id<CHIPPersistentStorageDelegate>)storageDelegate vendorId:(uint16_t)vendorId;
 
 /**
  * Shutdown the CHIP Stack. Repeated calls to shutdown without calls to startup in between are NO-OPs.
