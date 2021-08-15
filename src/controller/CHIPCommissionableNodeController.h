@@ -37,7 +37,8 @@ namespace Controller {
 class DLL_EXPORT CommissionableNodeController : public AbstractMdnsDiscoveryController
 {
 public:
-    CommissionableNodeController(){};
+    CommissionableNodeController(chip::Mdns::Resolver * resolver = &chip::Mdns::Resolver::Instance()) :
+        AbstractMdnsDiscoveryController(resolver){};
     virtual ~CommissionableNodeController() {}
 
     CHIP_ERROR DiscoverCommissioners(Mdns::DiscoveryFilter discoveryFilter = Mdns::DiscoveryFilter());
