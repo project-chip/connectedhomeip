@@ -59,7 +59,7 @@ public:
 };
 
 // Default to avoid nullptr on getter and cleanly handle new products/clients before
-// their provide their own.
+// they provide their own.
 UnimplementedDACAccessor gDefaultDACAccessor;
 
 DeviceAttestationCredentialsAccessor * gDacAccessor = &gDefaultDACAccessor;
