@@ -18,7 +18,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <credentials/CHIPCert.h>
-#include <credentials/DeviceAttestationCredsAccess.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <lib/core/CHIPError.h>
@@ -49,33 +49,33 @@ constexpr uint8_t kExpectedPaiPublicKey[] = { 0x04, 0xca, 0x73, 0xce, 0x46, 0x41
 
 } // namespace
 
-static void TestDACAccessorsExample_Accessors(nlTestSuite * inSuite, void * inContext)
+static void TestDACProvidersExample_Providers(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t der_cert_buf[kMaxDERCertLength];
     MutableByteSpan der_cert_span(der_cert_buf);
 
-    // Make sure default accessor exists and is not implemented on at least one method
-    DeviceAttestationCredentialsAccessor * defaultAccessor = GetDeviceAttestationCredentialsAccessor();
-    NL_TEST_ASSERT(inSuite, defaultAccessor != nullptr);
+    // Make sure default provider exists and is not implemented on at least one method
+    DeviceAttestationCredentialsProvider * default_provider = GetDeviceAttestationCredentialsProvider();
+    NL_TEST_ASSERT(inSuite, default_provider != nullptr);
 
-    CHIP_ERROR err = defaultAccessor->GetDeviceAttestationCert(der_cert_span);
+    CHIP_ERROR err = default_provider->GetDeviceAttestationCert(der_cert_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_IMPLEMENTED);
 
-    // Replace default accessor with example accessor
-    DeviceAttestationCredentialsAccessor * exampleDacAccessor = Examples::GetExampleDACAccessor();
-    NL_TEST_ASSERT(inSuite, exampleDacAccessor != nullptr);
-    NL_TEST_ASSERT(inSuite, defaultAccessor != exampleDacAccessor);
+    // Replace default provider with example provider
+    DeviceAttestationCredentialsProvider * example_dac_provider = Examples::GetExampleDACProvider();
+    NL_TEST_ASSERT(inSuite, example_dac_provider != nullptr);
+    NL_TEST_ASSERT(inSuite, default_provider != example_dac_provider);
 
-    SetDeviceAttestationCredentialsAccessor(exampleDacAccessor);
-    defaultAccessor = GetDeviceAttestationCredentialsAccessor();
-    NL_TEST_ASSERT(inSuite, defaultAccessor == exampleDacAccessor);
+    SetDeviceAttestationCredentialsProvider(example_dac_provider);
+    default_provider = GetDeviceAttestationCredentialsProvider();
+    NL_TEST_ASSERT(inSuite, default_provider == example_dac_provider);
 
     // TODO: Fix ESP32 QEMU X.509 unit tests
     // Can only run the following cases on OpenSSL due to x509 cert parsing
 #if CHIP_CRYPTO_OPENSSL
     // Make sure DAC is what we expect, by validating public key
     memset(der_cert_span.data(), 0, der_cert_span.size());
-    err = exampleDacAccessor->GetDeviceAttestationCert(der_cert_span);
+    err = example_dac_provider->GetDeviceAttestationCert(der_cert_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     P256PublicKey dac_public_key;
@@ -87,7 +87,7 @@ static void TestDACAccessorsExample_Accessors(nlTestSuite * inSuite, void * inCo
     // Make sure PAI is what we expect, by validating public key
     der_cert_span = MutableByteSpan{ der_cert_span };
     memset(der_cert_span.data(), 0, der_cert_span.size());
-    err = exampleDacAccessor->GetProductAttestationIntermediateCert(der_cert_span);
+    err = example_dac_provider->GetProductAttestationIntermediateCert(der_cert_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     P256PublicKey pai_public_key;
@@ -102,7 +102,7 @@ static void TestDACAccessorsExample_Accessors(nlTestSuite * inSuite, void * inCo
     MutableByteSpan other_data_span(other_data_buf);
     memset(other_data_span.data(), 0, other_data_span.size());
 
-    err = exampleDacAccessor->GetCertificationDeclaration(other_data_span);
+    err = example_dac_provider->GetCertificationDeclaration(other_data_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, other_data_span.size() > 0);
     NL_TEST_ASSERT(inSuite, other_data_span.data()[0] != 0);
@@ -111,35 +111,35 @@ static void TestDACAccessorsExample_Accessors(nlTestSuite * inSuite, void * inCo
     other_data_span = MutableByteSpan{ other_data_buf };
     memset(other_data_span.data(), 0, other_data_span.size());
 
-    err = exampleDacAccessor->GetFirmwareInformation(other_data_span);
+    err = example_dac_provider->GetFirmwareInformation(other_data_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, other_data_span.size() == 0);
 }
 
-static void TestDACAccessorsExample_Signature(nlTestSuite * inSuite, void * inContext)
+static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inContext)
 {
     constexpr uint8_t kExampleDigest[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x10, 0x11, 0x12,
                                            0x13, 0x14, 0x15, 0x16, 0x17, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25,
                                            0x26, 0x27, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 };
 
-    DeviceAttestationCredentialsAccessor * exampleDacAccessor = Examples::GetExampleDACAccessor();
-    NL_TEST_ASSERT(inSuite, exampleDacAccessor != nullptr);
+    DeviceAttestationCredentialsProvider * example_dac_provider = Examples::GetExampleDACProvider();
+    NL_TEST_ASSERT(inSuite, example_dac_provider != nullptr);
 
     // Sign using the example attestation private key
     P256ECDSASignature da_signature;
     MutableByteSpan out_sig_span(da_signature.Bytes(), da_signature.Capacity());
-    CHIP_ERROR err = exampleDacAccessor->SignWithDeviceAttestationKey(ByteSpan{ kExampleDigest }, out_sig_span);
+    CHIP_ERROR err = example_dac_provider->SignWithDeviceAttestationKey(ByteSpan{ kExampleDigest }, out_sig_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, out_sig_span.size() == kP256_ECDSA_Signature_Length_Raw);
     da_signature.SetLength(out_sig_span.size());
 
-    // Get DAC from the accessor
+    // Get DAC from the provider
     uint8_t dac_cert_buf[kMaxDERCertLength];
     MutableByteSpan dac_cert_span(dac_cert_buf);
 
     memset(dac_cert_span.data(), 0, dac_cert_span.size());
-    err = exampleDacAccessor->GetDeviceAttestationCert(dac_cert_span);
+    err = example_dac_provider->GetDeviceAttestationCert(dac_cert_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // TODO: Fix ESP32 QEMU X.509 unit tests
@@ -163,18 +163,18 @@ static void TestDACAccessorsExample_Signature(nlTestSuite * inSuite, void * inCo
  */
 // clang-format off
 static const nlTest sTests[] = {
-    NL_TEST_DEF("Test Example Device Attestation Credentials Accessors", TestDACAccessorsExample_Accessors),
-    NL_TEST_DEF("Test Example Device Attestation Signature", TestDACAccessorsExample_Signature),
+    NL_TEST_DEF("Test Example Device Attestation Credentials Providers", TestDACProvidersExample_Providers),
+    NL_TEST_DEF("Test Example Device Attestation Signature", TestDACProvidersExample_Signature),
     NL_TEST_SENTINEL()
 };
 // clang-format on
 
-int TestDACAccessors()
+int TestDACProviders()
 {
     // clang-format off
     nlTestSuite theSuite =
     {
-        "Device Attestation Credentials Accessors",
+        "Device Attestation Credentials Providers",
         &sTests[0],
         nullptr,
         nullptr
@@ -184,4 +184,4 @@ int TestDACAccessors()
     return (nlTestRunnerStats(&theSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestDACAccessors);
+CHIP_REGISTER_TEST_SUITE(TestDACProviders);

@@ -22,15 +22,15 @@
 namespace chip {
 namespace Credentials {
 
-class DeviceAttestationCredentialsAccessor
+class DeviceAttestationCredentialsProvider
 {
 public:
-    DeviceAttestationCredentialsAccessor()          = default;
-    virtual ~DeviceAttestationCredentialsAccessor() = default;
+    DeviceAttestationCredentialsProvider()          = default;
+    virtual ~DeviceAttestationCredentialsProvider() = default;
 
     // Not copyable
-    DeviceAttestationCredentialsAccessor(const DeviceAttestationCredentialsAccessor &) = delete;
-    DeviceAttestationCredentialsAccessor & operator=(const DeviceAttestationCredentialsAccessor &) = delete;
+    DeviceAttestationCredentialsProvider(const DeviceAttestationCredentialsProvider &) = delete;
+    DeviceAttestationCredentialsProvider & operator=(const DeviceAttestationCredentialsProvider &) = delete;
 
     /**
      * @brief Get the Certification Declaration body. Updates `out_cd_buffer`'s size on success
@@ -93,24 +93,24 @@ public:
 };
 
 /**
- * Instance getter for the global DeviceAttestationCredentialsAccessor.
+ * Instance getter for the global DeviceAttestationCredentialsProvider.
  *
  * Callers have to externally synchronize usage of this function.
  *
- * @return The global device attestation credentials accessor. Assume never null.
+ * @return The global device attestation credentials provider. Assume never null.
  */
-DeviceAttestationCredentialsAccessor * GetDeviceAttestationCredentialsAccessor();
+DeviceAttestationCredentialsProvider * GetDeviceAttestationCredentialsProvider();
 
 /**
- * Instance setter for the global DeviceAttestationCredentialsAccessor.
+ * Instance setter for the global DeviceAttestationCredentialsProvider.
  *
  * Callers have to externally synchronize usage of this function.
  *
- * If the `accessor` is nullptr, no change is done.
+ * If the `provider` is nullptr, no change is done.
  *
- * @param[in] accessor the DeviceAttestationCredentialsAccessor to start returning with the getter
+ * @param[in] provider the DeviceAttestationCredentialsProvider to start returning with the getter
  */
-void SetDeviceAttestationCredentialsAccessor(DeviceAttestationCredentialsAccessor * accessor);
+void SetDeviceAttestationCredentialsProvider(DeviceAttestationCredentialsProvider * provider);
 
 } // namespace Credentials
 } // namespace chip

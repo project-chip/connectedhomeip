@@ -27,7 +27,7 @@ namespace Examples {
 
 namespace {
 
-// Helper to do common logic to all accessors
+// Helper to do common logic to all providers
 CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan & out_buf)
 {
     VerifyOrReturnError(IsSpanUsable(span_to_copy), CHIP_ERROR_INVALID_ARGUMENT);
@@ -49,7 +49,7 @@ CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto:
     return keypair.Deserialize(serialized_keypair);
 }
 
-class ExampleDACAccessor : public DeviceAttestationCredentialsAccessor
+class ExampleDACProvider : public DeviceAttestationCredentialsProvider
 {
 public:
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & out_cd_buffer) override;
@@ -59,7 +59,7 @@ public:
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer) override;
 };
 
-CHIP_ERROR ExampleDACAccessor::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
+CHIP_ERROR ExampleDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
 {
     /*
     credentials/test/attestation/Chip-Test-DAC-FFF1-8000-000A-Cert.pem
@@ -108,7 +108,7 @@ CHIP_ERROR ExampleDACAccessor::GetDeviceAttestationCert(MutableByteSpan & out_da
     return CopySpanToMutableSpan(ByteSpan{ kDacCertificate }, out_dac_buffer);
 }
 
-CHIP_ERROR ExampleDACAccessor::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
+CHIP_ERROR ExampleDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
 {
     /*
     credentials/test/attestation/Chip-Test-PAI-FFF1-8000-Cert.pem
@@ -154,7 +154,7 @@ CHIP_ERROR ExampleDACAccessor::GetProductAttestationIntermediateCert(MutableByte
     return CopySpanToMutableSpan(ByteSpan{ kPaiCertificate }, out_pai_buffer);
 }
 
-CHIP_ERROR ExampleDACAccessor::GetCertificationDeclaration(MutableByteSpan & out_cd_buffer)
+CHIP_ERROR ExampleDACProvider::GetCertificationDeclaration(MutableByteSpan & out_cd_buffer)
 {
     // TODO: We need a real example CD to be populated.
     constexpr uint8_t kCertificationDeclaration[128] = { 1 };
@@ -162,7 +162,7 @@ CHIP_ERROR ExampleDACAccessor::GetCertificationDeclaration(MutableByteSpan & out
     return CopySpanToMutableSpan(ByteSpan{ kCertificationDeclaration }, out_cd_buffer);
 }
 
-CHIP_ERROR ExampleDACAccessor::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
+CHIP_ERROR ExampleDACProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
 {
     // TODO: We need a real example FirmwareInformation to be populated.
     out_firmware_info_buffer.reduce_size(0);
@@ -170,7 +170,7 @@ CHIP_ERROR ExampleDACAccessor::GetFirmwareInformation(MutableByteSpan & out_firm
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleDACAccessor::SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer)
+CHIP_ERROR ExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer)
 {
 
     /*
@@ -209,11 +209,11 @@ CHIP_ERROR ExampleDACAccessor::SignWithDeviceAttestationKey(const ByteSpan & dig
 
 } // namespace
 
-DeviceAttestationCredentialsAccessor * GetExampleDACAccessor()
+DeviceAttestationCredentialsProvider * GetExampleDACProvider()
 {
-    static ExampleDACAccessor example_dac_accessor;
+    static ExampleDACProvider example_dac_provider;
 
-    return &example_dac_accessor;
+    return &example_dac_provider;
 }
 
 } // namespace Examples

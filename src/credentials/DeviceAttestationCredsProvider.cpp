@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "DeviceAttestationCredsAccess.h"
+#include "DeviceAttestationCredsProvider.h"
 
 namespace chip {
 namespace Credentials {
@@ -23,7 +23,7 @@ namespace {
 
 // Version to have a default placeholder so the getter never
 // returns `nullptr` by default.
-class UnimplementedDACAccessor : public DeviceAttestationCredentialsAccessor
+class UnimplementedDACProvider : public DeviceAttestationCredentialsProvider
 {
 public:
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & out_cd_buffer) override
@@ -60,25 +60,25 @@ public:
 
 // Default to avoid nullptr on getter and cleanly handle new products/clients before
 // they provide their own.
-UnimplementedDACAccessor gDefaultDACAccessor;
+UnimplementedDACProvider gDefaultDACProvider;
 
-DeviceAttestationCredentialsAccessor * gDacAccessor = &gDefaultDACAccessor;
+DeviceAttestationCredentialsProvider * gDacProvider = &gDefaultDACProvider;
 
 } // namespace
 
-DeviceAttestationCredentialsAccessor * GetDeviceAttestationCredentialsAccessor()
+DeviceAttestationCredentialsProvider * GetDeviceAttestationCredentialsProvider()
 {
-    return gDacAccessor;
+    return gDacProvider;
 }
 
-void SetDeviceAttestationCredentialsAccessor(DeviceAttestationCredentialsAccessor * accessor)
+void SetDeviceAttestationCredentialsProvider(DeviceAttestationCredentialsProvider * provider)
 {
-    if (accessor == nullptr)
+    if (provider == nullptr)
     {
         return;
     }
 
-    gDacAccessor = accessor;
+    gDacProvider = provider;
 }
 
 } // namespace Credentials

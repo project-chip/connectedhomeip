@@ -16,20 +16,20 @@
  */
 #pragma once
 
-#include <credentials/DeviceAttestationCredsAccess.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
 
 namespace chip {
 namespace Credentials {
 namespace Examples {
 
 /**
- * @brief Get implementation of a sample DAC accessor to validate device
+ * @brief Get implementation of a sample DAC provider to validate device
  *        attestation procedure.
  *
- * @returns a singleton DeviceAttestationCredentialsAccessor that relies on no
+ * @returns a singleton DeviceAttestationCredentialsProvider that relies on no
  *          storage abstractions.
  */
-DeviceAttestationCredentialsAccessor * GetExampleDACAccessor();
+DeviceAttestationCredentialsProvider * GetExampleDACProvider();
 
 } // namespace Examples
 } // namespace Credentials
