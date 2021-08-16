@@ -26,7 +26,7 @@ concurrency:
 jobs:
     mbedos:
         name: Mbed OS examples building
-        timeout-minutes: 30
+        timeout-minutes: 60
         
         env:
             BUILD_TYPE: mbedos
@@ -46,6 +46,19 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
+
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: scripts/build/gn_bootstrap.sh
+
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }}
+              with:
+                  name: bootstrap-logs
+                  path: |
+                   .environment/gn_out/.ninja_log
+                   .environment/pigweed-venv/*.log
 
             - name: Build lock-app example
               timeout-minutes: 10
