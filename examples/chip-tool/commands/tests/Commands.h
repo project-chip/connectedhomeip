@@ -8681,7 +8681,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_91{
         OnTestSendClusterTestClusterCommandWriteAttribute_91_FailureResponse, this
     };
-    bool mIsFailureExpected_91 = 0;
+    bool mIsFailureExpected_91 = true;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_91()
     {
@@ -9198,7 +9198,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        chip::ByteSpan charStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("☉Test☉"), strlen("☉Test☉"));
+        chip::ByteSpan charStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("☉T☉"), strlen("☉T☉"));
         err = cluster.WriteAttributeCharString(mOnSuccessCallback_99.Cancel(), mOnFailureCallback_99.Cancel(), charStringArgument);
 
         return err;
@@ -9236,7 +9236,7 @@ private:
         runner->NextTest();
     }
 
-    // Test Write attribute CHAR_STRING
+    // Test Write attribute CHAR_STRING - Value too long
     using SuccessCallback_100 = void (*)(void * context, chip::ByteSpan charString);
     chip::Callback::Callback<SuccessCallback_100> mOnSuccessCallback_100{
         OnTestSendClusterTestClusterCommandWriteAttribute_100_SuccessResponse, this
@@ -9244,11 +9244,11 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_100{
         OnTestSendClusterTestClusterCommandWriteAttribute_100_FailureResponse, this
     };
-    bool mIsFailureExpected_100 = 0;
+    bool mIsFailureExpected_100 = true;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_100()
     {
-        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Sending command...");
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Value too long: Sending command...");
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -9265,7 +9265,7 @@ private:
 
     static void OnTestSendClusterTestClusterCommandWriteAttribute_100_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Failure Response");
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Value too long: Failure Response");
 
         TestCluster * runner = reinterpret_cast<TestCluster *>(context);
 
@@ -9281,7 +9281,7 @@ private:
 
     static void OnTestSendClusterTestClusterCommandWriteAttribute_100_SuccessResponse(void * context, chip::ByteSpan charString)
     {
-        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Success Response");
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Value too long: Success Response");
 
         TestCluster * runner = reinterpret_cast<TestCluster *>(context);
 
@@ -9295,7 +9295,7 @@ private:
         runner->NextTest();
     }
 
-    // Test Write attribute CHAR_STRING
+    // Test Write attribute CHAR_STRING - Empty
     using SuccessCallback_101 = void (*)(void * context, chip::ByteSpan charString);
     chip::Callback::Callback<SuccessCallback_101> mOnSuccessCallback_101{
         OnTestSendClusterTestClusterCommandWriteAttribute_101_SuccessResponse, this
@@ -9307,7 +9307,7 @@ private:
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_101()
     {
-        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Sending command...");
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Empty: Sending command...");
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -9323,7 +9323,7 @@ private:
 
     static void OnTestSendClusterTestClusterCommandWriteAttribute_101_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Failure Response");
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Empty: Failure Response");
 
         TestCluster * runner = reinterpret_cast<TestCluster *>(context);
 
@@ -9339,7 +9339,7 @@ private:
 
     static void OnTestSendClusterTestClusterCommandWriteAttribute_101_SuccessResponse(void * context, chip::ByteSpan charString)
     {
-        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Success Response");
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Empty: Success Response");
 
         TestCluster * runner = reinterpret_cast<TestCluster *>(context);
 
