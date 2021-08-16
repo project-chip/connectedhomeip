@@ -107,7 +107,7 @@ CHIP_ERROR AdvertiseOperational()
         chip::Mdns::OperationalAdvertisingParameters()
             .SetPeerId(PeerId().SetFabricId(fabricId).SetNodeId(GetCurrentNodeId()))
             .SetMac(FillMAC(mac))
-            .SetPort(CHIP_PORT)
+            .SetPort(chip::DeviceLayer::ConfigurationMgr().GetSecuredPort())
             .SetMRPRetryIntervals(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL, CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL)
             .EnableIpV4(true);
 
@@ -120,18 +120,22 @@ CHIP_ERROR AdvertiseOperational()
 }
 
 /// Overloaded utility method for commissioner and commissionable advertisement
-// This method is used for both commissioner discovery and commissionable node discovery since
-// they share many fields.
+/// This method is used for both commissioner discovery and commissionable node discovery since
+/// they share many fields.
 CHIP_ERROR Advertise(bool commissionableNode, CommissioningMode mode)
 {
     bool commissioningMode = (mode == CommissioningMode::kEnabled || mode == CommissioningMode::kEnabledAsAdditionalCommissioning);
     bool additionalCommissioning = (mode == CommissioningMode::kEnabledAsAdditionalCommissioning);
 
-    auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
+    auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters()
+                                   .SetPort(commissionableNode ? chip::DeviceLayer::ConfigurationMgr().GetSecuredPort()
+                                                               : chip::DeviceLayer::ConfigurationMgr().GetUnsecuredPort())
+                                   .EnableIpV4(true);
     advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Mdns::CommssionAdvertiseMode::kCommissionableNode
                                                                       : chip::Mdns::CommssionAdvertiseMode::kCommissioner);
 
-    advertiseParameters.SetCommissioningMode(commissioningMode, additionalCommissioning);
+    advertiseParameters.SetCommissioningMode(commissioningMode);
+    advertiseParameters.SetAdditionalCommissioning(additionalCommissioning);
 
     char pairingInst[chip::Mdns::kKeyPairingInstructionMaxLength + 1];
 
@@ -235,26 +239,26 @@ CHIP_ERROR Advertise(bool commissionableNode, CommissioningMode mode)
 /// Set MDNS commissioner advertisement
 CHIP_ERROR AdvertiseCommisioner()
 {
-    return Advertise(false, CommissioningMode::kDisabled);
+    return Advertise(false /* commisionableNode */, CommissioningMode::kDisabled);
 }
 
 /// Set MDNS commissionable node advertisement
 CHIP_ERROR AdvertiseCommissionableNode(CommissioningMode mode)
 {
-    return Advertise(true, mode);
+    return Advertise(true /* commisionableNode */, mode);
 }
 
-/// (Re-)starts the minmdns server
-// Commissioning mode is enabled if device has not yet been commissioned
+/// (Re-)starts the minmdns server using default state
+/// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
+/// - if devica has been commissioned, then commissioning mode will show as disabled (CM=0, AC=0)
 void StartServer()
 {
     StartServer(CommissioningMode::kDisabled);
 }
 
 /// (Re-)starts the minmdns server
-//
-// NOTE: when device has never been commissioned, mode will be treated as CommissioningMode::kEnabled
-//
+/// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
+/// - if devica has been commissioned, then commissioning mode will reflect the state of mode argument
 void StartServer(CommissioningMode mode)
 {
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);

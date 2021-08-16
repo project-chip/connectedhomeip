@@ -19,7 +19,6 @@
 
 #include <core/CHIPError.h>
 #include <stddef.h>
-#include <support/BitFlags.h>
 
 namespace chip {
 namespace app {
@@ -27,9 +26,9 @@ namespace Mdns {
 
 enum class CommissioningMode
 {
-    kDisabled,
-    kEnabled,
-    kEnabledAsAdditionalCommissioning
+    kDisabled,                        // Commissioning Mode is disabled, CM=0, AC=0 in DNS-SD key/value pairs
+    kEnabled,                         // Basic Commissioning Mode, CM=1, AC=0 in DNS-SD key/value pairs
+    kEnabledAsAdditionalCommissioning // Enhanced Commissioning Mode, CM=1, AC=1 in DNS-SD key/value pairs
 };
 
 /// Start operational advertising
@@ -42,13 +41,13 @@ CHIP_ERROR AdvertiseCommissioner();
 CHIP_ERROR AdvertiseCommissionableNode(CommissioningMode mode);
 
 /// (Re-)starts the minmdns server using default state
-// Commissioning mode is enabled if device has not yet been commissioned
+/// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
+/// - if devica has been commissioned, then commissioning mode will show as disabled (CM=0, AC=0)
 void StartServer();
 
 /// (Re-)starts the minmdns server
-//
-// NOTE: when device has never been commissioned, kAdditionalCommissioning flag will be ignored
-//
+/// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
+/// - if devica has been commissioned, then commissioning mode will reflect the state of mode argument
 void StartServer(CommissioningMode mode);
 
 CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);

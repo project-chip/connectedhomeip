@@ -62,9 +62,11 @@ static CHIP_ERROR PrintAllCommands()
     streamer_printf(sout,
                     "  sendudc <address> <port>   Send UDC message to address. Usage: commissionee sendudc 127.0.0.1 5543\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    streamer_printf(sout,
-                    "  restartmdns <commissioningMode> <additionalPairing>   Start Mdns with given settings. Usage: commissionee "
-                    "startmdns true true\r\n");
+    streamer_printf(
+        sout,
+        "  restartmdns <commissioningMode> (disabled|enabled|enabled_with_additional_commissioning)   Start Mdns with given "
+        "settings. Usage: commissionee "
+        "restartmdns enabled\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -90,24 +92,26 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     else if (strcmp(argv[0], "restartmdns") == 0)
     {
-        // if commissioning mode is true
-        if ((argc > 1) && (strcmp(argv[1], "true") == 0))
+        if (argc < 2)
         {
-            // if additional commissioning is true
-            if ((argc > 2) && (strcmp(argv[2], "true") == 0))
-            {
-                chip::app::Mdns::StartServer(chip::app::Mdns::CommissioningMode::kEnabledAsAdditionalCommissioning);
-            }
-            else
-            {
-                chip::app::Mdns::StartServer(chip::app::Mdns::CommissioningMode::kEnabled);
-            }
+            return PrintAllCommands();
         }
-        else
+        if (strcmp(argv[1], "disabled") == 0)
         {
             chip::app::Mdns::StartServer(chip::app::Mdns::CommissioningMode::kDisabled);
+            return CHIP_NO_ERROR;
         }
-        return CHIP_NO_ERROR;
+        if (strcmp(argv[1], "enabled") == 0)
+        {
+            chip::app::Mdns::StartServer(chip::app::Mdns::CommissioningMode::kEnabled);
+            return CHIP_NO_ERROR;
+        }
+        else if (strcmp(argv[1], "enabled_with_additional_commissioning") == 0)
+        {
+            chip::app::Mdns::StartServer(chip::app::Mdns::CommissioningMode::kEnabledAsAdditionalCommissioning);
+            return CHIP_NO_ERROR;
+        }
+        return PrintAllCommands();
     }
     else
     {

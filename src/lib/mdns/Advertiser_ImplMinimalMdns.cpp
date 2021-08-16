@@ -504,7 +504,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
             }
         }
 
-        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
+        if (params.GetCommissioningMode() && params.GetAdditionalCommissioning())
         {
             MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
                                DiscoveryFilter(DiscoveryFilterType::kCommissioningModeFromCommand, 1));
@@ -591,11 +591,11 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         snprintf(txtCommissioningMode, sizeof(txtCommissioningMode), "CM=%d", params.GetCommissioningMode() ? 1 : 0);
         txtFields[numTxtFields++] = txtCommissioningMode;
 
-        char txtOpenWindowCommissioningMode[chip::Mdns::kKeyAdditionalPairingMaxLength + 4];
-        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
+        char txtAdditionalCommissioning[chip::Mdns::kKeyAdditionalCommissioningMaxLength + 4];
+        if (params.GetCommissioningMode() && params.GetAdditionalCommissioning())
         {
-            snprintf(txtOpenWindowCommissioningMode, sizeof(txtOpenWindowCommissioningMode), "AP=1");
-            txtFields[numTxtFields++] = txtOpenWindowCommissioningMode;
+            snprintf(txtAdditionalCommissioning, sizeof(txtAdditionalCommissioning), "AP=1");
+            txtFields[numTxtFields++] = txtAdditionalCommissioning;
         }
 
         char txtRotatingDeviceId[chip::Mdns::kKeyRotatingIdMaxLength + 4];

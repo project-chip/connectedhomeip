@@ -1341,6 +1341,17 @@
 #endif // CHIP_PORT
 
 /**
+ *  @def CHIP_UDC_PORT
+ *
+ *  @brief
+ *    chip TCP/UDP port for unsecured user-directed-commissioning traffic.
+ *
+ */
+#ifndef CHIP_UDC_PORT
+#define CHIP_UDC_PORT CHIP_PORT + 10
+#endif // CHIP_UDC_PORT
+
+/**
  *  @def CHIP_UNSECURED_PORT
  *
  *  @brief

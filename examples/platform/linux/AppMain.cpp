@@ -182,7 +182,7 @@ CHIP_ERROR InitCommissioner()
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
 
     ReturnErrorOnFailure(gCommissioner.SetUdpListenPort(CHIP_PORT + 2));
-    ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(CHIP_PORT + 3));
+    ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(CHIP_UDC_PORT));
     ReturnErrorOnFailure(gCommissioner.Init(localId, params));
 
     return CHIP_NO_ERROR;
@@ -202,6 +202,11 @@ void ChipLinuxAppMainLoop()
     std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
     chip::Shell::RegisterCommissioneeCommands();
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    // use a different port to make testing easier
+    chip::DeviceLayer::ConfigurationMgr().SetSecuredPort(CHIP_PORT + 100);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     // Init ZCL Data Model and CHIP App Server
     InitServer();
