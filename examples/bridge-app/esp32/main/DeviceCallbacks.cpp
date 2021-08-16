@@ -21,6 +21,9 @@
 #include "esp_log.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <BLEdeinit.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/server/Mdns.h>
 #include <support/CodeUtils.h>
 
@@ -54,6 +57,11 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             chip::app::Mdns::StartServer();
         }
         break;
+#if CONFIG_RENDEZVOUS_MODE_BLE
+    case DeviceEventType::kCommissioningComplete:
+        deinitBLE();
+        break;
+#endif
     }
 
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));

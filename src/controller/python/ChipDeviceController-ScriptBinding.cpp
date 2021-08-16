@@ -96,6 +96,8 @@ ChipError::StorageType pychip_DeviceController_DeleteDeviceController(chip::Cont
 ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl,
                                                                  chip::NodeId nodeId, char * outAddress, uint64_t maxAddressLen,
                                                                  uint16_t * outPort);
+ChipError::StorageType pychip_DeviceController_CommissioiningComplete(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                      chip::NodeId nodeId);
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 
 // Rendezvous
@@ -238,6 +240,12 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
     VerifyOrReturnError(address.ToString(outAddress, maxAddressLen), CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger());
 
     return CHIP_NO_ERROR.AsInteger();
+}
+
+ChipError::StorageType pychip_DeviceController_CommissioiningComplete(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                      chip::NodeId nodeId)
+{
+    return devCtrl->CommissioningComplete(nodeId).AsInteger();
 }
 
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId)
