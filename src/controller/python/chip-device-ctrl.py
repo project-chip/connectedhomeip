@@ -784,8 +784,9 @@ class DeviceMgrCmd(Cmd):
                     raise exceptions.UnknownCluster(args[0])
                 attribute_type = all_attrs.get(args[0], {}).get(
                     args[1], {}).get("type", None)
-                self.devCtrl.ZCLWriteAttribute(args[0], args[1], int(
+                res = self.devCtrl.ZCLWriteAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), ParseValueWithType(args[5], attribute_type))
+                print(repr(res))
             else:
                 self.do_help("zclwrite")
         except exceptions.ChipStackException as ex:
