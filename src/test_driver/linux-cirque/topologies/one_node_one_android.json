@@ -11,6 +11,6 @@
         "base_image": "android-emulator",
         "capability": ["Interactive", "LanAccess", "Mount", "Xvnc"],
         "mount_pairs": [["/dev/kvm", "/dev/kvm"]],
-	"xvnc_localhost": 0
+        "xvnc_localhost": 0
     }
 }
