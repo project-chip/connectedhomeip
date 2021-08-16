@@ -283,7 +283,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
     service.mTextEntries   = textEntries;
     service.mTextEntrySize = textEntrySize;
-    service.mPort          = params.getPort();
+    service.mPort          = params.GetPort();
     service.mInterface     = INET_NULL_INTERFACEID;
     service.mSubTypes      = subTypes;
     service.mSubTypeSize   = subTypeSize;
