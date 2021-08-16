@@ -57,7 +57,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     switch (aIdentifier)
     {
     case kOptionFilepath:
-        if (0 == access(aValue, R_OK))
+        if (0 != access(aValue, R_OK))
         {
             PrintArgError("%s: not permitted to read %s\n", aProgram, aValue);
             retval = false;
