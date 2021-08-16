@@ -31,8 +31,8 @@
 #include <nlunit-test.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
 #include <support/ScopedBuffer.h>
+#include <support/UnitTestRegistration.h>
 
 #include <lib/support/ZclString.h>
 
