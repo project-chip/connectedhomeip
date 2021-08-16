@@ -31,7 +31,7 @@ config("openthread_efr32_config") {
     "${chip_root}/examples/platform/efr32",
     "${chip_root}/examples/platform/efr32/${efr32_family}/${efr32_board}",
     "${openthread_efr32_root}/src/src",
-    "${openthread_efr32_root}/src/${efr32_family}/brd4161a",
+    "${openthread_efr32_root}/src/efr32mg21/brd4180a",
   ]
 }
 

@@ -1,3 +1,20 @@
+/*
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 /***************************************************************************//**
  * @file
  * Linker script for Silicon Labs EFR32MG24 devices
@@ -30,8 +47,8 @@
 
 MEMORY
 {
-  FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 1536K
-  RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 256K
+  FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 1572864
+  RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 262144
 }
 
 /* Linker script to place sections and symbol values. Should be used together
@@ -82,6 +99,12 @@ SECTIONS
 
     KEEP(*(.init))
     KEEP(*(.fini))
+
+    KEEP(*(.application_properties))
+	  KEEP(*(.gecko_configuration))
+	  KEEP(*(.xo_configuration))
+    KEEP(*(.gatt_header))
+    KEEP(*(.gatt_data))
 
     /* .ctors */
     *crtbegin.o(.ctors)
@@ -150,6 +173,36 @@ SECTIONS
 
   __etext = .;
 
+  /*******************************************************************/
+  /* Define flash block for BLE-simee & CHIP-nvm3                    */
+  /* simee: 9000H (36k) bytes for BLE nvm3                           */
+  /* chipNvm3_section: 4000H (16k) bytes for CHIP nvm3.              */
+  /* 8K is reserved for OpenThread's NVM which is mapped directly at */
+  /* the top of flash                                                */
+  /*******************************************************************/
+
+  OPENTHREAD_NVM_SIZE = 8192;
+
+  .nvm_dummy (DSECT):
+  {
+    __nvm3_dummy_begin = .;
+    . = ALIGN (8192);
+    __nvm3_dummy_simee = .;
+    KEEP(*(.simee));
+    . = ALIGN (8192);
+    __nvm3_dummy_chip = .;
+    KEEP(*(chipNvm3_section));
+    . = ALIGN (8192);
+    . += OPENTHREAD_NVM_SIZE;
+    . = ALIGN (8192);
+  } > FLASH
+
+  /* Set NVM to end of FLASH */
+  __nvm3Base = LENGTH(FLASH) - SIZEOF(.nvm_dummy) + (__nvm3_dummy_simee - __nvm3_dummy_begin);
+  __chipNvm3Base = LENGTH(FLASH) - SIZEOF(.nvm_dummy) + (__nvm3_dummy_chip - __nvm3_dummy_begin);
+
+
+  /*******************************************************************/
   .data : AT (__etext)
   {
     __data_start__ = .;
@@ -226,4 +279,5 @@ SECTIONS
 
   /* Check if FLASH usage exceeds FLASH size */
   /*ASSERT( LENGTH(FLASH) >= (__etext + SIZEOF(.data)), "FLASH memory overflowed !")*/
-}
+  /*ASSERT((__etext + SIZEOF(.data)) <= __nvm3Base, "FLASH memory overlapped with NVM section.")*/
+  }

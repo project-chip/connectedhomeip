@@ -47,7 +47,7 @@ declare_args() {
 show_qr_code = true
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
-if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A" || efr32_board == "BRD4186A") {
+if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
 }
 
