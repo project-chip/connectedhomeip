@@ -819,22 +819,6 @@ emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, E
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-/** @brief Write Attributes Response
- *
- * This function is called by the application framework when a Write Attributes
- * Response command is received from an external device.  The application should
- * return true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of write attribute status records.
- * Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool __attribute__((weak)) emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    return false;
-}
-
 /** @brief External Attribute Write
  *
  * This function is called whenever the Application Framework needs to write an

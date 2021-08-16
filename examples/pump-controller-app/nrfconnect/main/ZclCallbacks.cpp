@@ -146,18 +146,6 @@ EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::
     return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_READ_ONLY;
 }
 
-bool emberAfReadAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    ChipLogProgress(Zcl, "%s: " ChipLogFormatMEI, __FUNCTION__, ChipLogValueMEI(clusterId));
-    return false;
-}
-
-bool emberAfWriteAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
-{
-    ChipLogProgress(Zcl, "%s: " ChipLogFormatMEI, __FUNCTION__, ChipLogValueMEI(clusterId));
-    return false;
-}
-
 bool emberAfConfigureReportingResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     ChipLogProgress(Zcl, "%s: " ChipLogFormatMEI, __FUNCTION__, ChipLogValueMEI(clusterId));
