@@ -1084,7 +1084,19 @@ CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t
         ReturnErrorOnFailure(QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode));
         ChipLogProgress(Controller, "SetupQRCode: [%s]", QRCode.c_str());
     }
+}
 
+CHIP_ERROR DeviceCommissioner::CommissioningComplete(NodeId remoteDeviceId)
+{
+    if (!mIsIPRendezvous)
+    {
+        Device * device = nullptr;
+        ReturnErrorOnFailure(GetDevice(remoteDeviceId, &device));
+        ChipLogProgress(Controller, "Calling commissioning complete for device ID %" PRIu64, remoteDeviceId);
+        GeneralCommissioningCluster genCom;
+        genCom.Associate(device, 0);
+        return genCom.CommissioningComplete(NULL, NULL);
+    }
     return CHIP_NO_ERROR;
 }
 
