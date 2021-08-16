@@ -34,6 +34,8 @@ constexpr const char kOperationalCredentialsRootCertificateStorage[] = "MatterCA
 
 using namespace chip;
 using namespace TLV;
+using namespace Credentials;
+using namespace Crypto;
 
 static BOOL isRunningTests(void)
 {
@@ -173,9 +175,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::ByteSpan & csrElements,
-    const chip::ByteSpan & attestationSignature, const chip::ByteSpan & DAC, const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
-    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId,
+    const Crypto::P256PublicKey & pubkey, MutableByteSpan & rcac, MutableByteSpan & icac, MutableByteSpan & noc)
 {
     uint32_t validityStart, validityEnd;
 
@@ -189,6 +190,34 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Byte
         return CHIP_ERROR_INTERNAL;
     }
 
+    X509CertRequestParams noc_request = { 1, mIssuerId, validityStart, validityEnd, true, fabricId, true, nodeId };
+    ReturnErrorOnFailure(NewNodeOperationalX509Cert(noc_request, CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuerKey, noc));
+    icac.reduce_size(0);
+
+    uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+        err = mStorage->SyncGetKeyValue(key, rcac.data(), rcacBufLen));
+    if (err == CHIP_NO_ERROR) {
+        // Found root certificate in the storage.
+        rcac.reduce_size(rcacBufLen);
+        return CHIP_NO_ERROR;
+    }
+
+    X509CertRequestParams rcac_request = { 0, mIssuerId, validityStart, validityEnd, true, fabricId, false, 0 };
+    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuerKey, rcac));
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
+    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+        err = mStorage->SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size())));
+
+    return err;
+}
+
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::ByteSpan & csrElements,
+    const chip::ByteSpan & attestationSignature, const chip::ByteSpan & DAC, const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
+    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
+{
     chip::NodeId assignedId;
     if (mNodeIdRequested) {
         assignedId = mNextRequestedNodeId;
@@ -200,11 +229,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Byte
         assignedId = mDeviceBeingPaired;
     }
 
-    chip::Credentials::X509CertRequestParams noc_request
-        = { 1, mIssuerId, validityStart, validityEnd, true, mNextFabricId, true, assignedId };
-
     TLVReader reader;
-    reader.Init(csrElements.data(), static_cast<uint32_t>(csrElements.size()));
+    reader.Init(csrElements);
 
     if (reader.GetType() == kTLVType_NotSpecified) {
         ReturnErrorOnFailure(reader.Next());
@@ -224,37 +250,16 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Byte
     ReturnErrorOnFailure(chip::Crypto::VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
 
     NSMutableData * nocBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
-    uint32_t nocLen = 0;
-    uint8_t * noc = (uint8_t *) [nocBuffer mutableBytes];
-
-    ReturnErrorOnFailure(
-        chip::Credentials::NewNodeOperationalX509Cert(noc_request, chip::Credentials::CertificateIssuerLevel::kIssuerIsRootCA,
-            pubkey, mIssuerKey, noc, chip::Controller::kMaxCHIPDERCertLength, nocLen));
+    MutableByteSpan noc((uint8_t *) [nocBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
 
     NSMutableData * rcacBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
-    uint16_t rcacLen = chip::Controller::kMaxCHIPDERCertLength;
-    uint8_t * rcac = (uint8_t *) [rcacBuffer mutableBytes];
+    MutableByteSpan rcac((uint8_t *) [rcacBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    PERSISTENT_KEY_OP(
-        mNextFabricId, kOperationalCredentialsRootCertificateStorage, key, err = mStorage->SyncGetKeyValue(key, rcac, rcacLen));
+    MutableByteSpan icac;
 
-    if (err != CHIP_NO_ERROR) {
-        chip::Credentials::X509CertRequestParams rcac_request
-            = { 0, mIssuerId, validityStart, validityEnd, true, mNextFabricId, false, 0 };
-        uint32_t outCertLen = 0;
-        ReturnErrorOnFailure(chip::Credentials::NewRootX509Cert(
-            rcac_request, mIssuerKey, rcac, chip::Controller::kMaxCHIPDERCertLength, outCertLen));
+    ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, pubkey, rcac, icac, noc));
 
-        VerifyOrReturnError(CanCastTo<uint16_t>(outCertLen), CHIP_ERROR_INVALID_ARGUMENT);
-        rcacLen = static_cast<uint16_t>(outCertLen);
-        PERSISTENT_KEY_OP(
-            mNextFabricId, kOperationalCredentialsRootCertificateStorage, key, err = mStorage->SyncSetKeyValue(key, rcac, rcacLen));
-        ReturnErrorOnFailure(err);
-    }
-
-    onCompletion->mCall(
-        onCompletion->mContext, CHIP_NO_ERROR, chip::ByteSpan(noc, nocLen), chip::ByteSpan(), chip::ByteSpan(rcac, rcacLen));
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, noc, icac, rcac);
 
     return CHIP_NO_ERROR;
 }

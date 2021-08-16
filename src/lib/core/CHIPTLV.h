@@ -114,7 +114,29 @@ public:
      * @param[in]   dataLen The length of the TLV data to be parsed.
      *
      */
-    void Init(const uint8_t * data, uint32_t dataLen);
+    void Init(const uint8_t * data, size_t dataLen);
+
+    /**
+     * Initializes a TLVReader object to read from a single input buffer
+     * represented as a span.
+     *
+     * @param[in]   data    A byte span to read from
+     *
+     */
+    void Init(const ByteSpan & data) { Init(data.data(), data.size()); }
+
+    /**
+     * Initializes a TLVReader object to read from a single input buffer
+     * represented as byte array.
+     *
+     * @param[in]   data    A byte buffer to read from
+     *
+     */
+    template <size_t N>
+    void Init(const uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
 
     /**
      * Initializes a TLVReader object to read from a TLVBackingStore.
@@ -438,7 +460,7 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetBytes(uint8_t * buf, uint32_t bufSize);
+    CHIP_ERROR GetBytes(uint8_t * buf, size_t bufSize);
 
     /**
      * Allocates and returns a buffer containing the value of the current byte or UTF8 string.
@@ -487,7 +509,7 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetString(char * buf, uint32_t bufSize);
+    CHIP_ERROR GetString(char * buf, size_t bufSize);
 
     /**
      * Allocates and returns a buffer containing the null-terminated value of the current byte or UTF8
@@ -849,7 +871,27 @@ public:
      * @param[in]   maxLen  The maximum number of bytes that should be written to the output buffer.
      *
      */
-    void Init(uint8_t * buf, uint32_t maxLen);
+    void Init(uint8_t * buf, size_t maxLen);
+
+    /**
+     * Initializes a TLVWriter object to write into a single output buffer
+     * represented by a MutableSpan.  See documentation for the two-arg Init()
+     * form for details.
+     *
+     */
+    void Init(const MutableByteSpan & data) { Init(data.data(), data.size()); }
+
+    /**
+     * Initializes a TLVWriter object to write into a single output buffer
+     * represented by a fixed-size byte array.  See documentation for the
+     * two-arg Init() form for details.
+     *
+     */
+    template <size_t N>
+    void Init(uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
 
     /**
      * Initializes a TLVWriter object to write into memory provided by a TLVBackingStore.

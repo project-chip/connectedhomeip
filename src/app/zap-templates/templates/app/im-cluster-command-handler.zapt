@@ -37,9 +37,9 @@ namespace clusters {
 
 {{#all_user_clusters}}
 {{#if (user_cluster_has_enabled_command name side)}}
-namespace {{asCamelCased name false}} {
+namespace {{asUpperCamelCase name}} {
 
-void Dispatch{{asCamelCased side false}}Command({{#if (isServer side)}}CommandHandler{{else}}CommandSender{{/if}} * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void Dispatch{{asUpperCamelCase side}}Command({{#if (isServer side)}}CommandHandler{{else}}CommandSender{{/if}} * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     {{#chip_available_cluster_commands}}
     {{#first}}
@@ -111,7 +111,7 @@ void DispatchSingleClusterCommand(ClusterId aClusterId, CommandId aCommandId, En
     {{#chip_server_clusters}}
     {{#if (user_cluster_has_enabled_command name side)}}
     case Clusters::{{asUpperCamelCase name}}::Id:
-        clusters::{{asCamelCased name false}}::Dispatch{{asCamelCased side false}}Command(apCommandObj, aCommandId, aEndPointId, aReader);
+        clusters::{{asUpperCamelCase name}}::Dispatch{{asUpperCamelCase side}}Command(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     {{/if}}
     {{/chip_server_clusters}}
@@ -145,7 +145,7 @@ void DispatchSingleClusterResponseCommand(ClusterId aClusterId, CommandId aComma
     {{#chip_client_clusters}}
     {{#if (user_cluster_has_enabled_command name side)}}
     case Clusters::{{asUpperCamelCase name}}::Id:
-        clusters::{{asCamelCased name false}}::Dispatch{{asCamelCased side false}}Command(apCommandObj, aCommandId, aEndPointId, aReader);
+        clusters::{{asUpperCamelCase name}}::Dispatch{{asUpperCamelCase side}}Command(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     {{/if}}
     {{/chip_client_clusters}}

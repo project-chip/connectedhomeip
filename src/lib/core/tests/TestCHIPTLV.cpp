@@ -1347,7 +1347,7 @@ void CheckSimpleWriteRead(nlTestSuite * inSuite, void * inContext)
     TLVReader reader;
     uint32_t remainingFreedLen;
 
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
 
     remainingFreedLen = writer.GetRemainingFreeLength();
@@ -1407,7 +1407,7 @@ void CheckPrettyPrinter(nlTestSuite * inSuite, void * inContext)
     TLVWriter writer;
     TLVReader reader;
 
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
 
     WriteEncoding1(inSuite, writer);
@@ -1432,7 +1432,7 @@ void CheckDataMacro(nlTestSuite * inSuite, void * inContext)
 
     uint8_t buf[2048];
     TLVWriter writer;
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
     WriteEncoding5(inSuite, writer);
     uint32_t encodedLen = writer.GetLengthWritten();
@@ -1490,7 +1490,7 @@ void CheckCHIPTLVUtilities(nlTestSuite * inSuite, void * inContext)
     TLVReader reader, reader1;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
 
     WriteEncoding1(inSuite, writer);
@@ -1524,7 +1524,7 @@ void CheckCHIPTLVUtilities(nlTestSuite * inSuite, void * inContext)
     {
         uint8_t buf1[74];
 
-        writer.Init(buf1, sizeof(buf1));
+        writer.Init(buf1);
         writer.ImplicitProfileId = TestProfile_2;
 
         WriteEncoding2(inSuite, writer);
@@ -1583,7 +1583,7 @@ void CheckCHIPTLVEmptyFind(nlTestSuite * inSuite, void * inContext)
     TLVReader reader;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
 
     WriteEmptyEncoding(inSuite, writer);
@@ -1647,7 +1647,7 @@ void WriteAppendReadTest0(nlTestSuite * inSuite)
     TLVWriter writer;
     TLVReader reader;
 
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
 
     WriteEncoding2(inSuite, writer);
@@ -1699,7 +1699,7 @@ void WriteFindAppendReadTest(nlTestSuite * inSuite, bool findContainer)
     TLVWriter writer;
     TLVReader reader;
 
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
 
     WriteEncoding2(inSuite, writer);
@@ -1770,7 +1770,7 @@ void WriteAppendReadTest1(nlTestSuite * inSuite)
     TLVWriter writer;
     TLVReader reader;
 
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
 
     WriteEncoding3(inSuite, writer);
@@ -1914,7 +1914,7 @@ void WriteDeleteReadTest(nlTestSuite * inSuite)
     TLVWriter writer;
     TLVReader reader;
 
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
 
     WriteEncoding5(inSuite, writer);
@@ -2415,9 +2415,9 @@ void CheckCHIPTLVByteSpan(nlTestSuite * inSuite, void * inContext)
     TLVReader reader;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    writer.Init(backingStore, sizeof(backingStore));
+    writer.Init(backingStore);
 
-    ByteSpan writerSpan(bytesBuffer, sizeof(bytesBuffer));
+    ByteSpan writerSpan(bytesBuffer);
     err = writer.Put(ProfileTag(TestProfile_1, 1), writerSpan);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -2558,12 +2558,12 @@ void TestCHIPTLVWriterCopyContainer(nlTestSuite * inSuite)
         TLVWriter writer;
         TLVReader reader;
 
-        reader.Init(Encoding1, sizeof(Encoding1));
+        reader.Init(Encoding1);
         reader.ImplicitProfileId = TestProfile_2;
 
         TestNext<TLVReader>(inSuite, reader);
 
-        writer.Init(buf, sizeof(buf));
+        writer.Init(buf);
         writer.ImplicitProfileId = TestProfile_2;
 
         CHIP_ERROR err = writer.CopyContainer(reader);
@@ -2579,7 +2579,7 @@ void TestCHIPTLVWriterCopyContainer(nlTestSuite * inSuite)
     {
         TLVWriter writer;
 
-        writer.Init(buf, sizeof(buf));
+        writer.Init(buf);
         writer.ImplicitProfileId = TestProfile_2;
 
         CHIP_ERROR err = writer.CopyContainer(ProfileTag(TestProfile_1, 1), Encoding1, sizeof(Encoding1));
@@ -2608,7 +2608,7 @@ void TestCHIPTLVWriterCopyElement(nlTestSuite * inSuite)
         kRepeatCount = 3
     };
 
-    writer.Init(expectedBuf, sizeof(expectedBuf));
+    writer.Init(expectedBuf);
     writer.ImplicitProfileId = TestProfile_2;
 
     err = writer.StartContainer(AnonymousTag, kTLVType_Structure, outerContainerType);
@@ -2627,7 +2627,7 @@ void TestCHIPTLVWriterCopyElement(nlTestSuite * inSuite)
 
     expectedLen = writer.GetLengthWritten();
 
-    writer.Init(testBuf, sizeof(testBuf));
+    writer.Init(testBuf);
     writer.ImplicitProfileId = TestProfile_2;
 
     err = writer.StartContainer(AnonymousTag, kTLVType_Structure, outerContainerType);
@@ -2637,7 +2637,7 @@ void TestCHIPTLVWriterCopyElement(nlTestSuite * inSuite)
     {
         TLVReader reader;
 
-        reader.Init(Encoding1, sizeof(Encoding1));
+        reader.Init(Encoding1);
         reader.ImplicitProfileId = TestProfile_2;
 
         TestNext<TLVReader>(inSuite, reader);
@@ -2737,7 +2737,7 @@ void TestCHIPTLVWriterPreserveSize(nlTestSuite * inSuite)
     uint8_t buf[2048];
     TLVWriter writer;
 
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
 
     PreserveSizeWrite(inSuite, writer, true);
@@ -2755,7 +2755,7 @@ void TestCHIPTLVWriterErrorHandling(nlTestSuite * inSuite)
     uint8_t buf[2048];
     TLVWriter writer, writer2, writer3;
 
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
 
     // OpenContainer() for non-container
@@ -2818,7 +2818,7 @@ void SkipNonContainer(nlTestSuite * inSuite)
     const uint8_t * readpoint1 = nullptr;
     const uint8_t * readpoint2 = nullptr;
 
-    reader.Init(Encoding1, sizeof(Encoding1));
+    reader.Init(Encoding1);
     reader.ImplicitProfileId = TestProfile_2;
 
     TestSkip(inSuite, reader);
@@ -2839,7 +2839,7 @@ void SkipContainer(nlTestSuite * inSuite)
     const uint8_t * readpoint1 = nullptr;
     const uint8_t * readpoint2 = nullptr;
 
-    reader.Init(Encoding1, sizeof(Encoding1));
+    reader.Init(Encoding1);
     reader.ImplicitProfileId = TestProfile_2;
 
     TestNext<TLVReader>(inSuite, reader);
@@ -2860,7 +2860,7 @@ void NextContainer(nlTestSuite * inSuite)
 {
     TLVReader reader;
 
-    reader.Init(Encoding1, sizeof(Encoding1));
+    reader.Init(Encoding1);
     reader.ImplicitProfileId = TestProfile_2;
 
     TestNext<TLVReader>(inSuite, reader);
@@ -2888,7 +2888,7 @@ void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
 {
     TLVReader reader;
 
-    reader.Init(Encoding1, sizeof(Encoding1));
+    reader.Init(Encoding1);
     reader.ImplicitProfileId = TestProfile_2;
 
     TestNext<TLVReader>(inSuite, reader);
@@ -3016,7 +3016,7 @@ void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
     uint8_t buf[2048];
     TLVReader reader;
 
-    reader.Init(buf, sizeof(buf));
+    reader.Init(buf);
     reader.ImplicitProfileId = TestProfile_2;
 
     // Get(bool&)
@@ -3090,14 +3090,14 @@ void TestCHIPTLVReaderTruncatedReads(nlTestSuite * inSuite)
     float outF;
 
     // Setup: Write some values into the buffer
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
 
     err = writer.Put(AnonymousTag, double{ 12.5 });
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Test reading values from the buffer
-    reader.Init(buf, sizeof(buf));
+    reader.Init(buf);
 
     TestNext<TLVReader>(inSuite, reader);
 
@@ -3116,12 +3116,12 @@ void TestCHIPTLVReaderInPractice(nlTestSuite * inSuite)
     TLVWriter writer;
     TLVReader reader;
 
-    writer.Init(buf, sizeof(buf));
+    writer.Init(buf);
     writer.ImplicitProfileId = TestProfile_2;
 
     PreserveSizeWrite(inSuite, writer, true);
 
-    reader.Init(buf, sizeof(buf));
+    reader.Init(buf);
 
     TestNext<TLVReader>(inSuite, reader);
 
@@ -3178,7 +3178,7 @@ void TestCHIPTLVReader_NextOverContainer(nlTestSuite * inSuite)
 {
     TLVReader reader;
 
-    reader.Init(Encoding1, sizeof(Encoding1));
+    reader.Init(Encoding1);
     reader.ImplicitProfileId = TestProfile_2;
 
     ForEachElement(inSuite, reader, nullptr, TestCHIPTLVReader_NextOverContainer_ProcessElement);
@@ -3220,7 +3220,7 @@ void TestCHIPTLVReader_SkipOverContainer(nlTestSuite * inSuite)
 {
     TLVReader reader;
 
-    reader.Init(Encoding1, sizeof(Encoding1));
+    reader.Init(Encoding1);
     reader.ImplicitProfileId = TestProfile_2;
 
     ForEachElement(inSuite, reader, nullptr, TestCHIPTLVReader_SkipOverContainer_ProcessElement);
@@ -3256,7 +3256,7 @@ static void TestItems(nlTestSuite * inSuite, void * inContext)
     uint8_t sBuffer[256];
 
     TLVWriter writer;
-    writer.Init(sBuffer, sizeof(sBuffer));
+    writer.Init(sBuffer);
 
     TLVWriter writer2;
     err = writer.OpenContainer(AnonymousTag, kTLVType_Array, writer2);
@@ -3342,7 +3342,7 @@ static void TestContainers(nlTestSuite * inSuite, void * inContext)
     TLVWriter writer;
 
     uint8_t sBuffer[256];
-    writer.Init(sBuffer, sizeof(sBuffer));
+    writer.Init(sBuffer);
 
     TLVWriter writer2;
     err = writer.OpenContainer(AnonymousTag, kTLVType_Array, writer2);
@@ -3401,10 +3401,10 @@ static void CheckCHIPUpdater(nlTestSuite * inSuite, void * inContext)
 class OptimisticTLVWriter : public TLVWriter
 {
 public:
-    void Init(uint8_t * buf, uint32_t maxLen);
+    void Init(uint8_t * buf, size_t maxLen);
 };
 
-void OptimisticTLVWriter::Init(uint8_t * buf, uint32_t maxLen)
+void OptimisticTLVWriter::Init(uint8_t * buf, size_t maxLen)
 {
     TLVWriter::Init(buf, maxLen);
     SetCloseContainerReserved(false);
@@ -3436,7 +3436,7 @@ static void CheckCloseContainerReserve(nlTestSuite * inSuite, void * inContext)
     TLVWriter innerWriter1, innerWriter2;
     TLVType container1, container2;
 
-    writer1.Init(buf, sizeof(buf));
+    writer1.Init(buf);
 
     err = writer1.OpenContainer(AnonymousTag, kTLVType_Array, innerWriter1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -3472,7 +3472,7 @@ static void CheckCloseContainerReserve(nlTestSuite * inSuite, void * inContext)
 
     // test the same scheme works on the Start/End container
 
-    writer1.Init(buf, sizeof(buf));
+    writer1.Init(buf);
 
     err = writer1.StartContainer(AnonymousTag, kTLVType_Array, container1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -3508,7 +3508,7 @@ static void CheckCloseContainerReserve(nlTestSuite * inSuite, void * inContext)
 
     // Test that the reservations work for the empty containers
 
-    writer1.Init(buf1, sizeof(buf1));
+    writer1.Init(buf1);
     err = writer1.OpenContainer(ProfileTag(TestProfile_1, 2), kTLVType_Structure, innerWriter1);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -3522,7 +3522,7 @@ static void CheckCloseContainerReserve(nlTestSuite * inSuite, void * inContext)
     err = writer2.CloseContainer(innerWriter1);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    writer1.Init(buf1, sizeof(buf1));
+    writer1.Init(buf1);
 
     err = writer1.StartContainer(ProfileTag(TestProfile_1, 2), kTLVType_Structure, container1);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -3787,7 +3787,7 @@ static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
             }
 
             TLVReader reader;
-            reader.Init(fuzzedData, sizeof(fuzzedData));
+            reader.Init(fuzzedData);
             reader.ImplicitProfileId = TestProfile_2;
 
             CHIP_ERROR readRes = ReadFuzzedEncoding1(inSuite, reader);

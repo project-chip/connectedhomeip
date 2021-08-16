@@ -88,7 +88,7 @@ void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apRead
         CHIP_ERROR err = CHIP_NO_ERROR;
         TLV::TLVWriter writer;
         uint8_t writerBuffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
-        writer.Init(writerBuffer, sizeof(writerBuffer));
+        writer.Init(writerBuffer);
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
         if (apData != nullptr)

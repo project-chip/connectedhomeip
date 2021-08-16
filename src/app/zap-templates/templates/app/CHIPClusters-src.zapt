@@ -120,7 +120,7 @@ exit:
 
 {{/chip_cluster_commands}}
 // {{asUpperCamelCase name}} Cluster Attributes
-CHIP_ERROR {{asCamelCased name false}}Cluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR {{asUpperCamelCase name}}Cluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     COMMAND_HEADER("Discover{{asUpperCamelCase name}}Attributes", {{asUpperCamelCase name}}::Id);
     buf.Put8(kFrameControlGlobalCommand)

@@ -22,7 +22,7 @@ static constexpr CommandId {{asUpperCamelCase label}} = {{asMEI manufacturerCode
 
 {{#zcl_commands}}
 {{#first}}
-namespace {{asCamelCased parent.label false}} {
+namespace {{asUpperCamelCase parent.label}} {
 namespace Commands {
 namespace Ids {
 {{/first}}
@@ -30,7 +30,7 @@ static constexpr CommandId {{asUpperCamelCase label}} = {{asMEI manufacturerCode
 {{#last}}
 } // namespace Ids
 } // namespace Commands
-} // namespace {{asCamelCased parent.label false}}
+} // namespace {{asUpperCamelCase parent.label}}
 {{/last}}
 {{/zcl_commands}}
 {{/zcl_clusters}}

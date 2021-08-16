@@ -1,0 +1,193 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: . [TC-CC-8] Color Loop Controls
+
+config:
+    cluster: "Color Control"
+    endpoint: 1
+
+tests:
+    - label: "Turn on light for color control tests"
+      cluster: "On/Off"
+      command: "on"
+
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Color Loop Set Command - Set all Attributs"
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 14
+              - name: "action"
+                value: 0
+              - name: "direction"
+                value: 1
+              - name: "time"
+                value: 100
+              - name: "startHue"
+                value: 500
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Check ColorLoopDirection Value"
+      command: "readAttribute"
+      attribute: "color loop direction"
+      response:
+          value: 1
+
+    - label: "Check ColorLoopTime Value"
+      command: "readAttribute"
+      attribute: "color loop time"
+      response:
+          value: 100
+
+    - label: "Check ColorLoopStartEnhancedHue Value"
+      command: "readAttribute"
+      attribute: "color loop start enhanced hue"
+      response:
+          value: 500
+
+    - label: "Check ColorLoopActive Value"
+      command: "readAttribute"
+      attribute: "color loop active"
+      response:
+          value: 0
+
+    - label: "Color Loop Set Command - Start Color Loop"
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 1
+              - name: "action"
+                value: 1
+              - name: "direction"
+                value: 0
+              - name: "time"
+                value: 0
+              - name: "startHue"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Check ColorLoopActive Value"
+      command: "readAttribute"
+      attribute: "color loop active"
+      response:
+          value: 1
+
+    # Test is disabled because a sleep/wait is necessary to let the hue change over time
+    # Once sleep/wait is available, test case will need to be adapted
+    - label: "Check EnhancedCurrentHue attribute value changed to a Higher Hue"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 500
+
+    - label: "Color Loop Set Command - Set direction and time while running"
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 6
+              - name: "action"
+                value: 0
+              - name: "direction"
+                value: 0
+              - name: "time"
+                value: 3500
+              - name: "startHue"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    # Test is disabled because a sleep/wait is necessary to let the hue change over time
+    # Once sleep/wait is available, test case will need to be adapted
+    - label: "Check EnhancedCurrentHue attribute value changed to a lower Hue"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 500
+
+    - label: "Check ColorLoopDirection Value"
+      command: "readAttribute"
+      attribute: "color loop direction"
+      response:
+          value: 0
+
+    - label: "Check ColorLoopTime Value"
+      command: "readAttribute"
+      attribute: "color loop time"
+      response:
+          value: 3500
+
+    - label: "Color Loop Set Command - Set direction while running"
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 2
+              - name: "action"
+                value: 0
+              - name: "direction"
+                value: 1
+              - name: "time"
+                value: 0
+              - name: "startHue"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    # Test is disabled because a sleep/wait is necessary to let the hue change over time
+    # Once sleep/wait is available, test case will need to be adapted
+    - label: "Check EnhancedCurrentHue attribute value changed to a Higher Hue"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 500
+
+    - label: "Check ColorLoopDirection Value"
+      command: "readAttribute"
+      attribute: "color loop direction"
+      response:
+          value: 1
+
+    - label: "Turn off light that we turned on"
+      cluster: "On/Off"
+      command: "off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
