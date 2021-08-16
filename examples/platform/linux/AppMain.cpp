@@ -27,7 +27,7 @@
 #include <core/CHIPError.h>
 #include <core/NodeId.h>
 
-#include <credentials/DeviceAttestationCredsAccess.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -236,7 +236,7 @@ void ChipLinuxAppMainLoop()
     InitServer();
 
     // Initialize device attestation config
-    Credentials::SetDeviceAttestationCredentialsAccessor(Credentials::Examples::GetExampleDACAccessor());
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     InitCommissioner();
