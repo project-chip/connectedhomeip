@@ -19,11 +19,19 @@
 
 #include "AppTask.h"
 
+#ifdef CAPSENSE_ENABLED
+#include "capsense.h"
+#endif
+
 #include "mbedtls/platform.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/mbed/Logging.h>
 #include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
+
+#define sleep unistd_sleep
+#include <platform/CHIPDeviceLayer.h>
+#undef sleep
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -36,6 +44,10 @@ int main()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mbed_logging_init();
+
+#ifdef CAPSENSE_ENABLED
+    Capsense::getInstance().init();
+#endif
 
     ret = mbedtls_platform_setup(NULL);
     if (ret)
