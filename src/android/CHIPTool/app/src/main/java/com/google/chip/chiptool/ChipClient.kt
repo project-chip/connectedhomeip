@@ -17,9 +17,12 @@
  */
 package com.google.chip.chiptool
 
+import android.content.Context
 import android.util.Log
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
+import chip.devicecontroller.NsdManagerServiceResolver
+import chip.devicecontroller.PreferencesKeyValueStoreManager
 import java.lang.IllegalStateException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -30,9 +33,12 @@ object ChipClient {
   private const val TAG = "ChipClient"
   private lateinit var chipDeviceController: ChipDeviceController
 
-  fun getDeviceController(): ChipDeviceController {
+  fun getDeviceController(context: Context): ChipDeviceController {
     if (!this::chipDeviceController.isInitialized) {
-      chipDeviceController = ChipDeviceController()
+      chipDeviceController = ChipDeviceController(
+        PreferencesKeyValueStoreManager(context),
+        NsdManagerServiceResolver(context)
+      )
     }
     return chipDeviceController
   }
@@ -40,9 +46,9 @@ object ChipClient {
   /**
    * Wrapper around [ChipDeviceController.getConnectedDevicePointer] to return the value directly.
    */
-  suspend fun getConnectedDevicePointer(nodeId: Long): Long {
+  suspend fun getConnectedDevicePointer(context: Context, nodeId: Long): Long {
     return suspendCoroutine { continuation ->
-      getDeviceController().getConnectedDevicePointer(
+      getDeviceController(context).getConnectedDevicePointer(
         nodeId,
         object : GetConnectedDeviceCallback {
           override fun onDeviceConnected(devicePointer: Long) {
