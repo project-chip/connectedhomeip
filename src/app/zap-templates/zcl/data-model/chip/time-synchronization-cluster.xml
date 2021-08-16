@@ -79,8 +79,8 @@ limitations under the License.
     <command source="server" code="0x00" name="SetUtcTime" optional="false">
       <description>Requests UTCTime update.</description>
       <arg name="UtcTime" type="INT64U"/>
-      <arg name="Granularity" type="ENUM8"/>
-      <arg name="TimeSource" type="ENUM8"/>
+      <arg name="Granularity" type="GranularityEnum"/>
+      <arg name="TimeSource" type="TimeSourceEnum"/>
     </command>
 
   </cluster>
