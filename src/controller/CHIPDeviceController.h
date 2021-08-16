@@ -609,7 +609,7 @@ private:
     UserDirectedCommissioningServer * mUdcServer = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
     DeviceTransportMgr * mUdcTransportMgr = nullptr;
-    uint16_t mUdcListenPort               = CHIP_PORT + 1;
+    uint16_t mUdcListenPort               = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void PersistDeviceList();
