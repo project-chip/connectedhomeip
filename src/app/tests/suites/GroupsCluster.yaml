@@ -75,7 +75,7 @@ tests:
               - name: "status"
                 value: 0
 
-                
+
     - label: "View Group 2 (not found)"
       command: "ViewGroup"
       arguments:
@@ -119,7 +119,7 @@ tests:
               - name: "status"
                 value: 0
 
-                
+
     - label: "View Group 3 (not found)"
       command: "ViewGroup"
       arguments:

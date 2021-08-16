@@ -93,7 +93,7 @@ static EmberAfStatus checkGroup(EndpointId endpoint, GroupId groupId)
     if(!isGroupIdValid(groupId))
     {
         return EMBER_ZCL_STATUS_INVALID_VALUE;
-    }  
+    }
 
     std::map<EndpointId, std::set<GroupId>>::iterator it = sGroupTable.find(endpoint);
     // Check if the endpoint is on the table AND the groupId is associated with the endpoint
@@ -112,7 +112,7 @@ static EmberAfStatus addGroup(EndpointId endpoint, GroupId groupId, uint8_t * gr
     if(!isGroupIdValid(groupId))
     {
         return EMBER_ZCL_STATUS_INVALID_VALUE;
-    }   
+    }
 
     std::map<EndpointId, std::set<GroupId>>::iterator it = sGroupTable.find(endpoint);
     EmberAfStatus status                                 = EMBER_ZCL_STATUS_SUCCESS;
@@ -149,7 +149,7 @@ static EmberAfStatus removeGroup(EndpointId endpoint, GroupId groupId)
     if(!isGroupIdValid(groupId))
     {
         return EMBER_ZCL_STATUS_INVALID_VALUE;
-    }  
+    }
 
     std::map<EndpointId, std::set<GroupId>>::iterator it = sGroupTable.find(endpoint);
     EmberAfStatus status                                 = EMBER_ZCL_STATUS_NOT_FOUND;
@@ -279,7 +279,7 @@ exit:
 
 /**
  * @brief  Cluster GetGroupMembership Command callback (from client)
- * 
+ *
  * WARNING: This function is UNTESTED. The groupList parameter is an array of structures,
  * which is currently not supported. In consequence, the groupList parameter fails to decode,
  * and this function is not being called.
