@@ -423,7 +423,7 @@ int Finalize(void * aContext);
 // clang-format off
 nlTestSuite sSuite =
 {
-    "Test-CHIP-Connection",
+    "Test-CHIP-SecureSessionMgr",
     &sTests[0],
     Initialize,
     Finalize
