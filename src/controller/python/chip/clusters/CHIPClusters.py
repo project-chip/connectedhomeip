@@ -985,6 +985,16 @@ class ChipClusters:
                     "attributeId": 0x00004004,
                     "type": "int",
                 },
+                0x00004005: {
+                    "attributeName": "ColorLoopStartEnhancedHue",
+                    "attributeId": 0x00004005,
+                    "type": "int",
+                },
+                0x00004006: {
+                    "attributeName": "ColorLoopStoredEnhancedHue",
+                    "attributeId": 0x00004006,
+                    "type": "int",
+                },
                 0x0000400A: {
                     "attributeName": "ColorCapabilities",
                     "attributeId": 0x0000400A,
@@ -4540,6 +4550,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopDirection(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorLoopTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopTime(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ReadAttributeColorLoopStartEnhancedHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopStartEnhancedHue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ReadAttributeColorLoopStoredEnhancedHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopStoredEnhancedHue(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorCapabilities(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorCapabilities(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorTempPhysicalMin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -5649,6 +5663,12 @@ class ChipClusters:
         # Cluster ColorControl ReadAttribute ColorLoopTime
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopTime.restype = ctypes.c_uint32
+        # Cluster ColorControl ReadAttribute ColorLoopStartEnhancedHue
+        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopStartEnhancedHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopStartEnhancedHue.restype = ctypes.c_uint32
+        # Cluster ColorControl ReadAttribute ColorLoopStoredEnhancedHue
+        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopStoredEnhancedHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopStoredEnhancedHue.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorCapabilities
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorCapabilities.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorCapabilities.restype = ctypes.c_uint32

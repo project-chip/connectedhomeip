@@ -3,7 +3,7 @@
 ## Building and Developing
 
 -   Documentation about building from the command line can be found in
-    [the build guide](./BUILDING.md)
+    [the build guide](guides/BUILDING.md)
 -   Documentation about running [cirque](https://github.com/openweave/cirque)
     tests can be found in
     [the cirque test guide](src/test_driver/linux-cirque/README.md)

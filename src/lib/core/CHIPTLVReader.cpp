@@ -38,13 +38,15 @@ using namespace chip::Encoding;
 
 static const uint8_t sTagSizes[] = { 0, 1, 2, 4, 2, 4, 6, 8 };
 
-void TLVReader::Init(const uint8_t * data, uint32_t dataLen)
+void TLVReader::Init(const uint8_t * data, size_t dataLen)
 {
-    mBackingStore = nullptr;
-    mReadPoint    = data;
-    mBufEnd       = data + dataLen;
-    mLenRead      = 0;
-    mMaxLen       = dataLen;
+    // TODO: Maybe we can just make mMaxLen and mLenRead size_t instead?
+    uint32_t actualDataLen = dataLen > UINT32_MAX ? UINT32_MAX : static_cast<uint32_t>(dataLen);
+    mBackingStore          = nullptr;
+    mReadPoint             = data;
+    mBufEnd                = data + actualDataLen;
+    mLenRead               = 0;
+    mMaxLen                = actualDataLen;
     ClearElementState();
     mContainerType = kTLVType_NotSpecified;
     SetContainerOpen(false);
@@ -264,7 +266,7 @@ CHIP_ERROR TLVReader::Get(ByteSpan & v)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, uint32_t bufSize)
+CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, size_t bufSize)
 {
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
@@ -281,7 +283,7 @@ CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, uint32_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::GetString(char * buf, uint32_t bufSize)
+CHIP_ERROR TLVReader::GetString(char * buf, size_t bufSize)
 {
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;

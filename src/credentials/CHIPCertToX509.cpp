@@ -842,9 +842,8 @@ DLL_EXPORT CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, uint8_t
     ChipCertificateData certData;
 
     VerifyOrReturnError(!chipCert.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(CanCastTo<uint32_t>(chipCert.size()), CHIP_ERROR_INVALID_ARGUMENT);
 
-    reader.Init(chipCert.data(), static_cast<uint32_t>(chipCert.size()));
+    reader.Init(chipCert);
 
     writer.Init(x509CertBuf, x509CertBufSize);
 

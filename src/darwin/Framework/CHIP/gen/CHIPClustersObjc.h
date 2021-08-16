@@ -443,6 +443,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorLoopActiveWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeColorLoopDirectionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeColorLoopTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorLoopStartEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorLoopStoredEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeColorCapabilitiesWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeColorTempPhysicalMinWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeColorTempPhysicalMaxWithResponseHandler:(ResponseHandler)responseHandler;

@@ -4,11 +4,10 @@ You can use [CHIPTool](../../src/android/CHIPTool/README.md) for Android
 smartphones to commission a Nordic Semiconductor device running an nRF Connect
 platform example onto a CHIP-enabled Thread network.
 
-This guide references the nRF52840 DK and the
-[nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md),
-but the instructions are also valid for the
-[nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
-and can be adapted to other applications as well.
+This guide references the nRF52840 DK and the door lock example application
+based on the nRF Connect platform, but the instructions are also valid for the
+nRF Connect lighting example application and can be adapted to other platforms
+and applications as well.
 
 <hr>
 
@@ -50,7 +49,7 @@ The following diagram shows the connectivity between network components required
 to allow communication between devices running the CHIPTool and Lock
 applications:
 
-<img src="../images/nrfconnect_android_connectivity.svg" alt="CHIP nodes connectivity" width="600" />
+<img src="./images/nrfconnect_android_connectivity.svg" alt="CHIP nodes connectivity" width="600" />
 
 <hr>
 
@@ -95,9 +94,8 @@ or the nRF52840 Dongle acting as the
 
 Build and program the example application onto your compatible device.
 
-For this guide, see
-[nRF Connect Lock Example Application README](../../examples/lock-app/nrfconnect/README.md)
-to learn how to build and program the example onto an nRF52840 DK.
+For this guide, see the documentation for the door lock example application to
+learn how to build and program the example onto an nRF52840 DK.
 
 <hr>
 
@@ -105,8 +103,8 @@ to learn how to build and program the example onto an nRF52840 DK.
 
 ## Building and installing Android CHIPTool
 
-To build the CHIPTool application for your smartphone, read
-[Android CHIPTool README](../../src/android/CHIPTool/README.md).
+To build the CHIPTool application for your smartphone, read the
+[Building Android CHIPTool](android_chiptool_building.md) guide.
 
 After building, install the application by completing the following steps:
 
@@ -143,16 +141,18 @@ To prepare the accessory device for commissioning, complete the following steps:
     device. For details, see the
     [Using CLI in nRF Connect examples](nrfconnect_examples_cli.md) guide. This
     will grant you access to the application logs.
-2.  Hold **Button 1** on the accessory device for more than 6 s to trigger the
-    factory reset of the device.
+2.  Hold the appropriate button on the accessory device for more than 6 s to
+    trigger the factory reset of the device. See the user interface section in
+    the example documentation to check the button number.
 3.  Find a message similar to the following one in the application logs:
 
         I: 615 [SVR]Copy/paste the below URL in a browser to see the QR Code:
         I: 621 [SVR]https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 
 4.  Open the URL in a web browser to have the commissioning QR code generated.
-5.  Press **Button 4** on the device (or **Button 1** on a Thingy device) to
-    start the Bluetooth LE advertising.
+5.  Press the appropriate button on the device to start the Bluetooth LE
+    advertising. See the user interface section in the example documentation to
+    check the button number.
 
 <hr>
 
@@ -187,7 +187,7 @@ device successfully joins the Thread network.
 
 Once the device is commissioned, the following screen appears:
 
-![CHIPTool device control screen](../../docs/images/CHIPTool_device_commissioned.jpg)
+![CHIPTool device control screen](./images/CHIPTool_device_commissioned.jpg)
 
 The two textboxes at the top contain **Fabric ID** and **Node ID** of the last
 commissioned device.
@@ -200,8 +200,8 @@ Check the IPv6 connectivity with the device using the following steps:
    be it the address or an error message, will be displayed at the bottom of the
    screen.
 
-2. Tap the following buttons to change the lock state of the nRF Connect Lock
-   Example Application referenced in this guide:
+2. Tap the following buttons to change the lock state of the nRF Connect door
+   lock example application referenced in this guide:
 
     - **ON** and **OFF** buttons lock and unlock the door, respectively.
     - **TOGGLE** changes the lock state to the opposite.

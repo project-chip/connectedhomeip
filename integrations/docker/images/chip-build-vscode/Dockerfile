@@ -6,6 +6,7 @@ FROM connectedhomeip/chip-build-esp32-qemu:${VERSION} as esp32
 FROM connectedhomeip/chip-build-mbed-os:${VERSION} AS mbedos
 FROM connectedhomeip/chip-build-telink:${VERSION} AS telink
 FROM connectedhomeip/chip-build-infineon:${VERSION} AS p6
+FROM connectedhomeip/chip-build-tizen:${VERSION} AS tizen
 FROM connectedhomeip/chip-build:${VERSION}
 
 # qemu-src copied over because qemu directory contains symlinks to the src
@@ -29,6 +30,8 @@ COPY --from=p6 /opt/ModusToolbox /opt/ModusToolbox
 
 COPY --from=telink /opt/zephyrproject /opt/telink/zephyrproject
 COPY --from=telink /opt/telink/telink_riscv_linux_toolchain /opt/telink/telink_riscv_linux_toolchain
+
+COPY --from=tizen /opt/tizen_sdk /opt/tizen_sdk
 
 # Telink toolchain dependency. Will be removed as soon as Telink platform
 # migrates to zephyr-sdk toolchain
@@ -64,3 +67,4 @@ ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_TOOLCHAIN_PATH=/opt/telink/telink_riscv_linux_toolchain/nds32le-elf-mculib-v5f/bin
 ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.3"
+ENV TIZEN_HOME /opt/tizen_sdk
