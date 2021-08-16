@@ -76,7 +76,7 @@ run_suite libCoreTests.a
 run_suite libInetLayerTests.a
 run_suite libRetransmitTests.a
 run_suite libSystemLayerTests.a
-run_suite libChipCryptoTests.a "-lChipCertTestVectors"
+run_suite libChipCryptoTests.a
 
 # TODO: Transport layer tests do not link:
 #    - getpid undefined
