@@ -19,7 +19,8 @@
 
 namespace chip {
 
-constexpr size_t kBufferMaximumSize = 254;
+// maximum size of MutableByteSpan -1 (the length of pascal string)
+constexpr size_t kBufferMaximumSize = std::numeric_limits<uint8_t>::max() - 1;
 
 CHIP_ERROR MakeZclCharString(MutableByteSpan & buffer, const char * cString)
 {
@@ -34,8 +35,8 @@ CHIP_ERROR MakeZclCharString(MutableByteSpan & buffer, const char * cString)
     size_t availableStorage = min(buffer.size() - 1, kBufferMaximumSize);
     if (len > availableStorage)
     {
-        err = CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG;
-        len = availableStorage;
+        buffer.data()[0] = 0;
+        return CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG;
     }
 
     buffer.data()[0] = static_cast<uint8_t>(len);

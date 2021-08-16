@@ -31,6 +31,7 @@
 #include <nlunit-test.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/ScopedBuffer.h>
 #include <support/UnitTestRegistration.h>
 
 #include <lib/support/ZclString.h>
@@ -42,50 +43,30 @@ using namespace chip::Platform;
 static void TestZclStringWhenBufferIsZero(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t bufferMemory[1];
-    // Init zcl string
     MutableByteSpan zclString(bufferMemory);
-    // Init c string
-    char * cString64 = static_cast<char *>(MemoryCalloc(1024, 1));
-    // Add random chars to c string
-    for (size_t i = 0; i < 64; i++)
-        cString64[i] = 'A';
+    char * cString1 = static_cast<char *>(MemoryCalloc(1024, 1));
+    memset(cString1, 'A', 1);
+    NL_TEST_ASSERT(inSuite, cString1 != nullptr);
 
-    // Verify cString is properly initialized
-    NL_TEST_ASSERT(inSuite, cString64 != nullptr);
+    CHIP_ERROR err = MakeZclCharString(zclString, cString1);
 
-    CHIP_ERROR err = MakeZclCharString(zclString, cString64);
-
-    // ZCL String is created error of inbound message too big
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
-    // ZCL String data is not null
-    NL_TEST_ASSERT(inSuite, zclString.data() != NULL);
-    // ZCL String length assert
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 0);
 
-    chip::Platform::MemoryFree(cString64);
+    chip::Platform::MemoryFree(cString1);
 }
 
 static void TestZclStringLessThanMaximumSize_Length_64(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t bufferMemory[256];
-    // Init zcl string
     MutableByteSpan zclString(bufferMemory);
-    // Init c string
     char * cString64 = static_cast<char *>(MemoryCalloc(1024, 1));
-    // Add random chars to c string
-    for (size_t i = 0; i < 64; i++)
-        cString64[i] = 'A';
-
-    // Verify cString is properly initialized
+    memset(cString64, 'A', 64);
     NL_TEST_ASSERT(inSuite, cString64 != nullptr);
 
     CHIP_ERROR err = MakeZclCharString(zclString, cString64);
 
-    // ZCL String is created with no errors
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    // ZCL String data is not null
-    NL_TEST_ASSERT(inSuite, zclString.data() != NULL);
-    // ZCL String length assert
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 64);
 
     chip::Platform::MemoryFree(cString64);
@@ -94,24 +75,14 @@ static void TestZclStringLessThanMaximumSize_Length_64(nlTestSuite * inSuite, vo
 static void TestZclStringEqualsMaximumSize(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t bufferMemory[256];
-    // Init zcl string
     MutableByteSpan zclString(bufferMemory);
-    // Init c string
     char * cString254 = static_cast<char *>(MemoryCalloc(1024, 1));
-    // Add random chars to c string
-    for (size_t i = 0; i < 254; i++)
-        cString254[i] = 'A';
-
-    // Verify cString is properly initialized
+    memset(cString254, 'A', 254);
     NL_TEST_ASSERT(inSuite, cString254 != nullptr);
 
     CHIP_ERROR err = MakeZclCharString(zclString, cString254);
 
-    // ZCL String is created with no errors
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    // ZCL String data is not null
-    NL_TEST_ASSERT(inSuite, zclString.data() != NULL);
-    // ZCL String length assert
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 254);
 
     chip::Platform::MemoryFree(cString254);
@@ -120,25 +91,15 @@ static void TestZclStringEqualsMaximumSize(nlTestSuite * inSuite, void * inConte
 static void TestSizeZclStringBiggerThanMaximumSize_Length_255(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t bufferMemory[255];
-    // Init zcl string
     MutableByteSpan zclString(bufferMemory);
-    // Init c string
     char * cString255 = static_cast<char *>(MemoryCalloc(1024, 1));
-    // Add random chars to c string
-    for (size_t i = 0; i < 255; i++)
-        cString255[i] = 'A';
-
-    // Verify cString is properly initialized
+    memset(cString255, 'A', 255);
     NL_TEST_ASSERT(inSuite, cString255 != nullptr);
 
     CHIP_ERROR err = MakeZclCharString(zclString, cString255);
 
-    // ZCL String is created error of inbound message too big
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
-    // ZCL String data is not null
-    NL_TEST_ASSERT(inSuite, zclString.data() != NULL);
-    // ZCL String length assert
-    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 254);
+    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 0);
 
     chip::Platform::MemoryFree(cString255);
 }
@@ -146,25 +107,15 @@ static void TestSizeZclStringBiggerThanMaximumSize_Length_255(nlTestSuite * inSu
 static void TestSizeZclStringBiggerThanMaximumSize_Length_256(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t bufferMemory[256];
-    // Init zcl string
     MutableByteSpan zclString(bufferMemory);
-    // Init c string
     char * cString256 = static_cast<char *>(MemoryCalloc(1024, 1));
-    // Add random chars to c string
-    for (size_t i = 0; i < 256; i++)
-        cString256[i] = 'A';
-
-    // Verify cString is properly initialized
+    memset(cString256, 'A', 256);
     NL_TEST_ASSERT(inSuite, cString256 != nullptr);
 
     CHIP_ERROR err = MakeZclCharString(zclString, cString256);
 
-    // ZCL String is created error of inbound message too big
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
-    // ZCL String data is not null
-    NL_TEST_ASSERT(inSuite, zclString.data() != NULL);
-    // ZCL String length assert
-    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 254);
+    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 0);
 
     chip::Platform::MemoryFree(cString256);
 }
@@ -172,25 +123,15 @@ static void TestSizeZclStringBiggerThanMaximumSize_Length_256(nlTestSuite * inSu
 static void TestZclStringBiggerThanMaximumSize_Length_257(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t bufferMemory[257];
-    // Init zcl string
     MutableByteSpan zclString(bufferMemory);
-    // Init c string
     char * cString257 = static_cast<char *>(MemoryCalloc(1024, 1));
-    // Add random chars to c string
-    for (size_t i = 0; i < 257; i++)
-        cString257[i] = 'A';
-
-    // Verify cString is properly initialized
+    memset(cString257, 'A', 257);
     NL_TEST_ASSERT(inSuite, cString257 != nullptr);
 
     CHIP_ERROR err = MakeZclCharString(zclString, cString257);
 
-    // ZCL String is created error of inbound message too big
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
-    // ZCL String data is not null
-    NL_TEST_ASSERT(inSuite, zclString.data() != NULL);
-    // ZCL String length assert
-    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 254);
+    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 0);
 
     chip::Platform::MemoryFree(cString257);
 }
