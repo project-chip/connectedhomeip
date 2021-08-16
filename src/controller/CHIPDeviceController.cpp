@@ -1112,11 +1112,12 @@ void DeviceCommissioner::OnSessionEstablished()
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
 
-    mPairingSession.PeerConnection().SetPeerNodeId(device->GetDeviceId());
+    // TODO: the session should know which peer we are trying to connect to when started
+    mPairingSession.SetPeerNodeId(device->GetDeviceId());
 
-    CHIP_ERROR err = mSessionMgr->NewPairing(
-        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kInitiator, mFabricIndex);
+    CHIP_ERROR err = mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()),
+                                             mPairingSession.GetPeerNodeId(), &mPairingSession,
+                                             SecureSession::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
