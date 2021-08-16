@@ -827,7 +827,7 @@ INPUT                  = README.md \
                          CODE_OF_CONDUCT.md \
                          CONTRIBUTING.md \
                          docs/README.md \
-                         docs/BUILDING.md \
+                         docs/guides/BUILDING.md \
                          docs/VSCODE_DEVELOPMENT.md \
                          docs/PROJECT_FLOW.md \
                          docs/STYLE_GUIDE.md \
