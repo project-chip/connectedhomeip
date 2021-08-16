@@ -235,7 +235,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject keyVa
     ChipLogProgress(Controller, "newDeviceController() called");
 
     DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeWithObject(keyValueStoreManager);
-    using namespace chip::Mdns;
+    using ::chip::Mdns::InitializeWithObject;
     InitializeWithObject(serviceResolver);
 
     wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, JniReferences::GetInstance().GetStackLock(), kLocalDeviceId,
