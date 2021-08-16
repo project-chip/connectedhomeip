@@ -15,12 +15,11 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${build_root}/config/compiler/compiler.gni")
-
 
 declare_args() {
   # Build monolithic test library.
@@ -90,7 +89,8 @@ if (chip_build_tests) {
       deps += [ "${chip_root}/src/ble/tests" ]
     }
 
-    if (!is_clang && chip_device_platform != "darwin" && chip_device_platform != "nrfconnect") {
+    if (!is_clang && chip_device_platform != "darwin" &&
+        chip_device_platform != "nrfconnect") {
       deps += [ "${chip_root}/src/controller/tests" ]
     }
 
