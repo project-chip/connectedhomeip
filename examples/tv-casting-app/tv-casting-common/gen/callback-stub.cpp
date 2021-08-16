@@ -24,6 +24,7 @@
 using namespace chip;
 
 // Cluster Init Functions
+<<<<<<< HEAD
 void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
@@ -83,92 +84,151 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         // Unrecognized cluster ID
         break;
     }
+=======
+void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId) {
+  switch (clusterId) {
+  case ZCL_BASIC_CLUSTER_ID:
+    emberAfBasicClusterInitCallback(endpoint);
+    break;
+  case ZCL_BINDING_CLUSTER_ID:
+    emberAfBindingClusterInitCallback(endpoint);
+    break;
+  case ZCL_DESCRIPTOR_CLUSTER_ID:
+    emberAfDescriptorClusterInitCallback(endpoint);
+    break;
+  case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID:
+    emberAfDiagnosticLogsClusterInitCallback(endpoint);
+    break;
+  case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+    emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
+    break;
+  case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
+    emberAfGeneralCommissioningClusterInitCallback(endpoint);
+    break;
+  case ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID:
+    emberAfGeneralDiagnosticsClusterInitCallback(endpoint);
+    break;
+  case ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID:
+    emberAfGroupKeyManagementClusterInitCallback(endpoint);
+    break;
+  case ZCL_LEVEL_CONTROL_CLUSTER_ID:
+    emberAfLevelControlClusterInitCallback(endpoint);
+    break;
+  case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
+    emberAfNetworkCommissioningClusterInitCallback(endpoint);
+    break;
+  case ZCL_OTA_PROVIDER_CLUSTER_ID:
+    emberAfOtaSoftwareUpdateProviderClusterInitCallback(endpoint);
+    break;
+  case ZCL_ON_OFF_CLUSTER_ID:
+    emberAfOnOffClusterInitCallback(endpoint);
+    break;
+  case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
+    emberAfOperationalCredentialsClusterInitCallback(endpoint);
+    break;
+  case ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID:
+    emberAfRelativeHumidityMeasurementClusterInitCallback(endpoint);
+    break;
+  case ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID:
+    emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);
+    break;
+  case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+    emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
+    break;
+  case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+    emberAfWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
+    break;
+  default:
+    // Unrecognized cluster ID
+    break;
+  }
+>>>>>>> ZAP regen tv-casting-app
 }
 
-void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfBasicClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfBindingClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfBindingClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfDescriptorClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfDescriptorClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfDiagnosticLogsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfDiagnosticLogsClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfGeneralCommissioningClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfGeneralCommissioningClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfGroupKeyManagementClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfGroupKeyManagementClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfLevelControlClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfLevelControlClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfOnOffClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfOperationalCredentialsClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfRelativeHumidityMeasurementClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfRelativeHumidityMeasurementClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfThreadNetworkDiagnosticsClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
-void __attribute__((weak)) emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
+void __attribute__((weak))
+emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
 }
 
 //
@@ -186,7 +246,8 @@ void __attribute__((weak)) emberAfWiFiNetworkDiagnosticsClusterInitCallback(Endp
  *
  * @param tasks   Ver.: always
  */
-void __attribute__((weak)) emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
+void __attribute__((weak))
+emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
 
 /** @brief Remove From Current App Tasks
  *
@@ -200,7 +261,8 @@ void __attribute__((weak)) emberAfAddToCurrentAppTasksCallback(EmberAfApplicatio
  *
  * @param tasks   Ver.: always
  */
-void __attribute__((weak)) emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
+void __attribute__((weak))
+emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
 
 /** @brief Allow Network Write Attribute
  *
@@ -236,10 +298,19 @@ void __attribute__((weak)) emberAfRemoveFromCurrentAppTasksCallback(EmberAfAppli
  * @param type   Ver.: always
  */
 EmberAfAttributeWritePermission __attribute__((weak))
+<<<<<<< HEAD
 emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                           uint16_t manufacturerCode, uint8_t * value, uint8_t type)
 {
     return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
+=======
+emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint,
+                                          ClusterId clusterId,
+                                          AttributeId attributeId, uint8_t mask,
+                                          uint16_t manufacturerCode,
+                                          uint8_t *value, uint8_t type) {
+  return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Attribute Read Access
@@ -253,9 +324,16 @@ emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId cluster
  * @param attributeId   Ver.: always
  */
 bool __attribute__((weak))
+<<<<<<< HEAD
 emberAfAttributeReadAccessCallback(EndpointId endpoint, ClusterId clusterId, uint16_t manufacturerCode, AttributeId attributeId)
 {
     return true;
+=======
+emberAfAttributeReadAccessCallback(EndpointId endpoint, ClusterId clusterId,
+                                   uint16_t manufacturerCode,
+                                   AttributeId attributeId) {
+  return true;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Attribute Write Access
@@ -269,9 +347,16 @@ emberAfAttributeReadAccessCallback(EndpointId endpoint, ClusterId clusterId, uin
  * @param attributeId   Ver.: always
  */
 bool __attribute__((weak))
+<<<<<<< HEAD
 emberAfAttributeWriteAccessCallback(EndpointId endpoint, ClusterId clusterId, uint16_t manufacturerCode, AttributeId attributeId)
 {
     return true;
+=======
+emberAfAttributeWriteAccessCallback(EndpointId endpoint, ClusterId clusterId,
+                                    uint16_t manufacturerCode,
+                                    AttributeId attributeId) {
+  return true;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Default Response
@@ -286,9 +371,16 @@ emberAfAttributeWriteAccessCallback(EndpointId endpoint, ClusterId clusterId, ui
  * @param status Specifies either SUCCESS or the nature of the error that was
  * detected in the received command.  Ver.: always
  */
+<<<<<<< HEAD
 bool __attribute__((weak)) emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId, EmberAfStatus status)
 {
     return false;
+=======
+bool __attribute__((weak))
+emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId,
+                               EmberAfStatus status) {
+  return false;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Configure Reporting Response
@@ -303,9 +395,16 @@ bool __attribute__((weak)) emberAfDefaultResponseCallback(ClusterId clusterId, C
  * always
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
+<<<<<<< HEAD
 bool __attribute__((weak)) emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     return false;
+=======
+bool __attribute__((weak))
+emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t *buffer,
+                                          uint16_t bufLen) {
+  return false;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Read Reporting Configuration Response
@@ -320,9 +419,17 @@ bool __attribute__((weak)) emberAfConfigureReportingResponseCallback(ClusterId c
  * records.  Ver.: always
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
+<<<<<<< HEAD
 bool __attribute__((weak)) emberAfReadReportingConfigurationResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     return false;
+=======
+bool __attribute__((weak))
+emberAfReadReportingConfigurationResponseCallback(ClusterId clusterId,
+                                                  uint8_t *buffer,
+                                                  uint16_t bufLen) {
+  return false;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Discover Attributes Response
@@ -345,10 +452,19 @@ bool __attribute__((weak)) emberAfReadReportingConfigurationResponseCallback(Clu
  * @param extended Indicates whether the response is in the extended format or
  * not.  Ver.: always
  */
+<<<<<<< HEAD
 bool __attribute__((weak)) emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discoveryComplete, uint8_t * buffer,
                                                                      uint16_t bufLen, bool extended)
 {
     return false;
+=======
+bool __attribute__((weak))
+emberAfDiscoverAttributesResponseCallback(ClusterId clusterId,
+                                          bool discoveryComplete,
+                                          uint8_t *buffer, uint16_t bufLen,
+                                          bool extended) {
+  return false;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Discover Commands Generated Response
@@ -365,11 +481,18 @@ bool __attribute__((weak)) emberAfDiscoverAttributesResponseCallback(ClusterId c
  * @param commandIdCount The length of bytes of the list, whish is the same as
  * the number of identifiers.  Ver.: always
  */
+<<<<<<< HEAD
 bool __attribute__((weak))
 emberAfDiscoverCommandsGeneratedResponseCallback(ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
                                                  CommandId * commandIds, uint16_t commandIdCount)
 {
     return false;
+=======
+bool __attribute__((weak)) emberAfDiscoverCommandsGeneratedResponseCallback(
+    ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
+    CommandId *commandIds, uint16_t commandIdCount) {
+  return false;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Discover Commands Received Response
@@ -386,11 +509,18 @@ emberAfDiscoverCommandsGeneratedResponseCallback(ClusterId clusterId, uint16_t m
  * @param commandIdCount The length of bytes of the list, whish is the same as
  * the number of identifiers.  Ver.: always
  */
+<<<<<<< HEAD
 bool __attribute__((weak))
 emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
                                                 CommandId * commandIds, uint16_t commandIdCount)
 {
     return false;
+=======
+bool __attribute__((weak)) emberAfDiscoverCommandsReceivedResponseCallback(
+    ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
+    CommandId *commandIds, uint16_t commandIdCount) {
+  return false;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Pre Command Received
@@ -406,9 +536,15 @@ emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16_t ma
  *
  * @param cmd   Ver.: always
  */
+<<<<<<< HEAD
 bool __attribute__((weak)) emberAfPreCommandReceivedCallback(EmberAfClusterCommand * cmd)
 {
     return false;
+=======
+bool __attribute__((weak))
+emberAfPreCommandReceivedCallback(EmberAfClusterCommand *cmd) {
+  return false;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Pre Message Send
@@ -430,9 +566,16 @@ bool __attribute__((weak)) emberAfPreCommandReceivedCallback(EmberAfClusterComma
  * @param status A pointer to the status code value that will be returned to the
  * caller.  Ver.: always
  */
+<<<<<<< HEAD
 bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberStatus * status)
 {
     return false;
+=======
+bool __attribute__((weak))
+emberAfPreMessageSendCallback(EmberAfMessageStruct *messageStruct,
+                              EmberStatus *status) {
+  return false;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Message Sent
@@ -453,10 +596,18 @@ bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * 
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
+<<<<<<< HEAD
 bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame,
                                                       uint16_t msgLen, uint8_t * message, EmberStatus status)
 {
     return false;
+=======
+bool __attribute__((weak))
+emberAfMessageSentCallback(const MessageSendDestination &destination,
+                           EmberApsFrame *apsFrame, uint16_t msgLen,
+                           uint8_t *message, EmberStatus status) {
+  return false;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Pre Attribute Change
@@ -477,10 +628,18 @@ bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestinati
  * @param value   Ver.: always
  */
 EmberAfStatus __attribute__((weak))
+<<<<<<< HEAD
 emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                   uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
     return EMBER_ZCL_STATUS_SUCCESS;
+=======
+emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId,
+                                  AttributeId attributeId, uint8_t mask,
+                                  uint16_t manufacturerCode, uint8_t type,
+                                  uint16_t size, uint8_t *value) {
+  return EMBER_ZCL_STATUS_SUCCESS;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Post Attribute Change
@@ -499,9 +658,16 @@ emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, Attr
  * @param value   Ver.: always
  */
 void __attribute__((weak))
+<<<<<<< HEAD
 emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                    uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {}
+=======
+emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId,
+                                   AttributeId attributeId, uint8_t mask,
+                                   uint16_t manufacturerCode, uint8_t type,
+                                   uint16_t size, uint8_t *value) {}
+>>>>>>> ZAP regen tv-casting-app
 
 /** @brief External Attribute Read
  *
@@ -540,11 +706,19 @@ emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, Att
  * @param maxReadLength   Ver.: always
  * @param index   Ver.: always
  */
+<<<<<<< HEAD
 EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
                                      uint16_t manufacturerCode, uint8_t * buffer, uint16_t maxReadLength, int32_t index)
 {
     return EMBER_ZCL_STATUS_FAILURE;
+=======
+EmberAfStatus __attribute__((weak)) emberAfExternalAttributeReadCallback(
+    EndpointId endpoint, ClusterId clusterId,
+    EmberAfAttributeMetadata *attributeMetadata, uint16_t manufacturerCode,
+    uint8_t *buffer, uint16_t maxReadLength, int32_t index) {
+  return EMBER_ZCL_STATUS_FAILURE;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Write Attributes Response
@@ -558,9 +732,16 @@ emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, E
  * Ver.: always
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
+<<<<<<< HEAD
 bool __attribute__((weak)) emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     return false;
+=======
+bool __attribute__((weak))
+emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t *buffer,
+                                       uint16_t bufLen) {
+  return false;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief External Attribute Write
@@ -610,11 +791,19 @@ bool __attribute__((weak)) emberAfWriteAttributesResponseCallback(ClusterId clus
  * @param buffer   Ver.: always
  * @param index   Ver.: always
  */
+<<<<<<< HEAD
 EmberAfStatus __attribute__((weak))
 emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
                                       uint16_t manufacturerCode, uint8_t * buffer, int32_t index)
 {
     return EMBER_ZCL_STATUS_FAILURE;
+=======
+EmberAfStatus __attribute__((weak)) emberAfExternalAttributeWriteCallback(
+    EndpointId endpoint, ClusterId clusterId,
+    EmberAfAttributeMetadata *attributeMetadata, uint16_t manufacturerCode,
+    uint8_t *buffer, int32_t index) {
+  return EMBER_ZCL_STATUS_FAILURE;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Report Attributes
@@ -628,9 +817,16 @@ emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, 
  * always
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
+<<<<<<< HEAD
 bool __attribute__((weak)) emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     return false;
+=======
+bool __attribute__((weak))
+emberAfReportAttributesCallback(ClusterId clusterId, uint8_t *buffer,
+                                uint16_t bufLen) {
+  return false;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Get Current Time
@@ -642,10 +838,7 @@ bool __attribute__((weak)) emberAfReportAttributesCallback(ClusterId clusterId, 
  * that device does not have access to real time.
  *
  */
-uint32_t __attribute__((weak)) emberAfGetCurrentTimeCallback()
-{
-    return 0;
-}
+uint32_t __attribute__((weak)) emberAfGetCurrentTimeCallback() { return 0; }
 
 /** @brief Get Endpoint Info
  *
@@ -665,9 +858,15 @@ uint32_t __attribute__((weak)) emberAfGetCurrentTimeCallback()
  * with information about the endpoint.  Ver.: always
  */
 bool __attribute__((weak))
+<<<<<<< HEAD
 emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
 {
     return false;
+=======
+emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t *returnNetworkIndex,
+                               EmberAfEndpointInfoStruct *returnEndpointInfo) {
+  return false;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Registration Abort
@@ -689,9 +888,15 @@ void __attribute__((weak)) emberAfRegistrationAbortCallback() {}
  * @param message The message data received or to send.  Ver.: always
  */
 EmberStatus __attribute__((weak))
+<<<<<<< HEAD
 emberAfInterpanSendMessageCallback(EmberAfInterpanHeader * header, uint16_t messageLength, uint8_t * message)
 {
     return EMBER_LIBRARY_NOT_PRESENT;
+=======
+emberAfInterpanSendMessageCallback(EmberAfInterpanHeader *header,
+                                   uint16_t messageLength, uint8_t *message) {
+  return EMBER_LIBRARY_NOT_PRESENT;
+>>>>>>> ZAP regen tv-casting-app
 }
 
 /** @brief Start Move
@@ -700,7 +905,4 @@ emberAfInterpanSendMessageCallback(EmberAfInterpanHeader * header, uint16_t mess
  * to a new parent.
  *
  */
-bool __attribute__((weak)) emberAfStartMoveCallback()
-{
-    return false;
-}
+bool __attribute__((weak)) emberAfStartMoveCallback() { return false; }
