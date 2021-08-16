@@ -30,6 +30,7 @@
 #include "WiFiWidget.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include <Bluetooth.h>
 #include <app/Command.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/cluster-id.h>
@@ -60,6 +61,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     case DeviceEventType::kSessionEstablished:
         OnSessionEstablished(event);
         break;
+
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
             (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
@@ -69,10 +71,15 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
             chip::app::Mdns::StartServer();
+#ifdef CONFIG_RENDEZVOUS_MODE_BLE
+            if (event->CHIPoBLESubscribe.ConId)
+            {
+                deinitBLE();
+            }
+#endif
         }
         break;
-    }
-
+    } 
     ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 

@@ -23,9 +23,9 @@
  *
  **/
 #include "DeviceCallbacks.h"
-
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include <Bluetooth.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/server/Mdns.h>
@@ -58,6 +58,12 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
             chip::app::Mdns::StartServer();
+#ifdef CONFIG_RENDEZVOUS_MODE_BLE
+            if (event->CHIPoBLESubscribe.ConId)
+            {
+                deinitBLE();
+            }
+#endif
         }
         break;
     }
