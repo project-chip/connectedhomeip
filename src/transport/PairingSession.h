@@ -37,17 +37,20 @@ public:
     virtual ~PairingSession() {}
 
     // TODO: the session should know which peer we are trying to connect to at start
-    // mPeerNodeId should be const and assigned at the construction, such that GetPeerNodeId will never return kUndefinedNodeId, and SetPeerNodeId is not necessary.
+    // mPeerNodeId should be const and assigned at the construction, such that GetPeerNodeId will never return kUndefinedNodeId, and
+    // SetPeerNodeId is not necessary.
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
 
     // TODO: the local key id should be allocateed at start
-    // mLocalKeyId should be const and assigned at the construction, such that GetLocalKeyId will always return a valid key id , and SetLocalKeyId is not necessary.
+    // mLocalKeyId should be const and assigned at the construction, such that GetLocalKeyId will always return a valid key id , and
+    // SetLocalKeyId is not necessary.
     uint16_t GetLocalKeyId() const { return mLocalKeyId; }
     void SetLocalKeyId(uint16_t id) { mLocalKeyId = id; }
     bool IsValidLocalKeyId() const { return mLocalKeyId != kInvalidKeyId; }
 
-    uint16_t GetPeerKeyId() const {
+    uint16_t GetPeerKeyId() const
+    {
         VerifyOrDie(mPeerKeyId.HasValue());
         return mPeerKeyId.Value();
     }
@@ -62,10 +65,10 @@ public:
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear()
     {
-        mPeerNodeId = kUndefinedNodeId;
+        mPeerNodeId  = kUndefinedNodeId;
         mPeerAddress = Transport::PeerAddress::Uninitialized();
         mPeerKeyId.ClearValue();
-        mLocalKeyId  = kInvalidKeyId;
+        mLocalKeyId = kInvalidKeyId;
     }
 
     /**
@@ -103,7 +106,7 @@ private:
     uint16_t mLocalKeyId                    = kInvalidKeyId;
 
     // TODO: decouple peer address into transport, such that pairing session do not need to handle peer address
-    Transport::PeerAddress mPeerAddress     = Transport::PeerAddress::Uninitialized();
+    Transport::PeerAddress mPeerAddress = Transport::PeerAddress::Uninitialized();
 
     Optional<uint16_t> mPeerKeyId;
 };
