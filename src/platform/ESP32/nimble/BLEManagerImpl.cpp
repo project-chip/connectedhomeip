@@ -906,6 +906,10 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(struct ble_gap_event * gapEvent)
         HandleConnectionError(gapEvent->disconnect.conn.conn_handle, disconReason);
     }
 
+    ChipDeviceEvent disconnectEvent;
+    disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
+    PlatformMgr().PostEvent(&disconnectEvent);
+
     // Force a reconfiguration of advertising in case we switched to non-connectable mode when
     // the BLE connection was established.
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
