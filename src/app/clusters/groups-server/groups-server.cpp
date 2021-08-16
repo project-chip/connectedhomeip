@@ -90,14 +90,14 @@ static void printGroups()
 
 static EmberAfStatus checkGroup(EndpointId endpoint, GroupId groupId)
 {
-    if(!isGroupIdValid(groupId))
+    if (!isGroupIdValid(groupId))
     {
         return EMBER_ZCL_STATUS_INVALID_VALUE;
     }
 
     std::map<EndpointId, std::set<GroupId>>::iterator it = sGroupTable.find(endpoint);
     // Check if the endpoint is on the table AND the groupId is associated with the endpoint
-    if((it != sGroupTable.end()) && (it->second.find(groupId) != it->second.end()))
+    if ((it != sGroupTable.end()) && (it->second.find(groupId) != it->second.end()))
     {
         return EMBER_ZCL_STATUS_SUCCESS;
     }
@@ -109,7 +109,7 @@ static EmberAfStatus checkGroup(EndpointId endpoint, GroupId groupId)
 
 static EmberAfStatus addGroup(EndpointId endpoint, GroupId groupId, uint8_t * groupName)
 {
-    if(!isGroupIdValid(groupId))
+    if (!isGroupIdValid(groupId))
     {
         return EMBER_ZCL_STATUS_INVALID_VALUE;
     }
@@ -146,7 +146,7 @@ static EmberAfStatus addGroup(EndpointId endpoint, GroupId groupId, uint8_t * gr
 
 static EmberAfStatus removeGroup(EndpointId endpoint, GroupId groupId)
 {
-    if(!isGroupIdValid(groupId))
+    if (!isGroupIdValid(groupId))
     {
         return EMBER_ZCL_STATUS_INVALID_VALUE;
     }
@@ -456,9 +456,7 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(chip::EndpointId endpoint
  * @param groupId Group ID Ver.: always
  * @param groupName Group Name Ver.: always
  */
-void emberAfPluginGroupsServerGetGroupNameCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t * groupName)
-{
-}
+void emberAfPluginGroupsServerGetGroupNameCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t * groupName) {}
 
 /** @brief Set Group Name
  *
@@ -468,9 +466,7 @@ void emberAfPluginGroupsServerGetGroupNameCallback(chip::EndpointId endpoint, ch
  * @param groupId Group ID Ver.: always
  * @param groupName Group Name Ver.: always
  */
-void emberAfPluginGroupsServerSetGroupNameCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t * groupName)
-{
-}
+void emberAfPluginGroupsServerSetGroupNameCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t * groupName) {}
 
 /** @brief Group Names Supported
  *
