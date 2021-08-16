@@ -130,7 +130,16 @@ class AndroidBuilder(Builder):
         self._Execute(['mkdir', '-p', jnilibs_dir],
                       title='Prepare Native libs ' + self.identifier)
 
-        for libName in ['libSetupPayloadParser.so', 'libCHIPController.so']:
+        # TODO: Runtime dependencies should be computed by the build system rather than hardcoded
+        # GN supports getting these dependencies like:
+        #   gn desc out/android-x64-chip_tool/ //src/controller/java runtime_deps
+        #   gn desc out/android-x64-chip_tool/ //src/setup_payload/java runtime_deps
+        # However  this assumes that the output folder has been populated, which will not be
+        # the case for `dry-run` executions. Hence this harcoding here.
+        #
+        #   If we unify the JNI libraries, libc++_shared.so may not be needed anymore, which could
+        # be another path of resolving this inconsistency.
+        for libName in ['libSetupPayloadParser.so', 'libCHIPController.so', 'libc++_shared.so']:
             self._Execute(['cp', os.path.join(self.output_dir, 'lib', 'jni', self.board.AbiName(
             ), libName), os.path.join(jnilibs_dir, libName)])
 
@@ -159,10 +168,12 @@ class AndroidBuilder(Builder):
             'jni/%s/libSetupPayloadParser.so' % self.board.AbiName():
                 os.path.join(self.output_dir, 'lib', 'jni',
                              self.board.AbiName(), 'libSetupPayloadParser.so'),
-
             'jni/%s/libCHIPController.so' % self.board.AbiName():
                 os.path.join(self.output_dir, 'lib', 'jni',
                              self.board.AbiName(), 'libCHIPController.so'),
+            'jni/%s/libc++_shared.so' % self.board.AbiName():
+                os.path.join(self.output_dir, 'lib', 'jni',
+                             self.board.AbiName(), 'libc++_shared.so'),
         }
 
         return outputs
