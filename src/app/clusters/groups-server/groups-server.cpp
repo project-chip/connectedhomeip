@@ -49,308 +49,246 @@
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
-#include <app/util/binding-table.h>
 
-#ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
-#endif // EMBER_AF_PLUGIN_SCENES
+#include <platform/KeyValueStoreManager.h>
+#include <stdio.h>
+#include <utility>
 
 using namespace chip;
+using namespace chip::DeviceLayer;
+using namespace chip::app::Clusters::Groups;
 
-static bool isGroupPresent(EndpointId endpoint, GroupId groupId);
+#define STORAGE_KEY_SIZE_MAX 32
 
-static bool bindingGroupMatch(EndpointId endpoint, GroupId groupId, EmberBindingTableEntry * entry);
+//------------------------------------------------------------------------------
+// Local functions
+//------------------------------------------------------------------------------
 
-static uint8_t findGroupIndex(EndpointId endpoint, GroupId groupId);
-
-void emberAfGroupsClusterServerInitCallback(EndpointId endpoint)
+static bool isGroupIdValid(GroupId id)
 {
-    // The high bit of Name Support indicates whether group names are supported.
-    // Group names are not supported by this plugin.
-    EmberAfStatus status;
-    uint8_t nameSupport = (uint8_t) emberAfPluginGroupsServerGroupNamesSupportedCallback(endpoint);
-    status = emberAfWriteAttribute(endpoint, ZCL_GROUPS_CLUSTER_ID, ZCL_GROUP_NAME_SUPPORT_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                   (uint8_t *) &nameSupport, ZCL_BITMAP8_ATTRIBUTE_TYPE);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        emberAfGroupsClusterPrintln("ERR: writing name support %x", status);
-    }
+    return id > 0;
 }
 
-// --------------------------
-// Internal functions used to maintain the group table within the context
-// of the binding table.
-//
-// In the binding:
-// The first two bytes of the identifier is set to the groupId
-// The local endpoint is set to the endpoint that is mapped to this group
-// --------------------------
-static EmberAfStatus addEntryToGroupTable(EndpointId endpoint, GroupId groupId, uint8_t * groupName)
+static void buildStoreKey(char key[STORAGE_KEY_SIZE_MAX], EndpointId endpoint)
 {
-    uint8_t i;
+    snprintf(key, STORAGE_KEY_SIZE_MAX, "groups_table:%04x", endpoint);
+}
 
-    // Check for duplicates.
-    if (isGroupPresent(endpoint, groupId))
-    {
-        // Even if the group already exists, tell the application about the name,
-        // so it can cope with renames.
-        emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
-        return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
-    }
+static void printGroups(EndpointId endpoint)
+{
+    char store_key[STORAGE_KEY_SIZE_MAX];
+    GroupId count = 0;
 
-    // Look for an empty binding slot.
-    for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    buildStoreKey(store_key, endpoint);
+
+    CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(store_key, &count, sizeof(GroupId));
+    if (CHIP_NO_ERROR == err)
     {
-        EmberBindingTableEntry binding;
-        if (emberGetBinding(i, &binding) == EMBER_SUCCESS && binding.type == EMBER_UNUSED_BINDING)
+        GroupId groups[count + 1];
+
+        emberAfGroupsClusterPrint("GROUPS, end:%u, count:%u, err:%d", endpoint, count, err);
+
+        err = PersistedStorage::KeyValueStoreMgr().Get(store_key, groups, sizeof(groups));
+        if (CHIP_NO_ERROR == err)
         {
-            EmberStatus status;
-            binding.type    = EMBER_MULTICAST_BINDING;
-            binding.groupId = groupId;
-            binding.local   = endpoint;
-
-            status = emberSetBinding(i, &binding);
-            if (status == EMBER_SUCCESS)
+            for (uint16_t i = 1; i <= count; ++i)
             {
-                // Set the group name, if supported
-                emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
-                return EMBER_ZCL_STATUS_SUCCESS;
-            }
-            else
-            {
-                emberAfGroupsClusterPrintln("ERR: Failed to create binding (0x%x)", status);
+                emberAfGroupsClusterPrint("  group[%u]:%04x", i - 1, groups[i]);
             }
         }
     }
-    emberAfGroupsClusterPrintln("ERR: Binding table is full");
-    return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
 }
 
-static EmberAfStatus removeEntryFromGroupTable(EndpointId endpoint, GroupId groupId)
+static EmberAfStatus isGroupMember(EndpointId endpoint, GroupId groupId)
 {
-    if (isGroupPresent(endpoint, groupId))
+    printGroups(endpoint);
+
+    if (!isGroupIdValid(groupId))
     {
-        uint8_t bindingIndex = findGroupIndex(endpoint, groupId);
-        EmberStatus status   = emberDeleteBinding(bindingIndex);
-        if (status == EMBER_SUCCESS)
-        {
-            uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
-            emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
-            return EMBER_ZCL_STATUS_SUCCESS;
-        }
-        else
-        {
-            emberAfGroupsClusterPrintln("ERR: Failed to delete binding (0x%x)", status);
-            return EMBER_ZCL_STATUS_FAILURE;
-        }
-    }
-    return EMBER_ZCL_STATUS_NOT_FOUND;
-}
-
-bool emberAfGroupsClusterAddGroupCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId,
-                                          uint8_t * groupName)
-{
-    EmberAfStatus status;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    emberAfGroupsClusterPrint("RX: AddGroup 0x%2x, \"", groupId);
-    emberAfGroupsClusterPrintString(groupName);
-    emberAfGroupsClusterPrintln("\"");
-
-    status = addEntryToGroupTable(emberAfCurrentEndpoint(), groupId, groupName);
-
-    // For all networks, Add Group commands are only responded to when
-    // they are addressed to a single device.
-    if (emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST && emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST_REPLY)
-    {
-        return true;
-    }
-
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_GROUPS_CLUSTER_ID,
-                                             ZCL_ADD_GROUP_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to encode response command.");
-    }
-    return true;
-}
-
-bool emberAfGroupsClusterViewGroupCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId)
-{
-    EmberAfStatus status                                          = EMBER_ZCL_STATUS_NOT_FOUND;
-    CHIP_ERROR err                                                = CHIP_NO_ERROR;
-    uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
-
-    // Get the group name, if supported
-    emberAfPluginGroupsServerGetGroupNameCallback(emberAfCurrentEndpoint(), groupId, groupName);
-
-    emberAfGroupsClusterPrintln("RX: ViewGroup 0x%2x", groupId);
-
-    // For all networks, View Group commands can only be addressed to a
-    // single device.
-    if (emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST && emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST_REPLY)
-    {
-        return true;
-    }
-
-    if (isGroupPresent(emberAfCurrentEndpoint(), groupId))
-    {
-        status = EMBER_ZCL_STATUS_SUCCESS;
-    }
-
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_GROUPS_CLUSTER_ID,
-                                             ZCL_VIEW_GROUP_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
-        SuccessOrExit(err = writer->PutString(TLV::ContextTag(2), reinterpret_cast<char *>(&groupName[1]), groupName[0]));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to encode response command.");
-    }
-    return true;
-}
-
-bool emberAfGroupsClusterGetGroupMembershipCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t groupCount,
-                                                    uint8_t * groupList)
-{
-    EmberStatus status = EMBER_ZCL_STATUS_FAILURE;
-    uint8_t i, j;
-    uint8_t count = 0;
-    uint8_t list[EMBER_BINDING_TABLE_SIZE << 1];
-    uint8_t listLen = 0;
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-
-    emberAfGroupsClusterPrint("RX: GetGroupMembership 0x%x,", groupCount);
-    for (i = 0; i < groupCount; i++)
-    {
-        emberAfGroupsClusterPrint(" [0x%2x]", emberAfGetInt16u(groupList + (i << 1), 0, 2));
-    }
-    emberAfGroupsClusterPrintln("");
-
-    // For all networks, Get Group Membership commands may be sent either
-    // unicast or broadcast (removing the ZLL-specific limitation to unicast).
-
-    // When Group Count is zero, respond with a list of all active groups.
-    // Otherwise, respond with a list of matches.
-    if (groupCount == 0)
-    {
-        for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
-        {
-            EmberBindingTableEntry entry;
-            status = emberGetBinding(i, &entry);
-            if ((status == EMBER_SUCCESS) && (entry.type == EMBER_MULTICAST_BINDING) && (entry.local == emberAfCurrentEndpoint()))
-            {
-                list[listLen]     = EMBER_LOW_BYTE(entry.groupId);
-                list[listLen + 1] = EMBER_HIGH_BYTE(entry.groupId);
-                listLen           = static_cast<uint8_t>(listLen + 2);
-                count++;
-            }
-        }
+        return EMBER_ZCL_STATUS_INVALID_VALUE;
     }
     else
     {
-        for (i = 0; i < groupCount; i++)
+        char store_key[STORAGE_KEY_SIZE_MAX];
+        GroupId count = 0;
+
+        buildStoreKey(store_key, endpoint);
+
+        CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(store_key, &count, sizeof(GroupId));
+        if (CHIP_NO_ERROR == err)
         {
-            GroupId groupId = emberAfGetInt16u(groupList + (i << 1), 0, 2);
-            for (j = 0; j < EMBER_BINDING_TABLE_SIZE; j++)
+            GroupId groups[count + 1];
+            err = PersistedStorage::KeyValueStoreMgr().Get(store_key, groups, sizeof(groups));
+            if (CHIP_NO_ERROR == err)
             {
-                EmberBindingTableEntry entry;
-                status = emberGetBinding(j, &entry);
-                if ((status == EMBER_SUCCESS) && (entry.type == EMBER_MULTICAST_BINDING))
+                for (uint16_t i = 1; i <= count; ++i)
                 {
-                    if (entry.local == emberAfCurrentEndpoint() && entry.groupId == groupId)
+                    if (groups[i] == groupId)
                     {
-                        list[listLen]     = EMBER_LOW_BYTE(groupId);
-                        list[listLen + 1] = EMBER_HIGH_BYTE(groupId);
-                        listLen           = static_cast<uint8_t>(listLen + 2);
-                        count++;
+                        return EMBER_ZCL_STATUS_SUCCESS;
                     }
                 }
             }
         }
+        return EMBER_ZCL_STATUS_NOT_FOUND;
+    }
+}
+
+static EmberAfStatus addGroup(EndpointId endpoint, GroupId groupId, uint8_t * groupName)
+{
+    if (!isGroupIdValid(groupId))
+    {
+        return EMBER_ZCL_STATUS_INVALID_VALUE;
     }
 
-    // Only send a response if the Group Count was zero or if one or more active
-    // groups matched.  Otherwise, a Default Response is sent.
-    if (groupCount == 0 || count != 0)
+    char store_key[STORAGE_KEY_SIZE_MAX];
+    GroupId count = 0;
+
+    buildStoreKey(store_key, endpoint);
+
+    CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(store_key, &count, sizeof(GroupId));
+    if (CHIP_NO_ERROR == err)
     {
-        // A capacity of 0xFF means that it is unknown if any further groups may be
-        // added.  Each group requires a binding and, because the binding table is
-        // used for other purposes besides groups, we can't be sure what the
-        // capacity will be in the future.
+        // Existing endpoint
+        GroupId groups[count + 2]; // group_count + n_groups + new_group
+        err = PersistedStorage::KeyValueStoreMgr().Get(store_key, groups, (count + 1) * sizeof(GroupId));
+        if (CHIP_NO_ERROR != err)
         {
-            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_GROUPS_CLUSTER_ID,
-                                                 ZCL_GET_GROUP_MEMBERSHIP_RESPONSE_COMMAND_ID,
-                                                 (app::CommandPathFlags::kEndpointIdValid) };
-            TLV::TLVWriter * writer          = nullptr;
-            SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-            VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<uint8_t>(0xff)));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(1), count));
-            SuccessOrExit(err = writer->PutBytes(TLV::ContextTag(2), list, listLen));
-            SuccessOrExit(err = commandObj->FinishCommand());
+            // Cannot get endpoint's groups
+            return EMBER_ZCL_STATUS_FAILURE;
         }
+
+        // Check endpoint's groups
+        for (uint16_t i = 1; i <= count; ++i)
+        {
+            if (groups[i] == groupId)
+            {
+                return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
+            }
+        }
+        groups[0]         = static_cast<GroupId>(count + 1);
+        groups[count + 1] = groupId;
+        err               = PersistedStorage::KeyValueStoreMgr().Put(store_key, groups, sizeof(groups));
     }
     else
     {
-        status = emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
+        // New endpoint
+        GroupId groups[2] = { 1, groupId };
+        err               = PersistedStorage::KeyValueStoreMgr().Put(store_key, groups, sizeof(groups));
     }
-    if (EMBER_SUCCESS != status)
+
+    if (CHIP_NO_ERROR != err)
     {
-        emberAfGroupsClusterPrintln("Groups: failed to send %s: 0x%x",
-                                    (groupCount == 0 || count != 0) ? "get_group_membership response" : "default_response", status);
+        // Cannot store endpoint's groups
+        return EMBER_ZCL_STATUS_FAILURE;
     }
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to encode response command.");
-    }
-    return true;
+
+    printGroups(endpoint);
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-bool emberAfGroupsClusterRemoveGroupCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId)
+static EmberAfStatus removeGroup(EndpointId endpoint, GroupId groupId)
 {
-    EmberAfStatus status;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    emberAfGroupsClusterPrintln("RX: RemoveGroup 0x%2x", groupId);
-
-    status = removeEntryFromGroupTable(emberAfCurrentEndpoint(), groupId);
-
-    // For all networks, Remove Group commands are only responded to when
-    // they are addressed to a single device.
-    if (emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST && emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST_REPLY)
+    if (!isGroupIdValid(groupId))
     {
-        return true;
+        return EMBER_ZCL_STATUS_INVALID_VALUE;
     }
 
-    // EMAPPFWKV2-1414: if we remove a group, we should remove any scene
-    // associated with it. ZCL6: 3.6.2.3.5: "Note that if a group is
-    // removed the scenes associated with that group SHOULD be removed."
-    emberAfScenesClusterRemoveScenesInGroupCallback(emberAfCurrentEndpoint(), groupId);
+    char store_key[STORAGE_KEY_SIZE_MAX];
+    GroupId count = 0;
+
+    buildStoreKey(store_key, endpoint);
+
+    CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(store_key, &count, sizeof(GroupId));
+    if (CHIP_NO_ERROR != err)
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_GROUPS_CLUSTER_ID,
-                                             ZCL_REMOVE_GROUP_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+        return EMBER_ZCL_STATUS_NOT_FOUND;
+    }
+    else
+    {
+        // Existing endpoint
+        GroupId groups[count + 1];
+        err = PersistedStorage::KeyValueStoreMgr().Get(store_key, groups, sizeof(groups));
+        if (CHIP_NO_ERROR != err)
+        {
+            // Cannot get endpoint's groups
+            return EMBER_ZCL_STATUS_FAILURE;
+        }
+
+        // Remove group
+        bool found = false;
+        for (uint16_t i = 1; i <= count; ++i)
+        {
+            if (found)
+            {
+                // Shift-down remaining groups
+                groups[i - 1] = groups[i];
+            }
+            else if (groups[i] == groupId)
+            {
+                found = true;
+                // EMAPPFWKV2-1414: if we remove a group, we should remove any scene
+                // associated with it. ZCL6: 3.6.2.3.5: "Note that if a group is
+                // removed the scenes associated with that group SHOULD be removed."
+                emberAfScenesClusterRemoveScenesInGroupCallback(endpoint, groupId);
+            }
+        }
+        if (!found)
+        {
+            return EMBER_ZCL_STATUS_NOT_FOUND;
+        }
+        groups[0] = --count;
+        err       = PersistedStorage::KeyValueStoreMgr().Put(store_key, groups, (count + 1) * sizeof(GroupId));
+    }
+
+    printGroups(endpoint);
+    return CHIP_NO_ERROR == err ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
+}
+
+//------------------------------------------------------------------------------
+// Group Cluster callbacks
+//------------------------------------------------------------------------------
+
+/** @brief Groups Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfGroupsClusterServerInitCallback(chip::EndpointId endpoint)
+{
+    uint8_t nameSupport = 0x00;
+
+    EmberAfStatus status = Attributes::SetNameSupport(endpoint, nameSupport);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfGroupsClusterPrint("ERR: writing name support %x", status);
+    }
+}
+
+/**
+ * @brief  Cluster AddGroup Command callback (from client)
+ */
+bool emberAfGroupsClusterAddGroupCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint16_t groupId,
+                                          uint8_t * groupName)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    emberAfGroupsClusterPrint("AddGroup, end:%u, group:0x%2x \"%s\"", endpoint, groupId, groupName);
+
+    // For all networks, Add Group commands are only responded to when they are addressed to a single device.
+    if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
+    {
+        EmberAfStatus status = addGroup(endpoint, groupId, groupName);
+
+        app::CommandPathParams cmdParams = { endpoint, /* group id */ 0, ZCL_GROUPS_CLUSTER_ID, ZCL_ADD_GROUP_RESPONSE_COMMAND_ID,
+                                             (chip::app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -366,151 +304,287 @@ exit:
     return true;
 }
 
-bool emberAfGroupsClusterRemoveAllGroupsCallback(EndpointId aEndpoint, app::CommandHandler * commandObj)
+/**
+ * @brief  Cluster ViewGroup Command callback (from client)
+ */
+bool emberAfGroupsClusterViewGroupCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint16_t groupId)
 {
-    EmberStatus sendStatus = EMBER_SUCCESS;
-    uint8_t i;
-    EndpointId endpoint = emberAfCurrentEndpoint();
-    bool success        = true;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    emberAfGroupsClusterPrintln("RX: RemoveAllGroups");
-
-    for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    // For all networks, View Group commands can only be addressed to a single device.
+    if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
-        EmberBindingTableEntry binding;
-        if (emberGetBinding(i, &binding) == EMBER_SUCCESS)
+        uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
+
+        EmberAfStatus status = isGroupMember(endpoint, groupId);
+
+        emberAfGroupsClusterPrint("ViewGroup, end:%u, group:0x%2x \"%s\"", endpoint, groupId, groupName);
+
+        app::CommandPathParams cmdParams = { endpoint, /* group id */ 0, ZCL_GROUPS_CLUSTER_ID, ZCL_VIEW_GROUP_RESPONSE_COMMAND_ID,
+                                             (chip::app::CommandPathFlags::kEndpointIdValid) };
+        TLV::TLVWriter * writer          = nullptr;
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+        VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
+        SuccessOrExit(err = writer->PutString(TLV::ContextTag(2), reinterpret_cast<char *>(&groupName[0])));
+        SuccessOrExit(err = commandObj->FinishCommand());
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command.");
+    }
+    return true;
+}
+
+/**
+ * @brief  Cluster GetGroupMembership Command callback (from client)
+ *
+ * WARNING: This function is UNTESTED. The groupList parameter is an array of structures,
+ * which is currently not supported. In consequence, the groupList parameter fails to decode,
+ * and this function is not being called.
+ */
+bool emberAfGroupsClusterGetGroupMembershipCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                    uint8_t groupCount,
+                                                    /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
+{
+    EmberStatus status = EMBER_ZCL_STATUS_FAILURE;
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    uint8_t count      = 0;
+
+    if (!groupList)
+    {
+        status = emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
+    }
+    else
+    {
+        char store_key[STORAGE_KEY_SIZE_MAX];
+        GroupId stored_count = 0;
+
+        buildStoreKey(store_key, endpoint);
+        err = PersistedStorage::KeyValueStoreMgr().Get(store_key, &stored_count, sizeof(GroupId));
+        if (CHIP_NO_ERROR != err)
         {
-            if (binding.type == EMBER_MULTICAST_BINDING && endpoint == binding.local)
+            status = emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
+        }
+        else
+        {
+            // For all networks, Get Group Membership commands may be sent either
+            // unicast or broadcast (removing the ZLL-specific limitation to unicast).
+            GroupId groups[stored_count + 1];
+
+            err = PersistedStorage::KeyValueStoreMgr().Get(store_key, groups, (stored_count + 1) * sizeof(GroupId));
+            if (CHIP_NO_ERROR != err)
             {
-                EmberStatus status = emberDeleteBinding(i);
-                if (status != EMBER_SUCCESS)
+                status = emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
+            }
+            else
+            {
+                uint8_t list[stored_count * 2];
+                uint8_t listLen = 0;
+                uint8_t i;
+                if (0 == groupCount)
                 {
-                    success = false;
-                    emberAfGroupsClusterPrintln("ERR: Failed to delete binding (0x%x)", status);
+                    // When Group Count is zero, respond with a list of all active groups.
+                    for (i = 1; i <= stored_count; ++i)
+                    {
+                        list[listLen]     = EMBER_LOW_BYTE(groups[i]);
+                        list[listLen + 1] = EMBER_HIGH_BYTE(groups[i + 1]);
+                        listLen           = static_cast<uint8_t>(listLen + 2);
+                        count++;
+                    }
                 }
                 else
                 {
-                    uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
-                    GroupId groupId                                               = binding.groupId;
-                    emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
-                    success = true && success;
+                    uint8_t j;
+                    // Otherwise, respond with a list of matches.
+                    for (i = 0; i < groupCount; ++i)
+                    {
+                        GroupId groupId = emberAfGetInt16u(groupList + (i << 1), 0, 2);
+                        for (j = 1; j <= stored_count; ++j)
+                        {
+                            if (groups[j] == groupId)
+                            {
+                                list[listLen]     = EMBER_LOW_BYTE(groupId);
+                                list[listLen + 1] = EMBER_HIGH_BYTE(groupId);
+                                listLen           = static_cast<uint8_t>(listLen + 2);
+                                count++;
+                            }
+                        }
+                    }
+                }
 
-                    // EMAPPFWKV2-1414: if we remove a group, we should remove any scene
-                    // associated with it. ZCL6: 3.6.2.3.5: "Note that if a group is
-                    // removed the scenes associated with that group SHOULD be removed."
-                    emberAfScenesClusterRemoveScenesInGroupCallback(endpoint, groupId);
+                // Only send a response if the Group Count was zero or if one or more active
+                // groups matched.  Otherwise, a Default Response is sent.
+                if (groupCount == 0 || count != 0)
+                {
+                    // A capacity of 0xFF means that it is unknown if any further groups may be
+                    // added.  Each group requires a binding and, because the binding table is
+                    // used for other purposes besides groups, we can't be sure what the
+                    // capacity will be in the future.
+                    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_GROUPS_CLUSTER_ID,
+                                                         ZCL_GET_GROUP_MEMBERSHIP_RESPONSE_COMMAND_ID,
+                                                         (app::CommandPathFlags::kEndpointIdValid) };
+                    TLV::TLVWriter * writer          = nullptr;
+                    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+                    VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr,
+                                 err = CHIP_ERROR_INCORRECT_STATE);
+                    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<uint8_t>(0xff)));
+                    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), count));
+                    SuccessOrExit(err = writer->PutBytes(TLV::ContextTag(2), list, listLen));
+                    SuccessOrExit(err = commandObj->FinishCommand());
+                }
+                else
+                {
+                    status = emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
                 }
             }
         }
     }
 
-    emberAfScenesClusterRemoveScenesInGroupCallback(emberAfCurrentEndpoint(), ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
-
-    sendStatus = emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    if (EMBER_SUCCESS != sendStatus)
+    if (EMBER_SUCCESS != status)
     {
-        emberAfGroupsClusterPrintln("Groups: failed to send %s: 0x%x", "default_response", sendStatus);
+        emberAfGroupsClusterPrint("Groups: failed to send %s: 0x%x",
+                                  (groupCount == 0 || count != 0) ? "get_group_membership response" : "default_response", status);
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command.");
     }
     return true;
 }
 
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(EndpointId endpoint, app::CommandHandler * commandObj, GroupId groupId,
-                                                       uint8_t * groupName)
+/**
+ * @brief  Cluster RemoveGroup Command callback (from client)
+ */
+bool emberAfGroupsClusterRemoveGroupCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint16_t groupId)
+{
+    emberAfGroupsClusterPrint("RemoveGroup, end:%u, gid:%u", endpoint, groupId);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // For all networks, Remove Group commands are only responded to when
+    // they are addressed to a single device.
+    if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
+    {
+        EmberAfStatus status = removeGroup(endpoint, groupId);
+
+        app::CommandPathParams cmdParams = { endpoint, /* group id */ 0, ZCL_GROUPS_CLUSTER_ID,
+                                             ZCL_REMOVE_GROUP_RESPONSE_COMMAND_ID,
+                                             (chip::app::CommandPathFlags::kEndpointIdValid) };
+        TLV::TLVWriter * writer          = nullptr;
+        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+        VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
+        SuccessOrExit(err = commandObj->FinishCommand());
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command.");
+    }
+    return true;
+}
+
+/**
+ * @brief  Cluster RemoveAllGroups Command callback (from client)
+ */
+bool emberAfGroupsClusterRemoveAllGroupsCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj)
+{
+    EmberStatus sendStatus = EMBER_SUCCESS;
+
+    char store_key[STORAGE_KEY_SIZE_MAX];
+    GroupId count = 0;
+
+    emberAfGroupsClusterPrint("RemoveAllGroups, end:%u", endpoint);
+
+    buildStoreKey(store_key, endpoint);
+
+    CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(store_key, &count, sizeof(GroupId));
+    if (CHIP_NO_ERROR == err)
+    {
+        GroupId groups[count + 1];
+
+        err = PersistedStorage::KeyValueStoreMgr().Get(store_key, groups, (count + 1) * sizeof(GroupId));
+        if (CHIP_NO_ERROR == err)
+        {
+            for (uint16_t i = 1; i <= count; ++i)
+            {
+                // EMAPPFWKV2-1414: if we remove a group, we should remove any scene
+                // associated with it. ZCL6: 3.6.2.3.5: "Note that if a group is
+                // removed the scenes associated with that group SHOULD be removed."
+                emberAfScenesClusterRemoveScenesInGroupCallback(endpoint, groups[i]);
+            }
+        }
+        PersistedStorage::KeyValueStoreMgr().Delete(store_key);
+    }
+
+    emberAfScenesClusterRemoveScenesInGroupCallback(endpoint, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
+
+    sendStatus = emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    if (EMBER_SUCCESS != sendStatus)
+    {
+        emberAfGroupsClusterPrint("Groups: failed to send %s: 0x%x", "default_response", sendStatus);
+    }
+    return true;
+}
+
+/**
+ * @brief  Cluster AddGroupIfIdentifying Command callback (from client)
+ */
+bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                       uint16_t groupId, uint8_t * groupName)
 {
     EmberAfStatus status;
     EmberStatus sendStatus = EMBER_SUCCESS;
 
-    emberAfGroupsClusterPrint("RX: AddGroupIfIdentifying 0x%2x, \"", groupId);
-    emberAfGroupsClusterPrintString(groupName);
-    emberAfGroupsClusterPrintln("\"");
-
-    if (!emberAfIsDeviceIdentifying(emberAfCurrentEndpoint()))
+    if (emberAfIsDeviceIdentifying(endpoint))
     {
-        // If not identifying, ignore add group -> success; not a failure.
-        status = EMBER_ZCL_STATUS_SUCCESS;
+        emberAfGroupsClusterPrint("AddGroup, end:%u, group:0x%2x \"%s\"", endpoint, groupId, groupName);
+        status = addGroup(endpoint, groupId, groupName);
     }
     else
     {
-        status = addEntryToGroupTable(emberAfCurrentEndpoint(), groupId, groupName);
+        // If not identifying, ignore add group -> success; not a failure.
+        status = EMBER_ZCL_STATUS_SUCCESS;
     }
 
     sendStatus = emberAfSendImmediateDefaultResponse(status);
     if (EMBER_SUCCESS != sendStatus)
     {
-        emberAfGroupsClusterPrintln("Groups: failed to send %s: 0x%x", "default_response", sendStatus);
+        emberAfGroupsClusterPrint("Groups: failed to send %s: 0x%x", "default_response", sendStatus);
     }
+
     return true;
 }
 
-bool emberAfGroupsClusterEndpointInGroupCallback(EndpointId endpoint, GroupId groupId)
+//------------------------------------------------------------------------------
+// Groups Server Plugin
+//------------------------------------------------------------------------------
+
+/** @brief Groups Cluster Endpoint In Group
+ *
+ * This function is called by the framework when it needs to determine if an
+ * endpoint is a member of a group.  The application should return true if the
+ * endpoint is a member of the group and false otherwise.
+ *
+ * @param endpoint The endpoint.  Ver.: always
+ * @param groupId The group identifier.  Ver.: always
+ */
+bool emberAfGroupsClusterEndpointInGroupCallback(chip::EndpointId endpoint, chip::GroupId groupId)
 {
-    return isGroupPresent(endpoint, groupId);
+    return isGroupMember(endpoint, groupId);
 }
 
-void emberAfGroupsClusterClearGroupTableCallback(EndpointId endpoint)
-{
-    uint8_t i, networkIndex = 0 /* emberGetCurrentNetwork() */;
-    for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
-    {
-        EmberBindingTableEntry binding;
-        if (emberGetBinding(i, &binding) == EMBER_SUCCESS && binding.type == EMBER_MULTICAST_BINDING &&
-            (endpoint == binding.local || (endpoint == EMBER_BROADCAST_ENDPOINT && networkIndex == binding.networkIndex)))
-        {
-            EmberStatus status = emberDeleteBinding(i);
-            if (status != EMBER_SUCCESS)
-            {
-                emberAfGroupsClusterPrintln("ERR: Failed to delete binding (0x%x)", status);
-            }
-        }
-    }
-}
-
-static bool isGroupPresent(EndpointId endpoint, GroupId groupId)
-{
-    uint8_t i;
-
-    for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
-    {
-        EmberBindingTableEntry binding;
-        if (emberGetBinding(i, &binding) == EMBER_SUCCESS)
-        {
-            if (bindingGroupMatch(endpoint, groupId, &binding))
-            {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-static bool bindingGroupMatch(EndpointId endpoint, GroupId groupId, EmberBindingTableEntry * entry)
-{
-    return (entry->type == EMBER_MULTICAST_BINDING && entry->groupId == groupId && entry->local == endpoint);
-}
-
-static uint8_t findGroupIndex(EndpointId endpoint, GroupId groupId)
-{
-    EmberStatus status;
-    uint8_t i;
-
-    for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
-    {
-        EmberBindingTableEntry entry;
-        status = emberGetBinding(i, &entry);
-        if ((status == EMBER_SUCCESS) && bindingGroupMatch(endpoint, groupId, &entry))
-        {
-            return i;
-        }
-    }
-    return EMBER_AF_GROUP_TABLE_NULL_INDEX;
-}
-
-void emberAfPluginGroupsServerGetGroupNameCallback(EndpointId endpoint, GroupId groupId, uint8_t * groupName) {}
-
-bool emberAfPluginGroupsServerGroupNamesSupportedCallback(EndpointId endpoint)
-{
-    return false;
-}
-
-void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, uint8_t * groupName) {}
+/** @brief Scenes Cluster Remove Scenes In Group
+ *
+ * This function removes the scenes from a specified group. It is called
+ * whenever a group is removed from the GroupsTable.
+ *
+ *
+ * @param endpoint Endpoint  Ver.: always
+ * @param groupId Group ID  Ver.: always
+ */
+void __attribute__((weak)) emberAfScenesClusterRemoveScenesInGroupCallback(EndpointId endpoint, chip::GroupId groupId) {}

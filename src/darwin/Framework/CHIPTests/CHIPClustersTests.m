@@ -2258,6 +2258,471 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterGroupsCluster_000000_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 0 (invalid)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 0U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 0 (invalid) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 135);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000001_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 1 (not found)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 1U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 1 (not found) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 139);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 1);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000002_AddGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Add Group 1 (new)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 1U;
+    NSString * groupNameArgument = @"Group #1";
+    [cluster addGroup:groupIdArgument
+              groupName:groupNameArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Add Group 1 (new) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 1);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000003_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 1 (new)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 1U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 1 (new) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 1);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000004_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 2 (not found)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 4369U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 2 (not found) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 139);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 4369);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000005_AddGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Add Group 2 (new)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 4369U;
+    NSString * groupNameArgument = @"Group #2";
+    [cluster addGroup:groupIdArgument
+              groupName:groupNameArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Add Group 2 (new) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 4369);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000006_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 2 (new)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 4369U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 2 (new) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 4369);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000007_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 3 (not found)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 65535U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 3 (not found) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 139);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 65535);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000008_AddGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Add Group 3 (new)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 65535U;
+    NSString * groupNameArgument = @"Group #3";
+    [cluster addGroup:groupIdArgument
+              groupName:groupNameArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Add Group 3 (new) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 65535);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000009_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 1 (existing)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 1U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 1 (existing) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 1);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000010_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 2 (existing)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 4369U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 2 (existing) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 4369);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000011_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 3 (new)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 65535U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 3 (new) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 65535);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000012_RemoveGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove Group 0 (invalid)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 0U;
+    [cluster removeGroup:groupIdArgument
+         responseHandler:^(NSError * err, NSDictionary * values) {
+             NSLog(@"Remove Group 0 (invalid) Error: %@", err);
+
+             XCTAssertEqual(err.code, 0);
+             XCTAssertEqual([values[@"status"] unsignedCharValue], 135);
+             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 0);
+             [expectation fulfill];
+         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000013_RemoveGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove Group 4 (not found)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 4U;
+    [cluster removeGroup:groupIdArgument
+         responseHandler:^(NSError * err, NSDictionary * values) {
+             NSLog(@"Remove Group 4 (not found) Error: %@", err);
+
+             XCTAssertEqual(err.code, 0);
+             XCTAssertEqual([values[@"status"] unsignedCharValue], 139);
+             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 4);
+             [expectation fulfill];
+         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000014_RemoveGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove Group 2 (existing)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 4369U;
+    [cluster removeGroup:groupIdArgument
+         responseHandler:^(NSError * err, NSDictionary * values) {
+             NSLog(@"Remove Group 2 (existing) Error: %@", err);
+
+             XCTAssertEqual(err.code, 0);
+             XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
+             XCTAssertEqual([values[@"groupId"] unsignedShortValue], 4369);
+             [expectation fulfill];
+         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000015_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 1 (not removed)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 1U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 1 (not removed) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 1);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000016_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 1 (removed)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 4369U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 1 (removed) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 139);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 4369);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000017_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 3 (not removed)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 65535U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 3 (not removed) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 0);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 65535);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000018_RemoveAllGroups
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove All"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster removeAllGroups:^(NSError * err, NSDictionary * values) {
+        NSLog(@"Remove All Error: %@", err);
+
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000019_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 1 (removed)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 1U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 1 (removed) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 139);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 1);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000020_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 2 (still removed)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 4369U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 2 (still removed) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 139);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 4369);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupsCluster_000021_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 3 (removed)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroups * cluster = [[CHIPGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t groupIdArgument = 65535U;
+    [cluster viewGroup:groupIdArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"View Group 3 (removed) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            XCTAssertEqual([values[@"status"] unsignedCharValue], 139);
+            XCTAssertEqual([values[@"groupId"] unsignedShortValue], 65535);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTest_TC_OO_1_1_000000_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
