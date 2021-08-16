@@ -545,7 +545,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
         tlvWriter.Init(std::move(msg_R2));
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), &msg_rand[0], sizeof(msg_rand)));
-        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(2), GetLocalKeyID(), true));
+        SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(2), GetLocalKeyId(), true));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(3), mEphemeralKey.Pubkey(),
                                                static_cast<uint32_t>(mEphemeralKey.Pubkey().Length())));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(4), msg_R2_Encrypted.Get(),

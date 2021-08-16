@@ -169,6 +169,7 @@ public:
         return &mMessageDispatch;
     }
 
+    // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
      **/
     void Clear();
