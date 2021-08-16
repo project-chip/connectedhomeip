@@ -1,15 +1,8 @@
 # Using CLI in nRF Connect examples
 
-The following examples for the development kits from Nordic Semiconductor
-include a command-line interface that allows access to application logs and
-[Zephyr shell](https://docs.zephyrproject.org/1.13.0/subsystems/shell.html):
-
--   [CHIP nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md)
--   [CHIP nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
-
-The
-[CHIP nRF Connect Pigweed Example Application](../../examples/pigweed-app/nrfconnect/README.md)
-does not support CLI.
+Some Matter examples for the development kits from Nordic Semiconductor include
+a command-line interface that allows access to application logs and
+[Zephyr shell](https://docs.zephyrproject.org/1.13.0/subsystems/shell.html).
 
 ## Accessing the CLI console
 

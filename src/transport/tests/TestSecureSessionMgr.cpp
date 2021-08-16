@@ -66,8 +66,6 @@ public:
                            const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
                            System::PacketBufferHandle && msgBuf) override
     {
-        NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
-        NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
         NL_TEST_ASSERT(mSuite, session == mRemoteToLocalSession); // Packet received by remote peer
 
         size_t data_len = msgBuf->DataLength();
@@ -118,8 +116,6 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 
     CHIP_ERROR err;
 
-    ctx.GetInetLayer().SystemLayer()->Init();
-
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -135,8 +131,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     uint16_t payload_len = sizeof(PAYLOAD);
 
     callback.LargeMessageSent = false;
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -161,12 +155,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     secureSessionMgr.SetDelegate(&callback);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
-
-    Transport::FabricInfo * fabric = fabrics.AssignFabricIndex(0, kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
-
-    fabric = fabrics.AssignFabricIndex(1, kDestinationNodeId);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
     SecurePairingUsingTestSecret pairing1(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
@@ -234,8 +222,6 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     callback.LargeMessageSent = false;
 
-    ctx.GetInetLayer().SystemLayer()->Init();
-
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
@@ -259,12 +245,6 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     secureSessionMgr.SetDelegate(&callback);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
-
-    Transport::FabricInfo * fabric = fabrics.AssignFabricIndex(0, kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
-
-    fabric = fabrics.AssignFabricIndex(1, kDestinationNodeId);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
     SecurePairingUsingTestSecret pairing1(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
@@ -316,8 +296,6 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     callback.LargeMessageSent = false;
 
-    ctx.GetInetLayer().SystemLayer()->Init();
-
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
@@ -341,12 +319,6 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     secureSessionMgr.SetDelegate(&callback);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
-
-    Transport::FabricInfo * fabric = fabrics.AssignFabricIndex(0, kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
-
-    fabric = fabrics.AssignFabricIndex(1, kDestinationNodeId);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
     SecurePairingUsingTestSecret pairing1(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
@@ -387,50 +359,6 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     PacketHeader packetHeader;
 
-    // Change Destination Node ID
-    EncryptedPacketBufferHandle badDestNodeIdMsg = preparedMessage.CloneData();
-    NL_TEST_ASSERT(inSuite, badDestNodeIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, packetHeader.GetDestinationNodeId().Value() == kDestinationNodeId);
-    packetHeader.SetDestinationNodeId(kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, badDestNodeIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
-
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badDestNodeIdMsg);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
-
-    /* -------------------------------------------------------------------------------------------*/
-    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
-
-    // Change Source Node ID
-    EncryptedPacketBufferHandle badSrcNodeIdMsg = preparedMessage.CloneData();
-    NL_TEST_ASSERT(inSuite, badSrcNodeIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
-
-    packetHeader.SetSourceNodeId(kDestinationNodeId);
-    NL_TEST_ASSERT(inSuite, badSrcNodeIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
-
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badSrcNodeIdMsg);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
-
-    /* -------------------------------------------------------------------------------------------*/
-    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
-
-    // Change Source Node ID
-    EncryptedPacketBufferHandle noDstNodeIdMsg = preparedMessage.CloneData();
-    NL_TEST_ASSERT(inSuite, noDstNodeIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
-
-    packetHeader.ClearDestinationNodeId();
-    NL_TEST_ASSERT(inSuite, noDstNodeIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
-
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, noDstNodeIdMsg);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
-
-    /* -------------------------------------------------------------------------------------------*/
     state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     // Change Message ID

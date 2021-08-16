@@ -414,7 +414,7 @@ void Command::WaitForResponse(uint16_t seconds)
 
 #else // CONFIG_USE_SEPARATE_EVENTLOOP
 
-static void OnResponseTimeout(chip::System::Layer *, void *, CHIP_ERROR)
+static void OnResponseTimeout(chip::System::Layer *, void *)
 {
     ChipLogError(chipTool, "No response from device");
 
@@ -423,16 +423,10 @@ static void OnResponseTimeout(chip::System::Layer *, void *, CHIP_ERROR)
 
 CHIP_ERROR Command::ScheduleWaitForResponse(uint16_t seconds)
 {
-    chip::System::Timer * timer = nullptr;
-
-    CHIP_ERROR err = chip::DeviceLayer::SystemLayer.NewTimer(timer);
-    if (err == CHIP_NO_ERROR)
+    CHIP_ERROR err = chip::DeviceLayer::SystemLayer.StartTimer(seconds * 1000, OnResponseTimeout, this);
+    if (err != CHIP_NO_ERROR)
     {
-        timer->Start(seconds * 1000, OnResponseTimeout, this);
-    }
-    else
-    {
-        ChipLogError(chipTool, "Failed to allocate timer");
+        ChipLogError(chipTool, "Failed to allocate timer %" CHIP_ERROR_FORMAT, err.Format());
     }
     return err;
 }

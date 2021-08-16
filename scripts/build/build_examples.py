@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from runner import PrintOnlyRunner, ShellRunner
+import build
 import coloredlogs
 import click
 import logging
@@ -22,8 +24,6 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-import build
-from runner import PrintOnlyRunner, ShellRunner
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -36,18 +36,18 @@ __LOG_LEVELS__ = {
 
 
 def ValidateRepoPath(context, parameter, value):
-  """Validates that the given path looks like a valid chip repository checkout."""
-  if value.startswith('/TEST/'):
-    # Hackish command to allow for unit testing
-    return value
+    """Validates that the given path looks like a valid chip repository checkout."""
+    if value.startswith('/TEST/'):
+        # Hackish command to allow for unit testing
+        return value
 
-  for name in ['BUILD.gn', '.gn', os.path.join('scripts', 'bootstrap.sh')]:
-    expected_file = os.path.join(value, name)
-    if not os.path.exists(expected_file):
-      raise click.BadParameter(
-          "'%s' does not look like a valid repository path: %s not found." %
-          (value, expected_file))
-  return value
+    for name in ['BUILD.gn', '.gn', os.path.join('scripts', 'bootstrap.sh')]:
+        expected_file = os.path.join(value, name)
+        if not os.path.exists(expected_file):
+            raise click.BadParameter(
+                "'%s' does not look like a valid repository path: %s not found." %
+                (value, expected_file))
+    return value
 
 
 @click.group(chain=True)
@@ -78,6 +78,12 @@ def ValidateRepoPath(context, parameter, value):
     help='What example application to build. Empty will find suitable applications.'
 )
 @click.option(
+    '--enable-flashbundle',
+    default=False,
+    is_flag=True,
+    help='Also generate the flashbundles for the app.'
+)
+@click.option(
     '--repo',
     default='.',
     callback=ValidateRepoPath,
@@ -104,45 +110,46 @@ def ValidateRepoPath(context, parameter, value):
     help='Where to write the dry run output')
 @click.pass_context
 def main(context, log_level, platform, board, app, repo, out_prefix, clean,
-         dry_run, dry_run_output):
-  # Ensures somewhat pretty logging of what is going on
-  coloredlogs.install(
-      level=__LOG_LEVELS__[log_level],
-      fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
+         dry_run, dry_run_output, enable_flashbundle):
+    # Ensures somewhat pretty logging of what is going on
+    coloredlogs.install(
+        level=__LOG_LEVELS__[log_level],
+        fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
 
-  if not 'PW_PROJECT_ROOT' in os.environ:
-    raise click.UsageError("""
+    if not 'PW_PROJECT_ROOT' in os.environ:
+        raise click.UsageError("""
 PW_PROJECT_ROOT not in current environment.
 
 Please make sure you `source scripts/bootstrap.sh` or `source scripts/activate.sh`
 before running this script.
 """.strip())
 
-  # Support an 'all platforms' choice
-  if 'all' in platform:
-    platform = build.PLATFORMS
+    # Support an 'all platforms' choice
+    if 'all' in platform:
+        platform = build.PLATFORMS
 
-  if dry_run:
-    runner = PrintOnlyRunner(dry_run_output)
-  else:
-    runner = ShellRunner()
+    if dry_run:
+        runner = PrintOnlyRunner(dry_run_output)
+    else:
+        runner = ShellRunner()
 
-  context.obj = build.Context(
-      repository_path=repo, output_prefix=out_prefix, runner=runner)
-  context.obj.SetupBuilders(
-      platforms=[build.Platform.FromArgName(name) for name in platform],
-      boards=[build.Board.FromArgName(name) for name in board],
-      applications=[build.Application.FromArgName(name) for name in app])
+    context.obj = build.Context(
+        repository_path=repo, output_prefix=out_prefix, runner=runner)
+    context.obj.SetupBuilders(
+        platforms=[build.Platform.FromArgName(name) for name in platform],
+        boards=[build.Board.FromArgName(name) for name in board],
+        applications=[build.Application.FromArgName(name) for name in app],
+        enable_flashbundle=enable_flashbundle)
 
-  if clean:
-    context.obj.CleanOutputDirectories()
+    if clean:
+        context.obj.CleanOutputDirectories()
 
 
 @main.command(
     'gen', help='Generate ninja/makefiles (but does not run the compilation)')
 @click.pass_context
 def cmd_generate(context):
-  context.obj.Generate()
+    context.obj.Generate()
 
 
 @main.command('build', help='generate and run ninja/make as needed to compile')
@@ -158,14 +165,14 @@ def cmd_generate(context):
     help='Prefix of compressed archives of the generated files.')
 @click.pass_context
 def cmd_build(context, copy_artifacts_to, create_archives):
-  context.obj.Build()
+    context.obj.Build()
 
-  if copy_artifacts_to:
-    context.obj.CopyArtifactsTo(copy_artifacts_to)
+    if copy_artifacts_to:
+        context.obj.CopyArtifactsTo(copy_artifacts_to)
 
-  if create_archives:
-    context.obj.CreateArtifactArchives(create_archives)
+    if create_archives:
+        context.obj.CreateArtifactArchives(create_archives)
 
 
 if __name__ == '__main__':
-  main()
+    main()

@@ -1472,6 +1472,14 @@ public class ChipClusters {
       readColorLoopTimeAttribute(chipClusterPtr, callback);
     }
 
+    public void readColorLoopStartEnhancedHueAttribute(IntegerAttributeCallback callback) {
+      readColorLoopStartEnhancedHueAttribute(chipClusterPtr, callback);
+    }
+
+    public void readColorLoopStoredEnhancedHueAttribute(IntegerAttributeCallback callback) {
+      readColorLoopStoredEnhancedHueAttribute(chipClusterPtr, callback);
+    }
+
     public void readColorCapabilitiesAttribute(IntegerAttributeCallback callback) {
       readColorCapabilitiesAttribute(chipClusterPtr, callback);
     }
@@ -1670,6 +1678,12 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readColorLoopTimeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readColorLoopStartEnhancedHueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readColorLoopStoredEnhancedHueAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readColorCapabilitiesAttribute(
@@ -3786,13 +3800,8 @@ public class ChipClusters {
       opCSRRequest(chipClusterPtr, callback, cSRNonce);
     }
 
-    public void removeAllFabrics(DefaultClusterCallback callback) {
-      removeAllFabrics(chipClusterPtr, callback);
-    }
-
-    public void removeFabric(
-        NOCResponseCallback callback, long fabricId, long nodeId, int vendorId) {
-      removeFabric(chipClusterPtr, callback, fabricId, nodeId, vendorId);
+    public void removeFabric(NOCResponseCallback callback, int fabricIndex) {
+      removeFabric(chipClusterPtr, callback, fabricIndex);
     }
 
     public void removeTrustedRootCertificate(
@@ -3800,12 +3809,12 @@ public class ChipClusters {
       removeTrustedRootCertificate(chipClusterPtr, callback, trustedRootIdentifier);
     }
 
-    public void setFabric(SetFabricResponseCallback callback, int vendorId) {
-      setFabric(chipClusterPtr, callback, vendorId);
-    }
-
     public void updateFabricLabel(NOCResponseCallback callback, String label) {
       updateFabricLabel(chipClusterPtr, callback, label);
+    }
+
+    public void updateNOC(NOCResponseCallback callback, byte[] nOCArray) {
+      updateNOC(chipClusterPtr, callback, nOCArray);
     }
 
     private native void addNOC(
@@ -3822,23 +3831,17 @@ public class ChipClusters {
     private native void opCSRRequest(
         long chipClusterPtr, OpCSRResponseCallback callback, byte[] cSRNonce);
 
-    private native void removeAllFabrics(long chipClusterPtr, DefaultClusterCallback callback);
-
     private native void removeFabric(
-        long chipClusterPtr,
-        NOCResponseCallback callback,
-        long fabricId,
-        long nodeId,
-        int vendorId);
+        long chipClusterPtr, NOCResponseCallback callback, int fabricIndex);
 
     private native void removeTrustedRootCertificate(
         long chipClusterPtr, DefaultClusterCallback callback, byte[] trustedRootIdentifier);
 
-    private native void setFabric(
-        long chipClusterPtr, SetFabricResponseCallback callback, int vendorId);
-
     private native void updateFabricLabel(
         long chipClusterPtr, NOCResponseCallback callback, String label);
+
+    private native void updateNOC(
+        long chipClusterPtr, NOCResponseCallback callback, byte[] nOCArray);
 
     public interface NOCResponseCallback {
       void onSuccess(int StatusCode, int FabricIndex, byte[] DebugText);
@@ -3848,12 +3851,6 @@ public class ChipClusters {
 
     public interface OpCSRResponseCallback {
       void onSuccess(byte[] NOCSRElements, byte[] AttestationSignature);
-
-      void onError(Exception error);
-    }
-
-    public interface SetFabricResponseCallback {
-      void onSuccess(long FabricId);
 
       void onError(Exception error);
     }

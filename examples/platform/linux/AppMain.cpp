@@ -30,6 +30,7 @@
 #include <setup_payload/SetupPayload.h>
 #include <support/CHIPMem.h>
 #include <support/RandUtils.h>
+#include <support/ScopedBuffer.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <ControllerShellCommands.h>
@@ -183,7 +184,31 @@ CHIP_ERROR InitCommissioner()
 
     ReturnErrorOnFailure(gCommissioner.SetUdpListenPort(CHIP_PORT + 2));
     ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(CHIP_UDC_PORT));
-    ReturnErrorOnFailure(gCommissioner.Init(localId, params));
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
+    VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
+    chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
+    VerifyOrReturnError(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
+    chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
+    VerifyOrReturnError(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
+    chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+
+    chip::Crypto::P256Keypair ephemeralKey;
+    ReturnErrorOnFailure(ephemeralKey.Initialize());
+
+    ReturnErrorOnFailure(
+        gOpCredsIssuer.GenerateNOCChainAfterValidation(localId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+
+    params.ephemeralKeypair = &ephemeralKey;
+    params.controllerRCAC   = rcacSpan;
+    params.controllerICAC   = icacSpan;
+    params.controllerNOC    = nocSpan;
+
+    ReturnErrorOnFailure(gCommissioner.Init(params));
 
     return CHIP_NO_ERROR;
 }

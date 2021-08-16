@@ -202,7 +202,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     // Following fields are for nodes and not for commissioners
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
-        snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%04u", params.GetLongDiscriminator());
+        snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%u", params.GetLongDiscriminator());
         textEntries[textEntrySize++] = { "D", reinterpret_cast<const uint8_t *>(discriminatorBuf),
                                          strnlen(discriminatorBuf, sizeof(discriminatorBuf)) };
 
@@ -481,7 +481,7 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, MdnsService * resu
     {
         ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
         ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, &data);
+        FillNodeDataFromTxt(key, val, data);
     }
     mgr->mResolverDelegate->OnNodeDiscoveryComplete(data);
 }
@@ -539,9 +539,17 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
         return;
     }
 
+    Platform::CopyString(nodeData.mHostName, result->mHostName);
     nodeData.mInterfaceId = result->mInterface;
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
+
+    for (size_t i = 0; i < result->mTextEntrySize; ++i)
+    {
+        ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
+        ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
+        FillNodeDataFromTxt(key, val, nodeData);
+    }
 
     nodeData.LogNodeIdResolved();
     mgr->mResolverDelegate->OnNodeIdResolved(nodeData);

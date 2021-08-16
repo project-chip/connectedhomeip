@@ -37,9 +37,9 @@ namespace app {
 namespace {
 void ReportCommandUnsupported(Command * aCommandObj, EndpointId aEndpointId, ClusterId aClusterId, CommandId aCommandId)
 {
-    chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                       0, // GroupId
-                                                       aClusterId, aCommandId, (CommandPathFlags::kEndpointIdValid) };
+    CommandPathParams returnStatusParam = { aEndpointId,
+                                            0, // GroupId
+                                            aClusterId, aCommandId, (CommandPathFlags::kEndpointIdValid) };
     aCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::UnsupportedCommand);
     ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandId),
@@ -53,8 +53,7 @@ namespace clusters {
 
 namespace AccountLogin {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -139,10 +138,9 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::AccountLogin::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::AccountLogin::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -160,8 +158,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace ApplicationLauncher {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -250,10 +247,10 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::ApplicationLauncher::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::ApplicationLauncher::Id, aCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -271,8 +268,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace ContentLauncher {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -425,10 +421,9 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::ContentLauncher::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::ContentLauncher::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -446,8 +441,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace DoorLock {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -1928,10 +1922,9 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::DoorLock::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::DoorLock::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -1949,8 +1942,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace GeneralCommissioning {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2167,10 +2159,10 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::GeneralCommissioning::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::GeneralCommissioning::Id, aCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -2188,8 +2180,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace Groups {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2474,10 +2465,9 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::Groups::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::Groups::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -2495,8 +2485,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace Identify {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2579,10 +2568,9 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::Identify::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::Identify::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -2600,8 +2588,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace KeypadInput {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -2684,10 +2671,9 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::KeypadInput::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::KeypadInput::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -2705,8 +2691,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace MediaPlayback {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -3374,10 +3359,9 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::MediaPlayback::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::MediaPlayback::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -3395,8 +3379,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace NetworkCommissioning {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -3943,10 +3926,10 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::NetworkCommissioning::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::NetworkCommissioning::Id, aCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -3964,8 +3947,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace OtaSoftwareUpdateProvider {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4138,10 +4120,10 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::OtaSoftwareUpdateProvider::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::OtaSoftwareUpdateProvider::Id, aCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4159,8 +4141,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace OperationalCredentials {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4305,64 +4286,6 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
             }
             break;
         }
-        case Clusters::OperationalCredentials::Commands::Ids::SetFabricResponse: {
-            expectArgumentCount = 1;
-            chip::FabricId FabricId;
-            bool argExists[1];
-
-            memset(argExists, 0, sizeof argExists);
-
-            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
-            {
-                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
-                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
-                if (!TLV::IsContextTag(aDataTlv.GetTag()))
-                {
-                    continue;
-                }
-                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 1)
-                {
-                    if (argExists[currentDecodeTagId])
-                    {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-                        break;
-                    }
-                    else
-                    {
-                        argExists[currentDecodeTagId] = true;
-                        validArgumentCount++;
-                    }
-                }
-                switch (currentDecodeTagId)
-                {
-                case 0:
-                    TLVUnpackError = aDataTlv.Get(FabricId);
-                    break;
-                default:
-                    // Unsupported tag, ignore it.
-                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
-                    break;
-                }
-                if (CHIP_NO_ERROR != TLVUnpackError)
-                {
-                    break;
-                }
-            }
-
-            if (CHIP_END_OF_TLV == TLVError)
-            {
-                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
-                TLVError = CHIP_NO_ERROR;
-            }
-
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
-            {
-                wasHandled = emberAfOperationalCredentialsClusterSetFabricResponseCallback(aEndpointId, apCommandObj, FabricId);
-            }
-            break;
-        }
         default: {
             // Unrecognized command ID, error status will apply.
             ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::OperationalCredentials::Id, aCommandId);
@@ -4373,10 +4296,10 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::OperationalCredentials::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::OperationalCredentials::Id, aCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4394,8 +4317,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace Scenes {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4838,10 +4760,9 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::Scenes::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::Scenes::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4859,8 +4780,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace TvChannel {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -4949,10 +4869,9 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::TvChannel::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::TvChannel::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -4970,8 +4889,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace TargetNavigator {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -5060,10 +4978,9 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::TargetNavigator::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::TargetNavigator::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -5081,8 +4998,7 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 namespace TestCluster {
 
-void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId,
-                           TLV::TLVReader & aDataTlv)
+void DispatchClientCommand(CommandSender * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
     // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
@@ -5223,10 +5139,9 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
     if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-        chip::app::CommandPathParams returnStatusParam = { aEndpointId,
-                                                           0, // GroupId
-                                                           Clusters::TestCluster::Id, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::TestCluster::Id, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogProgress(Zcl,
@@ -5244,8 +5159,8 @@ void DispatchClientCommand(app::CommandSender * apCommandObj, CommandId aCommand
 
 } // namespace clusters
 
-void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::TLV::TLVReader & aReader, CommandHandler * apCommandObj)
+void DispatchSingleClusterCommand(ClusterId aClusterId, CommandId aCommandId, EndpointId aEndPointId, TLV::TLVReader & aReader,
+                                  CommandHandler * apCommandObj)
 {
     ChipLogDetail(Zcl, "Received Cluster Command: Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " Endpoint=%" PRIx16,
                   ChipLogValueMEI(aClusterId), ChipLogValueMEI(aCommandId), aEndPointId);
@@ -5256,10 +5171,9 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     {
     default:
         // Unrecognized cluster ID, error status will apply.
-        chip::app::CommandPathParams returnStatusParam = { aEndPointId,
-                                                           0, // GroupId
-                                                           aClusterId, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndPointId,
+                                                0, // GroupId
+                                                aClusterId, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogError(Zcl, "Unknown cluster %" PRIx32, aClusterId);
@@ -5270,8 +5184,8 @@ exit:
     aReader.ExitContainer(dataTlvType);
 }
 
-void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                          chip::TLV::TLVReader & aReader, CommandSender * apCommandObj)
+void DispatchSingleClusterResponseCommand(ClusterId aClusterId, CommandId aCommandId, EndpointId aEndPointId,
+                                          TLV::TLVReader & aReader, CommandSender * apCommandObj)
 {
     ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%" PRIx16, aClusterId,
                   aCommandId, aEndPointId);
@@ -5330,10 +5244,9 @@ void DispatchSingleClusterResponseCommand(chip::ClusterId aClusterId, chip::Comm
         break;
     default:
         // Unrecognized cluster ID, error status will apply.
-        chip::app::CommandPathParams returnStatusParam = { aEndPointId,
-                                                           0, // GroupId
-                                                           aClusterId, aCommandId,
-                                                           (chip::app::CommandPathFlags::kEndpointIdValid) };
+        CommandPathParams returnStatusParam = { aEndPointId,
+                                                0, // GroupId
+                                                aClusterId, aCommandId, (CommandPathFlags::kEndpointIdValid) };
         apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
                                     Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aClusterId));

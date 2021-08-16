@@ -53,24 +53,24 @@ CHIP_ERROR FabricInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
     StorableFabricInfo * info = chip::Platform::New<StorableFabricInfo>();
     ReturnErrorCodeIf(info == nullptr, CHIP_ERROR_NO_MEMORY);
 
-    info->mNodeId   = Encoding::LittleEndian::HostSwap64(mNodeId);
+    info->mNodeId   = Encoding::LittleEndian::HostSwap64(mOperationalId.GetNodeId());
     info->mFabric   = Encoding::LittleEndian::HostSwap16(mFabric);
-    info->mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
+    info->mFabricId = Encoding::LittleEndian::HostSwap64(mOperationalId.GetFabricId());
     info->mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
 
     size_t stringLength = strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes);
     memcpy(info->mFabricLabel, mFabricLabel, stringLength);
     info->mFabricLabel[stringLength] = '\0'; // Set null terminator
 
-    if (mOperationalKey != nullptr)
+    if (mEphemeralKey != nullptr)
     {
-        SuccessOrExit(err = mOperationalKey->Serialize(info->mOperationalKey));
+        SuccessOrExit(err = mEphemeralKey->Serialize(info->mEphemeralKey));
     }
     else
     {
         P256Keypair keypair;
         SuccessOrExit(err = keypair.Initialize());
-        SuccessOrExit(err = keypair.Serialize(info->mOperationalKey));
+        SuccessOrExit(err = keypair.Serialize(info->mEphemeralKey));
     }
 
     if (mRootCert == nullptr || mRootCertLen == 0)
@@ -134,9 +134,9 @@ CHIP_ERROR FabricInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
 
     SuccessOrExit(err = kvs->SyncGetKeyValue(key, info, infoSize));
 
-    mNodeId     = Encoding::LittleEndian::HostSwap64(info->mNodeId);
+    mOperationalId.SetNodeId(Encoding::LittleEndian::HostSwap64(info->mNodeId));
+    mOperationalId.SetFabricId(Encoding::LittleEndian::HostSwap64(info->mFabricId));
     id          = Encoding::LittleEndian::HostSwap16(info->mFabric);
-    mFabricId   = Encoding::LittleEndian::HostSwap64(info->mFabricId);
     mVendorId   = Encoding::LittleEndian::HostSwap16(info->mVendorId);
     rootCertLen = Encoding::LittleEndian::HostSwap16(info->mRootCertLen);
     icaCertLen  = Encoding::LittleEndian::HostSwap16(info->mICACertLen);
@@ -148,29 +148,29 @@ CHIP_ERROR FabricInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
 
     VerifyOrExit(mFabric == id, err = CHIP_ERROR_INCORRECT_STATE);
 
-    if (mOperationalKey == nullptr)
+    if (mEphemeralKey == nullptr)
     {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
-        mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-        mOperationalKey->SetKeyId(CASE_OPS_KEY);
+        mEphemeralKey = chip::Platform::New<P256KeypairHSM>();
+        mEphemeralKey->SetKeyId(CASE_OPS_KEY);
 #else
-        mOperationalKey = chip::Platform::New<P256Keypair>();
+        mEphemeralKey = chip::Platform::New<P256Keypair>();
 #endif
     }
-    VerifyOrExit(mOperationalKey != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    SuccessOrExit(err = mOperationalKey->Deserialize(info->mOperationalKey));
+    VerifyOrExit(mEphemeralKey != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    SuccessOrExit(err = mEphemeralKey->Deserialize(info->mEphemeralKey));
 
     ChipLogProgress(Inet, "Loading certs from KVS");
-    SuccessOrExit(SetRootCert(ByteSpan(info->mRootCert, rootCertLen)));
-    SuccessOrExit(SetICACert(ByteSpan(info->mICACert, icaCertLen)));
-    SuccessOrExit(SetNOCCert(ByteSpan(info->mNOCCert, nocCertLen)));
+    SuccessOrExit(err = SetRootCert(ByteSpan(info->mRootCert, rootCertLen)));
+    SuccessOrExit(err = SetICACert(ByteSpan(info->mICACert, icaCertLen)));
+    SuccessOrExit(err = SetNOCCert(ByteSpan(info->mNOCCert, nocCertLen)));
 
 exit:
     if (info != nullptr)
     {
         chip::Platform::Delete(info);
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR FabricInfo::DeleteFromKVS(PersistentStorageDelegate * kvs, FabricIndex id)
@@ -202,21 +202,21 @@ CHIP_ERROR FabricInfo::GenerateKey(FabricIndex id, char * key, size_t len)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricInfo::SetOperationalKey(const P256Keypair & key)
+CHIP_ERROR FabricInfo::SetEphemeralKey(const P256Keypair * key)
 {
     P256SerializedKeypair serialized;
-    ReturnErrorOnFailure(key.Serialize(serialized));
-    if (mOperationalKey == nullptr)
+    ReturnErrorOnFailure(key->Serialize(serialized));
+    if (mEphemeralKey == nullptr)
     {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
-        mOperationalKey = chip::Platform::New<P256KeypairHSM>();
-        mOperationalKey->SetKeyId(CASE_OPS_KEY);
+        mEphemeralKey = chip::Platform::New<P256KeypairHSM>();
+        mEphemeralKey->SetKeyId(CASE_OPS_KEY);
 #else
-        mOperationalKey = chip::Platform::New<P256Keypair>();
+        mEphemeralKey = chip::Platform::New<P256Keypair>();
 #endif
     }
-    VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
-    return mOperationalKey->Deserialize(serialized);
+    VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_NO_MEMORY);
+    return mEphemeralKey->Deserialize(serialized);
 }
 
 void FabricInfo::ReleaseRootCert()
@@ -317,6 +317,8 @@ CHIP_ERROR FabricInfo::SetNOCCert(const ByteSpan & cert)
         ReleaseNOCCert();
     }
 
+    ReturnErrorOnFailure(ExtractPeerIdFromOpCert(cert, &mOperationalId));
+
     VerifyOrReturnError(CanCastTo<uint16_t>(cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
     if (mNOCCert == nullptr)
     {
@@ -379,36 +381,9 @@ CHIP_ERROR FabricInfo::GetCredentials(OperationalCredentialSet & credentials, Ch
     rootKeyId = credentials.GetTrustedRootId(0);
 
     ReturnErrorOnFailure(credentials.SetDevOpCred(rootKeyId, mNOCCert, mNOCCertLen));
-    ReturnErrorOnFailure(credentials.SetDevOpCredKeypair(rootKeyId, mOperationalKey));
+    ReturnErrorOnFailure(credentials.SetDevOpCredKeypair(rootKeyId, mEphemeralKey));
 
     return CHIP_NO_ERROR;
-}
-
-FabricInfo * FabricTable::AssignFabricIndex(FabricIndex fabricIndex)
-{
-    for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
-    {
-        if (!mStates[i].IsInitialized())
-        {
-            mStates[i].SetFabricIndex(fabricIndex);
-
-            return &mStates[i];
-        }
-    }
-
-    return nullptr;
-}
-
-FabricInfo * FabricTable::AssignFabricIndex(FabricIndex fabricIndex, NodeId nodeId)
-{
-    FabricInfo * fabric = AssignFabricIndex(fabricIndex);
-
-    if (fabric != nullptr)
-    {
-        fabric->SetNodeId(nodeId);
-    }
-
-    return fabric;
 }
 
 void FabricTable::ReleaseFabricIndex(FabricIndex fabricIndex)
@@ -422,39 +397,9 @@ void FabricTable::ReleaseFabricIndex(FabricIndex fabricIndex)
 
 FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex)
 {
-    for (auto & state : mStates)
+    if (fabricIndex >= kMinValidFabricIndex && fabricIndex <= kMaxValidFabricIndex)
     {
-        if (state.IsInitialized() && state.GetFabricIndex() == fabricIndex)
-        {
-            return &state;
-        }
-    }
-
-    return nullptr;
-}
-
-FabricInfo * FabricTable::FindFabricForNode(FabricId fabricId, NodeId nodeId, uint16_t vendorId)
-{
-    uint32_t index = 0;
-    for (auto & state : mStates)
-    {
-        if (state.IsInitialized())
-        {
-            ChipLogProgress(Discovery,
-                            "Checking ind:%" PRIu32 " [fabricId 0x" ChipLogFormatX64 " nodeId 0x" ChipLogFormatX64
-                            " vendorId %" PRIu16 "] vs"
-                            " [fabricId 0x" ChipLogFormatX64 " nodeId 0x" ChipLogFormatX64 " vendorId %d]",
-                            index, ChipLogValueX64(state.GetFabricId()), ChipLogValueX64(state.GetNodeId()), state.GetVendorId(),
-                            ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
-        }
-        if (state.IsInitialized() && state.GetFabricId() == fabricId &&
-            (nodeId == kUndefinedNodeId || state.GetNodeId() == nodeId) &&
-            (vendorId == kUndefinedVendorId || state.GetVendorId() == vendorId))
-        {
-            ChipLogProgress(Discovery, "Found a match!");
-            return &state;
-        }
-        index++;
+        return &mStates[fabricIndex - kMinValidFabricIndex];
     }
 
     return nullptr;
@@ -462,9 +407,17 @@ FabricInfo * FabricTable::FindFabricForNode(FabricId fabricId, NodeId nodeId, ui
 
 void FabricTable::Reset()
 {
-    for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
+    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
+    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
     {
-        mStates[i].Reset();
+        FabricInfo * fabric = FindFabricWithIndex(i);
+
+        if (fabric != nullptr)
+        {
+            fabric->Reset();
+
+            fabric->mFabric = i;
+        }
     }
 }
 
@@ -496,13 +449,15 @@ CHIP_ERROR FabricTable::LoadFromStorage(FabricIndex id)
     VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     fabric = FindFabricWithIndex(id);
-    if (fabric == nullptr)
-    {
-        fabric          = AssignFabricIndex(id);
-        didCreateFabric = true;
-    }
     VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    err = fabric->FetchFromKVS(mStorage);
+
+    if (!fabric->IsInitialized())
+    {
+        didCreateFabric = true;
+
+        err = fabric->FetchFromKVS(mStorage);
+        SuccessOrExit(err);
+    }
 
 exit:
     if (err != CHIP_NO_ERROR && didCreateFabric)
@@ -515,6 +470,56 @@ exit:
         mDelegate->OnFabricRetrievedFromStorage(fabric);
     }
     return err;
+}
+
+CHIP_ERROR FabricTable::SetFabricInfoIfIndexAvailable(FabricIndex index, FabricInfo & newFabric)
+{
+    FabricInfo * fabric = FindFabricWithIndex(index);
+
+    if (fabric != nullptr && !fabric->IsInitialized())
+    {
+        fabric->SetEphemeralKey(newFabric.GetEphemeralKey());
+        fabric->SetRootCert(ByteSpan(newFabric.mRootCert, newFabric.mRootCertLen));
+        fabric->SetICACert(ByteSpan(newFabric.mICACert, newFabric.mICACertLen));
+        fabric->SetNOCCert(ByteSpan(newFabric.mNOCCert, newFabric.mNOCCertLen));
+        fabric->SetOperationalId(newFabric.mOperationalId);
+        fabric->SetVendorId(newFabric.GetVendorId());
+        fabric->SetFabricLabel(newFabric.GetFabricLabel());
+        ChipLogProgress(Discovery, "Added new fabric at index: %d, Initialized: %d", fabric->GetFabricIndex(),
+                        fabric->IsInitialized());
+        ChipLogProgress(Discovery, "Assigned fabric ID: 0x" ChipLogFormatX64 ", node ID: 0x" ChipLogFormatX64,
+                        ChipLogValueX64(fabric->mOperationalId.GetFabricId()), ChipLogValueX64(fabric->mOperationalId.GetNodeId()));
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+CHIP_ERROR FabricTable::AddNewFabric(FabricInfo & newFabric, FabricIndex * outputIndex)
+{
+    VerifyOrReturnError(outputIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
+    for (FabricIndex i = mNextAvailableFabricIndex; i <= kMaxValidFabricIndex; i++)
+    {
+        if (CHIP_NO_ERROR == SetFabricInfoIfIndexAvailable(i, newFabric))
+        {
+            mNextAvailableFabricIndex = static_cast<FabricIndex>((i + 1) % UINT8_MAX);
+            *outputIndex              = i;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    for (FabricIndex i = kMinValidFabricIndex; i < kMaxValidFabricIndex; i++)
+    {
+        if (CHIP_NO_ERROR == SetFabricInfoIfIndexAvailable(i, newFabric))
+        {
+            mNextAvailableFabricIndex = static_cast<FabricIndex>((i + 1) % UINT8_MAX);
+            *outputIndex              = i;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_NO_MEMORY;
 }
 
 CHIP_ERROR FabricTable::Delete(FabricIndex id)
@@ -539,6 +544,15 @@ exit:
         }
     }
     return CHIP_NO_ERROR;
+}
+
+void FabricTable::DeleteAllFabrics()
+{
+    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
+    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
+    {
+        Delete(i);
+    }
 }
 
 CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)

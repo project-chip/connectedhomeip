@@ -32,6 +32,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
+#include <support/UnitTestUtils.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -98,7 +99,7 @@ static bool sleepRan;
 
 static void SleepSome(intptr_t)
 {
-    usleep(static_cast<useconds_t>(1 * 1000 * 1000));
+    chip::test_utils::SleepMillis(1000);
     sleepRan = true;
 }
 

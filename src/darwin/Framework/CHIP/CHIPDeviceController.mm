@@ -125,7 +125,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     return YES;
 }
 
-- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate vendorId:(uint16_t)vendorId
 {
     chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
@@ -173,7 +173,33 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         params.operationalCredentialsDelegate = _operationalCredentialsDelegate;
 
-        errorCode = _cppCommissioner->Init(_localDeviceId, params);
+        chip::Crypto::P256Keypair ephemeralKey;
+        errorCode = ephemeralKey.Initialize();
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+            return;
+        }
+
+        NSMutableData * nocBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
+        chip::MutableByteSpan noc((uint8_t *) [nocBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
+
+        NSMutableData * rcacBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
+        chip::MutableByteSpan rcac((uint8_t *) [rcacBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
+
+        chip::MutableByteSpan icac;
+
+        errorCode = _operationalCredentialsDelegate->GenerateNOCChainAfterValidation(
+            _localDeviceId, 0, ephemeralKey.Pubkey(), rcac, icac, noc);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+            return;
+        }
+
+        params.ephemeralKeypair = &ephemeralKey;
+        params.controllerRCAC = rcac;
+        params.controllerICAC = icac;
+        params.controllerNOC = noc;
+        params.controllerVendorId = vendorId;
+
+        errorCode = _cppCommissioner->Init(params);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return;
         }

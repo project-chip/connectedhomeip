@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -19,27 +19,21 @@
 
 /**
  *    @file
- *          Provides implementations of the CHIP System Layer platform
- *          timer functions that are suitable for use on all platforms.
+ *          Platform-specific configuration overrides for the Chip
+ *          Addressing and Routing Module (WARM) on the PSoC6 platform.
+ *
  */
-/* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/PlatformManager.h>
+#pragma once
 
-namespace chip {
-namespace System {
-namespace Platform {
-namespace Eventing {
+// ==================== Platform Adaptations ====================
 
-using namespace ::chip::DeviceLayer;
+#define WARM_CONFIG_SUPPORT_THREAD 0
+#define WARM_CONFIG_SUPPORT_THREAD_ROUTING 0
+#define WARM_CONFIG_SUPPORT_LEGACY6LOWPAN_NETWORK 0
+#define WARM_CONFIG_SUPPORT_WIFI 1
+#define WARM_CONFIG_SUPPORT_CELLULAR 0
 
-CHIP_ERROR StartTimer(System::Layer & aLayer, uint32_t aMilliseconds)
-{
-    return PlatformMgr().StartChipTimer(aMilliseconds);
-}
+// ========== Platform-specific Configuration Overrides =========
 
-} // namespace Eventing
-} // namespace Platform
-} // namespace System
-} // namespace chip
+/* none so far */

@@ -73,7 +73,7 @@ uint64_t gEchoRespCount = 0;
 bool gUseTCP = false;
 
 CHIP_ERROR SendEchoRequest();
-void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error);
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState);
 
 void Shutdown()
 {
@@ -82,7 +82,7 @@ void Shutdown()
     ShutdownChip();
 }
 
-void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     if (gEchoRespCount != gEchoCount)
     {
@@ -201,7 +201,6 @@ int main(int argc, char * argv[])
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     chip::Transport::FabricTable fabrics;
-    chip::Transport::FabricInfo * fabricInfo = nullptr;
 
     if (argc <= 1)
     {
@@ -227,9 +226,6 @@ int main(int argc, char * argv[])
     }
 
     InitializeChip();
-
-    fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, chip::kTestControllerNodeId);
-    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     if (gUseTCP)
     {

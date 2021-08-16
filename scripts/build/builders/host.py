@@ -19,46 +19,50 @@ from enum import Enum, auto
 
 from .gn import GnBuilder
 
+
 class HostApp(Enum):
-  ALL_CLUSTERS = auto()
-  CHIP_TOOL = auto()
+    ALL_CLUSTERS = auto()
+    CHIP_TOOL = auto()
 
-  def ExamplePath(self):
-    if self == HostApp.ALL_CLUSTERS:
-      return 'all-clusters-app/linux'
-    elif self == HostApp.CHIP_TOOL:
-      return 'chip-tool'
-    else:
-      raise Exception('Unknown app type: %r' % self)
+    def ExamplePath(self):
+        if self == HostApp.ALL_CLUSTERS:
+            return 'all-clusters-app/linux'
+        elif self == HostApp.CHIP_TOOL:
+            return 'chip-tool'
+        else:
+            raise Exception('Unknown app type: %r' % self)
 
-  def BinaryName(self):
-    if self == HostApp.ALL_CLUSTERS:
-      return 'chip-all-clusters-app'
-    elif self == HostApp.CHIP_TOOL:
-      return 'chip-tool'
-    else:
-      raise Exception('Unknown app type: %r' % self)
+    def BinaryName(self):
+        if self == HostApp.ALL_CLUSTERS:
+            return 'chip-all-clusters-app'
+        elif self == HostApp.CHIP_TOOL:
+            return 'chip-tool'
+        else:
+            raise Exception('Unknown app type: %r' % self)
+
 
 def ConcretePlatformName():
     uname_result = uname()
     return '-'.join([uname_result.system.lower(), release(), uname_result.machine])
 
+
 class HostBuilder(GnBuilder):
 
-  def __init__(self, root, runner, output_prefix: str, app: HostApp):
-    super(HostBuilder, self).__init__(
-        root=os.path.join(root, 'examples', app.ExamplePath()),
-        runner=runner,
-        output_prefix=output_prefix)
+    def __init__(self, root, runner, output_prefix: str, app: HostApp):
+        super(HostBuilder, self).__init__(
+            root=os.path.join(root, 'examples', app.ExamplePath()),
+            runner=runner,
+            output_prefix=output_prefix)
 
-    self.app_name = app.BinaryName()
-    self.map_name = self.app_name + '.map'
+        self.app_name = app.BinaryName()
+        self.map_name = self.app_name + '.map'
 
-  def outputs(self):
-    return {
-        self.app_name: os.path.join(self.output_dir, self.app_name),
-        self.map_name : os.path.join(self.output_dir, self.map_name)
-    }
+    def build_outputs(self):
+        return {
+            self.app_name: os.path.join(self.output_dir, self.app_name),
+            self.map_name: os.path.join(self.output_dir, self.map_name)
+        }
 
-  def SetIdentifier(self, platform: str, board: str, app: str):
-    super(HostBuilder, self).SetIdentifier(ConcretePlatformName(), board, app)
+    def SetIdentifier(self, platform: str, board: str, app: str):
+        super(HostBuilder, self).SetIdentifier(
+            ConcretePlatformName(), board, app)

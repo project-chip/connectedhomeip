@@ -309,11 +309,6 @@ bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHea
         // AND The message was received from the peer node associated with the exchange
         && (mSecureSession == session)
 
-        // AND The message's source Node ID matches the peer Node ID associated with the exchange, or the peer Node ID of the
-        // exchange is 'any'.
-        && ((mSecureSession.GetPeerNodeId() == kPlaceholderNodeId) ||
-            (packetHeader.GetSourceNodeId().HasValue() && mSecureSession.GetPeerNodeId() == packetHeader.GetSourceNodeId().Value()))
-
         // AND The message was sent by an initiator and the exchange context is a responder (IsInitiator==false)
         //    OR The message was sent by a responder and the exchange context is an initiator (IsInitiator==true) (for the broadcast
         //    case, the initiator is ill defined)
@@ -366,7 +361,7 @@ void ExchangeContext::CancelResponseTimer()
     lSystemLayer->CancelTimer(HandleResponseTimeout, this);
 }
 
-void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState)
 {
     ExchangeContext * ec = reinterpret_cast<ExchangeContext *>(aAppState);
 

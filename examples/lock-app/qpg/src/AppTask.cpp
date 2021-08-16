@@ -244,7 +244,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     }
 }
 
-void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
+void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
@@ -342,7 +342,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
                 if (!ConnectivityMgr().IsThreadProvisioned())
                 {
                     // Enable BLE advertisements and pairing window
-                    if (OpenDefaultPairingWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
+                    if (OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
                     {
                         ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
                     }

@@ -18,7 +18,6 @@
 #include <app/server/RendezvousServer.h>
 
 #include <app/server/Mdns.h>
-#include <app/server/StorablePeerConnection.h>
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
@@ -58,7 +57,6 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
         }
         // reset all advertising
         app::Mdns::StartServer(app::Mdns::CommissioningMode::kDisabled);
-        // TODO: Commissioning complete means we can finalize the fabric in our storage
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
@@ -69,13 +67,11 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
 
 CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params, uint32_t pbkdf2IterCount, const ByteSpan & salt,
                                             uint16_t passcodeID, Messaging::ExchangeManager * exchangeManager,
-                                            TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
-                                            Transport::FabricInfo * fabric)
+                                            TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr)
 {
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sessionMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.HasSetupPINCode() || params.HasPASEVerifier(), CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -91,6 +87,7 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
     }
 #endif
 
+    ChipLogProgress(Discovery, "WaitForPairing(): HasAdvertisementDelegate %d", HasAdvertisementDelegate());
     if (HasAdvertisementDelegate())
     {
         ReturnErrorOnFailure(GetAdvertisementDelegate()->StartAdvertisement());
@@ -102,7 +99,6 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
     app::Mdns::StartServer(app::Mdns::CommissioningMode::kEnabledAsAdditionalCommissioning);
 
     mSessionMgr      = sessionMgr;
-    mFabric          = fabric;
     mExchangeManager = exchangeManager;
 
     ReturnErrorOnFailure(mExchangeManager->RegisterUnsolicitedMessageHandlerForType(
@@ -155,10 +151,9 @@ void RendezvousServer::OnSessionEstablishmentError(CHIP_ERROR err)
 
 void RendezvousServer::OnSessionEstablished()
 {
-    CHIP_ERROR err =
-        mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-                                mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession,
-                                SecureSession::SessionRole::kResponder, mFabric->GetFabricIndex());
+    CHIP_ERROR err = mSessionMgr->NewPairing(
+        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
+        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kResponder, 0);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -187,19 +182,5 @@ void RendezvousServer::OnSessionEstablished()
     }
 
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
-    StorablePeerConnection connection(mPairingSession, mFabric->GetFabricIndex());
-
-    VerifyOrReturn(mStorage != nullptr,
-                   ChipLogError(AppServer, "Storage delegate is not available. Cannot store the connection state"));
-    VerifyOrReturn(connection.StoreIntoKVS(*mStorage) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to store the connection state"));
-
-    // The Peek() is used to find the smallest key ID that's not been assigned to any session.
-    // This value is persisted, and on reboot, it is used to revive any previously
-    // active secure sessions.
-    // We support one active PASE session at any time. So the key ID should not be updated
-    // in another thread, while we retrieve it here.
-    uint16_t keyID = mIDAllocator->Peek();
-    mStorage->SyncSetKeyValue(kStorablePeerConnectionCountKey, &keyID, sizeof(keyID));
 }
 } // namespace chip

@@ -91,6 +91,17 @@ struct ControllerInitParams
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
+
+    /* The following keypair must correspond to the public key used for generating
+       controllerNOC. It's used by controller to establish CASE sessions with devices */
+    Crypto::P256Keypair * ephemeralKeypair = nullptr;
+
+    /* The following certificates must be in x509 DER format */
+    ByteSpan controllerNOC;
+    ByteSpan controllerICAC;
+    ByteSpan controllerRCAC;
+
+    uint16_t controllerVendorId;
 };
 
 enum CommissioningStage : uint8_t
@@ -210,7 +221,7 @@ public:
     DeviceController();
     virtual ~DeviceController() {}
 
-    CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
+    CHIP_ERROR Init(ControllerInitParams params);
 
     /**
      * @brief
@@ -345,7 +356,7 @@ protected:
 
     void PersistNextKeyId();
 
-    FabricIndex mFabricIndex = 0;
+    FabricIndex mFabricIndex = 1;
     Transport::FabricTable mFabrics;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
@@ -356,6 +367,8 @@ protected:
     uint8_t mCredentialsIndex;
 
     SessionIDAllocator mIDAllocator;
+
+    uint16_t mVendorId;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     //////////// ResolverDelegate Implementation ///////////////
@@ -376,11 +389,7 @@ private:
 
     void ReleaseAllDevices();
 
-    CHIP_ERROR LoadLocalCredentials(Transport::FabricInfo * fabric);
-
-    static void OnLocalNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                          const ByteSpan & rcac);
-    Callback::Callback<OnNOCChainGeneration> mLocalNOCChainCallback;
+    CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
 };
 
 /**
@@ -432,7 +441,7 @@ public:
     /**
      * Commissioner-specific initialization, includes parameters such as the pairing delegate.
      */
-    CHIP_ERROR Init(NodeId localDeviceId, CommissionerInitParams params);
+    CHIP_ERROR Init(CommissionerInitParams params);
 
     /**
      * @brief
@@ -620,7 +629,7 @@ private:
 
     void OnSessionEstablishmentTimeout();
 
-    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, CHIP_ERROR aError);
+    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
     /* This function sends an OpCSR request to the device.
        The function does not hold a refernce to the device object.

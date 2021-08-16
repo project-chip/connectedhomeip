@@ -52,7 +52,7 @@ void InitServer(AppDelegate * delegate = nullptr);
 CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-CHIP_ERROR AddTestPairing();
+CHIP_ERROR AddTestCommissioning();
 
 chip::Transport::FabricTable & GetGlobalFabricTable();
 
@@ -77,12 +77,13 @@ constexpr uint16_t kNoCommissioningTimeout = UINT16_MAX;
 /**
  * Open the pairing window using default configured parameters.
  */
-CHIP_ERROR OpenDefaultPairingWindow(chip::ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds = kNoCommissioningTimeout,
-                                    chip::PairingWindowAdvertisement advertisementMode = chip::PairingWindowAdvertisement::kBle);
+CHIP_ERROR
+OpenBasicCommissioningWindow(chip::ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds = kNoCommissioningTimeout,
+                             chip::PairingWindowAdvertisement advertisementMode = chip::PairingWindowAdvertisement::kBle);
 
-CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                          chip::PASEVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
-                                          uint16_t passcodeID);
+CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
+                                           chip::PASEVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
+                                           uint16_t passcodeID);
 
 void ClosePairingWindow();
 

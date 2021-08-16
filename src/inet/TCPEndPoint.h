@@ -612,7 +612,7 @@ private:
 
     bool mUserTimeoutTimerRunning; // Indicates whether the TCP UserTimeout timer has been started.
 
-    static void TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
+    static void TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState);
 
     void StartTCPUserTimeoutTimer();
 
@@ -649,7 +649,7 @@ private:
     CHIP_ERROR DoClose(CHIP_ERROR err, bool suppressCallback);
     static bool IsConnected(int state);
 
-    static void TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
+    static void TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState);
 
     void StartConnectTimerIfSet();
     void StopConnectTimer();

@@ -674,7 +674,12 @@ static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHa
 
     lAddressType = aPacketInfo->DestAddress.Type();
 
-    if (lAddressType == kIPAddressType_IPv4)
+    if (lAddressType == kIPAddressType_IPv6)
+    {
+        lStatus = Common::HandleICMPv6DataReceived(std::move(aBuffer), sTestState.mStats, !lStatsByPacket, lCheckBuffer);
+    }
+#if INET_CONFIG_ENABLE_IPV4
+    else if (lAddressType == kIPAddressType_IPv4)
     {
         const uint16_t kIPv4HeaderSize = 20;
 
@@ -682,10 +687,7 @@ static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHa
 
         lStatus = Common::HandleICMPv4DataReceived(std::move(aBuffer), sTestState.mStats, !lStatsByPacket, lCheckBuffer);
     }
-    else if (lAddressType == kIPAddressType_IPv6)
-    {
-        lStatus = Common::HandleICMPv6DataReceived(std::move(aBuffer), sTestState.mStats, !lStatsByPacket, lCheckBuffer);
-    }
+#endif // INET_CONFIG_ENABLE_IPV4
     else
     {
         lStatus = false;

@@ -45,12 +45,14 @@
 #include <app/common/gen/af-structs.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/attribute-type.h>
+#include <app/common/gen/attributes/Accessors.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
+using namespace app::Clusters::ColorControl;
 
 #define COLOR_TEMP_CONTROL emberAfPluginColorControlServerTempTransitionEventControl
 #define COLOR_XY_CONTROL emberAfPluginColorControlServerXyTransitionEventControl
@@ -1498,12 +1500,159 @@ bool emberAfColorControlClusterStopMoveStepCallback(EndpointId aEndpoint, app::C
     return true;
 }
 
-bool emberAfColorControlClusterColorLoopSetCallback(EndpointId endpoint, app::CommandHandler * commandObj, uint8_t updateFlags,
-                                                    uint8_t action, uint8_t direction, uint16_t time, uint16_t startHue,
-                                                    uint8_t optionsMask, uint8_t optionsOverride)
+static void startColorLoop(EndpointId endpoint, uint8_t startFromStartHue)
 {
-    // TODO IMPLEMENT LOGIC
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUP_COMMAND);
+    uint8_t direction = 0;
+    Attributes::GetColorLoopDirection(endpoint, &direction);
+
+    uint16_t time = 0x0019;
+    Attributes::GetColorLoopTime(endpoint, &time);
+
+    uint16_t currentHue = 0;
+    Attributes::GetEnhancedCurrentHue(endpoint, &currentHue);
+
+    u_int16_t startHue = 0x2300;
+    if (startFromStartHue)
+    {
+        Attributes::GetColorLoopStartEnhancedHue(endpoint, &startHue);
+    }
+    else
+    {
+        startHue = currentHue;
+    }
+
+    Attributes::SetColorLoopStoredEnhancedHue(endpoint, currentHue);
+    Attributes::SetColorLoopActive(endpoint, true);
+
+    initHueSat(endpoint);
+
+    colorHueTransitionState.isEnhancedHue = true;
+
+    colorHueTransitionState.initialEnhancedHue = startHue;
+    colorHueTransitionState.currentEnhancedHue = currentHue;
+
+    if (direction)
+    {
+        colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(startHue - 1);
+    }
+    else
+    {
+        colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(startHue + 1);
+    }
+
+    colorHueTransitionState.up     = direction;
+    colorHueTransitionState.repeat = true;
+
+    colorHueTransitionState.stepsRemaining = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
+    colorHueTransitionState.stepsTotal     = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
+    colorHueTransitionState.endpoint       = endpoint;
+
+    writeRemainingTime(endpoint, MAX_INT16U_VALUE);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+}
+
+bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, chip::app::CommandHandler * commandObj,
+                                                    uint8_t updateFlags, uint8_t action, uint8_t direction, uint16_t time,
+                                                    uint16_t startHue, uint8_t optionsMask, uint8_t optionsOverride)
+{
+    EndpointId endpoint = emberAfCurrentEndpoint();
+
+    if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        return true;
+    }
+
+    uint8_t isColorLoopActive = 0;
+    Attributes::GetColorLoopActive(endpoint, &isColorLoopActive);
+
+    uint8_t deactiveColorLoop =
+        (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_ACTION) && (action == EMBER_ZCL_COLOR_LOOP_ACTION_DEACTIVATE);
+
+    if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_DIRECTION)
+    {
+        Attributes::SetColorLoopDirection(endpoint, direction);
+
+        // Checks if color loop is active and stays active
+        if (isColorLoopActive && !deactiveColorLoop)
+        {
+            colorHueTransitionState.up                 = direction;
+            colorHueTransitionState.initialEnhancedHue = colorHueTransitionState.currentEnhancedHue;
+
+            if (direction)
+            {
+                colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState.initialEnhancedHue - 1);
+            }
+            else
+            {
+                colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState.initialEnhancedHue + 1);
+            }
+            colorHueTransitionState.stepsRemaining = colorHueTransitionState.stepsTotal;
+        }
+    }
+
+    if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_TIME)
+    {
+        Attributes::SetColorLoopTime(endpoint, time);
+
+        // Checks if color loop is active and stays active
+        if (isColorLoopActive && !deactiveColorLoop)
+        {
+            colorHueTransitionState.stepsTotal         = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
+            colorHueTransitionState.initialEnhancedHue = colorHueTransitionState.currentEnhancedHue;
+
+            if (colorHueTransitionState.up)
+            {
+                colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState.initialEnhancedHue - 1);
+            }
+            else
+            {
+                colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState.initialEnhancedHue + 1);
+            }
+            colorHueTransitionState.stepsRemaining = colorHueTransitionState.stepsTotal;
+        }
+    }
+
+    if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_START_HUE)
+    {
+        Attributes::SetColorLoopStartEnhancedHue(endpoint, startHue);
+    }
+
+    if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_ACTION)
+    {
+        if (action == EMBER_ZCL_COLOR_LOOP_ACTION_DEACTIVATE)
+        {
+            if (isColorLoopActive)
+            {
+                stopAllColorTransitions();
+
+                Attributes::SetColorLoopActive(endpoint, false);
+
+                uint16_t storedEnhancedHue = 0;
+                Attributes::GetColorLoopStoredEnhancedHue(endpoint, &storedEnhancedHue);
+                Attributes::SetEnhancedCurrentHue(endpoint, storedEnhancedHue);
+            }
+            else
+            {
+                // Do Nothing since it's not on
+            }
+        }
+        else if (action == EMBER_ZCL_COLOR_LOOP_ACTION_ACTIVATE_FROM_COLOR_LOOP_START_ENHANCED_HUE)
+        {
+            startColorLoop(endpoint, true);
+        }
+        else if (action == EMBER_ZCL_COLOR_LOOP_ACTION_ACTIVATE_FROM_ENHANCED_CURRENT_HUE)
+        {
+            startColorLoop(endpoint, false);
+        }
+        else
+        {
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+            return true;
+        }
+    }
+
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
@@ -1611,7 +1760,7 @@ static uint8_t addHue(uint8_t hue1, uint8_t hue2)
 
     if (hue16 > MAX_HUE_VALUE)
     {
-        hue16 = static_cast<uint16_t>(hue16 - MAX_HUE_VALUE);
+        hue16 = static_cast<uint16_t>(hue16 - MAX_HUE_VALUE - 1);
     }
 
     return ((uint8_t) hue16);
@@ -1624,7 +1773,7 @@ static uint8_t subtractHue(uint8_t hue1, uint8_t hue2)
     hue16 = ((uint16_t) hue1);
     if (hue2 > hue1)
     {
-        hue16 = static_cast<uint16_t>(hue16 + MAX_HUE_VALUE);
+        hue16 = static_cast<uint16_t>(hue16 + MAX_HUE_VALUE + 1);
     }
 
     hue16 = static_cast<uint16_t>(hue16 - static_cast<uint16_t>(hue2));
@@ -1697,47 +1846,59 @@ static bool computeNewHueValue(ColorHueTransitionState * p)
         }
         else
         {
-            // we are performing a Hue move.  Need to compute the new values for the
-            // next move period.
-            if (p->up)
+            // Check if we are in a color loop. If not, we are in a moveHue
+            uint8_t isColorLoop = 0;
+            Attributes::GetColorLoopActive(p->endpoint, &isColorLoop);
+
+            if (isColorLoop)
             {
-                if (p->isEnhancedHue)
-                {
-                    newHue = subtractEnhancedHue(p->finalEnhancedHue, p->initialEnhancedHue);
-                    newHue = addEnhancedHue(p->finalEnhancedHue, newHue);
-
-                    p->initialEnhancedHue = p->finalEnhancedHue;
-                    p->finalEnhancedHue   = newHue;
-                }
-                else
-                {
-                    newHue = subtractHue(p->finalHue, p->initialHue);
-                    newHue = addHue(p->finalHue, static_cast<uint8_t>(newHue));
-
-                    p->initialHue = p->finalHue;
-                    p->finalHue   = static_cast<uint8_t>(newHue);
-                }
+                p->currentEnhancedHue = p->initialEnhancedHue;
             }
             else
             {
-                if (p->isEnhancedHue)
+                // we are performing a Hue move.  Need to compute the new values for the
+                // next move period.
+                if (p->up)
                 {
-                    newHue = subtractEnhancedHue(p->finalEnhancedHue, p->initialEnhancedHue);
-                    newHue = subtractEnhancedHue(p->finalEnhancedHue, newHue);
+                    if (p->isEnhancedHue)
+                    {
+                        newHue = subtractEnhancedHue(p->finalEnhancedHue, p->initialEnhancedHue);
+                        newHue = addEnhancedHue(p->finalEnhancedHue, newHue);
 
-                    p->initialEnhancedHue = p->finalEnhancedHue;
-                    p->finalEnhancedHue   = newHue;
+                        p->initialEnhancedHue = p->finalEnhancedHue;
+                        p->finalEnhancedHue   = newHue;
+                    }
+                    else
+                    {
+                        newHue = subtractHue(p->finalHue, p->initialHue);
+                        newHue = addHue(p->finalHue, static_cast<uint8_t>(newHue));
+
+                        p->initialHue = p->finalHue;
+                        p->finalHue   = static_cast<uint8_t>(newHue);
+                    }
                 }
                 else
                 {
-                    newHue = subtractHue(p->initialHue, p->finalHue);
-                    newHue = subtractHue(p->finalHue, static_cast<uint8_t>(newHue));
+                    if (p->isEnhancedHue)
+                    {
+                        newHue = subtractEnhancedHue(p->initialEnhancedHue, p->finalEnhancedHue);
+                        newHue = subtractEnhancedHue(p->finalEnhancedHue, newHue);
 
-                    p->initialHue = p->finalHue;
-                    p->finalHue   = static_cast<uint8_t>(newHue);
+                        p->initialEnhancedHue = p->finalEnhancedHue;
+                        p->finalEnhancedHue   = newHue;
+                    }
+                    else
+                    {
+                        newHue = subtractHue(p->initialHue, p->finalHue);
+                        newHue = subtractHue(p->finalHue, static_cast<uint8_t>(newHue));
+
+                        p->initialHue = p->finalHue;
+                        p->finalHue   = static_cast<uint8_t>(newHue);
+                    }
                 }
             }
-            p->stepsRemaining = TRANSITION_TIME_1S;
+
+            p->stepsRemaining = p->stepsTotal;
         }
     }
     return false;

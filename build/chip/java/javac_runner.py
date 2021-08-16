@@ -28,93 +28,93 @@ EXIT_FAILURE = 1
 
 
 def IsExecutable(path):
-  """Returns whether file at |path| exists and is executable.
+    """Returns whether file at |path| exists and is executable.
 
-  Args:
-    path: absolute or relative path to test.
+    Args:
+      path: absolute or relative path to test.
 
-  Returns:
-    True if the file at |path| exists, False otherwise.
-  """
-  return os.path.isfile(path) and os.access(path, os.X_OK)
+    Returns:
+      True if the file at |path| exists, False otherwise.
+    """
+    return os.path.isfile(path) and os.access(path, os.X_OK)
 
 
 def FindCommand(command):
-  """Looks up for |command| in PATH.
+    """Looks up for |command| in PATH.
 
-  Args:
-    command: name of the command to lookup, if command is a relative or absolute
-      path (i.e. contains some path separator) then only that path will be
-      tested.
+    Args:
+      command: name of the command to lookup, if command is a relative or absolute
+        path (i.e. contains some path separator) then only that path will be
+        tested.
 
-  Returns:
-    Full path to command or None if the command was not found.
+    Returns:
+      Full path to command or None if the command was not found.
 
-    On Windows, this respects the PATHEXT environment variable when the
-    command name does not have an extension.
-  """
-  fpath, _ = os.path.split(command)
-  if fpath:
-    if IsExecutable(command):
-      return command
+      On Windows, this respects the PATHEXT environment variable when the
+      command name does not have an extension.
+    """
+    fpath, _ = os.path.split(command)
+    if fpath:
+        if IsExecutable(command):
+            return command
 
-  if sys.platform == 'win32':
-    # On Windows, if the command does not have an extension, cmd.exe will
-    # try all extensions from PATHEXT when resolving the full path.
-    command, ext = os.path.splitext(command)
-    if not ext:
-      exts = os.environ['PATHEXT'].split(os.path.pathsep)
+    if sys.platform == 'win32':
+        # On Windows, if the command does not have an extension, cmd.exe will
+        # try all extensions from PATHEXT when resolving the full path.
+        command, ext = os.path.splitext(command)
+        if not ext:
+            exts = os.environ['PATHEXT'].split(os.path.pathsep)
+        else:
+            exts = [ext]
     else:
-      exts = [ext]
-  else:
-    exts = ['']
+        exts = ['']
 
-  for path in os.environ['PATH'].split(os.path.pathsep):
-    for ext in exts:
-      path = os.path.join(path, command) + ext
-      if IsExecutable(path):
-        return path
+    for path in os.environ['PATH'].split(os.path.pathsep):
+        for ext in exts:
+            path = os.path.join(path, command) + ext
+            if IsExecutable(path):
+                return path
 
-  return None
+    return None
 
 
 def main():
-  java_path = FindCommand('javac')
-  if not java_path:
-    sys.stderr.write('javac: command not found\n')
-    sys.exit(EXIT_FAILURE)
+    java_path = FindCommand('javac')
+    if not java_path:
+        sys.stderr.write('javac: command not found\n')
+        sys.exit(EXIT_FAILURE)
 
-  parser = argparse.ArgumentParser('Javac runner')
-  parser.add_argument(
-      '--classdir',
-      dest='classdir',
-      required=True,
-      help='Directory that will contain class files')
-  parser.add_argument(
-      '--outfile',
-      dest='outfile',
-      required=True,
-      help='Output file containing a list of classes')
-  parser.add_argument(
-      'rest', metavar='JAVAC_ARGS', nargs='*', help='Argumets to pass to javac')
+    parser = argparse.ArgumentParser('Javac runner')
+    parser.add_argument(
+        '--classdir',
+        dest='classdir',
+        required=True,
+        help='Directory that will contain class files')
+    parser.add_argument(
+        '--outfile',
+        dest='outfile',
+        required=True,
+        help='Output file containing a list of classes')
+    parser.add_argument(
+        'rest', metavar='JAVAC_ARGS', nargs='*', help='Argumets to pass to javac')
 
-  args = parser.parse_args()
-  if not os.path.isdir(args.classdir):
-    os.makedirs(args.classdir)
-  retcode = subprocess.check_call([java_path] + args.rest)
-  if retcode != EXIT_SUCCESS:
-    return retcode
+    args = parser.parse_args()
+    if not os.path.isdir(args.classdir):
+        os.makedirs(args.classdir)
+    retcode = subprocess.check_call([java_path] + args.rest)
+    if retcode != EXIT_SUCCESS:
+        return retcode
 
-  with open(args.outfile, 'wt') as f:
-    prefixlen = len(args.classdir) + 1
-    for root, dirnames, filenames in os.walk(args.classdir):
-      for filename in filenames:
-        if filename.endswith('.class'):
-          f.write(os.path.join(root[prefixlen:], filename))
-          f.write('\n')
+    with open(args.outfile, 'wt') as f:
+        prefixlen = len(args.classdir) + 1
+        for root, dirnames, filenames in os.walk(args.classdir):
+            for filename in filenames:
+                if filename.endswith('.class'):
+                    f.write(os.path.join(root[prefixlen:], filename))
+                    f.write('\n')
 
-  return EXIT_SUCCESS
+    return EXIT_SUCCESS
 
 
 if __name__ == '__main__':
-  sys.exit(main())
+    sys.exit(main())

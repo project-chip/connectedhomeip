@@ -985,6 +985,16 @@ class ChipClusters:
                     "attributeId": 0x00004004,
                     "type": "int",
                 },
+                0x00004005: {
+                    "attributeName": "ColorLoopStartEnhancedHue",
+                    "attributeId": 0x00004005,
+                    "type": "int",
+                },
+                0x00004006: {
+                    "attributeName": "ColorLoopStoredEnhancedHue",
+                    "attributeId": 0x00004006,
+                    "type": "int",
+                },
                 0x0000400A: {
                     "attributeName": "ColorCapabilities",
                     "attributeId": 0x0000400A,
@@ -2200,8 +2210,8 @@ class ChipClusters:
                         "adminVendorId": "int",
                     },
                 },
-            0x000000A1: {
-                    "commandId": 0x000000A1,
+            0x0000000B: {
+                    "commandId": 0x0000000B,
                     "commandName": "AddTrustedRootCertificate",
                     "args": {
                         "rootCertificate": "bytes",
@@ -2214,33 +2224,18 @@ class ChipClusters:
                         "cSRNonce": "bytes",
                     },
                 },
-            0x0000000B: {
-                    "commandId": 0x0000000B,
-                    "commandName": "RemoveAllFabrics",
-                    "args": {
-                    },
-                },
             0x0000000A: {
                     "commandId": 0x0000000A,
                     "commandName": "RemoveFabric",
                     "args": {
-                        "fabricId": "int",
-                        "nodeId": "int",
-                        "vendorId": "int",
+                        "fabricIndex": "int",
                     },
                 },
-            0x000000A2: {
-                    "commandId": 0x000000A2,
+            0x0000000C: {
+                    "commandId": 0x0000000C,
                     "commandName": "RemoveTrustedRootCertificate",
                     "args": {
                         "trustedRootIdentifier": "bytes",
-                    },
-                },
-            0x00000000: {
-                    "commandId": 0x00000000,
-                    "commandName": "SetFabric",
-                    "args": {
-                        "vendorId": "int",
                     },
                 },
             0x00000009: {
@@ -2248,6 +2243,13 @@ class ChipClusters:
                     "commandName": "UpdateFabricLabel",
                     "args": {
                         "label": "str",
+                    },
+                },
+            0x00000007: {
+                    "commandId": 0x00000007,
+                    "commandName": "UpdateNOC",
+                    "args": {
+                        "nOCArray": "bytes",
                     },
                 },
             },
@@ -4136,26 +4138,22 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest(
                 device, ZCLendpoint, ZCLgroupid, cSRNonce, len(cSRNonce)
         )
-    def ClusterOperationalCredentials_CommandRemoveAllFabrics(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics(
-                device, ZCLendpoint, ZCLgroupid
-        )
-    def ClusterOperationalCredentials_CommandRemoveFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricId: int, nodeId: int, vendorId: int):
+    def ClusterOperationalCredentials_CommandRemoveFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricIndex: int):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric(
-                device, ZCLendpoint, ZCLgroupid, fabricId, nodeId, vendorId
+                device, ZCLendpoint, ZCLgroupid, fabricIndex
         )
     def ClusterOperationalCredentials_CommandRemoveTrustedRootCertificate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, trustedRootIdentifier: bytes):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveTrustedRootCertificate(
                 device, ZCLendpoint, ZCLgroupid, trustedRootIdentifier, len(trustedRootIdentifier)
         )
-    def ClusterOperationalCredentials_CommandSetFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int):
-        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_SetFabric(
-                device, ZCLendpoint, ZCLgroupid, vendorId
-        )
     def ClusterOperationalCredentials_CommandUpdateFabricLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, label: bytes):
         label = label.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel(
                 device, ZCLendpoint, ZCLgroupid, label, len(label)
+        )
+    def ClusterOperationalCredentials_CommandUpdateNOC(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nOCArray: bytes):
+        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateNOC(
+                device, ZCLendpoint, ZCLgroupid, nOCArray, len(nOCArray)
         )
     def ClusterScenes_CommandAddScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int, sceneName: bytes, clusterId: int, length: int, value: int):
         sceneName = sceneName.encode("utf-8") + b'\x00'
@@ -4552,6 +4550,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopDirection(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorLoopTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopTime(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ReadAttributeColorLoopStartEnhancedHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopStartEnhancedHue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ReadAttributeColorLoopStoredEnhancedHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopStoredEnhancedHue(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorCapabilities(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorCapabilities(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorTempPhysicalMin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -5661,6 +5663,12 @@ class ChipClusters:
         # Cluster ColorControl ReadAttribute ColorLoopTime
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopTime.restype = ctypes.c_uint32
+        # Cluster ColorControl ReadAttribute ColorLoopStartEnhancedHue
+        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopStartEnhancedHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopStartEnhancedHue.restype = ctypes.c_uint32
+        # Cluster ColorControl ReadAttribute ColorLoopStoredEnhancedHue
+        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopStoredEnhancedHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopStoredEnhancedHue.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorCapabilities
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorCapabilities.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorCapabilities.restype = ctypes.c_uint32
@@ -6197,21 +6205,18 @@ class ChipClusters:
         # Cluster OperationalCredentials Command OpCSRRequest
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest.restype = ctypes.c_uint32
-        # Cluster OperationalCredentials Command RemoveAllFabrics
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command RemoveFabric
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint64, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command RemoveTrustedRootCertificate
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveTrustedRootCertificate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveTrustedRootCertificate.restype = ctypes.c_uint32
-        # Cluster OperationalCredentials Command SetFabric
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_SetFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_SetFabric.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command UpdateFabricLabel
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials Command UpdateNOC
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateNOC.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateNOC.restype = ctypes.c_uint32
         # Cluster OperationalCredentials ReadAttribute FabricsList
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_FabricsList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_FabricsList.restype = ctypes.c_uint32

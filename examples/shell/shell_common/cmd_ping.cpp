@@ -132,7 +132,7 @@ Protocols::Echo::EchoClient gEchoClient;
 Transport::FabricTable gFabrics;
 
 CHIP_ERROR SendEchoRequest(streamer_t * stream);
-void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error);
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState);
 
 Transport::PeerAddress GetEchoPeerAddress()
 {
@@ -166,7 +166,7 @@ void Shutdown()
     gSessionManager.Shutdown();
 }
 
-void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
+void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     if (gPingArguments.GetEchoRespCount() != gPingArguments.GetEchoCount())
     {
@@ -285,16 +285,11 @@ void StartPinging(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::FabricInfo * fabricInfo = nullptr;
-
     if (!IPAddress::FromString(destination, gDestAddr))
     {
         streamer_printf(stream, "Invalid Echo Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
-
-    fabricInfo = gFabrics.AssignFabricIndex(gFabricIndex, kTestControllerNodeId);
-    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)

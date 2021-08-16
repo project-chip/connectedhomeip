@@ -304,7 +304,7 @@ private:
     /**
      * Callback for timer expiry check
      */
-    static void ExpiryTimerCallback(System::Layer * layer, void * param, CHIP_ERROR error);
+    static void ExpiryTimerCallback(System::Layer * layer, void * param);
 
     void SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                System::PacketBufferHandle && msg);

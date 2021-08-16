@@ -39,25 +39,19 @@ namespace Mdns {
 
 namespace {
 
-NodeId GetCurrentNodeId()
+bool HaveOperationalCredentials()
 {
-    // TODO: once operational credentials are implemented, node ID should be read from them
-
-    // TODO: once multi-admin is decided, figure out if a single node id
-    // is sufficient or if we need multi-node-id advertisement. Existing
-    // mdns advertises a single node id as parameter.
-
-    // Search for one admin pairing and use its node id.
+    // Look for any fabric info that has a useful operational identity.
     for (const Transport::FabricInfo & fabricInfo : GetGlobalFabricTable())
     {
-        if (fabricInfo.GetNodeId() != kUndefinedNodeId)
+        if (fabricInfo.IsInitialized())
         {
-            return fabricInfo.GetNodeId();
+            return true;
         }
     }
 
     ChipLogProgress(Discovery, "Failed to find a valid admin pairing. Node ID unknown");
-    return kUndefinedNodeId;
+    return false;
 }
 
 // Requires an 8-byte mac to accommodate thread.
@@ -93,30 +87,32 @@ CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen)
 /// Set MDNS operational advertisement
 CHIP_ERROR AdvertiseOperational()
 {
-    uint64_t fabricId;
-
-    if (DeviceLayer::ConfigurationMgr().GetFabricId(fabricId) != CHIP_NO_ERROR)
+    for (const Transport::FabricInfo & fabricInfo : GetGlobalFabricTable())
     {
-        ChipLogError(Discovery, "Fabric ID not known. Using a default");
-        fabricId = 5544332211;
+        if (fabricInfo.IsInitialized())
+        {
+            uint8_t mac[8];
+
+            const auto advertiseParameters =
+                chip::Mdns::OperationalAdvertisingParameters()
+                    .SetPeerId(PeerId().SetFabricId(fabricInfo.GetFabricId()).SetNodeId(fabricInfo.GetNodeId()))
+                    .SetMac(FillMAC(mac))
+                    .SetPort(chip::DeviceLayer::ConfigurationMgr().GetSecuredPort())
+                    .SetMRPRetryIntervals(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL,
+                                          CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL)
+                    .EnableIpV4(true);
+
+            auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
+
+            ChipLogProgress(Discovery, "Advertise operational node " ChipLogFormatX64 "-" ChipLogFormatX64,
+                            ChipLogValueX64(advertiseParameters.GetPeerId().GetFabricId()),
+                            ChipLogValueX64(advertiseParameters.GetPeerId().GetNodeId()));
+            // Should we keep trying to advertise the other operational
+            // identities on failure?
+            ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
+        }
     }
-
-    uint8_t mac[8];
-
-    const auto advertiseParameters =
-        chip::Mdns::OperationalAdvertisingParameters()
-            .SetPeerId(PeerId().SetFabricId(fabricId).SetNodeId(GetCurrentNodeId()))
-            .SetMac(FillMAC(mac))
-            .SetPort(chip::DeviceLayer::ConfigurationMgr().GetSecuredPort())
-            .SetMRPRetryIntervals(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL, CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL)
-            .EnableIpV4(true);
-
-    auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
-
-    ChipLogProgress(Discovery, "Advertise operational node " ChipLogFormatX64 "-" ChipLogFormatX64,
-                    ChipLogValueX64(advertiseParameters.GetPeerId().GetFabricId()),
-                    ChipLogValueX64(advertiseParameters.GetPeerId().GetNodeId()));
-    return mdnsAdvertiser.Advertise(advertiseParameters);
+    return CHIP_NO_ERROR;
 }
 
 /// Overloaded utility method for commissioner and commissionable advertisement
@@ -263,16 +259,31 @@ void StartServer(CommissioningMode mode)
 {
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
 
-    // TODO: advertise all operational ids once we support multiple
-    if (GetCurrentNodeId() != kUndefinedNodeId)
+    err = app::Mdns::AdvertiseOperational();
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(
-            Discovery, "Start dns-sd server CM=%d, AC=%d",
-            ((mode == CommissioningMode::kEnabled || mode == CommissioningMode::kEnabledAsAdditionalCommissioning) ? 1 : 0),
-            (mode == CommissioningMode::kEnabledAsAdditionalCommissioning) ? 1 : 0);
-        err = app::Mdns::AdvertiseOperational();
+        ChipLogError(Discovery, "Failed to advertise operational node: %s", chip::ErrorStr(err));
+    }
+
+    if (HaveOperationalCredentials())
+    {
+        if (mode != CommissioningMode::kDisabled)
+        {
+            err = app::Mdns::AdvertiseCommissionableNode(mode);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "Failed to advertise commissionable node: %s", chip::ErrorStr(err));
+            }
+        }
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-        err = app::Mdns::AdvertiseCommissionableNode(mode);
+        else
+        {
+            err = app::Mdns::AdvertiseCommissionableNode(mode);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "Failed to advertise extended commissionable node: %s", chip::ErrorStr(err));
+            }
+        }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     }
     else
@@ -280,17 +291,20 @@ void StartServer(CommissioningMode mode)
 #if CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
         ChipLogProgress(Discovery, "Start dns-sd server - no current nodeId");
         err = app::Mdns::AdvertiseCommissionableNode(CommissioningMode::kEnabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to advertise unprovisioned commissionable node: %s", chip::ErrorStr(err));
+        }
 #endif
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     err = app::Mdns::AdvertiseCommisioner();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Failed to start mDNS server: %s", chip::ErrorStr(err));
+        ChipLogError(Discovery, "Failed to advertise commissioner: %s", chip::ErrorStr(err));
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 }
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID

@@ -103,7 +103,7 @@ CHIP_ERROR AppTask::Init()
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     // Enable BLE advertisements
-    OpenDefaultPairingWindow(chip::ResetFabrics::kNo);
+    OpenBasicCommissioningWindow(chip::ResetFabrics::kNo);
     ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
 
     return err;
@@ -250,7 +250,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     sAppTask.PostEvent(&button_event);
 }
 
-void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
+void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
@@ -374,7 +374,6 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
     CHIP_ERROR err;
 
-    SystemLayer.CancelTimer(TimerEventHandler, this);
     err = SystemLayer.StartTimer(aTimeoutInMs, TimerEventHandler, this);
     SuccessOrExit(err);
 

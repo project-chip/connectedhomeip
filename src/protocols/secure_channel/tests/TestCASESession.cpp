@@ -55,6 +55,7 @@ using TestContext = chip::Test::MessagingContext;
 namespace {
 TransportMgrBase gTransportMgr;
 Test::LoopbackTransport gLoopback;
+chip::Test::IOContext gIOContext;
 
 OperationalCredentialSet commissionerDevOpCred;
 OperationalCredentialSet accessoryDevOpCred;
@@ -368,11 +369,10 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     fabricTable.Init(&storageDelegate);
 
-    FabricInfo * fabric = fabricTable.AssignFabricIndex(0);
+    FabricInfo fabric;
 
-    NL_TEST_ASSERT(inSuite, fabric->SetOperationalKey(accessoryOpKeys) == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, fabric->SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, fabric.SetEphemeralKey(&accessoryOpKeys) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, fabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)) == CHIP_NO_ERROR);
 
     uint8_t chipCert[kMaxCHIPCertLength * 2];
     MutableByteSpan chipCertSpan(chipCert, sizeof(chipCert));
@@ -380,19 +380,21 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
                    ConvertX509CertsToChipCertArray(ByteSpan(sTestCert_Node01_01_DER, sTestCert_Node01_01_DER_Len),
                                                    ByteSpan(sTestCert_ICA01_DER, sTestCert_ICA01_DER_Len),
                                                    chipCertSpan) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, fabric->SetOperationalCertsFromCertArray(chipCertSpan) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, fabric.SetOperationalCertsFromCertArray(chipCertSpan) == CHIP_NO_ERROR);
 
-    fabricTable.Store(0);
-    fabricTable.ReleaseFabricIndex(0);
+    FabricIndex index;
+    fabricTable.AddNewFabric(fabric, &index);
+    fabricTable.Store(index);
+    fabricTable.ReleaseFabricIndex(index);
 
-    fabricTable.LoadFromStorage(0);
-    fabric = fabricTable.FindFabricWithIndex(0);
+    fabricTable.LoadFromStorage(index);
+    FabricInfo * loaded_fabric = fabricTable.FindFabricWithIndex(index);
 
     ChipCertificateSet certificates;
     OperationalCredentialSet credentials;
     CertificateKeyId rootKeyId;
     uint8_t credentialsIndex;
-    NL_TEST_ASSERT(inSuite, fabric->GetCredentials(credentials, certificates, rootKeyId, credentialsIndex) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, loaded_fabric->GetCredentials(credentials, certificates, rootKeyId, credentialsIndex) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
                    gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &gTransportMgr,
@@ -555,8 +557,9 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
 
     gTransportMgr.Init(&gLoopback);
+    ReturnErrorOnFailure(gIOContext.Init(&sSuite));
 
-    ReturnErrorOnFailure(ctx.Init(&sSuite, &gTransportMgr));
+    ReturnErrorOnFailure(ctx.Init(&sSuite, &gTransportMgr, &gIOContext));
 
     ctx.SetSourceNodeId(kPlaceholderNodeId);
     ctx.SetDestinationNodeId(kPlaceholderNodeId);
@@ -584,6 +587,7 @@ int CASE_TestSecurePairing_Setup(void * inContext)
 int CASE_TestSecurePairing_Teardown(void * inContext)
 {
     reinterpret_cast<TestContext *>(inContext)->Shutdown();
+    gIOContext.Shutdown();
     commissionerDevOpCred.Release();
     accessoryDevOpCred.Release();
     commissionerCertificateSet.Release();

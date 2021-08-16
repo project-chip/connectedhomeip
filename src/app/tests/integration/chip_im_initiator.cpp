@@ -85,10 +85,10 @@ enum class TestCommandResult : uint8_t
 
 TestCommandResult gLastCommandResult = TestCommandResult::kUndefined;
 
-void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error);
-void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error);
-void ReadRequestTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error);
-void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error);
+void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appState);
+void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appState);
+void ReadRequestTimerHandler(chip::System::Layer * systemLayer, void * appState);
+void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState);
 
 CHIP_ERROR SendCommandRequest(chip::app::CommandSender * commandSender)
 {
@@ -296,7 +296,7 @@ void HandleWriteComplete()
            static_cast<double>(gWriteRespCount) * 100 / gWriteCount, static_cast<double>(transitTime) / 1000);
 }
 
-void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
+void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -333,7 +333,7 @@ exit:
     }
 }
 
-void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
+void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     // Test with invalid endpoint / cluster / command combination.
     chip::app::CommandSender * commandSender;
@@ -353,7 +353,7 @@ exit:
     }
 }
 
-void ReadRequestTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
+void ReadRequestTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -386,7 +386,7 @@ exit:
     }
 }
 
-void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
+void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -552,8 +552,6 @@ int main(int argc, char * argv[])
     std::unique_lock<std::mutex> lock(mutex);
     MockInteractionModelApp mockDelegate;
     chip::Transport::FabricTable fabrics;
-    chip::Transport::FabricInfo * fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, chip::kTestControllerNodeId);
-    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     if (argc <= 1)
     {

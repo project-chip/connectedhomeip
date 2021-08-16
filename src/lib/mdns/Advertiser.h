@@ -38,6 +38,7 @@ static constexpr size_t kMaxMacSize = 8;
 // Operational node TXT entries
 static constexpr size_t kTxtRetryIntervalIdleMaxLength   = 7; // [CRI] 0-3600000
 static constexpr size_t kTxtRetryIntervalActiveMaxLength = 7; // [CRA] 0-3600000
+static constexpr size_t kMaxRetryInterval                = 3600000;
 
 // Commissionable/commissioner node TXT entries
 static constexpr size_t kKeyDiscriminatorMaxLength           = 5;
@@ -59,7 +60,8 @@ static constexpr size_t kSubTypeCommissioningModeMaxLength       = 3; // _C<d>
 static constexpr size_t kSubTypeAdditionalCommissioningMaxLength = 3; // _A<d>
 static constexpr size_t kSubTypeMaxNumber                        = 6;
 static constexpr size_t kSubTypeTotalLength = kSubTypeShortDiscriminatorMaxLength + kSubTypeLongDiscriminatorMaxLength +
-    kSubTypeVendorMaxLength + kSubTypeDeviceTypeMaxLength + kSubTypeCommissioningModeMaxLength + kSubTypeAdditionalPairingMaxLength;
+    kSubTypeVendorMaxLength + kSubTypeDeviceTypeMaxLength + kSubTypeCommissioningModeMaxLength +
+    kSubTypeAdditionalCommissioningMaxLength;
 
 enum class CommssionAdvertiseMode : uint8_t
 {
@@ -141,12 +143,12 @@ public:
     static constexpr uint8_t kTxtMaxNumber  = 9;
     static constexpr uint8_t kTxtMaxKeySize = MaxStringLength("D", "VP", "CM", "DT", "DN", "RI", "PI", "PH"); // possible keys
     static constexpr uint8_t kTxtMaxValueSize =
-        std::max({ kKeyDiscriminatorMaxLength, kKeyVendorProductMaxLength, kKeyAdditionalPairingMaxLength,
+        std::max({ kKeyDiscriminatorMaxLength, kKeyVendorProductMaxLength, kKeyAdditionalCommissioningMaxLength,
                    kKeyCommissioningModeMaxLength, kKeyDeviceTypeMaxLength, kKeyDeviceNameMaxLength, kKeyRotatingIdMaxLength,
                    kKeyPairingInstructionMaxLength, kKeyPairingHintMaxLength });
     static constexpr size_t kTxtTotalKeySize   = TotalStringLength("D", "VP", "CM", "DT", "DN", "RI", "PI", "PH"); // possible keys
     static constexpr size_t kTxtTotalValueSize = kKeyDiscriminatorMaxLength + kKeyVendorProductMaxLength +
-        kKeyAdditionalPairingMaxLength + kKeyCommissioningModeMaxLength + kKeyDeviceTypeMaxLength + kKeyDeviceNameMaxLength +
+        kKeyAdditionalCommissioningMaxLength + kKeyCommissioningModeMaxLength + kKeyDeviceTypeMaxLength + kKeyDeviceNameMaxLength +
         kKeyRotatingIdMaxLength + kKeyPairingInstructionMaxLength + kKeyPairingHintMaxLength;
 
     CommissionAdvertisingParameters & SetShortDiscriminator(uint8_t discriminator)

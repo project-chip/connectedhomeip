@@ -7,12 +7,6 @@ application based on the provided example. This page also contains information
 about the configuration structure, which can be useful to better understand the
 building process.
 
-This guide can be used with the following examples:
-
--   [CHIP nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md)
--   [CHIP nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
--   [CHIP nRF Connect Pigweed Example Application](../../examples/pigweed-app/nrfconnect/README.md)
-
 <hr>
 
 ## Configuring application

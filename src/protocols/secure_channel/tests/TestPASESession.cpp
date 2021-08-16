@@ -32,6 +32,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
+#include <support/UnitTestUtils.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
 using namespace chip;
@@ -42,11 +43,6 @@ using namespace chip::Protocols;
 
 using TestContext = chip::Test::MessagingContext;
 
-static void test_os_sleep_ms(uint64_t millisecs)
-{
-    usleep(static_cast<useconds_t>(millisecs * 1000));
-}
-
 class PASETestLoopbackTransport : public Test::LoopbackTransport
 {
     void MessageDropped() override
@@ -54,9 +50,9 @@ class PASETestLoopbackTransport : public Test::LoopbackTransport
         // Trigger a retransmit.
         if (mContext != nullptr)
         {
-            test_os_sleep_ms(65);
+            chip::test_utils::SleepMillis(65);
             ReliableMessageMgr * rm = mContext->GetExchangeManager().GetReliableMessageMgr();
-            ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm, CHIP_NO_ERROR);
+            ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm);
         }
     }
 
@@ -74,6 +70,7 @@ public:
 
 TransportMgrBase gTransportMgr;
 PASETestLoopbackTransport gLoopback;
+chip::Test::IOContext gIOContext;
 
 class TestSecurePairingDelegate : public SessionEstablishmentDelegate
 {
@@ -371,17 +368,13 @@ static TestContext sContext;
  */
 int TestSecurePairing_Setup(void * inContext)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    // Initialize System memory and resources
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gTransportMgr.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
 
-    CHIP_ERROR err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-        return FAILURE;
-
-    gTransportMgr.Init(&gLoopback);
-
-    err = ctx.Init(&sSuite, &gTransportMgr);
-    if (err != CHIP_NO_ERROR)
-        return FAILURE;
+    auto & ctx = *static_cast<TestContext *>(inContext);
+    VerifyOrReturnError(ctx.Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
     ctx.SetSourceNodeId(kPlaceholderNodeId);
     ctx.SetDestinationNodeId(kPlaceholderNodeId);
@@ -400,6 +393,7 @@ int TestSecurePairing_Setup(void * inContext)
 int TestSecurePairing_Teardown(void * inContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(inContext)->Shutdown();
+    gIOContext.Shutdown();
     chip::Platform::MemoryShutdown();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }

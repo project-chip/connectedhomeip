@@ -208,7 +208,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     if (sIOThread != PTHREAD_NULL)
     {
         sShutdown = true;
-        sSystemLayer.WatchableEvents().Signal();
+        sSystemLayer.WatchableEventsManager().Signal();
 
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         pthread_join(sIOThread, NULL);
@@ -1060,7 +1060,7 @@ void * IOThreadMain(void * arg)
     // Lock the stack to prevent collisions with Java threads.
     pthread_mutex_lock(JniReferences::GetInstance().GetStackLock());
 
-    System::WatchableEventManager & watchState = sSystemLayer.WatchableEvents();
+    System::WatchableEventManager & watchState = sSystemLayer.WatchableEventsManager();
     watchState.EventLoopBegins();
 
     // Loop until we are told to exit.

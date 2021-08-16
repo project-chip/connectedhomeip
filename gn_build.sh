@@ -103,6 +103,12 @@ for arg; do
         enable_efr32_builds=true)
             efr32_enabled=1
             ;;
+        enable_p6_builds=true)
+            p6_builds_enabled=1
+            ;;
+        p6_board=*)
+            p6_board_selected=1
+            ;;
     esac
     user_args+=" $arg"
 done
@@ -128,6 +134,18 @@ if [[ -z "$efr32_enabled" ]]; then
 else
     echo 'To build the EFR32 lock sample as a standalone project':
     echo "(cd $CHIP_ROOT/examples/lock-app/efr32; gn gen out/debug; ninja -C out/debug)"
+fi
+
+echo
+
+# P6 Build setup
+if [[ -z "$p6_builds_enabled" ]]; then
+    echo "Hint: Pass enable_p6_builds=true to this script to enable building for PSoC6-43012"
+else
+    p6_sdk_args=""
+    if [[ -z "$p6_board_selected" ]]; then
+        p6_sdk_args="p6_board=\"CY8CKIT-062S2-43012\""
+    fi
 fi
 
 # K32W SDK setup

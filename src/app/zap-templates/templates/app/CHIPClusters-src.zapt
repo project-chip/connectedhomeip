@@ -41,6 +41,7 @@
     }                                                                                                                              \
     return SendCommand(seqNum, buf.Finalize(), onSuccessCallback, onFailureCallback);
 
+namespace chip {
 namespace {
   // TODO: Find a way to calculate maximum message length for clusters
   //       https://github.com/project-chip/connectedhomeip/issues/965
@@ -52,16 +53,15 @@ namespace {
   constexpr uint8_t kFrameControlGlobalCommand = 0x00;
 
   // Pick source endpoint as 1 for now
-  constexpr chip::EndpointId kSourceEndpoint = 1;
+  constexpr EndpointId kSourceEndpoint = 1;
 
   const uint8_t kReportingDirectionReported = 0x00;
 }
 
-using namespace chip::app::Clusters;
-using namespace chip::System;
-using namespace chip::Encoding::LittleEndian;
+using namespace app::Clusters;
+using namespace System;
+using namespace Encoding::LittleEndian;
 
-namespace chip {
 namespace Controller {
 
 // TODO(#4502): onCompletion is not used by IM for now.
@@ -86,9 +86,9 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, {{asUpperCamelCase parent.name}}::Commands::Ids::{{asUpperCamelCase name}},
-                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                         (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
@@ -120,7 +120,7 @@ exit:
 
 {{/chip_cluster_commands}}
 // {{asUpperCamelCase name}} Cluster Attributes
-CHIP_ERROR {{asCamelCased name false}}Cluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR {{asUpperCamelCase name}}Cluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     COMMAND_HEADER("Discover{{asUpperCamelCase name}}Attributes", {{asUpperCamelCase name}}::Id);
     buf.Put8(kFrameControlGlobalCommand)
@@ -134,11 +134,11 @@ CHIP_ERROR {{asCamelCased name false}}Cluster::DiscoverAttributes(Callback::Canc
 {{#chip_server_cluster_attributes}}
 CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReadAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    chip::app::AttributePathParams attributePath;
+    app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = {{asHex code 8}};
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,{{#if isList}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter{{else}}BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>{{/if}});
 }
 

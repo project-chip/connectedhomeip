@@ -198,7 +198,7 @@ exit:
 }
 #endif
 
-void IdentifyTimerHandler(Layer * systemLayer, void * appState, CHIP_ERROR error)
+void IdentifyTimerHandler(Layer * systemLayer, void * appState)
 {
     statusLED1.Animate();
 

@@ -27,7 +27,7 @@ from dataclasses import dataclass
 # The type should match CommandStatus in interaction_model/Delegate.h
 # CommandStatus should not contain padding
 IMCommandStatus = Struct(
-    "ProtocolId" /  Int32ul,
+    "ProtocolId" / Int32ul,
     "ProtocolCode" / Int16ul,
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
@@ -50,11 +50,13 @@ class AttributePath:
     clusterId: int
     attributeId: int
 
+
 @dataclass
 class AttributeReadResult:
     path: AttributePath
     status: int
     value: 'typing.Any'
+
 
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,
 #                                                                                         void * commandStatusBuf);
@@ -63,10 +65,12 @@ class AttributeReadResult:
 # typedef void (*PythonInteractionModelDelegate_OnReportDataFunct)(chip::NodeId nodeId, uint64_t readClientAppIdentifier,
 #                                                                  void * attributePathBuf, size_t attributePathBufLen,
 #                                                                  uint8_t * readTlvData, size_t readTlvDataLen, uint16_t statusCode);
-_OnCommandResponseStatusCodeReceivedFunct = CFUNCTYPE(None, c_uint64, c_void_p, c_uint32)
+_OnCommandResponseStatusCodeReceivedFunct = CFUNCTYPE(
+    None, c_uint64, c_void_p, c_uint32)
 _OnCommandResponseProtocolErrorFunct = CFUNCTYPE(None, c_uint64, c_uint8)
 _OnCommandResponseFunct = CFUNCTYPE(None, c_uint64, c_uint32)
-_OnReportDataFunct = CFUNCTYPE(None, c_uint64, c_ssize_t, c_void_p, c_uint32, c_void_p, c_uint32, c_uint16)
+_OnReportDataFunct = CFUNCTYPE(
+    None, c_uint64, c_ssize_t, c_void_p, c_uint32, c_void_p, c_uint32, c_uint16)
 
 _commandStatusDict = dict()
 _commandIndexStatusDict = dict()
@@ -80,35 +84,45 @@ _attributeDictLock = threading.RLock()
 PLACEHOLDER_COMMAND_HANDLE = 1
 DEFAULT_ATTRIBUTEREAD_APPID = 0
 
+
 def _GetCommandStatus(commandHandle: int):
     with _commandStatusLock:
         return _commandStatusDict.get(commandHandle, None)
+
 
 def _GetCommandIndexStatus(commandHandle: int, commandIndex: int):
     with _commandStatusLock:
         indexDict = _commandIndexStatusDict.get(commandHandle, {})
         return indexDict.get(commandIndex, None)
 
+
 def _SetCommandStatus(commandHandle: int, val):
     with _commandStatusLock:
         _commandStatusDict[commandHandle] = val
         _commandStatusCV.notify_all()
 
+
 def _SetCommandIndexStatus(commandHandle: int, commandIndex: int, status):
     with _commandStatusLock:
-        print("SetCommandIndexStatus commandHandle={} commandIndex={}".format(commandHandle, commandIndex))
+        print("SetCommandIndexStatus commandHandle={} commandIndex={}".format(
+            commandHandle, commandIndex))
         indexDict = _commandIndexStatusDict.get(commandHandle, {})
         indexDict[commandIndex] = status
         _commandIndexStatusDict[commandHandle] = indexDict
 
+
 @_OnCommandResponseStatusCodeReceivedFunct
 def _OnCommandResponseStatusCodeReceived(commandHandle: int, IMCommandStatusBuf, IMCommandStatusBufLen):
-    status = IMCommandStatus.parse(ctypes.string_at(IMCommandStatusBuf, IMCommandStatusBufLen))
-    _SetCommandIndexStatus(PLACEHOLDER_COMMAND_HANDLE, status["CommandIndex"], status)
+    status = IMCommandStatus.parse(ctypes.string_at(
+        IMCommandStatusBuf, IMCommandStatusBufLen))
+    _SetCommandIndexStatus(PLACEHOLDER_COMMAND_HANDLE,
+                           status["CommandIndex"], status)
+
 
 @_OnCommandResponseProtocolErrorFunct
 def _OnCommandResponseProtocolError(commandHandle: int, errorcode: int):
     pass
+
 
 @_OnCommandResponseFunct
 def _OnCommandResponse(commandHandle: int, errorcode: int):
@@ -135,20 +149,31 @@ def _OnReportData(nodeId: int, appId: int, attrPathBuf, attrPathBufLen: int, tlv
         _attributeDict[appId] = AttributeReadResult(
             path, statusCode, tlvData)
 
+
 def InitIMDelegate():
     handle = chip.native.GetLibraryHandle()
     if not handle.pychip_InteractionModelDelegate_SetCommandResponseStatusCallback.argtypes:
         setter = chip.native.NativeLibraryHandleMethodArguments(handle)
-        setter.Set("pychip_InteractionModelDelegate_SetCommandResponseStatusCallback", None, [_OnCommandResponseStatusCodeReceivedFunct])
-        setter.Set("pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback", None, [_OnCommandResponseProtocolErrorFunct])
-        setter.Set("pychip_InteractionModelDelegate_SetCommandResponseErrorCallback", None, [_OnCommandResponseFunct])
-        setter.Set("pychip_InteractionModel_GetCommandSenderHandle", c_uint32, [ctypes.POINTER(c_uint64)])
-        setter.Set("pychip_InteractionModelDelegate_SetOnReportDataCallback", None, [_OnReportDataFunct])
+        setter.Set("pychip_InteractionModelDelegate_SetCommandResponseStatusCallback", None, [
+                   _OnCommandResponseStatusCodeReceivedFunct])
+        setter.Set("pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback", None, [
+                   _OnCommandResponseProtocolErrorFunct])
+        setter.Set("pychip_InteractionModelDelegate_SetCommandResponseErrorCallback", None, [
+                   _OnCommandResponseFunct])
+        setter.Set("pychip_InteractionModel_GetCommandSenderHandle",
+                   c_uint32, [ctypes.POINTER(c_uint64)])
+        setter.Set("pychip_InteractionModelDelegate_SetOnReportDataCallback", None, [
+                   _OnReportDataFunct])
 
-        handle.pychip_InteractionModelDelegate_SetCommandResponseStatusCallback(_OnCommandResponseStatusCodeReceived)
-        handle.pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback(_OnCommandResponseProtocolError)
-        handle.pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(_OnCommandResponse)
-        handle.pychip_InteractionModelDelegate_SetOnReportDataCallback(_OnReportData)
+        handle.pychip_InteractionModelDelegate_SetCommandResponseStatusCallback(
+            _OnCommandResponseStatusCodeReceived)
+        handle.pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback(
+            _OnCommandResponseProtocolError)
+        handle.pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(
+            _OnCommandResponse)
+        handle.pychip_InteractionModelDelegate_SetOnReportDataCallback(
+            _OnReportData)
+
 
 def ClearCommandStatus(commandHandle: int):
     """
@@ -157,6 +182,7 @@ def ClearCommandStatus(commandHandle: int):
     with _commandStatusLock:
         _SetCommandStatus(commandHandle, None)
         _commandIndexStatusDict[commandHandle] = {}
+
 
 def WaitCommandStatus(commandHandle: int):
     """
@@ -175,6 +201,7 @@ def WaitCommandStatus(commandHandle: int):
             ret = _GetCommandStatus(commandHandle)
         return ret
 
+
 def WaitCommandIndexStatus(commandHandle: int, commandIndex: int):
     """
     Wait for response of particular command from device, returns error code and struct of response info.
@@ -189,14 +216,17 @@ def WaitCommandIndexStatus(commandHandle: int, commandIndex: int):
     err = WaitCommandStatus(commandHandle)
     return (err, _GetCommandIndexStatus(commandHandle, commandIndex))
 
-def GetCommandSenderHandle()->int:
+
+def GetCommandSenderHandle() -> int:
     handle = chip.native.GetLibraryHandle()
     resPointer = c_uint64()
-    res = handle.pychip_InteractionModel_GetCommandSenderHandle(ctypes.pointer(resPointer))
+    res = handle.pychip_InteractionModel_GetCommandSenderHandle(
+        ctypes.pointer(resPointer))
     if res != 0:
         raise chip.exceptions.ChipStackError(res)
     ClearCommandStatus(resPointer.value)
     return resPointer.value
+
 
 def GetAttributeReadResponse(appId: int) -> AttributeReadResult:
     with _attributeDictLock:

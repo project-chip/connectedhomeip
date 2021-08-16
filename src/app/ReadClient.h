@@ -99,7 +99,6 @@ private:
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apDelegate       InteractionModelDelegate set by application.
-     *  @param[in]    aAppState        Application defined object to distinguish different read requests.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.

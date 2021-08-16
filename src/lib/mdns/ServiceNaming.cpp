@@ -98,8 +98,8 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
     switch (subtype.type)
     {
     case DiscoveryFilterType::kShort:
-        // 8-bit number
-        if (subtype.code >= 1 << 8)
+        // 4-bit number
+        if (subtype.code >= 1 << 4)
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }

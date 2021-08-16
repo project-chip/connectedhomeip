@@ -60,6 +60,7 @@ const char PAYLOAD[] = "Hello!";
 
 TransportMgrBase gTransportMgr;
 Test::LoopbackTransport gLoopback;
+chip::Test::IOContext gIOContext;
 
 class MockAppDelegate : public ExchangeDelegate
 {
@@ -213,8 +214,6 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init();
-
     MockAppDelegate mockAppDelegate;
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
@@ -236,8 +235,6 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
 void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -280,7 +277,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -290,7 +287,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     // sleep another 65 ms to trigger second re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 3);
@@ -303,8 +300,6 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -344,7 +339,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -354,7 +349,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 
     // sleep another 65 ms to trigger second re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 3);
@@ -365,8 +360,6 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -407,7 +400,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit table is empty, as we did not provide a message to retain
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
@@ -416,8 +409,6 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
 void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -459,8 +450,6 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
 void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -506,7 +495,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 2);
@@ -523,8 +512,6 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
 void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -580,7 +567,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was sent and the ack was sent
     // and retransmit table was cleared
@@ -594,7 +581,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     // Making this static to reduce stack usage, as some platforms have limits on stack size.
     static TestContext ctx;
 
-    CHIP_ERROR err = ctx.Init(inSuite, &gTransportMgr);
+    CHIP_ERROR err = ctx.Init(inSuite, &gTransportMgr, &gIOContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.SetSourceNodeId(kPlaceholderNodeId);
@@ -602,8 +589,6 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     ctx.SetLocalKeyId(0);
     ctx.SetPeerKeyId(0);
     ctx.SetFabricIndex(kUndefinedFabricIndex);
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -650,7 +635,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 2);
@@ -678,8 +663,6 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
 void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -736,7 +719,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was sent and the ack was sent
     // and retransmit table was cleared
@@ -750,8 +733,6 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
 void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -837,8 +818,6 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
 void CheckNoPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -973,8 +952,6 @@ void CheckSendUnsolicitedStandaloneAckMessage(nlTestSuite * inSuite, void * inCo
      */
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init();
-
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData("", 0);
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
@@ -1016,8 +993,6 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ctx.GetInetLayer().SystemLayer()->Init();
-
     MockAppDelegate mockAppDelegate;
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
@@ -1050,8 +1025,6 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
      */
 
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init();
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -1201,18 +1174,13 @@ nlTestSuite sSuite =
  */
 int Initialize(void * aContext)
 {
-    CHIP_ERROR err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-        return FAILURE;
+    // Initialize System memory and resources
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gTransportMgr.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
 
-    gTransportMgr.Init(&gLoopback);
-
-    auto * ctx = reinterpret_cast<TestContext *>(aContext);
-    err        = ctx->Init(&sSuite, &gTransportMgr);
-    if (err != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
+    auto * ctx = static_cast<TestContext *>(aContext);
+    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
     gTransportMgr.SetSecureSessionMgr(&ctx->GetSecureSessionManager());
     return SUCCESS;
@@ -1224,6 +1192,7 @@ int Initialize(void * aContext)
 int Finalize(void * aContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    gIOContext.Shutdown();
     chip::Platform::MemoryShutdown();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }

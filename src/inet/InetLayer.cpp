@@ -276,7 +276,7 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     err = InitQueueLimiter();
     SuccessOrExit(err);
 
-    mSystemLayer->AddEventHandlerDelegate(sInetEventHandlerDelegate);
+    mSystemLayer->WatchableEventsManager().AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     State = kState_Initialized;
@@ -986,7 +986,7 @@ bool InetLayer::MatchLocalIPv6Subnet(const IPAddress & addr)
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState)
 {
     InetLayer & lInetLayer = *reinterpret_cast<InetLayer *>(aAppState);
     bool lTimerRequired    = lInetLayer.IsIdleTimerRunning();

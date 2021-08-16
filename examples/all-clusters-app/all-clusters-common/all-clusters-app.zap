@@ -3316,14 +3316,6 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "SetFabric",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
               "name": "OpCSRRequest",
               "code": 4,
               "mfgCode": null,
@@ -3334,6 +3326,14 @@
             {
               "name": "AddNOC",
               "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "UpdateNOC",
+              "code": 7,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -3356,7 +3356,7 @@
               "outgoing": 1
             },
             {
-              "name": "RemoveAllFabrics",
+              "name": "AddTrustedRootCertificate",
               "code": 11,
               "mfgCode": null,
               "source": "client",
@@ -3364,16 +3364,8 @@
               "outgoing": 1
             },
             {
-              "name": "AddTrustedRootCertificate",
-              "code": 161,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
               "name": "RemoveTrustedRootCertificate",
-              "code": 162,
+              "code": 12,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -3406,14 +3398,6 @@
           "side": "server",
           "enabled": 1,
           "commands": [
-            {
-              "name": "SetFabricResponse",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
             {
               "name": "OpCSRResponse",
               "code": 5,
@@ -11041,6 +11025,36 @@
               "reportableChange": 0
             },
             {
+              "name": "color loop start enhanced hue",
+              "code": 16389,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x2300",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "color loop stored enhanced hue",
+              "code": 16390,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0000",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
               "name": "color capabilities",
               "code": 16394,
               "mfgCode": null,
@@ -17104,5 +17118,6 @@
       "endpointVersion": null,
       "deviceIdentifier": null
     }
-  ]
+  ],
+  "log": []
 }
