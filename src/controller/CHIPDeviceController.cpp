@@ -217,17 +217,17 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
 
     ReturnErrorCodeIf(!chipCert.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
 
-    uint32_t chipCertLen = 0;
-    ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerRCAC, chipCert.Get(), chipCertAllocatedLen, chipCertLen));
-    ReturnErrorOnFailure(newFabric.SetRootCert(ByteSpan(chipCert.Get(), chipCertLen)));
+    ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerRCAC, chipCertSpan));
+    ReturnErrorOnFailure(newFabric.SetRootCert(chipCertSpan));
 
     if (params.controllerICAC.empty())
     {
         ChipLogProgress(Controller, "Intermediate CA is not needed");
     }
 
-    MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
+    chipCertSpan = MutableByteSpan(chipCert.Get(), chipCertAllocatedLen);
 
     ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(params.controllerNOC, params.controllerICAC, chipCertSpan));
     ReturnErrorOnFailure(newFabric.SetOperationalCertsFromCertArray(chipCertSpan));
@@ -1218,12 +1218,8 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
     {
         MutableByteSpan rootCert = device->GetMutableNOCChain();
 
-        uint32_t certLen = (rootCert.size() > UINT32_MAX) ? UINT32_MAX : static_cast<uint32_t>(rootCert.size());
-
-        err = ConvertX509CertToChipCert(rcac, rootCert.data(), certLen, certLen);
+        err = ConvertX509CertToChipCert(rcac, rootCert);
         SuccessOrExit(err);
-
-        rootCert.reduce_size(certLen);
 
         err = commissioner->SendTrustedRootCertificate(device, rootCert);
         SuccessOrExit(err);

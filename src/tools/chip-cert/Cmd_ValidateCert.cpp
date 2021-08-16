@@ -30,6 +30,7 @@
 
 namespace {
 
+using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
 using namespace chip::ASN1;
@@ -147,6 +148,7 @@ bool Cmd_ValidateCert(int argc, char * argv[])
     const ChipCertificateData * validatedCert     = nullptr;
     ValidationContext context;
     uint8_t certsBuf[kMaxCerts * kMaxCHIPCertLength];
+    MutableByteSpan chipCert[kMaxCerts];
 
     context.Reset();
 
@@ -168,12 +170,13 @@ bool Cmd_ValidateCert(int argc, char * argv[])
 
     for (size_t i = 0; i < gNumCertFileNames; i++)
     {
-        res =
-            LoadChipCert(gCACertFileNames[i], gCACertIsTrusted[i], certSet, &certsBuf[i * kMaxCHIPCertLength], kMaxCHIPCertLength);
+        chipCert[i] = MutableByteSpan(&certsBuf[i * kMaxCHIPCertLength], kMaxCHIPCertLength);
+        res         = LoadChipCert(gCACertFileNames[i], gCACertIsTrusted[i], certSet, chipCert[i]);
         VerifyTrueOrExit(res);
     }
 
-    res = LoadChipCert(gTargetCertFileName, false, certSet, &certsBuf[gNumCertFileNames * kMaxCHIPCertLength], kMaxCHIPCertLength);
+    chipCert[gNumCertFileNames] = MutableByteSpan(&certsBuf[gNumCertFileNames * kMaxCHIPCertLength], kMaxCHIPCertLength);
+    res                         = LoadChipCert(gTargetCertFileName, false, certSet, chipCert[gNumCertFileNames]);
     VerifyTrueOrExit(res);
 
     certToBeValidated = certSet.GetLastCert();
