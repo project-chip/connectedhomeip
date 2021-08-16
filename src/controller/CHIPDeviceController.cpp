@@ -1062,6 +1062,20 @@ CHIP_ERROR DeviceCommissioner::OperationalDiscoveryComplete(NodeId remoteDeviceI
     return GetConnectedDevice(remoteDeviceId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
+CHIP_ERROR DeviceCommissioner::CommissioningComplete(NodeId remoteDeviceId)
+{
+    if (!mIsIPRendezvous)
+    {
+        Device * device = nullptr;
+        ReturnErrorOnFailure(GetDevice(remoteDeviceId, &device));
+        ChipLogProgress(Controller, "Calling commissioning complete for device ID %" PRIu64, remoteDeviceId);
+        GeneralCommissioningCluster genCom;
+        genCom.Associate(device, 0);
+        return genCom.CommissioningComplete(NULL, NULL);
+    }
+    return CHIP_NO_ERROR;
+}
+
 void DeviceCommissioner::FreeRendezvousSession()
 {
     PersistNextKeyId();

@@ -496,6 +496,12 @@ public:
      */
     CHIP_ERROR OperationalDiscoveryComplete(NodeId remoteDeviceId);
 
+    /**
+     *  This function call indicates commissioning complete and sends commissioining complete
+     *  complete event to the application.
+     */
+    CHIP_ERROR CommissioningComplete(NodeId remoteDeviceId);
+
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;

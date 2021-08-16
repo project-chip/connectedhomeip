@@ -23,9 +23,9 @@
  *
  **/
 #include "DeviceCallbacks.h"
-
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include <Bluetooth.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/server/Mdns.h>
@@ -60,6 +60,12 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
             chip::app::Mdns::StartServer();
         }
         break;
+
+#if CONFIG_RENDEZVOUS_MODE_BLE
+    case DeviceEventType::kCommissioningComplete:
+        deinitBLE();
+        break;
+#endif
     }
 
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
