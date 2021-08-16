@@ -357,15 +357,15 @@ void WatchableEventManager::HandleEvents()
             SocketEventsFromFDs(watchable->GetFD(), mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet));
     }
 
-    WatchableSocket * watchableSocket = mAttachedSockets;
-    while (watchableSocket != nullptr)
+    WatchableSocket * nextWatchableSocket = mAttachedSockets;
+    while (nextWatchableSocket != nullptr)
     {
-        WatchableSocket * watchable = watchableSocket;
-        watchableSocket             = watchableSocket->mAttachedNext;
+        WatchableSocket * currentWatchable = nextWatchableSocket;
+        nextWatchableSocket                = nextWatchableSocket->mAttachedNext;
 
-        if (watchable->mPendingIO.HasAny())
+        if (currentWatchable->mPendingIO.HasAny())
         {
-            watchable->InvokeCallback();
+            currentWatchable->InvokeCallback();
         }
     }
 
