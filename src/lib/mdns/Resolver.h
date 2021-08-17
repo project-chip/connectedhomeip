@@ -149,57 +149,57 @@ struct DiscoveredNodeData
         {
             char rotatingIdString[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
             Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
-            ChipLogDetail(DiscoveryVerbose, "Rotating ID: %s", rotatingIdString);
+            ChipLogDetail(Discovery, "Rotating ID: %s", rotatingIdString);
         }
 #endif // CHIP_ENABLE_ROTATING_DEVICE_ID
         if (strlen(deviceName) != 0)
         {
-            ChipLogDetail(DiscoveryVerbose, "Device Name: %s", deviceName);
+            ChipLogDetail(Discovery, "Device Name: %s", deviceName);
         }
         if (vendorId > 0)
         {
-            ChipLogDetail(DiscoveryVerbose, "Vendor ID: %u", vendorId);
+            ChipLogDetail(Discovery, "Vendor ID: %u", vendorId);
         }
         if (productId > 0)
         {
-            ChipLogDetail(DiscoveryVerbose, "Product ID: %u", productId);
+            ChipLogDetail(Discovery, "Product ID: %u", productId);
         }
         if (deviceType > 0)
         {
-            ChipLogDetail(DiscoveryVerbose, "Device Type: %u", deviceType);
+            ChipLogDetail(Discovery, "Device Type: %u", deviceType);
         }
         if (longDiscriminator > 0)
         {
-            ChipLogDetail(DiscoveryVerbose, "Long Discriminator: %u", longDiscriminator);
+            ChipLogDetail(Discovery, "Long Discriminator: %u", longDiscriminator);
         }
         if (additionalPairing > 0)
         {
-            ChipLogDetail(DiscoveryVerbose, "Additional Pairing: %u", additionalPairing);
+            ChipLogDetail(Discovery, "Additional Pairing: %u", additionalPairing);
         }
         if (strlen(pairingInstruction) != 0)
         {
-            ChipLogDetail(DiscoveryVerbose, "Pairing Instruction: %s", pairingInstruction);
+            ChipLogDetail(Discovery, "Pairing Instruction: %s", pairingInstruction);
         }
         if (pairingHint > 0)
         {
-            ChipLogDetail(DiscoveryVerbose, "Pairing Hint: 0x%x", pairingHint);
+            ChipLogDetail(Discovery, "Pairing Hint: 0x%x", pairingHint);
         }
         if (!IsHost(""))
         {
-            ChipLogDetail(DiscoveryVerbose, "Hostname: %s", hostName);
+            ChipLogDetail(Discovery, "Hostname: %s", hostName);
         }
         for (int j = 0; j < numIPs; j++)
         {
             char buf[Inet::kMaxIPAddressStringLength];
             char * ipAddressOut = ipAddress[j].ToString(buf, sizeof(buf));
-            ChipLogDetail(DiscoveryVerbose, "IP Address #%d: %s", j + 1, ipAddressOut);
+            ChipLogDetail(Discovery, "IP Address #%d: %s", j + 1, ipAddressOut);
             (void) ipAddressOut;
         }
         if (port > 0)
         {
-            ChipLogDetail(DiscoveryVerbose, "Port: %u", port);
+            ChipLogDetail(Discovery, "Port: %u", port);
         }
-        ChipLogDetail(DiscoveryVerbose, "Commissioning Mode: %u", commissioningMode);
+        ChipLogDetail(Discovery, "Commissioning Mode: %u", commissioningMode);
     }
 };
 
