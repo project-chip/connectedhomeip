@@ -23,6 +23,7 @@
 
 #include <platform/LockTracker.h>
 #include <support/CodeUtils.h>
+#include <support/TimeUtils.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 #include <system/WatchableEventManager.h>
@@ -294,16 +295,10 @@ void WatchableEventManager::PrepareEvents()
 {
     assertChipStackLockedByCurrentThread();
 
-    // Max out this duration and let CHIP set it appropriately.
-    mNextTimeout.tv_sec  = DEFAULT_MIN_SLEEP_PERIOD;
-    mNextTimeout.tv_usec = 0;
-    PrepareEventsWithTimeout(mNextTimeout);
-}
-
-void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeout)
-{
+    constexpr Clock::MonotonicMilliseconds kMaxTimeout =
+        static_cast<Clock::MonotonicMilliseconds>(DEFAULT_MIN_SLEEP_PERIOD) * kMillisecondsPerSecond;
     const Clock::MonotonicMilliseconds currentTime = Clock::GetMonotonicMilliseconds();
-    Clock::MonotonicMilliseconds awakenTime        = currentTime + TimevalToMilliseconds(nextTimeout);
+    Clock::MonotonicMilliseconds awakenTime        = currentTime + kMaxTimeout;
 
     Timer * timer = mTimerList.Earliest();
     if (timer && Clock::IsEarlier(timer->mAwakenTime, awakenTime))
@@ -312,10 +307,10 @@ void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeou
     }
 
     const Clock::MonotonicMilliseconds sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : 0;
-    MillisecondsToTimeval(sleepTime, nextTimeout);
+    MillisecondsToTimeval(sleepTime, mNextTimeout);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
-    chip::Mdns::GetMdnsTimeout(nextTimeout);
+    chip::Mdns::GetMdnsTimeout(mNextTimeout);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
     mSelected = mRequest;

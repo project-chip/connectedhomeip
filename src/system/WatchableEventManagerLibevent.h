@@ -61,9 +61,6 @@ public:
     void HandleEvents();
     void EventLoopEnds() {}
 
-    // TODO(#5556): Some unit tests supply a timeout at low level, due to originally using select(); these should a proper timer.
-    void PrepareEventsWithTimeout(timeval & nextTimeout);
-
 private:
     /*
      * In this implementation, libevent invokes LibeventCallbackHandler from beneath WaitForEvents(),

@@ -652,18 +652,16 @@ static void HandleResolutionComplete(void * appState, CHIP_ERROR err, uint8_t ad
     }
 }
 
-static void ServiceNetworkUntilDone(uint32_t timeoutMS)
+static void ServiceNetworkUntilDone(uint32_t timeoutMilliseconds)
 {
-    uint64_t timeoutTimeMS = System::Clock::GetMonotonicMilliseconds() + timeoutMS;
-    struct timeval sleepTime;
-    sleepTime.tv_sec  = 0;
-    sleepTime.tv_usec = 10000;
+    uint64_t timeoutTimeMilliseconds          = System::Clock::GetMonotonicMilliseconds() + timeoutMilliseconds;
+    constexpr uint32_t kSleepTimeMilliseconds = 10;
 
     while (!gDone)
     {
-        ServiceNetwork(sleepTime);
+        ServiceNetwork(kSleepTimeMilliseconds);
 
-        if (System::Clock::GetMonotonicMilliseconds() >= timeoutTimeMS)
+        if (System::Clock::GetMonotonicMilliseconds() >= timeoutTimeMilliseconds)
         {
             break;
         }

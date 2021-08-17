@@ -50,7 +50,7 @@
 #include <support/CHIPMem.h>
 #include <support/ErrorStr.h>
 #include <support/ScopedBuffer.h>
-#include <system/SystemTimer.h>
+#include <system/SystemClock.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/dns.h>
@@ -398,10 +398,8 @@ void InitNetwork()
 
     while (!NetworkIsReady())
     {
-        struct timeval lSleepTime;
-        lSleepTime.tv_sec  = 0;
-        lSleepTime.tv_usec = 100000;
-        ServiceEvents(lSleepTime);
+        constexpr uint32_t kSleepTimeMilliseconds = 100;
+        ServiceEvents(kSleepTimeMilliseconds);
     }
 
     // FIXME: this is kinda nasty :(
@@ -446,7 +444,7 @@ void InitNetwork()
     gInet.Init(gSystemLayer, lContext);
 }
 
-void ServiceEvents(struct ::timeval & aSleepTime)
+void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 {
     static bool printed = false;
 
@@ -462,8 +460,12 @@ void ServiceEvents(struct ::timeval & aSleepTime)
         }
     }
 
+    // Start a timer (with a no-op callback) to ensure that WaitForEvents() does not block longer than aSleepTimeMilliseconds.
+    gSystemLayer.StartTimer(
+        aSleepTimeMilliseconds, [](System::Layer *, void *) -> void {}, nullptr);
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    gSystemLayer.WatchableEventsManager().PrepareEventsWithTimeout(aSleepTime);
+    gSystemLayer.WatchableEventsManager().PrepareEvents();
     gSystemLayer.WatchableEventsManager().WaitForEvents();
     gSystemLayer.WatchableEventsManager().HandleEvents();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -482,9 +484,6 @@ void ServiceEvents(struct ::timeval & aSleepTime)
             }
             else
                 sRemainingSystemLayerEventDelay--;
-
-            // TODO: Currently timers are delayed by aSleepTime above. A improved solution would have a mechanism to reduce
-            // aSleepTime according to the next timer.
 
             gSystemLayer.WatchableEventsManager().HandlePlatformTimer();
         }

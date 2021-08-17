@@ -90,14 +90,8 @@ CHIP_ERROR WatchableEventManager::Init(System::Layer & systemLayer)
 
 void WatchableEventManager::PrepareEvents()
 {
-    timeval nextTimeout = { 0, 0 };
-    PrepareEventsWithTimeout(nextTimeout);
-}
-
-void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeout)
-{
     const Clock::MonotonicMilliseconds currentTime = Clock::GetMonotonicMilliseconds();
-    Clock::MonotonicMilliseconds awakenTime        = currentTime + TimevalToMilliseconds(nextTimeout);
+    Clock::MonotonicMilliseconds awakenTime        = currentTime;
 
     Timer * timer = mTimerList.Earliest();
     if (timer && Clock::IsEarlier(timer->mAwakenTime, awakenTime))
@@ -106,6 +100,7 @@ void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeou
     }
 
     const Clock::MonotonicMilliseconds sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : 0;
+    timeval nextTimeout;
     MillisecondsToTimeval(sleepTime, nextTimeout);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
