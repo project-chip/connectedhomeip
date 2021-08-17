@@ -91,7 +91,7 @@ AvahiWatchEvent ToAvahiWatchEvent(SocketEvents events)
 void AvahiWatchCallbackTrampoline(chip::System::SocketEvents events, intptr_t data)
 {
     AvahiWatch * const watch = reinterpret_cast<AvahiWatch *>(data);
-    watch->mPendingIO = ToAvahiWatchEvent(events);
+    watch->mPendingIO        = ToAvahiWatchEvent(events);
     watch->mCallback(watch, watch->mSocket, watch->mPendingIO, watch->mContext);
 }
 
@@ -163,10 +163,11 @@ AvahiWatch * Poller::WatchNew(int fd, AvahiWatchEvent event, AvahiWatchCallback 
 {
     VerifyOrDie(callback != nullptr && fd >= 0);
 
-    auto watch = std::make_unique<AvahiWatch>();
+    auto watch     = std::make_unique<AvahiWatch>();
     watch->mSocket = fd;
     LogErrorOnFailure(DeviceLayer::SystemLayer.StartWatchingSocket(fd, &watch->mSocketWatch));
-    LogErrorOnFailure(DeviceLayer::SystemLayer.SetCallback(watch->mSocketWatch, AvahiWatchCallbackTrampoline, reinterpret_cast<intptr_t>(watch.get())));
+    LogErrorOnFailure(DeviceLayer::SystemLayer.SetCallback(watch->mSocketWatch, AvahiWatchCallbackTrampoline,
+                                                           reinterpret_cast<intptr_t>(watch.get())));
     WatchUpdate(watch.get(), event);
     watch->mCallback = callback;
     watch->mContext  = context;

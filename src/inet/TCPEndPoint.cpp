@@ -2731,7 +2731,7 @@ void TCPEndPoint::HandleIncomingConnection()
     {
         // Put the new end point into the Connected state.
         conEP->mSocket = conSocket;
-        err = SystemLayer().StartWatchingSocket(conSocket, &conEP->mWatch);
+        err            = SystemLayer().StartWatchingSocket(conSocket, &conEP->mWatch);
         if (err == CHIP_NO_ERROR)
         {
             conEP->State = kState_Connected;

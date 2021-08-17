@@ -210,8 +210,8 @@ CHIP_ERROR WatchableEventManager::ScheduleWork(TimerCompleteCallback onComplete,
 CHIP_ERROR WatchableEventManager::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)
 {
     // Find a free slot.
-    SocketWatch *watch = nullptr;
-    for (auto & w: mSocketWatchPool)
+    SocketWatch * watch = nullptr;
+    for (auto & w : mSocketWatchPool)
     {
         if (w.mFD == fd)
         {
@@ -236,7 +236,7 @@ CHIP_ERROR WatchableEventManager::SetCallback(SocketWatchToken token, SocketWatc
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    watch->mCallback = callback;
+    watch->mCallback     = callback;
     watch->mCallbackData = data;
     return CHIP_NO_ERROR;
 }
@@ -278,7 +278,7 @@ CHIP_ERROR WatchableEventManager::ClearCallbackOnPendingWrite(SocketWatchToken t
 CHIP_ERROR WatchableEventManager::StopWatchingSocket(SocketWatchToken * tokenInOut)
 {
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(*tokenInOut);
-    *tokenInOut = InvalidSocketWatchToken();
+    *tokenInOut         = InvalidSocketWatchToken();
 
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(watch->mFD >= 0, CHIP_ERROR_INCORRECT_STATE);

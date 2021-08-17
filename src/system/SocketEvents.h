@@ -31,7 +31,7 @@ enum class SocketEventFlags : uint8_t
 
 using SocketEvents = BitFlags<SocketEventFlags>;
 
-using SocketWatchToken = intptr_t;
+using SocketWatchToken    = intptr_t;
 using SocketWatchCallback = void (*)(SocketEvents events, intptr_t data);
 
 constexpr int kInvalidFd = -1;

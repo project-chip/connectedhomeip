@@ -115,9 +115,9 @@ void Timer::Clear()
 void Timer::HandleComplete()
 {
     // Save information needed to perform the callback.
-    Layer & lLayer                            = this->SystemLayer();
+    Layer & lLayer                          = this->SystemLayer();
     const TimerCompleteCallback lOnComplete = this->mOnComplete;
-    void * lAppState                          = this->AppState;
+    void * lAppState                        = this->AppState;
 
     // Check if timer is armed
     VerifyOrReturn(lOnComplete != nullptr, );

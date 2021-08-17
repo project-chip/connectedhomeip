@@ -185,8 +185,7 @@ public:
     /**
      * Obtain a new timer from the system object pool.
      */
-    static Timer * New(System::Layer & systemLayer, uint32_t delayMilliseconds, TimerCompleteCallback onComplete,
-                       void * appState);
+    static Timer * New(System::Layer & systemLayer, uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState);
 
     /**
      * Return the expiration time.
