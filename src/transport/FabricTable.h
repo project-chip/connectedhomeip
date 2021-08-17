@@ -98,6 +98,8 @@ public:
     NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
     FabricId GetFabricId() const { return mOperationalId.GetFabricId(); }
 
+    uint64_t GetCompressedFabricId() const { return mCompressedFabricId; }
+
     FabricIndex GetFabricIndex() const { return mFabric; }
 
     uint16_t GetVendorId() const { return mVendorId; }
@@ -124,20 +126,6 @@ public:
         return (mRootCert != nullptr && mNOCCert != nullptr && mRootCertLen != 0 && mNOCCertLen != 0);
     }
 
-    /**
-     * @brief
-     *   Retrieve the credentials corresponding to the device being commissioned in form of OperationalCredentialSet.
-     *
-     * @param credentials Credential Set object containing  the device's certificate set and keypair.
-     * @param certSet Set of Root [+ ICA] certificates corresponding to the device's credential set.
-     * @param rootKeyId Trusted Root Id corresponding to the device's credential set.
-     * @param credentialsIndex Index for the retrieved credentials corresponding to this device's credential set.
-     *
-     * @return CHIP_ERROR
-     */
-    CHIP_ERROR GetCredentials(Credentials::OperationalCredentialSet & credentials, Credentials::ChipCertificateSet & certSet,
-                              Credentials::CertificateKeyId & rootKeyId, uint8_t & credentialsIndex);
-
     const uint8_t * GetTrustedRoot(uint16_t & size)
     {
         size = mRootCertLen;
@@ -155,6 +143,39 @@ public:
 
     bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
 
+    CHIP_ERROR GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
+                                     MutableByteSpan & destinationId);
+
+    CHIP_ERROR MatchDestinationID(const ByteSpan & destinationId, const ByteSpan & initiatorRandom, const ByteSpan * ipkList,
+                                  size_t ipkListEntries);
+
+    CHIP_ERROR GetOperationalCredentials(MutableByteSpan & credentials)
+    {
+        ReturnErrorCodeIf(!AreCredentialsAvailable(), CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(credentials.size() < mNOCCertLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(credentials.data(), mNOCCert, mNOCCertLen);
+        credentials.reduce_size(mNOCCertLen);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetRootCert(ByteSpan & cert)
+    {
+        ReturnErrorCodeIf(!AreCredentialsAvailable(), CHIP_ERROR_INCORRECT_STATE);
+        cert = ByteSpan(mRootCert, mRootCertLen);
+        return CHIP_NO_ERROR;
+    }
+
+    uint16_t GetOperationalCredentialsLength() { return mNOCCertLen; }
+
+    Credentials::CertificateKeyId GetTrustedRootId()
+    {
+        return mRootKeyIdLen == Credentials::kKeyIdentifierLength ? Credentials::CertificateKeyId(mRootKeyId)
+                                                                  : Credentials::CertificateKeyId();
+    }
+
+    CHIP_ERROR VerifyCredentials(const ByteSpan & noc, Credentials::ValidationContext & context, PeerId & nocPeerId,
+                                 Crypto::P256PublicKey & nocPubkey);
+
     /**
      *  Reset the state to a completely uninitialized status.
      */
@@ -166,7 +187,8 @@ public:
 
         if (mEphemeralKey != nullptr)
         {
-            mEphemeralKey->Initialize();
+            chip::Platform::Delete(mEphemeralKey);
+            mEphemeralKey = nullptr;
         }
         ReleaseRootCert();
         ReleaseICACert();
@@ -184,11 +206,16 @@ private:
 
     AccessControlList mACL;
 
+    uint8_t mRootKeyId[Credentials::kKeyIdentifierLength];
+    uint16_t mRootKeyIdLen = 0;
+
 #ifdef ENABLE_HSM_CASE_OPS_KEY
     Crypto::P256KeypairHSM * mEphemeralKey = nullptr;
 #else
     Crypto::P256Keypair * mEphemeralKey = nullptr;
 #endif
+
+    Crypto::P256PublicKey mRootPubkey;
 
     uint8_t * mRootCert            = nullptr;
     uint16_t mRootCertLen          = 0;
@@ -197,6 +224,7 @@ private:
     uint16_t mICACertLen           = 0;
     uint8_t * mNOCCert             = nullptr;
     uint16_t mNOCCertLen           = 0;
+    uint64_t mCompressedFabricId   = 0;
 
     static constexpr size_t KeySize();
 
@@ -207,6 +235,8 @@ private:
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, FabricIndex id);
 
     void SetOperationalId(PeerId id) { mOperationalId = id; }
+
+    CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
 
     CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert);
     CHIP_ERROR SetICACert(const chip::ByteSpan & cert);
@@ -329,7 +359,7 @@ class DLL_EXPORT FabricTable
 public:
     FabricTable() { Reset(); }
     CHIP_ERROR Store(FabricIndex id);
-    CHIP_ERROR LoadFromStorage(FabricIndex id);
+    CHIP_ERROR LoadFromStorage(FabricInfo * info);
 
     CHIP_ERROR Delete(FabricIndex id);
     void DeleteAllFabrics();
@@ -348,6 +378,9 @@ public:
     void ReleaseFabricIndex(FabricIndex fabricId);
 
     FabricInfo * FindFabricWithIndex(FabricIndex fabricId);
+
+    FabricIndex FindDestinationIDCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
+                                           const ByteSpan * ipkList, size_t ipkListEntries);
 
     void Reset();
 
@@ -370,8 +403,6 @@ private:
     FabricTableDelegate * mDelegate = nullptr;
 
     FabricIndex mNextAvailableFabricIndex = kMinValidFabricIndex;
-
-    CHIP_ERROR SetFabricInfoIfIndexAvailable(FabricIndex index, FabricInfo & fabric);
 };
 
 } // namespace Transport

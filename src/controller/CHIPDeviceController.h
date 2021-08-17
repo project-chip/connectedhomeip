@@ -361,11 +361,6 @@ protected:
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
-    Credentials::ChipCertificateSet mCertificates;
-    Credentials::OperationalCredentialSet mCredentials;
-    Credentials::CertificateKeyId mRootKeyId;
-    uint8_t mCredentialsIndex;
-
     SessionIDAllocator mIDAllocator;
 
     uint16_t mVendorId;

@@ -38,6 +38,7 @@
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/FabricTable.h>
 #include <transport/PairingSession.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
@@ -96,7 +97,7 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR ListenForSessionEstablishment(Credentials::OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+    CHIP_ERROR ListenForSessionEstablishment(uint16_t myKeyId, Transport::FabricTable * fabrics,
                                              SessionEstablishmentDelegate * delegate);
 
     /**
@@ -116,8 +117,7 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress,
-                                Credentials::OperationalCredentialSet * operationalCredentialSet, uint8_t opCredSetIndex,
+    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, Transport::FabricTable * fabrics, FabricIndex fabricIndex,
                                 NodeId peerNodeId, uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
                                 SessionEstablishmentDelegate * delegate);
 
@@ -183,8 +183,7 @@ private:
         kUnexpected           = 0xff,
     };
 
-    CHIP_ERROR Init(Credentials::OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
-                    SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(uint16_t myKeyId, Transport::FabricTable * fabrics, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SendSigmaR1();
     CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle & msg);
@@ -198,13 +197,7 @@ private:
     CHIP_ERROR SendSigmaR1Resume();
     CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
-protected:
-    CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::P256PublicKeySpan & rootPubkey, NodeId nodeId,
-                                     FabricId fabricId, const ByteSpan & ipk, MutableByteSpan & destinationId);
-
 private:
-    CHIP_ERROR FindDestinationIdCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
-                                          const ByteSpan * ipkList, size_t ipkListEntries);
     CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                     MutableByteSpan & salt);
     CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID);
@@ -242,7 +235,6 @@ private:
     Crypto::P256Keypair mEphemeralKey;
 #endif
     Crypto::P256ECDHDerivedSecret mSharedSecret;
-    Credentials::OperationalCredentialSet * mOpCredSet;
     Credentials::CertificateKeyId mTrustedRootId;
     Credentials::ValidationContext mValidContext;
 
@@ -251,6 +243,9 @@ private:
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
     SessionEstablishmentExchangeDispatch mMessageDispatch;
+
+    Transport::FabricTable * mFabricsTable = nullptr;
+    FabricIndex mFabricIndex;
 
     struct SigmaErrorMsg
     {

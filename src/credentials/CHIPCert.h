@@ -833,6 +833,20 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1::AS
 CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::TLVWriter & writer, uint64_t tag);
 
 /**
+ * Extract the FabricID from a CHIP certificate in ByteSpan TLV-encoded
+ * form.  This does not perform any sort of validation on the certificate
+ * structure other than parsing it.
+ *
+ * This function can be used to extract Fabric ID from an ICA certificate.
+ * These certificates may not contain a NodeID, so ExtractPeerIdFromOpCert()
+ * cannot be used for such certificates.
+ *
+ * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have RDN
+ * corresponding to FabricID.
+ */
+CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * fabricId);
+
+/**
  * Extract a PeerId from an operational certificate that has already been
  * parsed.
  *

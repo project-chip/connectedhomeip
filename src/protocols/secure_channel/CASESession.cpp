@@ -61,8 +61,6 @@ static_assert(sizeof(kTBEData2_Nonce) == sizeof(kTBEData3_Nonce), "TBEData2_Nonc
 // TODO: move this constant over to src/crypto/CHIPCryptoPAL.h - name it CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES
 constexpr size_t kTAGSize = 16;
 
-constexpr size_t kDestinationMessageLen = kSigmaParamRandomNumberSize + kP256_PublicKey_Length + sizeof(FabricId) + sizeof(NodeId);
-
 #ifdef ENABLE_HSM_HKDF
 using HKDF_sha_crypto = HKDF_shaHSM;
 #else
@@ -190,12 +188,10 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
-                             SessionEstablishmentDelegate * delegate)
+CHIP_ERROR CASESession::Init(uint16_t myKeyId, Transport::FabricTable * fabrics, SessionEstablishmentDelegate * delegate)
 {
+    VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(operationalCredentialSet != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(operationalCredentialSet->GetCertCount() > 0, CHIP_ERROR_CERT_NOT_FOUND);
 
     Clear();
 
@@ -203,7 +199,7 @@ CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet
 
     mDelegate = delegate;
     SetLocalKeyId(myKeyId);
-    mOpCredSet = operationalCredentialSet;
+    mFabricsTable = fabrics;
 
     mValidContext.Reset();
     mValidContext.mRequiredKeyUsages.Set(KeyUsageFlags::kDigitalSignature);
@@ -213,10 +209,10 @@ CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet
 }
 
 CHIP_ERROR
-CASESession::ListenForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+CASESession::ListenForSessionEstablishment(uint16_t myKeyId, Transport::FabricTable * fabrics,
                                            SessionEstablishmentDelegate * delegate)
 {
-    ReturnErrorOnFailure(Init(operationalCredentialSet, myKeyId, delegate));
+    ReturnErrorOnFailure(Init(myKeyId, fabrics, delegate));
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR1;
     mPairingComplete = false;
@@ -226,17 +222,16 @@ CASESession::ListenForSessionEstablishment(OperationalCredentialSet * operationa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress,
-                                         OperationalCredentialSet * operationalCredentialSet, uint8_t opCredSetIndex,
-                                         NodeId peerNodeId, uint16_t myKeyId, ExchangeContext * exchangeCtxt,
-                                         SessionEstablishmentDelegate * delegate)
+CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress, Transport::FabricTable * fabrics,
+                                         FabricIndex fabricIndex, NodeId peerNodeId, uint16_t myKeyId,
+                                         ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Return early on error here, as we have not initalized any state yet
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = Init(operationalCredentialSet, myKeyId, delegate);
+    err = Init(myKeyId, fabrics, delegate);
 
     // We are setting the exchange context specifically before checking for error.
     // This is to make sure the exchange will get closed if Init() returned an error.
@@ -246,11 +241,11 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     // been initialized
     SuccessOrExit(err);
 
+    mFabricIndex = fabricIndex;
+
     mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout);
     SetPeerAddress(peerAddress);
     SetPeerNodeId(peerNodeId);
-    mTrustedRootId = operationalCredentialSet->GetTrustedRootId(opCredSetIndex);
-    VerifyOrExit(!mTrustedRootId.empty(), err = CHIP_ERROR_INTERNAL);
 
     err = SendSigmaR1();
     SuccessOrExit(err);
@@ -336,23 +331,12 @@ CHIP_ERROR CASESession::SendSigmaR1()
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalKeyId(), true));
     // Generate a Destination Identifier
     {
-        const ChipCertificateData * rootCertificate = mOpCredSet->GetRootCertificate(mTrustedRootId);
-        VerifyOrReturnError(rootCertificate != nullptr, CHIP_ERROR_CERT_NOT_FOUND);
-        VerifyOrReturnError(!rootCertificate->mPublicKey.empty(), CHIP_ERROR_INTERNAL);
-        VerifyOrReturnError(rootCertificate->mPublicKey.size() == kP256_PublicKey_Length, CHIP_ERROR_INTERNAL);
-        ChipCertificateData nodeOperationalCertificate;
-        FabricId fabricId;
         MutableByteSpan destinationIdSpan(destinationIdentifier);
-
+        Transport::FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+        ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mIPK, GetIPKList()->data(), sizeof(mIPK));
         ReturnErrorOnFailure(
-            DecodeChipCert(ByteSpan(mOpCredSet->GetDevOpCred(mTrustedRootId), mOpCredSet->GetDevOpCredLen(mTrustedRootId)),
-                           nodeOperationalCertificate));
-        ReturnErrorOnFailure(nodeOperationalCertificate.mSubjectDN.GetCertFabricId(fabricId));
-        // retrieve Fabric IPK
-        MutableByteSpan ipkSpan(mIPK);
-        ReturnErrorOnFailure(RetrieveIPK(fabricId, ipkSpan));
-        ReturnErrorOnFailure(GenerateDestinationID(ByteSpan(initiatorRandom), rootCertificate->mPublicKey, GetPeerNodeId(),
-                                                   fabricId, ByteSpan(mIPK), destinationIdSpan));
+            fabric->GenerateDestinationID(ByteSpan(mIPK), ByteSpan(initiatorRandom), GetPeerNodeId(), destinationIdSpan));
     }
     ReturnErrorOnFailure(tlvWriter.PutBytes(TLV::ContextTag(3), destinationIdentifier, sizeof(destinationIdentifier)));
 
@@ -419,8 +403,10 @@ CHIP_ERROR CASESession::HandleSigmaR1(System::PacketBufferHandle & msg)
 
     {
         const ByteSpan * ipkListSpan = GetIPKList();
-        SuccessOrExit(err = FindDestinationIdCandidate(ByteSpan(destinationIdentifier), ByteSpan(initiatorRandom), ipkListSpan,
-                                                       GetIPKListEntries()));
+        memcpy(mIPK, ipkListSpan->data(), sizeof(mIPK));
+        mFabricIndex = mFabricsTable->FindDestinationIDCandidate(ByteSpan(destinationIdentifier), ByteSpan(initiatorRandom),
+                                                                 ipkListSpan, GetIPKListEntries());
+        VerifyOrExit(mFabricIndex != Transport::kUndefinedFabricIndex, err = CHIP_ERROR_CERT_NOT_TRUSTED);
     }
 
     SuccessOrExit(err = tlvReader.Next());
@@ -456,6 +442,22 @@ CHIP_ERROR CASESession::SendSigmaR2()
     uint8_t sr2k[kAEADKeySize];
     P256ECDSASignature tbsData2Signature;
 
+    uint32_t opcredsLen = 0;
+    uint8_t opcreds[kMaxCHIPCertLength];
+    MutableByteSpan opcredsSpan(opcreds);
+
+    Transport::FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = fabric->GetOperationalCredentials(opcredsSpan);
+    SuccessOrExit(err);
+
+    VerifyOrExit(CanCastTo<uint32_t>(opcredsSpan.size()), err = CHIP_ERROR_INVALID_ARGUMENT);
+    opcredsLen = static_cast<uint32_t>(opcredsSpan.size());
+
+    mTrustedRootId = fabric->GetTrustedRootId();
+    VerifyOrExit(!mTrustedRootId.empty(), err = CHIP_ERROR_INTERNAL);
+
     // Fill in the random value
     err = DRBG_get_bytes(&msg_rand[0], sizeof(msg_rand));
     SuccessOrExit(err);
@@ -483,7 +485,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
     }
 
     // Construct Sigma2 TBS Data
-    msg_r2_signed_len = EstimateTLVStructOverhead(mOpCredSet->GetDevOpCredLen(mTrustedRootId) + kP256_PublicKey_Length * 2, 3);
+    msg_r2_signed_len = EstimateTLVStructOverhead(opcredsLen + kP256_PublicKey_Length * 2, 3);
 
     VerifyOrExit(msg_R2_Signed.Alloc(msg_r2_signed_len), err = CHIP_ERROR_NO_MEMORY);
 
@@ -493,8 +495,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
 
         tlvWriter.Init(msg_R2_Signed.Get(), msg_r2_signed_len);
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), mOpCredSet->GetDevOpCred(mTrustedRootId),
-                                               mOpCredSet->GetDevOpCredLen(mTrustedRootId)));
+        SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), opcredsSpan.data(), opcredsLen));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(2), mEphemeralKey.Pubkey(),
                                                static_cast<uint32_t>(mEphemeralKey.Pubkey().Length())));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(3), mRemotePubKey, static_cast<uint32_t>(mRemotePubKey.Length())));
@@ -504,11 +505,12 @@ CHIP_ERROR CASESession::SendSigmaR2()
     }
 
     // Generate a Signature
-    err = mOpCredSet->SignMsg(mTrustedRootId, msg_R2_Signed.Get(), msg_r2_signed_len, tbsData2Signature);
+    VerifyOrExit(fabric->GetEphemeralKey() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    err = fabric->GetEphemeralKey()->ECDSA_sign_msg(msg_R2_Signed.Get(), msg_r2_signed_len, tbsData2Signature);
     SuccessOrExit(err);
 
     // Construct Sigma2 TBE Data
-    msg_r2_signed_enc_len = EstimateTLVStructOverhead(mOpCredSet->GetDevOpCredLen(mTrustedRootId) + tbsData2Signature.Length(), 2);
+    msg_r2_signed_enc_len = EstimateTLVStructOverhead(opcredsLen + tbsData2Signature.Length(), 2);
 
     VerifyOrExit(msg_R2_Encrypted.Alloc(msg_r2_signed_enc_len + kTAGSize), err = CHIP_ERROR_NO_MEMORY);
 
@@ -518,8 +520,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
 
         tlvWriter.Init(msg_R2_Encrypted.Get(), msg_r2_signed_enc_len);
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), mOpCredSet->GetDevOpCred(mTrustedRootId),
-                                               mOpCredSet->GetDevOpCredLen(mTrustedRootId)));
+        SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), opcredsSpan.data(), opcredsLen));
         SuccessOrExit(
             err = tlvWriter.PutBytes(TLV::ContextTag(2), tbsData2Signature, static_cast<uint32_t>(tbsData2Signature.Length())));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
@@ -744,8 +745,24 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
     ChipLogDetail(SecureChannel, "Sending SigmaR3");
 
+    uint32_t opcredsLen = 0;
+    uint8_t opcreds[kMaxCHIPCertLength];
+    MutableByteSpan opcredsSpan(opcreds);
+
+    Transport::FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = fabric->GetOperationalCredentials(opcredsSpan);
+    SuccessOrExit(err);
+
+    VerifyOrExit(CanCastTo<uint32_t>(opcredsSpan.size()), err = CHIP_ERROR_INVALID_ARGUMENT);
+    opcredsLen = static_cast<uint32_t>(opcredsSpan.size());
+
+    mTrustedRootId = fabric->GetTrustedRootId();
+    VerifyOrExit(!mTrustedRootId.empty(), err = CHIP_ERROR_INTERNAL);
+
     // Prepare SigmaR3 TBS Data Blob
-    msg_r3_signed_len = EstimateTLVStructOverhead(mOpCredSet->GetDevOpCredLen(mTrustedRootId) + kP256_PublicKey_Length * 2, 3);
+    msg_r3_signed_len = EstimateTLVStructOverhead(opcredsLen + kP256_PublicKey_Length * 2, 3);
 
     VerifyOrExit(msg_R3_Signed.Alloc(msg_r3_signed_len), err = CHIP_ERROR_NO_MEMORY);
 
@@ -755,8 +772,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
         tlvWriter.Init(msg_R3_Signed.Get(), msg_r3_signed_len);
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), mOpCredSet->GetDevOpCred(mTrustedRootId),
-                                               mOpCredSet->GetDevOpCredLen(mTrustedRootId)));
+        SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), opcredsSpan.data(), opcredsLen));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(2), mEphemeralKey.Pubkey(),
                                                static_cast<uint32_t>(mEphemeralKey.Pubkey().Length())));
         SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(3), mRemotePubKey, static_cast<uint32_t>(mRemotePubKey.Length())));
@@ -766,11 +782,12 @@ CHIP_ERROR CASESession::SendSigmaR3()
     }
 
     // Generate a signature
-    err = mOpCredSet->SignMsg(mTrustedRootId, msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature);
+    VerifyOrExit(fabric->GetEphemeralKey() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    err = fabric->GetEphemeralKey()->ECDSA_sign_msg(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature);
     SuccessOrExit(err);
 
     // Prepare SigmaR3 TBE Data Blob
-    msg_r3_encrypted_len = EstimateTLVStructOverhead(mOpCredSet->GetDevOpCredLen(mTrustedRootId) + tbsData3Signature.Length(), 2);
+    msg_r3_encrypted_len = EstimateTLVStructOverhead(opcredsLen + tbsData3Signature.Length(), 2);
 
     VerifyOrExit(msg_R3_Encrypted.Alloc(msg_r3_encrypted_len + kTAGSize), err = CHIP_ERROR_NO_MEMORY);
 
@@ -780,8 +797,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
         tlvWriter.Init(msg_R3_Encrypted.Get(), msg_r3_encrypted_len);
         SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), mOpCredSet->GetDevOpCred(mTrustedRootId),
-                                               mOpCredSet->GetDevOpCredLen(mTrustedRootId)));
+        SuccessOrExit(err = tlvWriter.PutBytes(TLV::ContextTag(1), opcredsSpan.data(), opcredsLen));
         SuccessOrExit(
             err = tlvWriter.PutBytes(TLV::ContextTag(2), tbsData3Signature, static_cast<uint32_t>(tbsData3Signature.Length())));
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
@@ -1001,75 +1017,6 @@ void CASESession::SendErrorMsg(SigmaErrorType errorCode)
                    ChipLogError(SecureChannel, "Failed to send error message"));
 }
 
-CHIP_ERROR CASESession::GenerateDestinationID(const ByteSpan & random, const P256PublicKeySpan & rootPubkey, NodeId nodeId,
-                                              FabricId fabricId, const ByteSpan & ipk, MutableByteSpan & destinationId)
-{
-    HMAC_sha hmac;
-    uint8_t destinationMessage[kDestinationMessageLen];
-
-    Encoding::LittleEndian::BufferWriter bbuf(destinationMessage, sizeof(destinationMessage));
-
-    bbuf.Put(random.data(), random.size());
-    bbuf.Put(rootPubkey.data(), rootPubkey.size());
-    bbuf.Put64(fabricId);
-    bbuf.Put64(nodeId);
-
-    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    ReturnErrorOnFailure(hmac.HMAC_SHA256(ipk.data(), ipk.size(), destinationMessage, sizeof(destinationMessage),
-                                          destinationId.data(), destinationId.size()));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CASESession::FindDestinationIdCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
-                                                   const ByteSpan * ipkList, size_t ipkListEntries)
-{
-    uint8_t nCertificateSets = mOpCredSet->GetCertCount();
-
-    for (size_t certChainIdx = 0; certChainIdx < nCertificateSets; ++certChainIdx)
-    {
-        uint8_t candidate[kSHA256_Hash_Length] = { 0 };
-        CertificateKeyId trustedRootId;
-        ChipCertificateData nodeOperationalCertificate;
-        NodeId nodeId;
-        FabricId fabricId;
-
-        trustedRootId = mOpCredSet->GetTrustedRootId(static_cast<uint16_t>(certChainIdx));
-
-        ReturnErrorOnFailure(
-            DecodeChipCert(ByteSpan(mOpCredSet->GetDevOpCred(trustedRootId), mOpCredSet->GetDevOpCredLen(trustedRootId)),
-                           nodeOperationalCertificate));
-
-        ReturnErrorOnFailure(nodeOperationalCertificate.mSubjectDN.GetCertChipId(nodeId));
-        ReturnErrorOnFailure(nodeOperationalCertificate.mSubjectDN.GetCertFabricId(fabricId));
-
-        const ChipCertificateData * rootCertificate = mOpCredSet->GetRootCertificate(trustedRootId);
-        VerifyOrReturnError(rootCertificate != nullptr, CHIP_ERROR_CERT_NOT_FOUND);
-        VerifyOrReturnError(!rootCertificate->mPublicKey.empty(), CHIP_ERROR_INTERNAL);
-        VerifyOrReturnError(rootCertificate->mPublicKey.size() == kP256_PublicKey_Length, CHIP_ERROR_INTERNAL);
-
-        for (size_t ipkIdx = 0; ipkIdx < ipkListEntries; ++ipkIdx)
-        {
-            MutableByteSpan candidateSpan(candidate);
-            ReturnErrorOnFailure(GenerateDestinationID(initiatorRandom, rootCertificate->mPublicKey, nodeId, fabricId,
-                                                       ipkList[ipkIdx], candidateSpan));
-
-            if (destinationId.data_equal(candidateSpan))
-            {
-                VerifyOrReturnError(sizeof(mIPK) == ipkList[ipkIdx].size(), CHIP_ERROR_INTERNAL);
-                memcpy(mIPK, ipkList[ipkIdx].data(), ipkList[ipkIdx].size());
-                mTrustedRootId = trustedRootId;
-                break;
-            }
-        }
-    }
-
-    VerifyOrReturnError(!mTrustedRootId.empty(), CHIP_ERROR_CERT_NOT_TRUSTED);
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR CASESession::ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                              MutableByteSpan & salt)
 {
@@ -1111,40 +1058,15 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR3(const ByteSpan & ipk, MutableByteSp
 
 CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID)
 {
-    const ChipCertificateData * resultCert = nullptr;
-
-    ChipCertificateSet certSet;
-    // Certificate set can contain up to 3 certs (NOC, ICA cert, and Root CA cert)
-    ReturnErrorOnFailure(certSet.Init(3));
-
-    Encoding::LittleEndian::BufferWriter bbuf(responderID, responderID.Length());
-    ReturnErrorOnFailure(certSet.LoadCert(responderOpCert, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
-
-    bbuf.Put(certSet.GetCertSet()[0].mPublicKey.data(), certSet.GetCertSet()[0].mPublicKey.size());
-
-    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    // Validate responder identity located in msg_r2_encrypted
-    ReturnErrorOnFailure(mOpCredSet->FindCertSet(mTrustedRootId)
-                             ->LoadCert(responderOpCert, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+    Transport::FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(SetEffectiveTime());
-    // Locate the subject DN and key id that will be used as input the FindValidCert() method.
-    {
-        const ChipDN & subjectDN              = certSet.GetCertSet()[0].mSubjectDN;
-        const CertificateKeyId & subjectKeyId = certSet.GetCertSet()[0].mSubjectKeyId;
 
-        ReturnErrorOnFailure(mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, &resultCert));
+    PeerId peerId;
+    ReturnErrorOnFailure(fabric->VerifyCredentials(responderOpCert, mValidContext, peerId, responderID));
 
-        // Now that we have verified that this is a valid cert, try to get the
-        // peer's operational identity from it.
-        PeerId peerId;
-        ReturnErrorOnFailure(ExtractPeerIdFromOpCert(certSet.GetCertSet()[0], &peerId));
-        SetPeerNodeId(peerId.GetNodeId());
-    }
-
-    // Release the previously loaded NOC Certificate
-    ReturnErrorOnFailure(mOpCredSet->FindCertSet(mTrustedRootId)->ReleaseLastCert());
+    SetPeerNodeId(peerId.GetNodeId());
 
     return CHIP_NO_ERROR;
 }
