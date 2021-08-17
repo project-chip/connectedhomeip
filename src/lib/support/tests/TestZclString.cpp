@@ -93,7 +93,6 @@ static void TestZclStringEqualsMaximumSize(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 255);
     NL_TEST_ASSERT(inSuite, allCharactersSame(zclString.data()) == true);
-
 }
 
 static void TestSizeZclStringBiggerThanMaximumSize_Length_256(nlTestSuite * inSuite, void * inContext)
@@ -109,7 +108,6 @@ static void TestSizeZclStringBiggerThanMaximumSize_Length_256(nlTestSuite * inSu
 
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 0);
-
 }
 
 static void TestZclStringBiggerThanMaximumSize_Length_257(nlTestSuite * inSuite, void * inContext)
@@ -125,7 +123,6 @@ static void TestZclStringBiggerThanMaximumSize_Length_257(nlTestSuite * inSuite,
 
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 0);
-
 }
 
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
