@@ -78,6 +78,7 @@ static_library("support") {
     "FibonacciUtils.h",
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
+    "GenericAllocator.h",
     "LifetimePersistedCounter.cpp",
     "LifetimePersistedCounter.h",
     "ObjectLifeCycle.h",
