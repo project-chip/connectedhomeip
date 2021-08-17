@@ -15,6 +15,8 @@
 #    limitations under the License.
 #
 
+from dataclasses import dataclass
+from typing import Any
 from chip import ChipDeviceCtrl
 import threading
 import os
@@ -179,21 +181,44 @@ class BaseTestHelper:
         return True
 
     def TestWriteBasicAttributes(self, nodeid: int, endpoint: int, group: int):
-        basic_cluster_attrs = [
-            ("UserLabel", "Test"),
+        @dataclass
+        class AttributeWriteRequest:
+            cluster: str
+            attribute: str
+            value: Any
+
+        requests = [
+            AttributeWriteRequest("Basic", "UserLabel", "Test"),
         ]
         failed_zcl = []
-        for basic_attr in basic_cluster_attrs:
+        for req in requests:
             try:
-                self.devCtrl.ZCLWriteAttribute(cluster="Basic",
-                                               attribute=basic_attr[0],
-                                               nodeid=nodeid,
-                                               endpoint=endpoint,
-                                               groupid=group,
-                                               value=basic_attr[1])
+                res = self.devCtrl.ZCLWriteAttribute(cluster=req.cluster,
+                                                     attribute=req.attribute,
+                                                     nodeid=nodeid,
+                                                     endpoint=endpoint,
+                                                     groupid=group,
+                                                     value=req.value)
+                if res is None:
+                    raise Exception(
+                        f"Write {req.cluster}.{req.attribute} attribute: no value get")
+                elif res.status != 0:
+                    raise Exception(
+                        f"Write {req.cluster}.{req.attribute} attribute: non-zero status code {res.status}")
                 time.sleep(2)
+                res = self.devCtrl.ZCLReadAttribute(
+                    cluster=req.cluster, attribute=req.attribute, nodeid=nodeid, endpoint=endpoint, groupid=group)
+                if res is None:
+                    raise Exception(
+                        f"Read written {req.cluster}.{req.attribute} attribute: failed to read attribute")
+                elif res.status != 0:
+                    raise Exception(
+                        f"Read written {req.cluster}.{req.attribute} attribute: non-zero status code {res.status}")
+                elif res.value != req.value:
+                    raise Exception(
+                        f"Read written {req.cluster}.{req.attribute} attribute: expected {req.value} got {res.value}")
             except Exception:
-                failed_zcl.append(basic_attr)
+                failed_zcl.append(req)
         if failed_zcl:
             self.logger.exception(f"Following attributes failed: {failed_zcl}")
             return False
