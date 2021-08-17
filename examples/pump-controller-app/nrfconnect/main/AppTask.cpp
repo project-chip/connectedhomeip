@@ -30,6 +30,9 @@
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <platform/CHIPDeviceLayer.h>
 
 #include <dk_buttons_and_leds.h>
@@ -94,6 +97,10 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // Initialize device attestation config
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
 

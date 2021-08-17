@@ -53,6 +53,8 @@
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -625,6 +627,9 @@ extern "C" void app_main()
     // Init ZCL Data Model and CHIP App Server
     AppCallbacks callbacks;
     InitServer(&callbacks);
+
+    // Initialize device attestation config
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     SetupPretendDevices();
     SetupInitialLevelControlValues(/* endpointId = */ 1);

@@ -30,6 +30,9 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 //#include <app/server/DataModelHandler.h>
 
 #include <ti/drivers/apps/Button.h>
@@ -143,6 +146,9 @@ int AppTask::Init()
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
     InitServer();
+
+    // Initialize device attestation config
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");

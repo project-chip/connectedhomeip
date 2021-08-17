@@ -30,6 +30,9 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -97,6 +100,10 @@ CHIP_ERROR AppTask::Init()
 
     // Init ZCL Data Model
     InitServer();
+
+    // Initialize device attestation config
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+
     UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();

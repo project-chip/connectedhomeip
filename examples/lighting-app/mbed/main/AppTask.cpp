@@ -38,6 +38,9 @@
 #include <app/common/gen/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 // mbed-os headers
 #include "drivers/InterruptIn.h"
 #include "drivers/Timeout.h"
@@ -113,6 +116,9 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // Initialize device attestation config
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));

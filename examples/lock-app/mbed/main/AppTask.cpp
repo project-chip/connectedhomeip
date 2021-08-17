@@ -27,6 +27,8 @@
 #define sleep unistd_sleep
 #include <app/server/Mdns.h>
 #include <app/server/Server.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/CHIPDeviceLayer.h>
 #undef sleep
 
@@ -118,6 +120,9 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // Initialize device attestation config
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));

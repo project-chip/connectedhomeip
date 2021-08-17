@@ -30,6 +30,9 @@
 #include "shell_extension/launch.h"
 #include <app/server/Server.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <cmath>
 #include <cstdio>
 #include <string>
@@ -82,6 +85,9 @@ extern "C" void app_main()
     }
 
     InitServer();
+
+    // Initialize device attestation config
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
     error = GetAppTask().StartAppTask();

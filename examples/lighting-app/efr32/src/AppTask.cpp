@@ -33,6 +33,9 @@
 
 #include <assert.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -99,6 +102,9 @@ CHIP_ERROR AppTask::Init()
 
     // Init ZCL Data Model
     InitServer();
+
+    // Initialize device attestation config
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     // Initialise WSTK buttons PB0 and PB1 (including debounce).
     ButtonHandler::Init();
