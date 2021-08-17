@@ -25,6 +25,7 @@ class Platform(IntEnum):
     ANDROID = auto()
     INFINEON = auto()
     TELINK = auto()
+    TIZEN = auto()
 
     @property
     def ArgName(self):
@@ -68,6 +69,9 @@ class Board(IntEnum):
 
     # Infineon board
     P6BOARD = auto()
+
+    # Tizen platform
+    TIZEN = auto()
 
     @property
     def ArgName(self):

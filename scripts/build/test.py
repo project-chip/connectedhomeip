@@ -46,6 +46,7 @@ def build_actual_output(root: str, out: str) -> List[str]:
         'PW_PROJECT_ROOT': root,
         'ANDROID_NDK_HOME': 'TEST_ANDROID_NDK_HOME',
         'ANDROID_HOME': 'TEST_ANDROID_HOME',
+        'TIZEN_HOME': 'TEST_TIZEN_HOME',
     })
 
     retval = subprocess.run([

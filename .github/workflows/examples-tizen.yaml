@@ -29,6 +29,7 @@ jobs:
 
         container:
             image: connectedhomeip/chip-build-tizen:latest
+            options: --user root
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -40,5 +41,4 @@ jobs:
                   submodules: true
             - name: Build example Tizen lighting app
               run:
-                  scripts/examples/gn_tizen_example.sh examples/lighting-app/linux
-                  out/lighting_app_tizen 'import("//with_tizen.gni")'
+                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py --platform tizen build"

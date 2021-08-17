@@ -140,7 +140,10 @@
         {
             "label": "Build Lighting App (Tizen)",
             "type": "shell",
-            "command": "scripts/examples/gn_tizen_example.sh examples/lighting-app/linux out/lighting_app_tizen 'import(\"//with_tizen.gni\")'",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "./scripts/build/build_examples.py --platform tizen build"
+            ],
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
