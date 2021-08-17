@@ -165,9 +165,7 @@ static_library("system") {
   allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]
 
   if (chip_system_config_use_sockets) {
-    sources += [
-      "SocketEvents.h",
-    ]
+    sources += [ "SocketEvents.h" ]
     if (chip_system_config_event_loop == "Libevent") {
       libs = [ "event" ]
     }
