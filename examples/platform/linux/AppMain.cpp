@@ -26,6 +26,10 @@
 #include <app/server/Server.h>
 #include <core/CHIPError.h>
 #include <core/NodeId.h>
+
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CHIPMem.h>
@@ -230,6 +234,9 @@ void ChipLinuxAppMainLoop()
 
     // Init ZCL Data Model and CHIP App Server
     InitServer();
+
+    // Initialize device attestation config
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     InitCommissioner();
