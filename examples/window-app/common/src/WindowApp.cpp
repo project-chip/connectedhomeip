@@ -24,6 +24,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/CHIPDeviceLayer.h>
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 void WindowApp::Timer::Timeout()
@@ -51,7 +52,7 @@ CHIP_ERROR WindowApp::Init()
     InitServer();
 
     // Initialize device attestation config
-    Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     ConfigurationMgr().LogDeviceConfig();
 

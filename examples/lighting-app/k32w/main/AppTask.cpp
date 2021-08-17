@@ -63,6 +63,7 @@ static uint32_t eventMask = 0;
 extern "C" void K32WUartProcess(void);
 #endif
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -90,7 +91,7 @@ CHIP_ERROR AppTask::Init()
     InitServer();
 
     // Initialize device attestation config
-    Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));

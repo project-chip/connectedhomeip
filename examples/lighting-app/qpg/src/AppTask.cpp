@@ -37,6 +37,7 @@
 #include <setup_payload/SetupPayload.h>
 
 using namespace chip::TLV;
+using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 
 #include <platform/CHIPDeviceLayer.h>
@@ -102,7 +103,7 @@ CHIP_ERROR AppTask::Init()
     InitServer();
 
     // Initialize device attestation config
-    Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
 
     UpdateClusterState();
 
