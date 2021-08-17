@@ -31,6 +31,18 @@ enum class CommissioningMode
     kEnabledAsAdditionalCommissioning // Enhanced Commissioning Mode, CM=1, AC=1 in DNS-SD key/value pairs
 };
 
+/// Sets the secure Matter port
+void SetSecuredPort(uint16_t port);
+
+/// Gets the secure Matter port
+uint16_t GetSecuredPort();
+
+/// Sets the unsecure Matter port
+void SetUnsecuredPort(uint16_t port);
+
+/// Gets the unsecure Matter port
+uint16_t GetUnsecuredPort();
+
 /// Start operational advertising
 CHIP_ERROR AdvertiseOperational();
 
@@ -40,15 +52,10 @@ CHIP_ERROR AdvertiseCommissioner();
 /// Set MDNS commissionable node advertisement
 CHIP_ERROR AdvertiseCommissionableNode(CommissioningMode mode);
 
-/// (Re-)starts the minmdns server using default state
-/// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
-/// - if devica has been commissioned, then commissioning mode will show as disabled (CM=0, AC=0)
-void StartServer();
-
 /// (Re-)starts the minmdns server
 /// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
-/// - if devica has been commissioned, then commissioning mode will reflect the state of mode argument
-void StartServer(CommissioningMode mode);
+/// - if device has been commissioned, then commissioning mode will reflect the state of mode argument
+void StartServer(CommissioningMode mode = CommissioningMode::kDisabled);
 
 CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 

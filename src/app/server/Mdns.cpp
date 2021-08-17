@@ -78,6 +78,33 @@ chip::ByteSpan FillMAC(uint8_t (&mac)[8])
 
 } // namespace
 
+uint16_t gSecuredPort   = CHIP_PORT;
+uint16_t gUnsecuredPort = CHIP_UDC_PORT;
+
+/// Sets the secure Matter port
+void SetSecuredPort(uint16_t port)
+{
+    gSecuredPort = port;
+}
+
+/// Gets the secure Matter port
+uint16_t GetSecuredPort()
+{
+    return gSecuredPort;
+}
+
+/// Sets the unsecure Matter port
+void SetUnsecuredPort(uint16_t port)
+{
+    gUnsecuredPort = port;
+}
+
+/// Gets the unsecure Matter port
+uint16_t GetUnsecuredPort()
+{
+    return gUnsecuredPort;
+}
+
 CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen)
 {
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
@@ -97,7 +124,7 @@ CHIP_ERROR AdvertiseOperational()
                 chip::Mdns::OperationalAdvertisingParameters()
                     .SetPeerId(PeerId().SetFabricId(fabricInfo.GetFabricId()).SetNodeId(fabricInfo.GetNodeId()))
                     .SetMac(FillMAC(mac))
-                    .SetPort(chip::DeviceLayer::ConfigurationMgr().GetSecuredPort())
+                    .SetPort(GetSecuredPort())
                     .SetMRPRetryIntervals(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL,
                                           CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL)
                     .EnableIpV4(true);
@@ -124,8 +151,7 @@ CHIP_ERROR Advertise(bool commissionableNode, CommissioningMode mode)
     bool additionalCommissioning = (mode == CommissioningMode::kEnabledAsAdditionalCommissioning);
 
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters()
-                                   .SetPort(commissionableNode ? chip::DeviceLayer::ConfigurationMgr().GetSecuredPort()
-                                                               : chip::DeviceLayer::ConfigurationMgr().GetUnsecuredPort())
+                                   .SetPort(commissionableNode ? GetSecuredPort() : GetUnsecuredPort())
                                    .EnableIpV4(true);
     advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Mdns::CommssionAdvertiseMode::kCommissionableNode
                                                                       : chip::Mdns::CommssionAdvertiseMode::kCommissioner);
@@ -244,17 +270,9 @@ CHIP_ERROR AdvertiseCommissionableNode(CommissioningMode mode)
     return Advertise(true /* commisionableNode */, mode);
 }
 
-/// (Re-)starts the minmdns server using default state
-/// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
-/// - if devica has been commissioned, then commissioning mode will show as disabled (CM=0, AC=0)
-void StartServer()
-{
-    StartServer(CommissioningMode::kDisabled);
-}
-
 /// (Re-)starts the minmdns server
 /// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
-/// - if devica has been commissioned, then commissioning mode will reflect the state of mode argument
+/// - if device has been commissioned, then commissioning mode will reflect the state of mode argument
 void StartServer(CommissioningMode mode)
 {
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);

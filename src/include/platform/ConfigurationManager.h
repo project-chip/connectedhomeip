@@ -157,11 +157,6 @@ public:
     CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint);
     CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize);
 
-    void SetSecuredPort(uint16_t port) { gSecuredPort = port; }
-    uint16_t GetSecuredPort() { return gSecuredPort; }
-    void SetUnsecuredPort(uint16_t port) { gUnsecuredPort = port; }
-    uint16_t GetUnsecuredPort() { return gUnsecuredPort; }
-
 private:
     // ===== Members for internal use by the following friends.
 
@@ -197,9 +192,6 @@ protected:
     ConfigurationManager(const ConfigurationManager &)  = delete;
     ConfigurationManager(const ConfigurationManager &&) = delete;
     ConfigurationManager & operator=(const ConfigurationManager &) = delete;
-
-    uint16_t gSecuredPort   = CHIP_PORT;
-    uint16_t gUnsecuredPort = CHIP_UDC_PORT;
 };
 
 /**

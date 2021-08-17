@@ -182,8 +182,10 @@ CHIP_ERROR InitCommissioner()
 
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
 
+    // use a different listen port for the commissioner.
     ReturnErrorOnFailure(gCommissioner.SetUdpListenPort(CHIP_PORT + 2));
-    ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(CHIP_UDC_PORT));
+    // No need to explicitly set the UDC port since we will use default
+    // ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(CHIP_UDC_PORT));
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
@@ -229,8 +231,10 @@ void ChipLinuxAppMainLoop()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    // use a different port to make testing easier
-    chip::DeviceLayer::ConfigurationMgr().SetSecuredPort(CHIP_PORT + 100);
+    // use a different service port to make testing possible with other sample devices running on same host
+    ServerConfigParams params;
+    params.securedServicePort = CHIP_PORT + 100;
+    SetServerConfig(params);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     // Init ZCL Data Model and CHIP App Server

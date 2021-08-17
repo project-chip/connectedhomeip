@@ -328,6 +328,15 @@ bool IsPairingWindowOpen()
     return gPairingWindowOpen;
 }
 
+uint16_t gSecuredServicePort   = CHIP_PORT;
+uint16_t gUnsecuredServicePort = CHIP_UDC_PORT;
+
+void SetServerConfig(ServerConfigParams params)
+{
+    gSecuredServicePort   = params.securedServicePort;
+    gUnsecuredServicePort = params.unsecuredServicePort;
+}
+
 // The function will initialize datamodel handler and then start the server
 // The server assumes the platform's networking has been setup already
 void InitServer(AppDelegate * delegate)
@@ -355,19 +364,16 @@ void InitServer(AppDelegate * delegate)
     SuccessOrExit(err);
 
     // Init transport before operations with secure session mgr.
-    err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(kIPAddressType_IPv6)
-                               .SetListenPort(chip::DeviceLayer::ConfigurationMgr().GetSecuredPort())
+    err = gTransports.Init(
+        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(gSecuredServicePort)
 
 #if INET_CONFIG_ENABLE_IPV4
-                               ,
-                           UdpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(kIPAddressType_IPv4)
-                               .SetListenPort(chip::DeviceLayer::ConfigurationMgr().GetSecuredPort())
+            ,
+        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(gSecuredServicePort)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-                               ,
-                           BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
+            ,
+        BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
 #endif
     );
 
@@ -409,6 +415,8 @@ void InitServer(AppDelegate * delegate)
 
 // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED
+    app::Mdns::SetSecuredPort(gSecuredServicePort);
+    app::Mdns::SetUnsecuredPort(gUnsecuredServicePort);
     // StartServer only enables commissioning mode if device has not been commissioned
     app::Mdns::StartServer();
 #endif
