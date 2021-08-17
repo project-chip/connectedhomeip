@@ -56,9 +56,10 @@
 #include "Options.h"
 
 using namespace chip;
+using namespace chip::Credentials;
+using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
-using namespace chip::DeviceLayer;
 
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
