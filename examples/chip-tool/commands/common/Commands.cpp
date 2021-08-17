@@ -120,11 +120,6 @@ int Commands::Run(int argc, char ** argv)
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 #endif // !CONFIG_USE_SEPARATE_EVENTLOOP
 
-    if (command)
-    {
-        err = command->GetCommandExitStatus();
-    }
-
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -134,6 +129,15 @@ exit:
 #if CONFIG_USE_SEPARATE_EVENTLOOP
     chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
+
+    if (command)
+    {
+        err = command->GetCommandExitStatus();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
+        }
+    }
 
     if (command)
     {
