@@ -55,8 +55,6 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 
-    mShouldRunEventLoop.store(true, std::memory_order_relaxed);
-
     int ret = pthread_cond_init(&mEventQueueStoppedCond, nullptr);
     VerifyOrReturnError(ret == 0, System::MapErrorPOSIX(ret));
 
@@ -141,6 +139,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::ProcessDeviceEvents()
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
 {
+    mShouldRunEventLoop.store(true, std::memory_order_relaxed);
     pthread_mutex_lock(&mStateLock);
 
     //
@@ -203,6 +202,8 @@ void * GenericPlatformManagerImpl_POSIX<ImplClass>::EventLoopTaskMain(void * arg
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
 {
+    mShouldRunEventLoop.store(true, std::memory_order_relaxed);
+
     int err;
     err = pthread_attr_init(&mChipTaskAttr);
     VerifyOrReturnError(err == 0, System::MapErrorPOSIX(err));

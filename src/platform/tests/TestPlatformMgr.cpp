@@ -122,6 +122,37 @@ static void TestPlatformMgr_RunEventLoopTwoTasks(nlTestSuite * inSuite, void * i
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
+static void TestPlatformMgr_RunEventLoopTwice(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = PlatformMgr().InitChipStack();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // first time
+    stopRan  = false;
+    sleepRan = false;
+
+    PlatformMgr().ScheduleWork(SleepSome);
+    PlatformMgr().ScheduleWork(StopTheLoop);
+
+    PlatformMgr().RunEventLoop();
+    NL_TEST_ASSERT(inSuite, stopRan);
+    NL_TEST_ASSERT(inSuite, sleepRan);
+
+    // second time
+    stopRan  = false;
+    sleepRan = false;
+
+    PlatformMgr().ScheduleWork(SleepSome);
+    PlatformMgr().ScheduleWork(StopTheLoop);
+
+    PlatformMgr().RunEventLoop();
+    NL_TEST_ASSERT(inSuite, stopRan);
+    NL_TEST_ASSERT(inSuite, sleepRan);
+
+    err = PlatformMgr().Shutdown();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
 void StopAndSleep(intptr_t arg)
 {
     // Ensure that we don't proceed after stopping until the sleep is done too.
@@ -187,6 +218,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test basic PlatformMgr::StartEventLoopTask", TestPlatformMgr_BasicEventLoopTask),
     NL_TEST_DEF("Test basic PlatformMgr::RunEventLoop", TestPlatformMgr_BasicRunEventLoop),
     NL_TEST_DEF("Test PlatformMgr::RunEventLoop with two tasks", TestPlatformMgr_RunEventLoopTwoTasks),
+    NL_TEST_DEF("Test PlatformMgr::RunEventLoop twice", TestPlatformMgr_RunEventLoopTwice),
     NL_TEST_DEF("Test PlatformMgr::RunEventLoop with stop before sleep", TestPlatformMgr_RunEventLoopStopBeforeSleep),
     NL_TEST_DEF("Test PlatformMgr::TryLockChipStack", TestPlatformMgr_TryLockChipStack),
     NL_TEST_DEF("Test PlatformMgr::AddEventHandler", TestPlatformMgr_AddEventHandler),
