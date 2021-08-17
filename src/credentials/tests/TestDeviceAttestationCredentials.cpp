@@ -33,7 +33,6 @@ using namespace chip::Credentials;
 
 namespace {
 
-#if CHIP_CRYPTO_OPENSSL
 constexpr uint8_t kExpectedDacPublicKey[] = { 0x04, 0x7a, 0x84, 0x58, 0xaf, 0xbb, 0x9b, 0xcd, 0x15, 0xe1, 0x9a, 0xdc, 0xd2,
                                               0x66, 0xf6, 0x6c, 0x9c, 0x2f, 0x60, 0x7c, 0x74, 0x74, 0x7a, 0x35, 0xf8, 0x0f,
                                               0x37, 0xe1, 0x18, 0x13, 0x3f, 0x80, 0xf1, 0x76, 0x01, 0x13, 0x27, 0x8f, 0x91,
@@ -45,7 +44,6 @@ constexpr uint8_t kExpectedPaiPublicKey[] = { 0x04, 0xca, 0x73, 0xce, 0x46, 0x41
                                               0x2f, 0x25, 0x06, 0xcf, 0x6a, 0xd3, 0x70, 0xe3, 0x7f, 0x65, 0xd6, 0x34, 0x7a,
                                               0xe7, 0x97, 0xa1, 0x97, 0x26, 0x50, 0x50, 0x97, 0x6d, 0x34, 0xac, 0x7b, 0x63,
                                               0x7b, 0x3b, 0xda, 0x0b, 0x5b, 0xd8, 0x43, 0xed, 0x8e, 0x5d, 0x5e, 0x9b, 0xf2 };
-#endif // CHIP_CRYPTO_OPENSSL
 
 } // namespace
 
@@ -70,9 +68,6 @@ static void TestDACProvidersExample_Providers(nlTestSuite * inSuite, void * inCo
     default_provider = GetDeviceAttestationCredentialsProvider();
     NL_TEST_ASSERT(inSuite, default_provider == example_dac_provider);
 
-    // TODO: Fix ESP32 QEMU X.509 unit tests
-    // Can only run the following cases on OpenSSL due to x509 cert parsing
-#if CHIP_CRYPTO_OPENSSL
     // Make sure DAC is what we expect, by validating public key
     memset(der_cert_span.data(), 0, der_cert_span.size());
     err = example_dac_provider->GetDeviceAttestationCert(der_cert_span);
@@ -95,7 +90,6 @@ static void TestDACProvidersExample_Providers(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, pai_public_key.Length() == sizeof(kExpectedPaiPublicKey));
     NL_TEST_ASSERT(inSuite, 0 == memcmp(pai_public_key.ConstBytes(), kExpectedPaiPublicKey, sizeof(kExpectedPaiPublicKey)));
-#endif // CHIP_CRYPTO_OPENSSL
 
     // Check for CD presence
     uint8_t other_data_buf[256];
@@ -142,9 +136,6 @@ static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inCo
     err = example_dac_provider->GetDeviceAttestationCert(dac_cert_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // TODO: Fix ESP32 QEMU X.509 unit tests
-    // Can only run the following cases on OpenSSL due to x509 cert parsing
-#if CHIP_CRYPTO_OPENSSL
     // Extract public key from DAC, prior to signature verification
     P256PublicKey dac_public_key;
     err = ExtractPubkeyFromX509Cert(dac_cert_span, dac_public_key);
@@ -155,7 +146,6 @@ static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inCo
     // Verify round trip signature
     err = dac_public_key.ECDSA_validate_hash_signature(&kExampleDigest[0], sizeof(kExampleDigest), da_signature);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-#endif // CHIP_CRYPTO_OPENSSL
 }
 
 /**
