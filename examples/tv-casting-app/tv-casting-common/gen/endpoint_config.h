@@ -1092,7 +1092,7 @@
                 0x003E, ZAP_ATTRIBUTE_INDEX(106), 2, 256, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
             { 0x0405, ZAP_ATTRIBUTE_INDEX(108), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 0, Cluster: Relative Humidity \
-                                                                                           Measurement (server) */                                                                                                                       \
+                                                                                           Measurement (server) */                 \
             {                                                                                                                      \
                 0xF000, ZAP_ATTRIBUTE_INDEX(112), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Binding (server) */                                                                        \
