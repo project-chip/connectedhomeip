@@ -51,7 +51,7 @@ CHIP_ERROR WindowApp::Init()
     InitServer();
 
     // Initialize device attestation config
-    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
     ConfigurationMgr().LogDeviceConfig();
 
