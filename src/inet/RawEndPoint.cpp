@@ -352,7 +352,7 @@ optfail:
     res = chip::System::MapErrorPOSIX(errno);
     SystemLayer().StopWatchingSocket(&mWatch);
     close(mSocket);
-    mSocket = INET_INVALID_SOCKET_FD;
+    mSocket   = INET_INVALID_SOCKET_FD;
     mAddrType = kIPAddressType_Unknown;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

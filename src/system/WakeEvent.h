@@ -46,7 +46,7 @@ class WakeEvent
 {
 public:
     CHIP_ERROR Open(Layer & systemLayer); /**< Initialize the pipeline */
-    void Close(Layer & systemLayer);                                        /**< Close both ends of the pipeline. */
+    void Close(Layer & systemLayer);      /**< Close both ends of the pipeline. */
 
     CHIP_ERROR Notify(); /**< Set the event. */
     void Confirm();      /**< Clear the event. */

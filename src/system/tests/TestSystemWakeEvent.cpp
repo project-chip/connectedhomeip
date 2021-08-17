@@ -62,11 +62,13 @@ struct TestContext
     fd_set mWriteSet;
     fd_set mErrorSet;
 
-    TestContext() {
+    TestContext()
+    {
         mSystemLayer.Init();
         mWakeEvent.Open(mSystemLayer);
     }
-    ~TestContext() {
+    ~TestContext()
+    {
         mWakeEvent.Close(mSystemLayer);
         mSystemLayer.Shutdown();
     }

@@ -72,7 +72,7 @@ CHIP_ERROR WakeEvent::Open(Layer & systemLayer)
     if (SetNonBlockingMode(fds[FD_WRITE]) < 0)
         return chip::System::MapErrorPOSIX(errno);
 
-    mReadFD = fds[FD_READ];
+    mReadFD  = fds[FD_READ];
     mWriteFD = fds[FD_WRITE];
 
     ReturnErrorOnFailure(systemLayer.StartWatchingSocket(mReadFD, &mReadWatch));
@@ -87,7 +87,7 @@ void WakeEvent::Close(Layer & systemLayer)
     systemLayer.StopWatchingSocket(&mReadWatch);
     VerifyOrDie(::close(mReadFD) == 0);
     VerifyOrDie(::close(mWriteFD) == 0);
-    mReadFD = -1;
+    mReadFD  = -1;
     mWriteFD = -1;
 }
 

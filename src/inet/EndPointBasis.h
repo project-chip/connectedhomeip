@@ -97,10 +97,10 @@ protected:
 #endif
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    int mSocket;                    /**< Encapsulated socket descriptor. */
-    IPAddressType mAddrType;        /**< Protocol family, i.e. IPv4 or IPv6. */
+    int mSocket;                     /**< Encapsulated socket descriptor. */
+    IPAddressType mAddrType;         /**< Protocol family, i.e. IPv4 or IPv6. */
     System::SocketWatchToken mWatch; /**< Socket event watcher */
-#endif                              // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif                               // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     /** Encapsulated LwIP protocol control block */

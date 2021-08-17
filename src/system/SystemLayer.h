@@ -204,11 +204,7 @@ public:
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-    WatchableEventManager &
-    WatchableEventsManager()
-    {
-        return mWatchableEventsManager;
-    }
+    WatchableEventManager & WatchableEventsManager() { return mWatchableEventsManager; }
 
     Clock & GetClock() { return mClock; }
 
