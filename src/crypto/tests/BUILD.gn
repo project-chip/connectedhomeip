@@ -22,6 +22,7 @@ chip_test_suite("tests") {
   output_name = "libChipCryptoTests"
 
   sources = [
+    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
     "AES_CCM_128_test_vectors.h",
     "AES_CCM_256_test_vectors.h",
     "CHIPCryptoPALTest.cpp",
@@ -42,7 +43,6 @@ chip_test_suite("tests") {
     "SPAKE2P_POINT_VALID_test_vectors.h",
     "SPAKE2P_RFC_test_vectors.h",
     "TestCryptoLayer.h",
-    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
