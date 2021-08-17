@@ -19,8 +19,9 @@
 
 namespace chip {
 
-// maximum size of MutableByteSpan -1 (the length of pascal string)
-constexpr size_t kBufferMaximumSize = std::numeric_limits<uint8_t>::max() - 1;
+// ZCL strings are stored as pascal-strings (first byte contains the length of the
+// data), so the maximum string length is the maximum of uint8_t
+constexpr size_t kBufferMaximumSize = std::numeric_limits<uint8_t>::max();
 
 CHIP_ERROR MakeZclCharString(MutableByteSpan & buffer, const char * cString)
 {
