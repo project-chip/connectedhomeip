@@ -44,7 +44,8 @@ chip_test_suite("tests") {
     "TestCryptoLayer.h",
   ]
   if (chip_device_platform == "esp32") {
-    sources += [ "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp" ]
+    sources +=
+        [ "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]
