@@ -43,6 +43,9 @@ chip_test_suite("tests") {
     "SPAKE2P_RFC_test_vectors.h",
     "TestCryptoLayer.h",
   ]
+  if (chip_device_platform == "esp32") {
+    sources += [ "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 
