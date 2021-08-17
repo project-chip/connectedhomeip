@@ -665,6 +665,23 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGroupKeyManagement : CHIPCluster
 
+- (void)assignKey:(uint16_t)fabricIndex
+            groupId:(uint16_t)groupId
+        keySetIndex:(uint16_t)keySetIndex
+    responseHandler:(ResponseHandler)responseHandler;
+- (void)removeAllKeys:(uint16_t)fabricIndex responseHandler:(ResponseHandler)responseHandler;
+- (void)removeKey:(uint16_t)fabricIndex keySetIndex:(uint16_t)keySetIndex responseHandler:(ResponseHandler)responseHandler;
+- (void)revokeKey:(uint16_t)fabricIndex
+            groupId:(uint16_t)groupId
+        keySetIndex:(uint16_t)keySetIndex
+    responseHandler:(ResponseHandler)responseHandler;
+- (void)setKey:(uint16_t)fabricIndex
+        keySetIndex:(uint16_t)keySetIndex
+            keyRoot:(NSData *)keyRoot
+     epochStartTime:(NSData *)epochStartTime
+     securityPolicy:(uint8_t)securityPolicy
+    responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeGroupsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeGroupKeysWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;

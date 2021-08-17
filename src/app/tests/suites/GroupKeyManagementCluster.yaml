@@ -1,0 +1,261 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: GroupKeyManagement Cluster Tests
+
+config:
+    cluster: "Group Key Management"
+    endpoint: 0
+
+tests:
+    - label: "Set Key 1a"
+      command: "SetKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "keySetIndex"
+                value: 0
+              - name: "keyRoot"
+                value: "key000000000001a"
+              - name: "epochStartTime"
+                value: "12345678"
+              - name: "securityPolicy"
+                value: 0
+      response:
+          error: 0x00
+
+    - label: "Set Key 1b"
+      command: "SetKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "keySetIndex"
+                value: 0
+              - name: "keyRoot"
+                value: "key000000000001b"
+              - name: "epochStartTime"
+                value: "12345678"
+              - name: "securityPolicy"
+                value: 0
+      response:
+          error: 0x00
+
+    - label: "Set Key 1c"
+      command: "SetKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "keySetIndex"
+                value: 0
+              - name: "keyRoot"
+                value: "key000000000001c"
+              - name: "epochStartTime"
+                value: "12345678"
+              - name: "securityPolicy"
+                value: 0
+      response:
+          error: 0x00
+
+    - label: "Set Key 2a"
+      command: "SetKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "keySetIndex"
+                value: 1
+              - name: "keyRoot"
+                value: "key000000000002a"
+              - name: "epochStartTime"
+                value: "12345678"
+              - name: "securityPolicy"
+                value: 0
+      response:
+          error: 0x00
+
+    - label: "Set Key 2b"
+      command: "SetKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "keySetIndex"
+                value: 1
+              - name: "keyRoot"
+                value: "key000000000002b"
+              - name: "epochStartTime"
+                value: "12345678"
+              - name: "securityPolicy"
+                value: 0
+      response:
+          error: 0x00
+
+    - label: "Set Key 2c"
+      command: "SetKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "keySetIndex"
+                value: 1
+              - name: "keyRoot"
+                value: "key000000000002c"
+              - name: "epochStartTime"
+                value: "12345678"
+              - name: "securityPolicy"
+                value: 0
+      response:
+          error: 0x00
+
+    - label: "Remove Key 3 (not found)"
+      command: "RemoveKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "keySetIndex"
+                value: 2
+      response:
+          error: 0x8b
+
+    - label: "Assign Key, Group 101, Set 1 (existing)"
+      command: "AssignKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "groupId"
+                value: 101
+              - name: "keySetIndex"
+                value: 0
+      response:
+          error: 0x00
+
+    - label: "Assign Key, Group 101, Set 2 (existing)"
+      command: "AssignKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "groupId"
+                value: 101
+              - name: "keySetIndex"
+                value: 1
+      response:
+          error: 0x00
+
+    - label: "Assign Key, Group 101, Set 3 (not found)"
+      command: "AssignKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "groupId"
+                value: 101
+              - name: "keySetIndex"
+                value: 2
+      response:
+          error: 0x08b
+
+    - label: "Set Key 3a"
+      command: "SetKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "keySetIndex"
+                value: 2
+              - name: "keyRoot"
+                value: "key000000000003a"
+              - name: "epochStartTime"
+                value: "12345678"
+              - name: "securityPolicy"
+                value: 0
+      response:
+          error: 0x00
+
+    - label: "Assign Key, Group 101, Set 3 (existing)"
+      command: "AssignKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "groupId"
+                value: 101
+              - name: "keySetIndex"
+                value: 2
+      response:
+          error: 0x00
+
+    - label: "Assign Key, Group 102, Set 2 (existing)"
+      command: "AssignKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "groupId"
+                value: 102
+              - name: "keySetIndex"
+                value: 1
+      response:
+          error: 0x00
+
+    - label: "Assign Key, Group 102, Set 3 (existing)"
+      command: "AssignKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "groupId"
+                value: 102
+              - name: "keySetIndex"
+                value: 2
+      response:
+          error: 0x00
+
+    - label: "Remove Key 2 (existing)"
+      command: "RemoveKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "keySetIndex"
+                value: 1
+      response:
+          error: 0x00
+
+    - label: "Revoke Key, Group 101, Set 3 (existing)"
+      command: "RevokeKey"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+              - name: "groupId"
+                value: 101
+              - name: "keySetIndex"
+                value: 2
+      response:
+          error: 0x00
+
+    - label: "Remove All Keys"
+      command: "RemoveAllKeys"
+      arguments:
+          values:
+              - name: "fabricIndex"
+                value: 1
+      response:
+          error: 0x00
