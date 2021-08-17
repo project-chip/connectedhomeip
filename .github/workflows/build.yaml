@@ -136,7 +136,7 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Setup Build, Run Build and Run Tests
-              timeout-minutes: 20
+              timeout-minutes: 50
               run: |
                   for BUILD_TYPE  in gcc_release clang mbedtls; do
                       case $BUILD_TYPE in
