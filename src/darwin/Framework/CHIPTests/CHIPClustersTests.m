@@ -7820,25 +7820,6 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterGeneralCommissioningReadAttributeFabricIdWithResponseHandler
-{
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"GeneralCommissioningReadAttributeFabricIdWithResponseHandler"];
-
-    CHIPDevice * device = GetPairedDevice(kDeviceId);
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeFabricIdWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"GeneralCommissioning FabricId Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
 - (void)testSendClusterGeneralCommissioningReadAttributeBreadcrumbWithResponseHandler
 {
     XCTestExpectation * expectation =
@@ -7877,6 +7858,25 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterGeneralCommissioningReadAttributeBasicCommissioningInfoListWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"GeneralCommissioningReadAttributeBasicCommissioningInfoListWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeBasicCommissioningInfoListWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"GeneralCommissioning BasicCommissioningInfoList Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterGeneralCommissioningReadAttributeClusterRevisionWithResponseHandler
 {
     XCTestExpectation * expectation =

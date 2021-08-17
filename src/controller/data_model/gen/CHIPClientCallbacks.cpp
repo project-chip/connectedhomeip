@@ -1079,6 +1079,36 @@ void FixedLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Cal
     cb->mCall(cb->mContext, count, data);
 }
 
+void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                              Callback::Cancelable * onSuccessCallback,
+                                                                              Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = Encoding::LittleEndian::Read16(message);
+    _BasicCommissioningInfoType data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(4);
+        data[i].FailSafeExpiryLengthMs = emberAfGetInt32u(message, 0, 4);
+        message += 4;
+    }
+    Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback> * cb =
+        Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
 void GeneralDiagnosticsClusterNetworkInterfacesListAttributeFilter(TLV::TLVReader * tlvData,
                                                                    Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback)
