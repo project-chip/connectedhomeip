@@ -88,7 +88,7 @@ extern "C" void app_main()
     InitServer();
 
     // Initialize device attestation config
-    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
     error = GetAppTask().StartAppTask();

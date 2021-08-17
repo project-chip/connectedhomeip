@@ -630,7 +630,7 @@ extern "C" void app_main()
     InitServer(&callbacks);
 
     // Initialize device attestation config
-    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     SetupPretendDevices();
     SetupInitialLevelControlValues(/* endpointId = */ 1);
