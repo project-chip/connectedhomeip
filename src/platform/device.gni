@@ -19,6 +19,7 @@ declare_args() {
   # Device platform layer: cc13x2_26x2, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w, qpg, none.
   chip_device_platform = "auto"
   chip_platform_target = ""
+
   # Substitue fake platform when building with chip_device_platform=auto.
   chip_fake_platform = false
 }
