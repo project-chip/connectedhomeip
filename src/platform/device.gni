@@ -19,11 +19,12 @@ declare_args() {
   # Device platform layer: cc13x2_26x2, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w, qpg, none.
   chip_device_platform = "auto"
   chip_platform_target = ""
-  fake_platform = false
+  # Substitue fake platform when building with chip_device_platform=auto.
+  chip_fake_platform = false
 }
 
 if (chip_device_platform == "auto") {
-  if (fake_platform) {
+  if (chip_fake_platform) {
     chip_device_platform = "fake"
   } else if (current_os == "mac" || current_os == "ios") {
     chip_device_platform = "darwin"

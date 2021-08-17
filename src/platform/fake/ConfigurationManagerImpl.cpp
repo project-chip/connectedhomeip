@@ -16,10 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Stub for ConfigurationManagerImpl for fake platform.
- */
 #include <platform/ConfigurationManager.h>
 
 namespace chip {

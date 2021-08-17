@@ -16,10 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Stub for KeyValueStoreManagerImpl for fake platform.
- */
 #include <platform/KeyValueStoreManager.h>
 
 namespace chip {

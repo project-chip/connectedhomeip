@@ -16,10 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Stub for ConnectivityManagerImpl for fake platform.
- */
 #include <platform/ConnectivityManager.h>
 
 namespace chip {

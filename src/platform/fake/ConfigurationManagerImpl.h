@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Provides an implementation of the ConfigurationManager object
- */
-
 #pragma once
 #include <platform/ConfigurationManager.h>
 
@@ -28,7 +23,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the ConfigurationManager singleton object for the ESP32 platform.
+ * Concrete implementation of the ConfigurationManager singleton object for the fake platform.
  */
 class ConfigurationManagerImpl final : public ConfigurationManager
 {

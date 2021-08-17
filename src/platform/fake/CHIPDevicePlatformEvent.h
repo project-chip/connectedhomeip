@@ -15,11 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Stub file for platform events for fake platform.
- */
-
 #pragma once
 
 namespace chip {

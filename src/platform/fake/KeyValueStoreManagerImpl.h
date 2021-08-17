@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific implementation of KVS for linux.
- */
-
 #pragma once
 
 #include <platform/KeyValueStoreManager.h>

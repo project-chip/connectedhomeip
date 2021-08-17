@@ -38,7 +38,7 @@ gcc_toolchain("fake_${host_cpu}_gcc") {
     current_os = host_os
     current_os = host_os
     current_cpu = host_cpu
-    is_clang = true
-    fake_platform = true
+    is_clang = false
+    chip_fake_platform = true
   }
 }
