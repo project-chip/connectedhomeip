@@ -263,17 +263,21 @@ public:
         memset(valuesize, 0, sizeof(valuesize));
     }
 
-    ~TestPersistentStorageDelegate()
+    ~TestPersistentStorageDelegate() { Cleanup(); }
+
+    void Cleanup()
     {
         for (int i = 0; i < 16; i++)
         {
             if (keys[i] != nullptr)
             {
                 chip::Platform::MemoryFree(keys[i]);
+                keys[i] = nullptr;
             }
             if (values[i] != nullptr)
             {
                 chip::Platform::MemoryFree(values[i]);
+                values[i] = nullptr;
             }
         }
     }
@@ -323,6 +327,9 @@ private:
     uint16_t valuesize[16];
 };
 
+TestPersistentStorageDelegate gCommissionerStorageDelegate;
+TestPersistentStorageDelegate gDeviceStorageDelegate;
+
 TestCASEServerIPK gPairingServer;
 
 void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext)
@@ -331,7 +338,6 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     auto * pairingCommissioner = chip::Platform::New<TestCASESessionIPK>();
 
-    TestPersistentStorageDelegate storageDelegate;
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     gLoopback.mSentMessageCount = 0;
@@ -339,8 +345,6 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, gPairingServer.GetSession().MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
 
     SessionIDAllocator idAllocator;
-
-    gDeviceFabrics.Init(&storageDelegate);
 
     NL_TEST_ASSERT(inSuite,
                    gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &gTransportMgr,
@@ -481,6 +485,9 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 
     gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());
 
+    gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
+    gDeviceFabrics.Init(&gDeviceStorageDelegate);
+
     return InitCredentialSets();
 }
 } // anonymous namespace
@@ -500,6 +507,8 @@ int CASE_TestSecurePairing_Teardown(void * inContext)
 {
     reinterpret_cast<TestContext *>(inContext)->Shutdown();
     gIOContext.Shutdown();
+    gCommissionerStorageDelegate.Cleanup();
+    gDeviceStorageDelegate.Cleanup();
     gCommissionerFabrics.Reset();
     gDeviceFabrics.Reset();
     chip::Platform::MemoryShutdown();

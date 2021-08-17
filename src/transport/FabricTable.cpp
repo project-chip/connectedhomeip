@@ -422,14 +422,14 @@ CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpa
 {
     constexpr uint16_t kSigmaParamRandomNumberSize = 32;
     constexpr size_t kDestinationMessageLen =
-        kSigmaParamRandomNumberSize + kKeyIdentifierLength + sizeof(FabricId) + sizeof(NodeId);
+        kSigmaParamRandomNumberSize + kP256_PublicKey_Length + sizeof(FabricId) + sizeof(NodeId);
     HMAC_sha hmac;
     uint8_t destinationMessage[kDestinationMessageLen];
 
     Encoding::LittleEndian::BufferWriter bbuf(destinationMessage, sizeof(destinationMessage));
 
     bbuf.Put(random.data(), random.size());
-    bbuf.Put(mRootKeyId, mRootKeyIdLen);
+    bbuf.Put(mRootPubkey.ConstBytes(), mRootPubkey.Length());
     bbuf.Put64(GetFabricId());
     bbuf.Put64(destNodeId);
 
