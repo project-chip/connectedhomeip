@@ -44,7 +44,7 @@ bool allCharactersSame(uint8_t zclString[])
     for (int i = 1; i < n; i++)
         if (zclString[i] != zclString[1])
             return false;
- 
+
     return true;
 }
 
