@@ -574,7 +574,6 @@ chip-device-ctrl > zclwrite TestCluster CharString 1 1 0 233233
 Note: The format of the value is the same as the format of argument values for
 ZCL cluster commands.
 
-
 ### `zclconfigure <Cluster> <Attribute> <Nodeid> <Endpoint> <MinInterval> <MaxInterval> <Change>`
 
 Configure ZCL attribute reporting settings. For example:
