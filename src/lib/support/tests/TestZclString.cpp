@@ -17,9 +17,7 @@
  */
 
 /**
- *    @file
- *      This file implements a unit test suite for ZclString
- *
+ *  This file implements a unit test suite for ZclString
  */
 
 #include <inttypes.h>
@@ -40,100 +38,94 @@ using namespace chip;
 using namespace chip::Logging;
 using namespace chip::Platform;
 
+bool allCharactersSame(uint8_t zclString[])
+{
+    int n = zclString[0];
+    for (int i = 1; i < n; i++)
+        if (zclString[i] != zclString[1])
+            return false;
+ 
+    return true;
+}
+
 static void TestZclStringWhenBufferIsZero(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t bufferMemory[1];
     MutableByteSpan zclString(bufferMemory);
-    char * cString1 = static_cast<char *>(MemoryCalloc(1024, 1));
-    memset(cString1, 'A', 1);
-    NL_TEST_ASSERT(inSuite, cString1 != nullptr);
+    chip::Platform::ScopedMemoryBuffer<char> cString1;
+    cString1.Alloc(1024);
+    NL_TEST_ASSERT(inSuite, cString1.Get() != nullptr);
+    memset(cString1.Get(), 'A', 1);
 
-    CHIP_ERROR err = MakeZclCharString(zclString, cString1);
+    CHIP_ERROR err = MakeZclCharString(zclString, cString1.Get());
 
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 0);
-
-    chip::Platform::MemoryFree(cString1);
 }
 
 static void TestZclStringLessThanMaximumSize_Length_64(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t bufferMemory[256];
     MutableByteSpan zclString(bufferMemory);
-    char * cString64 = static_cast<char *>(MemoryCalloc(1024, 1));
-    memset(cString64, 'A', 64);
-    NL_TEST_ASSERT(inSuite, cString64 != nullptr);
+    chip::Platform::ScopedMemoryBuffer<char> cString64;
+    cString64.Alloc(1024);
+    NL_TEST_ASSERT(inSuite, cString64.Get() != nullptr);
+    memset(cString64.Get(), 'A', 64);
 
-    CHIP_ERROR err = MakeZclCharString(zclString, cString64);
+    CHIP_ERROR err = MakeZclCharString(zclString, cString64.Get());
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 64);
-
-    chip::Platform::MemoryFree(cString64);
+    NL_TEST_ASSERT(inSuite, allCharactersSame(zclString.data()) == true);
 }
 
 static void TestZclStringEqualsMaximumSize(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t bufferMemory[256];
     MutableByteSpan zclString(bufferMemory);
-    char * cString254 = static_cast<char *>(MemoryCalloc(1024, 1));
-    memset(cString254, 'A', 254);
-    NL_TEST_ASSERT(inSuite, cString254 != nullptr);
+    chip::Platform::ScopedMemoryBuffer<char> cString255;
+    cString255.Alloc(1024);
+    NL_TEST_ASSERT(inSuite, cString255.Get() != nullptr);
+    memset(cString255.Get(), 'A', 255);
 
-    CHIP_ERROR err = MakeZclCharString(zclString, cString254);
+    CHIP_ERROR err = MakeZclCharString(zclString, cString255.Get());
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 254);
+    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 255);
+    NL_TEST_ASSERT(inSuite, allCharactersSame(zclString.data()) == true);
 
-    chip::Platform::MemoryFree(cString254);
-}
-
-static void TestSizeZclStringBiggerThanMaximumSize_Length_255(nlTestSuite * inSuite, void * inContext)
-{
-    uint8_t bufferMemory[255];
-    MutableByteSpan zclString(bufferMemory);
-    char * cString255 = static_cast<char *>(MemoryCalloc(1024, 1));
-    memset(cString255, 'A', 255);
-    NL_TEST_ASSERT(inSuite, cString255 != nullptr);
-
-    CHIP_ERROR err = MakeZclCharString(zclString, cString255);
-
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
-    NL_TEST_ASSERT(inSuite, zclString.data()[0] == 0);
-
-    chip::Platform::MemoryFree(cString255);
 }
 
 static void TestSizeZclStringBiggerThanMaximumSize_Length_256(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t bufferMemory[256];
     MutableByteSpan zclString(bufferMemory);
-    char * cString256 = static_cast<char *>(MemoryCalloc(1024, 1));
-    memset(cString256, 'A', 256);
-    NL_TEST_ASSERT(inSuite, cString256 != nullptr);
+    chip::Platform::ScopedMemoryBuffer<char> cString256;
+    cString256.Alloc(1024);
+    NL_TEST_ASSERT(inSuite, cString256.Get() != nullptr);
+    memset(cString256.Get(), 'A', 256);
 
-    CHIP_ERROR err = MakeZclCharString(zclString, cString256);
+    CHIP_ERROR err = MakeZclCharString(zclString, cString256.Get());
 
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 0);
 
-    chip::Platform::MemoryFree(cString256);
 }
 
 static void TestZclStringBiggerThanMaximumSize_Length_257(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t bufferMemory[257];
     MutableByteSpan zclString(bufferMemory);
-    char * cString257 = static_cast<char *>(MemoryCalloc(1024, 1));
-    memset(cString257, 'A', 257);
-    NL_TEST_ASSERT(inSuite, cString257 != nullptr);
+    chip::Platform::ScopedMemoryBuffer<char> cString257;
+    cString257.Alloc(1024);
+    NL_TEST_ASSERT(inSuite, cString257.Get() != nullptr);
+    memset(cString257.Get(), 'A', 257);
 
-    CHIP_ERROR err = MakeZclCharString(zclString, cString257);
+    CHIP_ERROR err = MakeZclCharString(zclString, cString257.Get());
 
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG);
     NL_TEST_ASSERT(inSuite, zclString.data()[0] == 0);
 
-    chip::Platform::MemoryFree(cString257);
 }
 
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
@@ -164,7 +156,6 @@ int TestZclString_Teardown(void * inContext)
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestZclStringWhenBufferIsZero),
                                  NL_TEST_DEF_FN(TestZclStringLessThanMaximumSize_Length_64),
                                  NL_TEST_DEF_FN(TestZclStringEqualsMaximumSize),
-                                 NL_TEST_DEF_FN(TestSizeZclStringBiggerThanMaximumSize_Length_255),
                                  NL_TEST_DEF_FN(TestSizeZclStringBiggerThanMaximumSize_Length_256),
                                  NL_TEST_DEF_FN(TestZclStringBiggerThanMaximumSize_Length_257),
                                  NL_TEST_SENTINEL() };
