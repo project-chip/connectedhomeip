@@ -21,11 +21,10 @@
 namespace chip {
 
 /**
- * @brief Create ZCL string from char string.  If the char string is longer than 254 chars, or too long to fit into the provided
- * buffer, this function will place as many chars as it can, up to 254, into the buffer and then return an error.
- *
- * Even if an error is returned, the buffer still holds a valid (though truncated) ZCL string, _unless_ the buffer is 0-sized, in
- * which case it can't hold anything.
+ * @brief Create ZCL string (pascal string) from char string.
+ * The maximum size of the ZCL string is defined by the kBufferMaximumSize.
+ * In case char string exceeds the maximum of size ZCL string, the string will be 0-sized
+ * and the method will return an error.
  */
 extern CHIP_ERROR MakeZclCharString(MutableByteSpan & buffer, const char * cString);
 
