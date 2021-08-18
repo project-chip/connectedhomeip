@@ -166,8 +166,82 @@ jobs:
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
               uses: github/codeql-action/analyze@v1
+    build_linux_python_lib:
+        name: Build on Linux (python_lib)
+        timeout-minutes: 60
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: connectedhomeip/chip-build:0.5.0
+            volumes:
+                - "/tmp/log_output:/tmp/test_logs"
+            options:
+                --sysctl "net.ipv6.conf.all.disable_ipv6=0
+                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+        steps:
+            - name: Dump GitHub context
+              env:
+                GITHUB_CONTEXT: ${{ toJSON(github) }}
+              run: echo "$GITHUB_CONTEXT"
+            - name: Dump Concurrency context
+              env:
+                CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+              run: echo "$CONCURRENCY_CONTEXT"
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  submodules: true
+            - name: Initialize CodeQL
+              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
+              uses: github/codeql-action/init@v1
+              with:
+                  languages: "cpp"
+
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: scripts/build/gn_bootstrap.sh
+            # - name: Uploading bootstrap logs
+            #   uses: actions/upload-artifact@v2
+            #   if: ${{ always() }}
+            #   with:
+            #       name: bootstrap-logs
+            #       path: |
+            #        .environment/gn_out/.ninja_log
+            #        .environment/pigweed-venv/*.log
+            - name: Setup Build, Run Build and Run Tests
+              timeout-minutes: 50
+              run: |
+                  for BUILD_TYPE  in python_lib; do
+                      case $BUILD_TYPE in
+                          "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false';;
+                      esac
+
+                      scripts/build/gn_gen.sh --args="$GN_ARGS"
+                      scripts/build/gn_build.sh
+                      scripts/tests/gn_tests.sh
+                  done
+            # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
+            # TODO https://github.com/project-chip/connectedhomeip/issues/1512
+            # - name: Run Code Coverage
+            #   if: ${{ contains('main', env.BUILD_TYPE) }}
+            #   run: scripts/tools/codecoverage.sh
+            # - name: Upload Code Coverage
+            #   if: ${{ contains('main', env.BUILD_TYPE) }}
+            #   run: bash <(curl -s https://codecov.io/bash)
+            - name: Remove third_party binaries for CodeQL Analysis
+              run: find out -type d -name "third_party" -exec rm -rf {} +
+            - name: Remove dbus binaries for CodeQL Analysis
+              run: find out -type d -name "dbus" -exec rm -rf {} +
+            # - name: Remove nrfxlib binaries for CodeQL Analysis
+            #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
+            - name: Perform CodeQL Analysis
+              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
+              uses: github/codeql-action/analyze@v1
     build_darwin:
-        name: Build on Darwin
+        name: Build on Darwin (clang, python_lib)
         timeout-minutes: 60
 
         env:
@@ -202,19 +276,22 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Setup Build
+            - name: Setup Build, Run Build and Run Tests
+              timeout-minutes: 50
               # Just go ahead and do the "all" build; on Darwin that's fairly
               # fast.  If this ever becomes slow, we can think about ways to do
               # the examples-linux-standalone.yaml tests on darwin without too
               # much code duplication.
               run: |
-                  scripts/build/gn_gen.sh --args='is_clang=true target_os="all"'
-            - name: Run Build
-              timeout-minutes: 30
-              run: scripts/build/gn_build.sh
-            - name: Run Tests
-              timeout-minutes: 10
-              run: scripts/tests/gn_tests.sh
+                  for BUILD_TYPE  in clang python_lib; do
+                      case $BUILD_TYPE in
+                          "clang") GN_ARGS='is_clang=true target_os="all"';;
+                          "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
+                      esac
+                      scripts/build/gn_gen.sh --args="$GN_ARGS"
+                      scripts/build/gn_build.sh
+                      scripts/tests/gn_tests.sh
+                  done
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
             # - name: Run Code Coverage
