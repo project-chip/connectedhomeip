@@ -940,6 +940,21 @@ public:
 private:
 };
 
+class DLL_EXPORT OnOffSwitchConfigurationCluster : public ClusterBase
+{
+public:
+    OnOffSwitchConfigurationCluster() : ClusterBase(app::Clusters::OnOffSwitchConfiguration::Id) {}
+    ~OnOffSwitchConfigurationCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSwitchType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSwitchActions(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeSwitchActions(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint8_t value);
+};
+
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:

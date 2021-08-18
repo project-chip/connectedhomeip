@@ -3775,6 +3775,43 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
+  public static class OnOffSwitchConfigurationCluster extends BaseChipCluster {
+    public OnOffSwitchConfigurationCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void readSwitchTypeAttribute(IntegerAttributeCallback callback) {
+      readSwitchTypeAttribute(chipClusterPtr, callback);
+    }
+
+    public void readSwitchActionsAttribute(IntegerAttributeCallback callback) {
+      readSwitchActionsAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeSwitchActionsAttribute(DefaultClusterCallback callback, int value) {
+      writeSwitchActionsAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readSwitchTypeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readSwitchActionsAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeSwitchActionsAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
   public static class OperationalCredentialsCluster extends BaseChipCluster {
     public OperationalCredentialsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

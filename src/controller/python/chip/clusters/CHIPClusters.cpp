@@ -3820,6 +3820,49 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_OnOff_ClusterRevision(chip::
 }
 
 // End of Cluster OnOff
+// Cluster OnOffSwitchConfiguration
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchType(chip::Controller::Device * device,
+                                                                                        chip::EndpointId ZCLendpointId,
+                                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OnOffSwitchConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeSwitchType(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchActions(chip::Controller::Device * device,
+                                                                                           chip::EndpointId ZCLendpointId,
+                                                                                           chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OnOffSwitchConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeSwitchActions(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+chip::ChipError::StorageType chip_ime_WriteAttribute_OnOffSwitchConfiguration_SwitchActions(chip::Controller::Device * device,
+                                                                                            chip::EndpointId ZCLendpointId,
+                                                                                            chip::GroupId, uint8_t value)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OnOffSwitchConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.WriteAttributeSwitchActions(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), value)
+        .AsInteger();
+}
+chip::ChipError::StorageType chip_ime_ReadAttribute_OnOffSwitchConfiguration_ClusterRevision(chip::Controller::Device * device,
+                                                                                             chip::EndpointId ZCLendpointId,
+                                                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::OnOffSwitchConfigurationCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel()).AsInteger();
+}
+
+// End of Cluster OnOffSwitchConfiguration
 // Cluster OperationalCredentials
 
 chip::ChipError::StorageType chip_ime_AppendCommand_OperationalCredentials_AddNOC(

@@ -13684,6 +13684,127 @@ private:
 
 @end
 
+@interface CHIPOnOffSwitchConfiguration ()
+@property (readonly) Controller::OnOffSwitchConfigurationCluster cppCluster;
+@end
+
+@implementation CHIPOnOffSwitchConfiguration
+
+- (Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)readAttributeSwitchTypeWithResponseHandler:(ResponseHandler)responseHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeSwitchType(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeSwitchActionsWithResponseHandler:(ResponseHandler)responseHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeSwitchActions(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)writeAttributeSwitchActionsWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeSwitchActions(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+@end
+
 @interface CHIPOperationalCredentials ()
 @property (readonly) Controller::OperationalCredentialsCluster cppCluster;
 @end
