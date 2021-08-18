@@ -27,6 +27,8 @@ static void HandleResolve(void * context, MdnsService * result, CHIP_ERROR error
     NL_TEST_ASSERT(suite, strcmp(result->mTextEntries[0].mKey, "key") == 0);
     NL_TEST_ASSERT(suite, strcmp(reinterpret_cast<const char *>(result->mTextEntries[0].mData), "val") == 0);
 
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
     exit(0);
 }
 
@@ -104,6 +106,7 @@ int TestMdns()
 
     std::condition_variable doneCondition;
     bool done = false;
+    bool shutdown = false;
 
     int retVal = EXIT_FAILURE;
 
@@ -139,8 +142,10 @@ int TestMdns()
             // This will stop the event loop above, and wait till it has actually stopped
             // (i.e exited RunEventLoop()).
             //
+            chip::Mdns::ChipMdnsShutdown();
             chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
             chip::DeviceLayer::PlatformMgr().Shutdown();
+            shutdown = true;
 
             doneCondition.wait_for(lock, std::chrono::seconds(1));
             if (!done)
@@ -150,6 +155,16 @@ int TestMdns()
             retVal = EXIT_FAILURE;
         }
     }
+    t.join();
+
+    if (!shutdown)
+    {
+        chip::Mdns::ChipMdnsShutdown();
+        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        chip::DeviceLayer::PlatformMgr().Shutdown();
+    }
+    chip::Platform::MemoryShutdown();
+
     return retVal;
 }
 
