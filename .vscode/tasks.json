@@ -290,6 +290,7 @@
                 "light",
                 "lock",
                 "shell",
+                "temperature-measurement"
                 "window-covering"
             ],
             "default": "build"
