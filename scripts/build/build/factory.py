@@ -109,6 +109,8 @@ _MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
     Application.LOCK, Board.DEVKITC, app=Esp32App.LOCK)
 _MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
     Application.BRIDGE, Board.DEVKITC, app=Esp32App.BRIDGE)
+_MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
+    Application.TEMPERATURE_MEASUREMENT, Board.DEVKITC, app=Esp32App.TEMPERATURE_MEASUREMENT)
 
 _MATCHERS[Platform.QPG].AcceptApplication(Application.LOCK)
 _MATCHERS[Platform.QPG].AcceptBoard(Board.QPG6100)
