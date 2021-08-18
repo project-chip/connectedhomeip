@@ -31,7 +31,7 @@
 #include <app/util/basic-types.h>
 
 #include <app/InteractionModelEngine.h>
-#include <gen/CHIPClientCallbacks.h>
+#include <zap-generated/CHIPClientCallbacks.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
