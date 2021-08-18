@@ -274,7 +274,7 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     err = InitQueueLimiter();
     SuccessOrExit(err);
 
-    mSystemLayer->WatchableEventsManager().AddEventHandlerDelegate(sInetEventHandlerDelegate);
+    mSystemLayer->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     State = kState_Initialized;

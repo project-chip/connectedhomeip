@@ -171,6 +171,10 @@ static_library("system") {
     }
   }
 
+  if (chip_system_config_use_lwip) {
+    sources += [ "LwIPEventSupport.h" ]
+  }
+
   if (chip_with_nlfaultinjection) {
     sources += [ "SystemFaultInjection.cpp" ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
