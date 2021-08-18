@@ -37,6 +37,10 @@ _zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 #  use_default_client_callbacks
 #    Include CHIPClientCallbacks.cpp.
 #
+#  internal_controller_model
+#    Set to true to skip automatic dependency on controller datamodel
+#    generated files
+#
 # Forwards all the remaining variables to the source_set.
 #
 template("chip_data_model") {
@@ -52,6 +56,9 @@ template("chip_data_model") {
 
   _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
                              invoker.use_default_im_dispatch
+
+  _controller_model = defined(invoker.internal_controller_model) &&
+                      invoker.internal_controller_model
 
   _use_default_client_callbacks =
       defined(invoker.use_default_client_callbacks) &&
@@ -117,6 +124,12 @@ template("chip_data_model") {
       "${_app_root}/util/process-global-message.cpp",
       "${_app_root}/util/util.cpp",
     ]
+
+    # af-event.cpp includes af-gen-event.h
+    deps = []
+    if (!_controller_model) {
+      deps += [ "${chip_root}/src/controller/data_model" ]
+    }
 
     if (defined(invoker.cluster_sources)) {
       _cluster_sources = invoker.cluster_sources
