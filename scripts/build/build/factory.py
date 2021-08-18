@@ -127,6 +127,8 @@ _MATCHERS[Platform.NRF].AcceptBoard(Board.NRF52840, board=NrfBoard.NRF52840)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.LOCK, app=NrfApp.LOCK)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.LIGHT, app=NrfApp.LIGHT)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.SHELL, app=NrfApp.SHELL)
+_MATCHERS[Platform.NRF].AcceptApplication(Application.PUMP, app=NrfApp.PUMP)
+_MATCHERS[Platform.NRF].AcceptApplication(Application.PUMP_CONTROLLER, app=NrfApp.PUMP_CONTROLLER)
 
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM, board=AndroidBoard.ARM)
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM64, board=AndroidBoard.ARM64)

@@ -86,6 +86,8 @@ class Application(IntEnum):
     SHELL = auto()
     CHIP_TOOL = auto()
     BRIDGE = auto()
+    PUMP = auto()
+    PUMP_CONTROLLER = auto()
 
     @property
     def ArgName(self):

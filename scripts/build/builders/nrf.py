@@ -25,6 +25,8 @@ class NrfApp(Enum):
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
+    PUMP = auto()
+    PUMP_CONTROLLER = auto()
 
     def ExampleName(self):
         if self == NrfApp.LIGHT:
@@ -33,6 +35,10 @@ class NrfApp(Enum):
             return 'lock-app'
         elif self == NrfApp.SHELL:
             return 'shell'
+        elif self == NrfApp.PUMP:
+            return 'pump-app'
+        elif self == NrfApp.PUMP_CONTROLLER:
+            return 'pump-controller-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -43,6 +49,10 @@ class NrfApp(Enum):
             return 'chip-nrf-lock-example'
         elif self == NrfApp.SHELL:
             return 'chip-nrf-shell'
+        elif self == NrfApp.PUMP:
+            return 'chip-nrf-pump-example'
+        elif self == NrfApp.CONTROLLER:
+            return 'chip-nrf-pump-controller-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -53,6 +63,10 @@ class NrfApp(Enum):
             return 'chip-nrfconnect-lock-example'
         elif self == NrfApp.SHELL:
             return 'chip-nrfconnect-shell-example'
+        elif self == NrfApp.PUMP:
+            return 'chip-nrfconnect-pump-example'
+        elif self == NrfApp.PUMP_CONTROLLER:
+            return 'chip-nrfconnect-pump-controller-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
