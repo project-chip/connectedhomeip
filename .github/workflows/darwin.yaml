@@ -37,7 +37,7 @@ jobs:
               with:
                   submodules: true
             - name: Setup Environment
-              run: brew install openssl pkg-config
+              run: brew install openssl pkg-config python@3.9
             - name: Fix pkgconfig link
               working-directory: /usr/local/lib/pkgconfig
               run: |
