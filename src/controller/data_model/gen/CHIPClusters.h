@@ -659,11 +659,25 @@ public:
     GroupKeyManagementCluster() : ClusterBase(app::Clusters::GroupKeyManagement::Id) {}
     ~GroupKeyManagementCluster() {}
 
+    // Cluster Commands
+    CHIP_ERROR AssignKey(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t fabricIndex,
+                         uint16_t groupId, uint16_t keySetIndex);
+    CHIP_ERROR RemoveAllKeys(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                             uint16_t fabricIndex);
+    CHIP_ERROR RemoveKey(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t fabricIndex,
+                         uint16_t keySetIndex);
+    CHIP_ERROR RevokeKey(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t fabricIndex,
+                         uint16_t groupId, uint16_t keySetIndex);
+    CHIP_ERROR SetKey(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t fabricIndex,
+                      uint16_t keySetIndex, chip::ByteSpan keyRoot, chip::ByteSpan epochStartTime, uint8_t securityPolicy);
+
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeGroups(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeGroupKeys(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
 };
 
 class DLL_EXPORT GroupsCluster : public ClusterBase

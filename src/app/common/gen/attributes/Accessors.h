@@ -605,6 +605,11 @@ EmberAfStatus SetCommissionedFabrics(chip::EndpointId endpoint, uint8_t commissi
 } // namespace Attributes
 } // namespace OperationalCredentials
 
+namespace GroupKeyManagement {
+namespace Attributes {
+} // namespace Attributes
+} // namespace GroupKeyManagement
+
 namespace FixedLabel {
 namespace Attributes {
 } // namespace Attributes
@@ -2169,11 +2174,6 @@ EmberAfStatus GetRmsVoltageSwellPeriodPhaseC(chip::EndpointId endpoint, uint16_t
 EmberAfStatus SetRmsVoltageSwellPeriodPhaseC(chip::EndpointId endpoint, uint16_t rmsVoltageSwellPeriodPhaseC);
 } // namespace Attributes
 } // namespace ElectricalMeasurement
-
-namespace GroupKeyManagement {
-namespace Attributes {
-} // namespace Attributes
-} // namespace GroupKeyManagement
 
 namespace SampleMfgSpecificCluster {
 namespace Attributes {

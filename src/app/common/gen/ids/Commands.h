@@ -358,6 +358,18 @@ static constexpr CommandId RemoveTrustedRootCertificate = 0x0000000C;
 } // namespace Commands
 } // namespace OperationalCredentials
 
+namespace GroupKeyManagement {
+namespace Commands {
+namespace Ids {
+static constexpr CommandId SetKey        = 0x00000000;
+static constexpr CommandId RemoveKey     = 0x00000001;
+static constexpr CommandId RemoveAllKeys = 0x00000002;
+static constexpr CommandId AssignKey     = 0x00000003;
+static constexpr CommandId RevokeKey     = 0x00000004;
+} // namespace Ids
+} // namespace Commands
+} // namespace GroupKeyManagement
+
 namespace DoorLock {
 namespace Commands {
 namespace Ids {

@@ -1561,8 +1561,52 @@ class ChipClusters:
     }
     _GROUP_KEY_MANAGEMENT_CLUSTER_INFO = {
             "clusterName": "GroupKeyManagement",
-            "clusterId": 0x0000F004,
+            "clusterId": 0x0000003F,
             "commands": {
+            0x00000003: {
+                    "commandId": 0x00000003,
+                    "commandName": "AssignKey",
+                    "args": {
+                        "fabricIndex": "int",
+                        "groupId": "int",
+                        "keySetIndex": "int",
+                    },
+                },
+            0x00000002: {
+                    "commandId": 0x00000002,
+                    "commandName": "RemoveAllKeys",
+                    "args": {
+                        "fabricIndex": "int",
+                    },
+                },
+            0x00000001: {
+                    "commandId": 0x00000001,
+                    "commandName": "RemoveKey",
+                    "args": {
+                        "fabricIndex": "int",
+                        "keySetIndex": "int",
+                    },
+                },
+            0x00000004: {
+                    "commandId": 0x00000004,
+                    "commandName": "RevokeKey",
+                    "args": {
+                        "fabricIndex": "int",
+                        "groupId": "int",
+                        "keySetIndex": "int",
+                    },
+                },
+            0x00000000: {
+                    "commandId": 0x00000000,
+                    "commandName": "SetKey",
+                    "args": {
+                        "fabricIndex": "int",
+                        "keySetIndex": "int",
+                        "keyRoot": "bytes",
+                        "epochStartTime": "bytes",
+                        "securityPolicy": "int",
+                    },
+                },
             },
             "attributes": {
                 0x00000000: {
@@ -3511,7 +3555,7 @@ class ChipClusters:
     0x00000404: _FLOW_MEASUREMENT_CLUSTER_INFO,
     0x00000030: _GENERAL_COMMISSIONING_CLUSTER_INFO,
     0x00000033: _GENERAL_DIAGNOSTICS_CLUSTER_INFO,
-    0x0000F004: _GROUP_KEY_MANAGEMENT_CLUSTER_INFO,
+    0x0000003F: _GROUP_KEY_MANAGEMENT_CLUSTER_INFO,
     0x00000004: _GROUPS_CLUSTER_INFO,
     0x00000003: _IDENTIFY_CLUSTER_INFO,
     0x00000509: _KEYPAD_INPUT_CLUSTER_INFO,
@@ -3917,6 +3961,26 @@ class ChipClusters:
         countryCode = countryCode.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig(
                 device, ZCLendpoint, ZCLgroupid, location, countryCode, len(countryCode), breadcrumb, timeoutMs
+        )
+    def ClusterGroupKeyManagement_CommandAssignKey(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricIndex: int, groupId: int, keySetIndex: int):
+        return self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_AssignKey(
+                device, ZCLendpoint, ZCLgroupid, fabricIndex, groupId, keySetIndex
+        )
+    def ClusterGroupKeyManagement_CommandRemoveAllKeys(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricIndex: int):
+        return self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_RemoveAllKeys(
+                device, ZCLendpoint, ZCLgroupid, fabricIndex
+        )
+    def ClusterGroupKeyManagement_CommandRemoveKey(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricIndex: int, keySetIndex: int):
+        return self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_RemoveKey(
+                device, ZCLendpoint, ZCLgroupid, fabricIndex, keySetIndex
+        )
+    def ClusterGroupKeyManagement_CommandRevokeKey(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricIndex: int, groupId: int, keySetIndex: int):
+        return self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_RevokeKey(
+                device, ZCLendpoint, ZCLgroupid, fabricIndex, groupId, keySetIndex
+        )
+    def ClusterGroupKeyManagement_CommandSetKey(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricIndex: int, keySetIndex: int, keyRoot: bytes, epochStartTime: bytes, securityPolicy: int):
+        return self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_SetKey(
+                device, ZCLendpoint, ZCLgroupid, fabricIndex, keySetIndex, keyRoot, len(keyRoot), epochStartTime, len(epochStartTime), securityPolicy
         )
     def ClusterGroups_CommandAddGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
         groupName = groupName.encode("utf-8") + b'\x00'
@@ -5923,6 +5987,21 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision.restype = ctypes.c_uint32
         # Cluster GroupKeyManagement
+        # Cluster GroupKeyManagement Command AssignKey
+        self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_AssignKey.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_AssignKey.restype = ctypes.c_uint32
+        # Cluster GroupKeyManagement Command RemoveAllKeys
+        self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_RemoveAllKeys.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_RemoveAllKeys.restype = ctypes.c_uint32
+        # Cluster GroupKeyManagement Command RemoveKey
+        self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_RemoveKey.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_RemoveKey.restype = ctypes.c_uint32
+        # Cluster GroupKeyManagement Command RevokeKey
+        self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_RevokeKey.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_RevokeKey.restype = ctypes.c_uint32
+        # Cluster GroupKeyManagement Command SetKey
+        self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_SetKey.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_GroupKeyManagement_SetKey.restype = ctypes.c_uint32
         # Cluster GroupKeyManagement ReadAttribute Groups
         self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_Groups.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_Groups.restype = ctypes.c_uint32

@@ -3731,6 +3731,381 @@ void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, 
 
 } // namespace GeneralCommissioning
 
+namespace GroupKeyManagement {
+
+void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+{
+    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+    // Any error value TLVUnpackError means we have received an illegal value.
+    // The following variables are used for all commands to save code size.
+    CHIP_ERROR TLVError          = CHIP_NO_ERROR;
+    CHIP_ERROR TLVUnpackError    = CHIP_NO_ERROR;
+    uint32_t validArgumentCount  = 0;
+    uint32_t expectArgumentCount = 0;
+    uint32_t currentDecodeTagId  = 0;
+    bool wasHandled              = false;
+    {
+        switch (aCommandId)
+        {
+        case Clusters::GroupKeyManagement::Commands::Ids::AssignKey: {
+            expectArgumentCount = 3;
+            uint16_t fabricIndex;
+            uint16_t groupId;
+            uint16_t keySetIndex;
+            bool argExists[3];
+
+            memset(argExists, 0, sizeof argExists);
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+                if (!TLV::IsContextTag(aDataTlv.GetTag()))
+                {
+                    continue;
+                }
+                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+                if (currentDecodeTagId < 3)
+                {
+                    if (argExists[currentDecodeTagId])
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    else
+                    {
+                        argExists[currentDecodeTagId] = true;
+                        validArgumentCount++;
+                    }
+                }
+                switch (currentDecodeTagId)
+                {
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(fabricIndex);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(groupId);
+                    break;
+                case 2:
+                    TLVUnpackError = aDataTlv.Get(keySetIndex);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (CHIP_NO_ERROR != TLVUnpackError)
+                {
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
+            {
+                wasHandled =
+                    emberAfGroupKeyManagementClusterAssignKeyCallback(aEndpointId, apCommandObj, fabricIndex, groupId, keySetIndex);
+            }
+            break;
+        }
+        case Clusters::GroupKeyManagement::Commands::Ids::RemoveAllKeys: {
+            expectArgumentCount = 1;
+            uint16_t fabricIndex;
+            bool argExists[1];
+
+            memset(argExists, 0, sizeof argExists);
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+                if (!TLV::IsContextTag(aDataTlv.GetTag()))
+                {
+                    continue;
+                }
+                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+                if (currentDecodeTagId < 1)
+                {
+                    if (argExists[currentDecodeTagId])
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    else
+                    {
+                        argExists[currentDecodeTagId] = true;
+                        validArgumentCount++;
+                    }
+                }
+                switch (currentDecodeTagId)
+                {
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(fabricIndex);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (CHIP_NO_ERROR != TLVUnpackError)
+                {
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
+            {
+                wasHandled = emberAfGroupKeyManagementClusterRemoveAllKeysCallback(aEndpointId, apCommandObj, fabricIndex);
+            }
+            break;
+        }
+        case Clusters::GroupKeyManagement::Commands::Ids::RemoveKey: {
+            expectArgumentCount = 2;
+            uint16_t fabricIndex;
+            uint16_t keySetIndex;
+            bool argExists[2];
+
+            memset(argExists, 0, sizeof argExists);
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+                if (!TLV::IsContextTag(aDataTlv.GetTag()))
+                {
+                    continue;
+                }
+                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+                if (currentDecodeTagId < 2)
+                {
+                    if (argExists[currentDecodeTagId])
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    else
+                    {
+                        argExists[currentDecodeTagId] = true;
+                        validArgumentCount++;
+                    }
+                }
+                switch (currentDecodeTagId)
+                {
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(fabricIndex);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(keySetIndex);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (CHIP_NO_ERROR != TLVUnpackError)
+                {
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
+            {
+                wasHandled = emberAfGroupKeyManagementClusterRemoveKeyCallback(aEndpointId, apCommandObj, fabricIndex, keySetIndex);
+            }
+            break;
+        }
+        case Clusters::GroupKeyManagement::Commands::Ids::RevokeKey: {
+            expectArgumentCount = 3;
+            uint16_t fabricIndex;
+            uint16_t groupId;
+            uint16_t keySetIndex;
+            bool argExists[3];
+
+            memset(argExists, 0, sizeof argExists);
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+                if (!TLV::IsContextTag(aDataTlv.GetTag()))
+                {
+                    continue;
+                }
+                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+                if (currentDecodeTagId < 3)
+                {
+                    if (argExists[currentDecodeTagId])
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    else
+                    {
+                        argExists[currentDecodeTagId] = true;
+                        validArgumentCount++;
+                    }
+                }
+                switch (currentDecodeTagId)
+                {
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(fabricIndex);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(groupId);
+                    break;
+                case 2:
+                    TLVUnpackError = aDataTlv.Get(keySetIndex);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (CHIP_NO_ERROR != TLVUnpackError)
+                {
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
+            {
+                wasHandled =
+                    emberAfGroupKeyManagementClusterRevokeKeyCallback(aEndpointId, apCommandObj, fabricIndex, groupId, keySetIndex);
+            }
+            break;
+        }
+        case Clusters::GroupKeyManagement::Commands::Ids::SetKey: {
+            expectArgumentCount = 5;
+            uint16_t fabricIndex;
+            uint16_t keySetIndex;
+            chip::ByteSpan keyRoot;
+            chip::ByteSpan epochStartTime;
+            uint8_t securityPolicy;
+            bool argExists[5];
+
+            memset(argExists, 0, sizeof argExists);
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+                if (!TLV::IsContextTag(aDataTlv.GetTag()))
+                {
+                    continue;
+                }
+                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+                if (currentDecodeTagId < 5)
+                {
+                    if (argExists[currentDecodeTagId])
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    else
+                    {
+                        argExists[currentDecodeTagId] = true;
+                        validArgumentCount++;
+                    }
+                }
+                switch (currentDecodeTagId)
+                {
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(fabricIndex);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(keySetIndex);
+                    break;
+                case 2:
+                    TLVUnpackError = aDataTlv.Get(keyRoot);
+                    break;
+                case 3:
+                    TLVUnpackError = aDataTlv.Get(epochStartTime);
+                    break;
+                case 4:
+                    TLVUnpackError = aDataTlv.Get(securityPolicy);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (CHIP_NO_ERROR != TLVUnpackError)
+                {
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
+            {
+                wasHandled = emberAfGroupKeyManagementClusterSetKeyCallback(aEndpointId, apCommandObj, fabricIndex, keySetIndex,
+                                                                            keyRoot, epochStartTime, securityPolicy);
+            }
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            ReportCommandUnsupported(apCommandObj, aEndpointId, Clusters::GroupKeyManagement::Id, aCommandId);
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
+    {
+        CommandPathParams returnStatusParam = { aEndpointId,
+                                                0, // GroupId
+                                                Clusters::GroupKeyManagement::Id, aCommandId,
+                                                (CommandPathFlags::kEndpointIdValid) };
+        apCommandObj->AddStatusCode(returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                    Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::InvalidCommand);
+        ChipLogProgress(Zcl,
+                        "Failed to dispatch command, %" PRIu32 "/%" PRIu32 " arguments parsed, TLVError=%" CHIP_ERROR_FORMAT
+                        ", UnpackError=%" CHIP_ERROR_FORMAT " (last decoded tag = %" PRIu32,
+                        validArgumentCount, expectArgumentCount, TLVError.Format(), TLVUnpackError.Format(), currentDecodeTagId);
+        // A command with no arguments would never write currentDecodeTagId.  If
+        // progress logging is also disabled, it would look unused.  Silence that
+        // warning.
+        UNUSED_VAR(currentDecodeTagId);
+    }
+}
+
+} // namespace GroupKeyManagement
+
 namespace Groups {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
@@ -7120,6 +7495,9 @@ void DispatchSingleClusterCommand(ClusterId aClusterId, CommandId aCommandId, En
         break;
     case Clusters::GeneralCommissioning::Id:
         clusters::GeneralCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        break;
+    case Clusters::GroupKeyManagement::Id:
+        clusters::GroupKeyManagement::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case Clusters::Groups::Id:
         clusters::Groups::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);

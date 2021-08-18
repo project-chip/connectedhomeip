@@ -2258,6 +2258,432 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterGroupKeyManagementCluster_000000_SetKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Set Key 1a"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t keySetIndexArgument = 0U;
+    NSString * keyRootArgumentString = @"key000000000001a";
+    NSData * keyRootArgument = [keyRootArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    NSString * epochStartTimeArgumentString = @"12345678";
+    NSData * epochStartTimeArgument = [epochStartTimeArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    uint8_t securityPolicyArgument = 0;
+    [cluster setKey:fabricIndexArgument
+            keySetIndex:keySetIndexArgument
+                keyRoot:keyRootArgument
+         epochStartTime:epochStartTimeArgument
+         securityPolicy:securityPolicyArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Set Key 1a Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000001_SetKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Set Key 1b"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t keySetIndexArgument = 0U;
+    NSString * keyRootArgumentString = @"key000000000001b";
+    NSData * keyRootArgument = [keyRootArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    NSString * epochStartTimeArgumentString = @"12345678";
+    NSData * epochStartTimeArgument = [epochStartTimeArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    uint8_t securityPolicyArgument = 0;
+    [cluster setKey:fabricIndexArgument
+            keySetIndex:keySetIndexArgument
+                keyRoot:keyRootArgument
+         epochStartTime:epochStartTimeArgument
+         securityPolicy:securityPolicyArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Set Key 1b Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000002_SetKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Set Key 1c"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t keySetIndexArgument = 0U;
+    NSString * keyRootArgumentString = @"key000000000001c";
+    NSData * keyRootArgument = [keyRootArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    NSString * epochStartTimeArgumentString = @"12345678";
+    NSData * epochStartTimeArgument = [epochStartTimeArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    uint8_t securityPolicyArgument = 0;
+    [cluster setKey:fabricIndexArgument
+            keySetIndex:keySetIndexArgument
+                keyRoot:keyRootArgument
+         epochStartTime:epochStartTimeArgument
+         securityPolicy:securityPolicyArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Set Key 1c Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000003_SetKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Set Key 2a"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t keySetIndexArgument = 1U;
+    NSString * keyRootArgumentString = @"key000000000002a";
+    NSData * keyRootArgument = [keyRootArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    NSString * epochStartTimeArgumentString = @"12345678";
+    NSData * epochStartTimeArgument = [epochStartTimeArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    uint8_t securityPolicyArgument = 0;
+    [cluster setKey:fabricIndexArgument
+            keySetIndex:keySetIndexArgument
+                keyRoot:keyRootArgument
+         epochStartTime:epochStartTimeArgument
+         securityPolicy:securityPolicyArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Set Key 2a Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000004_SetKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Set Key 2b"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t keySetIndexArgument = 1U;
+    NSString * keyRootArgumentString = @"key000000000002b";
+    NSData * keyRootArgument = [keyRootArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    NSString * epochStartTimeArgumentString = @"12345678";
+    NSData * epochStartTimeArgument = [epochStartTimeArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    uint8_t securityPolicyArgument = 0;
+    [cluster setKey:fabricIndexArgument
+            keySetIndex:keySetIndexArgument
+                keyRoot:keyRootArgument
+         epochStartTime:epochStartTimeArgument
+         securityPolicy:securityPolicyArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Set Key 2b Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000005_SetKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Set Key 2c"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t keySetIndexArgument = 1U;
+    NSString * keyRootArgumentString = @"key000000000002c";
+    NSData * keyRootArgument = [keyRootArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    NSString * epochStartTimeArgumentString = @"12345678";
+    NSData * epochStartTimeArgument = [epochStartTimeArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    uint8_t securityPolicyArgument = 0;
+    [cluster setKey:fabricIndexArgument
+            keySetIndex:keySetIndexArgument
+                keyRoot:keyRootArgument
+         epochStartTime:epochStartTimeArgument
+         securityPolicy:securityPolicyArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Set Key 2c Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000006_RemoveKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove Key 3 (not found)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t keySetIndexArgument = 2U;
+    [cluster removeKey:fabricIndexArgument
+            keySetIndex:keySetIndexArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Remove Key 3 (not found) Error: %@", err);
+
+            XCTAssertEqual(err.code, 139);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000007_AssignKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Assign Key, Group 101, Set 1 (existing)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t groupIdArgument = 101U;
+    uint16_t keySetIndexArgument = 0U;
+    [cluster assignKey:fabricIndexArgument
+                groupId:groupIdArgument
+            keySetIndex:keySetIndexArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Assign Key, Group 101, Set 1 (existing) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000008_AssignKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Assign Key, Group 101, Set 2 (existing)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t groupIdArgument = 101U;
+    uint16_t keySetIndexArgument = 1U;
+    [cluster assignKey:fabricIndexArgument
+                groupId:groupIdArgument
+            keySetIndex:keySetIndexArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Assign Key, Group 101, Set 2 (existing) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000009_AssignKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Assign Key, Group 101, Set 3 (not found)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t groupIdArgument = 101U;
+    uint16_t keySetIndexArgument = 2U;
+    [cluster assignKey:fabricIndexArgument
+                groupId:groupIdArgument
+            keySetIndex:keySetIndexArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Assign Key, Group 101, Set 3 (not found) Error: %@", err);
+
+            XCTAssertEqual(err.code, 139);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000010_SetKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Set Key 3a"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t keySetIndexArgument = 2U;
+    NSString * keyRootArgumentString = @"key000000000003a";
+    NSData * keyRootArgument = [keyRootArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    NSString * epochStartTimeArgumentString = @"12345678";
+    NSData * epochStartTimeArgument = [epochStartTimeArgumentString dataUsingEncoding:NSUTF8StringEncoding];
+    uint8_t securityPolicyArgument = 0;
+    [cluster setKey:fabricIndexArgument
+            keySetIndex:keySetIndexArgument
+                keyRoot:keyRootArgument
+         epochStartTime:epochStartTimeArgument
+         securityPolicy:securityPolicyArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Set Key 3a Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000011_AssignKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Assign Key, Group 101, Set 3 (existing)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t groupIdArgument = 101U;
+    uint16_t keySetIndexArgument = 2U;
+    [cluster assignKey:fabricIndexArgument
+                groupId:groupIdArgument
+            keySetIndex:keySetIndexArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Assign Key, Group 101, Set 3 (existing) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000012_AssignKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Assign Key, Group 102, Set 2 (existing)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t groupIdArgument = 102U;
+    uint16_t keySetIndexArgument = 1U;
+    [cluster assignKey:fabricIndexArgument
+                groupId:groupIdArgument
+            keySetIndex:keySetIndexArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Assign Key, Group 102, Set 2 (existing) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000013_AssignKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Assign Key, Group 102, Set 3 (existing)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t groupIdArgument = 102U;
+    uint16_t keySetIndexArgument = 2U;
+    [cluster assignKey:fabricIndexArgument
+                groupId:groupIdArgument
+            keySetIndex:keySetIndexArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Assign Key, Group 102, Set 3 (existing) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000014_RemoveKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove Key 2 (existing)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t keySetIndexArgument = 1U;
+    [cluster removeKey:fabricIndexArgument
+            keySetIndex:keySetIndexArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Remove Key 2 (existing) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000015_RevokeKey
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Revoke Key, Group 101, Set 3 (existing)"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    uint16_t groupIdArgument = 101U;
+    uint16_t keySetIndexArgument = 2U;
+    [cluster revokeKey:fabricIndexArgument
+                groupId:groupIdArgument
+            keySetIndex:keySetIndexArgument
+        responseHandler:^(NSError * err, NSDictionary * values) {
+            NSLog(@"Revoke Key, Group 101, Set 3 (existing) Error: %@", err);
+
+            XCTAssertEqual(err.code, 0);
+            [expectation fulfill];
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterGroupKeyManagementCluster_000016_RemoveAllKeys
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove All Keys"];
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t fabricIndexArgument = 1U;
+    [cluster removeAllKeys:fabricIndexArgument
+           responseHandler:^(NSError * err, NSDictionary * values) {
+               NSLog(@"Remove All Keys Error: %@", err);
+
+               XCTAssertEqual(err.code, 0);
+               [expectation fulfill];
+           }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTest_TC_OO_1_1_000000_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"read the global attribute: ClusterRevision"];
