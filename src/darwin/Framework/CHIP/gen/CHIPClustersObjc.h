@@ -865,13 +865,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)applyUpdateRequest:(NSData *)updateToken newVersion:(uint32_t)newVersion responseHandler:(ResponseHandler)responseHandler;
 - (void)notifyUpdateApplied:(NSData *)updateToken
-             currentVersion:(uint32_t)currentVersion
+            softwareVersion:(uint32_t)softwareVersion
             responseHandler:(ResponseHandler)responseHandler;
 - (void)queryImage:(uint16_t)vendorId
               productId:(uint16_t)productId
-              imageType:(uint16_t)imageType
         hardwareVersion:(uint16_t)hardwareVersion
-         currentVersion:(uint32_t)currentVersion
+        softwareVersion:(uint32_t)softwareVersion
      protocolsSupported:(uint8_t)protocolsSupported
                location:(NSString *)location
     requestorCanConsent:(bool)requestorCanConsent

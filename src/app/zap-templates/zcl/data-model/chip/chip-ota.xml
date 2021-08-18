@@ -44,9 +44,8 @@ limitations under the License.
             <description>Determine availability of a new Software Image</description>
             <arg name="vendorId" type="INT16U"/>
             <arg name="productId" type="INT16U"/>
-            <arg name="imageType" type="INT16U"/>
             <arg name="hardwareVersion" type="INT16U"/>
-            <arg name="currentVersion" type="INT32U"/>
+            <arg name="softwareVersion" type="INT32U"/>
             <arg name="protocolsSupported" type="OTADownloadProtocol"/> <!-- TODO(#8605): add array="true" when lists are supported -->
             <arg name="location" type="CHAR_STRING" length="2"/>
             <arg name="requestorCanConsent" type="BOOLEAN"/>
@@ -60,7 +59,7 @@ limitations under the License.
         <command source="client" code="0x02" name="NotifyUpdateApplied" optional="false" cli="chip ota notifyupdateapplied">
             <description>Notify OTA Provider that an update was applied</description>
             <arg name="updateToken" type="OCTET_STRING" length="32"/>
-            <arg name="currentVersion" type="INT32U"/>
+            <arg name="softwareVersion" type="INT32U"/>
         </command>
         <command source="server" code="0x03" name="QueryImageResponse" optional="false" cli="chip ota queryimageresponse">
             <description>Response to QueryImage command</description>
@@ -68,6 +67,7 @@ limitations under the License.
             <arg name="delayedActionTime" type="INT32U"/>
             <arg name="imageURI" type="CHAR_STRING"/>
             <arg name="softwareVersion" type="INT32U"/>
+            <arg name="softwareVersionString" type="CHAR_STRING"/>
             <arg name="updateToken" type="OCTET_STRING" length="32"/>
             <arg name="userConsentNeeded" type="BOOLEAN" default="false"/>
             <arg name="metadataForRequestor" type="OCTET_STRING" length="512"/>
@@ -81,7 +81,7 @@ limitations under the License.
     <enum name="OTAAnnouncementReason" type="ENUM8">
         <item name="SimpleAnnouncement" value="0x0"/>
         <item name="UpdateAvailable" value="0x1"/>
-        <item name="CriticalUpdateAvailable" value="0x2"/>
+        <item name="UrgentUpdateAvailable" value="0x2"/>
     </enum>
     <cluster>
         <name>OTA Software Update Requestor</name>

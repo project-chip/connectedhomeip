@@ -599,8 +599,8 @@ static void OnOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponse(void * 
 
 static void OnOtaSoftwareUpdateProviderClusterQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime,
                                                                  uint8_t * imageURI, uint32_t softwareVersion,
-                                                                 chip::ByteSpan updateToken, bool userConsentNeeded,
-                                                                 chip::ByteSpan metadataForRequestor)
+                                                                 uint8_t * softwareVersionString, chip::ByteSpan updateToken,
+                                                                 bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
 {
     ChipLogProgress(chipTool, "OtaSoftwareUpdateProviderClusterQueryImageResponse");
 
@@ -13567,7 +13567,7 @@ public:
     OtaSoftwareUpdateProviderNotifyUpdateApplied() : ModelCommand("notify-update-applied")
     {
         AddArgument("UpdateToken", &mUpdateToken);
-        AddArgument("CurrentVersion", 0, UINT32_MAX, &mCurrentVersion);
+        AddArgument("SoftwareVersion", 0, UINT32_MAX, &mSoftwareVersion);
         ModelCommand::AddArguments();
     }
     ~OtaSoftwareUpdateProviderNotifyUpdateApplied()
@@ -13582,7 +13582,8 @@ public:
 
         chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.NotifyUpdateApplied(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUpdateToken, mCurrentVersion);
+        return cluster.NotifyUpdateApplied(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mUpdateToken,
+                                           mSoftwareVersion);
     }
 
 private:
@@ -13591,7 +13592,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::ByteSpan mUpdateToken;
-    uint32_t mCurrentVersion;
+    uint32_t mSoftwareVersion;
 };
 
 /*
@@ -13604,9 +13605,8 @@ public:
     {
         AddArgument("VendorId", 0, UINT16_MAX, &mVendorId);
         AddArgument("ProductId", 0, UINT16_MAX, &mProductId);
-        AddArgument("ImageType", 0, UINT16_MAX, &mImageType);
         AddArgument("HardwareVersion", 0, UINT16_MAX, &mHardwareVersion);
-        AddArgument("CurrentVersion", 0, UINT32_MAX, &mCurrentVersion);
+        AddArgument("SoftwareVersion", 0, UINT32_MAX, &mSoftwareVersion);
         AddArgument("ProtocolsSupported", 0, UINT8_MAX, &mProtocolsSupported);
         AddArgument("Location", &mLocation);
         AddArgument("RequestorCanConsent", 0, 1, &mRequestorCanConsent);
@@ -13625,8 +13625,8 @@ public:
 
         chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.QueryImage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mVendorId, mProductId, mImageType,
-                                  mHardwareVersion, mCurrentVersion, mProtocolsSupported,
+        return cluster.QueryImage(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mVendorId, mProductId, mHardwareVersion,
+                                  mSoftwareVersion, mProtocolsSupported,
                                   chip::ByteSpan(chip::Uint8::from_char(mLocation), strlen(mLocation)), mRequestorCanConsent,
                                   mMetadataForProvider);
     }
@@ -13639,9 +13639,8 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint16_t mVendorId;
     uint16_t mProductId;
-    uint16_t mImageType;
     uint16_t mHardwareVersion;
-    uint32_t mCurrentVersion;
+    uint32_t mSoftwareVersion;
     uint8_t mProtocolsSupported;
     char * mLocation;
     bool mRequestorCanConsent;

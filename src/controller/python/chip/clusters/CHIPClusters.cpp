@@ -3569,23 +3569,23 @@ chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_Ap
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_NotifyUpdateApplied(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, const uint8_t * updateToken,
-    uint32_t updateToken_Len, uint32_t currentVersion)
+    uint32_t updateToken_Len, uint32_t softwareVersion)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.NotifyUpdateApplied(nullptr, nullptr, chip::ByteSpan(updateToken, updateToken_Len), currentVersion).AsInteger();
+    return cluster.NotifyUpdateApplied(nullptr, nullptr, chip::ByteSpan(updateToken, updateToken_Len), softwareVersion).AsInteger();
 }
 chip::ChipError::StorageType chip_ime_AppendCommand_OtaSoftwareUpdateProvider_QueryImage(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t vendorId, uint16_t productId,
-    uint16_t imageType, uint16_t hardwareVersion, uint32_t currentVersion, uint8_t protocolsSupported, const uint8_t * location,
-    uint32_t location_Len, bool requestorCanConsent, const uint8_t * metadataForProvider, uint32_t metadataForProvider_Len)
+    uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported, const uint8_t * location, uint32_t location_Len,
+    bool requestorCanConsent, const uint8_t * metadataForProvider, uint32_t metadataForProvider_Len)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster
-        .QueryImage(nullptr, nullptr, vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
+        .QueryImage(nullptr, nullptr, vendorId, productId, hardwareVersion, softwareVersion, protocolsSupported,
                     chip::ByteSpan(location, location_Len), requestorCanConsent,
                     chip::ByteSpan(metadataForProvider, metadataForProvider_Len))
         .AsInteger();

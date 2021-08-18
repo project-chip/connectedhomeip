@@ -2304,7 +2304,7 @@ public:
     ~CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t status, uint32_t delayedActionTime, uint8_t * imageURI, uint32_t softwareVersion,
-        chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
+        uint8_t * softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor)
     {
         CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge * callback
             = reinterpret_cast<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge *>(context);
@@ -2315,6 +2315,7 @@ public:
                     @"delayedActionTime" : [NSNumber numberWithUnsignedLong:delayedActionTime],
                     @"imageURI" : [NSString stringWithFormat:@"%s", imageURI],
                     @"softwareVersion" : [NSNumber numberWithUnsignedLong:softwareVersion],
+                    @"softwareVersionString" : [NSString stringWithFormat:@"%s", softwareVersionString],
                     @"updateToken" : [NSData dataWithBytes:updateToken.data() length:updateToken.size()],
                     @"userConsentNeeded" : [NSNumber numberWithBool:userConsentNeeded],
                     @"metadataForRequestor" : [NSData dataWithBytes:metadataForRequestor.data() length:metadataForRequestor.size()],
@@ -12925,7 +12926,7 @@ private:
     }
 }
 - (void)notifyUpdateApplied:(NSData *)updateToken
-             currentVersion:(uint32_t)currentVersion
+            softwareVersion:(uint32_t)softwareVersion
             responseHandler:(ResponseHandler)responseHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
@@ -12944,7 +12945,7 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.NotifyUpdateApplied(onSuccess->Cancel(), onFailure->Cancel(),
-            chip::ByteSpan((const uint8_t *) updateToken.bytes, updateToken.length), currentVersion);
+            chip::ByteSpan((const uint8_t *) updateToken.bytes, updateToken.length), softwareVersion);
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -12955,9 +12956,8 @@ private:
 }
 - (void)queryImage:(uint16_t)vendorId
               productId:(uint16_t)productId
-              imageType:(uint16_t)imageType
         hardwareVersion:(uint16_t)hardwareVersion
-         currentVersion:(uint32_t)currentVersion
+        softwareVersion:(uint32_t)softwareVersion
      protocolsSupported:(uint8_t)protocolsSupported
                location:(NSString *)location
     requestorCanConsent:(bool)requestorCanConsent
@@ -12980,8 +12980,8 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.QueryImage(onSuccess->Cancel(), onFailure->Cancel(), vendorId, productId, imageType, hardwareVersion,
-            currentVersion, protocolsSupported,
+        err = self.cppCluster.QueryImage(onSuccess->Cancel(), onFailure->Cancel(), vendorId, productId, hardwareVersion,
+            softwareVersion, protocolsSupported,
             chip::ByteSpan((const uint8_t *) [location dataUsingEncoding:NSUTF8StringEncoding].bytes,
                 [location lengthOfBytesUsingEncoding:NSUTF8StringEncoding]),
             requestorCanConsent, chip::ByteSpan((const uint8_t *) metadataForProvider.bytes, metadataForProvider.length));
