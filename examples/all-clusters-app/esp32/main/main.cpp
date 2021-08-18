@@ -354,7 +354,7 @@ public:
         }
         else if (i == 2)
         {
-            app::Mdns::AdvertiseCommissionableNode();
+            app::Mdns::AdvertiseCommissionableNode(CommissioningMode::kEnabledBasic);
             OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
         }
     }
