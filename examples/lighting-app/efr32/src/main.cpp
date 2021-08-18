@@ -168,6 +168,7 @@ int main(void)
         appError(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
+
     EFR32_LOG("Starting App Task");
     ret = GetAppTask().StartAppTask();
     if (ret != CHIP_NO_ERROR)
@@ -185,7 +186,6 @@ int main(void)
     EFR32_LOG("vTaskStartScheduler() failed");
     appError(ret);
 }
-
 
 void sl_button_on_change(const sl_button_t *handle)
 {

@@ -23,31 +23,9 @@
 
 #define APP_TASK_NAME "APP"
 
-// EFR32 WSTK Buttons
-#define PB0 0
-#define PB1 1
-
-// EFR32 WSTK LEDs
-#define BSP_LED_0 0
-#define BSP_LED_1 1
-
-#define APP_LOCK_BUTTON PB1
-#define APP_FUNCTION_BUTTON PB0
-#define APP_BUTTON_DEBOUNCE_PERIOD_MS 50
-
-#define APP_BUTTON_PRESSED 0
-#define APP_BUTTON_RELEASED 1
-
-#define SYSTEM_STATE_LED BSP_LED_0
-#define LOCK_STATE_LED BSP_LED_1
-
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
 #define ACTUATOR_MOVEMENT_PERIOS_MS 2000
-
-// ---- Lock Example SWU Config ----
-#define SWU_INTERVAl_WINDOW_MIN_MS (23 * 60 * 60 * 1000) // 23 hours
-#define SWU_INTERVAl_WINDOW_MAX_MS (24 * 60 * 60 * 1000) // 24 hours
 
 // ---- Thread Polling Config ----
 #define THREAD_ACTIVE_POLLING_INTERVAL_MS 100

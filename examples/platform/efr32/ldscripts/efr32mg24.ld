@@ -45,11 +45,11 @@
  *
  ******************************************************************************/
 
-MEMORY
-{
-  FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 1572864
-  RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 262144
-}
+ MEMORY
+ {
+   FLASH   (rx)  : ORIGIN = 0x8000000, LENGTH = 0x17e000
+   RAM     (rwx) : ORIGIN = 0x20000000, LENGTH = 0x40000
+ }
 
 /* Linker script to place sections and symbol values. Should be used together
  * with other linker script that defines memory regions FLASH and RAM.
@@ -122,8 +122,10 @@ SECTIONS
 
     *(.rodata*)
 
+
     KEEP(*(.eh_frame*))
   } > FLASH
+
 
   .ARM.extab :
   {
@@ -136,6 +138,8 @@ SECTIONS
     *(.ARM.exidx* .gnu.linkonce.armexidx.*)
   } > FLASH
   __exidx_end = .;
+
+
 
   /* To copy multiple ROM to RAM sections,
    * uncomment .copy.table section and,
@@ -174,9 +178,9 @@ SECTIONS
   __etext = .;
 
   /*******************************************************************/
-  /* Define flash block for BLE-simee & CHIP-nvm3                    */
+  /* Define flash block for BLE-simee & chip-nvm3                    */
   /* simee: 9000H (36k) bytes for BLE nvm3                           */
-  /* chipNvm3_section: 4000H (16k) bytes for CHIP nvm3.              */
+  /* chipNvm3_section: 4000H (16k) bytes for chip nvm3.              */
   /* 8K is reserved for OpenThread's NVM which is mapped directly at */
   /* the top of flash                                                */
   /*******************************************************************/
@@ -198,11 +202,12 @@ SECTIONS
   } > FLASH
 
   /* Set NVM to end of FLASH */
-  __nvm3Base = LENGTH(FLASH) - SIZEOF(.nvm_dummy) + (__nvm3_dummy_simee - __nvm3_dummy_begin);
-  __chipNvm3Base = LENGTH(FLASH) - SIZEOF(.nvm_dummy) + (__nvm3_dummy_chip - __nvm3_dummy_begin);
+  __nvm3Base = (ORIGIN(FLASH) + LENGTH(FLASH)) - SIZEOF(.nvm_dummy) + (__nvm3_dummy_simee - __nvm3_dummy_begin);
+  __chipNvm3Base = (ORIGIN(FLASH) + LENGTH(FLASH)) - SIZEOF(.nvm_dummy) + (__nvm3_dummy_chip - __nvm3_dummy_begin);
 
 
   /*******************************************************************/
+
   .data : AT (__etext)
   {
     __data_start__ = .;
@@ -277,7 +282,8 @@ SECTIONS
   /* Check if data + heap + stack exceeds RAM limit */
   ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
 
+
   /* Check if FLASH usage exceeds FLASH size */
-  /*ASSERT( LENGTH(FLASH) >= (__etext + SIZEOF(.data)), "FLASH memory overflowed !")*/
-  /*ASSERT((__etext + SIZEOF(.data)) <= __nvm3Base, "FLASH memory overlapped with NVM section.")*/
-  }
+  ASSERT( (ORIGIN(FLASH) + LENGTH(FLASH)) >= (__etext + SIZEOF(.data)), "FLASH memory overflowed !")
+  ASSERT((__etext + SIZEOF(.data)) <= __nvm3Base, "FLASH memory overlapped with NVM section.")
+}

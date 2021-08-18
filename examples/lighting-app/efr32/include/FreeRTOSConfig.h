@@ -148,10 +148,15 @@ though that is faster than would normally be warranted by a real
 application. */
 #define configTICK_RATE_HZ (1000)
 
-/* The full demo always has tasks to run so the tick will never be turned
-off.  The blinky demo will use the default tickless idle implementation to
-turn the tick off. */
-#define configUSE_TICKLESS_IDLE (0)
+/* Energy saving modes. */
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+#define configUSE_TICKLESS_IDLE                       1
+#else
+#define configUSE_TICKLESS_IDLE                       0
+#endif
+
+/* Definition used by Keil to replace default system clock source. */
+#define configOVERRIDE_DEFAULT_TICK_CONFIGURATION     1
 
 /* Hook function related definitions. */
 #define configUSE_TICK_HOOK (1)
@@ -178,7 +183,7 @@ runs at 32768/8=4096Hz.  Ensure the tick rate is a multiple of the clock. */
 #define configUSE_TICK_HOOK (0)
 #define configCHECK_FOR_STACK_OVERFLOW (0)
 #define configUSE_MALLOC_FAILED_HOOK (0)
-#define configUSE_IDLE_HOOK (0)
+#define configUSE_IDLE_HOOK (1)
 
 #define configENERGY_MODE (sleepEM3)
 #endif
@@ -202,10 +207,14 @@ to all Cortex-M ports, and do not rely on any particular library functions. */
 #define configKERNEL_INTERRUPT_PRIORITY (255)
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY    96
-
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY    48//96
+#define configENABLE_FPU 0
+#define configENABLE_MPU 0
+/* FreeRTOS Secure Side Only and TrustZone Security Extension */
+#define configRUN_FREERTOS_SECURE_ONLY                1
+#define configENABLE_TRUSTZONE                        0
 /* FreeRTOS MPU specific definitions. */
-#define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS (1)
+#define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS (0)
 
 #define configCPU_CLOCK_HZ (SystemCoreClock)
 #define configUSE_PREEMPTION (1)
@@ -274,6 +283,12 @@ standard names. */
 #define xPortPendSVHandler PendSV_Handler
 /* Ensure Cortex-M port compatibility. */
 #define SysTick_Handler                         xPortSysTickHandler
+
+/* Thread local storage pointers used by the SDK */
+#ifndef configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS
+  #define configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS 0
+#endif
+
 
 #if defined(__GNUC__)
 /* For the linker. */

@@ -63,7 +63,6 @@
 #define APP_LIGHT_SWITCH &sl_button_btn1
  
 namespace {
-
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
 TaskHandle_t sAppTaskHandle;
@@ -124,7 +123,7 @@ CHIP_ERROR AppTask::Init()
     if (sFunctionTimer == NULL)
     {
         EFR32_LOG("funct timer create failed");
-        appError(err);
+        appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
     EFR32_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
@@ -140,7 +139,6 @@ CHIP_ERROR AppTask::Init()
     // Initialize LEDs
     LEDWidget::InitGpio();
     sStatusLED.Init(SYSTEM_STATE_LED);
-
     sLightLED.Init(LIGHT_LED);
     sLightLED.Set(LightMgr().IsLightOn());
     UpdateClusterState();

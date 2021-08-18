@@ -53,7 +53,6 @@ efr32_sdk("sdk") {
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
   defines = [
@@ -72,7 +71,6 @@ efr32_executable("lock_app") {
     "${examples_plat_dir}/uart.c",
     "src/AppTask.cpp",
     "src/BoltLockManager.cpp",
-    "src/ButtonHandler.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]

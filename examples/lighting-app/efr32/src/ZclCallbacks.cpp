@@ -71,10 +71,6 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
 
         // WIP Apply attribute change to Light
     }
-    else
-    {
-        ChipLogProgress(Zcl, "Unknown Cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-    }
 }
 
 /** @brief OnOff Cluster Init

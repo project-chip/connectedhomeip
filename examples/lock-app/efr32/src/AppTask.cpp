@@ -20,10 +20,10 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include "ButtonHandler.h"
 #include "LEDWidget.h"
 #include "lcd.h"
 #include "qrcodegen.h"
+#include "sl_simple_led_instances.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -53,6 +53,11 @@
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
+
+#define SYSTEM_STATE_LED &sl_led_led0
+#define LOCK_STATE_LED &sl_led_led1
+#define APP_FUNCTION_BUTTON &sl_button_btn0
+#define APP_LOCK_BUTTON &sl_button_btn1
 
 namespace {
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
@@ -99,10 +104,7 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    // Initialise WSTK buttons PB0 and PB1 (including debounce).
-    ButtonHandler::Init();
-
+    
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
                                   1,                // == default timer period (mS)
@@ -270,9 +272,9 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
+void AppTask::ButtonEventHandler(const sl_button_t *buttonHandle, uint8_t btnAction)
 {
-    if (btnIdx != APP_LOCK_BUTTON && btnIdx != APP_FUNCTION_BUTTON)
+    if (buttonHandle == NULL)
     {
         return;
     }
@@ -281,12 +283,12 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
     button_event.Type                  = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action    = btnAction;
 
-    if (btnIdx == APP_LOCK_BUTTON && btnAction == APP_BUTTON_PRESSED)
+    if (buttonHandle == APP_LOCK_BUTTON && btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
         button_event.Handler = LockActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (btnIdx == APP_FUNCTION_BUTTON)
+    else if (buttonHandle == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = FunctionHandler;
         sAppTask.PostEvent(&button_event);
@@ -346,7 +348,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
     // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
     // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (aEvent->ButtonEvent.Action == APP_BUTTON_PRESSED)
+    if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
@@ -480,10 +482,26 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 {
     if (sAppEventQueue != NULL)
     {
-        if (!xQueueSend(sAppEventQueue, aEvent, 1))
+        BaseType_t status;
+        if (xPortIsInsideInterrupt())
         {
-            EFR32_LOG("Failed to post event to app task event queue");
+            BaseType_t higherPrioTaskWoken = pdFALSE;
+            status = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+
+            #ifdef portYIELD_FROM_ISR
+            portYIELD_FROM_ISR(higherPrioTaskWoken);
+            #elif portEND_SWITCHING_ISR // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+                        portEND_SWITCHING_ISR(higherPrioTaskWoken);
+            #else                       // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+            #error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
+            #endif // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
         }
+        else
+        {
+            status = xQueueSend(sAppEventQueue, aEvent, 1);
+        }
+
+        if (!status) EFR32_LOG("Failed to post event to app task event queue");
     }
 }
 
