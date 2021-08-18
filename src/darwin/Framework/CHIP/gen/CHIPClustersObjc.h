@@ -640,9 +640,9 @@ NS_ASSUME_NONNULL_BEGIN
                   timeoutMs:(uint32_t)timeoutMs
             responseHandler:(ResponseHandler)responseHandler;
 
-- (void)readAttributeFabricIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeBreadcrumbWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBreadcrumbWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBasicCommissioningInfoListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

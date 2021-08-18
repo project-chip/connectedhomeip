@@ -239,6 +239,30 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         break;
     }
+    case 0x0030: // General Commissioning Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0001: // BasicCommissioningInfoList
+        {
+            entryLength = 4;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _BasicCommissioningInfoType
+            _BasicCommissioningInfoType * entry = reinterpret_cast<_BasicCommissioningInfoType *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->FailSafeExpiryLengthMs,
+                           write ? (uint8_t *) &entry->FailSafeExpiryLengthMs : src, write, &entryOffset,
+                           sizeof(entry->FailSafeExpiryLengthMs)); // INT32U
+            break;
+        }
+        }
+        break;
+    }
     case 0x0033: // General Diagnostics Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -727,6 +751,15 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0003: // parts list
             // chip::EndpointId
             entryLength = 2;
+            break;
+        }
+        break;
+    case 0x0030: // General Commissioning Cluster
+        switch (attributeId)
+        {
+        case 0x0001: // BasicCommissioningInfoList
+            // Struct _BasicCommissioningInfoType
+            entryLength = 4;
             break;
         }
         break;
