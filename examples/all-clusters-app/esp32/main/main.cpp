@@ -330,12 +330,14 @@ class SetupListModel : public ListScreen::Model
 public:
     SetupListModel()
     {
-        std::string resetWiFi              = "Reset WiFi";
-        std::string resetToFactory         = "Reset to factory";
-        std::string forceWifiCommissioning = "Force WiFi commissioning";
+        std::string resetWiFi                      = "Reset WiFi";
+        std::string resetToFactory                 = "Reset to factory";
+        std::string forceWifiCommissioningBasic    = "Force WiFi commissioning (basic)";
+        std::string forceWifiCommissioningEnahnced = "Force WiFi commissioning (enhanced)";
         options.emplace_back(resetWiFi);
         options.emplace_back(resetToFactory);
-        options.emplace_back(forceWifiCommissioning);
+        options.emplace_back(forceWifiCommissioningBasic);
+        options.emplace_back(forceWifiCommissioningEnhanced);
     }
     virtual std::string GetTitle() { return "Setup"; }
     virtual int GetItemCount() { return options.size(); }
@@ -354,7 +356,12 @@ public:
         }
         else if (i == 2)
         {
-            app::Mdns::AdvertiseCommissionableNode(CommissioningMode::kEnabledBasic);
+            app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledBasic);
+            OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
+        }
+        else if (i == 3)
+        {
+            app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledEnhanced);
             OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
         }
     }
