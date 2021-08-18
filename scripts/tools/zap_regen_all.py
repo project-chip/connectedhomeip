@@ -42,9 +42,11 @@ def getGlobalTemplatesTargets():
 
         logging.info("Found example %s (via %s)" % (example_name, str(filepath)))
 
-        output_dir = os.path.join('zzz_generated', example_name)
+        # The name zap-generated is to make includes clear by using
+        # a name like <zap-generated/foo.h>
+        output_dir = os.path.join('zzz_generated', example_name, 'zap-generated')
         if not os.path.exists(output_dir):
-            os.mkdir(output_dir)
+            os.makedirs(output_dir)
 
         targets.append([str(filepath), '-o', output_dir])
     
