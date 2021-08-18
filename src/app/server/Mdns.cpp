@@ -81,25 +81,21 @@ chip::ByteSpan FillMAC(uint8_t (&mac)[8])
 uint16_t gSecuredPort   = CHIP_PORT;
 uint16_t gUnsecuredPort = CHIP_UDC_PORT;
 
-/// Sets the secure Matter port
 void SetSecuredPort(uint16_t port)
 {
     gSecuredPort = port;
 }
 
-/// Gets the secure Matter port
 uint16_t GetSecuredPort()
 {
     return gSecuredPort;
 }
 
-/// Sets the unsecure Matter port
 void SetUnsecuredPort(uint16_t port)
 {
     gUnsecuredPort = port;
 }
 
-/// Gets the unsecure Matter port
 uint16_t GetUnsecuredPort()
 {
     return gUnsecuredPort;
@@ -145,10 +141,12 @@ CHIP_ERROR AdvertiseOperational()
 /// Overloaded utility method for commissioner and commissionable advertisement
 /// This method is used for both commissioner discovery and commissionable node discovery since
 /// they share many fields.
+///   commissionableNode = true : advertise commissionable node
+///   commissionableNode = false : advertise commissioner
 CHIP_ERROR Advertise(bool commissionableNode, CommissioningMode mode)
 {
-    bool commissioningMode = (mode == CommissioningMode::kEnabled || mode == CommissioningMode::kEnabledAsAdditionalCommissioning);
-    bool additionalCommissioning = (mode == CommissioningMode::kEnabledAsAdditionalCommissioning);
+    bool commissioningMode       = (mode != CommissioningMode::kDisabled);
+    bool additionalCommissioning = (mode == CommissioningMode::kEnabledEnhanced);
 
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters()
                                    .SetPort(commissionableNode ? GetSecuredPort() : GetUnsecuredPort())
@@ -259,15 +257,15 @@ CHIP_ERROR Advertise(bool commissionableNode, CommissioningMode mode)
 }
 
 /// Set MDNS commissioner advertisement
-CHIP_ERROR AdvertiseCommisioner()
+CHIP_ERROR AdvertiseCommissioner()
 {
-    return Advertise(false /* commisionableNode */, CommissioningMode::kDisabled);
+    return Advertise(false /* commissionableNode */, CommissioningMode::kDisabled);
 }
 
 /// Set MDNS commissionable node advertisement
 CHIP_ERROR AdvertiseCommissionableNode(CommissioningMode mode)
 {
-    return Advertise(true /* commisionableNode */, mode);
+    return Advertise(true /* commissionableNode */, mode);
 }
 
 /// (Re-)starts the minmdns server
@@ -308,7 +306,7 @@ void StartServer(CommissioningMode mode)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
         ChipLogProgress(Discovery, "Start dns-sd server - no current nodeId");
-        err = app::Mdns::AdvertiseCommissionableNode(CommissioningMode::kEnabled);
+        err = app::Mdns::AdvertiseCommissionableNode(CommissioningMode::kEnabledBasic);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Failed to advertise unprovisioned commissionable node: %s", chip::ErrorStr(err));
@@ -317,7 +315,7 @@ void StartServer(CommissioningMode mode)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-    err = app::Mdns::AdvertiseCommisioner();
+    err = app::Mdns::AdvertiseCommissioner();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to advertise commissioner: %s", chip::ErrorStr(err));

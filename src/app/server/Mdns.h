@@ -26,9 +26,9 @@ namespace Mdns {
 
 enum class CommissioningMode
 {
-    kDisabled,                        // Commissioning Mode is disabled, CM=0, AC=0 in DNS-SD key/value pairs
-    kEnabled,                         // Basic Commissioning Mode, CM=1, AC=0 in DNS-SD key/value pairs
-    kEnabledAsAdditionalCommissioning // Enhanced Commissioning Mode, CM=1, AC=1 in DNS-SD key/value pairs
+    kDisabled,       // Commissioning Mode is disabled, CM=0, AC=0 in DNS-SD key/value pairs
+    kEnabledBasic,   // Basic Commissioning Mode, CM=1, AC=0 in DNS-SD key/value pairs
+    kEnabledEnhanced // Enhanced Commissioning Mode, CM=1, AC=1 in DNS-SD key/value pairs
 };
 
 /// Sets the secure Matter port

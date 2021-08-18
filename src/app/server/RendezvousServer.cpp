@@ -96,7 +96,8 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
     // reset all advertising, indicating we are in commissioningMode
     // and we were put into this state via a command for additional commissioning
     // NOTE: when device has never been commissioned, Rendezvous will ensure AP is false
-    app::Mdns::StartServer(app::Mdns::CommissioningMode::kEnabledAsAdditionalCommissioning);
+    app::Mdns::StartServer(params.HasPASEVerifier() ? app::Mdns::CommissioningMode::kEnabledBasic
+                                                    : app::Mdns::CommissioningMode::kEnabledEnhanced);
 
     mSessionMgr      = sessionMgr;
     mExchangeManager = exchangeManager;
