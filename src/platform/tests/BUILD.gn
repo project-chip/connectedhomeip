@@ -18,7 +18,7 @@ import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
-if (chip_device_platform != "none") {
+if (chip_device_platform != "none" && chip_device_platform != "fake") {
   import("${chip_root}/build/chip/chip_test_suite.gni")
 
   chip_test_suite("tests") {

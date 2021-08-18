@@ -179,11 +179,14 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET_MBED=1",
         "CHIP_DEVICE_LAYER_TARGET=mbed",
       ]
+    } else if (chip_device_platform == "fake") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_FAKE=1",
+        "CHIP_DEVICE_LAYER_TARGET=fake",
+      ]
     }
   }
 } else {
-  chip_device_config_enable_mdns = chip_mdns != "none"
-
   buildconfig_header("platform_buildconfig") {
     header = "CHIPDeviceBuildConfig.h"
     header_dir = "platform"
@@ -194,6 +197,7 @@ if (chip_device_platform != "none") {
     ]
 
     if (current_os == "android") {
+      chip_device_config_enable_mdns = chip_mdns != "none"
       defines += [
         "CHIP_DEVICE_CONFIG_ENABLE_MDNS=${chip_device_config_enable_mdns}",
         "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"",
@@ -293,6 +297,8 @@ if (chip_device_platform != "none") {
       _platform_target = chip_platform_target
     } else if (chip_device_platform == "p6") {
       _platform_target = "P6"
+    } else if (chip_device_platform == "fake") {
+      _platform_target = "fake"
     } else {
       assert(false, "Unknown chip_device_platform: ${chip_device_platform}")
     }

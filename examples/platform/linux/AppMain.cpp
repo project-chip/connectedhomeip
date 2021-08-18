@@ -56,9 +56,10 @@
 #include "Options.h"
 
 using namespace chip;
+using namespace chip::Credentials;
+using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
-using namespace chip::DeviceLayer;
 
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
@@ -145,6 +146,7 @@ exit:
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Messaging;
 using namespace ::chip::Controller;
@@ -236,7 +238,7 @@ void ChipLinuxAppMainLoop()
     InitServer();
 
     // Initialize device attestation config
-    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     InitCommissioner();
