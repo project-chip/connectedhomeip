@@ -29,6 +29,6 @@ if (chip_enable_pw_rpc) {
 chip_data_model("lock-common") {
   zap_file = "lock-app.zap"
 
-  zap_pregenerated_dir = "zap-generated"
+  zap_pregenerated_dir = "${chip_root}/zzz_generated/lock-app/zap-generated"
   is_server = true
 }
