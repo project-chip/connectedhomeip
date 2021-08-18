@@ -19,6 +19,7 @@ import os
 from pathlib import Path
 import sys
 import subprocess
+import logging
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
@@ -33,8 +34,20 @@ def checkPythonVersion():
 
 def getGlobalTemplatesTargets():
     targets = []
-    targets.extend([[str(filepath)]
-                   for filepath in Path('./examples').rglob('*.zap')])
+
+    for filepath in Path('./examples').rglob('*.zap'):
+        example_name = filepath.as_posix()
+        example_name = example_name[example_name.index('examples/') + 9:]
+        example_name = example_name[:example_name.index('/')]
+
+        logging.info("Found example %s (via %s)" % (example_name, str(filepath)))
+
+        output_dir = os.path.join('zzz_generated', example_name)
+        if not os.path.exists(output_dir):
+            os.mkdir(output_dir)
+
+        targets.append([str(filepath), '-o', output_dir])
+    
     targets.extend([[str(filepath)]
                    for filepath in Path('./src/darwin').rglob('*.zap')])
     targets.extend([[str(filepath)] for filepath in Path(
@@ -65,6 +78,10 @@ def getTargets():
 
 
 def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s %(name)s %(levelname)-7s %(message)s'
+    )
     checkPythonVersion()
     os.chdir(CHIP_ROOT_DIR)
 
