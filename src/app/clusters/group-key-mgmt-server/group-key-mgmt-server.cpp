@@ -61,12 +61,12 @@ static EmberAfStatus revokeKeys(uint16_t fabricIndex);
 
 static uint8_t nextEpoch(uint8_t epoch)
 {
-    return epoch < GROUP_KEY_SET_SIZE - 1 ? epoch + static_cast<uint8_t>(1) :  static_cast<uint8_t>(0);
+    return epoch < GROUP_KEY_SET_SIZE - 1 ? epoch + static_cast<uint8_t>(1) : static_cast<uint8_t>(0);
 }
 
 static uint8_t previousEpoch(uint8_t epoch)
 {
-    return epoch > 0 ? epoch -  static_cast<uint8_t>(1) : GROUP_KEY_SET_SIZE -  static_cast<uint8_t>(1);
+    return epoch > 0 ? epoch - static_cast<uint8_t>(1) : GROUP_KEY_SET_SIZE - static_cast<uint8_t>(1);
 }
 
 static EmberAfStatus printKeys()
