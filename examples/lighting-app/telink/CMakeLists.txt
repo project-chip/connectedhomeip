@@ -18,7 +18,10 @@ cmake_minimum_required(VERSION 3.13.1)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
-get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighting-common REALPATH)
+get_filename_component(LIGHTING_GEN_DIR ${CHIP_ROOT}/zzz_generated/lighting-app/ REALPATH)
+set(LIGHTING_GEN_SRC ${LIGHTING_GEN_DIR}/zap-generated/)
+
+get_filename_component(DATA_MODEL_GEN_DIR ${CHIP_ROOT}/src/controller/data_model/ REALPATH)
 
 set(CONF_FILE ${CHIP_ROOT}/config/telink/app/zephyr.conf prj.conf)
 
@@ -34,7 +37,8 @@ target_compile_options(app PRIVATE -fpermissive)
 
 target_include_directories(app PRIVATE
                            include
-                           ${LIGHTING_COMMON}
+                           ${LIGHTING_GEN_DIR}
+                           ${DATA_MODEL_GEN_DIR}
                            ${NLIO_ROOT}
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
@@ -44,9 +48,9 @@ target_sources(app PRIVATE
                src/LightingManager.cpp
                src/main.cpp
                src/ZclCallbacks.cpp
-               ${LIGHTING_COMMON}/gen/attribute-size.cpp
-               ${LIGHTING_COMMON}/gen/callback-stub.cpp
-               ${LIGHTING_COMMON}/gen/IMClusterCommandHandler.cpp
+               ${LIGHTING_GEN_SRC}/attribute-size.cpp
+               ${LIGHTING_GEN_SRC}/callback-stub.cpp
+               ${LIGHTING_GEN_SRC}/IMClusterCommandHandler.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
