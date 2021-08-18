@@ -36,8 +36,13 @@
 #include <iostream>
 #include <unistd.h>
 
-using namespace chip;
-using namespace chip::ArgParser;
+using chip::BitFlags;
+using chip::ArgParser::HelpOptions;
+using chip::ArgParser::OptionDef;
+using chip::ArgParser::OptionSet;
+using chip::ArgParser::PrintArgError;
+using chip::bdx::TransferControlFlags;
+using chip::Messaging::ExchangeManager;
 
 using chip::app::clusters::OTAProviderDelegate;
 
@@ -77,7 +82,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
 }
 
 OptionDef cmdLineOptionsDef[] = {
-    { "filepath", kArgumentRequired, kOptionFilepath },
+    { "filepath", chip::ArgParser::kArgumentRequired, kOptionFilepath },
     {},
 };
 
@@ -95,7 +100,7 @@ int main(int argc, char * argv[])
     CHIP_ERROR err = CHIP_NO_ERROR;
     OTAProviderExample otaProvider;
     BdxOtaSender bdxServer;
-    Messaging::ExchangeManager * exchangeMgr;
+    ExchangeManager * exchangeMgr;
 
     if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
     {
@@ -103,7 +108,7 @@ int main(int argc, char * argv[])
         return 1;
     }
 
-    if (DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
+    if (chip::DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
     {
         fprintf(stderr, "FAILED to initialize chip stack\n");
         return 1;
@@ -114,11 +119,11 @@ int main(int argc, char * argv[])
         return 1;
     }
 
-    DeviceLayer::ConfigurationMgr().LogDeviceConfig();
+    chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     InitServer();
 
     exchangeMgr = chip::ExchangeManager();
-    err         = exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, &bdxServer);
+    err         = exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id, &bdxServer);
     VerifyOrReturnError(err == CHIP_NO_ERROR, 1);
 
     ChipLogDetail(SoftwareUpdate, "using OTA file: %s", gOtaFilepath ? gOtaFilepath : "(none)");
@@ -132,16 +137,16 @@ int main(int argc, char * argv[])
     // TODO: is there any way to not hardcode the endpoint id?
     chip::app::clusters::OTAProvider::SetDelegate(0, &otaProvider);
 
-    BitFlags<bdx::TransferControlFlags> bdxFlags;
-    bdxFlags.Set(bdx::TransferControlFlags::kReceiverDrive);
-    err = bdxServer.PrepareForTransfer(&DeviceLayer::SystemLayer, bdx::TransferRole::kSender, bdxFlags, kMaxBdxBlockSize,
-                                       kBdxTimeoutMs, kBdxPollFreqMs);
+    BitFlags<TransferControlFlags> bdxFlags;
+    bdxFlags.Set(TransferControlFlags::kReceiverDrive);
+    err = bdxServer.PrepareForTransfer(&chip::DeviceLayer::SystemLayer, chip::bdx::TransferRole::kSender, bdxFlags,
+                                       kMaxBdxBlockSize, kBdxTimeoutMs, kBdxPollFreqMs);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(BDX, "failed to init BDX server: %s", ErrorStr(err));
+        ChipLogError(BDX, "failed to init BDX server: %s", chip::ErrorStr(err));
     }
 
-    DeviceLayer::PlatformMgr().RunEventLoop();
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
     return 0;
 }

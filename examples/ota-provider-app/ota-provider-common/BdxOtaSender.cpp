@@ -25,7 +25,9 @@
 
 #include <fstream>
 
-using namespace chip::bdx;
+using chip::bdx::StatusCode;
+using chip::bdx::TransferControlFlags;
+using chip::bdx::TransferSession;
 
 BdxOtaSender::BdxOtaSender()
 {
