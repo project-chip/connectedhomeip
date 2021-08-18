@@ -33,7 +33,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'GENERAL_COMMISSIONING_CLUSTER': ['general-commissioning-server'],
     'GENERAL_DIAGNOSTICS_CLUSTER': [],
     'GROUPS_CLUSTER': ['groups-server'],
-    'GROUP_KEY_MANAGEMENT_CLUSTER': [],
+    'GROUP_KEY_MANAGEMENT_CLUSTER': ['group-key-mgmt-server'],
     'IAS_ZONE_CLUSTER': ['ias-zone-server'],
     'IDENTIFY_CLUSTER': ['identify'],
     'KEYPAD_INPUT_CLUSTER': ['keypad-input-server'],

@@ -154,6 +154,30 @@
 #define emberAfGroupsClusterPrintString(buffer)
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_GROUPS_CLUSTER)
 
+// Printing macros for cluster: GroupKeyManagement
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_GROUP_KEY_MANAGEMENT_CLUSTER)
+#define emberAfGroupKeyManagementClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_GROUP_KEY_MANAGEMENT_CLUSTER, __VA_ARGS__)
+#define emberAfGroupKeyManagementClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_GROUP_KEY_MANAGEMENT_CLUSTER, __VA_ARGS__)
+// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
+#define emberAfGroupKeyManagementClusterFlush()
+#define emberAfGroupKeyManagementClusterDebugExec(x)                                                                               \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_GROUP_KEY_MANAGEMENT_CLUSTER))                                                          \
+    {                                                                                                                              \
+        x;                                                                                                                         \
+    }
+#define emberAfGroupKeyManagementClusterPrintBuffer(buffer, len, withSpace)                                                        \
+    emberAfPrintBuffer(EMBER_AF_PRINT_GROUP_KEY_MANAGEMENT_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfGroupKeyManagementClusterPrintString(buffer)                                                                        \
+    emberAfPrintString(EMBER_AF_PRINT_GROUP_KEY_MANAGEMENT_CLUSTER, (buffer))
+#else
+#define emberAfGroupKeyManagementClusterPrint(...)
+#define emberAfGroupKeyManagementClusterPrintln(...)
+#define emberAfGroupKeyManagementClusterFlush()
+#define emberAfGroupKeyManagementClusterDebugExec(x)
+#define emberAfGroupKeyManagementClusterPrintBuffer(buffer, len, withSpace)
+#define emberAfGroupKeyManagementClusterPrintString(buffer)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_GROUP_KEY_MANAGEMENT_CLUSTER)
+
 // Printing macros for cluster: Scenes
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_SCENES_CLUSTER)
 #define emberAfScenesClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_SCENES_CLUSTER, __VA_ARGS__)

@@ -18,13 +18,13 @@ limitations under the License.
   <domain name="CHIP"/>
 
   <struct name="GroupState">
-    <item name="VendorId" type="INT16U"/>
-    <item name="VendorGroupId" type="INT16U"/>
+    <item name="FabricIndex" type="INT16U"/>
+    <item name="GroupId" type="INT16U"/>
     <item name="GroupKeySetIndex" type="INT16U"/>
   </struct>
 
   <struct name="GroupKey">
-    <item name="VendorId" type="INT16U"/>
+    <item name="FabricIndex" type="INT16U"/>
     <item name="GroupKeyIndex" type="INT16U"/>
     <item name="GroupKeyRoot" type="OCTET_STRING" length="16"/>
     <item name="GroupKeyEpochStartTime" type="INT64U"/>
@@ -39,10 +39,45 @@ limitations under the License.
   <cluster>
     <domain>General</domain>
     <name>Group Key Management</name>
-    <code>0xF004</code>
+    <code>0x003F</code>
     <define>GROUP_KEY_MANAGEMENT_CLUSTER</define>
     <description>The Group Key Management Cluster is the mechanism by which group keys are managed.</description>
     <attribute side="server" code="0x0000" define="GROUPS" type="ARRAY" entryType="GroupState" length="254" writable="false" optional="false">groups</attribute>
     <attribute side="server" code="0x0001" define="GROUPKEYS" type="ARRAY" entryType="GroupKey" length="254" writable="false" optional="false">group keys</attribute>
+
+    <command source="client" code="0x00" name="SetKey" optional="false" cli="zcl GroupKeyManagement Set">
+      <description>Set a Root Key</description>
+      <arg name="fabricIndex" type="INT16U"/>
+      <arg name="keySetIndex" type="INT16U"/>
+      <arg name="keyRoot" type="OCTET_STRING" length="16"/>
+      <arg name="epochStartTime" type="OCTET_STRING" length="8"/>
+      <arg name="securityPolicy" type="GroupKeySecurityPolicy"/>
+    </command>
+
+    <command source="client" code="0x01" name="RemoveKey" optional="false" cli="zcl GroupKeyManagement Remove">
+      <description>Remove a Root Key</description>
+      <arg name="fabricIndex" type="INT16U"/>
+      <arg name="keySetIndex" type="INT16U"/>
+    </command>
+
+    <command source="client" code="0x02" name="RemoveAllKeys" optional="false" cli="zcl GroupKeyManagement RemoveAll">
+      <description>Remove All Root Keys from Fabric</description>
+      <arg name="fabricIndex" type="INT16U"/>
+    </command>
+
+    <command source="client" code="0x03" name="AssignKey" optional="false" cli="zcl GroupKeyManagement Assign">
+      <description>Assign a Root Key to a Group</description>
+      <arg name="fabricIndex" type="INT16U"/>
+      <arg name="groupId" type="INT16U"/>
+      <arg name="keySetIndex" type="INT16U"/>
+    </command>
+
+    <command source="client" code="0x04" name="RevokeKey" optional="false" cli="zcl GroupKeyManagement Revoke">
+      <description>Revoke a Root Key from a Group</description>
+      <arg name="fabricIndex" type="INT16U"/>
+      <arg name="groupId" type="INT16U"/>
+      <arg name="keySetIndex" type="INT16U"/>
+    </command>
+
   </cluster>
 </configurator>
