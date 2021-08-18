@@ -23,9 +23,9 @@
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
 #import "app/util/af.h"
-#import "gen/CHIPClientCallbacks.h"
-#import "gen/CHIPClusters.h"
-#import "gen/CHIPClustersObjc.h"
+#import <zap-generated/CHIPClientCallbacks.h>
+#import <zap-generated/CHIPClusters.h>
+#import <zap-generated/CHIPClustersObjc.h>
 
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceLayer.h>

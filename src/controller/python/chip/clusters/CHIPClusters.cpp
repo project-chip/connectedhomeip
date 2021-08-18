@@ -25,8 +25,8 @@
 
 #include <controller/CHIPDevice.h>
 
-#include "gen/CHIPClientCallbacks.h"
-#include "gen/CHIPClusters.h"
+#include <zap-generated/CHIPClientCallbacks.h>
+#include <zap-generated/CHIPClusters.h>
 
 using namespace chip;
 using namespace chip::app;
