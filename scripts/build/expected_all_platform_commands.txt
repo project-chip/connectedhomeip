@@ -200,3 +200,5 @@ cp {out}/android-x64-chip_tool/lib/jni/x86_64/libc++_shared.so {root}/src/androi
 
 # Building APP android-x64-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-x64-chip_tool/lib -PbuildDir={out}/android-x64-chip_tool build
+
+
