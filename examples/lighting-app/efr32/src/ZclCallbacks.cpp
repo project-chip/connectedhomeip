@@ -65,7 +65,8 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     else if (clusterId == OnOffSwitchConfiguration::Id)
     {
         ChipLogProgress(Zcl,
-                        "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
+                        "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16
+                        ", length %" PRIu16,
                         ChipLogValueMEI(attributeId), type, *value, size);
 
         // WIP Apply attribute change to Light
