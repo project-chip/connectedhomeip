@@ -215,7 +215,7 @@ CHIP_ERROR RawEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, Int
     ReturnErrorOnFailure(IPEndPointBasis::Bind(addrType, addr, 0, intfId));
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = SystemLayer().WatchableEventsManager().GetDispatchQueue();
+    dispatch_queue_t dispatchQueue = SystemLayer().GetDispatchQueue();
     if (dispatchQueue != nullptr)
     {
         unsigned long fd = static_cast<unsigned long>(mSocket);

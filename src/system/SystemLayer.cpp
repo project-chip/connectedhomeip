@@ -112,6 +112,20 @@ SocketWatchToken Layer::InvalidSocketWatchToken()
     return mWatchableEventsManager.InvalidSocketWatchToken();
 }
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
+void Layer::SetDispatchQueue(dispatch_queue_t dispatchQueue)
+{
+    mWatchableEventsManager.SetDispatchQueue(dispatchQueue);
+}
+
+dispatch_queue_t Layer::GetDispatchQueue()
+{
+    return mWatchableEventsManager.GetDispatchQueue();
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace System

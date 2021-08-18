@@ -64,6 +64,11 @@ private:
     CHIP_ERROR StopWatchingSocket(SocketWatchToken * tokenInOut);
     SocketWatchToken InvalidSocketWatchToken() { return reinterpret_cast<SocketWatchToken>(nullptr); }
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    void SetDispatchQueue(dispatch_queue_t dispatchQueue) { mDispatchQueue = dispatchQueue; };
+    dispatch_queue_t GetDispatchQueue() { return mDispatchQueue; };
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
 public:
     // Platform implementation.
     void Signal();
@@ -74,8 +79,6 @@ public:
     void EventLoopEnds() {}
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    void SetDispatchQueue(dispatch_queue_t dispatchQueue) { mDispatchQueue = dispatchQueue; };
-    dispatch_queue_t GetDispatchQueue() { return mDispatchQueue; };
     void HandleTimerComplete(Timer * timer);
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 

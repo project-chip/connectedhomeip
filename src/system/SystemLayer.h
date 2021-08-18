@@ -202,6 +202,11 @@ public:
      */
     SocketWatchToken InvalidSocketWatchToken();
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    void SetDispatchQueue(dispatch_queue_t dispatchQueue);
+    dispatch_queue_t GetDispatchQueue();
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     WatchableEventManager & WatchableEventsManager() { return mWatchableEventsManager; }
