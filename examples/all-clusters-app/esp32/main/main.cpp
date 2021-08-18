@@ -333,7 +333,7 @@ public:
         std::string resetWiFi                      = "Reset WiFi";
         std::string resetToFactory                 = "Reset to factory";
         std::string forceWifiCommissioningBasic    = "Force WiFi commissioning (basic)";
-        std::string forceWifiCommissioningEnahnced = "Force WiFi commissioning (enhanced)";
+        std::string forceWifiCommissioningEnhanced = "Force WiFi commissioning (enhanced)";
         options.emplace_back(resetWiFi);
         options.emplace_back(resetToFactory);
         options.emplace_back(forceWifiCommissioningBasic);
