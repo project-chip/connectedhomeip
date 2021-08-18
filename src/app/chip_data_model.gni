@@ -125,12 +125,6 @@ template("chip_data_model") {
       "${_app_root}/util/util.cpp",
     ]
 
-    # af-event.cpp includes af-gen-event.h
-    public_configs = []
-    if (!_controller_model) {
-      public_configs += [ "${chip_root}/src/controller/data_model:data_model_config" ]
-    }
-
     if (defined(invoker.cluster_sources)) {
       _cluster_sources = invoker.cluster_sources
     } else if (defined(invoker.zap_file)) {
@@ -207,5 +201,11 @@ template("chip_data_model") {
     }
 
     public_configs += [ ":${_data_model_name}_config" ]
+
+    # af-event.cpp includes af-gen-event.h
+    if (!_controller_model) {
+      public_configs += [ "${chip_root}/src/controller/data_model:data_model_config" ]
+    }
+
   }
 }
