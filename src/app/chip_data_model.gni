@@ -126,9 +126,9 @@ template("chip_data_model") {
     ]
 
     # af-event.cpp includes af-gen-event.h
-    deps = []
+    public_configs = []
     if (!_controller_model) {
-      deps += [ "${chip_root}/src/controller/data_model" ]
+      public_configs += [ "${chip_root}/src/controller/data_model:data_model_config" ]
     }
 
     if (defined(invoker.cluster_sources)) {
