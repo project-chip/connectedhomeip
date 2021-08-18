@@ -37,6 +37,7 @@
 #include <unistd.h>
 
 using chip::BitFlags;
+using chip::app::clusters::OTAProviderDelegate;
 using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
@@ -44,11 +45,11 @@ using chip::ArgParser::PrintArgError;
 using chip::bdx::TransferControlFlags;
 using chip::Messaging::ExchangeManager;
 
-using chip::app::clusters::OTAProviderDelegate;
+// TODO: this should probably be done dynamically
+constexpr chip::EndpointId kOtaProviderEndpoint = 0;
 
 constexpr uint16_t kOptionFilepath = 'f';
-
-const char * gOtaFilepath = nullptr;
+const char * gOtaFilepath          = nullptr;
 
 // Arbitrary BDX Transfer Params
 constexpr uint32_t kMaxBdxBlockSize = 1024;
@@ -134,8 +135,7 @@ int main(int argc, char * argv[])
         bdxServer.SetFilepath(gOtaFilepath);
     }
 
-    // TODO: is there any way to not hardcode the endpoint id?
-    chip::app::clusters::OTAProvider::SetDelegate(0, &otaProvider);
+    chip::app::clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
 
     BitFlags<TransferControlFlags> bdxFlags;
     bdxFlags.Set(TransferControlFlags::kReceiverDrive);
