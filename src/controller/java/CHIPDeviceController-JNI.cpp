@@ -470,8 +470,8 @@ JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong de
         else
         {
             // We don't install a response handler, so aren't waiting for a response
-            err = chipDevice->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, Messaging::SendMessageFlags::kNone,
-                                          std::move(buffer));
+            err = chipDevice->GetInteractionPeer()->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest,
+                                                                Messaging::SendMessageFlags::kNone, std::move(buffer));
         }
     }
 

@@ -27,6 +27,7 @@
 #pragma once
 
 #include <controller/CHIPDevice.h>
+#include <controller/InteractionPeer.h>
 
 namespace chip {
 namespace Controller {
@@ -36,7 +37,9 @@ class DLL_EXPORT ClusterBase
 public:
     virtual ~ClusterBase() {}
 
-    CHIP_ERROR Associate(Device * device, EndpointId endpoint);
+    CHIP_ERROR Associate(Device * device, EndpointId endpoint) { return Associate(device->GetInteractionPeer(), endpoint); }
+
+    CHIP_ERROR Associate(InteractionPeer * device, EndpointId endpoint);
 
     void Dissociate();
 
@@ -72,7 +75,7 @@ protected:
     CHIP_ERROR RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * reportHandler);
 
     const ClusterId mClusterId;
-    Device * mDevice;
+    InteractionPeer * mDevice;
     EndpointId mEndpoint;
 };
 

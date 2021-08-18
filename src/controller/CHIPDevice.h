@@ -30,6 +30,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
+#include <controller/InteractionPeer.h>
 #include <controller/data_model/zap-generated/CHIPClientCallbacks.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
@@ -95,13 +96,13 @@ class Device;
 typedef void (*OnDeviceConnected)(void * context, Device * device);
 typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
 
-class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEstablishmentDelegate
+class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEstablishmentDelegate, public InteractionPeerDelegate
 {
 public:
     ~Device();
     Device() :
         mOpenPairingSuccessCallback(OnOpenPairingWindowSuccessResponse, this),
-        mOpenPairingFailureCallback(OnOpenPairingWindowFailureResponse, this)
+        mOpenPairingFailureCallback(OnOpenPairingWindowFailureResponse, this), mInteractionPeer(this)
     {}
     Device(const Device &) = delete;
 
@@ -123,41 +124,6 @@ public:
     void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
 
     // ----- Messaging -----
-    /**
-     * @brief
-     *   Send the provided message to the device
-     *
-     * @param[in] protocolId  The protocol identifier of the CHIP message to be sent.
-     * @param[in] msgType     The message type of the message to be sent.  Must be a valid message type for protocolId.
-     * @param [in] sendFlags  SendMessageFlags::kExpectResponse or SendMessageFlags::kNone
-     * @param[in] message     The message payload to be sent.
-     *
-     * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, Messaging::SendFlags sendFlags,
-                           System::PacketBufferHandle && message);
-
-    /**
-     * A strongly-message-typed version of SendMessage.
-     */
-    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR SendMessage(MessageType msgType, Messaging::SendFlags sendFlags, System::PacketBufferHandle && message)
-    {
-        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), to_underlying(msgType), sendFlags,
-                           std::move(message));
-    }
-
-    CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
-                                        Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter);
-
-    CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
-                                         Callback::Cancelable * onFailureCallback);
-
-    /**
-     * @brief
-     *   Send the command in internal command sender.
-     */
-    CHIP_ERROR SendCommands(app::CommandSender * commandObj);
 
     /**
      * @brief Get the IP address and port assigned to the device.
@@ -341,8 +307,6 @@ public:
 
     void Reset();
 
-    NodeId GetDeviceId() const { return mDeviceId; }
-
     bool MatchesSession(SessionHandle session) const { return mSecureSession == session; }
 
     SessionHandle GetSecureSession() const { return mSecureSession; }
@@ -350,20 +314,6 @@ public:
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
     PASESessionSerializable & GetPairing() { return mPairing; }
-
-    uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
-    void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            app::TLVDataFilter tlvDataFilter = nullptr);
-    void CancelResponseHandler(uint8_t seqNum);
-    void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
-
-    // This two functions are pretty tricky, it is used to bridge the response, we need to implement interaction model delegate on
-    // the app side instead of register callbacks here. The IM delegate can provide more infomation then callback and it is
-    // type-safe.
-    // TODO: Implement interaction model delegate in the application.
-    void AddIMResponseHandler(app::CommandSender * commandObj, Callback::Cancelable * onSuccessCallback,
-                              Callback::Cancelable * onFailureCallback);
-    void CancelIMResponseHandler(app::CommandSender * commandObj);
 
     void OperationalCertProvisioned();
     bool IsOperationalCertProvisioned() const { return mDeviceOperationalCertProvisioned; }
@@ -373,6 +323,32 @@ public:
         bool loadedSecureSession = false;
         return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
     };
+
+    InteractionPeer * GetInteractionPeer() { return &mInteractionPeer; }
+
+    //////////// InteractionPeerDelegate Implementation ///////////////
+
+    /**
+     * @brief
+     *   Send the provided message to the device
+     *
+     * @param[in] protocolId  The protocol identifier of the CHIP message to be sent.
+     * @param[in] msgType     The message type of the message to be sent.  Must be a valid message type for protocolId.
+     * @param [in] sendFlags  SendMessageFlags::kExpectResponse or SendMessageFlags::kNone
+     * @param[in] message     The message payload to be sent.
+     *
+     * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, Messaging::SendFlags sendFlags,
+                           System::PacketBufferHandle && message) override;
+
+    NodeId GetDeviceId() const override { return mDeviceId; }
+
+    FabricIndex GetFabricIndex() const override { return mFabricIndex; }
+
+    SessionHandle * GetSessionHandle() override { return &mSecureSession; }
+
+    CHIP_ERROR PreparePeer() override;
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -453,8 +429,6 @@ private:
 
     SessionHandle mSecureSession = {};
 
-    uint8_t mSequenceNumber = 0;
-
     uint32_t mLocalMessageCounter = 0;
     uint32_t mPeerMessageCounter  = 0;
 
@@ -516,6 +490,8 @@ private:
 
     Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
     Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
+
+    InteractionPeer mInteractionPeer;
 };
 
 /**
