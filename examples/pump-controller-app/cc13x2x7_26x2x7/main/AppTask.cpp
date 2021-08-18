@@ -30,6 +30,9 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 //#include <app/server/DataModelHandler.h>
 
 #include <ti/drivers/apps/Button.h>
@@ -42,6 +45,7 @@
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 static TaskHandle_t sAppTaskHandle;
@@ -143,6 +147,9 @@ int AppTask::Init()
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");

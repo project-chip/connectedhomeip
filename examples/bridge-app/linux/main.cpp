@@ -30,6 +30,8 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <core/CHIPError.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CHIPMem.h>
@@ -43,6 +45,7 @@
 #include <iostream>
 
 using namespace chip;
+using namespace chip::Credentials;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
@@ -518,6 +521,9 @@ int main(int argc, char * argv[])
 
     // Init ZCL Data Model and CHIP App Server
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
