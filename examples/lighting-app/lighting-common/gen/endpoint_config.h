@@ -965,7 +965,6 @@
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
         { ZAP_CLUSTER_INDEX(0), 11, 2238 }, { ZAP_CLUSTER_INDEX(11), 4, 57 },                                                      \
-
     }
 
 // Largest attribute size is needed for various buffers
