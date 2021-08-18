@@ -841,11 +841,6 @@ void TCPEndPoint::EnableReceive()
     ReceiveEnabled = true;
 
     DriveReceiving();
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    // Wake the thread waiting for I/O so that it can include the socket.
-    SystemLayer().WatchableEventsManager().Signal();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
 /**

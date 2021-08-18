@@ -41,11 +41,13 @@ namespace System {
 
 class WatchableEventManager
 {
-public:
+private:
+    // Transitionally, ensure that these ‘overrides’ can only be called via the System::Layer equivalents.
+    friend class Layer;
+
     // Core ‘overrides’.
     CHIP_ERROR Init(System::Layer & systemLayer);
     CHIP_ERROR Shutdown();
-    void Signal();
 
     // Timer ‘overrides’.
     CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState);
@@ -62,14 +64,14 @@ public:
     CHIP_ERROR StopWatchingSocket(SocketWatchToken * tokenInOut);
     SocketWatchToken InvalidSocketWatchToken() { return reinterpret_cast<SocketWatchToken>(nullptr); }
 
+public:
     // Platform implementation.
+    void Signal();
     void EventLoopBegins() {}
     void PrepareEvents();
     void WaitForEvents();
     void HandleEvents();
     void EventLoopEnds() {}
-
-    static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     void SetDispatchQueue(dispatch_queue_t dispatchQueue) { mDispatchQueue = dispatchQueue; };
@@ -78,6 +80,8 @@ public:
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 protected:
+    static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
+
     static constexpr int kSocketWatchMax = (INET_CONFIG_ENABLE_RAW_ENDPOINT ? INET_CONFIG_NUM_RAW_ENDPOINTS : 0) +
         (INET_CONFIG_ENABLE_TCP_ENDPOINT ? INET_CONFIG_NUM_TCP_ENDPOINTS : 0) +
         (INET_CONFIG_ENABLE_UDP_ENDPOINT ? INET_CONFIG_NUM_UDP_ENDPOINTS : 0) +

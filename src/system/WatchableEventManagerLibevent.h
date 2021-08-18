@@ -48,10 +48,13 @@ class WatchableEventManager
 public:
     WatchableEventManager() : mSystemLayer(nullptr), mEventBase(nullptr), mMdnsTimeoutEvent(nullptr) {}
 
+private:
+    // Transitionally, ensure that these ‘overrides’ can only be called via the System::Layer equivalents.
+    friend class Layer;
+
     // Core ‘overrides’.
     CHIP_ERROR Init(Layer & systemLayer);
     CHIP_ERROR Shutdown();
-    void Signal();
 
     // Timer ‘overrides’.
     CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState);
@@ -67,6 +70,9 @@ public:
     CHIP_ERROR ClearCallbackOnPendingWrite(SocketWatchToken token);
     CHIP_ERROR StopWatchingSocket(SocketWatchToken * tokenInOut);
     SocketWatchToken InvalidSocketWatchToken() { return reinterpret_cast<SocketWatchToken>(nullptr); }
+
+public:
+    void Signal();
 
     // Platform implementation.
     void EventLoopBegins() {}
