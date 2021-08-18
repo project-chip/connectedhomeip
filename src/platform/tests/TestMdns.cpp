@@ -105,7 +105,7 @@ int TestMdns()
     bool ready = false;
 
     std::condition_variable doneCondition;
-    bool done = false;
+    bool done     = false;
     bool shutdown = false;
 
     int retVal = EXIT_FAILURE;

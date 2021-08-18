@@ -338,7 +338,6 @@ exit:
     return error;
 }
 
-
 CHIP_ERROR MdnsAvahi::Shutdown()
 {
     if (mGroup)
