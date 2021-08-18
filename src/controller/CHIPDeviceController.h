@@ -291,14 +291,6 @@ public:
     CHIP_ERROR ServiceEvents();
 
     /**
-     * @brief
-     *   Allow the CHIP Stack to process any pending events
-     *   This can be called in an event handler loop to trigger callbacks within the CHIP stack
-     * @return CHIP_ERROR   The return status
-     */
-    CHIP_ERROR ServiceEventSignal();
-
-    /**
      * @brief Get the Fabric ID assigned to the device.
      *
      * @param[out] fabricId   Fabric ID of the device.

@@ -48,24 +48,27 @@ private:
 
 class WatchableEventManager
 {
-public:
+private:
+    // Transitionally, ensure that these ‘overrides’ can only be called via the System::Layer equivalents.
+    friend class Layer;
+
     // Core ‘overrides’.
     WatchableEventManager();
     CHIP_ERROR Init(System::Layer & systemLayer);
     CHIP_ERROR Shutdown();
-    void Signal();
 
     // Timer ‘overrides’.
     CHIP_ERROR StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState);
     void CancelTimer(TimerCompleteCallback onComplete, void * appState);
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState);
 
-    // Platform implementation.
-    // typedef CHIP_ERROR (*EventHandler)(Object & aTarget, EventType aEventType, uintptr_t aArgument);
+    // LwIP-specific ‘overrides’.
     CHIP_ERROR AddEventHandlerDelegate(LwIPEventHandlerDelegate & aDelegate);
-
     CHIP_ERROR PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
-    CHIP_ERROR DispatchEvents(void);
+
+public:
+    // Platform implementation.
+    CHIP_ERROR DispatchEvents(void); // XXX called only in a test → PlatformEventing::DispatchEvents → PlatformMgr().RunEventLoop()
     CHIP_ERROR HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
     CHIP_ERROR HandlePlatformTimer(void);
 

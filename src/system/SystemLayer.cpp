@@ -128,5 +128,21 @@ dispatch_queue_t Layer::GetDispatchQueue()
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+
+CHIP_ERROR Layer::AddEventHandlerDelegate(LwIPEventHandlerDelegate & aDelegate)
+{
+    VerifyOrReturnError(mLayerState == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    return mWatchableEventsManager.AddEventHandlerDelegate(aDelegate);
+}
+
+CHIP_ERROR Layer::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
+{
+    VerifyOrReturnError(mLayerState == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    return mWatchableEventsManager.PostEvent(aTarget, aEventType, aArgument);
+}
+
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
 } // namespace System
 } // namespace chip

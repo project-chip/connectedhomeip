@@ -51,18 +51,6 @@ namespace System {
 
 using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
 
-class Layer;
-class Object;
-
-class PlatformEventing
-{
-public:
-    static CHIP_ERROR PostEvent(System::Layer & aLayer, Object & aTarget, EventType aType, uintptr_t aArgument);
-    static CHIP_ERROR DispatchEvents(System::Layer & aLayer);
-    static CHIP_ERROR DispatchEvent(System::Layer & aLayer, Event aEvent);
-    static CHIP_ERROR StartTimer(System::Layer & aLayer, uint32_t aMilliseconds);
-};
-
 /**
  *  @enum LayerState
  *
@@ -209,8 +197,36 @@ public:
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-    WatchableEventManager & WatchableEventsManager() { return mWatchableEventsManager; }
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 
+    /**
+     * This adds an event handler delegate to the system layer to extend its ability to handle LwIP events.
+     *
+     *  @param[in]  aDelegate   An uninitialied LwIP event handler delegate structure
+     *
+     *  @retval     CHIP_NO_ERROR                 On success.
+     *  @retval     CHIP_ERROR_INVALID_ARGUMENT   If the function pointer contained in aDelegate is NULL
+     */
+    CHIP_ERROR AddEventHandlerDelegate(LwIPEventHandlerDelegate & aDelegate);
+
+    /**
+     * This posts an event / message of the specified type with the provided argument to this instance's platform-specific event
+     * queue.
+     *
+     *  @param[in,out]  aTarget     A pointer to the CHIP System Layer object making the post request.
+     *  @param[in]      aEventType  The type of event to post.
+     *  @param[in,out]  aArgument   The argument associated with the event to post.
+     *
+     *  @retval    CHIP_NO_ERROR                  On success.
+     *  @retval    CHIP_ERROR_INCORRECT_STATE     If the state of the Layer object is incorrect.
+     *  @retval    CHIP_ERROR_NO_MEMORY           If the event queue is already full.
+     *  @retval    other Platform-specific errors generated indicating the reason for failure.
+     */
+    CHIP_ERROR PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument);
+
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+    WatchableEventManager & WatchableEventsManager() { return mWatchableEventsManager; }
     Clock & GetClock() { return mClock; }
 
 private:

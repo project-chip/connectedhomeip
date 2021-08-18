@@ -22,6 +22,7 @@
  */
 
 #include <support/CodeUtils.h>
+#include <system/LwIPEventSupport.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 #include <system/WatchableEventManager.h>
@@ -51,8 +52,6 @@ CHIP_ERROR WatchableEventManager::Shutdown()
     mSystemLayer = nullptr;
     return CHIP_NO_ERROR;
 }
-
-void WatchableEventManager::Signal() {}
 
 CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
 {
@@ -135,14 +134,6 @@ CHIP_ERROR WatchableEventManager::HandleSystemLayerEvent(Object & aTarget, Event
     }
 }
 
-/**
- * This adds an event handler delegate to the system layer to extend its ability to handle LwIP events.
- *
- *  @param[in]  aDelegate   An uninitialied LwIP event handler delegate structure
- *
- *  @retval     CHIP_NO_ERROR                 On success.
- *  @retval     CHIP_ERROR_INVALID_ARGUMENT   If the function pointer contained in aDelegate is NULL
- */
 CHIP_ERROR WatchableEventManager::AddEventHandlerDelegate(LwIPEventHandlerDelegate & aDelegate)
 {
     VerifyOrReturnError(aDelegate.mFunction != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -150,19 +141,6 @@ CHIP_ERROR WatchableEventManager::AddEventHandlerDelegate(LwIPEventHandlerDelega
     return CHIP_NO_ERROR;
 }
 
-/**
- * This posts an event / message of the specified type with the provided argument to this instance's platform-specific event
- * queue.
- *
- *  @param[in,out]  aTarget     A pointer to the CHIP System Layer object making the post request.
- *  @param[in]      aEventType  The type of event to post.
- *  @param[in,out]  aArgument   The argument associated with the event to post.
- *
- *  @retval    CHIP_NO_ERROR                  On success.
- *  @retval    CHIP_ERROR_INCORRECT_STATE     If the state of the Layer object is incorrect.
- *  @retval    CHIP_ERROR_NO_MEMORY           If the event queue is already full.
- *  @retval    other Platform-specific errors generated indicating the reason for failure.
- */
 CHIP_ERROR WatchableEventManager::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
     VerifyOrReturnError(mSystemLayer->State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
