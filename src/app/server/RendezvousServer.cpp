@@ -55,6 +55,8 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
             ChipLogError(Discovery, "Commissioning errored out with error %" CHIP_ERROR_FORMAT,
                          event->CommissioningComplete.status.Format());
         }
+        // reset all advertising
+        app::Mdns::StartServer(app::Mdns::CommissioningMode::kDisabled);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
@@ -91,6 +93,12 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
         ReturnErrorOnFailure(GetAdvertisementDelegate()->StartAdvertisement());
     }
 
+    // reset all advertising, indicating we are in commissioningMode
+    // and we were put into this state via a command for additional commissioning
+    // NOTE: when device has never been commissioned, Rendezvous will ensure AP is false
+    app::Mdns::StartServer(params.HasPASEVerifier() ? app::Mdns::CommissioningMode::kEnabledBasic
+                                                    : app::Mdns::CommissioningMode::kEnabledEnhanced);
+
     mSessionMgr      = sessionMgr;
     mExchangeManager = exchangeManager;
 
@@ -124,6 +132,9 @@ void RendezvousServer::Cleanup()
     {
         GetAdvertisementDelegate()->StopAdvertisement();
     }
+
+    // reset all advertising
+    app::Mdns::StartServer(app::Mdns::CommissioningMode::kDisabled);
 }
 
 void RendezvousServer::OnSessionEstablishmentError(CHIP_ERROR err)
@@ -141,9 +152,9 @@ void RendezvousServer::OnSessionEstablishmentError(CHIP_ERROR err)
 
 void RendezvousServer::OnSessionEstablished()
 {
-    CHIP_ERROR err = mSessionMgr->NewPairing(
-        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kResponder, 0);
+    CHIP_ERROR err =
+        mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()),
+                                mPairingSession.GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kResponder, 0);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -159,7 +170,7 @@ void RendezvousServer::OnSessionEstablished()
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 
-    if (mPairingSession.PeerConnection().GetPeerAddress().GetTransportType() == Transport::Type::kBle)
+    if (mPairingSession.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
     {
         Cleanup();
     }

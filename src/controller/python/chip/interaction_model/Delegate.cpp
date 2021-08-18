@@ -80,6 +80,28 @@ CHIP_ERROR PythonInteractionModelDelegate::CommandResponseProcessed(const app::C
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR PythonInteractionModelDelegate::WriteResponseStatus(const app::WriteClient * apWriteClient,
+                                                               const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+                                                               const uint32_t aProtocolId, const uint16_t aProtocolCode,
+                                                               app::AttributePathParams & aAttributePathParams,
+                                                               uint8_t aCommandIndex)
+{
+    if (onWriteResponseFunct != nullptr)
+    {
+        AttributeWriteStatus status{ apWriteClient->GetSourceNodeId(),
+                                     apWriteClient->GetAppIdentifier(),
+                                     aProtocolId,
+                                     aProtocolCode,
+                                     aAttributePathParams.mEndpointId,
+                                     aAttributePathParams.mClusterId,
+                                     aAttributePathParams.mFieldId };
+        onWriteResponseFunct(&status, sizeof(status));
+    }
+    DeviceControllerInteractionModelDelegate::WriteResponseStatus(apWriteClient, aGeneralCode, aProtocolId, aProtocolCode,
+                                                                  aAttributePathParams, aCommandIndex);
+    return CHIP_NO_ERROR;
+}
+
 void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apReadClient, const app::ClusterInfo & aPath,
                                                   TLV::TLVReader * apData, Protocols::InteractionModel::ProtocolCode status)
 {
@@ -88,7 +110,7 @@ void PythonInteractionModelDelegate::OnReportData(const app::ReadClient * apRead
         CHIP_ERROR err = CHIP_NO_ERROR;
         TLV::TLVWriter writer;
         uint8_t writerBuffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
-        writer.Init(writerBuffer, sizeof(writerBuffer));
+        writer.Init(writerBuffer);
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
         if (apData != nullptr)
@@ -137,6 +159,11 @@ void pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(PythonInter
 void pychip_InteractionModelDelegate_SetOnReportDataCallback(PythonInteractionModelDelegate_OnReportDataFunct f)
 {
     gPythonInteractionModelDelegate.SetOnReportDataCallback(f);
+}
+
+void pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback(PythonInteractionModelDelegate_OnWriteResponseStatusFunct f)
+{
+    gPythonInteractionModelDelegate.SetOnWriteResponseStatusCallback(f);
 }
 
 PythonInteractionModelDelegate & PythonInteractionModelDelegate::Instance()

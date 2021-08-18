@@ -130,28 +130,23 @@ void ChipCertificateSet::Clear()
     mCertCount = 0;
 }
 
-CHIP_ERROR ChipCertificateSet::LoadCert(const uint8_t * chipCert, uint32_t chipCertLen, BitFlags<CertDecodeFlags> decodeFlags)
+CHIP_ERROR ChipCertificateSet::LoadCert(const ByteSpan chipCert, BitFlags<CertDecodeFlags> decodeFlags)
 {
-    CHIP_ERROR err;
     TLVReader reader;
     TLVType type;
     uint64_t tag;
 
-    reader.Init(chipCert, chipCertLen);
+    reader.Init(chipCert);
 
-    err = reader.Next();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.Next());
 
     type = reader.GetType();
     tag  = reader.GetTag();
 
-    VerifyOrExit((type == kTLVType_Structure || type == kTLVType_Array) && (tag == AnonymousTag),
-                 err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrReturnError((type == kTLVType_Structure || type == kTLVType_Array) && (tag == AnonymousTag),
+                        CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
-    err = LoadCert(reader, decodeFlags, ByteSpan(chipCert, chipCertLen));
-
-exit:
-    return err;
+    return LoadCert(reader, decodeFlags, chipCert);
 }
 
 CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags, ByteSpan chipCert)
@@ -238,28 +233,23 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipCertificateSet::LoadCerts(const uint8_t * chipCerts, uint32_t chipCertsLen, BitFlags<CertDecodeFlags> decodeFlags)
+CHIP_ERROR ChipCertificateSet::LoadCerts(const ByteSpan chipCert, BitFlags<CertDecodeFlags> decodeFlags)
 {
-    CHIP_ERROR err;
     TLVReader reader;
     TLVType type;
     uint64_t tag;
 
-    reader.Init(chipCerts, chipCertsLen);
+    reader.Init(chipCert);
 
-    err = reader.Next();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.Next());
 
     type = reader.GetType();
     tag  = reader.GetTag();
 
-    VerifyOrExit((type == kTLVType_Structure || type == kTLVType_Array) && (tag == AnonymousTag),
-                 err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrReturnError((type == kTLVType_Structure || type == kTLVType_Array) && (tag == AnonymousTag),
+                        CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
-    err = LoadCerts(reader, decodeFlags);
-
-exit:
-    return err;
+    return LoadCerts(reader, decodeFlags);
 }
 
 CHIP_ERROR ChipCertificateSet::LoadCerts(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags)
@@ -957,7 +947,7 @@ CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId)
 
     ReturnErrorOnFailure(certSet.Init(1));
 
-    ReturnErrorOnFailure(certSet.LoadCert(opcert.data(), static_cast<uint32_t>(opcert.size()), BitFlags<CertDecodeFlags>()));
+    ReturnErrorOnFailure(certSet.LoadCert(opcert, BitFlags<CertDecodeFlags>()));
 
     return ExtractPeerIdFromOpCert(certSet.GetCertSet()[0], peerId);
 }

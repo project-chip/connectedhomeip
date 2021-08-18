@@ -102,9 +102,7 @@ using namespace chip::Protocols::UserDirectedCommissioning;
 
 constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondsPerSecond;
 
-constexpr uint32_t kMaxCHIPCSRLength = 1024;
-
-DeviceController::DeviceController() : mLocalNOCChainCallback(OnLocalNOCChainGeneration, this)
+DeviceController::DeviceController()
 {
     mState                    = State::NotInitialized;
     mSessionMgr               = nullptr;
@@ -115,7 +113,7 @@ DeviceController::DeviceController() : mLocalNOCChainCallback(OnLocalNOCChainGen
     mListenPort               = CHIP_PORT;
 }
 
-CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams params)
+CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 {
     VerifyOrReturnError(mState == State::NotInitialized, CHIP_ERROR_INCORRECT_STATE);
 
@@ -196,147 +194,54 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 
     InitDataModelHandler(mExchangeMgr);
 
-    mState         = State::Initialized;
-    mLocalDeviceId = localDeviceId;
-
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
 
-    if (LoadLocalCredentials() != CHIP_NO_ERROR)
-    {
-        ReturnErrorOnFailure(GenerateLocalCredentials());
-    }
+    ReturnErrorOnFailure(ProcessControllerNOCChain(params));
+
+    mState = State::Initialized;
 
     ReleaseAllDevices();
 
     return CHIP_NO_ERROR;
 }
 
-void DeviceController::OnLocalNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                                 const ByteSpan & rcac)
+CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParams & params)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    DeviceController * controller = static_cast<DeviceController *>(context);
-
     Transport::FabricInfo newFabric;
 
-    newFabric.SetEphemeralKey(&controller->mOperationalKey);
+    ReturnErrorCodeIf(params.ephemeralKeypair == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    newFabric.SetEphemeralKey(params.ephemeralKeypair);
 
     constexpr uint32_t chipCertAllocatedLen = kMaxCHIPCertLength * 2;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
 
-    uint32_t chipCertLen = 0;
+    ReturnErrorCodeIf(!chipCert.Alloc(chipCertAllocatedLen), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
 
-    Transport::FabricInfo * fabric = nullptr;
+    ReturnErrorOnFailure(ConvertX509CertToChipCert(params.controllerRCAC, chipCertSpan));
+    ReturnErrorOnFailure(newFabric.SetRootCert(chipCertSpan));
 
-    // Check if the callback returned a failure
-    VerifyOrExit(status == CHIP_NO_ERROR, err = status);
-
-    VerifyOrExit(chipCert.Alloc(chipCertAllocatedLen), err = CHIP_ERROR_NO_MEMORY);
-
-    err = ConvertX509CertToChipCert(rcac, chipCert.Get(), chipCertAllocatedLen, chipCertLen);
-    SuccessOrExit(err);
-
-    err = newFabric.SetRootCert(ByteSpan(chipCert.Get(), chipCertLen));
-    SuccessOrExit(err);
-
-    if (icac.empty())
+    if (params.controllerICAC.empty())
     {
         ChipLogProgress(Controller, "Intermediate CA is not needed");
     }
 
-    {
-        MutableByteSpan chipCertSpan(chipCert.Get(), chipCertAllocatedLen);
+    chipCertSpan = MutableByteSpan(chipCert.Get(), chipCertAllocatedLen);
 
-        err = ConvertX509CertsToChipCertArray(noc, icac, chipCertSpan);
-        SuccessOrExit(err);
-
-        err = newFabric.SetOperationalCertsFromCertArray(chipCertSpan);
-        SuccessOrExit(err);
-    }
-
-    err = controller->mFabrics.AddNewFabric(newFabric, &controller->mFabricIndex);
-    SuccessOrExit(err);
-    ChipLogProgress(Controller, "Added new fabric %d", controller->mFabricIndex);
-
-    ChipLogProgress(Controller, "Storing controller credentials");
-    err = controller->mFabrics.Store(controller->mFabricIndex);
-    SuccessOrExit(err);
-
-    fabric = controller->mFabrics.FindFabricWithIndex(controller->mFabricIndex);
-    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = fabric->GetCredentials(controller->mCredentials, controller->mCertificates, controller->mRootKeyId,
-                                 controller->mCredentialsIndex);
-    SuccessOrExit(err);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed in generating local operational credentials. Error %s", ErrorStr(err));
-        controller->mState = State::NotInitialized;
-    }
-}
-
-CHIP_ERROR DeviceController::GenerateLocalCredentials()
-{
-    ChipLogProgress(Controller, "Generating new local credentials");
-    mOperationalKey.Initialize();
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> CSR;
-    size_t csrLength = kMaxCHIPCSRLength;
-    ReturnErrorCodeIf(!CSR.Alloc(csrLength), CHIP_ERROR_NO_MEMORY);
-
-    ReturnErrorOnFailure(mOperationalKey.NewCertificateSigningRequest(CSR.Get(), csrLength));
-
-    ChipLogProgress(Controller, "Getting certificate chain for the controller from the issuer");
-
-    // As per specifications section 11.22.5.1. Constant RESP_MAX
-    constexpr uint16_t kMaxRspLen = 900;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> csrElements;
-    ReturnErrorCodeIf(!csrElements.Alloc(kMaxRspLen), CHIP_ERROR_NO_MEMORY);
-
-    TLV::TLVWriter csrElementWriter;
-    TLV::TLVType containerType;
-    csrElementWriter.Init(csrElements.Get(), kMaxRspLen);
-    ReturnErrorOnFailure(csrElementWriter.StartContainer(TLV::AnonymousTag, TLV::TLVType::kTLVType_Structure, containerType));
-    ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(1), ByteSpan(CSR.Get(), csrLength)));
-
-    // TODO - Need a mechanism to generate CSRNonce for commissioner's CSR
-    ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(2), ByteSpan()));
-    ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(3), ByteSpan()));
-    ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(4), ByteSpan()));
-    ReturnErrorOnFailure(csrElementWriter.Put(TLV::ContextTag(5), ByteSpan()));
-    ReturnErrorOnFailure(csrElementWriter.EndContainer(containerType));
-    ReturnErrorOnFailure(csrElementWriter.Finalize());
-
-    mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(mLocalDeviceId);
-    mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(0);
-
-    // TODO - Need a mechanism to generate signature for commissioner's CSR
-    ReturnErrorOnFailure(
-        mOperationalCredentialsDelegate->GenerateNOCChain(ByteSpan(csrElements.Get(), csrElementWriter.GetLengthWritten()),
-                                                          ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(), &mLocalNOCChainCallback));
-
-    ChipLogProgress(Controller, "Called credentials delegate to generate credentials");
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceController::LoadLocalCredentials()
-{
-    ChipLogProgress(Controller, "Loading local credentials for fabric %d from the storage", mFabricIndex);
-    ReturnErrorOnFailure(mFabrics.LoadFromStorage(mFabricIndex));
+    ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(params.controllerNOC, params.controllerICAC, chipCertSpan));
+    ReturnErrorOnFailure(newFabric.SetOperationalCertsFromCertArray(chipCertSpan));
+    newFabric.SetVendorId(params.controllerVendorId);
+    ReturnErrorOnFailure(mFabrics.AddNewFabric(newFabric, &mFabricIndex));
+    ChipLogProgress(Controller, "Joined new fabric at index %d", mFabricIndex);
 
     Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    ReturnErrorCodeIf(!fabric->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(!fabric->AreCredentialsAvailable(), CHIP_ERROR_INCORRECT_STATE);
-
     ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId, mCredentialsIndex));
 
-    ChipLogProgress(Controller, "Loaded credentials successfully");
+    mLocalDeviceId = fabric->GetNodeId();
+    mVendorId      = fabric->GetVendorId();
+
     return CHIP_NO_ERROR;
 }
 
@@ -844,9 +749,9 @@ DeviceCommissioner::DeviceCommissioner() :
     mPairedDevicesUpdated = false;
 }
 
-CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams params)
+CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
-    ReturnErrorOnFailure(DeviceController::Init(localDeviceId, params));
+    ReturnErrorOnFailure(DeviceController::Init(params));
 
     uint16_t nextKeyID = 0;
     uint16_t size      = sizeof(nextKeyID);
@@ -1207,11 +1112,12 @@ void DeviceCommissioner::OnSessionEstablished()
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
 
-    mPairingSession.PeerConnection().SetPeerNodeId(device->GetDeviceId());
+    // TODO: the session should know which peer we are trying to connect to when started
+    mPairingSession.SetPeerNodeId(device->GetDeviceId());
 
-    CHIP_ERROR err = mSessionMgr->NewPairing(
-        Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
-        mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession, SecureSession::SessionRole::kInitiator, mFabricIndex);
+    CHIP_ERROR err = mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()),
+                                             mPairingSession.GetPeerNodeId(), &mPairingSession,
+                                             SecureSession::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1298,7 +1204,7 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
 
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
-    ChipLogError(Controller, "Received callback from the CA for NOC Chain generation. Status %s", ErrorStr(status));
+    ChipLogProgress(Controller, "Received callback from the CA for NOC Chain generation. Status %s", ErrorStr(status));
     Device * device = nullptr;
     VerifyOrExit(commissioner->mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(commissioner->mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
@@ -1313,12 +1219,8 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
     {
         MutableByteSpan rootCert = device->GetMutableNOCChain();
 
-        uint32_t certLen = (rootCert.size() > UINT32_MAX) ? UINT32_MAX : static_cast<uint32_t>(rootCert.size());
-
-        err = ConvertX509CertToChipCert(rcac, rootCert.data(), certLen, certLen);
+        err = ConvertX509CertToChipCert(rcac, rootCert);
         SuccessOrExit(err);
-
-        rootCert.reduce_size(certLen);
 
         err = commissioner->SendTrustedRootCertificate(device, rootCert);
         SuccessOrExit(err);
@@ -1368,7 +1270,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     Callback::Cancelable * successCallback = mNOCResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(cluster.AddNOC(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0), mLocalDeviceId, 0));
+    ReturnErrorOnFailure(
+        cluster.AddNOC(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0), mLocalDeviceId, mVendorId));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");

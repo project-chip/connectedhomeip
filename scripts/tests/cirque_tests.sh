@@ -30,7 +30,7 @@ OPENTHREAD=$REPO_DIR/third_party/openthread/repo
 OPENTHREAD_CHECKOUT=$(cd "$REPO_DIR" && git rev-parse :third_party/openthread/repo)
 
 CIRQUE_CACHE_PATH=${GITHUB_CACHE_PATH:-"/tmp/cirque-cache/"}
-OT_SIMULATION_CACHE="$CIRQUE_CACHE_PATH/ot-simulation.tgz"
+OT_SIMULATION_CACHE="$CIRQUE_CACHE_PATH/ot-simulation-cmake.tgz"
 OT_SIMULATION_CACHE_STAMP_FILE="$CIRQUE_CACHE_PATH/ot-simulation.commit"
 
 # Append test name here to add more tests for run_all_tests
@@ -52,7 +52,7 @@ function __cirquetest_start_flask() {
     # When running the ManualTests, if Ctrl-C is send to the shell, it will stop flask as well.
     # This is not expected. Start a new session to prevent it from receiving signals
     setsid bash -c 'FLASK_APP=cirque/restservice/service.py \
-        PATH="'"$PATH"'":"'"$REPO_DIR"'"/third_party/openthread/repo/output/simulation/bin/ \
+        PATH="'"$PATH"'":"'"$REPO_DIR"'"/third_party/openthread/repo/build/simulation/examples/apps/ncp/ \
         python3 -m flask run >"'"$LOG_DIR"'"/"'"$CURRENT_TEST"'"/flask.log 2>&1' &
     FLASK_PID=$!
     echo "Flask running in backgroud with pid $FLASK_PID"
@@ -65,9 +65,8 @@ function __cirquetest_clean_flask() {
 
 function __cirquetest_build_ot() {
     echo -e "[$BOLD_YELLOW_TEXT""INFO""$RESET_COLOR] Cache miss, build openthread simulation."
-    ./bootstrap
-    make -f examples/Makefile-simulation
-    tar czf "$OT_SIMULATION_CACHE" output
+    script/cmake-build simulation -DOT_THREAD_VERSION=1.2 -DOT_MTD=OFF -DOT_FTD=OFF
+    tar czf "$OT_SIMULATION_CACHE" build
     echo "$OPENTHREAD_CHECKOUT" >"$OT_SIMULATION_CACHE_STAMP_FILE"
 }
 

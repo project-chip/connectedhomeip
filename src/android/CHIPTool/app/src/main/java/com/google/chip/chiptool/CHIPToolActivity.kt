@@ -55,8 +55,6 @@ class CHIPToolActivity :
     setContentView(R.layout.top_activity)
 
     if (savedInstanceState == null) {
-      ChipDeviceController.setKeyValueStoreManager(PreferencesKeyValueStoreManager(this))
-      ChipDeviceController.setServiceResolver(NsdManagerServiceResolver(this))
       val fragment = SelectActionFragment.newInstance()
       supportFragmentManager
           .beginTransaction()

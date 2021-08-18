@@ -530,55 +530,6 @@ bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient
     return true;
 }
 
-bool emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
-{
-    ChipLogProgress(Zcl, "WriteAttributesResponse:");
-    ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    GET_RESPONSE_CALLBACKS("emberAfWriteAttributesResponseCallback");
-
-    // struct writeAttributeResponseRecord[]
-    while (messageLen)
-    {
-        CHECK_MESSAGE_LENGTH(1);
-        uint8_t status = Encoding::Read8(message); // zclStatus
-        LogStatus(status);
-
-        if (status == EMBER_ZCL_STATUS_SUCCESS)
-        {
-            Callback::Callback<DefaultSuccessCallback> * cb =
-                Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
-            cb->mCall(cb->mContext);
-        }
-        else
-        {
-            CHECK_MESSAGE_LENGTH(4);
-            AttributeId attributeId = Encoding::LittleEndian::Read32(message); // attribId
-            ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-            // Silence unused var warning if progress logging is disabled.  Note
-            // that we _do_ want to call Read32 unconditionally here, because we
-            // want to advance the 'message' pointer even if we don't use
-            // attributeId.
-            UNUSED_VAR(attributeId);
-
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, status);
-        }
-
-        // The current code is written matching the current API where there is a single attribute written
-        // per write command. So if multiple attributes are written at the same time, something is wrong
-        // somewhere.
-        if (messageLen)
-        {
-            ChipLogError(Zcl, "Multiple attributes written at the same time. Something went wrong.");
-            break;
-        }
-    }
-
-    return true;
-}
-
 bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "ConfigureReportingResponseCallback:");
@@ -1076,6 +1027,36 @@ void FixedLabelClusterLabelListListAttributeFilter(TLV::TLVReader * tlvData, Cal
     }
     Callback::Callback<FixedLabelLabelListListAttributeCallback> * cb =
         Callback::Callback<FixedLabelLabelListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                              Callback::Cancelable * onSuccessCallback,
+                                                                              Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = Encoding::LittleEndian::Read16(message);
+    _BasicCommissioningInfoType data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(4);
+        data[i].FailSafeExpiryLengthMs = emberAfGetInt32u(message, 0, 4);
+        message += 4;
+    }
+    Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback> * cb =
+        Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
 

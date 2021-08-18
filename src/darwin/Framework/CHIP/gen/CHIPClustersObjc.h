@@ -443,6 +443,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeColorLoopActiveWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeColorLoopDirectionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeColorLoopTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorLoopStartEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeColorLoopStoredEnhancedHueWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeColorCapabilitiesWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeColorTempPhysicalMinWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeColorTempPhysicalMaxWithResponseHandler:(ResponseHandler)responseHandler;
@@ -638,9 +640,9 @@ NS_ASSUME_NONNULL_BEGIN
                   timeoutMs:(uint32_t)timeoutMs
             responseHandler:(ResponseHandler)responseHandler;
 
-- (void)readAttributeFabricIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeBreadcrumbWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBreadcrumbWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBasicCommissioningInfoListWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

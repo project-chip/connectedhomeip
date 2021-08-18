@@ -66,9 +66,6 @@ public:
     void HandleEvents();
     void EventLoopEnds() {}
 
-    // TODO(#5556): Some unit tests supply a timeout at low level, due to originally using select(); these should a proper timer.
-    void PrepareEventsWithTimeout(timeval & nextTimeout);
-
     static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH

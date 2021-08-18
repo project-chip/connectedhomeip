@@ -39,7 +39,6 @@
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PairingSession.h>
-#include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -134,35 +133,9 @@ public:
      */
     virtual CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override;
 
-    /**
-     * @brief
-     *  Return the associated secure session peer NodeId
-     *
-     * @return NodeId The associated peer NodeId
-     */
-    NodeId GetPeerNodeId() const { return mConnectionState.GetPeerNodeId(); }
-
-    /**
-     * @brief
-     *  Return the associated peer key id
-     *
-     * @return uint16_t The associated peer key id
-     */
-    uint16_t GetPeerKeyId() override { return mConnectionState.GetPeerKeyID(); }
-
-    /**
-     * @brief
-     *  Return the associated local key id
-     *
-     * @return uint16_t The assocated local key id
-     */
-    uint16_t GetLocalKeyId() override { return mConnectionState.GetLocalKeyID(); }
-
     const char * GetI2RSessionInfo() const override { return "Sigma I2R Key"; }
 
     const char * GetR2ISessionInfo() const override { return "Sigma R2I Key"; }
-
-    Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
     /**
      * @brief Serialize the Pairing Session to a string.
@@ -196,6 +169,7 @@ public:
         return &mMessageDispatch;
     }
 
+    // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
      **/
     void Clear();
@@ -235,14 +209,11 @@ private:
                                     MutableByteSpan & salt);
     CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID);
     CHIP_ERROR ConstructSaltSigmaR3(const ByteSpan & ipk, MutableByteSpan & salt);
-    CHIP_ERROR ConstructTBS2Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
-    CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
+    CHIP_ERROR ConstructTBS2Data(const ByteSpan & responderOpCert, uint8_t * tbsData, size_t & tbsDataLen);
+    CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, size_t & tbsDataLen);
     CHIP_ERROR RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk);
 
-    uint16_t EstimateTLVStructOverhead(uint16_t dataLen, uint16_t nFields)
-    {
-        return static_cast<uint16_t>(dataLen + sizeof(uint64_t) * nFields);
-    }
+    constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields) { return dataLen + (sizeof(uint64_t) * nFields); }
 
     void SendErrorMsg(SigmaErrorType errorCode);
 
@@ -288,8 +259,6 @@ private:
 
 protected:
     bool mPairingComplete = false;
-
-    Transport::PeerConnectionState mConnectionState;
 
     virtual ByteSpan * GetIPKList() const
     {

@@ -43,13 +43,12 @@ public:
     ~AndroidDeviceControllerWrapper();
 
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
-    chip::Controller::ExampleOperationalCredentialsIssuer & OpCredsIssuer() { return mOpCredsIssuer; }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
     jobject JavaObjectRef() { return mJavaObjectRef; }
     jlong ToJNIHandle();
 
     void CallJavaMethod(const char * methodName, jint argument);
-    CHIP_ERROR Initialize();
+    CHIP_ERROR InitializeOperationalCredentialsIssuer();
 
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
@@ -87,6 +86,10 @@ public:
     static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, pthread_mutex_t * stackLock,
                                                         chip::NodeId nodeId, chip::System::Layer * systemLayer,
                                                         chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure);
+
+    CHIP_ERROR GenerateNOCChainAfterValidation(chip::NodeId nodeId, chip::FabricId fabricId,
+                                               const chip::Crypto::P256PublicKey & ephemeralKey, chip::MutableByteSpan & rcac,
+                                               chip::MutableByteSpan & icac, chip::MutableByteSpan & noc);
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;

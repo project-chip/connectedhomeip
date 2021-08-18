@@ -369,10 +369,7 @@
 {
     NSLog(@"Call to setVendorIDOnAccessory");
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-            if (device) {
-                CHIPOperationalCredentials * opCreds =
-                    [[CHIPOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:dispatch_get_main_queue()];
-            } else {
+            if (!device) {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
         })) {

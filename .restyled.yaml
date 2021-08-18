@@ -65,6 +65,7 @@ exclude:
     - "third_party/bluez/repo/**/*"
     - "third_party/cirque/repo/**/*"
     - "third_party/nanopb/repo/**/*"
+    - "src/android/CHIPTool/gradlew" # gradle wrapper generated file
     - "src/controller/python/chip/clusters/CHIPClusters.py" # generated file
 
 

@@ -23,6 +23,7 @@
 
 #include <platform/LockTracker.h>
 #include <support/CodeUtils.h>
+#include <support/TimeUtils.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 #include <system/WatchableEventManager.h>
@@ -77,6 +78,15 @@ CHIP_ERROR WatchableEventManager::Shutdown()
     while ((timer = mTimerList.PopEarliest()) != nullptr)
     {
         timer->Clear();
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+        if (timer->mTimerSource != nullptr)
+        {
+            dispatch_source_cancel(timer->mTimerSource);
+            dispatch_release(timer->mTimerSource);
+        }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
         timer->Release();
     }
     mWakeEvent.Close();
@@ -285,16 +295,10 @@ void WatchableEventManager::PrepareEvents()
 {
     assertChipStackLockedByCurrentThread();
 
-    // Max out this duration and let CHIP set it appropriately.
-    mNextTimeout.tv_sec  = DEFAULT_MIN_SLEEP_PERIOD;
-    mNextTimeout.tv_usec = 0;
-    PrepareEventsWithTimeout(mNextTimeout);
-}
-
-void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeout)
-{
+    constexpr Clock::MonotonicMilliseconds kMaxTimeout =
+        static_cast<Clock::MonotonicMilliseconds>(DEFAULT_MIN_SLEEP_PERIOD) * kMillisecondsPerSecond;
     const Clock::MonotonicMilliseconds currentTime = Clock::GetMonotonicMilliseconds();
-    Clock::MonotonicMilliseconds awakenTime        = currentTime + TimevalToMilliseconds(nextTimeout);
+    Clock::MonotonicMilliseconds awakenTime        = currentTime + kMaxTimeout;
 
     Timer * timer = mTimerList.Earliest();
     if (timer && Clock::IsEarlier(timer->mAwakenTime, awakenTime))
@@ -303,10 +307,10 @@ void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeou
     }
 
     const Clock::MonotonicMilliseconds sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : 0;
-    MillisecondsToTimeval(sleepTime, nextTimeout);
+    MillisecondsToTimeval(sleepTime, mNextTimeout);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
-    chip::Mdns::GetMdnsTimeout(nextTimeout);
+    chip::Mdns::GetMdnsTimeout(mNextTimeout);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
     mSelected = mRequest;
@@ -347,11 +351,16 @@ void WatchableEventManager::HandleEvents()
         watchable->SetPendingIO(
             SocketEventsFromFDs(watchable->GetFD(), mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet));
     }
-    for (WatchableSocket * watchable = mAttachedSockets; watchable != nullptr; watchable = watchable->mAttachedNext)
+
+    WatchableSocket * nextWatchableSocket = mAttachedSockets;
+    while (nextWatchableSocket != nullptr)
     {
-        if (watchable->mPendingIO.HasAny())
+        WatchableSocket * currentWatchable = nextWatchableSocket;
+        nextWatchableSocket                = nextWatchableSocket->mAttachedNext;
+
+        if (currentWatchable->mPendingIO.HasAny())
         {
-            watchable->InvokeCallback();
+            currentWatchable->InvokeCallback();
         }
     }
 

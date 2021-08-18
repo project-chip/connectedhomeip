@@ -1472,6 +1472,14 @@ public class ChipClusters {
       readColorLoopTimeAttribute(chipClusterPtr, callback);
     }
 
+    public void readColorLoopStartEnhancedHueAttribute(IntegerAttributeCallback callback) {
+      readColorLoopStartEnhancedHueAttribute(chipClusterPtr, callback);
+    }
+
+    public void readColorLoopStoredEnhancedHueAttribute(IntegerAttributeCallback callback) {
+      readColorLoopStoredEnhancedHueAttribute(chipClusterPtr, callback);
+    }
+
     public void readColorCapabilitiesAttribute(IntegerAttributeCallback callback) {
       readColorCapabilitiesAttribute(chipClusterPtr, callback);
     }
@@ -1670,6 +1678,12 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readColorLoopTimeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readColorLoopStartEnhancedHueAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readColorLoopStoredEnhancedHueAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readColorCapabilitiesAttribute(
@@ -2600,8 +2614,18 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public void readFabricIdAttribute(OctetStringAttributeCallback callback) {
-      readFabricIdAttribute(chipClusterPtr, callback);
+    public static class BasicCommissioningInfoListAttribute {
+      public long failSafeExpiryLengthMs;
+
+      public BasicCommissioningInfoListAttribute(long failSafeExpiryLengthMs) {
+        this.failSafeExpiryLengthMs = failSafeExpiryLengthMs;
+      }
+    }
+
+    public interface BasicCommissioningInfoListAttributeCallback {
+      void onSuccess(List<BasicCommissioningInfoListAttribute> valueList);
+
+      void onError(Exception ex);
     }
 
     public void readBreadcrumbAttribute(LongAttributeCallback callback) {
@@ -2612,18 +2636,23 @@ public class ChipClusters {
       writeBreadcrumbAttribute(chipClusterPtr, callback, value);
     }
 
+    public void readBasicCommissioningInfoListAttribute(
+        BasicCommissioningInfoListAttributeCallback callback) {
+      readBasicCommissioningInfoListAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
-
-    private native void readFabricIdAttribute(
-        long chipClusterPtr, OctetStringAttributeCallback callback);
 
     private native void readBreadcrumbAttribute(
         long chipClusterPtr, LongAttributeCallback callback);
 
     private native void writeBreadcrumbAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, long value);
+
+    private native void readBasicCommissioningInfoListAttribute(
+        long chipClusterPtr, BasicCommissioningInfoListAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
