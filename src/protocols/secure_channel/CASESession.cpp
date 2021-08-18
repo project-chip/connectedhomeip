@@ -453,10 +453,10 @@ CHIP_ERROR CASESession::SendSigmaR2()
 
     VerifyOrExit(mFabricInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(opcreds.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(opcreds.Alloc(mFabricInfo->GetOperationalCredentialsLength()), err = CHIP_ERROR_NO_MEMORY);
 
     {
-        MutableByteSpan opcredsMutableSpan(opcreds.Get(), kMaxCHIPCertLength);
+        MutableByteSpan opcredsMutableSpan(opcreds.Get(), mFabricInfo->GetOperationalCredentialsLength());
         err = mFabricInfo->GetOperationalCredentials(opcredsMutableSpan);
         SuccessOrExit(err);
 
@@ -516,8 +516,8 @@ CHIP_ERROR CASESession::SendSigmaR2()
     }
 
     // Generate a Signature
-    VerifyOrExit(mFabricInfo->GetEphemeralKey() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mFabricInfo->GetEphemeralKey()->ECDSA_sign_msg(msg_R2_Signed.Get(), msg_r2_signed_len, tbsData2Signature);
+    VerifyOrExit(mFabricInfo->GetOperationalKey() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    err = mFabricInfo->GetOperationalKey()->ECDSA_sign_msg(msg_R2_Signed.Get(), msg_r2_signed_len, tbsData2Signature);
     SuccessOrExit(err);
 
     // Construct Sigma2 TBE Data
@@ -623,7 +623,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
 
     uint8_t responderRandom[kSigmaParamRandomNumberSize];
     // Responder opCert must fit up to 2x TLV certificates in an array
-    uint8_t responderOpCert[EstimateTLVStructOverhead((2 * kMaxCHIPCertLength), 2)];
+    uint8_t responderOpCert[EstimateTLVStructOverhead((kMaxCHIPOpCertArrayLength), 2)];
     size_t responderOpCertLen;
 
     uint16_t responderSessionId = 0;
@@ -762,10 +762,10 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
     VerifyOrExit(mFabricInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(opcreds.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(opcreds.Alloc(mFabricInfo->GetOperationalCredentialsLength()), err = CHIP_ERROR_NO_MEMORY);
 
     {
-        MutableByteSpan opcredsMutableSpan(opcreds.Get(), kMaxCHIPCertLength);
+        MutableByteSpan opcredsMutableSpan(opcreds.Get(), mFabricInfo->GetOperationalCredentialsLength());
         err = mFabricInfo->GetOperationalCredentials(opcredsMutableSpan);
         SuccessOrExit(err);
 
@@ -799,8 +799,8 @@ CHIP_ERROR CASESession::SendSigmaR3()
     }
 
     // Generate a signature
-    VerifyOrExit(mFabricInfo->GetEphemeralKey() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mFabricInfo->GetEphemeralKey()->ECDSA_sign_msg(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature);
+    VerifyOrExit(mFabricInfo->GetOperationalKey() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    err = mFabricInfo->GetOperationalKey()->ECDSA_sign_msg(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature);
     SuccessOrExit(err);
 
     // Prepare SigmaR3 TBE Data Blob
@@ -914,7 +914,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
     P256PublicKey remoteCredential;
 
     // Initiator opCert must fit up to 2x TLV certificates in an array
-    uint8_t initiatorOpCert[EstimateTLVStructOverhead((2 * kMaxCHIPCertLength), 2)];
+    uint8_t initiatorOpCert[EstimateTLVStructOverhead((kMaxCHIPOpCertArrayLength), 2)];
     size_t initiatorOpCertLen;
 
     uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
@@ -991,6 +991,11 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
     tbsData3Signature.SetLength(decryptedDataTlvReader.GetLength());
     SuccessOrExit(err = decryptedDataTlvReader.GetBytes(tbsData3Signature, tbsData3Signature.Length()));
 
+    // TODO - Validate message signature prior to validating the received operational credentials.
+    //        The op cert check requires traversal of cert chain, that is a more expensive operation.
+    //        If message signature check fails, the cert chain check will be unnecessary, but with the
+    //        current flow of code, a malicious node can trigger a DoS style attack on the device.
+    //        The same change should be made in SigmaR2 processing.
     // Step 7 - Validate Signature
     SuccessOrExit(err = remoteCredential.ECDSA_validate_msg_signature(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature));
 

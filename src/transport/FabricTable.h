@@ -86,13 +86,12 @@ public:
 
     ~FabricInfo()
     {
-        if (mEphemeralKey != nullptr)
+        if (mOperationalKey != nullptr)
         {
-            chip::Platform::Delete(mEphemeralKey);
+            chip::Platform::Delete(mOperationalKey);
         }
         ReleaseRootCert();
-        ReleaseICACert();
-        ReleaseNOCCert();
+        ReleaseOperationalCerts();
     }
 
     NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
@@ -105,25 +104,25 @@ public:
     uint16_t GetVendorId() const { return mVendorId; }
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
-    Crypto::P256Keypair * GetEphemeralKey()
+    Crypto::P256Keypair * GetOperationalKey()
     {
-        if (mEphemeralKey == nullptr)
+        if (mOperationalKey == nullptr)
         {
 #ifdef ENABLE_HSM_CASE_OPS_KEY
-            mEphemeralKey = chip::Platform::New<Crypto::P256KeypairHSM>();
-            mEphemeralKey->SetKeyId(CASE_OPS_KEY);
+            mOperationalKey = chip::Platform::New<Crypto::P256KeypairHSM>();
+            mOperationalKey->SetKeyId(CASE_OPS_KEY);
 #else
-            mEphemeralKey = chip::Platform::New<Crypto::P256Keypair>();
+            mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
 #endif
-            mEphemeralKey->Initialize();
+            mOperationalKey->Initialize();
         }
-        return mEphemeralKey;
+        return mOperationalKey;
     }
     CHIP_ERROR SetEphemeralKey(const Crypto::P256Keypair * key);
 
     bool AreCredentialsAvailable() const
     {
-        return (mRootCert != nullptr && mNOCCert != nullptr && mRootCertLen != 0 && mNOCCertLen != 0);
+        return (mRootCert != nullptr && mOperationalCerts != nullptr && mRootCertLen != 0 && mOperationalCertsLen != 0);
     }
 
     const uint8_t * GetTrustedRoot(uint16_t & size)
@@ -151,10 +150,13 @@ public:
 
     CHIP_ERROR GetOperationalCredentials(MutableByteSpan & credentials)
     {
+        // TODO - Refactor storing and loading of fabric info from persistent storage.
+        //        The op cert array doesn't need to be in RAM except when it's being
+        //        transmitted to peer node during CASE session setup.
         ReturnErrorCodeIf(!AreCredentialsAvailable(), CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(credentials.size() < mNOCCertLen, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(credentials.data(), mNOCCert, mNOCCertLen);
-        credentials.reduce_size(mNOCCertLen);
+        ReturnErrorCodeIf(credentials.size() < mOperationalCertsLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(credentials.data(), mOperationalCerts, mOperationalCertsLen);
+        credentials.reduce_size(mOperationalCertsLen);
         return CHIP_NO_ERROR;
     }
 
@@ -165,7 +167,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    uint16_t GetOperationalCredentialsLength() { return mNOCCertLen; }
+    uint16_t GetOperationalCredentialsLength() { return mOperationalCertsLen; }
 
     Credentials::CertificateKeyId GetTrustedRootId()
     {
@@ -185,14 +187,13 @@ public:
         mVendorId       = kUndefinedVendorId;
         mFabricLabel[0] = '\0';
 
-        if (mEphemeralKey != nullptr)
+        if (mOperationalKey != nullptr)
         {
-            chip::Platform::Delete(mEphemeralKey);
-            mEphemeralKey = nullptr;
+            chip::Platform::Delete(mOperationalKey);
+            mOperationalKey = nullptr;
         }
         ReleaseRootCert();
-        ReleaseICACert();
-        ReleaseNOCCert();
+        ReleaseOperationalCerts();
     }
 
     friend class FabricTable;
@@ -210,9 +211,9 @@ private:
     uint16_t mRootKeyIdLen = 0;
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
-    Crypto::P256KeypairHSM * mEphemeralKey = nullptr;
+    Crypto::P256KeypairHSM * mOperationalKey = nullptr;
 #else
-    Crypto::P256Keypair * mEphemeralKey = nullptr;
+    Crypto::P256Keypair * mOperationalKey = nullptr;
 #endif
 
     Crypto::P256PublicKey mRootPubkey;
@@ -220,10 +221,8 @@ private:
     uint8_t * mRootCert            = nullptr;
     uint16_t mRootCertLen          = 0;
     uint16_t mRootCertAllocatedLen = 0;
-    uint8_t * mICACert             = nullptr;
-    uint16_t mICACertLen           = 0;
-    uint8_t * mNOCCert             = nullptr;
-    uint16_t mNOCCertLen           = 0;
+    uint8_t * mOperationalCerts    = nullptr;
+    uint16_t mOperationalCertsLen  = 0;
     uint64_t mCompressedFabricId   = 0;
 
     static constexpr size_t KeySize();
@@ -238,11 +237,7 @@ private:
 
     CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
 
-    CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert);
-    CHIP_ERROR SetICACert(const chip::ByteSpan & cert);
-
-    void ReleaseNOCCert();
-    void ReleaseICACert();
+    void ReleaseOperationalCerts();
     void ReleaseRootCert();
 
     struct StorableFabricInfo
@@ -252,14 +247,12 @@ private:
         uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
         uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
 
-        uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
-        uint16_t mICACertLen;  /* This field is serialized in LittleEndian byte order */
-        uint16_t mNOCCertLen;  /* This field is serialized in LittleEndian byte order */
+        uint16_t mRootCertLen;         /* This field is serialized in LittleEndian byte order */
+        uint16_t mOperationalCertsLen; /* This field is serialized in LittleEndian byte order */
 
-        Crypto::P256SerializedKeypair mEphemeralKey;
+        Crypto::P256SerializedKeypair mOperationalKey;
         uint8_t mRootCert[Credentials::kMaxCHIPCertLength];
-        uint8_t mICACert[Credentials::kMaxCHIPCertLength];
-        uint8_t mNOCCert[Credentials::kMaxCHIPCertLength];
+        uint8_t mOperationalCerts[Credentials::kMaxCHIPOpCertArrayLength];
         char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
     };
 };
