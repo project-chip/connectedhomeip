@@ -39,9 +39,13 @@ public:
     FabricIndex GetFabricIndex() const { return mFabric; }
     void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
 
-    bool operator==(const SessionHandle & that) const { return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId; }
+    bool operator==(const SessionHandle & that) const
+    {
+        // TODO: Temporarily keep the old logic, check why only those two fields are used in comparison.
+        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
+    }
 
-    bool match(const SessionHandle & that) const
+    bool MatchIncomingSession(const SessionHandle & that) const
     {
 
         if (that.GetLocalKeyId().HasValue())

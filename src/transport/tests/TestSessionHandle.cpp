@@ -53,12 +53,12 @@ void TestMatchSession(nlTestSuite * inSuite, void * inContext)
     SessionHandle session1;
     SessionHandle session2;
     NL_TEST_ASSERT(inSuite, session1 == session2);
-    NL_TEST_ASSERT(inSuite, session1.match(session2));
+    NL_TEST_ASSERT(inSuite, session1.MatchIncomingSession(session2));
 
     SessionHandle session3(chip::kTestDeviceNodeId, 1, 1, 0);
     SessionHandle session4(chip::kTestDeviceNodeId, 1, 2, 0);
     NL_TEST_ASSERT(inSuite, !(session3 == session4));
-    NL_TEST_ASSERT(inSuite, session3.match(session4));
+    NL_TEST_ASSERT(inSuite, session3.MatchIncomingSession(session4));
 }
 
 // Test Suite
