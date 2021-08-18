@@ -380,26 +380,28 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, ValidationContext
     ByteSpan icac(mICACert, mICACertLen), rcac(mRootCert, mRootCertLen);
 
     constexpr uint8_t kMaxNumCertsInOpCreds = 3;
+    uint8_t nocCertIndex                    = 1;
 
     ChipCertificateSet certificates;
     ReturnErrorOnFailure(certificates.Init(kMaxNumCertsInOpCreds));
 
-    ReturnErrorOnFailure(certificates.LoadCert(noc, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+    ReturnErrorOnFailure(certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
 
     if (!icac.empty())
     {
         ReturnErrorOnFailure(certificates.LoadCert(icac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+        nocCertIndex = 2;
     }
 
-    ReturnErrorOnFailure(certificates.LoadCert(rcac, BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+    ReturnErrorOnFailure(certificates.LoadCert(noc, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
 
-    const ChipDN & nocSubjectDN              = certificates.GetCertSet()[0].mSubjectDN;
-    const CertificateKeyId & nocSubjectKeyId = certificates.GetCertSet()[0].mSubjectKeyId;
+    const ChipDN & nocSubjectDN              = certificates.GetCertSet()[nocCertIndex].mSubjectDN;
+    const CertificateKeyId & nocSubjectKeyId = certificates.GetCertSet()[nocCertIndex].mSubjectKeyId;
 
     const ChipCertificateData * resultCert = nullptr;
     ReturnErrorOnFailure(certificates.FindValidCert(nocSubjectDN, nocSubjectKeyId, context, &resultCert));
 
-    ReturnErrorOnFailure(ExtractPeerIdFromOpCert(certificates.GetCertSet()[0], &nocPeerId));
+    ReturnErrorOnFailure(ExtractPeerIdFromOpCert(certificates.GetCertSet()[nocCertIndex], &nocPeerId));
 
     if (!icac.empty())
     {
@@ -411,7 +413,7 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, ValidationContext
     }
 
     Encoding::LittleEndian::BufferWriter bbuf(nocPubkey, nocPubkey.Length());
-    bbuf.Put(certificates.GetCertSet()[0].mPublicKey.data(), certificates.GetCertSet()[0].mPublicKey.size());
+    bbuf.Put(certificates.GetCertSet()[nocCertIndex].mPublicKey.data(), certificates.GetCertSet()[nocCertIndex].mPublicKey.size());
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     return CHIP_NO_ERROR;
