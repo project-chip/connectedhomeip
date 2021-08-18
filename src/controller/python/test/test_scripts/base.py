@@ -18,6 +18,7 @@
 from dataclasses import dataclass
 from typing import Any
 from chip import ChipDeviceCtrl
+import chip.interaction_model as IM
 import threading
 import os
 import sys
@@ -172,7 +173,6 @@ class BaseTestHelper:
                 elif res.value != expected_value:
                     raise Exception("Read {} attribute: expect {} got {}".format(
                         basic_attr, repr(expected_value), repr(res.value)))
-                time.sleep(2)
             except Exception as ex:
                 failed_zcl[basic_attr] = str(ex)
         if failed_zcl:
@@ -186,9 +186,12 @@ class BaseTestHelper:
             cluster: str
             attribute: str
             value: Any
+            expected_status: IM.ProtocolCode = IM.ProtocolCode.Success
 
         requests = [
             AttributeWriteRequest("Basic", "UserLabel", "Test"),
+            AttributeWriteRequest("Basic", "Location",
+                                  "a pretty loooooooooooooog string", IM.ProtocolCode.InvalidValue),
         ]
         failed_zcl = []
         for req in requests:
@@ -202,10 +205,12 @@ class BaseTestHelper:
                 if res is None:
                     raise Exception(
                         f"Write {req.cluster}.{req.attribute} attribute: no value get")
-                elif res.status != 0:
+                elif res.status != req.expected_status:
                     raise Exception(
-                        f"Write {req.cluster}.{req.attribute} attribute: non-zero status code {res.status}")
-                time.sleep(2)
+                        f"Write {req.cluster}.{req.attribute} attribute: expected status is {req.expected_status} got {res.status}")
+                if req.expected_status != IM.ProtocolCode.Success:
+                    # If the write interaction is expected to success, proceed to verify it.
+                    continue
                 res = self.devCtrl.ZCLReadAttribute(
                     cluster=req.cluster, attribute=req.attribute, nodeid=nodeid, endpoint=endpoint, groupid=group)
                 if res is None:
@@ -217,8 +222,8 @@ class BaseTestHelper:
                 elif res.value != req.value:
                     raise Exception(
                         f"Read written {req.cluster}.{req.attribute} attribute: expected {req.value} got {res.value}")
-            except Exception:
-                failed_zcl.append(req)
+            except Exception as ex:
+                failed_zcl.append(str(ex))
         if failed_zcl:
             self.logger.exception(f"Following attributes failed: {failed_zcl}")
             return False

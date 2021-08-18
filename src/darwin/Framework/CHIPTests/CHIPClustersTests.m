@@ -1849,7 +1849,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                                 responseHandler:^(NSError * err, NSDictionary * values) {
                                     NSLog(@"Write attribute OCTET_STRING Error: %@", err);
 
-                                    XCTAssertEqual(err.code, 0);
+                                    XCTAssertEqual(err.code, true);
                                     [expectation fulfill];
                                 }];
 
@@ -2008,7 +2008,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSString * charStringArgument = @"☉Test☉";
+    NSString * charStringArgument = @"☉T☉";
     [cluster writeAttributeCharStringWithValue:charStringArgument
                                responseHandler:^(NSError * err, NSDictionary * values) {
                                    NSLog(@"Write attribute CHAR_STRING Error: %@", err);
@@ -2021,7 +2021,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 }
 - (void)testSendClusterTestCluster_000100_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute CHAR_STRING"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute CHAR_STRING - Value too long"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
@@ -2030,9 +2030,9 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     NSString * charStringArgument = @"☉TestValueLongerThan10☉";
     [cluster writeAttributeCharStringWithValue:charStringArgument
                                responseHandler:^(NSError * err, NSDictionary * values) {
-                                   NSLog(@"Write attribute CHAR_STRING Error: %@", err);
+                                   NSLog(@"Write attribute CHAR_STRING - Value too long Error: %@", err);
 
-                                   XCTAssertEqual(err.code, 0);
+                                   XCTAssertEqual(err.code, true);
                                    [expectation fulfill];
                                }];
 
@@ -2040,7 +2040,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 }
 - (void)testSendClusterTestCluster_000101_WriteAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute CHAR_STRING"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute CHAR_STRING - Empty"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
@@ -2049,7 +2049,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     NSString * charStringArgument = @"";
     [cluster writeAttributeCharStringWithValue:charStringArgument
                                responseHandler:^(NSError * err, NSDictionary * values) {
-                                   NSLog(@"Write attribute CHAR_STRING Error: %@", err);
+                                   NSLog(@"Write attribute CHAR_STRING - Empty Error: %@", err);
 
                                    XCTAssertEqual(err.code, 0);
                                    [expectation fulfill];
