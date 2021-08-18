@@ -22,6 +22,8 @@
 #include <app/server/Server.h>
 
 #include <app/server/OnboardingCodesUtil.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <support/ThreadOperationalDataset.h>
@@ -61,6 +63,7 @@ static uint32_t eventMask = 0;
 extern "C" void K32WUartProcess(void);
 #endif
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -86,6 +89,9 @@ CHIP_ERROR AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));

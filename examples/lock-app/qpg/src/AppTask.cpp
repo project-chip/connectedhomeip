@@ -31,10 +31,14 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
 using namespace chip::TLV;
+using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 
 #include <platform/CHIPDeviceLayer.h>
@@ -100,6 +104,10 @@ CHIP_ERROR AppTask::Init()
 
     // Init ZCL Data Model
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
     UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();

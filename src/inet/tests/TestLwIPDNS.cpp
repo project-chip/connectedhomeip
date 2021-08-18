@@ -126,11 +126,8 @@ static void TestLwIPDNS(void)
 
     while (!Done)
     {
-        struct timeval sleepTime;
-        sleepTime.tv_sec  = 0;
-        sleepTime.tv_usec = 10000;
-
-        ServiceNetwork(sleepTime);
+        constexpr uint32_t kSleepTimeMilliseconds = 10;
+        ServiceNetwork(kSleepTimeMilliseconds);
     }
 
     // Expected cached response
