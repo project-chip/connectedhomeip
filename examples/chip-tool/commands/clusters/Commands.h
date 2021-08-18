@@ -22,8 +22,8 @@
 #include <cstdint>
 
 #include "ModelCommand.h"
-#include <zap-generated/CHIPClientCallbacks.h>
-#include <zap-generated/CHIPClusters.h>
+#include "gen/CHIPClientCallbacks.h"
+#include "gen/CHIPClusters.h"
 #include <lib/core/CHIPSafeCasts.h>
 #include <support/BytesToHex.h>
 

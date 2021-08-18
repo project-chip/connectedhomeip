@@ -61,7 +61,7 @@ def getDirPath(name):
 def runArgumentsParser():
     default_templates = 'src/app/zap-templates/app-templates.json'
     default_zcl = 'src/app/zap-templates/zcl/zcl.json'
-    default_output_dir = 'gen/'
+    default_output_dir = 'zap-generated/'
 
     parser = argparse.ArgumentParser(
         description='Generate artifacts from .zapt templates')
@@ -75,7 +75,7 @@ def runArgumentsParser():
     args = parser.parse_args()
 
     # By default, this script assumes that the global CHIP template is used with
-    # a default 'gen/' output folder relative to APP_ROOT_DIR.
+    # a default 'zap-generated/' output folder relative to APP_ROOT_DIR.
     # If needed, the user may specify a specific template as a second argument. In
     # this case the output folder is relative to CHIP_ROOT_DIR.
     if args.output_dir:
