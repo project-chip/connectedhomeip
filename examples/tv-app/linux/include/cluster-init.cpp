@@ -72,7 +72,7 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
     err                           = wolManager.Init();
     if (CHIP_NO_ERROR == err)
     {
-        char macAddress[17] = "";
+        char macAddress[32] = "";
         wolManager.setMacAddress(endpoint, macAddress);
         wolManager.store(endpoint, macAddress);
     }

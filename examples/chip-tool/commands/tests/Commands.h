@@ -982,6 +982,114 @@ private:
     }
 };
 
+class TV_WakeOnLanCluster : public TestCommand
+{
+public:
+    TV_WakeOnLanCluster() : TestCommand("TV_WakeOnLanCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "TV_WakeOnLanCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterWakeOnLanCommandReadAttribute_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "TV_WakeOnLanCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    // Test Read mac address
+    using SuccessCallback_0 = void (*)(void * context, chip::ByteSpan wakeOnLanMacAddress);
+    chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{
+        OnTestSendClusterWakeOnLanCommandReadAttribute_0_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
+        OnTestSendClusterWakeOnLanCommandReadAttribute_0_FailureResponse, this
+    };
+    bool mIsFailureExpected_0 = 0;
+
+    CHIP_ERROR TestSendClusterWakeOnLanCommandReadAttribute_0()
+    {
+        ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Sending command...");
+
+        chip::Controller::WakeOnLanCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeWakeOnLanMacAddress(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterWakeOnLanCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Failure Response");
+
+        TV_WakeOnLanCluster * runner = reinterpret_cast<TV_WakeOnLanCluster *>(context);
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterWakeOnLanCommandReadAttribute_0_SuccessResponse(void * context, chip::ByteSpan wakeOnLanMacAddress)
+    {
+        ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Success Response");
+
+        TV_WakeOnLanCluster * runner = reinterpret_cast<TV_WakeOnLanCluster *>(context);
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        chip::ByteSpan wakeOnLanMacAddressArgument =
+            chip::ByteSpan(chip::Uint8::from_const_char("00:00:00:00:00"), strlen("00:00:00:00:00"));
+        if (!wakeOnLanMacAddress.data_equal(wakeOnLanMacAddressArgument))
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "00:00:00:00:00");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
 class TV_ApplicationBasicCluster : public TestCommand
 {
 public:
@@ -19312,6 +19420,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TV_ApplicationLauncherCluster>(),
         make_unique<TV_KeypadInputCluster>(),
         make_unique<TV_AccountLoginCluster>(),
+        make_unique<TV_WakeOnLanCluster>(),
         make_unique<TV_ApplicationBasicCluster>(),
         make_unique<TV_MediaPlaybackCluster>(),
         make_unique<TV_TvChannelCluster>(),

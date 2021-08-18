@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,27 +14,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <support/Span.h>
 
 #pragma once
 
-#include <app/util/af-types.h>
-#include <core/CHIPError.h>
+namespace chip {
 
-#include "../endpoint-configuration/EndpointConfigurationStorage.h"
+/**
+ * @brief Create ZCL string (pascal string) from char string.
+ * The maximum size of the ZCL string is defined by the kBufferMaximumSize.
+ * In case char string exceeds the maximum of size ZCL string, the string will be 0-sized
+ * and the method will return an error.
+ */
+extern CHIP_ERROR MakeZclCharString(MutableByteSpan & buffer, const char * cString);
 
-class WakeOnLanManager
-{
-public:
-    CHIP_ERROR Init();
-    void store(chip::EndpointId endpoint, char macAddress[32]);
-    void setMacAddress(chip::EndpointId endpoint, char * macAddress);
-
-    static WakeOnLanManager & GetInstance()
-    {
-        static WakeOnLanManager instance;
-        return instance;
-    }
-
-private:
-    EndpointConfigurationStorage * es = nullptr;
-};
+} // namespace chip

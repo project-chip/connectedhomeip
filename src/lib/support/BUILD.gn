@@ -102,6 +102,8 @@ static_library("support") {
     "UnitTestUtils.cpp",
     "UnitTestUtils.h",
     "Variant.h",
+    "ZclString.cpp",
+    "ZclString.h",
     "logging/CHIPLogging.cpp",
     "logging/CHIPLogging.h",
     "verhoeff/Verhoeff.cpp",
