@@ -30,6 +30,8 @@ static_library("controller") {
     "EmptyDataModelHandler.cpp",
     "ExampleOperationalCredentialsIssuer.cpp",
     "ExampleOperationalCredentialsIssuer.h",
+    "InteractionPeer.cpp",
+    "InteractionPeer.h",
   ]
 
   cflags = [ "-Wconversion" ]

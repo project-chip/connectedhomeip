@@ -24,6 +24,7 @@
  *    the CHIP device.
  */
 
+#include "InteractionPeer.h"
 #include <app/InteractionModelEngine.h>
 #include <controller/CHIPCluster.h>
 #include <protocols/temp_zcl/TempZCL.h>
@@ -32,7 +33,7 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR ClusterBase::Associate(Device * device, EndpointId endpoint)
+CHIP_ERROR ClusterBase::Associate(InteractionPeer * device, EndpointId endpoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // TODO: Check if the device supports mCluster at the requested endpoint
