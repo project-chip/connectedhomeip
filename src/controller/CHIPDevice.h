@@ -195,10 +195,10 @@ public:
         mFabricIndex     = fabric;
         mStorageDelegate = params.storageDelegate;
         mIDAllocator     = params.idAllocator;
+        mFabricsTable    = params.fabricsTable;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
-        mFabricsTable = params.fabricsTable;
     }
 
     /**

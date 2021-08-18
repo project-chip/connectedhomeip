@@ -552,8 +552,10 @@ CHIP_ERROR Device::WarmupCASESession()
     mLocalMessageCounter = 0;
     mPeerMessageCounter  = 0;
 
-    ReturnErrorOnFailure(
-        mCASESession.EstablishSession(mDeviceAddress, mFabricsTable, mFabricIndex, mDeviceId, keyID, exchange, this));
+    Transport::FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(mCASESession.EstablishSession(mDeviceAddress, fabric, mDeviceId, keyID, exchange, this));
 
     mState = ConnectionState::Connecting;
 

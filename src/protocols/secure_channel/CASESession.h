@@ -88,11 +88,10 @@ public:
 
     /**
      * @brief
-     *   Initialize using operational credentials code and wait for session establishment requests.
+     *   Initialize using configured fabrics and wait for session establishment requests.
      *
-     * @param operationalCredentialSet      CHIP Certificate Set used to store the chain root of trust an validate peer node
-     *                                      certificates
      * @param myKeyId                       Key ID to be assigned to the secure session on the peer node
+     * @param fabrics                       Table of fabrics that are currently configured on the device
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR     The result of initialization
@@ -105,11 +104,7 @@ public:
      *   Create and send session establishment request using device's operational credentials.
      *
      * @param peerAddress                   Address of peer with which to establish a session.
-     * @param operationalCredentialSet      CHIP Certificate Set used to store the chain root of trust an validate peer node
-     *                                      certificates
-     * @param opCredSetIndex                Index value used to choose the chain root of trust for establishing a session. Retrieve
-     *                                      this index value from an operationalCredentialSet's entry that matches the device's
-     *                                      operational credentials
+     * @param fabric                        The fabric that should be used for connecting with the peer
      * @param peerNodeId                    Node id of the peer node
      * @param myKeyId                       Key ID to be assigned to the secure session on the peer node
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
@@ -117,8 +112,8 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, Transport::FabricTable * fabrics, FabricIndex fabricIndex,
-                                NodeId peerNodeId, uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
+    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, Transport::FabricInfo * fabric, NodeId peerNodeId,
+                                uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
                                 SessionEstablishmentDelegate * delegate);
 
     /**
@@ -183,7 +178,7 @@ private:
         kUnexpected           = 0xff,
     };
 
-    CHIP_ERROR Init(uint16_t myKeyId, Transport::FabricTable * fabrics, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SendSigmaR1();
     CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle & msg);
@@ -245,7 +240,7 @@ private:
     SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     Transport::FabricTable * mFabricsTable = nullptr;
-    FabricIndex mFabricIndex;
+    Transport::FabricInfo * mFabricInfo    = nullptr;
 
     struct SigmaErrorMsg
     {

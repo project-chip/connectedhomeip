@@ -263,9 +263,7 @@ CHIP_ERROR FabricInfo::SetRootCert(const ByteSpan & cert)
     mRootCertAllocatedLen = (mRootCertLen > mRootCertAllocatedLen) ? mRootCertLen : mRootCertAllocatedLen;
     memcpy(mRootCert, cert.data(), mRootCertLen);
 
-    Encoding::LittleEndian::BufferWriter bbuf(mRootPubkey, mRootPubkey.Length());
-    bbuf.Put(certData.mPublicKey.data(), certData.mPublicKey.size());
-    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    mRootPubkey = P256PublicKey(certData.mPublicKey);
 
     return CHIP_NO_ERROR;
 }
@@ -412,9 +410,7 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & noc, ValidationContext
         }
     }
 
-    Encoding::LittleEndian::BufferWriter bbuf(nocPubkey, nocPubkey.Length());
-    bbuf.Put(certificates.GetCertSet()[nocCertIndex].mPublicKey.data(), certificates.GetCertSet()[nocCertIndex].mPublicKey.size());
-    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    nocPubkey = P256PublicKey(certificates.GetCertSet()[nocCertIndex].mPublicKey);
 
     return CHIP_NO_ERROR;
 }
