@@ -124,7 +124,7 @@ bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-shell'"'"
 bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-bridge'"'"''
 
 # Building esp32-devkitc-temperature_measurement
-bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'/OUTPUT/DIR/esp32-devkitc-temperature_measurement'"'"''
+bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-devkitc-temperature_measurement'"'"''
 
 # Building esp32-c3devkit-all_clusters
 bash -c 'source $IDF_PATH/export.sh; ninja -C '"'"'{out}/esp32-c3devkit-all_clusters'"'"''
@@ -200,5 +200,3 @@ cp {out}/android-x64-chip_tool/lib/jni/x86_64/libc++_shared.so {root}/src/androi
 
 # Building APP android-x64-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-x64-chip_tool/lib -PbuildDir={out}/android-x64-chip_tool build
-
-
