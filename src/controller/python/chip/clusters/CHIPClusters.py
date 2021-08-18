@@ -1519,15 +1519,15 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "FabricId",
-                    "attributeId": 0x00000000,
-                    "type": "bytes",
-                },
-                0x00000001: {
                     "attributeName": "Breadcrumb",
-                    "attributeId": 0x00000001,
+                    "attributeId": 0x00000000,
                     "type": "int",
                     "writable": True,
+                },
+                0x00000001: {
+                    "attributeName": "BasicCommissioningInfoList",
+                    "attributeId": 0x00000001,
+                    "type": "",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -4642,12 +4642,12 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
     def ClusterFlowMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-    def ClusterGeneralCommissioning_ReadAttributeFabricId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralCommissioning_ReadAttributeBreadcrumb(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_Breadcrumb(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralCommissioning_WriteAttributeBreadcrumb(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_GeneralCommissioning_Breadcrumb(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterGeneralCommissioning_ReadAttributeBasicCommissioningInfoList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_BasicCommissioningInfoList(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralCommissioning_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralDiagnostics_ReadAttributeNetworkInterfaces(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -5900,15 +5900,15 @@ class ChipClusters:
         # Cluster GeneralCommissioning Command SetRegulatoryConfig
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig.restype = ctypes.c_uint32
-        # Cluster GeneralCommissioning ReadAttribute FabricId
-        self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning ReadAttribute Breadcrumb
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_Breadcrumb.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_Breadcrumb.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning WriteAttribute Breadcrumb
         self._chipLib.chip_ime_WriteAttribute_GeneralCommissioning_Breadcrumb.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
         self._chipLib.chip_ime_WriteAttribute_GeneralCommissioning_Breadcrumb.restype = ctypes.c_uint32
+        # Cluster GeneralCommissioning ReadAttribute BasicCommissioningInfoList
+        self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_BasicCommissioningInfoList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_BasicCommissioningInfoList.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision.restype = ctypes.c_uint32

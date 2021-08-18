@@ -6389,6 +6389,92 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback
+    : public Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>
+{
+public:
+    CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback(jobject javaCallback) :
+        Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>(CallbackFn, this)
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+            return;
+        }
+
+        javaCallbackRef = env->NewGlobalRef(javaCallback);
+        if (javaCallbackRef == nullptr)
+        {
+            ChipLogError(Zcl, "Could not create global reference for Java callback");
+        }
+    }
+
+    static void CallbackFn(void * context, uint16_t count, _BasicCommissioningInfoType * entries)
+    {
+        StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+
+        VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+        std::unique_ptr<CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback> cppCallback(
+            reinterpret_cast<CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback *>(context));
+
+        // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+        javaCallbackRef = cppCallback.get()->javaCallbackRef;
+        VerifyOrReturn(javaCallbackRef != nullptr,
+                       ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+        jclass arrayListClass;
+        err = JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
+        JniClass arrayListJniClass(arrayListClass);
+        jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
+        jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+        VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
+                       ChipLogError(Zcl, "Error finding Java ArrayList methods"));
+        jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
+        VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
+
+        jmethodID javaMethod;
+        err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+        jclass attributeClass;
+        err = JniReferences::GetInstance().GetClassRef(
+            env, "chip/devicecontroller/ChipClusters$GeneralCommissioningCluster$BasicCommissioningInfoListAttribute",
+            attributeClass);
+        VerifyOrReturn(
+            err == CHIP_NO_ERROR,
+            ChipLogError(Zcl,
+                         "Could not find class "
+                         "chip/devicecontroller/ChipClusters$GeneralCommissioningCluster$BasicCommissioningInfoListAttribute"));
+        JniClass attributeJniClass(attributeClass);
+        jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "(J)V");
+        VerifyOrReturn(attributeCtor != nullptr,
+                       ChipLogError(Zcl, "Could not find BasicCommissioningInfoListAttribute constructor"));
+
+        for (uint16_t i = 0; i < count; i++)
+        {
+            jlong failSafeExpiryLengthMs = entries[i].FailSafeExpiryLengthMs;
+
+            jobject attributeObj = env->NewObject(attributeClass, attributeCtor, failSafeExpiryLengthMs);
+            VerifyOrReturn(attributeObj != nullptr,
+                           ChipLogError(Zcl, "Could not create BasicCommissioningInfoListAttribute object"));
+
+            env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+        }
+
+        env->ExceptionClear();
+        env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+    }
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback
     : public Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>
 {
@@ -17165,43 +17251,6 @@ exit:
     }
 }
 
-JNI_METHOD(void, GeneralCommissioningCluster, readFabricIdAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-{
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    CHIPOctetStringAttributeCallback * onSuccess = new CHIPOctetStringAttributeCallback(callback);
-    if (!onSuccess)
-    {
-        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
-        return;
-    }
-
-    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
-    if (!onFailure)
-    {
-        delete onSuccess;
-        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
-        return;
-    }
-
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
-    GeneralCommissioningCluster * cppCluster = reinterpret_cast<GeneralCommissioningCluster *>(clusterPtr);
-    if (cppCluster == nullptr)
-    {
-        delete onSuccess;
-        delete onFailure;
-        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
-        return;
-    }
-
-    err = cppCluster->ReadAttributeFabricId(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR)
-    {
-        delete onSuccess;
-        delete onFailure;
-        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
-    }
-}
-
 JNI_METHOD(void, GeneralCommissioningCluster, readBreadcrumbAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
@@ -17275,6 +17324,45 @@ JNI_METHOD(void, GeneralCommissioningCluster, writeBreadcrumbAttribute)
         delete onSuccess;
         delete onFailure;
         ReturnIllegalStateException(env, callback, "Error writing attribute", err.AsInteger());
+    }
+}
+
+JNI_METHOD(void, GeneralCommissioningCluster, readBasicCommissioningInfoListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback * onSuccess =
+        new CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback(callback);
+    if (!onSuccess)
+    {
+        ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIPDefaultFailureCallback * onFailure = new CHIPDefaultFailureCallback(callback);
+    if (!onFailure)
+    {
+        delete onSuccess;
+        ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY.AsInteger());
+        return;
+    }
+
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    GeneralCommissioningCluster * cppCluster = reinterpret_cast<GeneralCommissioningCluster *>(clusterPtr);
+    if (cppCluster == nullptr)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        return;
+    }
+
+    err = cppCluster->ReadAttributeBasicCommissioningInfoList(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR)
+    {
+        delete onSuccess;
+        delete onFailure;
+        ReturnIllegalStateException(env, callback, "Error reading attribute", err.AsInteger());
     }
 }
 

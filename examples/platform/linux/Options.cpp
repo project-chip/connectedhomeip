@@ -33,16 +33,19 @@ LinuxDeviceOptions gDeviceOptions;
 // Follow the code style of command line arguments in case we need to add more options in the future.
 enum
 {
-    kDeviceOption_BleDevice     = 0x1000,
-    kDeviceOption_WiFi          = 0x1001,
-    kDeviceOption_Thread        = 0x1002,
-    kDeviceOption_Version       = 0x1003,
-    kDeviceOption_VendorID      = 0x1004,
-    kDeviceOption_ProductID     = 0x1005,
-    kDeviceOption_CustomFlow    = 0x1006,
-    kDeviceOption_Capabilities  = 0x1007,
-    kDeviceOption_Discriminator = 0x1008,
-    kDeviceOption_Passcode      = 0x1009
+    kDeviceOption_BleDevice                 = 0x1000,
+    kDeviceOption_WiFi                      = 0x1001,
+    kDeviceOption_Thread                    = 0x1002,
+    kDeviceOption_Version                   = 0x1003,
+    kDeviceOption_VendorID                  = 0x1004,
+    kDeviceOption_ProductID                 = 0x1005,
+    kDeviceOption_CustomFlow                = 0x1006,
+    kDeviceOption_Capabilities              = 0x1007,
+    kDeviceOption_Discriminator             = 0x1008,
+    kDeviceOption_Passcode                  = 0x1009,
+    kDeviceOption_SecuredDevicePort         = 0x100a,
+    kDeviceOption_SecuredCommissionerPort   = 0x100b,
+    kDeviceOption_UnsecuredCommissionerPort = 0x100c
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -61,6 +64,9 @@ OptionDef sDeviceOptionDefs[] = { { "ble-device", kArgumentRequired, kDeviceOpti
                                   { "capabilities", kArgumentRequired, kDeviceOption_Capabilities },
                                   { "discriminator", kArgumentRequired, kDeviceOption_Discriminator },
                                   { "passcode", kArgumentRequired, kDeviceOption_Passcode },
+                                  { "secured-device-port", kArgumentRequired, kDeviceOption_SecuredDevicePort },
+                                  { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
+                                  { "unsecured-commissioner-port", kArgumentRequired, kDeviceOption_UnsecuredCommissionerPort },
                                   {} };
 
 const char * sDeviceOptionHelp =
@@ -97,6 +103,16 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --passcode <passcode>\n"
     "       A 27-bit unsigned integer, which serves as proof of possession during commissioning.\n"
+    "\n"
+    "  --secured-device-port <port>\n"
+    "       A 16-bit unsigned integer specifying the listen port to use for secure device messages (default is 5540).\n"
+    "\n"
+    "  --secured-commissioner-port <port>\n"
+    "       A 16-bit unsigned integer specifying the listen port to use for secure commissioner messages (default is 5542). Only "
+    "valid when app is both device and commissioner\n"
+    "\n"
+    "  --unsecured-commissioner-port <port>\n"
+    "       A 16-bit unsigned integer specifying the port to use for unsecured commissioner messages (default is 5550).\n"
     "\n";
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -148,6 +164,18 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_Passcode:
         LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(atoi(aValue));
+        break;
+
+    case kDeviceOption_SecuredDevicePort:
+        LinuxDeviceOptions::GetInstance().securedDevicePort = static_cast<uint16_t>(atoi(aValue));
+        break;
+
+    case kDeviceOption_SecuredCommissionerPort:
+        LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(atoi(aValue));
+        break;
+
+    case kDeviceOption_UnsecuredCommissionerPort:
+        LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort = static_cast<uint16_t>(atoi(aValue));
         break;
 
     default:

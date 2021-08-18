@@ -836,6 +836,21 @@ static void OnFixedLabelLabelListListAttributeResponse(void * context, uint16_t 
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
+static void OnGeneralCommissioningBasicCommissioningInfoListListAttributeResponse(void * context, uint16_t count,
+                                                                                  _BasicCommissioningInfoType * entries)
+{
+    ChipLogProgress(chipTool, "OnGeneralCommissioningBasicCommissioningInfoListListAttributeResponse: %" PRIu16 " entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "BasicCommissioningInfoType[%" PRIu16 "]:", i);
+        ChipLogProgress(chipTool, "  FailSafeExpiryLengthMs: %" PRIu32 "", entries[i].FailSafeExpiryLengthMs);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
 static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(void * context, uint16_t count,
                                                                        _NetworkInterfaceType * entries)
 {
@@ -10559,8 +10574,8 @@ private:
 | * SetRegulatoryConfig                                               |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * FabricId                                                          | 0x0000 |
-| * Breadcrumb                                                        | 0x0001 |
+| * Breadcrumb                                                        | 0x0000 |
+| * BasicCommissioningInfoList                                        | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -10708,40 +10723,6 @@ private:
 };
 
 /*
- * Attribute FabricId
- */
-class ReadGeneralCommissioningFabricId : public ModelCommand
-{
-public:
-    ReadGeneralCommissioningFabricId() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "fabric-id");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadGeneralCommissioningFabricId()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::GeneralCommissioningCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFabricId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
-    }
-
-private:
-    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-};
-
-/*
  * Attribute Breadcrumb
  */
 class ReadGeneralCommissioningBreadcrumb : public ModelCommand
@@ -10806,6 +10787,41 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     uint64_t mValue;
+};
+
+/*
+ * Attribute BasicCommissioningInfoList
+ */
+class ReadGeneralCommissioningBasicCommissioningInfoList : public ModelCommand
+{
+public:
+    ReadGeneralCommissioningBasicCommissioningInfoList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "basic-commissioning-info-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGeneralCommissioningBasicCommissioningInfoList()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0030) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GeneralCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBasicCommissioningInfoList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>(
+            OnGeneralCommissioningBasicCommissioningInfoListListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -24462,14 +24478,14 @@ void registerClusterGeneralCommissioning(Commands & commands)
     const char * clusterName = "GeneralCommissioning";
 
     commands_list clusterCommands = {
-        make_unique<GeneralCommissioningArmFailSafe>(),           //
-        make_unique<GeneralCommissioningCommissioningComplete>(), //
-        make_unique<GeneralCommissioningSetRegulatoryConfig>(),   //
-        make_unique<DiscoverGeneralCommissioningAttributes>(),    //
-        make_unique<ReadGeneralCommissioningFabricId>(),          //
-        make_unique<ReadGeneralCommissioningBreadcrumb>(),        //
-        make_unique<WriteGeneralCommissioningBreadcrumb>(),       //
-        make_unique<ReadGeneralCommissioningClusterRevision>(),   //
+        make_unique<GeneralCommissioningArmFailSafe>(),                    //
+        make_unique<GeneralCommissioningCommissioningComplete>(),          //
+        make_unique<GeneralCommissioningSetRegulatoryConfig>(),            //
+        make_unique<DiscoverGeneralCommissioningAttributes>(),             //
+        make_unique<ReadGeneralCommissioningBreadcrumb>(),                 //
+        make_unique<WriteGeneralCommissioningBreadcrumb>(),                //
+        make_unique<ReadGeneralCommissioningBasicCommissioningInfoList>(), //
+        make_unique<ReadGeneralCommissioningClusterRevision>(),            //
     };
 
     commands.Register(clusterName, clusterCommands);
