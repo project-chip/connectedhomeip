@@ -584,6 +584,17 @@ CHIP_ERROR FabricTable::Init(PersistentStorageDelegate * storage)
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mStorage = storage;
     ChipLogDetail(Discovery, "Init fabric pairing table with server storage");
+
+    // Load the current fabrics from the storage. This is done here, since ConstFabricIterator
+    // iterator doesn't have mechanism to load fabric info from storage on demand.
+    // TODO - Update ConstFabricIterator to load fabric info from storage
+    static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
+    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
+    {
+        FabricInfo * fabric = &mStates[i - kMinValidFabricIndex];
+        LoadFromStorage(fabric);
+    }
+
     return CHIP_NO_ERROR;
 }
 
