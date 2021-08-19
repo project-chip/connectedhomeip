@@ -20,6 +20,7 @@
 
 #include "../common/Command.h"
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <platform/CHIPDeviceLayer.h>
 
 class TestCommand : public Command
 {
@@ -34,6 +35,9 @@ public:
     uint16_t GetWaitDurationInSeconds() const override { return 30; }
 
     virtual void NextTest() = 0;
+    static void NextTest(intptr_t context) { reinterpret_cast<TestCommand *>(context)->NextTest(); }
+
+    void AsyncNextTest() { chip::DeviceLayer::PlatformMgr().ScheduleWork(NextTest, reinterpret_cast<intptr_t>(this)); }
 
 protected:
     ChipDevice * mDevice;

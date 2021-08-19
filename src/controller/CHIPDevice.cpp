@@ -690,9 +690,9 @@ void Device::CancelIMResponseHandler(app::CommandSender * commandObj)
 }
 
 void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute,
-                              Callback::Cancelable * onReportCallback)
+                              Callback::Cancelable * onReportCallback, app::TLVDataFilter tlvDataFilter)
 {
-    mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback);
+    mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback, tlvDataFilter);
 }
 
 CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
@@ -720,6 +720,45 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
         CancelResponseHandler(seqNum);
     }
     return err;
+}
+
+CHIP_ERROR Device::SendSubscribeAttributeRequest(app::AttributePathParams aPath, uint16_t mMinIntervalSeconds,
+                                                 uint16_t mMaxIntervalSeconds, Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback)
+{
+    bool loadedSecureSession = false;
+    uint8_t seqNum           = GetNextSequenceNumber();
+    aPath.mNodeId            = GetDeviceId();
+
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    app::AttributePathParams * path = mpIMDelegate->AllocateAttributePathParam(1, seqNum);
+
+    VerifyOrReturnError(path != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    *path = aPath;
+
+    // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
+    // use the seqNum.
+    app::ReadPrepareParams params(GetSecureSession());
+    params.mpAttributePathParamsList    = path;
+    params.mAttributePathParamsListSize = 1;
+    params.mMinIntervalSeconds          = mMinIntervalSeconds;
+    params.mMaxIntervalSeconds          = mMaxIntervalSeconds;
+
+    CHIP_ERROR err =
+        chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(params, seqNum /* application context */);
+    if (err != CHIP_NO_ERROR)
+    {
+        mpIMDelegate->FreeAttributePathParam(seqNum);
+        return err;
+    }
+
+    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
+    {
+        AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,

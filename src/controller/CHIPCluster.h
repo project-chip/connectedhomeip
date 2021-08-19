@@ -69,7 +69,8 @@ protected:
      *                              is active. The user can stop the reporting by cancelling the callback.
      *                              Reference: chip::Callback::Cancel()
      */
-    CHIP_ERROR RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * reportHandler);
+    CHIP_ERROR RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * reportHandler,
+                                         app::TLVDataFilter tlvDataFilter);
 
     const ClusterId mClusterId;
     Device * mDevice;

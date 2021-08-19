@@ -46,10 +46,23 @@ class {{filename}}: public TestCommand
 
     {{#chip_tests_items}}
     // Test {{label}}
+    {{#if isSubscribeAttribute}}
+    using SuccessCallback_{{index}} = void (*)(void * context);
+    {{else}}
     using SuccessCallback_{{index}} = void (*)(void * context{{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
+    {{/if}}
     chip::Callback::Callback<SuccessCallback_{{index}}> mOnSuccessCallback_{{index}} { OnTestSendCluster{{asUpperCamelCase cluster}}Command{{asUpperCamelCase command}}_{{index}}_SuccessResponse, this };
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_{{index}} { OnTestSendCluster{{asUpperCamelCase cluster}}Command{{asUpperCamelCase command}}_{{index}}_FailureResponse, this };
+    {{#if isSubscribeAttribute}}
+    chip::Callback::Callback<{{#chip_tests_with_command_attribute_info}}{{chipCallback.name}}{{/chip_tests_with_command_attribute_info}}AttributeCallback> mOnReportCallback_{{index}} { SubscribeAttribute_{{ index }}_OnReportCallback, this };
+    {{/if}}
+
     bool mIsFailureExpected_{{index}} = {{response.error}};
+
+    {{#if isSubscribeAttribute}}
+    size_t mReceivedReport_{{index}} = 0;
+    static constexpr size_t kExpectedReport_{{index}} = {{ kickCommands.length }} + 1;
+    {{/if}}
 
     CHIP_ERROR TestSendCluster{{asUpperCamelCase cluster}}Command{{asUpperCamelCase command}}_{{index}}()
     {
@@ -80,12 +93,62 @@ class {{filename}}: public TestCommand
         {{/if}}
         {{/chip_tests_item_parameters}}
         err = cluster.WriteAttribute{{asUpperCamelCase attribute}}(mOnSuccessCallback_{{index}}.Cancel(), mOnFailureCallback_{{index}}.Cancel(), {{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}});
+        {{else if isSubscribeAttribute}}
+        cluster.ReportAttribute{{asUpperCamelCase attribute}}(mOnReportCallback_{{index}}.Cancel());
+        err = cluster.ConfigureAttribute{{asUpperCamelCase attribute}}(mOnSuccessCallback_{{index}}.Cancel(), mOnFailureCallback_{{index}}.Cancel(), {{minInterval}}, {{maxInterval}});
         {{else}}
         err = CHIP_ERROR_NOT_IMPLEMENTED;
         {{/if}}
 
         return err;
     }
+
+    {{#if isSubscribeAttribute }}
+    static void SubscribeAttribute_{{ index }}_OnReportCallback(void * context, {{#chip_tests_with_command_attribute_info}}{{chipType}}{{/chip_tests_with_command_attribute_info}} value)
+    {
+        ChipLogProgress(chipTool, "On/Off - Subscribe {{asUpperCamelCase attribute}} Attribute: Report Data");
+        IgnoreUnusedVariable(value);
+        {{parent.filename}} * runner = reinterpret_cast<{{parent.filename}} *>(context);
+
+        switch (runner->mReceivedReport_{{index}}) {
+          {{#chip_tests_subscribe_kick_commands}}
+          case {{index}}:
+            chip::DeviceLayer::SystemLayer.StartTimer({{ waitSeconds }} * 1000, SubscribeAttribute_{{ parent.index }}_kick_{{ index }}, runner);
+            break;
+          {{/chip_tests_subscribe_kick_commands}}
+          default:
+            runner->NextTest();
+            break;
+        }
+        runner->mReceivedReport_{{index}}++;
+
+        ChipLogProgress(chipTool, "On/Off - %zu report received, %zu report expected.", runner->mReceivedReport_{{ index }},
+                        kExpectedReport_{{ index }});
+
+
+    }
+
+    {{#chip_tests_subscribe_kick_commands}}
+    static void SubscribeAttribute_{{ parent.index }}_kick_{{ index }}(chip::System::Layer* layer, void* context)
+    {
+      IgnoreUnusedVariable(layer);
+      {{parent.filename}} * runner = reinterpret_cast<{{parent.filename}} *>(context);
+      chip::Controller::{{asUpperCamelCase cluster}}Cluster cluster;
+      cluster.Associate(runner->mDevice, {{endpoint}});
+      {{#if isCommand}}
+        {{#chip_tests_item_parameters}}
+          {{#if (isString type)}}
+      {{chipType}} {{asLowerCamelCase name}}Argument = chip::ByteSpan(chip::Uint8::from_const_char("{{definedValue}}"), strlen("{{definedValue}}"));
+          {{else}}
+      {{chipType}} {{asLowerCamelCase name}}Argument = {{definedValue}}{{asTypeLiteralSuffix chipType}};
+          {{/if}}
+        {{/chip_tests_item_parameters}}
+      /* The we will check the command result by checking if we have received reports, so OnSuccess and OnFailure are nullptr here. */
+      cluster.{{asUpperCamelCase command}}(nullptr, nullptr {{#chip_tests_item_parameters}}, {{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}});
+      {{/if}}
+    }
+    {{/chip_tests_subscribe_kick_commands}}
+    {{/if}}
 
     static void OnTestSendCluster{{asUpperCamelCase cluster}}Command{{asUpperCamelCase command}}_{{index}}_FailureResponse(void * context, uint8_t status)
     {
@@ -109,7 +172,12 @@ class {{filename}}: public TestCommand
         runner->NextTest();
     }
 
-    static void OnTestSendCluster{{asUpperCamelCase cluster}}Command{{asUpperCamelCase command}}_{{index}}_SuccessResponse(void * context {{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}})
+    static void OnTestSendCluster{{asUpperCamelCase cluster}}Command{{asUpperCamelCase command}}_{{index}}_SuccessResponse
+    {{#if isSubscribeAttribute}}
+    (void * context)
+    {{else}}
+    (void * context {{#chip_tests_item_response_parameters}}, {{#if isList}}uint16_t count, {{/if}}{{chipType}} {{#if isList}}* {{/if}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}})
+    {{/if}}
     {
         ChipLogProgress(chipTool, "{{cluster}} - {{label}}: Success Response");
 
@@ -192,7 +260,9 @@ class {{filename}}: public TestCommand
         {{/if}}
         {{/chip_tests_item_response_parameters}}
 
+        {{#unless isSubscribeAttribute}}
         runner->NextTest();
+        {{/unless}}
     }
 
     {{/chip_tests_items}}

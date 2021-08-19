@@ -72,6 +72,11 @@ function setDefaultType(test)
     test.isWriteAttribute = true;
     break;
 
+  case 'subscribeAttribute':
+    test.isAttribute          = true;
+    test.isSubscribeAttribute = true;
+    break;
+
   default:
     test.isCommand = true;
     break;
@@ -272,6 +277,40 @@ function chip_tests_items(options)
   return templateUtil.collectBlocks(this.tests, options, this);
 }
 
+function chip_tests_with_command_attribute_info(options)
+{
+  const promise = assertCommandOrAttribute(this).then(item => {
+    return [ item ];
+  });
+  return asBlocks.call(this, promise, options);
+}
+
+function chip_tests_subscribe_kick_commands(options)
+{
+  const promises = Promise.all(this.kickCommands.map((kickCommand) => {
+    setDefaults(kickCommand, this);
+    return assertCommandOrAttribute(kickCommand).then((item) => {
+      setDefaults(item, kickCommand);
+      return Object.assign(kickCommand, item);
+    });
+  }));
+  return asBlocks.call(this, promises, options);
+}
+
+function chip_tests_subscribe_with_kick_command_info(options)
+{
+  setDefaults(this, this.parent);
+  const promise = Promise
+                      .all(assertCommandOrAttribute(this).then(item => {
+                        console.log(item);
+                        return [ item ];
+                      }))
+                      .then((values) => {
+                        return values;
+                      });
+  return asBlocks.call(this, promise, options);
+}
+
 function chip_tests_item_parameters(options)
 {
   const commandValues = this.arguments.values;
@@ -341,7 +380,10 @@ function chip_tests_item_response_parameters(options)
 //
 // Module exports
 //
-exports.chip_tests                          = chip_tests;
-exports.chip_tests_items                    = chip_tests_items;
-exports.chip_tests_item_parameters          = chip_tests_item_parameters;
-exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
+exports.chip_tests                                  = chip_tests;
+exports.chip_tests_items                            = chip_tests_items;
+exports.chip_tests_item_parameters                  = chip_tests_item_parameters;
+exports.chip_tests_item_response_parameters         = chip_tests_item_response_parameters;
+exports.chip_tests_with_command_attribute_info      = chip_tests_with_command_attribute_info;
+exports.chip_tests_subscribe_kick_commands          = chip_tests_subscribe_kick_commands;
+exports.chip_tests_subscribe_with_kick_command_info = chip_tests_subscribe_with_kick_command_info;

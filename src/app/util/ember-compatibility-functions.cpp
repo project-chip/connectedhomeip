@@ -21,8 +21,10 @@
  *          when calling ember callbacks.
  */
 
+#include <app/ClusterInfo.h>
 #include <app/Command.h>
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/Engine.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -463,8 +465,9 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 } // namespace app
 } // namespace chip
 
-void InteractionModelReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                             uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
+void InteractionModelReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                                                      uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type,
+                                                      uint8_t * data)
 {
     IgnoreUnusedVariable(manufacturerCode);
     IgnoreUnusedVariable(type);
