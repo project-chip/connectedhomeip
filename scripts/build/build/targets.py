@@ -86,6 +86,7 @@ class Application(IntEnum):
     SHELL = auto()
     CHIP_TOOL = auto()
     BRIDGE = auto()
+    THERMOSTAT = auto()
 
     @property
     def ArgName(self):
