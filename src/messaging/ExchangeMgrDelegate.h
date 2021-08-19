@@ -43,7 +43,7 @@ public:
      * @param session   The handle to the secure session
      * @param mgr       A pointer to the ExchangeManager
      */
-    virtual void OnNewConnection(SecureSessionHandle session, ExchangeManager * mgr) {}
+    virtual void OnNewConnection(SessionHandle session, ExchangeManager * mgr) {}
 
     /**
      * @brief
@@ -52,7 +52,7 @@ public:
      * @param session   The handle to the secure session
      * @param mgr       A pointer to the ExchangeManager
      */
-    virtual void OnConnectionExpired(SecureSessionHandle session, ExchangeManager * mgr) {}
+    virtual void OnConnectionExpired(SessionHandle session, ExchangeManager * mgr) {}
 };
 
 } // namespace Messaging

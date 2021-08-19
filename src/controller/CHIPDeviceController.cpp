@@ -514,7 +514,7 @@ void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(Controller, "Time out! failed to receive response from Exchange: %p", ec);
 }
 
-void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
+void DeviceController::OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNewConnection was called in incorrect state"));
 
@@ -525,7 +525,7 @@ void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::E
     mActiveDevices[index].OnNewConnection(session);
 }
 
-void DeviceController::OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
+void DeviceController::OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
 
@@ -581,7 +581,7 @@ void DeviceController::ReleaseAllDevices()
     }
 }
 
-uint16_t DeviceController::FindDeviceIndex(SecureSessionHandle session)
+uint16_t DeviceController::FindDeviceIndex(SessionHandle session)
 {
     uint16_t i = 0;
     while (i < kNumMaxActiveDevices)
@@ -903,7 +903,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         }
     }
 #endif
-    exchangeCtxt = mExchangeMgr->NewContext(SecureSessionHandle(), &mPairingSession);
+    exchangeCtxt = mExchangeMgr->NewContext(SessionHandle(), &mPairingSession);
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
     err = mIDAllocator.Allocate(keyID);

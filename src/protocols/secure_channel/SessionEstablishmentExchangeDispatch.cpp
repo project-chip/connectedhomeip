@@ -28,7 +28,7 @@ namespace chip {
 
 using namespace Messaging;
 
-CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
+CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader,
                                                                 System::PacketBufferHandle && message,
                                                                 EncryptedPacketBufferHandle & preparedMessage)
 {
@@ -40,7 +40,7 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(SecureSessionHan
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(SecureSessionHandle session,
+CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(SessionHandle session,
                                                                      const EncryptedPacketBufferHandle & preparedMessage) const
 {
     ReturnErrorCodeIf(mTransportMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
