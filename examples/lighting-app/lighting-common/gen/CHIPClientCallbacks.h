@@ -52,31 +52,7 @@ typedef void (*CharStringAttributeCallback)(void * context, const chip::ByteSpan
 typedef void (*AttributeResponseFilter)(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
                                         chip::Callback::Cancelable * onFailure);
 
-/**
- * BasicAttributeFilter accepts the actual type of onSuccess callback as template parameter.
- * It will check whether the type of the TLV data is expected by onSuccess callback.
- * If a non expected value received, onFailure callback will be called with EMBER_ZCL_STATUS_INVALID_VALUE.
- */
-template <typename CallbackType>
-void BasicAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccess,
-                          chip::Callback::Cancelable * onFailure)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    typename chip::FunctionTraits<CallbackType>::template ArgType<1> value;
-
-    if ((err = data->Get(value)) == CHIP_NO_ERROR)
-    {
-        chip::Callback::Callback<CallbackType> * cb = chip::Callback::Callback<CallbackType>::FromCancelable(onSuccess);
-        cb->mCall(cb->mContext, value);
-    }
-    else
-    {
-        ChipLogError(Zcl, "Failed to get value from TLV data for attribute reading response: %s", chip::ErrorStr(err));
-        chip::Callback::Callback<DefaultFailureCallback> * cb =
-            chip::Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailure);
-        cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-    }
-}
+// Deleted BasicAttributeFilter() definition as it conflicts with the one for the controller
 
 typedef void (*ReadReportingConfigurationReportedCallback)(void * context, uint16_t minInterval, uint16_t maxInterval);
 typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint16_t timeout);
