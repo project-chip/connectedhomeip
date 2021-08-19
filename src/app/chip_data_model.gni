@@ -210,8 +210,8 @@ template("chip_data_model") {
     # Generated file name uniqueness would be very useful here (or have alternate
     # subdirectory paths)
     if (!_controller_model) {
-      public_configs += [ "${chip_root}/src/controller/data_model:data_model_config" ]
+      public_configs +=
+          [ "${chip_root}/src/controller/data_model:data_model_config" ]
     }
-
   }
 }
