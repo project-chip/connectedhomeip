@@ -665,7 +665,7 @@ CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & no
  * @brief Convert CHIP certificate to the standard X.509 DER encoded certificate.
  *
  * @param chipCert        CHIP certificate in CHIP TLV encoding.
- * @param x509Cet         Buffer to store converted certificate in X.509 DER format.
+ * @param x509Cert        Buffer to store converted certificate in X.509 DER format.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
