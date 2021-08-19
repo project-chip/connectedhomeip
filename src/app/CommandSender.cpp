@@ -109,7 +109,7 @@ exit:
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "CommandSender:Time out! failed to receive invoke command response from Exchange: %d",
+    ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: %d",
                     apExchangeContext->GetExchangeId());
 
     if (mpDelegate != nullptr)

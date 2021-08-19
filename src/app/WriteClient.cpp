@@ -327,7 +327,7 @@ exit:
 
 void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "WriteClient:Time out! failed to receive write response from Exchange: %d",
+    ChipLogProgress(DataManagement, "Time out! failed to receive write response from Exchange: %d",
                     apExchangeContext->GetExchangeId());
 
     if (mpDelegate != nullptr)
