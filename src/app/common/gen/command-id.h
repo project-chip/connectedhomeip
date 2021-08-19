@@ -45,6 +45,9 @@
 #define ZCL_DISCOVER_ATTRIBUTES_EXTENDED_COMMAND_ID (0x15)
 #define ZCL_DISCOVER_ATTRIBUTES_EXTENDED_RESPONSE_COMMAND_ID (0x16)
 
+
+
+
 // Commands for cluster: Identify
 #define ZCL_IDENTIFY_COMMAND_ID (0x00)
 #define ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID (0x00)
@@ -99,6 +102,7 @@
 #define ZCL_ON_WITH_RECALL_GLOBAL_SCENE_COMMAND_ID (0x41)
 #define ZCL_ON_WITH_TIMED_OFF_COMMAND_ID (0x42)
 
+
 // Commands for cluster: Level Control
 #define ZCL_MOVE_TO_LEVEL_COMMAND_ID (0x00)
 #define ZCL_MOVE_COMMAND_ID (0x01)
@@ -116,6 +120,8 @@
 #define ZCL_GET_ALARM_RESPONSE_COMMAND_ID (0x01)
 #define ZCL_GET_ALARM_COMMAND_ID (0x02)
 #define ZCL_RESET_ALARM_LOG_COMMAND_ID (0x03)
+
+
 
 // Commands for cluster: Power Profile
 #define ZCL_POWER_PROFILE_REQUEST_COMMAND_ID (0x00)
@@ -149,6 +155,7 @@
 #define ZCL_OVERLOAD_PAUSE_RESUME_COMMAND_ID (0x03)
 #define ZCL_OVERLOAD_PAUSE_COMMAND_ID (0x04)
 #define ZCL_OVERLOAD_WARNING_COMMAND_ID (0x05)
+
 
 // Commands for cluster: Poll Control
 #define ZCL_CHECK_IN_COMMAND_ID (0x00)
@@ -204,6 +211,7 @@
 #define ZCL_RETRIEVE_LOGS_REQUEST_COMMAND_ID (0x00)
 #define ZCL_RETRIEVE_LOGS_RESPONSE_COMMAND_ID (0x01)
 
+
 // Commands for cluster: Software Diagnostics
 #define ZCL_RESET_WATERMARKS_COMMAND_ID (0x00)
 
@@ -222,6 +230,7 @@
 #define ZCL_LEAVE_COMMAND_ID (0x02)
 #define ZCL_REACHABLE_CHANGED_COMMAND_ID (0x03)
 
+
 // Commands for cluster: AdministratorCommissioning
 #define ZCL_OPEN_COMMISSIONING_WINDOW_COMMAND_ID (0x00)
 #define ZCL_OPEN_BASIC_COMMISSIONING_WINDOW_COMMAND_ID (0x01)
@@ -237,6 +246,8 @@
 #define ZCL_REMOVE_FABRIC_COMMAND_ID (0x0A)
 #define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x0B)
 #define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x0C)
+
+
 
 // Commands for cluster: Door Lock
 #define ZCL_LOCK_DOOR_COMMAND_ID (0x00)
@@ -307,6 +318,7 @@
 #define ZCL_BARRIER_CONTROL_GO_TO_PERCENT_COMMAND_ID (0x00)
 #define ZCL_BARRIER_CONTROL_STOP_COMMAND_ID (0x01)
 
+
 // Commands for cluster: Thermostat
 #define ZCL_SETPOINT_RAISE_LOWER_COMMAND_ID (0x00)
 #define ZCL_CURRENT_WEEKLY_SCHEDULE_COMMAND_ID (0x00)
@@ -315,6 +327,9 @@
 #define ZCL_GET_WEEKLY_SCHEDULE_COMMAND_ID (0x02)
 #define ZCL_CLEAR_WEEKLY_SCHEDULE_COMMAND_ID (0x03)
 #define ZCL_GET_RELAY_STATUS_LOG_COMMAND_ID (0x04)
+
+
+
 
 // Commands for cluster: Color Control
 #define ZCL_MOVE_TO_HUE_COMMAND_ID (0x00)
@@ -336,6 +351,44 @@
 #define ZCL_STOP_MOVE_STEP_COMMAND_ID (0x47)
 #define ZCL_MOVE_COLOR_TEMPERATURE_COMMAND_ID (0x4B)
 #define ZCL_STEP_COLOR_TEMPERATURE_COMMAND_ID (0x4C)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Commands for cluster: IAS Zone
 #define ZCL_ZONE_ENROLL_RESPONSE_COMMAND_ID (0x00)
@@ -370,6 +423,7 @@
 // Commands for cluster: IAS WD
 #define ZCL_START_WARNING_COMMAND_ID (0x00)
 #define ZCL_SQUAWK_COMMAND_ID (0x01)
+
 
 // Commands for cluster: TV Channel
 #define ZCL_CHANGE_CHANNEL_COMMAND_ID (0x00)
@@ -458,6 +512,8 @@
 #define ZCL_GET_MESSAGE_CANCELLATION_COMMAND_ID (0x02)
 #define ZCL_CANCEL_ALL_MESSAGES_COMMAND_ID (0x03)
 
+
+
 // Commands for cluster: Appliance Events and Alert
 #define ZCL_GET_ALERTS_COMMAND_ID (0x00)
 #define ZCL_GET_ALERTS_RESPONSE_COMMAND_ID (0x00)
@@ -481,6 +537,7 @@
 // Commands for cluster: Binding
 #define ZCL_BIND_COMMAND_ID (0x00)
 #define ZCL_UNBIND_COMMAND_ID (0x01)
+
 
 // Commands for cluster: Sample Mfg Specific Cluster
 #define ZCL_COMMAND_ONE_COMMAND_ID (0x00)

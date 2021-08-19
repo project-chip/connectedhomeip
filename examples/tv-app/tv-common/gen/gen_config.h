@@ -26,6 +26,7 @@
 /**** Network Section ****/
 #define EMBER_SUPPORTED_NETWORKS (1)
 
+
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
