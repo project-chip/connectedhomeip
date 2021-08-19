@@ -87,7 +87,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(EndpointI
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    status = delegate->HandleApplyUpdateRequest(updateToken, newVersion);
+    status = delegate->HandleApplyUpdateRequest(commandObj, updateToken, newVersion);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
@@ -182,8 +182,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(EndpointId endpoi
 
     ByteSpan locationSpan(location, locationLen);
 
-    status = delegate->HandleQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
-                                        locationSpan, clientCanConsent, metadataForProvider);
+    status = delegate->HandleQueryImage(commandObj, vendorId, productId, imageType, hardwareVersion, currentVersion,
+                                        protocolsSupported, locationSpan, clientCanConsent, metadataForProvider);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);

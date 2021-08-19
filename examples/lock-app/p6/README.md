@@ -54,7 +54,7 @@ will then join the network.
 
     Or Using P6 build script
 
-          $ ./scripts/examples/gn_p6_example.sh examples/lock-app/p6
+          $ ./scripts/examples/gn_p6_example.sh examples/lock-app/p6 out/lock_app_p6
 
 -   To delete generated executable, libraries and object files use:
 

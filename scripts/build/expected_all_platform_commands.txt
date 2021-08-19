@@ -94,6 +94,9 @@ gn gen --check --fail-on-unused-args {out}/android-x64-chip_tool '--args=target_
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
+# Generating infineon-p6board-lock
+gn gen --check --fail-on-unused-args --root=/TEST/BUILD/ROOT/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' /OUTPUT/DIR/infineon-p6board-lock
+
 # Building {real_platform}-native-all_clusters
 ninja -C {out}/{real_platform}-native-all_clusters
 
@@ -192,5 +195,8 @@ cp {out}/android-x64-chip_tool/lib/jni/x86_64/libc++_shared.so {root}/src/androi
 
 # Building APP android-x64-chip_tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PchipSdkJarDir={out}/android-x64-chip_tool/lib -PbuildDir={out}/android-x64-chip_tool build
+
+# Building infineon-p6board-lock
+ninja -C /OUTPUT/DIR/infineon-p6board-lock
 
 

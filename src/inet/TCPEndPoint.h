@@ -91,6 +91,8 @@ public:
         kState_Closed          = 8                   /**< Endpoint closed, ready for release. */
     } State;
 
+    TCPEndPoint() = default;
+
     /**
      * @brief   Bind the endpoint to an interface IP address.
      *
@@ -637,9 +639,7 @@ private:
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-    TCPEndPoint();                    // not defined
     TCPEndPoint(const TCPEndPoint &); // not defined
-    ~TCPEndPoint();                   // not defined
 
     void Init(InetLayer * inetLayer);
     CHIP_ERROR DriveSending();

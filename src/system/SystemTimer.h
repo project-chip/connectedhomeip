@@ -182,6 +182,8 @@ public:
         MutexedList & operator=(const MutexedList &) = delete;
     };
 
+    Timer() = default;
+
     /**
      * Obtain a new timer from the system object pool.
      */

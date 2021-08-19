@@ -487,6 +487,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     testTCPEP1->Shutdown();
 }
 
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 // Test the InetLayer resource limitation
 static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
@@ -495,7 +496,7 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 #endif //
     UDPEndPoint * testUDPEP = nullptr;
     TCPEndPoint * testTCPEP = nullptr;
-    CHIP_ERROR err;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
     for (int i = 0; i < INET_CONFIG_NUM_RAW_ENDPOINTS + 1; i++)
@@ -528,6 +529,7 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     ShutdownNetwork();
     ShutdownSystemLayer();
 }
+#endif
 
 // Test Suite
 
@@ -542,7 +544,9 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
                                  NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
                                  NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
                                  NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointInternal),
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
                                  NL_TEST_DEF("InetEndPoint::TestEndPointLimit", TestInetEndPointLimit),
+#endif
                                  NL_TEST_SENTINEL() };
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
