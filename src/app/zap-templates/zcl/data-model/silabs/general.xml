@@ -249,48 +249,6 @@ limitations under the License.
     <attribute side="server" code="0x0014" define="HIGH_TEMP_DWELL_TRIP_POINT" type="INT24U" min="0x000000" max="0xFFFFFF" writable="true" optional="true">high temp dwell trip point</attribute>
   </cluster>
   <cluster>
-    <name>Identify</name>
-    <domain>General</domain>
-    <description>Attributes and commands for putting a device into Identification mode (e.g. flashing a light).</description>
-    <code>0x0003</code>
-    <define>IDENTIFY_CLUSTER</define>
-    <client tick="false" init="false">true</client>
-    <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
-    <attribute side="server" code="0x0000" define="IDENTIFY_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="false">identify time</attribute>
-    <attribute side="server" code="0x0001" define="COMMISSION_STATE" type="BITMAP8" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">commission state</attribute>
-    <command source="client" code="0x00" name="Identify" optional="false" cli="zcl identify id">
-      <description>
-        Command description for Identify
-      </description>
-      <arg name="identifyTime" type="INT16U"/>
-    </command>
-    <command source="client" code="0x01" name="IdentifyQuery" optional="false" cli="zcl identify query">
-      <description>
-        Command description for IdentifyQuery
-      </description>
-    </command>
-    <command source="client" code="0x02" name="EZModeInvoke" optional="true" cli="zcl identify ez-mode">
-      <description>
-	   Invoke EZMode on an Identify Server
-      </description>
-      <arg name="action" type="BITMAP8"/>
-    </command>
-    <command source="client" code="0x03" name="UpdateCommissionState" optional="true">
-      <description>
-          Update Commission State on the server device.
-      </description>
-      <arg name="action" type="ENUM8"/>
-      <arg name="commissionStateMask" type="BITMAP8"/>
-    </command>
-    <command source="server" code="0x00" name="IdentifyQueryResponse" optional="false" disableDefaultResponse="true">
-      <description>
-        Command description for IdentifyQueryResponse
-      </description>
-      <arg name="timeout" type="INT16U"/>
-    </command>
-  </cluster>
-  <cluster>
     <name>Groups</name>
     <domain>General</domain>
     <description>Attributes and commands for group configuration and manipulation.</description>
