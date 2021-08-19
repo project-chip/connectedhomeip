@@ -25,6 +25,7 @@
         "general-diagnostics-cluster.xml",
         "global-attributes.xml",
         "group-key-mgmt-cluster.xml",
+        "identify-cluster.xml",
         "keypad-input-cluster.xml",
         "low-power-cluster.xml",
         "media-input-cluster.xml",
