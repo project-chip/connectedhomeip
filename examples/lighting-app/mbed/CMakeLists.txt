@@ -6,7 +6,10 @@ cmake_minimum_required(VERSION 3.19.0)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 get_filename_component(MBED_COMMON ${CHIP_ROOT}/examples/platform/mbed REALPATH)
-get_filename_component(LIGHTING_GEN ${CHIP_ROOT}/zzz_generated/lighting-app/zap-generated/ REALPATH)
+get_filename_component(LIGHTING_GEN_DIR ${CHIP_ROOT}/zzz_generated/lighting-app/ REALPATH)
+set(LIGHTING_GEN_SRC ${LIGHTING_GEN_DIR}/zap-generated/)
+
+get_filename_component(DATA_MODEL_GEN_DIR ${CHIP_ROOT}/src/controller/data_model/ REALPATH)
 
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.in
@@ -34,6 +37,8 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}/main/include/
                            ${APP_ROOT}/lighting-common
                            ${MBED_COMMON}/util/include
+                           ${LIGHTING_GEN_DIR}
+                           ${DATA_MODEL_GEN_DIR}
                            ${CHIP_ROOT}/src/app
                            ${CHIP_ROOT}/third_party/nlio/repo/include
 )
@@ -43,9 +48,9 @@ target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/LightingManager.cpp               
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
-               ${LIGHTING_GEN}/attribute-size.cpp               
-               ${LIGHTING_GEN}/callback-stub.cpp
-               ${LIGHTING_GEN}/IMClusterCommandHandler.cpp
+               ${LIGHTING_GEN_SRC}/attribute-size.cpp               
+               ${LIGHTING_GEN_SRC}/callback-stub.cpp
+               ${LIGHTING_GEN_SRC}/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${CHIP_ROOT}/src/app/common/gen/attributes/Accessors.cpp
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
