@@ -153,6 +153,9 @@ CHIP_ERROR FabricInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     SuccessOrExit(err = SetRootCert(ByteSpan(info->mRootCert, rootCertLen)));
 
     {
+        // The compressed fabric ID doesn't change for a fabric over time.
+        // Computing it here will save computational overhead when it's accessed by other
+        // parts of the code.
         MutableByteSpan compressedId(reinterpret_cast<uint8_t *>(&mCompressedFabricId), sizeof(mCompressedFabricId));
         SuccessOrExit(err = GenerateCompressedFabricId(mRootPubkey, mOperationalId.GetFabricId(), compressedId));
     }

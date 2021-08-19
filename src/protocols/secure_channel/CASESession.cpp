@@ -623,7 +623,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(System::PacketBufferHandle & msg)
 
     uint8_t responderRandom[kSigmaParamRandomNumberSize];
     // Responder opCert must fit up to 2x TLV certificates in an array
-    uint8_t responderOpCert[EstimateTLVStructOverhead((kMaxCHIPOpCertArrayLength), 2)];
+    uint8_t responderOpCert[EstimateTLVStructOverhead(kMaxCHIPOpCertArrayLength, 2)];
     size_t responderOpCertLen;
 
     uint16_t responderSessionId = 0;
@@ -914,7 +914,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(System::PacketBufferHandle & msg)
     P256PublicKey remoteCredential;
 
     // Initiator opCert must fit up to 2x TLV certificates in an array
-    uint8_t initiatorOpCert[EstimateTLVStructOverhead((kMaxCHIPOpCertArrayLength), 2)];
+    uint8_t initiatorOpCert[EstimateTLVStructOverhead(kMaxCHIPOpCertArrayLength, 2)];
     size_t initiatorOpCertLen;
 
     uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
