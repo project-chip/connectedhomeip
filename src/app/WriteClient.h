@@ -88,11 +88,13 @@ private:
     /**
      *  Once SendWriteRequest returns successfully, the WriteClient will
      *  handle calling Shutdown on itself once it decides it's done with waiting
-     *  for a response (i.e. times out or gets a response).
+     *  for a response (i.e. times out or gets a response). Client can specify
+     *  the maximum time to wait for response (in milliseconds) via timeout parameter.
+     *  Default timeout value will be used otherwise.
      *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
-    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession);
+    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession, uint32_t timeout);
 
     /**
      *  Initialize the client object. Within the lifetime
@@ -173,7 +175,7 @@ public:
      *  Finalize the message and send it to the desired node. The underlying write object will always be released, and the user
      * should not use this object after calling this function.
      */
-    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession);
+    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession, uint32_t timeout = 0);
 
     /**
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put

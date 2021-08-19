@@ -34,7 +34,8 @@ using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
 namespace chip {
 namespace app {
 
-CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * secureSession)
+CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * secureSession,
+                                             uint32_t timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle commandPacket;
@@ -58,7 +59,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabric
         mpExchangeCtx = mpExchangeMgr->NewContext(*secureSession, this);
     }
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
+    mpExchangeCtx->SetResponseTimeout(timeout > 0 ? timeout : kImMessageTimeoutMsec);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(commandPacket),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
@@ -108,7 +109,7 @@ exit:
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: %d",
+    ChipLogProgress(DataManagement, "CommandSender:Time out! failed to receive invoke command response from Exchange: %d",
                     apExchangeContext->GetExchangeId());
 
     if (mpDelegate != nullptr)

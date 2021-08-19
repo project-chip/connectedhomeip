@@ -69,13 +69,16 @@ public:
      *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReportError
      *  call happens with guarantee.
      *
+     *  Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
+     *  Default timeout value will be used otherwise.
+     *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * aSecureSession,
                                EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
                                AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
-                               EventNumber aEventNumber);
+                               EventNumber aEventNumber, uint32_t timeout = 0);
 
     uint64_t GetAppIdentifier() const { return mAppIdentifier; }
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }

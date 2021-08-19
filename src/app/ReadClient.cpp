@@ -89,7 +89,7 @@ void ReadClient::MoveToState(const ClientState aTargetState)
 CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,
                                        EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
                                        AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
-                                       EventNumber aEventNumber)
+                                       EventNumber aEventNumber, uint32_t timeout)
 {
     // TODO: SendRequest parameter is too long, need to have the structure to represent it
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -143,7 +143,7 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex,
         mpExchangeCtx = mpExchangeMgr->NewContext(SessionHandle(aNodeId, 0, 0, aFabricIndex), this);
     }
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
+    mpExchangeCtx->SetResponseTimeout(timeout > 0 ? timeout : kImMessageTimeoutMsec);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
@@ -348,7 +348,7 @@ exit:
 
 void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: %d",
+    ChipLogProgress(DataManagement, "ReadClient:Time out! failed to receive report data from Exchange: %d",
                     apExchangeContext->GetExchangeId());
     if (nullptr != mpDelegate)
     {
