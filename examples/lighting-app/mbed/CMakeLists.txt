@@ -43,9 +43,9 @@ target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/LightingManager.cpp               
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
-               ${LIGHTING_GEN}/gen/attribute-size.cpp               
-               ${LIGHTING_GEN}/gen/callback-stub.cpp
-               ${LIGHTING_GEN}/gen/IMClusterCommandHandler.cpp
+               ${LIGHTING_GEN}/attribute-size.cpp               
+               ${LIGHTING_GEN}/callback-stub.cpp
+               ${LIGHTING_GEN}/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${CHIP_ROOT}/src/app/common/gen/attributes/Accessors.cpp
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
