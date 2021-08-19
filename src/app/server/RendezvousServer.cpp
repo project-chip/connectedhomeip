@@ -55,6 +55,8 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
             ChipLogError(Discovery, "Commissioning errored out with error %" CHIP_ERROR_FORMAT,
                          event->CommissioningComplete.status.Format());
         }
+        // reset all advertising
+        app::Mdns::StartServer(app::Mdns::CommissioningMode::kDisabled);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkEnabled)
     {
@@ -91,6 +93,12 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
         ReturnErrorOnFailure(GetAdvertisementDelegate()->StartAdvertisement());
     }
 
+    // reset all advertising, indicating we are in commissioningMode
+    // and we were put into this state via a command for additional commissioning
+    // NOTE: when device has never been commissioned, Rendezvous will ensure AP is false
+    app::Mdns::StartServer(params.HasPASEVerifier() ? app::Mdns::CommissioningMode::kEnabledBasic
+                                                    : app::Mdns::CommissioningMode::kEnabledEnhanced);
+
     mSessionMgr      = sessionMgr;
     mExchangeManager = exchangeManager;
 
@@ -124,6 +132,9 @@ void RendezvousServer::Cleanup()
     {
         GetAdvertisementDelegate()->StopAdvertisement();
     }
+
+    // reset all advertising
+    app::Mdns::StartServer(app::Mdns::CommissioningMode::kDisabled);
 }
 
 void RendezvousServer::OnSessionEstablishmentError(CHIP_ERROR err)
