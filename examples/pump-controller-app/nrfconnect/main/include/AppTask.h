@@ -69,8 +69,8 @@ private:
         kFunction_Invalid
     };
 
-    Function_t mFunction;
-    bool mFunctionTimerActive;
+    Function_t mFunction      = kFunction_NoneSelected;
+    bool mFunctionTimerActive = false;
     static AppTask sAppTask;
 };
 
