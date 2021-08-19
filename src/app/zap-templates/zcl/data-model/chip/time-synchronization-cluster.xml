@@ -65,16 +65,16 @@ limitations under the License.
     <define>TIMESYNC_CLUSTER</define>
     <description>This cluster is used for time synchronization.</description>
 
-    <attribute side="server" code="0x0001" define="UTC_TIME" type="INT64U" writable="false" default="" optional="false">UTCTime</attribute>
-    <attribute side="server" code="0x0002" define="GRANULARITY" type="ENUM8" writable="false" default="0x0" optional="false">Granularity</attribute>
-    <attribute side="server" code="0x0003" define="TIME_SOURCE" type="ENUM8" writable="false" default="0x0" optional="true">TimeSource</attribute>
-    <attribute side="server" code="0x0004" define="TRUSTED_TIME_NODE_ID" type="NODE_ID" writable="true" default="" optional="false">TrustedTimeNodeId</attribute>
-    <attribute side="server" code="0x0005" define="DEFAULT_NTP" type="CHAR_STRING" writable="true" default="" length="128" optional="true">DefaultNtp</attribute>
-    <attribute side="server" code="0x0006" define="TIME_ZONE" type="ARRAY" entryType="TimeZoneType" writable="true" default="" length="64" optional="true">TimeZone</attribute>
-    <attribute side="server" code="0x0007" define="DST_OFFSET" type="ARRAY" entryType="DstOffsetType" writable="true" default="" length="480" optional="true">DstOffset</attribute>
-    <attribute side="server" code="0x0008" define="LOCAL_TIME" type="INT64U" writable="false" default="0" optional="true">LocalTime</attribute>
-    <attribute side="server" code="0x0009" define="TIME_ZONE_DATABASE" type="boolean" writable="false" default="false" optional="true">TimeZoneDatabase</attribute>
-    <attribute side="server" code="0x000a" define="NTP_SERVER_PORT" type="INT16S" writable="true" default="" optional="false">NtpServerPort</attribute>
+    <attribute side="server" code="0x0001" define="TIME_SYNC_UTC_TIME" type="INT64U" writable="false" default="" optional="false">UTCTime</attribute>
+    <attribute side="server" code="0x0002" define="TIME_SYNC_GRANULARITY" type="ENUM8" writable="false" default="0x0" optional="false">Granularity</attribute>
+    <attribute side="server" code="0x0003" define="TIME_SYNC_TIME_SOURCE" type="ENUM8" writable="false" default="0x0" optional="true">TimeSource</attribute>
+    <attribute side="server" code="0x0004" define="TIME_SYNC_TRUSTED_TIME_NODE_ID" type="NODE_ID" writable="true" default="" optional="false">TrustedTimeNodeId</attribute>
+    <attribute side="server" code="0x0005" define="TIME_SYNC_DEFAULT_NTP" type="CHAR_STRING" writable="true" default="" length="128" optional="true">DefaultNtp</attribute>
+    <attribute side="server" code="0x0006" define="TIME_SYNC_TIME_ZONE" type="ARRAY" entryType="TimeZoneType" writable="true" default="" length="64" optional="true">TimeZone</attribute>
+    <attribute side="server" code="0x0007" define="TIME_SYNC_DST_OFFSET" type="ARRAY" entryType="DstOffsetType" writable="true" default="" length="480" optional="true">DstOffset</attribute>
+    <attribute side="server" code="0x0008" define="TIME_SYNC_LOCAL_TIME" type="INT64U" writable="false" default="0" optional="true">LocalTime</attribute>
+    <attribute side="server" code="0x0009" define="TIME_SYNC_TIME_ZONE_DATABASE" type="boolean" writable="false" default="false" optional="true">TimeZoneDatabase</attribute>
+    <attribute side="server" code="0x000a" define="TIME_SYNC_NTP_SERVER_PORT" type="INT16S" writable="true" default="" optional="false">NtpServerPort</attribute>
 	    
     <command source="server" code="0x00" name="SetUtcTime" optional="false">
       <description>Requests UTCTime update.</description>
