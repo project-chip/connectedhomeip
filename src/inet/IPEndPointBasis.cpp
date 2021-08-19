@@ -661,8 +661,8 @@ done:
 CHIP_ERROR IPEndPointBasis::PostPacketBufferEvent(chip::System::Layer & aLayer, System::Object & aTarget,
                                                   System::EventType aEventType, System::PacketBufferHandle && aBuffer)
 {
-    const CHIP_ERROR error = aLayer.PostEvent(
-        aTarget, aEventType, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(aBuffer));
+    const CHIP_ERROR error =
+        aLayer.PostEvent(aTarget, aEventType, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(aBuffer));
     if (error == CHIP_NO_ERROR)
     {
         // If PostEvent() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
