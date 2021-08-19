@@ -30,10 +30,10 @@
 #include <app/common/gen/ids/Attributes.h>
 #include <app/util/basic-types.h>
 
-#include <gen/CHIPClientCallbacks.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/CodeUtils.h>
 #include <app/InteractionModelEngine.h>
+#include <gen/CHIPClientCallbacks.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 
 #define COMMAND_HEADER(name, clusterId)                                                                                            \
     const char * kName = name;                                                                                                     \
@@ -59,20 +59,20 @@
 
 namespace chip {
 namespace {
-  // TODO: Find a way to calculate maximum message length for clusters
-  //       https://github.com/project-chip/connectedhomeip/issues/965
-  constexpr uint16_t kMaxBufferSize = 1024;
+// TODO: Find a way to calculate maximum message length for clusters
+//       https://github.com/project-chip/connectedhomeip/issues/965
+constexpr uint16_t kMaxBufferSize = 1024;
 
-  // This is a global command, so the low bits are 0b00.  The command is
-  // standard, so does not need a manufacturer code, and we're sending client
-  // to server, so all the remaining bits are 0.
-  constexpr uint8_t kFrameControlGlobalCommand = 0x00;
+// This is a global command, so the low bits are 0b00.  The command is
+// standard, so does not need a manufacturer code, and we're sending client
+// to server, so all the remaining bits are 0.
+constexpr uint8_t kFrameControlGlobalCommand = 0x00;
 
-  // Pick source endpoint as 1 for now
-  constexpr EndpointId kSourceEndpoint = 1;
+// Pick source endpoint as 1 for now
+constexpr EndpointId kSourceEndpoint = 1;
 
-  const uint8_t kReportingDirectionReported = 0x00;
-}
+const uint8_t kReportingDirectionReported = 0x00;
+} // namespace
 
 using namespace app::Clusters;
 using namespace System;
@@ -84,41 +84,41 @@ namespace Controller {
 // TODO(#4503): length should be passed to commands when byte string is in argument list.
 // TODO(#4503): Commands should take group id as an argument.
 
-
 // FlowMeasurement Cluster Commands
 // FlowMeasurement Cluster Attributes
-CHIP_ERROR FlowMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR FlowMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback)
 {
     COMMAND_HEADER("DiscoverFlowMeasurementAttributes", FlowMeasurement::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-       .Put8(seqNum)
-       .Put32(Globals::Commands::Ids::DiscoverAttributes)
-       .Put32(0x0000)
-       .Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
-CHIP_ERROR FlowMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR FlowMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000000;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16sAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR FlowMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, int16_t change)
+CHIP_ERROR FlowMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                   uint16_t maxInterval, int16_t change)
 {
     COMMAND_HEADER("ReportFlowMeasurementMeasuredValue", FlowMeasurement::Id);
     buf.Put8(kFrameControlGlobalCommand)
-       .Put8(seqNum)
-       .Put32(Globals::Commands::Ids::ConfigureReporting)
-       .Put8(kReportingDirectionReported)
-       .Put32(FlowMeasurement::Attributes::Ids::MeasuredValue)
-       .Put8(41)
-       .Put16(minInterval)
-       .Put16(maxInterval);
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
+        .Put8(kReportingDirectionReported)
+        .Put32(FlowMeasurement::Attributes::Ids::MeasuredValue)
+        .Put8(41)
+        .Put16(minInterval)
+        .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -128,41 +128,47 @@ CHIP_ERROR FlowMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancel
     return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
-CHIP_ERROR FlowMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR FlowMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000001;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16sAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR FlowMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR FlowMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000002;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16sAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR FlowMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR FlowMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x0000FFFD;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16uAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-
 // LevelControl Cluster Commands
-CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
+CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
@@ -206,9 +212,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
@@ -252,9 +259,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t level, uint16_t transitionTime)
+CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint8_t level,
+                                                     uint16_t transitionTime)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
@@ -294,9 +303,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode, uint8_t rate)
+CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint8_t moveMode, uint8_t rate)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
@@ -336,9 +346,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR LevelControlCluster::Step(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+CHIP_ERROR LevelControlCluster::Step(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask,
+                                     uint8_t optionOverride)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
@@ -384,9 +396,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime)
+CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
@@ -428,9 +441,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR LevelControlCluster::Stop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t optionMask, uint8_t optionOverride)
+CHIP_ERROR LevelControlCluster::Stop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint8_t optionMask, uint8_t optionOverride)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
@@ -472,7 +486,7 @@ exit:
 
 CHIP_ERROR LevelControlCluster::StopWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
@@ -509,38 +523,39 @@ exit:
 }
 
 // LevelControl Cluster Attributes
-CHIP_ERROR LevelControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR LevelControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback)
 {
     COMMAND_HEADER("DiscoverLevelControlAttributes", LevelControl::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-       .Put8(seqNum)
-       .Put32(Globals::Commands::Ids::DiscoverAttributes)
-       .Put32(0x0000)
-       .Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
-CHIP_ERROR LevelControlCluster::ReadAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR LevelControlCluster::ReadAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000000;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int8uAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-CHIP_ERROR LevelControlCluster::ConfigureAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, uint8_t change)
+CHIP_ERROR LevelControlCluster::ConfigureAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                               uint16_t maxInterval, uint8_t change)
 {
     COMMAND_HEADER("ReportLevelControlCurrentLevel", LevelControl::Id);
     buf.Put8(kFrameControlGlobalCommand)
-       .Put8(seqNum)
-       .Put32(Globals::Commands::Ids::ConfigureReporting)
-       .Put8(kReportingDirectionReported)
-       .Put32(LevelControl::Attributes::Ids::CurrentLevel)
-       .Put8(32)
-       .Put16(minInterval)
-       .Put16(maxInterval);
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
+        .Put8(kReportingDirectionReported)
+        .Put32(LevelControl::Attributes::Ids::CurrentLevel)
+        .Put8(32)
+        .Put16(minInterval)
+        .Put16(maxInterval);
     buf.Put8(static_cast<uint8_t>(change));
     COMMAND_FOOTER();
 }
@@ -550,21 +565,22 @@ CHIP_ERROR LevelControlCluster::ReportAttributeCurrentLevel(Callback::Cancelable
     return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
-CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x0000FFFD;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16uAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
 
 // OnOff Cluster Commands
 CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
@@ -602,7 +618,7 @@ exit:
 
 CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
@@ -640,7 +656,7 @@ exit:
 
 CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     app::CommandSender * sender = nullptr;
     TLV::TLVWriter * writer     = nullptr;
     uint8_t argSeqNumber        = 0;
@@ -680,11 +696,7 @@ exit:
 CHIP_ERROR OnOffCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     COMMAND_HEADER("DiscoverOnOffAttributes", OnOff::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-       .Put8(seqNum)
-       .Put32(Globals::Commands::Ids::DiscoverAttributes)
-       .Put32(0x0000)
-       .Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
@@ -695,54 +707,57 @@ CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCall
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000000;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<BooleanAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<BooleanAttributeCallback>);
 }
 
-CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x0000FFFD;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16uAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
 
 // PressureMeasurement Cluster Commands
 // PressureMeasurement Cluster Attributes
-CHIP_ERROR PressureMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PressureMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback)
 {
     COMMAND_HEADER("DiscoverPressureMeasurementAttributes", PressureMeasurement::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-       .Put8(seqNum)
-       .Put32(Globals::Commands::Ids::DiscoverAttributes)
-       .Put32(0x0000)
-       .Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
-CHIP_ERROR PressureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PressureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000000;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16sAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR PressureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, int16_t change)
+CHIP_ERROR PressureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                       Callback::Cancelable * onFailureCallback,
+                                                                       uint16_t minInterval, uint16_t maxInterval, int16_t change)
 {
     COMMAND_HEADER("ReportPressureMeasurementMeasuredValue", PressureMeasurement::Id);
     buf.Put8(kFrameControlGlobalCommand)
-       .Put8(seqNum)
-       .Put32(Globals::Commands::Ids::ConfigureReporting)
-       .Put8(kReportingDirectionReported)
-       .Put32(PressureMeasurement::Attributes::Ids::MeasuredValue)
-       .Put8(41)
-       .Put16(minInterval)
-       .Put16(maxInterval);
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
+        .Put8(kReportingDirectionReported)
+        .Put32(PressureMeasurement::Attributes::Ids::MeasuredValue)
+        .Put8(41)
+        .Put16(minInterval)
+        .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -752,121 +767,138 @@ CHIP_ERROR PressureMeasurementCluster::ReportAttributeMeasuredValue(Callback::Ca
     return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
-CHIP_ERROR PressureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PressureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000001;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16sAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR PressureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PressureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000002;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16sAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR PressureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PressureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x0000FFFD;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16uAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
 
 // PumpConfigurationAndControl Cluster Commands
 // PumpConfigurationAndControl Cluster Attributes
-CHIP_ERROR PumpConfigurationAndControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback)
 {
     COMMAND_HEADER("DiscoverPumpConfigurationAndControlAttributes", PumpConfigurationAndControl::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-       .Put8(seqNum)
-       .Put32(Globals::Commands::Ids::DiscoverAttributes)
-       .Put32(0x0000)
-       .Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxPressure(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxPressure(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000000;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16sAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxSpeed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxSpeed(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000001;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16uAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxFlow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxFlow(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000002;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16uAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeEffectiveOperationMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeEffectiveOperationMode(Callback::Cancelable * onSuccessCallback,
+                                                                                   Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000011;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int8uAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeEffectiveControlMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeEffectiveControlMode(Callback::Cancelable * onSuccessCallback,
+                                                                                 Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000012;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int8uAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeCapacity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeCapacity(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000013;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16sAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ConfigureAttributeCapacity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, int16_t change)
+CHIP_ERROR PumpConfigurationAndControlCluster::ConfigureAttributeCapacity(Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback,
+                                                                          uint16_t minInterval, uint16_t maxInterval,
+                                                                          int16_t change)
 {
     COMMAND_HEADER("ReportPumpConfigurationAndControlCapacity", PumpConfigurationAndControl::Id);
     buf.Put8(kFrameControlGlobalCommand)
-       .Put8(seqNum)
-       .Put32(Globals::Commands::Ids::ConfigureReporting)
-       .Put8(kReportingDirectionReported)
-       .Put32(PumpConfigurationAndControl::Attributes::Ids::Capacity)
-       .Put8(41)
-       .Put16(minInterval)
-       .Put16(maxInterval);
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
+        .Put8(kReportingDirectionReported)
+        .Put32(PumpConfigurationAndControl::Attributes::Ids::Capacity)
+        .Put8(41)
+        .Put16(minInterval)
+        .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -876,24 +908,27 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeCapacity(Callback:
     return RequestAttributeReporting(0x0013, onReportCallback);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeOperationMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000020;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int8uAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
+CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
+                                                                           Callback::Cancelable * onFailureCallback, uint8_t value)
 {
     app::WriteClientHandle handle;
     chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId         = mDevice->GetDeviceId();
-    attributePath.mEndpointId     = mEndpoint;
-    attributePath.mClusterId      = mClusterId;
-    attributePath.mFieldId        = 0x00000020;
+    attributePath.mNodeId     = mDevice->GetDeviceId();
+    attributePath.mEndpointId = mEndpoint;
+    attributePath.mClusterId  = mClusterId;
+    attributePath.mFieldId    = 0x00000020;
     attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
@@ -902,51 +937,54 @@ CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callb
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                            Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x0000FFFD;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16uAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
 
 // TemperatureMeasurement Cluster Commands
 // TemperatureMeasurement Cluster Attributes
-CHIP_ERROR TemperatureMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback)
 {
     COMMAND_HEADER("DiscoverTemperatureMeasurementAttributes", TemperatureMeasurement::Id);
-    buf.Put8(kFrameControlGlobalCommand)
-       .Put8(seqNum)
-       .Put32(Globals::Commands::Ids::DiscoverAttributes)
-       .Put32(0x0000)
-       .Put8(0xFF);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put32(Globals::Commands::Ids::DiscoverAttributes).Put32(0x0000).Put8(0xFF);
     COMMAND_FOOTER();
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000000;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16sAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, int16_t change)
+CHIP_ERROR TemperatureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback,
+                                                                          uint16_t minInterval, uint16_t maxInterval,
+                                                                          int16_t change)
 {
     COMMAND_HEADER("ReportTemperatureMeasurementMeasuredValue", TemperatureMeasurement::Id);
     buf.Put8(kFrameControlGlobalCommand)
-       .Put8(seqNum)
-       .Put32(Globals::Commands::Ids::ConfigureReporting)
-       .Put8(kReportingDirectionReported)
-       .Put32(TemperatureMeasurement::Attributes::Ids::MeasuredValue)
-       .Put8(41)
-       .Put16(minInterval)
-       .Put16(maxInterval);
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
+        .Put8(kReportingDirectionReported)
+        .Put32(TemperatureMeasurement::Attributes::Ids::MeasuredValue)
+        .Put8(41)
+        .Put16(minInterval)
+        .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
     COMMAND_FOOTER();
 }
@@ -956,36 +994,41 @@ CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMeasuredValue(Callback:
     return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000001;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16sAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x00000002;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16sAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                       Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId = mEndpoint;
     attributePath.mClusterId  = mClusterId;
     attributePath.mFieldId    = 0x0000FFFD;
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,BasicAttributeFilter<Int16uAttributeCallback>);
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
-
 
 } // namespace Controller
 } // namespace chip
