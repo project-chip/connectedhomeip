@@ -65,7 +65,6 @@ android_library("java") {
   ]
 
   sources = [
-    "zap-generated/ChipClusters.java",
     "src/chip/devicecontroller/AndroidChipStack.java",
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
@@ -76,6 +75,7 @@ android_library("java") {
     "src/chip/devicecontroller/NsdManagerServiceResolver.java",
     "src/chip/devicecontroller/PreferencesKeyValueStoreManager.java",
     "src/chip/devicecontroller/ServiceResolver.java",
+    "zap-generated/ChipClusters.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
