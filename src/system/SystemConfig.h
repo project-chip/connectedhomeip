@@ -214,6 +214,15 @@
 #define CHIP_SYSTEM_CONFIG_MBED_LOCKING 0
 #endif /* CHIP_SYSTEM_CONFIG_MBED_LOCKING */
 
+/**
+ *  @def CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+ *
+ *  @brief
+ *      Allocate Pool from Heap for large systems (e.g. Linux).
+ */
+#ifndef CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+#define CHIP_SYSTEM_CONFIG_POOL_USE_HEAP 0
+#endif /* CHIP_SYSTEM_CONFIG_POOL_USE_HEAP */
 
 /**
  *  @def CHIP_SYSTEM_CONFIG_NO_LOCKING
