@@ -264,9 +264,10 @@ void ChannelContext::EnterCasePairingState()
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;
     addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(prepare.mAddress);
-    CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(
-        addr, &prepare.mBuilder.GetOperationalCredentialSet(), prepare.mBuilder.GetOperationalCredentialSetIndex(),
-        prepare.mBuilder.GetPeerNodeId(), mExchangeManager->GetNextKeyId(), ctxt, this);
+    Transport::FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    VerifyOrReturn(fabric != nullptr);
+    CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(addr, fabric, prepare.mBuilder.GetPeerNodeId(),
+                                                                   mExchangeManager->GetNextKeyId(), ctxt, this);
     if (err != CHIP_NO_ERROR)
     {
         ExitCasePairingState();

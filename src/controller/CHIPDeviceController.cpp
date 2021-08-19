@@ -237,7 +237,6 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
 
     Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId, mCredentialsIndex));
 
     mLocalDeviceId = fabric->GetNodeId();
     mVendorId      = fabric->GetVendorId();
@@ -725,14 +724,13 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
     return ControllerDeviceInitParams{
-        .transportMgr     = mTransportMgr,
-        .sessionMgr       = mSessionMgr,
-        .exchangeMgr      = mExchangeMgr,
-        .inetLayer        = mInetLayer,
-        .storageDelegate  = mStorageDelegate,
-        .credentials      = &mCredentials,
-        .credentialsIndex = mCredentialsIndex,
-        .idAllocator      = &mIDAllocator,
+        .transportMgr    = mTransportMgr,
+        .sessionMgr      = mSessionMgr,
+        .exchangeMgr     = mExchangeMgr,
+        .inetLayer       = mInetLayer,
+        .storageDelegate = mStorageDelegate,
+        .idAllocator     = &mIDAllocator,
+        .fabricsTable    = &mFabrics,
     };
 }
 
