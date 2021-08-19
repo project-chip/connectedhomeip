@@ -43,7 +43,7 @@ shared_library("jni") {
     "MdnsImpl.cpp",
     "MdnsImpl.h",
     "StackLock.h",
-    "gen/CHIPClusters-JNI.cpp",
+    "zap-generated/CHIPClusters-JNI.cpp",
   ]
 
   deps = [
@@ -65,7 +65,7 @@ android_library("java") {
   ]
 
   sources = [
-    "gen/ChipClusters.java",
+    "zap-generated/ChipClusters.java",
     "src/chip/devicecontroller/AndroidChipStack.java",
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
