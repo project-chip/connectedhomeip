@@ -26,7 +26,7 @@ concurrency:
 jobs:
     mbedos:
         name: Mbed OS examples building
-        timeout-minutes: 60
+        timeout-minutes: 70
 
         env:
             BUILD_TYPE: mbedos
@@ -97,6 +97,15 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     mbed $APP_TARGET+$APP_PROFILE all-clusters-app \
                     examples/all-clusters-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-all-clusters-app-example.elf \
+                    /tmp/bloat_reports/
+
+            - name: Build shell example
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/mbed_example.sh -a=shell -b=$APP_TARGET -p=$APP_PROFILE
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    mbed $APP_TARGET+$APP_PROFILE shell \
+                    examples/shell/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-shell-example.elf \
                     /tmp/bloat_reports/
             
             - name: Build unit tests

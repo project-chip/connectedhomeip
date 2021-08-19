@@ -720,7 +720,6 @@ CHIP_ERROR cmd_server_on(int argc, char ** argv)
     secure_channel::MessageCounterManager gMessageCounterManager;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
     FabricTable fabrics;
-    FabricInfo * fabricInfo              = nullptr;
     const chip::FabricIndex gFabricIndex = 0;
 
     streamer_t * sout = streamer_get();
@@ -751,9 +750,6 @@ CHIP_ERROR cmd_server_on(int argc, char ** argv)
     {
         gChipServer.port = atoi(argv[1]);
     }
-
-    fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, chip::kTestDeviceNodeId);
-    VerifyOrExit(fabricInfo != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     gChipServer.sessionManager = new SecureSessionMgr();
     if (gChipServer.sessionManager == nullptr)
