@@ -35,7 +35,6 @@ add_executable(${APP_TARGET})
 target_include_directories(${APP_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
                            ${CMAKE_CURRENT_SOURCE_DIR}/main/include/
-                           ${APP_ROOT}/lock-common
                            ${MBED_COMMON}/util/include
                            ${CHIP_ROOT}/src/app
                            ${CHIP_ROOT}/third_party/nlio/repo/include
