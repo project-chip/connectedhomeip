@@ -18,8 +18,8 @@
 
 #include "AppTask.h"
 #include "AppConfig.h"
-#include "PumpManager.h"
 #include "LEDWidget.h"
+#include "PumpManager.h"
 #include "ThreadUtil.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
