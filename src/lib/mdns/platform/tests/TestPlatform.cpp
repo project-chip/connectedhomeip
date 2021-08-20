@@ -91,7 +91,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLarge =
         .SetVendorId(chip::Optional<uint16_t>(555))
         .SetDeviceType(chip::Optional<uint16_t>(25))
         .SetCommissioningMode(true)
-        .SetAdditionalCommissioning(false)
+        .SetAdditionalCommissioning(true)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
         .SetPairingInstr(chip::Optional<const char *>("Pair me"))
