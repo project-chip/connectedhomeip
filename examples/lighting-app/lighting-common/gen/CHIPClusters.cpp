@@ -104,6 +104,26 @@ CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCall
                                              BasicAttributeFilter<BooleanAttributeCallback>);
 }
 
+CHIP_ERROR OnOffCluster::ConfigureAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportOnOffOnOff", OnOff::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
+        .Put8(kReportingDirectionReported)
+        .Put32(OnOff::Attributes::Ids::OnOff)
+        .Put8(16)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0000, onReportCallback);
+}
+
 CHIP_ERROR OnOffCluster::ReadAttributeGlobalSceneControl(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback)
 {
