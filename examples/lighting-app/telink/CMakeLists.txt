@@ -21,8 +21,6 @@ get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALP
 get_filename_component(LIGHTING_GEN_DIR ${CHIP_ROOT}/zzz_generated/lighting-app/ REALPATH)
 set(LIGHTING_GEN_SRC ${LIGHTING_GEN_DIR}/zap-generated/)
 
-get_filename_component(DATA_MODEL_GEN_DIR ${CHIP_ROOT}/src/controller/data_model/ REALPATH)
-
 set(CONF_FILE ${CHIP_ROOT}/config/telink/app/zephyr.conf prj.conf)
 
 # Load NCS/Zephyr build system
@@ -38,7 +36,6 @@ target_compile_options(app PRIVATE -fpermissive)
 target_include_directories(app PRIVATE
                            include
                            ${LIGHTING_GEN_DIR}
-                           ${DATA_MODEL_GEN_DIR}
                            ${NLIO_ROOT}
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)

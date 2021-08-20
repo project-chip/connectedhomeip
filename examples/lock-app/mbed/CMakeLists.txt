@@ -9,8 +9,6 @@ get_filename_component(MBED_COMMON ${CHIP_ROOT}/examples/platform/mbed REALPATH)
 get_filename_component(LOCK_GEN_DIR ${CHIP_ROOT}/zzz_generated/lock-app/ REALPATH)
 set(LOCK_GEN_SRC ${LOCK_GEN_DIR}/zap-generated/)
 
-get_filename_component(DATA_MODEL_GEN_DIR ${CHIP_ROOT}/src/controller/data_model/ REALPATH)
-
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.in
     ${CMAKE_CURRENT_BINARY_DIR}/chip_build/config
@@ -39,7 +37,6 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${CHIP_ROOT}/src/app
                            ${CHIP_ROOT}/third_party/nlio/repo/include
                            ${LOCK_GEN_DIR}
-                           ${DATA_MODEL_GEN_DIR}
 )
 
 target_sources(${APP_TARGET} PRIVATE

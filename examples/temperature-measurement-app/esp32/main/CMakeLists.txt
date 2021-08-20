@@ -21,7 +21,6 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlio/repo/include"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/temperature-measurement-app/"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/controller/data_model"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       SRC_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}"

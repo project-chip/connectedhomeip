@@ -22,8 +22,6 @@ get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighti
 get_filename_component(LIGHTING_GEN_DIR ${CHIP_ROOT}/zzz_generated/lighting-app/ REALPATH)
 set(LIGHTING_GEN_SRC ${LIGHTING_GEN_DIR}/zap-generated/)
 
-get_filename_component(DATA_MODEL_GEN_DIR ${CHIP_ROOT}/src/controller/data_model/ REALPATH)
-
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
 # Load NCS/Zephyr build system
@@ -57,7 +55,6 @@ target_include_directories(app PRIVATE
                            main/include
                            ${LIGHTING_COMMON}
                            ${LIGHTING_GEN_DIR}
-                           ${DATA_MODEL_GEN_DIR}
                            ${NLIO_ROOT}
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)

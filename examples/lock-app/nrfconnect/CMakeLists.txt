@@ -21,8 +21,6 @@ get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconne
 get_filename_component(LOCK_GEN_DIR ${CHIP_ROOT}/zzz_generated/lock-app/ REALPATH)
 set(LOCK_GEN_SRC ${LOCK_GEN_DIR}/zap-generated/)
 
-get_filename_component(DATA_MODEL_GEN_DIR ${CHIP_ROOT}/src/controller/data_model/ REALPATH)
-
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
 # Load NCS/Zephyr build system
@@ -55,7 +53,6 @@ include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 target_include_directories(app PRIVATE 
                            main/include 
                            ${LOCK_GEN_DIR} 
-                           ${DATA_MODEL_GEN_DIR} 
                            ${NLIO_ROOT}
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)

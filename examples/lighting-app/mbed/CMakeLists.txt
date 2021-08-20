@@ -9,8 +9,6 @@ get_filename_component(MBED_COMMON ${CHIP_ROOT}/examples/platform/mbed REALPATH)
 get_filename_component(LIGHTING_GEN_DIR ${CHIP_ROOT}/zzz_generated/lighting-app/ REALPATH)
 set(LIGHTING_GEN_SRC ${LIGHTING_GEN_DIR}/zap-generated/)
 
-get_filename_component(DATA_MODEL_GEN_DIR ${CHIP_ROOT}/src/controller/data_model/ REALPATH)
-
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.in
     ${CMAKE_CURRENT_BINARY_DIR}/chip_build/config
@@ -38,7 +36,6 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${APP_ROOT}/lighting-common
                            ${MBED_COMMON}/util/include
                            ${LIGHTING_GEN_DIR}
-                           ${DATA_MODEL_GEN_DIR}
                            ${CHIP_ROOT}/src/app
                            ${CHIP_ROOT}/third_party/nlio/repo/include
 )

@@ -23,6 +23,4 @@ chip_data_model("data_model") {
 
   use_default_client_callbacks = true
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
-
-  internal_controller_model = true
 }
