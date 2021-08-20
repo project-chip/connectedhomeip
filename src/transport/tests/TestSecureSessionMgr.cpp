@@ -93,9 +93,9 @@ public:
             mLocalToRemoteSession = session;
         NewConnectionHandlerCallCount++;
     }
-    void OnConnectionExpired(SessionHandle session) override { mConnectionExpired = true; }
+    void OnConnectionExpired(SessionHandle session) override { mOldConnectionDropped = true; }
 
-    bool mConnectionExpired = false;
+    bool mOldConnectionDropped = false;
 
     nlTestSuite * mSuite = nullptr;
     SessionHandle mRemoteToLocalSession;
@@ -402,12 +402,12 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
 }
 
-void ConnectionExpiryTest(nlTestSuite * inSuite, void * inContext)
+void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
+    IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     TransportMgr<LoopbackTransport> transportMgr;
@@ -431,33 +431,33 @@ void ConnectionExpiryTest(nlTestSuite * inSuite, void * inContext)
     SecurePairingUsingTestSecret pairing1(1, 1);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, !callback.mConnectionExpired);
+    NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with different peer node ID and different local key ID (same peer key ID)
     SecurePairingUsingTestSecret pairing2(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, !callback.mConnectionExpired);
+    NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with undefined node ID and different local key ID (same peer key ID)
     SecurePairingUsingTestSecret pairing3(1, 3);
     err = secureSessionMgr.NewPairing(peer, kUndefinedNodeId, &pairing3, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, !callback.mConnectionExpired);
+    NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with same local key ID, and a given node ID
     SecurePairingUsingTestSecret pairing4(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing4, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, callback.mConnectionExpired);
+    NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
 
-    callback.mConnectionExpired = false;
+    callback.mOldConnectionDropped = false;
 
     // New pairing with same local key ID, and undefined node ID
     SecurePairingUsingTestSecret pairing5(1, 1);
     err = secureSessionMgr.NewPairing(peer, kUndefinedNodeId, &pairing5, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, callback.mConnectionExpired);
+    NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
 }
 
 // Test Suite
@@ -472,7 +472,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Message Self Test",              CheckMessageTest),
     NL_TEST_DEF("Send Encrypted Packet Test",     SendEncryptedPacketTest),
     NL_TEST_DEF("Send Bad Encrypted Packet Test", SendBadEncryptedPacketTest),
-    NL_TEST_DEF("Connection expiry Test",         ConnectionExpiryTest),
+    NL_TEST_DEF("Drop stale connection Test",     StaleConnectionDropTest),
 
     NL_TEST_SENTINEL()
 };
