@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "OTAProviderExample.h"
+#include <ota-provider-common/OTAProviderExample.h>
 
 #include <app/CommandPathParams.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
