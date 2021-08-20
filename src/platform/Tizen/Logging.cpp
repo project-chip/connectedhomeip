@@ -20,8 +20,8 @@
 #include <core/CHIPConfig.h>
 #include <support/logging/Constants.h>
 
-#include <stdio.h>
 #include <dlog.h>
+#include <stdio.h>
 
 #ifdef LOG_TAG
 #undef LOG_TAG
@@ -47,7 +47,9 @@ namespace Platform {
  */
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    char msgBuf[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = { 0, };
+    char msgBuf[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = {
+        0,
+    };
     vsnprintf(msgBuf, sizeof(msgBuf), msg, v);
 
     switch (category)

@@ -58,7 +58,8 @@ class TizenBuilder(GnBuilder):
         os.environ['PKG_CONFIG_SYSROOT_DIR'] = tizen_home
         os.environ['PKG_CONFIG_LIBDIR'] = tizen_home + '/usr/lib/pkgconfig'
         os.environ['PKG_CONFIG_PATH'] = tizen_home + '/usr/lib/pkgconfig'
-        self.gn_build_args = ['target_os="tizen" target_cpu="arm" arm_arch="armv7-a" import("//build_overrides/build.gni") target_cflags=[ "--sysroot=' + tizen_home + '" ] target_ldflags=[ "--sysroot=' + tizen_home + '" ] custom_toolchain="${build_root}/toolchain/custom" target_cc="' + tizen_home + '/bin/arm-linux-gnueabi-gcc" target_cxx="' + tizen_home + '/bin/arm-linux-gnueabi-g++" target_ar="' + tizen_home + '/bin/arm-linux-gnueabi-ar"']
+        self.gn_build_args = ['target_os="tizen" target_cpu="arm" arm_arch="armv7-a" import("//build_overrides/build.gni") target_cflags=[ "--sysroot=' + tizen_home + '" ] target_ldflags=[ "--sysroot=' + tizen_home +
+                              '" ] custom_toolchain="${build_root}/toolchain/custom" target_cc="' + tizen_home + '/bin/arm-linux-gnueabi-gcc" target_cxx="' + tizen_home + '/bin/arm-linux-gnueabi-g++" target_ar="' + tizen_home + '/bin/arm-linux-gnueabi-ar"']
 
     def build_outputs(self):
         items = {

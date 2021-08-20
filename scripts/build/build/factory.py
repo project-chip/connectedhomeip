@@ -153,7 +153,9 @@ _MATCHERS[Platform.INFINEON].AcceptBoard(
     Board.P6BOARD, board=InfineonBoard.P6BOARD)
 
 _MATCHERS[Platform.TIZEN].AcceptBoard(Board.TIZEN)
-_MATCHERS[Platform.TIZEN].AcceptApplication(Application.LIGHT, app=TizenApp.LIGHT)
+_MATCHERS[Platform.TIZEN].AcceptApplication(
+    Application.LIGHT, app=TizenApp.LIGHT)
+
 
 class BuilderFactory:
     """Creates application builders."""

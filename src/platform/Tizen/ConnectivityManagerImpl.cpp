@@ -54,9 +54,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init(void)
     return err;
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-}
+void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
@@ -109,9 +107,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
     return false;
 }
 
-void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
-{
-}
+void ConnectivityManagerImpl::_ClearWiFiStationProvision(void) {}
 
 bool ConnectivityManagerImpl::_CanStartWiFiScan(void)
 {
@@ -123,21 +119,13 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
-{
-}
+void ConnectivityManagerImpl::_DemandStartWiFiAP(void) {}
 
-void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
-{
-}
+void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void) {}
 
-void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void)
-{
-}
+void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void) {}
 
-void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val)
-{
-}
+void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val) {}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)

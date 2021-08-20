@@ -33,7 +33,7 @@ config("tizen_sdk_config") {
     packages = [
       "glib-2.0",
       "gio-unix-2.0",
-     ]
+    ]
   }
 
   if (chip_mdns != "none") {

@@ -78,9 +78,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-}
+void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
@@ -126,9 +124,7 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
     return false;
 }
 
-void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
-{
-}
+void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
 
 } // namespace Internal
 } // namespace DeviceLayer

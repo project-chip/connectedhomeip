@@ -57,15 +57,9 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * service, chip::Inet::InterfaceId interf
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void GetMdnsTimeout(timeval & timeout)
-{
+void GetMdnsTimeout(timeval & timeout) {}
 
-}
-
-void HandleMdnsTimeout()
-{
-
-}
+void HandleMdnsTimeout() {}
 
 } // namespace Mdns
 } // namespace chip

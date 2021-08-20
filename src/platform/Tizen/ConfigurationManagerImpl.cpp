@@ -63,9 +63,7 @@ bool ConfigurationManagerImpl::_CanFactoryReset(void)
     return true;
 }
 
-void ConfigurationManagerImpl::_InitiateFactoryReset(void)
-{
-}
+void ConfigurationManagerImpl::_InitiateFactoryReset(void) {}
 
 CHIP_ERROR ConfigurationManagerImpl::_ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
