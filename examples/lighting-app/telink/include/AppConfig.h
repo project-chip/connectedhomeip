@@ -21,7 +21,7 @@
 // ---- Lighting Example App Config ----
 
 // Buttons config
-#define BUTTON_PORT DT_LABEL(DT_NODELABEL(gpioc))
+#define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))
 
 #define BUTTON_PIN_1 2
 #define BUTTON_PIN_3 3

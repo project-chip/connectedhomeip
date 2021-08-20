@@ -338,12 +338,9 @@ void AppTask::UpdateClusterState()
 
 void AppTask::InitButtons(void)
 {
-    const struct device * port = device_get_binding(BUTTON_PORT);
-    assert(port != NULL);
-
-    sFactoryResetButton.Configure(port, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sLightingButton.Configure(port, BUTTON_PIN_4, BUTTON_PIN_1, LightingActionButtonEventHandler);
-    sThreadStartButton.Configure(port, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
+    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
+    sLightingButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, LightingActionButtonEventHandler);
+    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
     ButtonManagerInst().AddButton(sLightingButton);

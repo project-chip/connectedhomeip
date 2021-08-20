@@ -31,6 +31,8 @@ ButtonManager ButtonManager::sInstance;
 
 void Button::Configure(const struct device * port, gpio_pin_t outPin, gpio_pin_t inPin, void (*callback)(void))
 {
+    __ASSERT(device_is_ready(port), "%s is not ready\n", port->name);
+
     mPort     = port;
     mOutPin   = outPin;
     mInPin    = inPin;
