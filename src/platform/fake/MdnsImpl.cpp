@@ -14,11 +14,60 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include "MdnsImpl.h"
 #include "lib/mdns/platform/Mdns.h"
 
 namespace chip {
 namespace Mdns {
+
+namespace test {
+namespace {
+static constexpr size_t kMaxExpectedCalls = 10;
+size_t numExpectedCalls                   = 0;
+ExpectedCall expectedCalls[kMaxExpectedCalls];
+bool foundCall[kMaxExpectedCalls] = {};
+} // namespace
+
+CHIP_ERROR AddExpectedCall(const ExpectedCall & call)
+{
+    if (!call.IsValid())
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (numExpectedCalls >= kMaxExpectedCalls)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    expectedCalls[numExpectedCalls++] = call;
+    return CHIP_NO_ERROR;
+}
+
+void Reset()
+{
+    numExpectedCalls = 0;
+    for (auto & found : foundCall)
+    {
+        found = false;
+    }
+}
+
+CHIP_ERROR CheckExpected(CallType type, const MdnsService * service)
+{
+    for (size_t i = 0; i < test::numExpectedCalls; ++i)
+    {
+        if (test::foundCall[i])
+        {
+            continue;
+        }
+        if (test::expectedCalls->CheckMatch(type, service))
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_ERROR_UNEXPECTED_EVENT;
+}
+
+} // namespace test
 
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)
 {
@@ -27,7 +76,7 @@ CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCal
 
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return test::CheckExpected(test::CallType::kStart, service);
 }
 
 CHIP_ERROR ChipMdnsStopPublish()
@@ -37,7 +86,7 @@ CHIP_ERROR ChipMdnsStopPublish()
 
 CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return test::CheckExpected(test::CallType::kStart, service);
 }
 
 CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip::Inet::IPAddressType addressType,
