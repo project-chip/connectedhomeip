@@ -78,17 +78,16 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 
 struct ControllerDeviceInitParams
 {
-    DeviceTransportMgr * transportMgr                   = nullptr;
-    SecureSessionMgr * sessionMgr                       = nullptr;
-    Messaging::ExchangeManager * exchangeMgr            = nullptr;
-    Inet::InetLayer * inetLayer                         = nullptr;
-    PersistentStorageDelegate * storageDelegate         = nullptr;
-    Credentials::OperationalCredentialSet * credentials = nullptr;
-    uint8_t credentialsIndex                            = 0;
-    SessionIDAllocator * idAllocator                    = nullptr;
+    DeviceTransportMgr * transportMgr           = nullptr;
+    SecureSessionMgr * sessionMgr               = nullptr;
+    Messaging::ExchangeManager * exchangeMgr    = nullptr;
+    Inet::InetLayer * inetLayer                 = nullptr;
+    PersistentStorageDelegate * storageDelegate = nullptr;
+    SessionIDAllocator * idAllocator            = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
+    Transport::FabricTable * fabricsTable = nullptr;
 };
 
 class Device;
@@ -188,16 +187,15 @@ public:
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, FabricIndex fabric)
     {
-        mTransportMgr     = params.transportMgr;
-        mSessionManager   = params.sessionMgr;
-        mExchangeMgr      = params.exchangeMgr;
-        mInetLayer        = params.inetLayer;
-        mListenPort       = listenPort;
-        mFabricIndex      = fabric;
-        mStorageDelegate  = params.storageDelegate;
-        mCredentials      = params.credentials;
-        mCredentialsIndex = params.credentialsIndex;
-        mIDAllocator      = params.idAllocator;
+        mTransportMgr    = params.transportMgr;
+        mSessionManager  = params.sessionMgr;
+        mExchangeMgr     = params.exchangeMgr;
+        mInetLayer       = params.inetLayer;
+        mListenPort      = listenPort;
+        mFabricIndex     = fabric;
+        mStorageDelegate = params.storageDelegate;
+        mIDAllocator     = params.idAllocator;
+        mFabricsTable    = params.fabricsTable;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -257,7 +255,7 @@ public:
      *
      * @param session A handle to the secure session
      */
-    void OnNewConnection(SecureSessionHandle session);
+    void OnNewConnection(SessionHandle session);
 
     /**
      * @brief
@@ -267,7 +265,7 @@ public:
      *
      * @param session A handle to the secure session
      */
-    void OnConnectionExpired(SecureSessionHandle session);
+    void OnConnectionExpired(SessionHandle session);
 
     /**
      * @brief
@@ -345,9 +343,9 @@ public:
 
     NodeId GetDeviceId() const { return mDeviceId; }
 
-    bool MatchesSession(SecureSessionHandle session) const { return mSecureSession == session; }
+    bool MatchesSession(SessionHandle session) const { return mSecureSession == session; }
 
-    SecureSessionHandle GetSecureSession() const { return mSecureSession; }
+    SessionHandle GetSecureSession() const { return mSecureSession; }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
@@ -453,7 +451,7 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    SecureSessionHandle mSecureSession = {};
+    SessionHandle mSecureSession = {};
 
     uint8_t mSequenceNumber = 0;
 
@@ -496,14 +494,11 @@ private:
 
     FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
 
+    Transport::FabricTable * mFabricsTable = nullptr;
+
     bool mDeviceOperationalCertProvisioned = false;
 
     CASESession mCASESession;
-
-    Credentials::OperationalCredentialSet * mCredentials = nullptr;
-    // TODO: Switch to size_t whenever OperationalCredentialSet Class is updated to support more then 255 credentials per controller
-    uint8_t mCredentialsIndex = 0;
-
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
     uint8_t mCSRNonce[kOpCSRNonceLength];

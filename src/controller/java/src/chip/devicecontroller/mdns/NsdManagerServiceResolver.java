@@ -15,7 +15,7 @@
  *   limitations under the License.
  *
  */
-package chip.devicecontroller;
+package chip.devicecontroller.mdns;
 
 import android.content.Context;
 import android.net.nsd.NsdManager;
@@ -48,7 +48,8 @@ public class NsdManagerServiceResolver implements ServiceResolver {
       final String instanceName,
       final String serviceType,
       final long callbackHandle,
-      final long contextHandle) {
+      final long contextHandle,
+      final ChipMdnsCallback chipMdnsCallback) {
     multicastLock.acquire();
 
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
@@ -77,7 +78,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
             Log.w(
                 TAG,
                 "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
-            ChipDeviceController.handleServiceResolve(
+            chipMdnsCallback.handleServiceResolve(
                 instanceName, serviceType, null, 0, callbackHandle, contextHandle);
 
             if (multicastLock.isHeld()) {
@@ -95,7 +96,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
                     + "' to "
                     + serviceInfo.getHost());
             // TODO: Find out if DNS-SD results for Android should contain interface ID
-            ChipDeviceController.handleServiceResolve(
+            chipMdnsCallback.handleServiceResolve(
                 instanceName,
                 serviceType,
                 serviceInfo.getHost().getHostAddress(),

@@ -127,7 +127,7 @@ public:
 class MockSessionEstablishmentExchangeDispatch : public Messaging::ExchangeMessageDispatch
 {
 public:
-    CHIP_ERROR PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
+    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
                               EncryptedPacketBufferHandle & preparedMessage) override
     {
         PacketHeader packetHeader;
@@ -139,7 +139,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const override
+    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const override
     {
         return gTransportMgr.SendMessage(Transport::PeerAddress(), preparedMessage.CastToWritable());
     }
@@ -242,7 +242,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockAppDelegate mockSender;
-    // TODO: temporarily create a SecureSessionHandle from node id, will be fix in PR 3602
+    // TODO: temporarily create a SessionHandle from node id, will be fix in PR 3602
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
@@ -307,7 +307,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockAppDelegate mockSender;
-    // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
+    // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 

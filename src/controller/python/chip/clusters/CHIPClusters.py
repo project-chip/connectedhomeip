@@ -2865,6 +2865,26 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000003: {
+                    "attributeName": "AbsMinHeatSetpointLimit",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                },
+                0x00000004: {
+                    "attributeName": "AbsMaxHeatSetpointLimit",
+                    "attributeId": 0x00000004,
+                    "type": "int",
+                },
+                0x00000005: {
+                    "attributeName": "AbsMinCoolSetpointLimit",
+                    "attributeId": 0x00000005,
+                    "type": "int",
+                },
+                0x00000006: {
+                    "attributeName": "AbsMaxCoolSetpointLimit",
+                    "attributeId": 0x00000006,
+                    "type": "int",
+                },
                 0x00000011: {
                     "attributeName": "OccupiedCoolingSetpoint",
                     "attributeId": 0x00000011,
@@ -2874,6 +2894,30 @@ class ChipClusters:
                 0x00000012: {
                     "attributeName": "OccupiedHeatingSetpoint",
                     "attributeId": 0x00000012,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000015: {
+                    "attributeName": "MinHeatSetpointLimit",
+                    "attributeId": 0x00000015,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000016: {
+                    "attributeName": "MaxHeatSetpointLimit",
+                    "attributeId": 0x00000016,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000017: {
+                    "attributeName": "MinCoolSetpointLimit",
+                    "attributeId": 0x00000017,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000018: {
+                    "attributeName": "MaxCoolSetpointLimit",
+                    "attributeId": 0x00000018,
                     "type": "int",
                     "writable": True,
                 },
@@ -4916,6 +4960,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_LocalTemperature(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_ConfigureAttributeLocalTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
         return self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterThermostat_ReadAttributeAbsMinHeatSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMinHeatSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeAbsMaxHeatSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMaxHeatSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeAbsMinCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMinCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeAbsMaxCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMaxCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_ReadAttributeOccupiedCoolingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_WriteAttributeOccupiedCoolingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
@@ -4924,6 +4976,22 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedHeatingSetpoint(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_WriteAttributeOccupiedHeatingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_Thermostat_OccupiedHeatingSetpoint(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterThermostat_ReadAttributeMinHeatSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_MinHeatSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_WriteAttributeMinHeatSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_MinHeatSetpointLimit(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterThermostat_ReadAttributeMaxHeatSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_MaxHeatSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_WriteAttributeMaxHeatSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxHeatSetpointLimit(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterThermostat_ReadAttributeMinCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_MinCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_WriteAttributeMinCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_MinCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterThermostat_ReadAttributeMaxCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_MaxCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_WriteAttributeMaxCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterThermostat_ReadAttributeControlSequenceOfOperation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_WriteAttributeControlSequenceOfOperation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
@@ -6573,6 +6641,18 @@ class ChipClusters:
         # Cluster Thermostat ConfigureAttribute LocalTemperature
         self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_int16]
         self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute AbsMinHeatSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMinHeatSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMinHeatSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute AbsMaxHeatSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMaxHeatSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMaxHeatSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute AbsMinCoolSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMinCoolSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMinCoolSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute AbsMaxCoolSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMaxCoolSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMaxCoolSetpointLimit.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute OccupiedCoolingSetpoint
         self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint.restype = ctypes.c_uint32
@@ -6585,6 +6665,30 @@ class ChipClusters:
         # Cluster Thermostat WriteAttribute OccupiedHeatingSetpoint
         self._chipLib.chip_ime_WriteAttribute_Thermostat_OccupiedHeatingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
         self._chipLib.chip_ime_WriteAttribute_Thermostat_OccupiedHeatingSetpoint.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute MinHeatSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MinHeatSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MinHeatSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute MinHeatSetpointLimit
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MinHeatSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MinHeatSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute MaxHeatSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MaxHeatSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MaxHeatSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute MaxHeatSetpointLimit
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxHeatSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxHeatSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute MinCoolSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MinCoolSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MinCoolSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute MinCoolSetpointLimit
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MinCoolSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MinCoolSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute MaxCoolSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MaxCoolSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MaxCoolSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute MaxCoolSetpointLimit
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointLimit.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute ControlSequenceOfOperation
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation.restype = ctypes.c_uint32
