@@ -1157,6 +1157,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | OtaSoftwareUpdateProvider                                           | 0x0029 |
 | OccupancySensing                                                    | 0x0406 |
 | OnOff                                                               | 0x0006 |
+| OnOffSwitchConfiguration                                            | 0x0007 |
 | OperationalCredentials                                              | 0x003E |
 | PressureMeasurement                                                 | 0x0403 |
 | PumpConfigurationAndControl                                         | 0x0200 |
@@ -1209,6 +1210,7 @@ constexpr chip::ClusterId kNetworkCommissioningClusterId                 = 0x003
 constexpr chip::ClusterId kOtaSoftwareUpdateProviderClusterId            = 0x0029;
 constexpr chip::ClusterId kOccupancySensingClusterId                     = 0x0406;
 constexpr chip::ClusterId kOnOffClusterId                                = 0x0006;
+constexpr chip::ClusterId kOnOffSwitchConfigurationClusterId             = 0x0007;
 constexpr chip::ClusterId kOperationalCredentialsClusterId               = 0x003E;
 constexpr chip::ClusterId kPressureMeasurementClusterId                  = 0x0403;
 constexpr chip::ClusterId kPumpConfigurationAndControlClusterId          = 0x0200;
@@ -14578,6 +14580,182 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster OnOffSwitchConfiguration                                    | 0x0007 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * SwitchType                                                        | 0x0000 |
+| * SwitchActions                                                     | 0x0010 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Discover Attributes
+ */
+class DiscoverOnOffSwitchConfigurationAttributes : public ModelCommand
+{
+public:
+    DiscoverOnOffSwitchConfigurationAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverOnOffSwitchConfigurationAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OnOffSwitchConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute SwitchType
+ */
+class ReadOnOffSwitchConfigurationSwitchType : public ModelCommand
+{
+public:
+    ReadOnOffSwitchConfigurationSwitchType() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "switch-type");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOnOffSwitchConfigurationSwitchType()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OnOffSwitchConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSwitchType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute SwitchActions
+ */
+class ReadOnOffSwitchConfigurationSwitchActions : public ModelCommand
+{
+public:
+    ReadOnOffSwitchConfigurationSwitchActions() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "switch-actions");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOnOffSwitchConfigurationSwitchActions()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OnOffSwitchConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSwitchActions(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteOnOffSwitchConfigurationSwitchActions : public ModelCommand
+{
+public:
+    WriteOnOffSwitchConfigurationSwitchActions() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "switch-actions");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteOnOffSwitchConfigurationSwitchActions()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OnOffSwitchConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeSwitchActions(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mValue;
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadOnOffSwitchConfigurationClusterRevision : public ModelCommand
+{
+public:
+    ReadOnOffSwitchConfigurationClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOnOffSwitchConfigurationClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OnOffSwitchConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -25122,6 +25300,20 @@ void registerClusterOnOff(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterOnOffSwitchConfiguration(Commands & commands)
+{
+    const char * clusterName = "OnOffSwitchConfiguration";
+
+    commands_list clusterCommands = {
+        make_unique<DiscoverOnOffSwitchConfigurationAttributes>(),  //
+        make_unique<ReadOnOffSwitchConfigurationSwitchType>(),      //
+        make_unique<ReadOnOffSwitchConfigurationSwitchActions>(),   //
+        make_unique<WriteOnOffSwitchConfigurationSwitchActions>(),  //
+        make_unique<ReadOnOffSwitchConfigurationClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterOperationalCredentials(Commands & commands)
 {
     const char * clusterName = "OperationalCredentials";
@@ -25588,6 +25780,7 @@ void registerClusters(Commands & commands)
     registerClusterOtaSoftwareUpdateProvider(commands);
     registerClusterOccupancySensing(commands);
     registerClusterOnOff(commands);
+    registerClusterOnOffSwitchConfiguration(commands);
     registerClusterOperationalCredentials(commands);
     registerClusterPressureMeasurement(commands);
     registerClusterPumpConfigurationAndControl(commands);

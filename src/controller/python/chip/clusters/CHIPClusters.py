@@ -2196,6 +2196,30 @@ class ChipClusters:
                 },
             },
     }
+    _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO = {
+            "clusterName": "OnOffSwitchConfiguration",
+            "clusterId": 0x00000007,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "SwitchType",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x00000010: {
+                    "attributeName": "SwitchActions",
+                    "attributeId": 0x00000010,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
     _OPERATIONAL_CREDENTIALS_CLUSTER_INFO = {
             "clusterName": "OperationalCredentials",
             "clusterId": 0x0000003E,
@@ -3567,6 +3591,7 @@ class ChipClusters:
     0x00000029: _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
     0x00000406: _OCCUPANCY_SENSING_CLUSTER_INFO,
     0x00000006: _ON_OFF_CLUSTER_INFO,
+    0x00000007: _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
     0x0000003E: _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
     0x00000403: _PRESSURE_MEASUREMENT_CLUSTER_INFO,
     0x00000200: _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
@@ -3620,6 +3645,7 @@ class ChipClusters:
         "OtaSoftwareUpdateProvider": _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
         "OccupancySensing": _OCCUPANCY_SENSING_CLUSTER_INFO,
         "OnOff": _ON_OFF_CLUSTER_INFO,
+        "OnOffSwitchConfiguration": _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
         "OperationalCredentials": _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
         "PressureMeasurement": _PRESSURE_MEASUREMENT_CLUSTER_INFO,
         "PumpConfigurationAndControl": _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
@@ -4772,6 +4798,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_OnOff_FeatureMap(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOffSwitchConfiguration_ReadAttributeSwitchType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchType(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOffSwitchConfiguration_ReadAttributeSwitchActions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchActions(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOffSwitchConfiguration_WriteAttributeSwitchActions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_OnOffSwitchConfiguration_SwitchActions(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterOnOffSwitchConfiguration_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOperationalCredentials_ReadAttributeFabricsList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_FabricsList(device, ZCLendpoint, ZCLgroupid)
     def ClusterOperationalCredentials_ReadAttributeSupportedFabrics(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -6263,6 +6297,19 @@ class ChipClusters:
         # Cluster OnOff ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster OnOffSwitchConfiguration
+        # Cluster OnOffSwitchConfiguration ReadAttribute SwitchType
+        self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchType.restype = ctypes.c_uint32
+        # Cluster OnOffSwitchConfiguration ReadAttribute SwitchActions
+        self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchActions.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchActions.restype = ctypes.c_uint32
+        # Cluster OnOffSwitchConfiguration WriteAttribute SwitchActions
+        self._chipLib.chip_ime_WriteAttribute_OnOffSwitchConfiguration_SwitchActions.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_OnOffSwitchConfiguration_SwitchActions.restype = ctypes.c_uint32
+        # Cluster OnOffSwitchConfiguration ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OperationalCredentials
         # Cluster OperationalCredentials Command AddNOC
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint16]

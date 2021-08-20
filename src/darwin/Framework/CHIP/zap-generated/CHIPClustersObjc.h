@@ -933,6 +933,19 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster On/off Switch Configuration
+ *
+ */
+@interface CHIPOnOffSwitchConfiguration : CHIPCluster
+
+- (void)readAttributeSwitchTypeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeSwitchActionsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeSwitchActionsWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Operational Credentials
  *
  */
