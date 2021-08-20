@@ -118,11 +118,11 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-            - name: Initialize CodeQL
-              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-              uses: github/codeql-action/init@v1
-              with:
-                  languages: "cpp"
+            #- name: Initialize CodeQL
+            #  if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
+            #  uses: github/codeql-action/init@v1
+            #  with:
+            #      languages: "cpp"
 
             - name: Bootstrap
               timeout-minutes: 10
@@ -157,15 +157,15 @@ jobs:
             # - name: Upload Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: bash <(curl -s https://codecov.io/bash)
-            - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
-            - name: Remove dbus binaries for CodeQL Analysis
-              run: find out -type d -name "dbus" -exec rm -rf {} +
+            # - name: Remove third_party binaries for CodeQL Analysis
+            #   run: find out -type d -name "third_party" -exec rm -rf {} +
+            # - name: Remove dbus binaries for CodeQL Analysis
+            #   run: find out -type d -name "dbus" -exec rm -rf {} +
             # - name: Remove nrfxlib binaries for CodeQL Analysis
             #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-              uses: github/codeql-action/analyze@v1
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
+            #   uses: github/codeql-action/analyze@v1
     build_linux_python_lib:
         name: Build on Linux (python_lib)
         timeout-minutes: 60
@@ -194,11 +194,11 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-            - name: Initialize CodeQL
-              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-              uses: github/codeql-action/init@v1
-              with:
-                  languages: "cpp"
+            # - name: Initialize CodeQL
+            #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
+            #   uses: github/codeql-action/init@v1
+            #   with:
+            #       languages: "cpp"
 
             - name: Bootstrap
               timeout-minutes: 10
@@ -231,15 +231,15 @@ jobs:
             # - name: Upload Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: bash <(curl -s https://codecov.io/bash)
-            - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
-            - name: Remove dbus binaries for CodeQL Analysis
-              run: find out -type d -name "dbus" -exec rm -rf {} +
+            # - name: Remove third_party binaries for CodeQL Analysis
+            #   run: find out -type d -name "third_party" -exec rm -rf {} +
+            # - name: Remove dbus binaries for CodeQL Analysis
+            #   run: find out -type d -name "dbus" -exec rm -rf {} +
             # - name: Remove nrfxlib binaries for CodeQL Analysis
             #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
-              uses: github/codeql-action/analyze@v1
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
+            #   uses: github/codeql-action/analyze@v1
     build_darwin:
         name: Build on Darwin (clang, python_lib)
         timeout-minutes: 60

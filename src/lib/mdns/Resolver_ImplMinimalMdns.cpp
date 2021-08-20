@@ -219,24 +219,18 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         else if (mDiscoveryType == DiscoveryType::kOperational)
         {
             // Ensure this is our record.
+            // TODO: Fix this comparison which is too loose.
             if (HasQNamePart(data.GetName(), kOperationalServiceName))
             {
                 OnOperationalSrvRecord(data.GetName(), srv);
             }
-            else
-            {
-                mValid = false;
-            }
         }
         else if (mDiscoveryType == DiscoveryType::kCommissionableNode || mDiscoveryType == DiscoveryType::kCommissionerNode)
         {
+            // TODO: Fix this comparison which is too loose.
             if (HasQNamePart(data.GetName(), kCommissionableServiceName) || HasQNamePart(data.GetName(), kCommissionerServiceName))
             {
                 OnCommissionableNodeSrvRecord(data.GetName(), srv);
-            }
-            else
-            {
-                mValid = false;
             }
         }
         break;
