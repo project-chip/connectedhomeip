@@ -429,32 +429,35 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
 
     // First pairing
     SecurePairingUsingTestSecret pairing1(1, 1);
+    callback.mOldConnectionDropped = false;
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with different peer node ID and different local key ID (same peer key ID)
     SecurePairingUsingTestSecret pairing2(1, 2);
+    callback.mOldConnectionDropped = false;
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with undefined node ID and different local key ID (same peer key ID)
     SecurePairingUsingTestSecret pairing3(1, 3);
+    callback.mOldConnectionDropped = false;
     err = secureSessionMgr.NewPairing(peer, kUndefinedNodeId, &pairing3, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with same local key ID, and a given node ID
     SecurePairingUsingTestSecret pairing4(1, 2);
+    callback.mOldConnectionDropped = false;
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing4, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
 
-    callback.mOldConnectionDropped = false;
-
     // New pairing with same local key ID, and undefined node ID
     SecurePairingUsingTestSecret pairing5(1, 1);
+    callback.mOldConnectionDropped = false;
     err = secureSessionMgr.NewPairing(peer, kUndefinedNodeId, &pairing5, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
