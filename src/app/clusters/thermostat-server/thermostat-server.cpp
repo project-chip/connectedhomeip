@@ -34,18 +34,18 @@
 using namespace chip;
 using namespace chip::app::Clusters::Thermostat::Attributes;
 
-const int16_t kDefaultAbsMinHeatSetpointLimit    = 700;  // 7C (44.5 F) is the default
-const int16_t kDefaultAbsMaxHeatSetpointLimit    = 3000; // 30C (86 F) is the default
-const int16_t kDefaultMinHeatSetpointLimit       = 700;  // 7C (44.5 F) is the default
-const int16_t kDefaultMaxHeatSetpointLimit       = 3000; // 30C (86 F) is the default
-const int16_t kDefaultAbsMinCoolSetpointLimit    = 1600; // 16C (61 F) is the default
-const int16_t kDefaultAbsMaxCoolSetpointLimit    = 3200; // 32C (90 F) is the default
-const int16_t kDefaultMinCoolSetpointLimit       = 1600; // 16C (61 F) is the default
-const int16_t kDefaultMaxCoolSetpointLimit       = 3200; // 32C (90 F) is the default
-const int16_t kDefaultHeatingSetpoint            = 2000;
-const int16_t kDefaultCoolingSetpoint            = 2600;
-const uint8_t kInvalidControlSequenceOfOperation = 0xff;
-const uint8_t kInvalidRequestedSystemMode        = 0xff;
+constexpr int16_t kDefaultAbsMinHeatSetpointLimit    = 700;  // 7C (44.5 F) is the default
+constexpr int16_t kDefaultAbsMaxHeatSetpointLimit    = 3000; // 30C (86 F) is the default
+constexpr int16_t kDefaultMinHeatSetpointLimit       = 700;  // 7C (44.5 F) is the default
+constexpr int16_t kDefaultMaxHeatSetpointLimit       = 3000; // 30C (86 F) is the default
+constexpr int16_t kDefaultAbsMinCoolSetpointLimit    = 1600; // 16C (61 F) is the default
+constexpr int16_t kDefaultAbsMaxCoolSetpointLimit    = 3200; // 32C (90 F) is the default
+constexpr int16_t kDefaultMinCoolSetpointLimit       = 1600; // 16C (61 F) is the default
+constexpr int16_t kDefaultMaxCoolSetpointLimit       = 3200; // 32C (90 F) is the default
+constexpr int16_t kDefaultHeatingSetpoint            = 2000;
+constexpr int16_t kDefaultCoolingSetpoint            = 2600;
+constexpr uint8_t kInvalidControlSequenceOfOperation = 0xff;
+constexpr uint8_t kInvalidRequestedSystemMode        = 0xff;
 
 void emberAfThermostatClusterServerInitCallback()
 {
