@@ -48,7 +48,8 @@ constexpr size_t kMaxCommandMessageCount          = 3;
 constexpr size_t kTotalFailureCommandMessageCount = 1;
 constexpr size_t kMaxReadMessageCount             = 3;
 constexpr size_t kMaxWriteMessageCount            = 3;
-constexpr int32_t gMessageIntervalSeconds         = 1;
+constexpr uint32_t gMessageIntervalMsec           = 1200;
+constexpr uint32_t gMessageTimeoutMsec            = 1000;
 constexpr chip::FabricIndex gFabricIndex          = 0;
 
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
@@ -125,7 +126,7 @@ CHIP_ERROR SendCommandRequest(chip::app::CommandSender * commandSender)
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex);
+    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr, gMessageTimeoutMsec);
     SuccessOrExit(err);
 
 exit:
@@ -162,7 +163,7 @@ CHIP_ERROR SendBadCommandRequest(chip::app::CommandSender * commandSender)
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex);
+    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr, gMessageTimeoutMsec);
     SuccessOrExit(err);
 
 exit:
@@ -197,8 +198,8 @@ CHIP_ERROR SendReadRequest()
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr,
-                                                                            eventPathParams, 2, &attributePathParams, 1, number);
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        chip::kTestDeviceNodeId, gFabricIndex, nullptr, eventPathParams, 2, &attributePathParams, 1, number, gMessageTimeoutMsec);
     SuccessOrExit(err);
 
 exit:
@@ -235,7 +236,7 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
 
     SuccessOrExit(err = writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), true));
     SuccessOrExit(err = apWriteClient->FinishAttribute());
-    SuccessOrExit(err = apWriteClient.SendWriteRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr));
+    SuccessOrExit(err = apWriteClient.SendWriteRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr, gMessageTimeoutMsec));
 
     gWriteCount++;
 
@@ -317,12 +318,12 @@ void CommandRequestTimerHandler(chip::System::Layer * systemLayer, void * appSta
         err = SendCommandRequest(commandSender);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send command request with error: %s\n", chip::ErrorStr(err)));
 
-        err = chip::DeviceLayer::SystemLayer.StartTimer(gMessageIntervalSeconds * 1000, CommandRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer.StartTimer(gMessageIntervalMsec, CommandRequestTimerHandler, NULL);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
     else
     {
-        err = chip::DeviceLayer::SystemLayer.StartTimer(gMessageIntervalSeconds * 1000, BadCommandRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer.StartTimer(gMessageIntervalMsec, BadCommandRequestTimerHandler, NULL);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
 
@@ -343,7 +344,7 @@ void BadCommandRequestTimerHandler(chip::System::Layer * systemLayer, void * app
     err = SendBadCommandRequest(commandSender);
     VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send bad command request with error: %s\n", chip::ErrorStr(err)));
 
-    err = chip::DeviceLayer::SystemLayer.StartTimer(gMessageIntervalSeconds * 1000, ReadRequestTimerHandler, NULL);
+    err = chip::DeviceLayer::SystemLayer.StartTimer(gMessageIntervalMsec, ReadRequestTimerHandler, NULL);
     VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
 
 exit:
@@ -370,12 +371,12 @@ void ReadRequestTimerHandler(chip::System::Layer * systemLayer, void * appState)
         err = SendReadRequest();
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send read request with error: %s\n", chip::ErrorStr(err)));
 
-        err = chip::DeviceLayer::SystemLayer.StartTimer(gMessageIntervalSeconds * 1000, ReadRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer.StartTimer(gMessageIntervalMsec, ReadRequestTimerHandler, NULL);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
     else
     {
-        err = chip::DeviceLayer::SystemLayer.StartTimer(gMessageIntervalSeconds * 1000, WriteRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer.StartTimer(gMessageIntervalMsec, WriteRequestTimerHandler, NULL);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
 
@@ -407,7 +408,7 @@ void WriteRequestTimerHandler(chip::System::Layer * systemLayer, void * appState
         err = SendWriteRequest(writeClient);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to send write request with error: %s\n", chip::ErrorStr(err)));
 
-        err = chip::DeviceLayer::SystemLayer.StartTimer(gMessageIntervalSeconds * 1000, WriteRequestTimerHandler, NULL);
+        err = chip::DeviceLayer::SystemLayer.StartTimer(gMessageIntervalMsec, WriteRequestTimerHandler, NULL);
         VerifyOrExit(err == CHIP_NO_ERROR, printf("Failed to schedule timer with error: %s\n", chip::ErrorStr(err)));
     }
     else
@@ -564,6 +565,8 @@ int main(int argc, char * argv[])
         printf("Invalid Command Server IP address: %s\n", argv[1]);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
+
+    static_assert(gMessageIntervalMsec > gMessageTimeoutMsec, "Interval period too small");
 
     InitializeChip();
 

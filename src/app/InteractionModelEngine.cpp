@@ -183,7 +183,7 @@ CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext *
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
+    ChipLogDetail(InteractionModel, "Msg type %d not supported", aPayloadHeader.GetMessageType());
 
     // Todo: Add status report
     // err = SendStatusReport(ec, kChipProfile_Common, kStatus_UnsupportedMessage);
@@ -234,7 +234,7 @@ CHIP_ERROR InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * ap
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogDetail(DataManagement, "Receive Read request");
+    ChipLogDetail(InteractionModel, "Receive Read request");
 
     for (auto & readHandler : mReadHandlers)
     {
@@ -264,7 +264,7 @@ CHIP_ERROR InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * a
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogDetail(DataManagement, "Receive Write request");
+    ChipLogDetail(InteractionModel, "Receive Write request");
 
     for (auto & writeHandler : mWriteHandlers)
     {
@@ -314,7 +314,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
+    ChipLogProgress(InteractionModel, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
 CHIP_ERROR InteractionModelEngine::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,

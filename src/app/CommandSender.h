@@ -50,9 +50,13 @@ public:
     // handle calling Shutdown on itself once it decides it's done with waiting
     // for a response (i.e. times out or gets a response).
     //
+    // Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
+    // Default timeout value will be used otherwise.
+    //
     // If SendCommandRequest is never called, or the call fails, the API
     // consumer is responsible for calling Shutdown on the CommandSender.
-    CHIP_ERROR SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * secureSession = nullptr);
+    CHIP_ERROR SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * secureSession,
+                                  uint32_t timeout = kImMessageTimeoutMsec);
 
 private:
     // ExchangeDelegate interface implementation.  Private so people won't
