@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "BdxOtaSender.h"
+#include <ota-provider-common/BdxOtaSender.h>
 
 #include <core/CHIPError.h>
 #include <messaging/ExchangeContext.h>

@@ -30,7 +30,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
-#include <controller/data_model/gen/CHIPClientCallbacks.h>
+#include <controller/data_model/zap-generated/CHIPClientCallbacks.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <credentials/CHIPOperationalCredentials.h>

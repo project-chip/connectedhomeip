@@ -49,8 +49,8 @@
 #include <support/ThreadOperationalDataset.h>
 #include <support/logging/CHIPLogging.h>
 
-#include <gen/CHIPClientCallbacks.h>
-#include <gen/CHIPClusters.h>
+#include <zap-generated/CHIPClientCallbacks.h>
+#include <zap-generated/CHIPClusters.h>
 
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
 #ifndef PTHREAD_NULL

@@ -44,7 +44,7 @@ shared_library("jni") {
     "MdnsImpl.cpp",
     "MdnsImpl.h",
     "StackLock.h",
-    "gen/CHIPClusters-JNI.cpp",
+    "zap-generated/CHIPClusters-JNI.cpp",
   ]
 
   deps = [
@@ -66,7 +66,6 @@ android_library("java") {
   ]
 
   sources = [
-    "gen/ChipClusters.java",
     "src/chip/devicecontroller/AndroidChipStack.java",
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
@@ -79,6 +78,7 @@ android_library("java") {
     "src/chip/devicecontroller/mdns/ChipMdnsCallbackImpl.java",
     "src/chip/devicecontroller/mdns/NsdManagerServiceResolver.java",
     "src/chip/devicecontroller/mdns/ServiceResolver.java",
+    "zap-generated/ChipClusters.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

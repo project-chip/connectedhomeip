@@ -39,7 +39,7 @@
 #include <app/common/gen/att-storage.h>
 #include <app/common/gen/attribute-type.h>
 
-#include <gen/endpoint_config.h>
+#include <zap-generated/endpoint_config.h>
 
 using namespace chip;
 using namespace chip::app;

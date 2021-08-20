@@ -6,9 +6,9 @@
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
-#import "gen/CHIPClusters.h"
-#import "gen/CHIPClustersObjc.h"
-#import "gen/CHIPClientCallbacks.h"
+#import <zap-generated/CHIPClusters.h>
+#import <zap-generated/CHIPClustersObjc.h>
+#import <zap-generated/CHIPClientCallbacks.h>
 #import "app/util/af.h"
 
 #include <lib/support/Span.h>

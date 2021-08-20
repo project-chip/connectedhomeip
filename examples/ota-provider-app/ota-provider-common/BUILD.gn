@@ -16,17 +16,26 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/app/chip_data_model.gni")
 
+config("config") {
+  include_dirs = [ ".." ]
+}
+
 chip_data_model("ota-provider-common") {
   zap_file = "ota-provider-app.zap"
 
-  zap_pregenerated_dir = "gen"
+  zap_pregenerated_dir =
+      "${chip_root}/zzz_generated/ota-provider-app/zap-generated"
 
   sources = [
     "BdxOtaSender.cpp",
+    "BdxOtaSender.h",
     "OTAProviderExample.cpp",
+    "OTAProviderExample.h",
   ]
 
   deps = [ "${chip_root}/src/protocols/bdx" ]
 
   is_server = true
+
+  public_configs = [ ":config" ]
 }
