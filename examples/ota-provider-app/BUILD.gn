@@ -15,4 +15,3 @@
 config("config") {
   include_dirs = [ "." ]
 }
-
