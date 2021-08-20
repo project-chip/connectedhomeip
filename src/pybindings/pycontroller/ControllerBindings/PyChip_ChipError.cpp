@@ -1,5 +1,21 @@
+/*
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include <core/CHIPError.h>
-#include <sstream> // __str__
+#include <sstream>
 #include <support/TypeTraits.h>
 
 #include <functional>
@@ -15,7 +31,7 @@ PYBIND11_MAKE_OPAQUE(std::shared_ptr<void>)
 
 void bind_PyChip_ChipError(std::function<pybind11::module &(std::string const & namespace_)> & M)
 {
-    { // chip::ChipError file:core/CHIPError.h line:50
+    {
         pybind11::class_<chip::ChipError, std::shared_ptr<chip::ChipError>> cl(
             M("chip"), "ChipError",
             "This is a helper class for managing `CHIP_ERROR` numbers.\n\n At the top level, an error belongs to a `Range` and has "
@@ -52,11 +68,9 @@ void bind_PyChip_ChipError(std::function<pybind11::module &(std::string const & 
         cl.def_static("IsSuccess", (bool (*)(class chip::ChipError)) & chip::ChipError::IsSuccess,
                       "C++: chip::ChipError::IsSuccess(class chip::ChipError) --> bool", pybind11::arg("error"));
     }
-    // chip::RegisterCHIPLayerErrorFormatter() file:core/CHIPError.h line:2052
     M("chip").def("RegisterCHIPLayerErrorFormatter", (void (*)()) & chip::RegisterCHIPLayerErrorFormatter,
                   "C++: chip::RegisterCHIPLayerErrorFormatter() --> void");
 
-    // chip::FormatCHIPError(char *, unsigned short, unsigned int) file:core/CHIPError.h line:2053
     M("chip").def("FormatCHIPError", (bool (*)(char *, unsigned short, unsigned int)) & chip::FormatCHIPError,
                   "C++: chip::FormatCHIPError(char *, unsigned short, unsigned int) --> bool", pybind11::arg("buf"),
                   pybind11::arg("bufSize"), pybind11::arg("err"));
