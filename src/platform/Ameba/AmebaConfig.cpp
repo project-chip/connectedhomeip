@@ -101,6 +101,7 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint32_t & val)
 CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint64_t & val)
 {
     // TODO
+    // Read configuration value
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -124,6 +125,7 @@ CHIP_ERROR AmebaConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 CHIP_ERROR AmebaConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     // TODO
+    // Read configuration value
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -204,18 +206,21 @@ exit:
 CHIP_ERROR AmebaConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
     // TODO
+    // Set configuration value
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR AmebaConfig::ClearConfigValue(Key key)
 {
     // TODO
+    // Delete configuration value
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 bool AmebaConfig::ConfigValueExists(Key key)
 {
     // TODO
+    // Check if configuration value exists
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 

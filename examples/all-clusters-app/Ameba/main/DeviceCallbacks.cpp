@@ -52,6 +52,7 @@ constexpr uint32_t kIdentifyTimerDelayMS = 250;
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     // TODO
+    // Add callback functions for different ChipDeviceEvent Types
 }
 
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
