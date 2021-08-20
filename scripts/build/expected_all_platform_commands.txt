@@ -207,3 +207,5 @@ ninja -C /OUTPUT/DIR/infineon-p6board-lock
 
 # Building telink-tlsr9518adk80d-light
 ninja -C {out}/telink-tlsr9518adk80d-light
+
+
