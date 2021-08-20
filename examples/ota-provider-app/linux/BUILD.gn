@@ -29,8 +29,6 @@ executable("chip-ota-provider-app") {
   cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
-
-  configs = [ "${chip_root}/examples/ota-provider-app:config" ]
 }
 
 group("linux") {
