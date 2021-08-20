@@ -54,13 +54,12 @@ shared_library("CHIPController") {
   }
 
   sources = [
-    "${root_gen_dir}/include/pybindings/pycontroller/CHIPErrorToExceptionBindings.cpp",
-    "${root_gen_dir}/include/pybindings/pycontroller/CHIPErrorToExceptionBindings.h",
+    "ControllerBindings/PyChip_ChipError.cpp",
+    "ControllerBindings/PyChip_ErrorStr.cpp",
     "ControllerBindings/PyChip_Main.cpp",
   ]
 
   public_deps = [
-    ":build_exceptions",
     "${chip_root}/src/app",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
@@ -82,29 +81,6 @@ shared_library("CHIPController") {
     libs = [ "python3.9" ]
   }
 }
-pw_python_action("build_exceptions") {
-  script = "create_error_wrapper.py"
-
-  header_file = "${root_gen_dir}/include/pybindings/pycontroller/CHIPErrorToExceptionBindings.h"
-  cpp_file = "${root_gen_dir}/include/pybindings/pycontroller/CHIPErrorToExceptionBindings.cpp"
-  inputs = [
-    "${chip_root}/src/lib/core/CHIPError.h",
-    "${chip_root}/src/lib/core/CHIPConfig.h",
-  ]
-  outputs = [
-    header_file,
-    cpp_file,
-  ]
-
-  args = [
-    "--output_cpp_file=" + rebase_path(cpp_file, root_build_dir),
-    "--output_header_file=" + rebase_path(header_file, root_build_dir),
-    "--error_header=" +
-        rebase_path("${chip_root}/src/lib/core/CHIPError.h", root_build_dir),
-    "--config_header=" +
-        rebase_path("${chip_root}/src/lib/core/CHIPConfig.h", root_build_dir),
-  ]
-}
 
 pw_python_action("pycontroller") {
   script = "build-chip-wheel.py"
@@ -112,7 +88,7 @@ pw_python_action("pycontroller") {
   _py_manifest_files = [
     {
       src_dir = "."
-      sources = []
+      sources = [ "pychip/__init__.py" ]
     },
     {
       src_dir = target_out_dir
@@ -126,10 +102,7 @@ pw_python_action("pycontroller") {
 
   _py_manifest_file = "${target_gen_dir}/${target_name}.py_manifest.json"
 
-  inputs = [
-    "${root_gen_dir}/include/pybindings/pycontroller/CHIPErrorToExceptionBindings.cpp",
-    "${root_gen_dir}/include/pybindings/pycontroller/CHIPErrorToExceptionBindings.h",
-  ]
+  inputs = []
   _py_manifest_files_rebased = []
   foreach(_manifest_entry, _py_manifest_files) {
     inputs += _manifest_entry.sources
