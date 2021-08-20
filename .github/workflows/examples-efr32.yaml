@@ -44,10 +44,6 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-#             - name: Initialize CodeQL
-#               uses: github/codeql-action/init@v1
-#               with:
-#                   languages: "cpp, python"
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -98,10 +94,3 @@ jobs:
                       out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out.map
                       out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out
                       out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out.map
-            - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
-            - name: Remove SiliconLabs binaries for CodeQL Analysis
-              run: find out -type d -name "SiliconLabs" -exec rm -rf {} +
-#             - name: Perform CodeQL Analysis
-#               if: ${{ github.event_name == 'push' }}
-#               uses: github/codeql-action/analyze@v1
