@@ -29,8 +29,8 @@
 #include <support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
 
-#include "BdxOtaSender.h"
-#include "OTAProviderExample.h"
+#include <ota-provider-common/BdxOtaSender.h>
+#include <ota-provider-common/OTAProviderExample.h>
 
 #include <fstream>
 #include <iostream>
