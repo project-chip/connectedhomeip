@@ -81,9 +81,8 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR ret;
 
-    // Initialize LEDs
-    LEDWidget::InitGpio();
-
+    // Initialize status LED
+    LEDWidget::InitGpio(SYSTEM_STATE_LED_PORT);
     sStatusLED.Init(SYSTEM_STATE_LED_PIN);
 
     InitButtons();

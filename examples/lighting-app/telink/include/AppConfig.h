@@ -30,6 +30,7 @@
 
 // LEDs config
 // System led config
+#define SYSTEM_STATE_LED_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
 #define SYSTEM_STATE_LED_PIN 7
 
 // Lighting LED config
