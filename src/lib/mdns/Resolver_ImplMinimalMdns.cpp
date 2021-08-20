@@ -71,6 +71,7 @@ public:
         mDelegate(delegate),
         mDiscoveryType(discoveryType), mPacketRange(packet)
     {
+        mInterfaceId           = interfaceId;
         mNodeData.mInterfaceId = interfaceId;
     }
 
@@ -88,6 +89,7 @@ private:
     DiscoveryType mDiscoveryType;
     ResolvedNodeData mNodeData;
     DiscoveredNodeData mDiscoveredNodeData;
+    chip::Inet::InterfaceId mInterfaceId;
     BytesRange mPacketRange;
 
     bool mValid       = false;
@@ -160,6 +162,7 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     {
         strncpy(mDiscoveredNodeData.instanceName, name.Value(), sizeof(DiscoveredNodeData::instanceName));
     }
+    mDiscoveredNodeData.port = srv.GetPort();
 }
 
 void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
@@ -180,7 +183,9 @@ void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress &
     {
         return;
     }
-    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs++] = addr;
+    mDiscoveredNodeData.ipAddress[mDiscoveredNodeData.numIPs]   = addr;
+    mDiscoveredNodeData.interfaceId[mDiscoveredNodeData.numIPs] = mInterfaceId;
+    mDiscoveredNodeData.numIPs++;
 }
 
 bool HasQNamePart(SerializedQNameIterator qname, QNamePart part)
