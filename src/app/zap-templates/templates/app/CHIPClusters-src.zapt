@@ -14,7 +14,7 @@
 #include <app/common/gen/ids/Attributes.h>
 #include <app/util/basic-types.h>
 
-#include <gen/CHIPClientCallbacks.h>
+#include <zap-generated/CHIPClientCallbacks.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/CodeUtils.h>
 #include <app/InteractionModelEngine.h>

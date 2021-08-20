@@ -29,12 +29,12 @@
         {
             "path": "CHIPClusters-JNI.zapt",
             "name": "CHIP ZCL API for Java (native code)",
-            "output": "src/controller/java/gen/CHIPClusters-JNI.cpp"
+            "output": "src/controller/java/zap-generated/CHIPClusters-JNI.cpp"
         },
         {
             "path": "ChipClusters-java.zapt",
             "name": "CHIP ZCL API for Java",
-            "output": "src/controller/java/gen/ChipClusters.java"
+            "output": "src/controller/java/zap-generated/ChipClusters.java"
         }
     ]
 }

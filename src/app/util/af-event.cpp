@@ -51,7 +51,7 @@
 
 #include <app/common/gen/callback.h>
 
-#include "gen/af-gen-event.h"
+#include <zap-generated/af-gen-event.h>
 
 using namespace chip;
 

@@ -1,7 +1,7 @@
 {{> header}}
 
 {{#if (chip_has_client_clusters)}}
-#include "gen/CHIPClientCallbacks.h"
+#include <zap-generated/CHIPClientCallbacks.h>
 
 #include <cinttypes>
 
