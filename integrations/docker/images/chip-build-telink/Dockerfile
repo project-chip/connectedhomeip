@@ -22,7 +22,7 @@ RUN apt update \
     libsdl2-dev \
     && pip3 install --user -U west \
     && pip3 install pyelftools \
-    # @todo: Add --mr=zephyr-v2.7.0 as soon as this version would be released     
+    # @todo: Add --mr=zephyr-v2.7.0 as soon as this version would be released
     && west init ${ZEPHYR_PROJECT_DIR} \
     && cd ${ZEPHYR_PROJECT_DIR} && west update && west zephyr-export \
     && python3 -m pip install -U pip \
