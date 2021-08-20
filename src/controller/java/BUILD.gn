@@ -74,7 +74,6 @@ android_library("java") {
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/KeyValueStoreManager.java",
     "src/chip/devicecontroller/PreferencesKeyValueStoreManager.java",
-    "src/chip/devicecontroller/ServiceResolver.java",
     "src/chip/devicecontroller/mdns/ChipMdnsCallback.java",
     "src/chip/devicecontroller/mdns/ChipMdnsCallbackImpl.java",
     "src/chip/devicecontroller/mdns/NsdManagerServiceResolver.java",
