@@ -70,7 +70,8 @@ CommissionAdvertisingParameters commissionableNodeParamsSmall =
         .SetMac(ByteSpan(kMac))
         .SetLongDiscriminator(0xFFE)
         .SetShortDiscriminator(0xF)
-        .SetCommissioningMode(false, false);
+        .SetCommissioningMode(false)
+        .SetAdditionalCommissioning(false);
 // Instance names need to be obtained from the advertiser, so they are not set here.
 test::ExpectedCall commissionableSmall = test::ExpectedCall()
                                              .SetProtocol(MdnsServiceProtocol::kMdnsProtocolUdp)
@@ -89,7 +90,8 @@ CommissionAdvertisingParameters commissionableNodeParamsLarge =
         .SetShortDiscriminator(2)
         .SetVendorId(chip::Optional<uint16_t>(555))
         .SetDeviceType(chip::Optional<uint16_t>(25))
-        .SetCommissioningMode(true, true)
+        .SetCommissioningMode(true)
+        .SetAdditionalCommissioning(false)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
         .SetPairingInstr(chip::Optional<const char *>("Pair me"))
