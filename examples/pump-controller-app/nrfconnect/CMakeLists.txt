@@ -102,4 +102,9 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/pump-configuration-and-control-server/pump-configuration-and-control-server.cpp)
+
+if(BUILD_WITH_DFU)
+    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
+endif()
+
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
