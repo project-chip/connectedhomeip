@@ -34,6 +34,9 @@
 
 namespace chip {
 namespace app {
+
+static constexpr uint32_t kImMessageTimeoutMsec = 12000;
+
 class ReadClient;
 class WriteClient;
 class CommandSender;

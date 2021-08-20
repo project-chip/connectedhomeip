@@ -175,7 +175,8 @@ public:
      *  Finalize the message and send it to the desired node. The underlying write object will always be released, and the user
      * should not use this object after calling this function.
      */
-    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession, uint32_t timeout = 0);
+    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,
+                                uint32_t timeout = kImMessageTimeoutMsec);
 
     /**
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put

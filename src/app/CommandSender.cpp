@@ -59,7 +59,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, FabricIndex aFabric
         mpExchangeCtx = mpExchangeMgr->NewContext(*secureSession, this);
     }
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mpExchangeCtx->SetResponseTimeout(timeout > 0 ? timeout : kImMessageTimeoutMsec);
+    mpExchangeCtx->SetResponseTimeout(timeout);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(commandPacket),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
