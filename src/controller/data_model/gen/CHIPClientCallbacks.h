@@ -19,6 +19,9 @@
 
 #pragma once
 
+#ifndef CHIP_CLIENT_CALLBACKS_H
+#define CHIP_CLIENT_CALLBACKS_H
+
 #include <app/Command.h>
 #include <app/InteractionModelEngine.h>
 #include <app/common/gen/af-structs.h>
@@ -281,3 +284,5 @@ void ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter(c
                                                                                chip::Callback::Cancelable * onFailureCallback);
 typedef void (*ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback)(void * context, uint16_t count,
                                                                                      uint8_t * entries);
+
+#endif // CHIP_CLIENT_CALLBACKS_H

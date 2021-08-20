@@ -3,6 +3,9 @@
 {{#if (chip_has_client_clusters)}}
 #pragma once
 
+#ifndef CHIP_CLIENT_CALLBACKS_H
+#define CHIP_CLIENT_CALLBACKS_H
+
 #include <app/Command.h>
 #include <app/InteractionModelEngine.h>
 #include <app/common/gen/af-structs.h>
@@ -81,3 +84,5 @@ typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttr
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
+
+#endif // CHIP_CLIENT_CALLBACKS_H

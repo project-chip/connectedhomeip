@@ -19,6 +19,9 @@
 
 #pragma once
 
+#ifndef CHIP_CLIENT_CALLBACKS_H
+#define CHIP_CLIENT_CALLBACKS_H
+
 #include <app/Command.h>
 #include <app/InteractionModelEngine.h>
 #include <app/common/gen/af-structs.h>
@@ -84,3 +87,5 @@ typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint1
 // Cluster Specific Response Callbacks
 
 // List specific responses
+
+#endif // CHIP_CLIENT_CALLBACKS_H

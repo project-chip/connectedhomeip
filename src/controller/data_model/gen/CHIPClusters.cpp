@@ -71,7 +71,7 @@ constexpr uint8_t kFrameControlGlobalCommand = 0x00;
 // Pick source endpoint as 1 for now
 constexpr EndpointId kSourceEndpoint = 1;
 
-const uint8_t kReportingDirectionReported = 0x00;
+[[maybe_unused]] const uint8_t kReportingDirectionReported = 0x00;
 } // namespace
 
 using namespace app::Clusters;
