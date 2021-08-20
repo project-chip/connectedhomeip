@@ -232,11 +232,12 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(params.controllerNOC, params.controllerICAC, chipCertSpan));
     ReturnErrorOnFailure(newFabric.SetOperationalCertsFromCertArray(chipCertSpan));
     newFabric.SetVendorId(params.controllerVendorId);
-    ReturnErrorOnFailure(mFabrics.AddNewFabric(newFabric, &mFabricIndex));
-    ChipLogProgress(Controller, "Joined new fabric at index %d", mFabricIndex);
 
     Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(fabric->SetFabricInfo(newFabric));
+    ChipLogProgress(Controller, "Joined the fabric at index %d", mFabricIndex);
 
     mLocalDeviceId = fabric->GetNodeId();
     mVendorId      = fabric->GetVendorId();

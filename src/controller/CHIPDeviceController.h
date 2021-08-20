@@ -356,7 +356,7 @@ protected:
 
     void PersistNextKeyId();
 
-    FabricIndex mFabricIndex = 1;
+    FabricIndex mFabricIndex = Transport::kMinValidFabricIndex;
     Transport::FabricTable mFabrics;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;

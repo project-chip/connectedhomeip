@@ -196,6 +196,8 @@ public:
         ReleaseOperationalCerts();
     }
 
+    CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
+
     friend class FabricTable;
 
 private:
@@ -234,8 +236,6 @@ private:
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, FabricIndex id);
 
     void SetOperationalId(PeerId id) { mOperationalId = id; }
-
-    CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
 
     void ReleaseOperationalCerts();
     void ReleaseRootCert();
