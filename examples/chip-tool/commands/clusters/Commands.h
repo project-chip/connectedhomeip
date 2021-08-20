@@ -19265,8 +19265,16 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LocalTemperature                                                  | 0x0000 |
+| * AbsMinHeatSetpointLimit                                           | 0x0003 |
+| * AbsMaxHeatSetpointLimit                                           | 0x0004 |
+| * AbsMinCoolSetpointLimit                                           | 0x0005 |
+| * AbsMaxCoolSetpointLimit                                           | 0x0006 |
 | * OccupiedCoolingSetpoint                                           | 0x0011 |
 | * OccupiedHeatingSetpoint                                           | 0x0012 |
+| * MinHeatSetpointLimit                                              | 0x0015 |
+| * MaxHeatSetpointLimit                                              | 0x0016 |
+| * MinCoolSetpointLimit                                              | 0x0017 |
+| * MaxCoolSetpointLimit                                              | 0x0018 |
 | * ControlSequenceOfOperation                                        | 0x001B |
 | * SystemMode                                                        | 0x001C |
 | * StartOfWeek                                                       | 0x0020 |
@@ -19560,6 +19568,142 @@ private:
 };
 
 /*
+ * Attribute AbsMinHeatSetpointLimit
+ */
+class ReadThermostatAbsMinHeatSetpointLimit : public ModelCommand
+{
+public:
+    ReadThermostatAbsMinHeatSetpointLimit() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "abs-min-heat-setpoint-limit");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatAbsMinHeatSetpointLimit()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeAbsMinHeatSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute AbsMaxHeatSetpointLimit
+ */
+class ReadThermostatAbsMaxHeatSetpointLimit : public ModelCommand
+{
+public:
+    ReadThermostatAbsMaxHeatSetpointLimit() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "abs-max-heat-setpoint-limit");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatAbsMaxHeatSetpointLimit()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeAbsMaxHeatSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute AbsMinCoolSetpointLimit
+ */
+class ReadThermostatAbsMinCoolSetpointLimit : public ModelCommand
+{
+public:
+    ReadThermostatAbsMinCoolSetpointLimit() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "abs-min-cool-setpoint-limit");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatAbsMinCoolSetpointLimit()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeAbsMinCoolSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute AbsMaxCoolSetpointLimit
+ */
+class ReadThermostatAbsMaxCoolSetpointLimit : public ModelCommand
+{
+public:
+    ReadThermostatAbsMaxCoolSetpointLimit() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "abs-max-cool-setpoint-limit");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatAbsMaxCoolSetpointLimit()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeAbsMaxCoolSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
  * Attribute OccupiedCoolingSetpoint
  */
 class ReadThermostatOccupiedCoolingSetpoint : public ModelCommand
@@ -19683,6 +19827,274 @@ public:
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.WriteAttributeOccupiedHeatingSetpoint(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int16_t mValue;
+};
+
+/*
+ * Attribute MinHeatSetpointLimit
+ */
+class ReadThermostatMinHeatSetpointLimit : public ModelCommand
+{
+public:
+    ReadThermostatMinHeatSetpointLimit() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "min-heat-setpoint-limit");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatMinHeatSetpointLimit()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMinHeatSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteThermostatMinHeatSetpointLimit : public ModelCommand
+{
+public:
+    WriteThermostatMinHeatSetpointLimit() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "min-heat-setpoint-limit");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteThermostatMinHeatSetpointLimit()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeMinHeatSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int16_t mValue;
+};
+
+/*
+ * Attribute MaxHeatSetpointLimit
+ */
+class ReadThermostatMaxHeatSetpointLimit : public ModelCommand
+{
+public:
+    ReadThermostatMaxHeatSetpointLimit() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "max-heat-setpoint-limit");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatMaxHeatSetpointLimit()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMaxHeatSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteThermostatMaxHeatSetpointLimit : public ModelCommand
+{
+public:
+    WriteThermostatMaxHeatSetpointLimit() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "max-heat-setpoint-limit");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteThermostatMaxHeatSetpointLimit()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeMaxHeatSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int16_t mValue;
+};
+
+/*
+ * Attribute MinCoolSetpointLimit
+ */
+class ReadThermostatMinCoolSetpointLimit : public ModelCommand
+{
+public:
+    ReadThermostatMinCoolSetpointLimit() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "min-cool-setpoint-limit");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatMinCoolSetpointLimit()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMinCoolSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteThermostatMinCoolSetpointLimit : public ModelCommand
+{
+public:
+    WriteThermostatMinCoolSetpointLimit() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "min-cool-setpoint-limit");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteThermostatMinCoolSetpointLimit()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeMinCoolSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int16_t mValue;
+};
+
+/*
+ * Attribute MaxCoolSetpointLimit
+ */
+class ReadThermostatMaxCoolSetpointLimit : public ModelCommand
+{
+public:
+    ReadThermostatMaxCoolSetpointLimit() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "max-cool-setpoint-limit");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatMaxCoolSetpointLimit()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeMaxCoolSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteThermostatMaxCoolSetpointLimit : public ModelCommand
+{
+public:
+    WriteThermostatMaxCoolSetpointLimit() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "max-cool-setpoint-limit");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteThermostatMaxCoolSetpointLimit()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeMaxCoolSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
     }
 
 private:
@@ -25140,10 +25552,22 @@ void registerClusterThermostat(Commands & commands)
         make_unique<DiscoverThermostatAttributes>(),              //
         make_unique<ReadThermostatLocalTemperature>(),            //
         make_unique<ReportThermostatLocalTemperature>(),          //
+        make_unique<ReadThermostatAbsMinHeatSetpointLimit>(),     //
+        make_unique<ReadThermostatAbsMaxHeatSetpointLimit>(),     //
+        make_unique<ReadThermostatAbsMinCoolSetpointLimit>(),     //
+        make_unique<ReadThermostatAbsMaxCoolSetpointLimit>(),     //
         make_unique<ReadThermostatOccupiedCoolingSetpoint>(),     //
         make_unique<WriteThermostatOccupiedCoolingSetpoint>(),    //
         make_unique<ReadThermostatOccupiedHeatingSetpoint>(),     //
         make_unique<WriteThermostatOccupiedHeatingSetpoint>(),    //
+        make_unique<ReadThermostatMinHeatSetpointLimit>(),        //
+        make_unique<WriteThermostatMinHeatSetpointLimit>(),       //
+        make_unique<ReadThermostatMaxHeatSetpointLimit>(),        //
+        make_unique<WriteThermostatMaxHeatSetpointLimit>(),       //
+        make_unique<ReadThermostatMinCoolSetpointLimit>(),        //
+        make_unique<WriteThermostatMinCoolSetpointLimit>(),       //
+        make_unique<ReadThermostatMaxCoolSetpointLimit>(),        //
+        make_unique<WriteThermostatMaxCoolSetpointLimit>(),       //
         make_unique<ReadThermostatControlSequenceOfOperation>(),  //
         make_unique<WriteThermostatControlSequenceOfOperation>(), //
         make_unique<ReadThermostatSystemMode>(),                  //

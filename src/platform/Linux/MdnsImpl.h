@@ -100,6 +100,7 @@ public:
     MdnsAvahi & operator=(const MdnsAvahi &) = delete;
 
     CHIP_ERROR Init(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context);
+    CHIP_ERROR Shutdown();
     CHIP_ERROR SetHostname(const char * hostname);
     CHIP_ERROR PublishService(const MdnsService & service);
     CHIP_ERROR StopPublish();
@@ -111,8 +112,6 @@ public:
     Poller & GetPoller() { return mPoller; }
 
     static MdnsAvahi & GetInstance() { return sInstance; }
-
-    ~MdnsAvahi();
 
 private:
     struct BrowseContext

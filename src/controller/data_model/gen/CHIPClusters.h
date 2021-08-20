@@ -1279,10 +1279,26 @@ public:
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeLocalTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeAbsMinHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeAbsMaxHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeAbsMinCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeAbsMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeOccupiedCoolingSetpoint(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMinHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMaxHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMinCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
+                                                 Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeSystemMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -1297,6 +1313,14 @@ public:
                                                      Callback::Cancelable * onFailureCallback, int16_t value);
     CHIP_ERROR WriteAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, int16_t value);
+    CHIP_ERROR WriteAttributeMinHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, int16_t value);
+    CHIP_ERROR WriteAttributeMaxHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, int16_t value);
+    CHIP_ERROR WriteAttributeMinCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, int16_t value);
+    CHIP_ERROR WriteAttributeMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, int16_t value);
     CHIP_ERROR WriteAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, uint8_t value);
     CHIP_ERROR WriteAttributeSystemMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,

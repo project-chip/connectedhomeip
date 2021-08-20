@@ -87,6 +87,10 @@ jobs:
               timeout-minutes: 5
               run:
                   scripts/examples/gn_build_example.sh examples/bridge-app/linux out/bridge_debug
+            - name: Build example OTA Provider
+              timeout-minutes: 5
+              run:
+                  scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0

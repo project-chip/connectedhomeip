@@ -941,6 +941,22 @@ CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, PeerId * 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * fabricId)
+{
+    const ChipDN & subjectDN = cert.mSubjectDN;
+    for (uint8_t i = 0; i < subjectDN.RDNCount(); ++i)
+    {
+        const auto & rdn = subjectDN.rdn[i];
+        if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipFabricId)
+        {
+            *fabricId = rdn.mChipVal;
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
 CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId)
 {
     ChipCertificateSet certSet;

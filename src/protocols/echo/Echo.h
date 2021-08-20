@@ -52,7 +52,7 @@ using EchoFunct = void (*)(Messaging::ExchangeContext * ec, System::PacketBuffer
 class DLL_EXPORT EchoClient : public Messaging::ExchangeDelegate
 {
 public:
-    // TODO: Init function will take a Channel instead a SecureSessionHandle, when Channel API is ready
+    // TODO: Init function will take a Channel instead a SessionHandle, when Channel API is ready
     /**
      *  Initialize the EchoClient object. Within the lifetime
      *  of this instance, this method is invoked once after object
@@ -67,7 +67,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr, SecureSessionHandle session);
+    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr, SessionHandle session);
 
     /**
      *  Shutdown the EchoClient. This terminates this instance
@@ -103,7 +103,7 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
     EchoFunct OnEchoResponseReceived          = nullptr;
-    SecureSessionHandle mSecureSession;
+    SessionHandle mSecureSession;
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                  const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;

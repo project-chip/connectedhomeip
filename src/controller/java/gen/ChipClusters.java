@@ -4956,6 +4956,22 @@ public class ChipClusters {
       readLocalTemperatureAttribute(chipClusterPtr, callback);
     }
 
+    public void readAbsMinHeatSetpointLimitAttribute(IntegerAttributeCallback callback) {
+      readAbsMinHeatSetpointLimitAttribute(chipClusterPtr, callback);
+    }
+
+    public void readAbsMaxHeatSetpointLimitAttribute(IntegerAttributeCallback callback) {
+      readAbsMaxHeatSetpointLimitAttribute(chipClusterPtr, callback);
+    }
+
+    public void readAbsMinCoolSetpointLimitAttribute(IntegerAttributeCallback callback) {
+      readAbsMinCoolSetpointLimitAttribute(chipClusterPtr, callback);
+    }
+
+    public void readAbsMaxCoolSetpointLimitAttribute(IntegerAttributeCallback callback) {
+      readAbsMaxCoolSetpointLimitAttribute(chipClusterPtr, callback);
+    }
+
     public void readOccupiedCoolingSetpointAttribute(IntegerAttributeCallback callback) {
       readOccupiedCoolingSetpointAttribute(chipClusterPtr, callback);
     }
@@ -4970,6 +4986,38 @@ public class ChipClusters {
 
     public void writeOccupiedHeatingSetpointAttribute(DefaultClusterCallback callback, int value) {
       writeOccupiedHeatingSetpointAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readMinHeatSetpointLimitAttribute(IntegerAttributeCallback callback) {
+      readMinHeatSetpointLimitAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeMinHeatSetpointLimitAttribute(DefaultClusterCallback callback, int value) {
+      writeMinHeatSetpointLimitAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readMaxHeatSetpointLimitAttribute(IntegerAttributeCallback callback) {
+      readMaxHeatSetpointLimitAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeMaxHeatSetpointLimitAttribute(DefaultClusterCallback callback, int value) {
+      writeMaxHeatSetpointLimitAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readMinCoolSetpointLimitAttribute(IntegerAttributeCallback callback) {
+      readMinCoolSetpointLimitAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeMinCoolSetpointLimitAttribute(DefaultClusterCallback callback, int value) {
+      writeMinCoolSetpointLimitAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readMaxCoolSetpointLimitAttribute(IntegerAttributeCallback callback) {
+      readMaxCoolSetpointLimitAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeMaxCoolSetpointLimitAttribute(DefaultClusterCallback callback, int value) {
+      writeMaxCoolSetpointLimitAttribute(chipClusterPtr, callback, value);
     }
 
     public void readControlSequenceOfOperationAttribute(IntegerAttributeCallback callback) {
@@ -5012,6 +5060,18 @@ public class ChipClusters {
     private native void readLocalTemperatureAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
+    private native void readAbsMinHeatSetpointLimitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readAbsMaxHeatSetpointLimitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readAbsMinCoolSetpointLimitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readAbsMaxCoolSetpointLimitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
     private native void readOccupiedCoolingSetpointAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -5022,6 +5082,30 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeOccupiedHeatingSetpointAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readMinHeatSetpointLimitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeMinHeatSetpointLimitAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readMaxHeatSetpointLimitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeMaxHeatSetpointLimitAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readMinCoolSetpointLimitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeMinCoolSetpointLimitAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int value);
+
+    private native void readMaxCoolSetpointLimitAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeMaxCoolSetpointLimitAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int value);
 
     private native void readControlSequenceOfOperationAttribute(

@@ -300,7 +300,7 @@ CHIP_ERROR Device::Persist()
     return error;
 }
 
-void Device::OnNewConnection(SecureSessionHandle session)
+void Device::OnNewConnection(SessionHandle session)
 {
     mState         = ConnectionState::SecureConnected;
     mSecureSession = session;
@@ -319,12 +319,12 @@ void Device::OnNewConnection(SecureSessionHandle session)
     peerCounter.SetCounter(mPeerMessageCounter);
 }
 
-void Device::OnConnectionExpired(SecureSessionHandle session)
+void Device::OnConnectionExpired(SessionHandle session)
 {
     VerifyOrReturn(session == mSecureSession,
                    ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));
     mState         = ConnectionState::NotConnected;
-    mSecureSession = SecureSessionHandle{};
+    mSecureSession = SessionHandle{};
 }
 
 CHIP_ERROR Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
@@ -540,7 +540,7 @@ CHIP_ERROR Device::WarmupCASESession()
     VerifyOrReturnError(mDeviceOperationalCertProvisioned, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == ConnectionState::NotConnected, CHIP_NO_ERROR);
 
-    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(SecureSessionHandle(), &mCASESession);
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(SessionHandle(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
     ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager->GetTransportManager()));
@@ -552,8 +552,10 @@ CHIP_ERROR Device::WarmupCASESession()
     mLocalMessageCounter = 0;
     mPeerMessageCounter  = 0;
 
-    ReturnErrorOnFailure(
-        mCASESession.EstablishSession(mDeviceAddress, mCredentials, mCredentialsIndex, mDeviceId, keyID, exchange, this));
+    Transport::FabricInfo * fabric = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+    ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(mCASESession.EstablishSession(mDeviceAddress, fabric, mDeviceId, keyID, exchange, this));
 
     mState = ConnectionState::Connecting;
 

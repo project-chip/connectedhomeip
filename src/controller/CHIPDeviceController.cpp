@@ -237,7 +237,6 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
 
     Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId, mCredentialsIndex));
 
     mLocalDeviceId = fabric->GetNodeId();
     mVendorId      = fabric->GetVendorId();
@@ -515,7 +514,7 @@ void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(Controller, "Time out! failed to receive response from Exchange: %p", ec);
 }
 
-void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
+void DeviceController::OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNewConnection was called in incorrect state"));
 
@@ -526,7 +525,7 @@ void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::E
     mActiveDevices[index].OnNewConnection(session);
 }
 
-void DeviceController::OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
+void DeviceController::OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
 
@@ -582,7 +581,7 @@ void DeviceController::ReleaseAllDevices()
     }
 }
 
-uint16_t DeviceController::FindDeviceIndex(SecureSessionHandle session)
+uint16_t DeviceController::FindDeviceIndex(SessionHandle session)
 {
     uint16_t i = 0;
     while (i < kNumMaxActiveDevices)
@@ -725,14 +724,13 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
     return ControllerDeviceInitParams{
-        .transportMgr     = mTransportMgr,
-        .sessionMgr       = mSessionMgr,
-        .exchangeMgr      = mExchangeMgr,
-        .inetLayer        = mInetLayer,
-        .storageDelegate  = mStorageDelegate,
-        .credentials      = &mCredentials,
-        .credentialsIndex = mCredentialsIndex,
-        .idAllocator      = &mIDAllocator,
+        .transportMgr    = mTransportMgr,
+        .sessionMgr      = mSessionMgr,
+        .exchangeMgr     = mExchangeMgr,
+        .inetLayer       = mInetLayer,
+        .storageDelegate = mStorageDelegate,
+        .idAllocator     = &mIDAllocator,
+        .fabricsTable    = &mFabrics,
     };
 }
 
@@ -905,7 +903,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         }
     }
 #endif
-    exchangeCtxt = mExchangeMgr->NewContext(SecureSessionHandle(), &mPairingSession);
+    exchangeCtxt = mExchangeMgr->NewContext(SessionHandle(), &mPairingSession);
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
     err = mIDAllocator.Allocate(keyID);

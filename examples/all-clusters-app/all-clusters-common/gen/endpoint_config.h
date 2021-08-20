@@ -2278,11 +2278,23 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                         /* ClusterRevision */          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Thermostat (server) */                                                                        \
-            { 0x0000, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() }, /* local temperature */                                       \
+            { 0x0000, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },        /* local temperature */                                \
+            { 0x0003, ZAP_TYPE(INT16S), 2, 0, ZAP_SIMPLE_DEFAULT(0x02BC) }, /* abs min heat setpoint limit */                      \
+            { 0x0004, ZAP_TYPE(INT16S), 2, 0, ZAP_SIMPLE_DEFAULT(0x0BB8) }, /* abs max heat setpoint limit */                      \
+            { 0x0005, ZAP_TYPE(INT16S), 2, 0, ZAP_SIMPLE_DEFAULT(0x0640) }, /* abs min cool setpoint limit */                      \
+            { 0x0006, ZAP_TYPE(INT16S), 2, 0, ZAP_SIMPLE_DEFAULT(0x0C80) }, /* abs max cool setpoint limit */                      \
             { 0x0011, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
               ZAP_SIMPLE_DEFAULT(0x0A28) }, /* occupied cooling setpoint */                                                        \
             { 0x0012, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
               ZAP_SIMPLE_DEFAULT(0x07D0) }, /* occupied heating setpoint */                                                        \
+            { 0x0015, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
+              ZAP_SIMPLE_DEFAULT(0x02BC) }, /* min heat setpoint limit */                                                          \
+            { 0x0016, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
+              ZAP_SIMPLE_DEFAULT(0x0BB8) }, /* max heat setpoint limit */                                                          \
+            { 0x0017, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
+              ZAP_SIMPLE_DEFAULT(0x0640) }, /* min cool setpoint limit */                                                          \
+            { 0x0018, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
+              ZAP_SIMPLE_DEFAULT(0x0C80) }, /* max cool setpoint limit */                                                          \
             { 0x001B, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                            \
               ZAP_SIMPLE_DEFAULT(0x04) }, /* control sequence of operation */                                                      \
             { 0x001C, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x01) }, /* system mode */              \

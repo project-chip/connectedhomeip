@@ -61,7 +61,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'TEMP_MEASUREMENT_CLUSTER': ['temperature-measurement-server'],
     'TEST_CLUSTER': ['test-cluster-server'],
     'TV_CHANNEL_CLUSTER': ['tv-channel-server'],
-    'THERMOSTAT_CLUSTER': [],
+    'THERMOSTAT_CLUSTER': ['thermostat-server'],
     'THREAD_NETWORK_DIAGNOSTICS_CLUSTER': ['thread_network_diagnostics_server'],
     'WINDOW_COVERING_CLUSTER': ['window-covering-server'],
     'THERMOSTAT_UI_CONFIG_CLUSTER': [],

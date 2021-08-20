@@ -32,6 +32,11 @@ CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCal
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ChipMdnsShutdown()
+{
+    return CHIP_NO_ERROR;
+}
+
 const char * GetProtocolString(MdnsServiceProtocol protocol)
 {
     return protocol == MdnsServiceProtocol::kMdnsProtocolUdp ? "_udp" : "_tcp";

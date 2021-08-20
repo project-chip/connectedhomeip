@@ -1223,10 +1223,22 @@ NS_ASSUME_NONNULL_BEGIN
                                                    change:(int16_t)change
                                           responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeLocalTemperatureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAbsMinHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAbsMaxHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAbsMinCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeAbsMaxCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeOccupiedCoolingSetpointWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOccupiedCoolingSetpointWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeOccupiedHeatingSetpointWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOccupiedHeatingSetpointWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMinHeatSetpointLimitWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxHeatSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMaxHeatSetpointLimitWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMinCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMinCoolSetpointLimitWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxCoolSetpointLimitWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeMaxCoolSetpointLimitWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeControlSequenceOfOperationWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeControlSequenceOfOperationWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeSystemModeWithResponseHandler:(ResponseHandler)responseHandler;
