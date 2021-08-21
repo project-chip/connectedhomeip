@@ -22,7 +22,6 @@
 import json
 import os
 import argparse
-import re
 
 # Parse the build's compile_commands.json to generate
 # final args file for CHIP build.

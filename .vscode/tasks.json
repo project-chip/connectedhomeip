@@ -275,7 +275,8 @@
                 "esp32",
                 "host",
                 "nrf",
-                "qpg"
+                "qpg",
+                "infineon"
             ],
             "default": "build"
         },
@@ -291,6 +292,7 @@
                 "lock",
                 "shell",
                 "temperature-measurement",
+                "thermostat",
                 "window-covering"
             ],
             "default": "build"
@@ -310,7 +312,8 @@
                 "nrf52840",
                 "nrf5340",
                 "qpg6100",
-                "x64"
+                "x64",
+                "p6board"
             ],
             "default": "build"
         }

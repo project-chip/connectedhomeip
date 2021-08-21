@@ -20,8 +20,8 @@
 
 #include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
-#include "gen/CHIPClientCallbacks.h"
-#include "gen/CHIPClusters.h"
+#include <zap-generated/CHIPClientCallbacks.h>
+#include <zap-generated/CHIPClusters.h>
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/support/ThreadOperationalDataset.h>

@@ -15,7 +15,7 @@
 #
 from chip.configuration import GetLocalNodeId
 from chip.native import NativeLibraryHandleMethodArguments, GetLibraryHandle
-from ctypes import c_uint64, c_uint32, c_uint16, c_char_p
+from ctypes import c_uint64, c_uint32, c_uint16
 from enum import Enum
 from typing import Optional
 from chip.internal.types import NetworkCredentialsRequested, OperationalCredentialsRequested, PairingComplete

@@ -12,11 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
 from typing import Set
-
-from builders.builder import Builder
 
 from builders.android import AndroidBoard, AndroidBuilder
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
@@ -24,6 +20,7 @@ from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
 from builders.host import HostBuilder, HostApp
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgBuilder
+from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 
 from .targets import Application, Board, Platform
 
@@ -87,6 +84,7 @@ _MATCHERS = {
     Platform.EFR32: Matcher(Efr32Builder),
     Platform.NRF: Matcher(NrfConnectBuilder),
     Platform.ANDROID: Matcher(AndroidBuilder),
+    Platform.INFINEON: Matcher(InfineonBuilder),
 }
 
 # Matrix of what can be compiled and what build options are required
@@ -96,6 +94,8 @@ _MATCHERS[Platform.HOST].AcceptApplication(
     Application.ALL_CLUSTERS, app=HostApp.ALL_CLUSTERS)
 _MATCHERS[Platform.HOST].AcceptApplication(
     Application.CHIP_TOOL, app=HostApp.CHIP_TOOL)
+_MATCHERS[Platform.HOST].AcceptApplication(
+    Application.THERMOSTAT, app=HostApp.THERMOSTAT)
 
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.DEVKITC, board=Esp32Board.DevKitC)
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.M5STACK, board=Esp32Board.M5Stack)
@@ -134,6 +134,11 @@ _MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM, board=AndroidBoard.ARM)
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM64, board=AndroidBoard.ARM64)
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.X64, board=AndroidBoard.X64)
 _MATCHERS[Platform.ANDROID].AcceptApplication(Application.CHIP_TOOL)
+
+_MATCHERS[Platform.INFINEON].AcceptApplication(
+    Application.LOCK, app=InfineonApp.LOCK)
+_MATCHERS[Platform.INFINEON].AcceptBoard(
+    Board.P6BOARD, board=InfineonBoard.P6BOARD)
 
 
 class BuilderFactory:

@@ -12,10 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
-import os
-import shutil
-
 from enum import IntEnum, auto
 
 
@@ -27,6 +23,7 @@ class Platform(IntEnum):
     EFR32 = auto()
     NRF = auto()
     ANDROID = auto()
+    INFINEON = auto()
 
     @property
     def ArgName(self):
@@ -65,6 +62,9 @@ class Board(IntEnum):
     ARM64 = auto()
     X64 = auto()
 
+    # Infineon board
+    P6BOARD = auto()
+
     @property
     def ArgName(self):
         return self.name.lower()
@@ -87,6 +87,7 @@ class Application(IntEnum):
     CHIP_TOOL = auto()
     BRIDGE = auto()
     TEMPERATURE_MEASUREMENT = auto()
+    THERMOSTAT = auto()
 
     @property
     def ArgName(self):

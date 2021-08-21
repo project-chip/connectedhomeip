@@ -135,6 +135,8 @@ public:
         MutexedList & operator=(const MutexedList &) = delete;
     };
 
+    Timer() = default;
+
     static Timer * New(System::Layer & systemLayer, uint32_t delayMilliseconds, Timers::OnCompleteFunct onComplete,
                        void * appState);
     void Clear();

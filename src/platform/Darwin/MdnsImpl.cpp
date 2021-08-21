@@ -485,6 +485,11 @@ CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback successCallback, MdnsAsyncReturn
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ChipMdnsShutdown()
+{
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);

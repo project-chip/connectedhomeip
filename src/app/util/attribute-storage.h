@@ -58,7 +58,7 @@
 // we use the provider sample.
 #ifndef ATTRIBUTE_STORAGE_CONFIGURATION
 //  #error "Must define ATTRIBUTE_STORAGE_CONFIGURATION to specify the App. Builder default attributes file."
-#include "gen/endpoint_config.h"
+#include <zap-generated/endpoint_config.h>
 #else
 #include ATTRIBUTE_STORAGE_CONFIGURATION
 #endif

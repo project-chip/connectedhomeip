@@ -40,10 +40,8 @@ import base64
 import textwrap
 import time
 import string
-import re
 import traceback
 from cmd import Cmd
-from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 from chip.setup_payload import SetupPayload
 
 # Extend sys.path with one or more directories, relative to the location of the
