@@ -54,6 +54,13 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
     ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    // Mark any PASE sessions used for commissioning as stale.
+    // This is a workaround, as we currently don't have a way to identify
+    // secure sessions established via PASE protocol.
+    // TODO - Identify which PASE base secure channel was used
+    //        for commissioning and drop it once commissioning is complete.
+    mSessionMgr->ExpireAllPairings(kUndefinedNodeId, kUndefinedFabricIndex);
+
     ReturnErrorOnFailure(mIDAllocator->Allocate(mSessionKeyId));
 
     // Setup CASE state machine using the credentials for the current fabric.

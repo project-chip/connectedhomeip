@@ -213,12 +213,13 @@ void SecureSessionMgr::ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric)
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
                                         PairingSession * pairing, SecureSession::SessionRole direction, FabricIndex fabric)
 {
-    uint16_t peerKeyId          = pairing->GetPeerKeyId();
-    uint16_t localKeyId         = pairing->GetLocalKeyId();
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, nullptr);
+    uint16_t peerKeyId  = pairing->GetPeerKeyId();
+    uint16_t localKeyId = pairing->GetLocalKeyId();
+    PeerConnectionState * state =
+        mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(peerNodeId), localKeyId, nullptr);
 
-    // Find any existing connection with the same node and key ID
-    if (state && (state->GetFabricIndex() == Transport::kUndefinedFabricIndex || state->GetFabricIndex() == fabric))
+    // Find any existing connection with the same local key ID
+    if (state)
     {
         mPeerConnections.MarkConnectionExpired(
             state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
