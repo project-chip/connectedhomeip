@@ -90,6 +90,7 @@ class Application(IntEnum):
     SHELL = auto()
     CHIP_TOOL = auto()
     BRIDGE = auto()
+    TEMPERATURE_MEASUREMENT = auto()
     THERMOSTAT = auto()
 
     @property
