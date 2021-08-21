@@ -291,6 +291,7 @@
                 "light",
                 "lock",
                 "shell",
+                "thermostat",
                 "window-covering"
             ],
             "default": "build"

@@ -4,6 +4,9 @@ gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/lin
 # Generating {real_platform}-native-chip_tool
 gn gen --check --fail-on-unused-args --root={root}/examples/chip-tool {out}/{real_platform}-native-chip_tool
 
+# Generating {real_platform}-native-thermostat
+gn gen --check --fail-on-unused-args --root={root}/examples/thermostat/linux {out}/{real_platform}-native-thermostat
+
 # Generating qpg-qpg6100-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
 
@@ -102,6 +105,9 @@ ninja -C {out}/{real_platform}-native-all_clusters
 
 # Building {real_platform}-native-chip_tool
 ninja -C {out}/{real_platform}-native-chip_tool
+
+# Building {real_platform}-native-thermostat
+ninja -C {out}/{real_platform}-native-thermostat
 
 # Building qpg-qpg6100-lock
 ninja -C {out}/qpg-qpg6100-lock

@@ -94,6 +94,8 @@ _MATCHERS[Platform.HOST].AcceptApplication(
     Application.ALL_CLUSTERS, app=HostApp.ALL_CLUSTERS)
 _MATCHERS[Platform.HOST].AcceptApplication(
     Application.CHIP_TOOL, app=HostApp.CHIP_TOOL)
+_MATCHERS[Platform.HOST].AcceptApplication(
+    Application.THERMOSTAT, app=HostApp.THERMOSTAT)
 
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.DEVKITC, board=Esp32Board.DevKitC)
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.M5STACK, board=Esp32Board.M5Stack)
