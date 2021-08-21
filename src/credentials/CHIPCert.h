@@ -858,7 +858,7 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
  * validation (e.g. checkign that there is exactly one RDN of each type) is
  * performed.
  */
-CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, PeerId * peerId);
+CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, UncompressedPeerId * peerId);
 
 /**
  * Extract a PeerId from an operational certificate in ByteSpan TLV-encoded
@@ -868,7 +868,7 @@ CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, PeerId * 
  * Can return any error that can be returned from parsing the cert or from the
  * ChipCertificateData* version of ExtractPeerIdFromOpCert.
  */
-CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId);
+CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, UncompressedPeerId * peerId);
 
 /**
  * Extract a PeerId from an operational certificate array in ByteSpan
@@ -878,7 +878,7 @@ CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId);
  * Can return any error that can be returned from parsing the array or from the
  * ChipCertificateData* version of ExtractPeerIdFromOpCert.
  */
-CHIP_ERROR ExtractPeerIdFromOpCertArray(const ByteSpan & opcertarray, PeerId * peerId);
+CHIP_ERROR ExtractPeerIdFromOpCertArray(const ByteSpan & opcertarray, UncompressedPeerId * peerId);
 
 } // namespace Credentials
 } // namespace chip

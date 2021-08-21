@@ -94,14 +94,11 @@ public:
         ReleaseOperationalCerts();
     }
 
-    NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
-    FabricId GetFabricId() const { return mOperationalId.GetFabricId(); }
-
-    uint64_t GetCompressedFabricId() const { return mCompressedFabricId; }
-
+    PeerId GetPeerId() const { return mOperationalId; }
+    FabricId GetUncompressedFabricId() const { return mUncompressedFabricId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
-
     uint16_t GetVendorId() const { return mVendorId; }
+
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
     Crypto::P256Keypair * GetOperationalKey()
@@ -123,12 +120,6 @@ public:
     bool AreCredentialsAvailable() const
     {
         return (mRootCert != nullptr && mOperationalCerts != nullptr && mRootCertLen != 0 && mOperationalCertsLen != 0);
-    }
-
-    const uint8_t * GetTrustedRoot(uint16_t & size)
-    {
-        size = mRootCertLen;
-        return mRootCert;
     }
 
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
@@ -176,7 +167,7 @@ public:
     }
 
     CHIP_ERROR VerifyCredentials(const ByteSpan & noc, Credentials::ValidationContext & context, PeerId & nocPeerId,
-                                 Crypto::P256PublicKey & nocPubkey);
+                                 FabricId & uncompressedFabricId, Crypto::P256PublicKey & nocPubkey) const;
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -225,7 +216,8 @@ private:
     uint16_t mRootCertAllocatedLen = 0;
     uint8_t * mOperationalCerts    = nullptr;
     uint16_t mOperationalCertsLen  = 0;
-    uint64_t mCompressedFabricId   = 0;
+
+    FabricId mUncompressedFabricId = 0;
 
     static constexpr size_t KeySize();
 
@@ -235,17 +227,17 @@ private:
     CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, FabricIndex id);
 
-    void SetOperationalId(PeerId id) { mOperationalId = id; }
-
     void ReleaseOperationalCerts();
     void ReleaseRootCert();
 
+    CHIP_ERROR GetCompressedId(const UncompressedPeerId & uncompressedPeerId, PeerId & compressedPeerId) const;
+
     struct StorableFabricInfo
     {
-        uint16_t mFabric;   /* This field is serialized in LittleEndian byte order */
-        uint64_t mNodeId;   /* This field is serialized in LittleEndian byte order */
-        uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
-        uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
+        uint16_t mFabric;               /* This field is serialized in LittleEndian byte order */
+        uint64_t mNodeId;               /* This field is serialized in LittleEndian byte order */
+        uint64_t mUncompressedFabricId; /* This field is serialized in LittleEndian byte order */
+        uint16_t mVendorId;             /* This field is serialized in LittleEndian byte order */
 
         uint16_t mRootCertLen;         /* This field is serialized in LittleEndian byte order */
         uint16_t mOperationalCertsLen; /* This field is serialized in LittleEndian byte order */

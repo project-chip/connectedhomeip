@@ -272,11 +272,11 @@ class ChipDeviceController(object):
                 self.devCtrl)
         )
 
-    def GetFabricId(self):
+    def GetCompressedFabricId(self):
         fabricid = c_uint64(0)
 
         res = self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_GetFabricId(
+            lambda: self._dmLib.pychip_DeviceController_GetCompressedFabricId(
                 self.devCtrl, pointer(fabricid))
         )
 
@@ -470,6 +470,6 @@ class ChipDeviceController(object):
             self._dmLib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
             self._dmLib.pychip_GetCommandSenderHandle.restype = c_uint64
 
-            self._dmLib.pychip_DeviceController_GetFabricId.argtypes = [
+            self._dmLib.pychip_DeviceController_GetCompressedFabricId.argtypes = [
                 c_void_p, POINTER(c_uint64)]
-            self._dmLib.pychip_DeviceController_GetFabricId.restype = c_uint32
+            self._dmLib.pychip_DeviceController_GetCompressedFabricId.restype = c_uint32

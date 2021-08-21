@@ -239,7 +239,7 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     ReturnErrorOnFailure(fabric->SetFabricInfo(newFabric));
     ChipLogProgress(Controller, "Joined the fabric at index %d", mFabricIndex);
 
-    mLocalDeviceId = fabric->GetNodeId();
+    mLocalDeviceId = fabric->GetPeerId().GetNodeId();
     mVendorId      = fabric->GetVendorId();
 
     return CHIP_NO_ERROR;
@@ -438,7 +438,9 @@ exit:
 CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId, uint64_t fabricId)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    return Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(deviceId).SetFabricId(fabricId),
+    CompressedFabricId id;
+    ReturnErrorOnFailure(GetCompressedFabricId(id));
+    return Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(deviceId).SetCompressedFabricId(id),
                                                     chip::Inet::kIPAddressType_Any);
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -468,12 +470,12 @@ CHIP_ERROR DeviceController::ServiceEvents()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::GetFabricId(uint64_t & fabricId)
+CHIP_ERROR DeviceController::GetCompressedFabricId(uint64_t & compressedFabricId)
 {
     Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
     VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    fabricId = fabric->GetFabricId();
+    compressedFabricId = fabric->GetPeerId().GetCompressedFabricId();
 
     return CHIP_NO_ERROR;
 }
@@ -1858,8 +1860,10 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
     break;
     case CommissioningStage::kFindOperational: {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+        CompressedFabricId id;
+        GetCompressedFabricId(id);
         ChipLogProgress(Controller, "Finding node on operational network");
-        Mdns::Resolver::Instance().ResolveNodeId(PeerId().SetFabricId(0).SetNodeId(device->GetDeviceId()),
+        Mdns::Resolver::Instance().ResolveNodeId(PeerId().SetCompressedFabricId(id).SetNodeId(device->GetDeviceId()),
                                                  Inet::IPAddressType::kIPAddressType_Any);
 #endif
     }

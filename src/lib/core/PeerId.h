@@ -21,12 +21,13 @@
 
 namespace chip {
 
-using FabricId = uint64_t;
+using CompressedFabricId = uint64_t;
+using FabricId           = uint64_t;
 
-constexpr FabricId kUndefinedFabricId = 0ULL;
-constexpr uint16_t kUndefinedVendorId = 0U;
+constexpr CompressedFabricId kUndefinedFabricId = 0ULL;
+constexpr uint16_t kUndefinedVendorId           = 0U;
 
-/// A peer is identified by a node id within a fabric
+/// A peer is identified by a node id within a compressed fabric ID
 class PeerId
 {
 public:
@@ -39,15 +40,49 @@ public:
         return *this;
     }
 
-    FabricId GetFabricId() const { return mFabricId; }
-    PeerId & SetFabricId(FabricId id)
+    CompressedFabricId GetCompressedFabricId() const { return mCompressedFabricId; }
+    PeerId & SetCompressedFabricId(CompressedFabricId id)
+    {
+        mCompressedFabricId = id;
+        return *this;
+    }
+
+    bool operator==(const PeerId & other) const
+    {
+        return (mNodeId == other.mNodeId) && (mCompressedFabricId == other.mCompressedFabricId);
+    }
+    bool operator!=(const PeerId & other) const
+    {
+        return (mNodeId != other.mNodeId) || (mCompressedFabricId != other.mCompressedFabricId);
+    }
+
+private:
+    NodeId mNodeId = kUndefinedNodeId;
+
+    CompressedFabricId mCompressedFabricId = kUndefinedFabricId;
+};
+
+class UncompressedPeerId
+{
+public:
+    UncompressedPeerId() {}
+
+    NodeId GetNodeId() const { return mNodeId; }
+    UncompressedPeerId & SetNodeId(NodeId id)
+    {
+        mNodeId = id;
+        return *this;
+    }
+
+    FabricId GetUncompressedFabricId() const { return mFabricId; }
+    UncompressedPeerId & SetUncompressedFabricId(FabricId id)
     {
         mFabricId = id;
         return *this;
     }
 
-    bool operator==(const PeerId & other) const { return (mNodeId == other.mNodeId) && (mFabricId == other.mFabricId); }
-    bool operator!=(const PeerId & other) const { return (mNodeId != other.mNodeId) || (mFabricId != other.mFabricId); }
+    bool operator==(const UncompressedPeerId & other) const { return (mNodeId == other.mNodeId) && (mFabricId == other.mFabricId); }
+    bool operator!=(const UncompressedPeerId & other) const { return (mNodeId != other.mNodeId) || (mFabricId != other.mFabricId); }
 
 private:
     NodeId mNodeId     = kUndefinedNodeId;

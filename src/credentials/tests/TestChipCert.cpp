@@ -1287,11 +1287,11 @@ static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)
         CHIP_ERROR err = GetTestCert(testCase.Cert, sNullLoadFlag, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        PeerId peerId;
+        UncompressedPeerId peerId;
         err = ExtractPeerIdFromOpCert(cert, &peerId);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, peerId.GetNodeId() == testCase.ExpectedNodeId);
-        NL_TEST_ASSERT(inSuite, peerId.GetFabricId() == testCase.ExpectedFabricId);
+        NL_TEST_ASSERT(inSuite, peerId.GetUncompressedFabricId() == testCase.ExpectedFabricId);
     }
 
     // Test extraction from the parsed form.
@@ -1304,11 +1304,11 @@ static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)
         err = LoadTestCert(certSet, testCase.Cert, sNullLoadFlag, sNullDecodeFlag);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        PeerId peerId;
+        UncompressedPeerId peerId;
         err = ExtractPeerIdFromOpCert(certSet.GetCertSet()[0], &peerId);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, peerId.GetNodeId() == testCase.ExpectedNodeId);
-        NL_TEST_ASSERT(inSuite, peerId.GetFabricId() == testCase.ExpectedFabricId);
+        NL_TEST_ASSERT(inSuite, peerId.GetUncompressedFabricId() == testCase.ExpectedFabricId);
         certSet.Release();
     }
 
@@ -1331,11 +1331,11 @@ static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)
         err = ConvertX509CertsToChipCertArray(cert, icaCert, certs);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        PeerId peerId;
+        UncompressedPeerId peerId;
         err = ExtractPeerIdFromOpCertArray(certs, &peerId);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, peerId.GetNodeId() == testCase.ExpectedNodeId);
-        NL_TEST_ASSERT(inSuite, peerId.GetFabricId() == testCase.ExpectedFabricId);
+        NL_TEST_ASSERT(inSuite, peerId.GetUncompressedFabricId() == testCase.ExpectedFabricId);
     }
 }
 

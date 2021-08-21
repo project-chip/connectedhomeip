@@ -116,8 +116,8 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     uint8_t fabricIndex = 0;
     for (auto & pairing : GetGlobalFabricTable())
     {
-        NodeId nodeId               = pairing.GetNodeId();
-        uint64_t fabricId           = pairing.GetFabricId();
+        NodeId nodeId               = pairing.GetPeerId().GetNodeId();
+        uint64_t fabricId           = pairing.GetUncompressedFabricId();
         uint16_t vendorId           = pairing.GetVendorId();
         const uint8_t * fabricLabel = pairing.GetFabricLabel();
 
@@ -195,8 +195,8 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric 0x%" PRIX16 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
-                       fabric->GetVendorId());
+                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetUncompressedFabricId()),
+                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         writeFabricsIntoFabricsListAttribute();
     }
 
@@ -206,8 +206,8 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric %" PRIX16 " was persisted to storage. FabricId %0x" ChipLogFormatX64
                        ", NodeId %0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
-                       fabric->GetVendorId());
+                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetUncompressedFabricId()),
+                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         writeFabricsIntoFabricsListAttribute();
     }
 };

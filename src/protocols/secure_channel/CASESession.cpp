@@ -1085,7 +1085,8 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const ByteSpan & respon
     ReturnErrorOnFailure(SetEffectiveTime());
 
     PeerId peerId;
-    ReturnErrorOnFailure(mFabricInfo->VerifyCredentials(responderOpCert, mValidContext, peerId, responderID));
+    FabricId uncompressedFabricId;
+    ReturnErrorOnFailure(mFabricInfo->VerifyCredentials(responderOpCert, mValidContext, peerId, uncompressedFabricId, responderID));
 
     SetPeerNodeId(peerId.GetNodeId());
 

@@ -291,13 +291,13 @@ public:
     CHIP_ERROR ServiceEvents();
 
     /**
-     * @brief Get the Fabric ID assigned to the device.
+     * @brief Get the Compressed Fabric ID assigned to the device.
      *
-     * @param[out] fabricId   Fabric ID of the device.
+     * @param[out] compressedFabricId   Compressed Fabric ID of the device.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR GetFabricId(uint64_t & fabricId);
+    CHIP_ERROR GetCompressedFabricId(uint64_t & compressedFabricId);
 
 protected:
     enum class State

@@ -910,11 +910,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, PeerId * peerId)
+CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, UncompressedPeerId * peerId)
 {
     // Since we assume the cert is pre-validated, we are going to assume that
     // its subject in fact has both a node id and a fabric id.
-    PeerId id;
+    UncompressedPeerId id;
     bool foundNodeId         = false;
     bool foundFabricId       = false;
     const ChipDN & subjectDN = opcert.mSubjectDN;
@@ -928,7 +928,7 @@ CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, PeerId * 
         }
         else if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipFabricId)
         {
-            id.SetFabricId(rdn.mChipVal);
+            id.SetUncompressedFabricId(rdn.mChipVal);
             foundFabricId = true;
         }
     }
@@ -957,7 +957,7 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
-CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId)
+CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, UncompressedPeerId * peerId)
 {
     ChipCertificateSet certSet;
 
@@ -968,7 +968,7 @@ CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId)
     return ExtractPeerIdFromOpCert(certSet.GetCertSet()[0], peerId);
 }
 
-CHIP_ERROR ExtractPeerIdFromOpCertArray(const ByteSpan & opcertarray, PeerId * peerId)
+CHIP_ERROR ExtractPeerIdFromOpCertArray(const ByteSpan & opcertarray, UncompressedPeerId * peerId)
 {
     ByteSpan noc;
     ByteSpan icac;

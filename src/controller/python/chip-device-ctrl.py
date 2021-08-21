@@ -846,7 +846,7 @@ class DeviceMgrCmd(Cmd):
         """
           get-fabricid
 
-          Read the current Fabric Id of the controller device, return 0 if not available.
+          Read the current Compressed Fabric Id of the controller device, return 0 if not available.
         """
         try:
             args = shlex.split(line)
@@ -855,14 +855,15 @@ class DeviceMgrCmd(Cmd):
                 print("Unexpected argument: " + args[1])
                 return
 
-            fabricid = self.devCtrl.GetFabricId()
+            fabricid = self.devCtrl.GetCompressedFabricId()
         except exceptions.ChipStackException as ex:
             print("An exception occurred during reading FabricID:")
             print(str(ex))
             return
 
         print("Get fabric ID complete")
-        print("Fabric ID: " + hex(fabricid))
+        print("Compressed Fabric ID: " +
+              hex(fabricid) + " (" + str(fabricid) + ")")
 
     def do_history(self, line):
         """
