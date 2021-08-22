@@ -107,7 +107,6 @@ DeviceController::DeviceController()
     mState                    = State::NotInitialized;
     mSessionMgr               = nullptr;
     mExchangeMgr              = nullptr;
-    mLocalDeviceId            = 0;
     mStorageDelegate          = nullptr;
     mPairedDevicesInitialized = false;
     mListenPort               = CHIP_PORT;
@@ -239,8 +238,8 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     ReturnErrorOnFailure(fabric->SetFabricInfo(newFabric));
     ChipLogProgress(Controller, "Joined the fabric at index %d", mFabricIndex);
 
-    mLocalDeviceId = fabric->GetPeerId().GetNodeId();
-    mVendorId      = fabric->GetVendorId();
+    mLocalId  = fabric->GetPeerId();
+    mVendorId = fabric->GetVendorId();
 
     return CHIP_NO_ERROR;
 }
@@ -435,13 +434,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId, uint64_t fabricId)
+CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    CompressedFabricId id;
-    ReturnErrorOnFailure(GetCompressedFabricId(id));
-    return Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(deviceId).SetCompressedFabricId(id),
-                                                    chip::Inet::kIPAddressType_Any);
+    return Mdns::Resolver::Instance().ResolveNodeId(
+        chip::PeerId().SetNodeId(deviceId).SetCompressedFabricId(mLocalId.GetCompressedFabricId()), chip::Inet::kIPAddressType_Any);
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
@@ -1259,7 +1256,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
     ReturnErrorOnFailure(
-        cluster.AddNOC(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0), mLocalDeviceId, mVendorId));
+        cluster.AddNOC(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0), mLocalId.GetNodeId(), mVendorId));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
@@ -1860,11 +1857,10 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
     break;
     case CommissioningStage::kFindOperational: {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-        CompressedFabricId id;
-        GetCompressedFabricId(id);
         ChipLogProgress(Controller, "Finding node on operational network");
-        Mdns::Resolver::Instance().ResolveNodeId(PeerId().SetCompressedFabricId(id).SetNodeId(device->GetDeviceId()),
-                                                 Inet::IPAddressType::kIPAddressType_Any);
+        Mdns::Resolver::Instance().ResolveNodeId(
+            PeerId().SetCompressedFabricId(mLocalId.GetCompressedFabricId()).SetNodeId(device->GetDeviceId()),
+            Inet::IPAddressType::kIPAddressType_Any);
 #endif
     }
     break;

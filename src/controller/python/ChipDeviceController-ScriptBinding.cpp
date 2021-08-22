@@ -244,7 +244,8 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
 ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl,
                                                                      uint64_t * outFabricId)
 {
-    return devCtrl->GetCompressedFabricId(*outFabricId).AsInteger();
+    *outFabricId = devCtrl->GetCompressedFabricId();
+    return CHIP_NO_ERROR.AsInteger();
 }
 
 const char * pychip_DeviceController_ErrorToString(ChipError::StorageType err)

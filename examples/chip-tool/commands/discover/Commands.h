@@ -80,8 +80,9 @@ public:
     /////////// DiscoverCommand Interface /////////
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
-        ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
-        return GetExecContext()->commissioner->UpdateDevice(remoteId, fabricId);
+        ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId,
+                        GetExecContext()->commissioner->GetCompressedFabricId());
+        return GetExecContext()->commissioner->UpdateDevice(remoteId);
     }
 
     /////////// DeviceAddressUpdateDelegate Interface /////////
