@@ -437,8 +437,9 @@ exit:
 CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    return Mdns::Resolver::Instance().ResolveNodeId(
-        chip::PeerId().SetNodeId(deviceId).SetCompressedFabricId(mLocalId.GetCompressedFabricId()), chip::Inet::kIPAddressType_Any);
+    PeerId peer;
+    peer.SetNodeId(deviceId).SetCompressedFabricId(GetCompressedFabricId());
+    return Mdns::Resolver::Instance().ResolveNodeId(peer, chip::Inet::kIPAddressType_Any);
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS

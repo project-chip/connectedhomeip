@@ -312,7 +312,8 @@ protected:
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
-    PeerId mLocalId;
+    PeerId mLocalId = PeerId();
+
     DeviceTransportMgr * mTransportMgr                             = nullptr;
     SecureSessionMgr * mSessionMgr                                 = nullptr;
     Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
