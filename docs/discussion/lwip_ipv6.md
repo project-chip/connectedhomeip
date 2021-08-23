@@ -6,7 +6,7 @@ CHIP. The recommendations here are listed roughly from most to least important.
 
 ## Route Information Options (RIO)
 
-The addressing proposal requires devices to store route options from Route
+The specification requires devices to store route options from Route
 Information Options (RIO) sent in router advertisements. This functionality is
 not currently present in upstream LwIP. The patch to add this is relatively
 small, but we may need to upstream this in order to require its use in CHIP. It
