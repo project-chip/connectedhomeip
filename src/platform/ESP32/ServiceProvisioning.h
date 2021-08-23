@@ -20,6 +20,7 @@
 
 #include <lib/core/CHIPError.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key);
-
+#endif
 #endif // _SERVICE_PROVISIONING_H

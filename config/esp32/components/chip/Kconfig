@@ -497,12 +497,12 @@ menu "CHIP Device Layer"
     endmenu
 
     menu "BLE Options"
-        visible if BT_ENABLED
+        visible if BT_NIMBLE_ENABLED || BT_BLUEDROID_ENABLED
 
         config ENABLE_CHIPOBLE
             bool "Enable CHIP-over-BLE (CHIPoBLE) Support"
             default y
-            depends on BT_ENABLED
+            depends on BT_NIMBLE_ENABLED || BT_BLUEDROID_ENABLED
             help
                 Enables support for sending and receiving CHIP messages over a BLE connection.
 

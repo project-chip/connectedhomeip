@@ -20,34 +20,31 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
+#include <platform/ESP32/ESP32Utils.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include "esp_netif.h"
+#include "esp_wifi.h"
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
+#endif
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/ESP32/ESP32Utils.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.cpp>
+#endif
 #include <platform/internal/BLEManager.h>
 
 #include "esp_event.h"
-#include "esp_netif.h"
-#include "esp_wifi.h"
-
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
 #include <lwip/nd6.h>
 #include <lwip/netif.h>
 
 #include <type_traits>
-
-#if !CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#error "WiFi Station support must be enabled when building for ESP32"
-#endif
-
-#if !CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-#error "WiFi AP support must be enabled when building for ESP32"
-#endif
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -59,7 +56,7 @@ namespace chip {
 namespace DeviceLayer {
 
 ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
@@ -386,11 +383,12 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
                     bssid, freq);
     return CHIP_NO_ERROR;
 }
-
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 // ==================== ConnectivityManager Platform Internal Methods ====================
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     mLastStationConnectFailTime     = 0;
     mLastAPDemandTime               = 0;
     mWiFiStationMode                = kWiFiStationMode_Disabled;
@@ -444,12 +442,16 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     // Queue work items to bootstrap the AP and station state machines once the Chip event loop is running.
     ReturnErrorOnFailure(SystemLayer.ScheduleWork(DriveStationState, NULL));
     ReturnErrorOnFailure(SystemLayer.ScheduleWork(DriveAPState, NULL));
-
     return CHIP_NO_ERROR;
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
+    return CHIP_NO_ERROR;
+#endif
 }
 
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     // Handle ESP system events...
     if (event->Type == DeviceEventType::kESPSystemEvent)
     {
@@ -521,8 +523,12 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             }
         }
     }
+#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
+#endif
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 void ConnectivityManagerImpl::_OnWiFiScanDone()
 {
     // Schedule a call to DriveStationState method in case a station connect attempt was
@@ -1018,6 +1024,6 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & 
 }
 
 void ConnectivityManagerImpl::RefreshMessageLayer(void) {}
-
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 } // namespace DeviceLayer
 } // namespace chip

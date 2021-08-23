@@ -33,17 +33,19 @@
 #include "esp_event.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
-#include "esp_netif.h"
 #include "esp_spi_flash.h"
 #include "esp_system.h"
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include "esp_netif.h"
 #include "esp_wifi.h"
-
+#endif
 namespace chip {
 namespace DeviceLayer {
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 namespace Internal {
 extern CHIP_ERROR InitLwIPCoreLock(void);
 }
+#endif
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
@@ -57,22 +59,21 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     esp_err_t err;
-    wifi_init_config_t cfg;
-    uint8_t ap_mac[6];
-    wifi_mode_t mode;
-
     // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
     Internal::ESP32Utils::RegisterESP32ErrorFormatter();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    wifi_init_config_t cfg;
+    uint8_t ap_mac[6];
+    wifi_mode_t mode;
     // Make sure the LwIP core lock has been initialized
     ReturnErrorOnFailure(Internal::InitLwIPCoreLock());
-
     err = esp_netif_init();
     if (err != ESP_OK)
     {
         goto exit;
     }
-
+#endif
     // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
     err = esp_event_loop_create_default();
     if (err != ESP_OK)
@@ -80,6 +81,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         goto exit;
     }
 
+    SuccessOrExit(err);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     esp_netif_create_default_wifi_ap();
     esp_netif_create_default_wifi_sta();
 
@@ -106,7 +109,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
             goto exit;
         }
     }
-
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
@@ -116,7 +119,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 exit:
     return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
 }
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
 {
     return Internal::InitLwIPCoreLock();
@@ -195,5 +198,6 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
     sInstance.PostEvent(&event);
 }
 
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 } // namespace DeviceLayer
 } // namespace chip
