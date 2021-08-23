@@ -73,7 +73,7 @@ void RequestCommissioning(intptr_t commandArg)
     if (selectedCommissioner != nullptr)
     {
         // Advertise self as Commissionable Node over mDNS
-        ReturnOnFailure(app::Mdns::AdvertiseCommissionableNode());
+        ReturnOnFailure(app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledBasic));
 
         // Send User Directed commissioning request
         ReturnOnFailure(SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress::UDP(
