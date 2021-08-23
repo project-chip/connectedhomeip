@@ -438,9 +438,8 @@ exit:
 CHIP_ERROR DeviceController::UpdateDevice(NodeId deviceId)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    PeerId peer;
-    peer.SetNodeId(deviceId).SetCompressedFabricId(GetCompressedFabricId());
-    return Mdns::Resolver::Instance().ResolveNodeId(peer, chip::Inet::kIPAddressType_Any);
+    return Mdns::Resolver::Instance().ResolveNodeId(PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(deviceId),
+                                                    chip::Inet::kIPAddressType_Any);
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
@@ -465,16 +464,6 @@ CHIP_ERROR DeviceController::ServiceEvents()
 #if CONFIG_DEVICE_LAYER
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().StartEventLoopTask());
 #endif // CONFIG_DEVICE_LAYER
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceController::GetCompressedFabricId(uint64_t & compressedFabricId)
-{
-    Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
-    VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    compressedFabricId = fabric->GetPeerId().GetCompressedFabricId();
 
     return CHIP_NO_ERROR;
 }
