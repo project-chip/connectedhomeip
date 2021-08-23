@@ -16,7 +16,7 @@
 
 import chip.native
 import ctypes
-from ctypes import c_void_p, c_int32, c_uint32, c_uint64
+from ctypes import c_uint32, c_uint64
 from chip.discovery.types import DiscoverSuccessCallback_t, DiscoverFailureCallback_t
 
 

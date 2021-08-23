@@ -114,7 +114,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegate * delegate)
+ExchangeContext * ExchangeManager::NewContext(SessionHandle session, ExchangeDelegate * delegate)
 {
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
@@ -196,8 +196,8 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SecureSessionHandle session, const Transport::PeerAddress & source,
-                                        DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf)
+                                        SessionHandle session, const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
+                                        System::PacketBufferHandle && msgBuf)
 {
     UnsolicitedMessageHandler * matchingUMH = nullptr;
 
@@ -299,7 +299,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
 }
 
-void ExchangeManager::OnNewConnection(SecureSessionHandle session)
+void ExchangeManager::OnNewConnection(SessionHandle session)
 {
     if (mDelegate != nullptr)
     {
@@ -307,7 +307,7 @@ void ExchangeManager::OnNewConnection(SecureSessionHandle session)
     }
 }
 
-void ExchangeManager::OnConnectionExpired(SecureSessionHandle session)
+void ExchangeManager::OnConnectionExpired(SessionHandle session)
 {
     if (mDelegate != nullptr)
     {

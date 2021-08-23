@@ -19,6 +19,6 @@ import("${chip_root}/src/app/chip_data_model.gni")
 chip_data_model("pump-common") {
   zap_file = "pump-app.zap"
 
-  zap_pregenerated_dir = "gen"
+  zap_pregenerated_dir = "${chip_root}/zzz_generated/pump-app/zap-generated"
   is_server = true
 }

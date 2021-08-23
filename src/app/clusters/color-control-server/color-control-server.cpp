@@ -1532,7 +1532,7 @@ static void startColorLoop(EndpointId endpoint, uint8_t startFromStartHue)
     uint16_t currentHue = 0;
     Attributes::GetEnhancedCurrentHue(endpoint, &currentHue);
 
-    u_int16_t startHue = 0x2300;
+    uint16_t startHue = 0x2300;
     if (startFromStartHue)
     {
         Attributes::GetColorLoopStartEnhancedHue(endpoint, &startHue);

@@ -32,6 +32,7 @@ class Esp32App(Enum):
     LOCK = auto()
     SHELL = auto()
     BRIDGE = auto()
+    TEMPERATURE_MEASUREMENT = auto()
 
     @property
     def ExampleName(self):
@@ -43,6 +44,8 @@ class Esp32App(Enum):
             return 'shell'
         elif self == Esp32App.BRIDGE:
             return 'bridge-app'
+        elif self == Esp32App.TEMPERATURE_MEASUREMENT:
+            return 'temperature-measurement-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -56,6 +59,8 @@ class Esp32App(Enum):
             return 'chip-shell'
         elif self == Esp32App.BRIDGE:
             return 'chip-bridge-app'
+        elif self == Esp32App.TEMPERATURE_MEASUREMENT:
+            return 'chip-temperature-measurement-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 

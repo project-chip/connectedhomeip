@@ -16,12 +16,9 @@
 #
 
 import argparse
-import json
 import os
-from pathlib import Path
 import subprocess
 import sys
-import urllib.request
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../../..'))

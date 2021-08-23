@@ -23,7 +23,7 @@
 #import "CHIPOperationalCredentialsDelegate.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 #import "CHIPSetupPayload.h"
-#import "gen/CHIPClustersObjc.h"
+#import <zap-generated/CHIPClustersObjc.h>
 
 #import "CHIPDeviceConnectionBridge.h"
 

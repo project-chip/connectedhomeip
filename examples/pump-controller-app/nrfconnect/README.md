@@ -159,7 +159,7 @@ opposite one.
 the test mode using the default configuration.
 
 **Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
-enables Bluetooth LE advertising for the predefined period of time.
+enables Bluetooth LE advertising for the predefined period of time (15 minutes by default).
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the

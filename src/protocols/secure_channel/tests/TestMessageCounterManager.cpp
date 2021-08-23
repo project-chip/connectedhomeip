@@ -78,8 +78,8 @@ void MessageCounterSyncProcess(nlTestSuite * inSuite, void * inContext)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    SecureSessionHandle localSession = ctx.GetSessionLocalToPeer();
-    SecureSessionHandle peerSession  = ctx.GetSessionPeerToLocal();
+    SessionHandle localSession = ctx.GetSessionLocalToPeer();
+    SessionHandle peerSession  = ctx.GetSessionPeerToLocal();
 
     Transport::PeerConnectionState * localState = ctx.GetSecureSessionManager().GetPeerConnectionState(localSession);
     Transport::PeerConnectionState * peerState  = ctx.GetSecureSessionManager().GetPeerConnectionState(peerSession);
@@ -99,7 +99,7 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
 
-    SecureSessionHandle peerSession            = ctx.GetSessionPeerToLocal();
+    SessionHandle peerSession                  = ctx.GetSessionPeerToLocal();
     Transport::PeerConnectionState * peerState = ctx.GetSecureSessionManager().GetPeerConnectionState(peerSession);
     peerState->GetSessionMessageCounter().GetPeerMessageCounter().Reset();
 

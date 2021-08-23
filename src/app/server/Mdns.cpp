@@ -304,7 +304,7 @@ void StartServer(CommissioningMode mode)
     }
     else
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY
         ChipLogProgress(Discovery, "Start dns-sd server - no current nodeId");
         err = app::Mdns::AdvertiseCommissionableNode(CommissioningMode::kEnabledBasic);
         if (err != CHIP_NO_ERROR)

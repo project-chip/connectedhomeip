@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 from platform import uname, release
 from enum import Enum, auto
@@ -23,12 +22,15 @@ from .gn import GnBuilder
 class HostApp(Enum):
     ALL_CLUSTERS = auto()
     CHIP_TOOL = auto()
+    THERMOSTAT = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
             return 'all-clusters-app/linux'
         elif self == HostApp.CHIP_TOOL:
             return 'chip-tool'
+        elif self == HostApp.THERMOSTAT:
+            return 'thermostat/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -37,6 +39,8 @@ class HostApp(Enum):
             return 'chip-all-clusters-app'
         elif self == HostApp.CHIP_TOOL:
             return 'chip-tool'
+        elif self == HostApp.THERMOSTAT:
+            return 'thermostat-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
