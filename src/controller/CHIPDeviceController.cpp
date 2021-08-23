@@ -236,10 +236,11 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(fabric->SetFabricInfo(newFabric));
-    ChipLogProgress(Controller, "Joined the fabric at index %d", mFabricIndex);
-
     mLocalId  = fabric->GetPeerId();
     mVendorId = fabric->GetVendorId();
+
+    ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64, mFabricIndex,
+                    ChipLogValueX64(GetCompressedFabricId()));
 
     return CHIP_NO_ERROR;
 }
@@ -1860,7 +1861,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
         ChipLogProgress(Controller, "Finding node on operational network");
         Mdns::Resolver::Instance().ResolveNodeId(
-            PeerId().SetCompressedFabricId(mLocalId.GetCompressedFabricId()).SetNodeId(device->GetDeviceId()),
+            PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(device->GetDeviceId()),
             Inet::IPAddressType::kIPAddressType_Any);
 #endif
     }

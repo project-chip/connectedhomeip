@@ -391,7 +391,8 @@ void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, 
 
 CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
-    ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " ...", mRemoteId);
+    ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " Compressed FabricId: %" PRIx64 " ...", mRemoteId,
+                    GetExecContext()->commissioner->GetCompressedFabricId());
     return GetExecContext()->commissioner->UpdateDevice(mRemoteId);
 }
 

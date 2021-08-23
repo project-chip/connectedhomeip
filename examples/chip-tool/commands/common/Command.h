@@ -109,7 +109,7 @@ public:
     Command(const char * commandName) : mName(commandName) {}
     virtual ~Command() {}
 
-    void SetExecutionContext(ExecutionContext & execContext) { mExecContext = &execContext; }
+    void SetExecutionContext(ExecutionContext & execContext) { memcpy(&mExecContext, &execContext, sizeof(execContext)); }
 
     const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;
@@ -206,8 +206,7 @@ public:
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
 
 protected:
-    ExecutionContext * GetExecContext() { return mExecContext; }
-    ExecutionContext * mExecContext;
+    ExecutionContext * GetExecContext() { return &mExecContext; }
 
 private:
     bool InitArgument(size_t argIndex, char * argValue);
@@ -217,6 +216,8 @@ private:
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
     const char * mName            = nullptr;
     std::vector<Argument> mArgs;
+
+    ExecutionContext mExecContext;
 
 #if CONFIG_USE_SEPARATE_EVENTLOOP
     std::condition_variable cvWaitingForResponse;
