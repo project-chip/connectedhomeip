@@ -29,6 +29,7 @@ namespace Internal {
 class ESP32Utils
 {
 public:
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     static CHIP_ERROR IsAPEnabled(bool & apEnabled);
     static bool IsStationProvisioned(void);
     static CHIP_ERROR IsStationConnected(bool & connected);
@@ -46,6 +47,7 @@ public:
     static CHIP_ERROR SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo);
     static CHIP_ERROR ClearWiFiStationProvision(void);
 
+#endif
     static CHIP_ERROR MapError(esp_err_t error);
     static void RegisterESP32ErrorFormatter();
     static bool FormatError(char * buf, uint16_t bufSize, CHIP_ERROR err);

@@ -26,7 +26,6 @@
 #pragma once
 
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -47,10 +46,10 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR InitLwIPCoreLock(void);
     static void HandleESPSystemEvent(void * arg, esp_event_base_t eventBase, int32_t eventId, void * eventData);
-
+#endif
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 

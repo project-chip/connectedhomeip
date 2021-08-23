@@ -21,14 +21,22 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
+#else
+#include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
 #include <lib/support/BitFlags.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
+#else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
+#endif
 
 #include "esp_event.h"
 
@@ -45,14 +53,22 @@ class PlatformManagerImpl;
  * Concrete implementation of the ConnectivityManager singleton object for the ESP32 platform.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
-                                      public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
                                       public Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>,
+#else
+                                      public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>,
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
 #endif
-                                      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+                                      public Internal::GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>,
+#else
+                                      public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
+#endif
+                                      public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>
 {
 
     // Allow the ConnectivityManager interface class to delegate method calls to
@@ -60,9 +76,9 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     friend class ConnectivityManager;
 
 private:
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     using Flags = GenericConnectivityManagerImpl_WiFi::ConnectivityFlags;
     // ===== Members that implement the ConnectivityManager abstract interface.
-
     WiFiStationMode _GetWiFiStationMode(void);
     CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
     bool _IsWiFiStationEnabled(void);
@@ -82,15 +98,15 @@ private:
     uint32_t _GetWiFiAPIdleTimeoutMS(void);
     void _SetWiFiAPIdleTimeoutMS(uint32_t val);
     CHIP_ERROR _GetAndLogWifiStatsCounters(void);
-    bool _HaveIPv4InternetConnectivity(void);
-    bool _HaveIPv6InternetConnectivity(void);
-    bool _HaveServiceConnectivity(void);
-    CHIP_ERROR _Init(void);
-    void _OnPlatformEvent(const ChipDeviceEvent * event);
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
-
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    CHIP_ERROR _Init(void);
+    void _OnPlatformEvent(const ChipDeviceEvent * event);
+    bool _HaveIPv4InternetConnectivity(void);
+    bool _HaveIPv6InternetConnectivity(void);
+    bool _HaveServiceConnectivity(void);
     // ===== Members for internal use by the following friends.
 
     friend ConnectivityManager & ConnectivityMgr(void);
@@ -99,7 +115,7 @@ private:
     static ConnectivityManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     uint64_t mLastStationConnectFailTime;
     uint64_t mLastAPDemandTime;
     WiFiStationMode mWiFiStationMode;
@@ -127,8 +143,9 @@ private:
     void OnIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
 
     static void RefreshMessageLayer(void);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 };
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 inline bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
 {
     return mWiFiStationMode == kWiFiStationMode_ApplicationControlled;
@@ -178,11 +195,24 @@ inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
 {
     return mWiFiStationState != kWiFiStationState_Connecting;
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
 {
     return HaveServiceConnectivityViaThread();
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
+{
+    return false;
+}
+
+inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
+{
+    return false;
+}
+#endif
 
 /**
  * Returns the public interface of the ConnectivityManager singleton object.
