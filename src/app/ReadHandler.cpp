@@ -84,7 +84,8 @@ CHIP_ERROR ReadHandler::OnStatusReport(Messaging::ExchangeContext * apExchangeCo
     Protocols::SecureChannel::StatusReport statusReport;
     err = statusReport.Parse(std::move(aPayload));
     SuccessOrExit(err);
-    ChipLogProgress(DataManagement, "Receive Status Report, protocol id is %" PRIu32", protocol code is %" PRIu16, statusReport.GetProtocolId(), statusReport.GetProtocolCode());
+    ChipLogProgress(DataManagement, "Receive Status Report, protocol id is %" PRIu32 ", protocol code is %" PRIu16,
+                    statusReport.GetProtocolId(), statusReport.GetProtocolCode());
     if ((statusReport.GetProtocolId() == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm()) &&
         (statusReport.GetProtocolCode() == to_underlying(Protocols::InteractionModel::ProtocolCode::Success)))
     {
