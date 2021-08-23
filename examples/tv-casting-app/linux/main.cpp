@@ -17,51 +17,28 @@
  */
 
 #include <app/server/Mdns.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
-#include <setup_payload/SetupPayload.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
 
 using namespace chip;
+using namespace chip::Controller;
 
 #define TV_DEVICE_TYPE 35
 
-chip::Controller::CommissionableNodeController commissionableNodeController;
+CommissionableNodeController commissionableNodeController;
+chip::System::SocketWatchToken token;
 
-void RequestCommissioning(intptr_t commandArg)
+/**
+ * Enters commissioning mode, opens commissioning window, logs onboarding payload.
+ * If non-null selectedCommissioner is provided, sends user directed commissioning
+ * request to the selectedCommissioner and advertises self commissionable node over DNS-SD
+ */
+void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommissioner = nullptr)
 {
-    int commissionerCount = 0, selectedCommissionerNumber = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES;
-    chip::SetupPayload payload;
-    const Mdns::DiscoveredNodeData * selectedCommissioner = nullptr;
-
-    // Display discovered commissioner TVs to ask user to select one
-    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
-    {
-        const Mdns::DiscoveredNodeData * commissioner = commissionableNodeController.GetDiscoveredCommissioner(i);
-        if (commissioner != nullptr)
-        {
-            ChipLogProgress(Zcl, "Discovered Commissioner #%d", ++commissionerCount);
-            commissioner->LogDetail();
-        }
-    }
-    ChipLogProgress(Zcl, "%d commissioner(s) discovered", commissionerCount);
-
-    if (commissionerCount > 0)
-    {
-        ChipLogProgress(Zcl, "Choose a commissioner (by number# above) to request commissioning from: ");
-        scanf("%d", &selectedCommissionerNumber);
-        selectedCommissioner = commissionableNodeController.GetDiscoveredCommissioner(selectedCommissionerNumber - 1);
-        VerifyOrReturn(selectedCommissioner != nullptr, ChipLogError(Zcl, "No such commissioner!"));
-    }
-    else
-    {
-        ChipLogError(Zcl, "No commissioner discovered, commissioning must be initiated manually!");
-    }
-
     // Enter commissioning mode, open commissioning window
     InitServer();
     ReturnOnFailure(OpenBasicCommissioningWindow(ResetFabrics::kYes, 3 * 60));
@@ -82,19 +59,73 @@ void RequestCommissioning(intptr_t commandArg)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 }
 
+/**
+ * Accepts user input of selected commissioner and calls PrepareForCommissioning with
+ * the selected commissioner
+ */
+void RequestUserDirectedCommisisioning(System::SocketEvents events, intptr_t data)
+{
+    // Accept user selection for commissioner to request commissioning from
+    int selectedCommissionerNumber = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES;
+    scanf("%d", &selectedCommissionerNumber);
+    chip::DeviceLayer::SystemLayer.StopWatchingSocket(&token);
+
+    const Mdns::DiscoveredNodeData * selectedCommissioner =
+        commissionableNodeController.GetDiscoveredCommissioner(selectedCommissionerNumber - 1);
+    VerifyOrReturn(selectedCommissioner != nullptr, ChipLogError(Zcl, "No such commissioner!"));
+    PrepareForCommissioning(selectedCommissioner);
+}
+
+void InitCommissioningFlow(intptr_t commandArg)
+{
+    int commissionerCount = 0;
+
+    // Display discovered commissioner TVs to ask user to select one
+    for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
+    {
+        const Mdns::DiscoveredNodeData * commissioner = commissionableNodeController.GetDiscoveredCommissioner(i);
+        if (commissioner != nullptr)
+        {
+            ChipLogProgress(Zcl, "Discovered Commissioner #%d", ++commissionerCount);
+            commissioner->LogDetail();
+        }
+    }
+
+    if (commissionerCount > 0)
+    {
+        ChipLogProgress(
+            Zcl, "%d commissioner(s) discovered. Select one (by number# above) to request commissioning from: ", commissionerCount);
+
+        // Setup for async/non-blocking user input from stdin
+        int flags = fcntl(0, F_GETFL, 0);
+        VerifyOrReturn(fcntl(0, F_SETFL, flags | O_NONBLOCK) == 0,
+                       ChipLogError(Zcl, "Could not set non-blocking mode for user input!"));
+        ReturnOnFailure(chip::DeviceLayer::SystemLayer.StartWatchingSocket(0, &token));
+        ReturnOnFailure(chip::DeviceLayer::SystemLayer.SetCallback(token, RequestUserDirectedCommisisioning, (intptr_t) NULL));
+        ReturnOnFailure(chip::DeviceLayer::SystemLayer.RequestCallbackOnPendingRead(token));
+    }
+    else
+    {
+        ChipLogError(Zcl, "No commissioner discovered, commissioning must be initiated manually!");
+        PrepareForCommissioning();
+    }
+}
+
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     SuccessOrExit(err = chip::Platform::MemoryInit());
     SuccessOrExit(err = chip::DeviceLayer::PlatformMgr().InitChipStack());
 
-    // Send discover commissioner TVs request
+    // Send discover commissioners request
     SuccessOrExit(err = commissionableNodeController.DiscoverCommissioners(
                       Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, TV_DEVICE_TYPE)));
 
-    // Give commissioner TVs some time to respond and then ScheduleWork to get commissioned
+    // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
     DeviceLayer::SystemLayer.StartTimer(
-        5 * 1000, [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(RequestCommissioning); }, nullptr);
+        5 * 1000, [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
+
+    // TBD: Content casting commands
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 exit:
