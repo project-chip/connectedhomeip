@@ -242,8 +242,8 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
     return CHIP_NO_ERROR.AsInteger();
 }
 
-ChipError:: StorageType pychip_DeviceController_CommissioiningComplete(chip::Controller::DeviceCommissioner * devCtrl,
-                                                                       chip::NodeId nodeId)
+ChipError::StorageType pychip_DeviceController_CommissioiningComplete(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                      chip::NodeId nodeId)
 {
     return devCtrl->CommissioningComplete(nodeId).AsInteger();
 }
