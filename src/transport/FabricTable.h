@@ -95,7 +95,7 @@ public:
     }
 
     PeerId GetPeerId() const { return mOperationalId; }
-    FabricId GetUncompressedFabricId() const { return mUncompressedFabricId; }
+    FabricId GetRawFabricId() const { return mRawFabricId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
     uint16_t GetVendorId() const { return mVendorId; }
 
@@ -167,7 +167,7 @@ public:
     }
 
     CHIP_ERROR VerifyCredentials(const ByteSpan & noc, Credentials::ValidationContext & context, PeerId & nocPeerId,
-                                 FabricId & uncompressedFabricId, Crypto::P256PublicKey & nocPubkey) const;
+                                 FabricId & RawFabricId, Crypto::P256PublicKey & nocPubkey) const;
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -217,7 +217,7 @@ private:
     uint8_t * mOperationalCerts    = nullptr;
     uint16_t mOperationalCertsLen  = 0;
 
-    FabricId mUncompressedFabricId = 0;
+    FabricId mRawFabricId = 0;
 
     static constexpr size_t KeySize();
 
@@ -230,14 +230,17 @@ private:
     void ReleaseOperationalCerts();
     void ReleaseRootCert();
 
-    CHIP_ERROR GetCompressedId(const UncompressedPeerId & uncompressedPeerId, PeerId & compressedPeerId) const;
+    /* Generate a compressed peer ID (containing compressed fabric ID) using provided raw Peer ID and
+       root public key of the fabric. The generated compressed ID is returned via compressedPeerId
+       output parameter */
+    CHIP_ERROR GetCompressedId(const RawPeerId & rawPeerId, PeerId * compressedPeerId) const;
 
     struct StorableFabricInfo
     {
-        uint16_t mFabric;               /* This field is serialized in LittleEndian byte order */
-        uint64_t mNodeId;               /* This field is serialized in LittleEndian byte order */
-        uint64_t mUncompressedFabricId; /* This field is serialized in LittleEndian byte order */
-        uint16_t mVendorId;             /* This field is serialized in LittleEndian byte order */
+        uint16_t mFabric;      /* This field is serialized in LittleEndian byte order */
+        uint64_t mNodeId;      /* This field is serialized in LittleEndian byte order */
+        uint64_t mRawFabricId; /* This field is serialized in LittleEndian byte order */
+        uint16_t mVendorId;    /* This field is serialized in LittleEndian byte order */
 
         uint16_t mRootCertLen;         /* This field is serialized in LittleEndian byte order */
         uint16_t mOperationalCertsLen; /* This field is serialized in LittleEndian byte order */

@@ -437,8 +437,8 @@ JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong f
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    CHIP_ERROR err                           = wrapper->Controller()->UpdateDevice(static_cast<chip::NodeId>(deviceId));
 
+    CHIP_ERROR err = wrapper->Controller()->UpdateDevice(static_cast<chip::NodeId>(deviceId));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to update device");

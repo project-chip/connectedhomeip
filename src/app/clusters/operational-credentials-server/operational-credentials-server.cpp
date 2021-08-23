@@ -117,7 +117,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     for (auto & pairing : GetGlobalFabricTable())
     {
         NodeId nodeId               = pairing.GetPeerId().GetNodeId();
-        uint64_t fabricId           = pairing.GetUncompressedFabricId();
+        uint64_t fabricId           = pairing.GetRawFabricId();
         uint16_t vendorId           = pairing.GetVendorId();
         const uint8_t * fabricLabel = pairing.GetFabricLabel();
 
@@ -195,7 +195,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric 0x%" PRIX16 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetUncompressedFabricId()),
+                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetRawFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         writeFabricsIntoFabricsListAttribute();
     }
@@ -206,7 +206,7 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric %" PRIX16 " was persisted to storage. FabricId %0x" ChipLogFormatX64
                        ", NodeId %0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetUncompressedFabricId()),
+                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetRawFabricId()),
                        ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         writeFabricsIntoFabricsListAttribute();
     }
