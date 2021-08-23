@@ -58,8 +58,8 @@ exit:
 
 void ShutdownChip(void)
 {
-    chip::DeviceLayer::PlatformMgr().Shutdown();
     gMessageCounterManager.Shutdown();
     gExchangeManager.Shutdown();
     gSessionManager.Shutdown();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
 }
