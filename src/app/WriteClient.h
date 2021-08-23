@@ -36,6 +36,10 @@
 
 namespace chip {
 namespace app {
+
+class WriteClientHandle;
+class InteractionModelEngine;
+
 /**
  *  @brief The read client represents the initiator side of a Write Interaction, and is responsible
  *  for generating one Write Request for a particular set of attributes, and handling the Write response.
@@ -52,22 +56,21 @@ public:
      */
     void Shutdown();
 
-    /**
-     *  Once SendWriteRequest returns successfully, the WriteClient will
-     *  handle calling Shutdown on itself once it decides it's done with waiting
-     *  for a response (i.e. times out or gets a response).
-     *  If SendWriteRequest is never called, or the call fails, the API
-     *  consumer is responsible for calling Shutdown on the WriteClient.
-     */
-    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession);
-
     CHIP_ERROR PrepareAttribute(const AttributePathParams & attributePathParams);
     CHIP_ERROR FinishAttribute();
     TLV::TLVWriter * GetAttributeDataElementTLVWriter();
 
+    uint64_t GetAppIdentifier() const { return mAppIdentifier; }
+    void SetAppIdentifier(uint64_t aAppIdentifier) { mAppIdentifier = aAppIdentifier; }
+    NodeId GetSourceNodeId() const
+    {
+        return mpExchangeCtx != nullptr ? mpExchangeCtx->GetSecureSession().GetPeerNodeId() : kUndefinedNodeId;
+    }
+
 private:
     friend class TestWriteInteraction;
     friend class InteractionModelEngine;
+    friend class WriteClientHandle;
 
     enum class State
     {
@@ -76,6 +79,22 @@ private:
         AddAttribute,      // The client has added attribute and ready for a SendWriteRequest
         AwaitingResponse,  // The client has sent out the write request message
     };
+
+    /**
+     * Finalize Write Request Message TLV Builder and retrieve final data from tlv builder for later sending
+     */
+    CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & aPacket);
+
+    /**
+     *  Once SendWriteRequest returns successfully, the WriteClient will
+     *  handle calling Shutdown on itself once it decides it's done with waiting
+     *  for a response (i.e. times out or gets a response). Client can specify
+     *  the maximum time to wait for response (in milliseconds) via timeout parameter.
+     *  Default timeout value will be used otherwise.
+     *  If SendWriteRequest is never called, or the call fails, the API
+     *  consumer is responsible for calling Shutdown on the WriteClient.
+     */
+    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession, uint32_t timeout);
 
     /**
      *  Initialize the client object. Within the lifetime
@@ -88,7 +107,8 @@ private:
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                    uint64_t aApplicationIdentifier);
 
     virtual ~WriteClient() = default;
 
@@ -100,11 +120,6 @@ private:
      *  Check if current write client is being used
      */
     bool IsFree() const { return mState == State::Uninitialized; };
-
-    /**
-     * Finalize Write Request Message TLV Builder and retrieve final data from tlv builder for later sending
-     */
-    CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & aPacket);
 
     void MoveToState(const State aTargetState);
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);
@@ -128,7 +143,79 @@ private:
     System::PacketBufferTLVWriter mMessageWriter;
     WriteRequest::Builder mWriteRequestBuilder;
     uint8_t mAttributeStatusIndex = 0;
-    intptr_t mAppIdentifier       = 0;
+    uint64_t mAppIdentifier       = 0;
+};
+
+class WriteClientHandle
+{
+public:
+    /**
+     * Construct an empty WriteClientHandle.
+     */
+    WriteClientHandle() : mpWriteClient(nullptr) {}
+    WriteClientHandle(decltype(nullptr)) : mpWriteClient(nullptr) {}
+
+    /**
+     * Construct a WriteClientHandle that takes ownership of a WriteClient from another.
+     */
+    WriteClientHandle(WriteClientHandle && aOther)
+    {
+        mpWriteClient        = aOther.mpWriteClient;
+        aOther.mpWriteClient = nullptr;
+    }
+
+    ~WriteClientHandle() { SetWriteClient(nullptr); }
+
+    /**
+     * Access a WriteClientHandle's public methods.
+     */
+    WriteClient * operator->() const { return mpWriteClient; }
+
+    /**
+     *  Finalize the message and send it to the desired node. The underlying write object will always be released, and the user
+     * should not use this object after calling this function.
+     */
+    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,
+                                uint32_t timeout = kImMessageTimeoutMsec);
+
+    /**
+     *  Encode an attribute value that can be directly encoded using TLVWriter::Put
+     */
+    template <class T>
+    CHIP_ERROR EncodeScalarAttributeWritePayload(const chip::app::AttributePathParams & attributePath, T value)
+    {
+        chip::TLV::TLVWriter * writer = nullptr;
+
+        VerifyOrReturnError(mpWriteClient != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(mpWriteClient->PrepareAttribute(attributePath));
+        VerifyOrReturnError((writer = mpWriteClient->GetAttributeDataElementTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(writer->Put(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), value));
+        ReturnErrorOnFailure(mpWriteClient->FinishAttribute());
+
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     *  Set the internal WriteClient of the Handler, expected to be called by InteractionModelEngline only since the user
+     * application does not have direct access to apWriteClient.
+     */
+    void SetWriteClient(WriteClient * apWriteClient)
+    {
+        if (mpWriteClient != nullptr)
+        {
+            mpWriteClient->Shutdown();
+        }
+        mpWriteClient = apWriteClient;
+    }
+
+private:
+    friend class TestWriteInteraction;
+
+    WriteClientHandle(const WriteClientHandle &) = delete;
+    WriteClientHandle & operator=(const WriteClientHandle &) = delete;
+    WriteClientHandle & operator=(const WriteClientHandle &&) = delete;
+
+    WriteClient * mpWriteClient = nullptr;
 };
 
 } // namespace app

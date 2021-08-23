@@ -21,6 +21,7 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <setup_payload/ManualSetupPayloadParser.h>
@@ -45,14 +46,16 @@ CHIP_ERROR PairingCommand::Run()
     // TODO: Ideally we'd just ask for an operational cert for the commissionnee
     // and get the node from that, but the APIs are not set up that way yet.
     NodeId randomId;
-    if (Controller::ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(&randomId) == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(Controller, "Generated random node id: 0x" ChipLogFormatX64, ChipLogValueX64(randomId));
-        if (GetExecContext()->storage->SetRemoteNodeId(randomId) == CHIP_NO_ERROR)
-        {
-            GetExecContext()->remoteId = randomId;
-        }
-    }
+    ReturnErrorOnFailure(Controller::ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(&randomId));
+
+    ChipLogProgress(Controller, "Generated random node id: 0x" ChipLogFormatX64, ChipLogValueX64(randomId));
+
+    ReturnErrorOnFailure(GetExecContext()->storage->SetRemoteNodeId(randomId));
+    GetExecContext()->remoteId = randomId;
+#else  // CONFIG_PAIR_WITH_RANDOM_ID
+    // Use the default id, not whatever happens to be in our storage, since this
+    // is a new pairing.
+    GetExecContext()->remoteId = kTestDeviceNodeId;
 #endif // CONFIG_PAIR_WITH_RANDOM_ID
 
     err = RunInternal(GetExecContext()->remoteId);
@@ -394,8 +397,8 @@ CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 
 void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
 {
-    ChipLogProgress(chipTool, "OnAddressUpdateComplete: %s", ErrorStr(err));
-    if (err != CHIP_NO_ERROR)
+    ChipLogProgress(chipTool, "OnAddressUpdateComplete: %" PRIx64 ": %s", nodeId, ErrorStr(err));
+    if (err != CHIP_NO_ERROR && nodeId == mRemoteId)
     {
         // Set exit status only if the address update failed.
         // Otherwise wait for OnCommissioningComplete() callback.

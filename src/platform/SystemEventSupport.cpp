@@ -29,12 +29,11 @@
 
 namespace chip {
 namespace System {
-namespace Platform {
-namespace Eventing {
 
 using namespace ::chip::DeviceLayer;
 
-CHIP_ERROR PostEvent(System::Layer & aLayer, System::Object & aTarget, System::EventType aType, uintptr_t aArgument)
+CHIP_ERROR PlatformEventing::PostEvent(System::Layer & aLayer, System::Object & aTarget, System::EventType aType,
+                                       uintptr_t aArgument)
 {
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kChipSystemLayerEvent;
@@ -47,21 +46,24 @@ CHIP_ERROR PostEvent(System::Layer & aLayer, System::Object & aTarget, System::E
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DispatchEvents(System::Layer & aLayer)
+CHIP_ERROR PlatformEventing::DispatchEvents(System::Layer & aLayer)
 {
     PlatformMgr().RunEventLoop();
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DispatchEvent(System::Layer & aLayer, const ChipDeviceEvent * aEvent)
+CHIP_ERROR PlatformEventing::DispatchEvent(System::Layer & aLayer, const ChipDeviceEvent * aEvent)
 {
     PlatformMgr().DispatchEvent(aEvent);
 
     return CHIP_NO_ERROR;
 }
 
-} // namespace Eventing
-} // namespace Platform
+CHIP_ERROR PlatformEventing::StartTimer(System::Layer & aLayer, uint32_t aMilliseconds)
+{
+    return PlatformMgr().StartChipTimer(aMilliseconds);
+}
+
 } // namespace System
 } // namespace chip

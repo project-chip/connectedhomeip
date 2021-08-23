@@ -297,7 +297,7 @@ void AsyncDNSResolverSockets::Resolve(DNSResolver & resolver)
 }
 
 /* Event handler function for asynchronous DNS notification */
-void AsyncDNSResolverSockets::DNSResultEventHandler(chip::System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
+void AsyncDNSResolverSockets::DNSResultEventHandler(chip::System::Layer * aLayer, void * aAppState)
 {
     DNSResolver * resolver = static_cast<DNSResolver *>(aAppState);
 

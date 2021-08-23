@@ -488,7 +488,7 @@ menu "CHIP Device Layer"
 
         config WIFI_AP_IDLE_TIMEOUT
             int "WiFi AP Idle Timeout (ms)"
-            range 0 65535
+            range 0 600000
             default 120000
             help
                 The amount of time (in milliseconds) after which the CHIP platform will deactivate the soft-AP

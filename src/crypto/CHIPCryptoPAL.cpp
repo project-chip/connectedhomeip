@@ -443,7 +443,13 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
     VerifyOrReturnError(Kcaorb != nullptr, CHIP_ERROR_INTERNAL);
 
     ReturnErrorOnFailure(PointWrite(XY, point_buffer, point_size));
-    ReturnErrorOnFailure(MacVerify(Kcaorb, hash_size / 2, in, in_len, point_buffer, point_size));
+
+    CHIP_ERROR err = MacVerify(Kcaorb, hash_size / 2, in, in_len, point_buffer, point_size);
+    if (err == CHIP_ERROR_INTERNAL)
+    {
+        ChipLogError(SecureChannel, "Failed to verify peer's MAC. This can happen when setup code is incorrect.");
+    }
+    ReturnErrorOnFailure(err);
 
     state = CHIP_SPAKE2P_STATE::KC;
     return CHIP_NO_ERROR;
@@ -606,6 +612,46 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1
     out_raw_sig = out_raw_sig.SubSpan(0, (2u * fe_length_bytes));
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_key, uint64_t fabric_id,
+                                      MutableByteSpan & out_compressed_fabric_id)
+{
+    VerifyOrReturnError(root_public_key.IsUncompressed(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_compressed_fabric_id.size() >= kCompressedFabricIdentifierSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Ensure proper endianness for Fabric ID (i.e. big-endian as it appears in certificates)
+    uint8_t fabric_id_as_big_endian_salt[kCompressedFabricIdentifierSize];
+    chip::Encoding::BigEndian::Put64(&fabric_id_as_big_endian_salt[0], fabric_id);
+
+    // Compute Compressed fabric reference per spec pseudocode
+    //   CompressedFabricIdentifier =
+    //     CHIP_Crypto_KDF(
+    //       inputKey := TargetOperationalRootPublicKey,
+    //       salt:= TargetOperationalFabricID,
+    //       info := CompressedFabricInfo,
+    //       len := 64)
+    //
+    // NOTE: len=64 bits is implied by output buffer size when calling HKDF_sha::HKDF_SHA256.
+
+    constexpr uint8_t kCompressedFabricInfo[16] = /* "CompressedFabric" */
+        { 0x43, 0x6f, 0x6d, 0x70, 0x72, 0x65, 0x73, 0x73, 0x65, 0x64, 0x46, 0x61, 0x62, 0x72, 0x69, 0x63 };
+    HKDF_sha hkdf;
+
+    // Must drop uncompressed point form format specifier (first byte), per spec method
+    ByteSpan input_key_span(root_public_key.ConstBytes() + 1, root_public_key.Length() - 1);
+
+    CHIP_ERROR status = hkdf.HKDF_SHA256(
+        input_key_span.data(), input_key_span.size(), &fabric_id_as_big_endian_salt[0], sizeof(fabric_id_as_big_endian_salt),
+        &kCompressedFabricInfo[0], sizeof(kCompressedFabricInfo), out_compressed_fabric_id.data(), kCompressedFabricIdentifierSize);
+
+    // Resize output to final bounds on success
+    if (status == CHIP_NO_ERROR)
+    {
+        out_compressed_fabric_id = out_compressed_fabric_id.SubSpan(0, kCompressedFabricIdentifierSize);
+    }
+
+    return status;
 }
 
 } // namespace Crypto

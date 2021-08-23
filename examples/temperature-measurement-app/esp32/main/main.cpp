@@ -33,9 +33,13 @@
 #include <string>
 #include <vector>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <support/ErrorStr.h>
 
 using namespace ::chip;
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
@@ -77,6 +81,9 @@ extern "C" void app_main()
     }
 
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Run the UI Loop
     while (true)

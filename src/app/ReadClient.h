@@ -69,15 +69,18 @@ public:
      *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReportError
      *  call happens with guarantee.
      *
+     *  Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
+     *  Default timeout value will be used otherwise.
+     *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * aSecureSession,
+    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * aSecureSession,
                                EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
                                AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
-                               EventNumber aEventNumber);
+                               EventNumber aEventNumber, uint32_t timeout = kImMessageTimeoutMsec);
 
-    intptr_t GetAppIdentifier() const { return mAppIdentifier; }
+    uint64_t GetAppIdentifier() const { return mAppIdentifier; }
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
 private:
@@ -99,13 +102,12 @@ private:
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apDelegate       InteractionModelDelegate set by application.
-     *  @param[in]    aAppState        Application defined object to distinguish different read requests.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, intptr_t aAppIdentifier);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, uint64_t aAppIdentifier);
 
     virtual ~ReadClient() = default;
 
@@ -140,7 +142,7 @@ private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
-    intptr_t mAppIdentifier                    = 0;
+    uint64_t mAppIdentifier                    = 0;
 };
 
 }; // namespace app

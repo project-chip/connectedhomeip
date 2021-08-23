@@ -1,79 +1,79 @@
 [submodule "nlassert"]
 	path = third_party/nlassert/repo
 	url = https://github.com/nestlabs/nlassert.git
-	branch = master
+	branch  = master
 [submodule "nlfaultinjection"]
 	path = third_party/nlfaultinjection/repo
 	url = https://github.com/nestlabs/nlfaultinjection.git
-	branch = master
+	branch  = master
 [submodule "nlio"]
 	path = third_party/nlio/repo
 	url = https://github.com/nestlabs/nlio.git
-	branch = master
+	branch  = master
 [submodule "nlunit-test"]
 	path = third_party/nlunit-test/repo
 	url = https://github.com/nestlabs/nlunit-test.git
-	branch = master
+	branch  = master
 [submodule "mbedtls"]
 	path = third_party/mbedtls/repo
 	url = https://github.com/ARMmbed/mbedtls.git
-	branch = mbedtls-2.25
+	branch  = mbedtls-2.25
 [submodule "qrcode"]
 	path = examples/common/QRCode/repo
 	url = https://github.com/nayuki/QR-Code-generator.git
-	branch = master
+	branch  = master
 [submodule "m5stack-tft"]
 	path = examples/common/m5stack-tft/repo
 	url = https://github.com/jeremyjh/ESP32_TFT_library.git
-	branch = master
+	branch  = master
 [submodule "pigweed"]
 	path = third_party/pigweed/repo
 	url = https://github.com/google/pigweed.git
-	branch = main
+	branch  = main
 [submodule "openthread"]
 	path = third_party/openthread/repo
 	url = https://github.com/openthread/openthread.git
-	branch = main
+	branch  = main
 [submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo
 	url = https://github.com/openthread/ot-br-posix.git
-	branch = main
+	branch  = main
 [submodule "bluez"]
 	path = third_party/bluez/repo
 	url = https://github.com/bluez/bluez.git
-	branch = master
+	branch  = master
 [submodule "cirque"]
 	path = third_party/cirque/repo
 	url = https://github.com/openweave/cirque.git
-	branch = master
+	branch  = master
 [submodule "happy"]
 	path = third_party/happy/repo
 	url = https://github.com/openweave/happy.git
-	branch = master
+	branch  = master
 [submodule "nanopb"]
 	path = third_party/nanopb/repo
 	url = https://github.com/nanopb/nanopb.git
-	branch = master
+	branch  = master
 [submodule "qpg_sdk"]
 	path = third_party/qpg_sdk/repo
 	url = https://github.com/Qorvo/qpg-connectedhomeip
-	branch = master
+	branch  = master
 [submodule "zap"]
 	path = third_party/zap/repo
 	url = https://github.com/project-chip/zap.git
-	branch = master
+	branch  = master
 [submodule "freertos"]
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
-	branch = V10.3.1-kernel-only
+	branch  = V10.3.1-kernel-only
 [submodule "efr32_sdk"]
 	path = third_party/efr32_sdk/repo
 	url = https://github.com/SiliconLabs/sdk_support.git
-	branch = master
+	branch  = master
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
-	branch = int/CHIPSE_Release
+	branch  = int/CHIPSE_Release
 [submodule "third_party/openthread/ot-nxp"]
 	path = third_party/openthread/ot-nxp
 	url = https://github.com/openthread/ot-nxp.git
@@ -86,12 +86,80 @@
 [submodule "third_party/mbed-os/repo"]
 	path = third_party/mbed-os/repo
 	url = https://github.com/ARMmbed/mbed-os.git
-	branch = feature-chip
+	branch  = feature-chip
 [submodule "third_party/wifi-ism43362/repo"]
 	path = third_party/wifi-ism43362/repo
 	url = https://github.com/ATmobica/wifi-ism43362.git
-	branch = master
+	branch  = master
 [submodule "third_party/mbed-os-posix-socket/repo"]
 	path = third_party/mbed-os-posix-socket/repo
 	url = https://github.com/ARMmbed/mbed-os-posix-socket.git
-	branch = main
+	branch  = main
+[submodule "p6/abstraction-rtos"]
+	path = third_party/p6/p6_sdk/libs/abstraction-rtos
+	url = https://github.com/Infineon/abstraction-rtos
+[submodule "p6/bluetooth-freertos"]
+	path = third_party/p6/p6_sdk/libs/bluetooth-freertos
+	url = https://github.com/Infineon/bluetooth-freertos
+	branch  = v2.X
+[submodule "p6/btstack"]
+	path = third_party/p6/p6_sdk/libs/btstack
+	url = https://github.com/Infineon/btstack
+[submodule "p6/clib-support"]
+	path = third_party/p6/p6_sdk/libs/clib-support
+	url = https://github.com/Infineon/clib-support
+[submodule "p6/connectivity-utilities"]
+	path = third_party/p6/p6_sdk/libs/connectivity-utilities
+	url = https://github.com/Infineon/connectivity-utilities
+[submodule "p6/core-lib"]
+	path = third_party/p6/p6_sdk/libs/core-lib
+	url = https://github.com/Infineon/core-lib
+[submodule "p6/core-make"]
+	path = third_party/p6/p6_sdk/libs/core-make
+	url = https://github.com/Infineon/core-make
+[submodule "p6/kv-store"]
+	path = third_party/p6/p6_sdk/libs/kv-store
+	url = https://github.com/Infineon/kv-store
+[submodule "p6/mtb-hal-cat1"]
+	path = third_party/p6/p6_sdk/libs/mtb-hal-cat1
+	url = https://github.com/Infineon/mtb-hal-cat1
+[submodule "p6/mtb-pdl-cat1"]
+	path = third_party/p6/p6_sdk/libs/mtb-pdl-cat1
+	url = https://github.com/Infineon/mtb-pdl-cat1
+[submodule "p6/psoc6cm0p"]
+	path = third_party/p6/p6_sdk/libs/psoc6cm0p
+	url = https://github.com/Infineon/psoc6cm0p
+[submodule "p6/whd-bsp-integration"]
+	path = third_party/p6/p6_sdk/libs/whd-bsp-integration
+	url = https://github.com/Infineon/whd-bsp-integration
+[submodule "p6/wifi-connection-manager"]
+	path = third_party/p6/p6_sdk/libs/wifi-connection-manager
+	url = https://github.com/Infineon/wifi-connection-manager
+[submodule "p6/wifi-host-driver"]
+	path = third_party/p6/p6_sdk/libs/wifi-host-driver
+	url = https://github.com/Infineon/wifi-host-driver
+[submodule "p6/wifi-mw-core"]
+	path = third_party/p6/p6_sdk/libs/wifi-mw-core
+	url = https://github.com/Infineon/wifi-mw-core
+[submodule "p6/TARGET_CY8CKIT-062S2-43012"]
+	path = third_party/p6/p6_sdk/libs/TARGET_CY8CKIT-062S2-43012
+	url = https://github.com/Infineon/TARGET_CY8CKIT-062S2-43012
+[submodule "p6/freertos"]
+	path = third_party/p6/p6_sdk/libs/freertos
+	url = https://github.com/Infineon/freertos
+[submodule "p6/retarget-io"]
+	path = third_party/p6/p6_sdk/libs/retarget-io
+	url = https://github.com/Infineon/retarget-io
+[submodule "p6/mbedtls"]
+	path = third_party/p6/p6_sdk/libs/mbedtls
+	url = https://github.com/ARMmbed/mbedtls
+[submodule "p6/secure-sockets"]
+	path = third_party/p6/p6_sdk/libs/secure-sockets
+	url = https://github.com/Infineon/secure-sockets
+[submodule "p6/recipe-make-cat1a"]
+	path = third_party/p6/p6_sdk/libs/recipe-make-cat1a
+	url = https://github.com/Infineon/recipe-make-cat1a
+[submodule "third_party/pybind11/repo"]
+	path = third_party/pybind11/repo
+	url = https://github.com/pybind/pybind11
+	branch  = stable

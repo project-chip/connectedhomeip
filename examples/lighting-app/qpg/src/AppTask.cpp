@@ -30,10 +30,14 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
 using namespace chip::TLV;
+using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 
 #include <platform/CHIPDeviceLayer.h>
@@ -97,13 +101,17 @@ CHIP_ERROR AppTask::Init()
 
     // Init ZCL Data Model
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
     UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     // Enable BLE advertisements
-    OpenDefaultPairingWindow(chip::ResetFabrics::kNo);
+    OpenBasicCommissioningWindow(chip::ResetFabrics::kNo);
     ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
 
     return err;
@@ -116,7 +124,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "AppTask.Init() failed: %" CHIP_ERROR_FORMAT, chip::ChipError::FormatError(err));
+        ChipLogError(NotSpecified, "AppTask.Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
         // appError(err);
     }
 
@@ -250,7 +258,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     sAppTask.PostEvent(&button_event);
 }
 
-void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
+void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
@@ -374,7 +382,6 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
     CHIP_ERROR err;
 
-    SystemLayer.CancelTimer(TimerEventHandler, this);
     err = SystemLayer.StartTimer(aTimeoutInMs, TimerEventHandler, this);
     SuccessOrExit(err);
 

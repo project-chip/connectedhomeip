@@ -183,7 +183,7 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError)
+void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void * context)
 {
     static_cast<BLEManagerImpl *>(context)->HandleAdvertisementTimer();
 }
@@ -199,7 +199,7 @@ void BLEManagerImpl::HandleAdvertisementTimer()
     }
 }
 
-void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError)
+void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context)
 {
     static_cast<BLEManagerImpl *>(context)->HandleFastAdvertisementTimer();
 }
@@ -448,7 +448,7 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
     case ESP_ERR_INVALID_ARG:
         return CHIP_ERROR_INVALID_ARGUMENT;
     default:
-        return ChipError::Encapsulate(ChipError::Range::kPlatform, CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + bleErr);
+        return CHIP_ERROR(ChipError::Range::kPlatform, CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + bleErr);
     }
 }
 void BLEManagerImpl::DriveBLEState(void)
@@ -1021,7 +1021,7 @@ exit:
     // Schedule DriveBLEState() to run.
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
-    return ChipError::AsInteger(err);
+    return err.AsInteger();
 }
 
 int BLEManagerImpl::gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg)

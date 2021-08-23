@@ -38,6 +38,9 @@
 #include <app/common/gen/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 // mbed-os headers
 #include "drivers/InterruptIn.h"
 #include "drivers/Timeout.h"
@@ -68,6 +71,7 @@ static mbed::Timeout sFunctionTimer;
 // TODO: change EventQueue default event size
 static events::EventQueue sAppEventQueue;
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -113,6 +117,9 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));

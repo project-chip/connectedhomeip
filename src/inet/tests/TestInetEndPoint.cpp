@@ -73,7 +73,7 @@ void HandleDNSResolveComplete(void * appState, CHIP_ERROR err, uint8_t addrCount
         printf("    DNS name resolution return no addresses\n");
 }
 
-void HandleTimer(Layer * aLayer, void * aAppState, CHIP_ERROR aError)
+void HandleTimer(Layer * aLayer, void * aAppState)
 {
     printf("    timer handler\n");
 }
@@ -136,12 +136,9 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     char testHostName2[20] = "127.0.0.1";
     char testHostName3[20] = "";
     char testHostName4[260];
-    struct timeval sleepTime;
     IPAddress testDestAddr[1] = { IPAddress::Any };
     CHIP_ERROR err;
-
-    sleepTime.tv_sec  = 0;
-    sleepTime.tv_usec = 10000;
+    constexpr uint32_t kSleepTimeMilliseconds = 10;
 
     memset(testHostName4, 'w', sizeof(testHostName4));
     testHostName4[259] = '\0';
@@ -154,7 +151,7 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     {
         while (!callbackHandlerCalled)
         {
-            ServiceNetwork(sleepTime);
+            ServiceNetwork(kSleepTimeMilliseconds);
         }
     }
 
@@ -166,7 +163,7 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     {
         while (!callbackHandlerCalled)
         {
-            ServiceNetwork(sleepTime);
+            ServiceNetwork(kSleepTimeMilliseconds);
         }
     }
 
@@ -178,7 +175,7 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
     {
         while (!callbackHandlerCalled)
         {
-            ServiceNetwork(sleepTime);
+            ServiceNetwork(kSleepTimeMilliseconds);
         }
     }
 
@@ -221,7 +218,7 @@ static void TestInetError(nlTestSuite * inSuite, void * inContext)
 
     err = MapErrorPOSIX(EPERM);
     NL_TEST_ASSERT(inSuite, DescribeErrorPOSIX(err));
-    NL_TEST_ASSERT(inSuite, ChipError::IsRange(ChipError::Range::kPOSIX, err));
+    NL_TEST_ASSERT(inSuite, err.IsRange(ChipError::Range::kPOSIX));
 }
 
 static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
@@ -496,6 +493,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     testTCPEP1->Free();
 }
 
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 // Test the InetLayer resource limitation
 static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
@@ -504,7 +502,7 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 #endif //
     UDPEndPoint * testUDPEP[INET_CONFIG_NUM_UDP_ENDPOINTS + 1] = { nullptr };
     TCPEndPoint * testTCPEP[INET_CONFIG_NUM_TCP_ENDPOINTS + 1] = { nullptr };
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
@@ -551,6 +549,7 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         testTCPEP[i]->Free();
     }
 }
+#endif
 
 // Test Suite
 
@@ -565,7 +564,9 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
                                  NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
                                  NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
                                  NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointInternal),
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
                                  NL_TEST_DEF("InetEndPoint::TestEndPointLimit", TestInetEndPointLimit),
+#endif
                                  NL_TEST_SENTINEL() };
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

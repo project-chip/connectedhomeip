@@ -23,49 +23,64 @@ import subprocess
 import sys
 import urllib.request
 
-CHIP_ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '../../..'))
+CHIP_ROOT_DIR = os.path.realpath(
+    os.path.join(os.path.dirname(__file__), '../../..'))
+
 
 def checkPythonVersion():
     if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' + str(sys.version_info[0]))
+        print('Must use Python 3. Current version is ' +
+              str(sys.version_info[0]))
         exit(1)
+
 
 def checkFileExists(path):
     if not os.path.isfile(path):
         print('Error: ' + path + ' does not exists or is not a file.')
         exit(1)
 
+
 def checkDirExists(path):
     if not os.path.isdir(path):
         print('Error: ' + path + ' does not exists or is not a directory.')
         exit(1)
+
 
 def getFilePath(name):
     fullpath = os.path.join(CHIP_ROOT_DIR, name)
     checkFileExists(fullpath)
     return fullpath
 
+
 def getDirPath(name):
     fullpath = os.path.join(CHIP_ROOT_DIR, name)
     checkDirExists(fullpath)
     return fullpath
 
+
 def runArgumentsParser():
     default_templates = 'src/app/zap-templates/app-templates.json'
     default_zcl = 'src/app/zap-templates/zcl/zcl.json'
-    default_output_dir = 'gen/'
+    default_output_dir = 'zap-generated/'
 
-    parser = argparse.ArgumentParser(description='Generate artifacts from .zapt templates')
+    parser = argparse.ArgumentParser(
+        description='Generate artifacts from .zapt templates')
     parser.add_argument('zap', help='Path to the application .zap file')
-    parser.add_argument('-t', '--templates', default=default_templates, help='Path to the .zapt templates records to use for generating artifacts (default: "' + default_templates + '")')
-    parser.add_argument('-z', '--zcl', default=default_zcl, help='Path to the zcl templates records to use for generating artifacts (default: "' + default_zcl + '")')
+    parser.add_argument('-t', '--templates', default=default_templates,
+                        help='Path to the .zapt templates records to use for generating artifacts (default: "' + default_templates + '")')
+    parser.add_argument('-z', '--zcl', default=default_zcl,
+                        help='Path to the zcl templates records to use for generating artifacts (default: "' + default_zcl + '")')
+    parser.add_argument('-o', '--output-dir', default=None,
+                        help='Output directory for the generated files (default: automatically selected)')
     args = parser.parse_args()
 
     # By default, this script assumes that the global CHIP template is used with
-    # a default 'gen/' output folder relative to APP_ROOT_DIR.
+    # a default 'zap-generated/' output folder relative to APP_ROOT_DIR.
     # If needed, the user may specify a specific template as a second argument. In
     # this case the output folder is relative to CHIP_ROOT_DIR.
-    if args.templates == default_templates:
+    if args.output_dir:
+        output_dir = args.output_dir
+    elif args.templates == default_templates:
         output_dir = os.path.join(Path(args.zap).parent, default_output_dir)
     else:
         output_dir = ''
@@ -77,18 +92,24 @@ def runArgumentsParser():
 
     return (zap_file, zcl_file, templates_file, output_dir)
 
+
 def runGeneration(zap_file, zcl_file, templates_file, output_dir):
     generator_dir = getDirPath('third_party/zap/repo')
     os.chdir(generator_dir)
-    subprocess.check_call(['node', './src-script/zap-generate.js', '-z', zcl_file, '-g', templates_file, '-i', zap_file, '-o', output_dir])
+    subprocess.check_call(['node', './src-script/zap-generate.js', '-z',
+                          zcl_file, '-g', templates_file, '-i', zap_file, '-o', output_dir])
+
 
 def runClangPrettifier(templates_file, output_dir):
-    listOfSupportedFileExtensions = ['.js', '.h', '.c', '.hpp', '.cpp', '.m', '.mm']
+    listOfSupportedFileExtensions = [
+        '.js', '.h', '.c', '.hpp', '.cpp', '.m', '.mm']
 
     try:
         jsonData = json.loads(Path(templates_file).read_text())
-        outputs = [(os.path.join(output_dir, template['output'])) for template in jsonData['templates']]
-        clangOutputs = list(filter(lambda filepath: os.path.splitext(filepath)[1] in listOfSupportedFileExtensions, outputs))
+        outputs = [(os.path.join(output_dir, template['output']))
+                   for template in jsonData['templates']]
+        clangOutputs = list(filter(lambda filepath: os.path.splitext(
+            filepath)[1] in listOfSupportedFileExtensions, outputs))
 
         if len(clangOutputs) > 0:
             args = ['clang-format', '-i']
@@ -97,26 +118,33 @@ def runClangPrettifier(templates_file, output_dir):
     except Exception as err:
         print('clang-format error:', err)
 
+
 def runJavaPrettifier(templates_file, output_dir):
     try:
         jsonData = json.loads(Path(templates_file).read_text())
-        outputs = [(os.path.join(output_dir, template['output'])) for template in jsonData['templates']]
-        javaOutputs = list(filter(lambda filepath: os.path.splitext(filepath)[1] == ".java", outputs))
+        outputs = [(os.path.join(output_dir, template['output']))
+                   for template in jsonData['templates']]
+        javaOutputs = list(
+            filter(lambda filepath: os.path.splitext(filepath)[1] == ".java", outputs))
 
         if len(javaOutputs) > 0:
             # Keep this version in sync with what restyler uses (https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml).
             google_java_format_version = "1.6"
-            google_java_format_url = 'https://github.com/google/google-java-format/releases/download/google-java-format-' + google_java_format_version + '/'
-            google_java_format_jar = 'google-java-format-' + google_java_format_version + '-all-deps.jar'
+            google_java_format_url = 'https://github.com/google/google-java-format/releases/download/google-java-format-' + \
+                google_java_format_version + '/'
+            google_java_format_jar = 'google-java-format-' + \
+                google_java_format_version + '-all-deps.jar'
             jar_url = google_java_format_url + google_java_format_jar
-            
+
             home = str(Path.home())
-            path, http_message = urllib.request.urlretrieve(jar_url, home + '/' + google_java_format_jar)
+            path, http_message = urllib.request.urlretrieve(
+                jar_url, home + '/' + google_java_format_jar)
             args = ['java', '-jar', path, '--replace']
             args.extend(javaOutputs)
             subprocess.check_call(args)
     except Exception as err:
         print('google-java-format error:', err)
+
 
 def main():
     checkPythonVersion()
@@ -125,6 +153,7 @@ def main():
     runGeneration(zap_file, zcl_file, templates_file, output_dir)
     runClangPrettifier(templates_file, output_dir)
     runJavaPrettifier(templates_file, output_dir)
+
 
 if __name__ == '__main__':
     main()

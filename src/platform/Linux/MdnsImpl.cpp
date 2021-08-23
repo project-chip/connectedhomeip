@@ -149,7 +149,7 @@ Poller::Poller()
     mAvahiPoller.timeout_update = TimeoutUpdate;
     mAvahiPoller.timeout_free   = TimeoutFree;
 
-    mWatchableEvents = &DeviceLayer::SystemLayer.WatchableEvents();
+    mWatchableEvents = &DeviceLayer::SystemLayer.WatchableEventsManager();
 }
 
 AvahiWatch * Poller::WatchNew(const struct AvahiPoll * poller, int fd, AvahiWatchEvent event, AvahiWatchCallback callback,
@@ -338,6 +338,21 @@ exit:
     return error;
 }
 
+CHIP_ERROR MdnsAvahi::Shutdown()
+{
+    if (mGroup)
+    {
+        avahi_entry_group_free(mGroup);
+        mGroup = nullptr;
+    }
+    if (mClient)
+    {
+        avahi_client_free(mClient);
+        mClient = nullptr;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR MdnsAvahi::SetHostname(const char * hostname)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -492,7 +507,7 @@ exit:
     }
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Avahi publish service failed: %" CHIP_ERROR_FORMAT, ChipError::FormatError(error));
+        ChipLogError(DeviceLayer, "Avahi publish service failed: %" CHIP_ERROR_FORMAT, error.Format());
     }
 
     return error;
@@ -733,18 +748,6 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
     chip::Platform::Delete(context);
 }
 
-MdnsAvahi::~MdnsAvahi()
-{
-    if (mGroup)
-    {
-        avahi_entry_group_free(mGroup);
-    }
-    if (mClient)
-    {
-        avahi_client_free(mClient);
-    }
-}
-
 void GetMdnsTimeout(timeval & timeout)
 {
     MdnsAvahi::GetInstance().GetPoller().GetTimeout(timeout);
@@ -758,6 +761,11 @@ void HandleMdnsTimeout()
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context)
 {
     return MdnsAvahi::GetInstance().Init(initCallback, errorCallback, context);
+}
+
+CHIP_ERROR ChipMdnsShutdown()
+{
+    return MdnsAvahi::GetInstance().Shutdown();
 }
 
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)

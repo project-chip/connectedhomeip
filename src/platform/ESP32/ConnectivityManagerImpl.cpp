@@ -695,7 +695,7 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
     }
 }
 
-void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError)
+void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, void * aAppState)
 {
     sInstance.DriveStationState();
 }
@@ -874,7 +874,7 @@ void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
     }
 }
 
-void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::CHIP_ERROR aError)
+void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void * aAppState)
 {
     sInstance.DriveAPState();
 }

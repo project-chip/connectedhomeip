@@ -30,6 +30,9 @@
 #include "shell_extension/launch.h"
 #include <app/server/Server.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <cmath>
 #include <cstdio>
 #include <string>
@@ -43,6 +46,7 @@
 #endif
 
 using namespace ::chip;
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
@@ -82,6 +86,9 @@ extern "C" void app_main()
     }
 
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
     error = GetAppTask().StartAppTask();

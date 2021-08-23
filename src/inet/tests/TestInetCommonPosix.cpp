@@ -50,10 +50,13 @@
 #include <support/CHIPMem.h>
 #include <support/ErrorStr.h>
 #include <support/ScopedBuffer.h>
-#include <system/SystemTimer.h>
+#include <system/SystemClock.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/dns.h>
+#if !(LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
+#include <lwip/ip6_route_table.h>
+#endif // !(LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
 #include <lwip/init.h>
 #include <lwip/netif.h>
 #include <lwip/sys.h>
@@ -95,7 +98,12 @@ static void ReleaseLwIP(void)
 #if !(LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
     if (sLwIPAcquireCount > 0 && --sLwIPAcquireCount == 0)
     {
+#if defined(INCLUDE_vTaskDelete) && INCLUDE_vTaskDelete
+        // FreeRTOS need to delete the task not return from it.
+        tcpip_finish(reinterpret_cast<tcpip_will_finish_fn>(vTaskDelete), NULL);
+#else  // defined(INCLUDE_vTaskDelete) && INCLUDE_vTaskDelete
         tcpip_finish(NULL, NULL);
+#endif // defined(INCLUDE_vTaskDelete) && INCLUDE_vTaskDelete
     }
 #endif
 }
@@ -390,10 +398,8 @@ void InitNetwork()
 
     while (!NetworkIsReady())
     {
-        struct timeval lSleepTime;
-        lSleepTime.tv_sec  = 0;
-        lSleepTime.tv_usec = 100000;
-        ServiceEvents(lSleepTime);
+        constexpr uint32_t kSleepTimeMilliseconds = 100;
+        ServiceEvents(kSleepTimeMilliseconds);
     }
 
     // FIXME: this is kinda nasty :(
@@ -438,7 +444,7 @@ void InitNetwork()
     gInet.Init(gSystemLayer, lContext);
 }
 
-void ServiceEvents(struct ::timeval & aSleepTime)
+void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 {
     static bool printed = false;
 
@@ -454,10 +460,14 @@ void ServiceEvents(struct ::timeval & aSleepTime)
         }
     }
 
+    // Start a timer (with a no-op callback) to ensure that WaitForEvents() does not block longer than aSleepTimeMilliseconds.
+    gSystemLayer.StartTimer(
+        aSleepTimeMilliseconds, [](System::Layer *, void *) -> void {}, nullptr);
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    gSystemLayer.WatchableEvents().PrepareEventsWithTimeout(aSleepTime);
-    gSystemLayer.WatchableEvents().WaitForEvents();
-    gSystemLayer.WatchableEvents().HandleEvents();
+    gSystemLayer.WatchableEventsManager().PrepareEvents();
+    gSystemLayer.WatchableEventsManager().WaitForEvents();
+    gSystemLayer.WatchableEventsManager().HandleEvents();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -469,16 +479,13 @@ void ServiceEvents(struct ::timeval & aSleepTime)
         {
             if (sRemainingSystemLayerEventDelay == 0)
             {
-                gSystemLayer.DispatchEvents();
+                gSystemLayer.WatchableEventsManager().DispatchEvents();
                 sRemainingSystemLayerEventDelay = gNetworkOptions.EventDelay;
             }
             else
                 sRemainingSystemLayerEventDelay--;
 
-            // TODO: Currently timers are delayed by aSleepTime above. A improved solution would have a mechanism to reduce
-            // aSleepTime according to the next timer.
-
-            gSystemLayer.HandlePlatformTimer();
+            gSystemLayer.WatchableEventsManager().HandlePlatformTimer();
         }
     }
 #if CHIP_TARGET_STYLE_UNIX

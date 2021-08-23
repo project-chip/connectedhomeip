@@ -23,17 +23,14 @@
 namespace chip {
 namespace Test {
 
-CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport)
+CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport, IOContext * ioContext)
 {
-    ReturnErrorOnFailure(IOContext::Init(suite));
+    VerifyOrReturnError(mInitialized == false, CHIP_ERROR_INTERNAL);
+    mInitialized = true;
+
+    mIOContext = ioContext;
 
     mFabrics.Reset();
-
-    chip::Transport::FabricInfo * srcNodeFabric = mFabrics.AssignFabricIndex(mSrcFabricIndex, GetSourceNodeId());
-    VerifyOrReturnError(srcNodeFabric != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    chip::Transport::FabricInfo * destNodeFabric = mFabrics.AssignFabricIndex(mDestFabricIndex, GetDestinationNodeId());
-    VerifyOrReturnError(destNodeFabric != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(mSecureSessionMgr.Init(&GetSystemLayer(), transport, &mFabrics, &mMessageCounterManager));
 
@@ -50,31 +47,35 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
 // Shutdown all layers, finalize operations
 CHIP_ERROR MessagingContext::Shutdown()
 {
+    VerifyOrReturnError(mInitialized == true, CHIP_ERROR_INTERNAL);
+    mInitialized = false;
+
     mExchangeManager.Shutdown();
-    return IOContext::Shutdown();
+    mSecureSessionMgr.Shutdown();
+    return CHIP_NO_ERROR;
 }
 
-SecureSessionHandle MessagingContext::GetSessionLocalToPeer()
+SessionHandle MessagingContext::GetSessionLocalToPeer()
 {
-    // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
-    return { GetDestinationNodeId(), GetPeerKeyId(), GetFabricIndex() };
+    // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
+    return SessionHandle(GetDestinationNodeId(), GetLocalKeyId(), GetPeerKeyId(), GetFabricIndex());
 }
 
-SecureSessionHandle MessagingContext::GetSessionPeerToLocal()
+SessionHandle MessagingContext::GetSessionPeerToLocal()
 {
-    // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
-    return { GetSourceNodeId(), GetLocalKeyId(), mDestFabricIndex };
+    // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
+    return SessionHandle(GetSourceNodeId(), GetPeerKeyId(), GetLocalKeyId(), mDestFabricIndex);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)
 {
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
     return mExchangeManager.NewContext(GetSessionLocalToPeer(), delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToLocal(Messaging::ExchangeDelegate * delegate)
 {
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
     return mExchangeManager.NewContext(GetSessionPeerToLocal(), delegate);
 }
 

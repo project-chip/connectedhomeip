@@ -200,9 +200,9 @@ private:
     static constexpr uint32_t kFastAdvertiseTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
     uint64_t mAdvertiseStartTime;
 
-    static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError);
+    static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
     void HandleFastAdvertisementTimer();
-    static void HandleAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError);
+    static void HandleAdvertisementTimer(System::Layer * systemLayer, void * context);
     void HandleAdvertisementTimer();
 
 #if CONFIG_BT_BLUEDROID_ENABLED

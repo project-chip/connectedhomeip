@@ -22,6 +22,8 @@
 #include <app/server/Server.h>
 
 #include <app/server/OnboardingCodesUtil.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <support/ThreadOperationalDataset.h>
@@ -59,6 +61,7 @@ static uint32_t eventMask = 0;
 extern "C" void K32WUartProcess(void);
 #endif
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -84,6 +87,9 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     InitServer();
 
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
@@ -97,6 +103,7 @@ CHIP_ERROR AppTask::Init()
 
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
+    UpdateClusterState();
 
     /* intialize the Keyboard and button press calback */
     KBD_Init(KBD_Callback);
@@ -486,13 +493,13 @@ void AppTask::BleHandler(AppEvent * aEvent)
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
-        if (OpenDefaultPairingWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
+        if (OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
         {
             K32W_LOG("Started BLE Advertising!");
         }
         else
         {
-            K32W_LOG("OpenDefaultPairingWindow() failed");
+            K32W_LOG("OpenBasicCommissioningWindow() failed");
         }
     }
 }
@@ -570,6 +577,11 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
         K32W_LOG("Unlock Action has been initiated")
     }
 
+    if (aActor == AppEvent::kEventType_Button)
+    {
+        sAppTask.mSyncClusterToButtonAction = true;
+    }
+
     sAppTask.mFunction = kFunctionLockUnlock;
     sLockLED.Blink(50, 50);
 }
@@ -588,6 +600,12 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     {
         K32W_LOG("Unlock Action has been completed")
         sLockLED.Set(false);
+    }
+
+    if (sAppTask.mSyncClusterToButtonAction)
+    {
+        sAppTask.UpdateClusterState();
+        sAppTask.mSyncClusterToButtonAction = false;
     }
 
     sAppTask.mFunction = kFunction_NoneSelected;

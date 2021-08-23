@@ -30,6 +30,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
+#include <controller/data_model/zap-generated/CHIPClientCallbacks.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <credentials/CHIPOperationalCredentials.h>
@@ -77,17 +78,16 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 
 struct ControllerDeviceInitParams
 {
-    DeviceTransportMgr * transportMgr                   = nullptr;
-    SecureSessionMgr * sessionMgr                       = nullptr;
-    Messaging::ExchangeManager * exchangeMgr            = nullptr;
-    Inet::InetLayer * inetLayer                         = nullptr;
-    PersistentStorageDelegate * storageDelegate         = nullptr;
-    Credentials::OperationalCredentialSet * credentials = nullptr;
-    uint8_t credentialsIndex                            = 0;
-    SessionIDAllocator * idAllocator                    = nullptr;
+    DeviceTransportMgr * transportMgr           = nullptr;
+    SecureSessionMgr * sessionMgr               = nullptr;
+    Messaging::ExchangeManager * exchangeMgr    = nullptr;
+    Inet::InetLayer * inetLayer                 = nullptr;
+    PersistentStorageDelegate * storageDelegate = nullptr;
+    SessionIDAllocator * idAllocator            = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
+    Transport::FabricTable * fabricsTable = nullptr;
 };
 
 class Device;
@@ -99,7 +99,10 @@ class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEsta
 {
 public:
     ~Device();
-    Device()               = default;
+    Device() :
+        mOpenPairingSuccessCallback(OnOpenPairingWindowSuccessResponse, this),
+        mOpenPairingFailureCallback(OnOpenPairingWindowFailureResponse, this)
+    {}
     Device(const Device &) = delete;
 
     enum class PairingWindowOption
@@ -147,6 +150,9 @@ public:
     CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
                                         Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter);
 
+    CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
+                                         Callback::Cancelable * onFailureCallback);
+
     /**
      * @brief
      *   Send the command in internal command sender.
@@ -181,16 +187,15 @@ public:
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, FabricIndex fabric)
     {
-        mTransportMgr     = params.transportMgr;
-        mSessionManager   = params.sessionMgr;
-        mExchangeMgr      = params.exchangeMgr;
-        mInetLayer        = params.inetLayer;
-        mListenPort       = listenPort;
-        mFabricIndex      = fabric;
-        mStorageDelegate  = params.storageDelegate;
-        mCredentials      = params.credentials;
-        mCredentialsIndex = params.credentialsIndex;
-        mIDAllocator      = params.idAllocator;
+        mTransportMgr    = params.transportMgr;
+        mSessionManager  = params.sessionMgr;
+        mExchangeMgr     = params.exchangeMgr;
+        mInetLayer       = params.inetLayer;
+        mListenPort      = listenPort;
+        mFabricIndex     = fabric;
+        mStorageDelegate = params.storageDelegate;
+        mIDAllocator     = params.idAllocator;
+        mFabricsTable    = params.fabricsTable;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -250,7 +255,7 @@ public:
      *
      * @param session A handle to the secure session
      */
-    void OnNewConnection(SecureSessionHandle session);
+    void OnNewConnection(SessionHandle session);
 
     /**
      * @brief
@@ -260,7 +265,7 @@ public:
      *
      * @param session A handle to the secure session
      */
-    void OnConnectionExpired(SecureSessionHandle session);
+    void OnConnectionExpired(SessionHandle session);
 
     /**
      * @brief
@@ -301,7 +306,7 @@ public:
      *
      * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload);
+    CHIP_ERROR OpenPairingWindow(uint16_t timeout, PairingWindowOption option, SetupPayload & setupPayload);
 
     /**
      *  In case there exists an open session to the device, mark it as expired.
@@ -338,7 +343,9 @@ public:
 
     NodeId GetDeviceId() const { return mDeviceId; }
 
-    bool MatchesSession(SecureSessionHandle session) const { return mSecureSession == session; }
+    bool MatchesSession(SessionHandle session) const { return mSecureSession == session; }
+
+    SessionHandle GetSecureSession() const { return mSecureSession; }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
@@ -444,7 +451,7 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    SecureSessionHandle mSecureSession = {};
+    SessionHandle mSecureSession = {};
 
     uint8_t mSequenceNumber = 0;
 
@@ -480,18 +487,18 @@ private:
 
     CHIP_ERROR WarmupCASESession();
 
+    static void OnOpenPairingWindowSuccessResponse(void * context);
+    static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);
+
     uint16_t mListenPort;
 
     FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
 
+    Transport::FabricTable * mFabricsTable = nullptr;
+
     bool mDeviceOperationalCertProvisioned = false;
 
     CASESession mCASESession;
-
-    Credentials::OperationalCredentialSet * mCredentials = nullptr;
-    // TODO: Switch to size_t whenever OperationalCredentialSet Class is updated to support more then 255 credentials per controller
-    uint8_t mCredentialsIndex = 0;
-
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 
     uint8_t mCSRNonce[kOpCSRNonceLength];
@@ -502,8 +509,13 @@ private:
 
     SessionIDAllocator * mIDAllocator = nullptr;
 
+    uint16_t mPAKEVerifierID = 1;
+
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
+
+    Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
+    Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
 };
 
 /**

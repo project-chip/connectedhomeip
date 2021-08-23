@@ -234,7 +234,7 @@ void ReliableMessageMgr::ExpireTicks()
 #endif
 }
 
-void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState)
 {
     ReliableMessageMgr * manager = reinterpret_cast<ReliableMessageMgr *>(aAppState);
 
@@ -361,7 +361,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     {
         // Using same error message for all errors to reduce code size.
         ChipLogError(ExchangeManager, "Crit-err %" CHIP_ERROR_FORMAT " when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
-                     ChipError::FormatError(CHIP_ERROR_INCORRECT_STATE), entry->retainedBuf.GetMsgId(), entry->sendCount);
+                     CHIP_ERROR_INCORRECT_STATE.Format(), entry->retainedBuf.GetMsgId(), entry->sendCount);
         ClearRetransTable(*entry);
         return CHIP_ERROR_INCORRECT_STATE;
     }
@@ -378,7 +378,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
         // Remove from table
         // Using same error message for all errors to reduce code size.
         ChipLogError(ExchangeManager, "Crit-err %" CHIP_ERROR_FORMAT " when sending CHIP MsgId:%08" PRIX32 ", send tries: %d",
-                     ChipError::FormatError(err), entry->retainedBuf.GetMsgId(), entry->sendCount);
+                     err.Format(), entry->retainedBuf.GetMsgId(), entry->sendCount);
 
         ClearRetransTable(*entry);
     }
@@ -489,7 +489,8 @@ void ReliableMessageMgr::StartTimer()
             StopTimer();
             res = mSystemLayer->StartTimer((uint32_t) timerArmValue, Timeout, this);
 
-            VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager, "Cannot start ReliableMessageMgr::Timeout\n");
+            VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager,
+                               "Cannot start ReliableMessageMgr::Timeout %" CHIP_ERROR_FORMAT, res.Format());
             mCurrentTimerExpiry = timerExpiry;
 #if defined(RMP_TICKLESS_DEBUG)
         }

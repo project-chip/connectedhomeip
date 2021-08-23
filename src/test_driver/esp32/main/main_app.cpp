@@ -117,7 +117,7 @@ extern "C" void app_main()
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "add_entropy_source() failed: %s", ErrorStr(error));
-        exit(ChipError::AsInteger(error));
+        exit(error.AsInteger());
     }
 
     xTaskCreate(tester_task, "tester", 12288, (void *) NULL, tskIDLE_PRIORITY + 10, NULL);

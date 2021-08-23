@@ -155,12 +155,13 @@ template("chip_data_model") {
         "${invoker.zap_pregenerated_dir}/CHIPClusters.h",
         "${invoker.zap_pregenerated_dir}/attribute-size.cpp",
         "${invoker.zap_pregenerated_dir}/callback-stub.cpp",
-        "${invoker.zap_pregenerated_dir}/chip-zcl-zpro-codec-api.h",
-        "${invoker.zap_pregenerated_dir}/encoder.cpp",
       ]
 
       if (_use_default_client_callbacks) {
-        sources += [ "${invoker.zap_pregenerated_dir}/CHIPClientCallbacks.cpp" ]
+        sources += [
+          "${_app_root}/util/im-client-callbacks.cpp",
+          "${invoker.zap_pregenerated_dir}/CHIPClientCallbacks.cpp",
+        ]
       }
 
       if (_use_default_im_dispatch) {

@@ -28,10 +28,10 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-void CommissioningTimerFunction(System::Layer * layer, void * aAppState, CHIP_ERROR aError)
+void HandleArmFailSafe(System::Layer * layer, void * aAppState)
 {
     DeviceControlServer * server = reinterpret_cast<DeviceControlServer *>(aAppState);
-    server->CommissioningFailedTimerComplete(aError);
+    server->CommissioningFailedTimerComplete();
 }
 
 DeviceControlServer DeviceControlServer::sInstance;
@@ -41,7 +41,7 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
     return sInstance;
 }
 
-void DeviceControlServer::CommissioningFailedTimerComplete(CHIP_ERROR aError)
+void DeviceControlServer::CommissioningFailedTimerComplete()
 {
     ChipDeviceEvent event;
     event.Type                         = DeviceEventType::kCommissioningComplete;
@@ -52,19 +52,19 @@ void DeviceControlServer::CommissioningFailedTimerComplete(CHIP_ERROR aError)
 CHIP_ERROR DeviceControlServer::ArmFailSafe(uint16_t expiryLengthSeconds)
 {
     uint32_t timerMs = expiryLengthSeconds * 1000;
-    SystemLayer.StartTimer(timerMs, CommissioningTimerFunction, this);
+    SystemLayer.StartTimer(timerMs, HandleArmFailSafe, this);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceControlServer::DisarmFailSafe()
 {
-    // TODO
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    SystemLayer.CancelTimer(HandleArmFailSafe, this);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceControlServer::CommissioningComplete()
 {
-    SystemLayer.CancelTimer(CommissioningTimerFunction, this);
+    VerifyOrReturnError(CHIP_NO_ERROR == DisarmFailSafe(), CHIP_ERROR_INTERNAL);
     ChipDeviceEvent event;
     event.Type                         = DeviceEventType::kCommissioningComplete;
     event.CommissioningComplete.status = CHIP_NO_ERROR;

@@ -117,6 +117,7 @@ pw_python_action("python") {
         "chip/discovery/library_handle.py",
         "chip/discovery/types.py",
         "chip/exceptions/__init__.py",
+        "chip/interaction_model/__init__.py",
         "chip/interaction_model/delegate.py",
         "chip/internal/__init__.py",
         "chip/internal/commissioner.py",

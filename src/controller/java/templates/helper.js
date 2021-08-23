@@ -127,7 +127,10 @@ function asJniBasicTypeForZclType(type)
     })
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise)
 }
 
@@ -141,7 +144,10 @@ function asJniSignature(type)
     })
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise)
 }
 
@@ -177,16 +183,22 @@ function omitCommaForFirstNonStatusCommand(id, index)
 {
   let promise = templateUtil.ensureZclPackageId(this)
                     .then((pkgId) => { return queryCommand.selectCommandArgumentsByCommandId(this.global.db, id, pkgId) })
-                    .catch(err => console.log(err))
+                    .catch(err => {
+                      console.log(err);
+                      throw err;
+                    })
                     .then((result) => {
                       // Currently, we omit array types, so don't count it as a valid non-status command.
-                      let firstNonStatusCommandIndex = result.findIndex((command) => command.label != "status" && !command.isArray);
+                      let firstNonStatusCommandIndex = result.findIndex((command) => !command.isArray);
                       if (firstNonStatusCommandIndex == -1 || firstNonStatusCommandIndex != index) {
                         return ", ";
                       }
                       return "";
                     })
-                    .catch(err => console.log(err));
+                    .catch(err => {
+                      console.log(err);
+                      throw err;
+                    });
 
   return templateUtil.templatePromise(this.global, promise);
 }

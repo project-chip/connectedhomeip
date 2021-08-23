@@ -50,6 +50,7 @@
 namespace {
 chip::TransportMgrBase gTransportManager;
 chip::Test::LoopbackTransport gLoopback;
+chip::Test::IOContext gIOContext;
 chip::secure_channel::MessageCounterManager gMessageCounterManager;
 uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
@@ -261,7 +262,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     err                            = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
+    SessionHandle session = ctx.GetSessionLocalToPeer();
     err = readClient.SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session, nullptr /*apEventPathParamsList*/,
                                      0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
                                      0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
@@ -388,7 +389,7 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     err                            = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
+    SessionHandle session = ctx.GetSessionLocalToPeer();
     err = readClient.SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session, nullptr /*apEventPathParamsList*/,
                                      0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
                                      0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
@@ -577,7 +578,7 @@ void TestReadInteraction::TestReadEventRoundtrip(nlTestSuite * apSuite, void * a
     eventPathParams[1].mClusterId  = kTestClusterId;
     eventPathParams[1].mEventId    = kTestEventIdCritical;
 
-    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
+    SessionHandle session = ctx.GetSessionLocalToPeer();
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(),
                                                                             &session, eventPathParams, 2, nullptr, 1, 0);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -632,22 +633,13 @@ nlTestSuite sSuite =
 
 int Initialize(void * aContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     // Initialize System memory and resources
-    err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
-
-    gTransportManager.Init(&gLoopback);
+    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gIOContext.Init(&sSuite) == CHIP_NO_ERROR, FAILURE);
+    VerifyOrReturnError(gTransportManager.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
 
     auto * ctx = static_cast<TestContext *>(aContext);
-    err        = ctx->Init(&sSuite, &gTransportManager);
-    if (err != CHIP_NO_ERROR)
-    {
-        return FAILURE;
-    }
+    VerifyOrReturnError(ctx->Init(&sSuite, &gTransportManager, &gIOContext) == CHIP_NO_ERROR, FAILURE);
 
     InitializeEventLogging(ctx->GetExchangeManager());
     gTransportManager.SetSecureSessionMgr(&ctx->GetSecureSessionManager());
@@ -657,6 +649,7 @@ int Initialize(void * aContext)
 int Finalize(void * aContext)
 {
     CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    gIOContext.Shutdown();
     chip::Platform::MemoryShutdown();
     chip::app::EventManagement::DestroyEventManagement();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;

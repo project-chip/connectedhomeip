@@ -74,8 +74,8 @@ private:
     volatile DNSResolver * mAsyncDNSQueueHead; /* The head of the asynchronous DNSResolver object queue. */
     volatile DNSResolver * mAsyncDNSQueueTail; /* The tail of the asynchronous DNSResolver object queue. */
     InetLayer * mInet;                         /* The pointer to the InetLayer. */
-    static void DNSResultEventHandler(chip::System::Layer * aLayer, void * aAppState,
-                                      CHIP_ERROR aError); /* Timer event handler function for asynchronous DNS notification */
+    static void DNSResultEventHandler(chip::System::Layer * aLayer,
+                                      void * aAppState); /* Timer event handler function for asynchronous DNS notification */
 
     CHIP_ERROR DequeueRequest(DNSResolver ** outResolver);
 

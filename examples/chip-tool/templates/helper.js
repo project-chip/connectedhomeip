@@ -36,6 +36,8 @@ function asTypeMinValue(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return '0';
       case 'int8_t':
       case 'int16_t':
       case 'int32_t':
@@ -53,7 +55,10 @@ function asTypeMinValue(type)
     })
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise);
 }
 
@@ -65,6 +70,8 @@ function asTypeMaxValue(type)
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
+      case 'bool':
+        return '1';
       case 'int8_t':
       case 'int16_t':
       case 'int32_t':
@@ -83,7 +90,10 @@ function asTypeMaxValue(type)
     })
   }
 
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => {
+    console.log(err);
+    throw err;
+  });
   return templateUtil.templatePromise(this.global, promise);
 }
 

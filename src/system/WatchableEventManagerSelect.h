@@ -29,44 +29,61 @@
 
 #include <sys/select.h>
 
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+#include <atomic>
+#include <pthread.h>
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+
 #include <support/BitFlags.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/SystemTimer.h>
 #include <system/WakeEvent.h>
 
 namespace chip {
 namespace System {
 
+class Layer;
+class Timer;
 class WatchableSocket;
 
 class WatchableEventManager
 {
 public:
+    // Core ‘overrides’.
     CHIP_ERROR Init(System::Layer & systemLayer);
     CHIP_ERROR Shutdown();
     void Signal();
 
+    // Timer ‘overrides’.
+    CHIP_ERROR StartTimer(uint32_t delayMilliseconds, Timers::OnCompleteFunct onComplete, void * appState);
+    void CancelTimer(Timers::OnCompleteFunct onComplete, void * appState);
+    CHIP_ERROR ScheduleWork(Timers::OnCompleteFunct onComplete, void * appState);
+
+    // Platform implementation.
     void EventLoopBegins() {}
     void PrepareEvents();
     void WaitForEvents();
     void HandleEvents();
     void EventLoopEnds() {}
 
-    // TODO(#5556): Some unit tests supply a timeout at low level, due to originally using select(); these should a proper timer.
-    void PrepareEventsWithTimeout(timeval & nextTimeout);
-
     static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    void SetDispatchQueue(dispatch_queue_t dispatchQueue) { mDispatchQueue = dispatchQueue; };
+    dispatch_queue_t GetDispatchQueue() { return mDispatchQueue; };
+    void HandleTimerComplete(Timer * timer);
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 protected:
     friend class WatchableSocket;
 
-    CHIP_ERROR Set(int fd, fd_set * fds);
-    CHIP_ERROR Clear(int fd, fd_set * fds);
+    CHIP_ERROR SetRequest(int fd, fd_set * fds);
+    CHIP_ERROR ClearRequest(int fd, fd_set * fds);
 
     Layer * mSystemLayer               = nullptr;
     WatchableSocket * mAttachedSockets = nullptr;
-
-    // TODO(#5556): Integrate timer platform details with WatchableEventManager.
-    struct timeval mNextTimeout;
+    Timer::MutexedList mTimerList;
+    timeval mNextTimeout;
 
     // Members for select loop
     struct SelectSets
@@ -78,14 +95,24 @@ protected:
     SelectSets mRequest;
     SelectSets mSelected;
     int mMaxFd;
-    int mSelectResult; ///< return value from select()
+
+    // Return value from select(), carried between WaitForEvents() and HandleEvents().
+    int mSelectResult;
 
     WakeEvent mWakeEvent;
 
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+    std::atomic<pthread_t> mHandleSelectThread;
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_queue_t mDispatchQueue;
+#endif
+
 private:
-    bool HasAny(int fd);
+    bool HasAnyRequest(int fd);
     void MaybeLowerMaxFd();
-    void Reset(int fd);
+    void ResetRequests(int fd);
 };
 
 } // namespace System

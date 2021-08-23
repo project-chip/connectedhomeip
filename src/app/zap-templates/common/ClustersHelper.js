@@ -145,6 +145,8 @@ function asPutLength(zclType)
 {
   const type = ChipTypesHelper.asBasicType(zclType);
   switch (type) {
+  case 'bool':
+    return '8';
   case 'int8_t':
   case 'int16_t':
   case 'int32_t':
@@ -163,6 +165,8 @@ function asPutCastType(zclType)
 {
   const type = ChipTypesHelper.asBasicType(zclType);
   switch (type) {
+  case 'bool':
+    return 'uint8_t';
   case 'int8_t':
   case 'int16_t':
   case 'int32_t':
@@ -180,8 +184,12 @@ function asPutCastType(zclType)
 
 function asChipCallback(item)
 {
-  if (StringHelper.isString(item.type)) {
-    return { name : 'String', type : 'const chip::ByteSpan' };
+  if (StringHelper.isOctetString(item.type)) {
+    return { name : 'OctetString', type : 'const chip::ByteSpan' };
+  }
+
+  if (StringHelper.isCharString(item.type)) {
+    return { name : 'CharString', type : 'const chip::ByteSpan' };
   }
 
   if (ListHelper.isList(item.type)) {
@@ -498,7 +506,7 @@ Clusters.init = function(context, packageId) {
     this._attributes = enhancedAttributes(attributes, globalAttributes, types);
 
     return this.ready.resolve();
-  });
+  }, err => this.ready.reject(err));
 }
 
 
@@ -508,13 +516,13 @@ Clusters.init = function(context, packageId) {
 function asBlocks(promise, options)
 {
   const fn = pkgId => Clusters.init(this, pkgId).then(() => promise.then(data => templateUtil.collectBlocks(data, options, this)));
-  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
+  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => { console.log(err); throw err; });
 }
 
 function asPromise(promise)
 {
   const fn = pkgId => Clusters.init(this, pkgId).then(() => promise);
-  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
+  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => { console.log(err); throw err; });
 }
 
 //
@@ -569,7 +577,8 @@ Clusters.getAttributesByClusterName = function(name)
 //
 // Helpers: Get by Cluster Side
 //
-const kSideFilter = (side, item) => side == (item.clusterSide || item.side);
+const kSideFilter = (side, item) => item.source ? ((item.source == side && item.outgoing) || (item.source != side && item.incoming))
+                                                : item.side == side;
 
 Clusters.getCommandsByClusterSide = function(side)
 {

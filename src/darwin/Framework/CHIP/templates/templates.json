@@ -18,18 +18,22 @@
         {
             "name": "test_cluster",
             "path": "partials/test_cluster.zapt"
+        },
+        {
+            "name": "CHIPCallbackBridge",
+            "path": "partials/CHIPCallbackBridge.zapt"
         }
     ],
     "templates": [
         {
             "path": "CHIPClustersObjc.zapt",
             "name": "Objc ZCL API Header",
-            "output": "src/darwin/Framework/CHIP/gen/CHIPClustersObjc.h"
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc.h"
         },
         {
             "path": "CHIPClustersObjc-src.zapt",
             "name": "Objc ZCL API",
-            "output": "src/darwin/Framework/CHIP/gen/CHIPClustersObjc.mm"
+            "output": "src/darwin/Framework/CHIP/zap-generated/CHIPClustersObjc.mm"
         },
         {
             "path": "clusters-tests.zapt",

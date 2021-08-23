@@ -37,6 +37,9 @@
 #include <mbedtls/pkcs5.h>
 #include <mbedtls/sha1.h>
 #include <mbedtls/sha256.h>
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+#include <mbedtls/x509_crt.h>
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 #include <mbedtls/x509_csr.h>
 
 #include <core/CHIPSafeCasts.h>
@@ -242,7 +245,8 @@ CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
     mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
 
     // Back-up context as we are about to finalize the hash to extract digest.
-    mbedtls_sha256_context previous_ctx = *context;
+    mbedtls_sha256_context previous_ctx;
+    mbedtls_sha256_clone(&previous_ctx, context);
 
     // Pad + compute digest, then finalize context. It is restored next line to continue.
     CHIP_ERROR result = Finish(out_buffer);
@@ -630,9 +634,9 @@ exit:
 #endif
 }
 
-void ClearSecretData(uint8_t * buf, uint32_t len)
+void ClearSecretData(uint8_t * buf, size_t len)
 {
-    memset(buf, 0, len);
+    mbedtls_platform_zeroize(buf, len);
 }
 
 CHIP_ERROR P256Keypair::Initialize()
@@ -802,10 +806,14 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     csr_length = out_length;
 
 exit:
-    keypair = nullptr;
     mbedtls_x509write_csr_free(&csr);
+
+    // TODO: Figure-out why the next 2 lines are OK. Valgrind complains or crash occurs if either is deleted.
+    // Oddly, the following `mbedtls_ecp_keypair_init` is needed to avoid a double-free
+    // with the following pk_free, which is needed.
     mbedtls_ecp_keypair_init(mbedtls_pk_ec(pk));
     mbedtls_pk_free(&pk);
+
     _log_mbedTLS_error(result);
     return error;
 }
@@ -1204,7 +1212,36 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
 
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    mbedtls_x509_crt mbed_cert;
+    mbedtls_ecp_keypair * keypair = nullptr;
+    size_t pubkey_size            = 0;
+
+    mbedtls_x509_crt_init(&mbed_cert);
+
+    int result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(certificate.data()), certificate.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    keypair = mbedtls_pk_ec(mbed_cert.pk);
+
+    // Copy the public key from the cert in raw point format
+    result = mbedtls_ecp_point_write_binary(&keypair->grp, &keypair->Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size,
+                                            Uint8::to_uchar(pubkey.Bytes()), pubkey.Length());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
+
+exit:
+    _log_mbedTLS_error(result);
+    mbedtls_x509_crt_free(&mbed_cert);
+
+#else
+    (void) certificate;
+    (void) pubkey;
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+
+    return error;
 }
 
 } // namespace Crypto

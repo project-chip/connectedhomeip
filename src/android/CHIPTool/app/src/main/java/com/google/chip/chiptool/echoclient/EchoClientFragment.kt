@@ -36,7 +36,7 @@ import kotlinx.android.synthetic.main.on_off_client_fragment.deviceIdEd
 class EchoClientFragment : Fragment() {
 
   private val deviceController: ChipDeviceController
-    get() = ChipClient.getDeviceController()
+    get() = ChipClient.getDeviceController(requireContext())
 
   override fun onCreateView(
       inflater: LayoutInflater,

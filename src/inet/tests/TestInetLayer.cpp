@@ -281,14 +281,11 @@ int main(int argc, char * argv[])
 
     while (Common::IsTesting(sTestState.mStatus))
     {
-        struct timeval sleepTime;
         bool lSucceeded = true;
         bool lFailed    = false;
 
-        sleepTime.tv_sec  = 0;
-        sleepTime.tv_usec = 10000;
-
-        ServiceNetwork(sleepTime);
+        constexpr uint32_t kSleepTimeMilliseconds = 10;
+        ServiceNetwork(kSleepTimeMilliseconds);
 
         CheckSucceededOrFailed(sTestState, lSucceeded, lFailed);
 
@@ -674,7 +671,12 @@ static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHa
 
     lAddressType = aPacketInfo->DestAddress.Type();
 
-    if (lAddressType == kIPAddressType_IPv4)
+    if (lAddressType == kIPAddressType_IPv6)
+    {
+        lStatus = Common::HandleICMPv6DataReceived(std::move(aBuffer), sTestState.mStats, !lStatsByPacket, lCheckBuffer);
+    }
+#if INET_CONFIG_ENABLE_IPV4
+    else if (lAddressType == kIPAddressType_IPv4)
     {
         const uint16_t kIPv4HeaderSize = 20;
 
@@ -682,10 +684,7 @@ static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHa
 
         lStatus = Common::HandleICMPv4DataReceived(std::move(aBuffer), sTestState.mStats, !lStatsByPacket, lCheckBuffer);
     }
-    else if (lAddressType == kIPAddressType_IPv6)
-    {
-        lStatus = Common::HandleICMPv6DataReceived(std::move(aBuffer), sTestState.mStats, !lStatsByPacket, lCheckBuffer);
-    }
+#endif // INET_CONFIG_ENABLE_IPV4
     else
     {
         lStatus = false;

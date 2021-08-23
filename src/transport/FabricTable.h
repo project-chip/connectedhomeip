@@ -41,7 +41,9 @@
 namespace chip {
 namespace Transport {
 
-static constexpr FabricIndex kUndefinedFabricIndex    = UINT8_MAX;
+static constexpr FabricIndex kUndefinedFabricIndex    = 0;
+static constexpr FabricIndex kMinValidFabricIndex     = 1;
+static constexpr FabricIndex kMaxValidFabricIndex     = std::min(UINT8_MAX, CHIP_CONFIG_MAX_DEVICE_ADMINS);
 static constexpr uint8_t kFabricLabelMaxLengthInBytes = 32;
 
 // KVS store is sensitive to length of key strings, based on the underlying
@@ -70,7 +72,11 @@ struct AccessControlList
 class DLL_EXPORT FabricInfo
 {
 public:
-    FabricInfo() { Reset(); }
+    FabricInfo()
+    {
+        Reset();
+        mFabric = kUndefinedFabricIndex;
+    }
 
     // Returns a pointer to a null terminated char array
     const uint8_t * GetFabricLabel() const { return Uint8::from_const_char(mFabricLabel); };
@@ -85,18 +91,15 @@ public:
             chip::Platform::Delete(mOperationalKey);
         }
         ReleaseRootCert();
-        ReleaseICACert();
-        ReleaseNOCCert();
+        ReleaseOperationalCerts();
     }
 
-    NodeId GetNodeId() const { return mNodeId; }
-    void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
+    NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
+    FabricId GetFabricId() const { return mOperationalId.GetFabricId(); }
 
-    FabricId GetFabricId() const { return mFabricId; }
-    void SetFabricId(FabricId fabricId) { mFabricId = fabricId; }
+    uint64_t GetCompressedFabricId() const { return mCompressedFabricId; }
 
     FabricIndex GetFabricIndex() const { return mFabric; }
-    void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
 
     uint16_t GetVendorId() const { return mVendorId; }
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
@@ -115,26 +118,12 @@ public:
         }
         return mOperationalKey;
     }
-    CHIP_ERROR SetOperationalKey(const Crypto::P256Keypair & key);
+    CHIP_ERROR SetEphemeralKey(const Crypto::P256Keypair * key);
 
     bool AreCredentialsAvailable() const
     {
-        return (mRootCert != nullptr && mNOCCert != nullptr && mRootCertLen != 0 && mNOCCertLen != 0);
+        return (mRootCert != nullptr && mOperationalCerts != nullptr && mRootCertLen != 0 && mOperationalCertsLen != 0);
     }
-
-    /**
-     * @brief
-     *   Retrieve the credentials corresponding to the device being commissioned in form of OperationalCredentialSet.
-     *
-     * @param credentials Credential Set object containing  the device's certificate set and keypair.
-     * @param certSet Set of Root [+ ICA] certificates corresponding to the device's credential set.
-     * @param rootKeyId Trusted Root Id corresponding to the device's credential set.
-     * @param credentialsIndex Index for the retrieved credentials corresponding to this device's credential set.
-     *
-     * @return CHIP_ERROR
-     */
-    CHIP_ERROR GetCredentials(Credentials::OperationalCredentialSet & credentials, Credentials::ChipCertificateSet & certSet,
-                              Credentials::CertificateKeyId & rootKeyId, uint8_t & credentialsIndex);
 
     const uint8_t * GetTrustedRoot(uint16_t & size)
     {
@@ -145,46 +134,83 @@ public:
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
     CHIP_ERROR SetOperationalCertsFromCertArray(const chip::ByteSpan & certArray);
-    CHIP_ERROR SetNOCCert(const chip::ByteSpan & cert);
-    CHIP_ERROR SetICACert(const chip::ByteSpan & cert);
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
 
     const AccessControlList & GetACL() const { return mACL; }
     AccessControlList & GetACL() { return mACL; }
     void SetACL(const AccessControlList & acl) { mACL = acl; }
 
-    bool IsInitialized() const { return (mFabric != kUndefinedFabricIndex); }
+    bool IsInitialized() const { return IsOperationalNodeId(mOperationalId.GetNodeId()); }
+
+    CHIP_ERROR GenerateDestinationID(const ByteSpan & ipk, const ByteSpan & random, NodeId destNodeId,
+                                     MutableByteSpan & destinationId);
+
+    CHIP_ERROR MatchDestinationID(const ByteSpan & destinationId, const ByteSpan & initiatorRandom, const ByteSpan * ipkList,
+                                  size_t ipkListEntries);
+
+    CHIP_ERROR GetOperationalCredentials(MutableByteSpan & credentials)
+    {
+        // TODO - Refactor storing and loading of fabric info from persistent storage.
+        //        The op cert array doesn't need to be in RAM except when it's being
+        //        transmitted to peer node during CASE session setup.
+        ReturnErrorCodeIf(!AreCredentialsAvailable(), CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(credentials.size() < mOperationalCertsLen, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(credentials.data(), mOperationalCerts, mOperationalCertsLen);
+        credentials.reduce_size(mOperationalCertsLen);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetRootCert(ByteSpan & cert)
+    {
+        ReturnErrorCodeIf(!AreCredentialsAvailable(), CHIP_ERROR_INCORRECT_STATE);
+        cert = ByteSpan(mRootCert, mRootCertLen);
+        return CHIP_NO_ERROR;
+    }
+
+    uint16_t GetOperationalCredentialsLength() { return mOperationalCertsLen; }
+
+    Credentials::CertificateKeyId GetTrustedRootId()
+    {
+        return mRootKeyIdLen == Credentials::kKeyIdentifierLength ? Credentials::CertificateKeyId(mRootKeyId)
+                                                                  : Credentials::CertificateKeyId();
+    }
+
+    CHIP_ERROR VerifyCredentials(const ByteSpan & noc, Credentials::ValidationContext & context, PeerId & nocPeerId,
+                                 Crypto::P256PublicKey & nocPubkey);
 
     /**
      *  Reset the state to a completely uninitialized status.
      */
     void Reset()
     {
-        mNodeId         = kUndefinedNodeId;
-        mFabric         = kUndefinedFabricIndex;
-        mFabricId       = kUndefinedFabricId;
+        mOperationalId  = PeerId();
         mVendorId       = kUndefinedVendorId;
         mFabricLabel[0] = '\0';
 
         if (mOperationalKey != nullptr)
         {
-            mOperationalKey->Initialize();
+            chip::Platform::Delete(mOperationalKey);
+            mOperationalKey = nullptr;
         }
         ReleaseRootCert();
-        ReleaseICACert();
-        ReleaseNOCCert();
+        ReleaseOperationalCerts();
     }
+
+    CHIP_ERROR SetFabricInfo(FabricInfo & fabric);
 
     friend class FabricTable;
 
 private:
-    NodeId mNodeId                                      = kUndefinedNodeId;
-    FabricId mFabricId                                  = kUndefinedFabricId;
+    PeerId mOperationalId;
+
     FabricIndex mFabric                                 = kUndefinedFabricIndex;
     uint16_t mVendorId                                  = kUndefinedVendorId;
     char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
 
     AccessControlList mACL;
+
+    uint8_t mRootKeyId[Credentials::kKeyIdentifierLength];
+    uint16_t mRootKeyIdLen = 0;
 
 #ifdef ENABLE_HSM_CASE_OPS_KEY
     Crypto::P256KeypairHSM * mOperationalKey = nullptr;
@@ -192,13 +218,14 @@ private:
     Crypto::P256Keypair * mOperationalKey = nullptr;
 #endif
 
+    Crypto::P256PublicKey mRootPubkey;
+
     uint8_t * mRootCert            = nullptr;
     uint16_t mRootCertLen          = 0;
     uint16_t mRootCertAllocatedLen = 0;
-    uint8_t * mICACert             = nullptr;
-    uint16_t mICACertLen           = 0;
-    uint8_t * mNOCCert             = nullptr;
-    uint16_t mNOCCertLen           = 0;
+    uint8_t * mOperationalCerts    = nullptr;
+    uint16_t mOperationalCertsLen  = 0;
+    uint64_t mCompressedFabricId   = 0;
 
     static constexpr size_t KeySize();
 
@@ -208,8 +235,9 @@ private:
     CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, FabricIndex id);
 
-    void ReleaseNOCCert();
-    void ReleaseICACert();
+    void SetOperationalId(PeerId id) { mOperationalId = id; }
+
+    void ReleaseOperationalCerts();
     void ReleaseRootCert();
 
     struct StorableFabricInfo
@@ -219,14 +247,12 @@ private:
         uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
         uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
 
-        uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
-        uint16_t mICACertLen;  /* This field is serialized in LittleEndian byte order */
-        uint16_t mNOCCertLen;  /* This field is serialized in LittleEndian byte order */
+        uint16_t mRootCertLen;         /* This field is serialized in LittleEndian byte order */
+        uint16_t mOperationalCertsLen; /* This field is serialized in LittleEndian byte order */
 
         Crypto::P256SerializedKeypair mOperationalKey;
         uint8_t mRootCert[Credentials::kMaxCHIPCertLength];
-        uint8_t mICACert[Credentials::kMaxCHIPCertLength];
-        uint8_t mNOCCert[Credentials::kMaxCHIPCertLength];
+        uint8_t mOperationalCerts[Credentials::kMaxCHIPOpCertArrayLength];
         char mFabricLabel[kFabricLabelMaxLengthInBytes + 1] = { '\0' };
     };
 };
@@ -324,19 +350,30 @@ private:
 class DLL_EXPORT FabricTable
 {
 public:
+    FabricTable() { Reset(); }
     CHIP_ERROR Store(FabricIndex id);
-    CHIP_ERROR LoadFromStorage(FabricIndex id);
+    CHIP_ERROR LoadFromStorage(FabricInfo * info);
+
     CHIP_ERROR Delete(FabricIndex id);
+    void DeleteAllFabrics();
 
-    FabricInfo * AssignFabricIndex(FabricIndex fabricId);
-
-    FabricInfo * AssignFabricIndex(FabricIndex fabricId, NodeId nodeId);
+    /**
+     * Add the new fabric information to fabric table if the table has space to store
+     * more fabrics. CHIP_ERROR_NO_MEMORY error will be returned if the table is full.
+     *
+     * The provided information will get copied to internal data structures, and the caller
+     * can release the memory associated with input parameter after the call is complete.
+     *
+     * If the call is successful, the assigned fabric index is returned as output parameter.
+     */
+    CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
 
     void ReleaseFabricIndex(FabricIndex fabricId);
 
     FabricInfo * FindFabricWithIndex(FabricIndex fabricId);
 
-    FabricInfo * FindFabricForNode(FabricId fabricId, NodeId nodeId = kUndefinedNodeId, uint16_t vendorId = kUndefinedVendorId);
+    FabricIndex FindDestinationIDCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
+                                           const ByteSpan * ipkList, size_t ipkListEntries);
 
     void Reset();
 
@@ -351,23 +388,14 @@ public:
     ConstFabricIterator begin() const { return cbegin(); }
     ConstFabricIterator end() const { return cend(); }
 
-    uint8_t GetFabricIndex(FabricInfo * fabric) const
-    {
-        std::ptrdiff_t diff = reinterpret_cast<const uint8_t *>(fabric) - reinterpret_cast<const uint8_t *>(&mStates[0]);
-        assert(diff >= 0);
-        assert(static_cast<size_t>(diff) % sizeof(FabricInfo) == 0);
-        auto index = static_cast<size_t>(diff) / sizeof(FabricInfo);
-        assert(index < CHIP_CONFIG_MAX_DEVICE_ADMINS);
-        assert(index < UINT8_MAX);
-        return static_cast<uint8_t>(index);
-    }
-
 private:
     FabricInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];
     PersistentStorageDelegate * mStorage = nullptr;
 
     // TODO: Fabric table should be backed by a single backing store (attribute store), remove delegate callbacks #6419
     FabricTableDelegate * mDelegate = nullptr;
+
+    FabricIndex mNextAvailableFabricIndex = kMinValidFabricIndex;
 };
 
 } // namespace Transport

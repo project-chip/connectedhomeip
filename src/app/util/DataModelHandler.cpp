@@ -22,7 +22,7 @@
 
 #include <app/util/DataModelHandler.h>
 
-#if __has_include("gen/endpoint_config.h")
+#if __has_include(<zap-generated/endpoint_config.h>)
 #define USE_ZAP_CONFIG 1
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>

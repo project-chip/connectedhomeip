@@ -188,7 +188,7 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError)
+void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void * context)
 {
     static_cast<BLEManagerImpl *>(context)->HandleAdvertisementTimer();
 }
@@ -204,7 +204,7 @@ void BLEManagerImpl::HandleAdvertisementTimer()
     }
 }
 
-void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError)
+void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context)
 {
     static_cast<BLEManagerImpl *>(context)->HandleFastAdvertisementTimer();
 }
@@ -439,7 +439,7 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
     case ESP_ERR_NO_MEM:
         return CHIP_ERROR_NO_MEMORY;
     default:
-        return ChipError::Encapsulate(ChipError::Range::kPlatform, CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + bleErr);
+        return CHIP_ERROR(ChipError::Range::kPlatform, CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + bleErr);
     }
 }
 

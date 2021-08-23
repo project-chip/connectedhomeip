@@ -276,7 +276,7 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     err = InitQueueLimiter();
     SuccessOrExit(err);
 
-    mSystemLayer->AddEventHandlerDelegate(sInetEventHandlerDelegate);
+    mSystemLayer->WatchableEventsManager().AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     State = kState_Initialized;
@@ -319,14 +319,13 @@ CHIP_ERROR InetLayer::Shutdown()
     {
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
         // Cancel all DNS resolution requests owned by this instance.
-        for (size_t i = 0; i < DNSResolver::sPool.Size(); i++)
-        {
-            DNSResolver * lResolver = DNSResolver::sPool.Get(*mSystemLayer, i);
+        DNSResolver::sPool.ForEachActiveObject([&](DNSResolver * lResolver) {
             if ((lResolver != nullptr) && lResolver->IsCreatedByInetLayer(*this))
             {
                 lResolver->Cancel();
             }
-        }
+            return true;
+        });
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
@@ -337,38 +336,35 @@ CHIP_ERROR InetLayer::Shutdown()
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
         // Close all raw endpoints owned by this Inet layer instance.
-        for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
-        {
-            RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
+        RawEndPoint::sPool.ForEachActiveObject([&](RawEndPoint * lEndPoint) {
             if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->Close();
             }
-        }
+            return true;
+        });
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         // Abort all TCP endpoints owned by this instance.
-        for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
-        {
-            TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
+        TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
             if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->Abort();
             }
-        }
+            return true;
+        });
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
         // Close all UDP endpoints owned by this instance.
-        for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
-        {
-            UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
+        UDPEndPoint::sPool.ForEachActiveObject([&](UDPEndPoint * lEndPoint) {
             if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
             {
                 lEndPoint->Close();
             }
-        }
+            return true;
+        });
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
     }
 
@@ -410,17 +406,15 @@ bool InetLayer::IsIdleTimerRunning()
 {
     bool timerRunning = false;
 
-    // see if there are any TCP connections with the idle timer check in use.
-    for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
-    {
-        TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-
+    // See if there are any TCP connections with the idle timer check in use.
+    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
         if ((lEndPoint != nullptr) && (lEndPoint->mIdleTimeout != 0))
         {
             timerRunning = true;
-            break;
+            return false;
         }
-    }
+        return true;
+    });
 
     return timerRunning;
 }
@@ -879,40 +873,32 @@ void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, voi
     if (State != kState_Initialized)
         return;
 
-    for (size_t i = 0; i < DNSResolver::sPool.Size(); i++)
-    {
-        DNSResolver * lResolver = DNSResolver::sPool.Get(*mSystemLayer, i);
-
-        if (lResolver == nullptr)
-        {
-            continue;
-        }
-
+    DNSResolver::sPool.ForEachActiveObject([&](DNSResolver * lResolver) {
         if (!lResolver->IsCreatedByInetLayer(*this))
         {
-            continue;
+            return true;
         }
 
         if (lResolver->OnComplete != onComplete)
         {
-            continue;
+            return true;
         }
 
         if (lResolver->AppState != appState)
         {
-            continue;
+            return true;
         }
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
         if (lResolver->mState == DNSResolver::kState_Canceled)
         {
-            continue;
+            return true;
         }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
         lResolver->Cancel();
-        break;
-    }
+        return false;
+    });
 }
 
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
@@ -986,7 +972,7 @@ bool InetLayer::MatchLocalIPv6Subnet(const IPAddress & addr)
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState)
 {
     InetLayer & lInetLayer = *reinterpret_cast<InetLayer *>(aAppState);
     bool lTimerRequired    = lInetLayer.IsIdleTimerRunning();

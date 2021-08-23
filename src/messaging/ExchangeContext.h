@@ -65,8 +65,7 @@ class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public Referen
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
 
-    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                    ExchangeDelegate * delegate);
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator, ExchangeDelegate * delegate);
 
     ~ExchangeContext();
 
@@ -168,7 +167,7 @@ public:
         return mExchangeACL;
     }
 
-    SecureSessionHandle GetSecureSession() { return mSecureSession; }
+    SessionHandle GetSecureSession() { return mSecureSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
@@ -190,8 +189,8 @@ private:
 
     ExchangeMessageDispatch * mDispatch = nullptr;
 
-    SecureSessionHandle mSecureSession; // The connection state
-    uint16_t mExchangeId;               // Assigned exchange ID.
+    SessionHandle mSecureSession; // The connection state
+    uint16_t mExchangeId;         // Assigned exchange ID.
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over
@@ -231,7 +230,7 @@ private:
      *  @retval  true                                       If a match is found.
      *  @retval  false                                      If a match is not found.
      */
-    bool MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+    bool MatchExchange(SessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     /**
      * Notify the exchange that its connection has expired.
@@ -247,7 +246,7 @@ private:
     CHIP_ERROR StartResponseTimer();
 
     void CancelResponseTimer();
-    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
+    static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState);
 
     void DoClose(bool clearRetransTable);
 

@@ -15,13 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      Unit tests for CHIP Operational Credential Set functionality.
- *
- */
-
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <support/CHIPMem.h>
@@ -114,7 +107,7 @@ static void TestChipOperationalCredentials_CertValidation(nlTestSuite * inSuite,
                                                                          { TestCerts::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
     };
     // clang-format on
-    static const size_t sNumValidationTestCases = sizeof(sValidationTestCases) / sizeof(sValidationTestCases[0]);
+    static const size_t sNumValidationTestCases = ArraySize(sValidationTestCases);
 
     for (unsigned i = 0; i < sNumValidationTestCases; i++)
     {

@@ -51,7 +51,7 @@
 
 #include <app/common/gen/callback.h>
 
-#include "gen/af-gen-event.h"
+#include <zap-generated/af-gen-event.h>
 
 using namespace chip;
 
@@ -97,7 +97,7 @@ EmberEventData emAfEvents[] = {
     { NULL, NULL }
 };
 
-void EventControlHandler(chip::System::Layer * systemLayer, void * appState, CHIP_ERROR error)
+void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
 {
     EmberEventControl * control = reinterpret_cast<EmberEventControl *>(appState);
     if (control->status != EMBER_EVENT_INACTIVE)

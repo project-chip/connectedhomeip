@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import os
 
 from .gn import GnBuilder
@@ -20,16 +19,17 @@ from .gn import GnBuilder
 
 class QpgBuilder(GnBuilder):
 
-  def __init__(self, root, runner, output_prefix):
-    super(QpgBuilder, self).__init__(
-        root=os.path.join(root, 'examples/lock-app/qpg/'),
-        runner=runner,
-        output_prefix=output_prefix)
+    def __init__(self, root, runner, output_prefix):
+        super(QpgBuilder, self).__init__(
+            root=os.path.join(root, 'examples/lock-app/qpg/'),
+            runner=runner,
+            output_prefix=output_prefix)
 
-  def outputs(self):
-    return {
-        'chip-qpg-lock-example.out':
-            os.path.join(self.output_dir, 'chip-qpg6100-lock-example.out'),
-        'chip-qpg-lock-example.out.map':
-            os.path.join(self.output_dir, 'chip-qpg6100-lock-example.out.map'),
-    }
+    def build_outputs(self):
+        return {
+            'chip-qpg-lock-example.out':
+                os.path.join(self.output_dir, 'chip-qpg6100-lock-example.out'),
+            'chip-qpg-lock-example.out.map':
+                os.path.join(self.output_dir,
+                             'chip-qpg6100-lock-example.out.map'),
+        }

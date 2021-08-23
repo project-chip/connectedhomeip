@@ -22,6 +22,7 @@
 
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <support/CodeUtils.h>
+#include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 #include <system/WatchableEventManager.h>
 #include <system/WatchableSocket.h>
@@ -38,8 +39,13 @@ void HandleMdnsTimeout();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
 #ifndef CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
-#define CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS 1 // TODO(#5556): default to off
+#define CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS 1
 #endif
+
+// Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING && !defined(PTHREAD_NULL)
+#define PTHREAD_NULL 0
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING && !defined(PTHREAD_NULL)
 
 namespace chip {
 namespace System {
@@ -53,16 +59,14 @@ System::SocketEvents SocketEventsFromLibeventFlags(short eventFlags)
         .Set(SocketEventFlags::kWrite, eventFlags & EV_WRITE);
 }
 
-void TimeoutCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
-{
-    event * const ev = reinterpret_cast<event *>(data);
-    evtimer_del(ev);
-}
+void TimeoutCallbackHandler(evutil_socket_t fd, short eventFlags, void * data) {}
 
 } // anonymous namespace
 
 CHIP_ERROR WatchableEventManager::Init(System::Layer & systemLayer)
 {
+    RegisterPOSIXErrorFormatter();
+
 #if CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
     static bool enabled_event_debug_mode = false;
     if (!enabled_event_debug_mode)
@@ -76,20 +80,33 @@ CHIP_ERROR WatchableEventManager::Init(System::Layer & systemLayer)
     mTimeoutEvent  = evtimer_new(mEventBase, TimeoutCallbackHandler, event_self_cbarg());
     mActiveSockets = nullptr;
     mSystemLayer   = &systemLayer;
-    return CHIP_NO_ERROR;
+
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+    mHandleSelectThread = PTHREAD_NULL;
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+
+    return mTimerList.Init();
 }
 
 void WatchableEventManager::PrepareEvents()
 {
-    // TODO(#5556): Integrate timer platform details with WatchableEventManager.
-    timeval nextTimeout = { 0, 0 };
-    PrepareEventsWithTimeout(nextTimeout);
-}
+    const Clock::MonotonicMilliseconds currentTime = Clock::GetMonotonicMilliseconds();
+    Clock::MonotonicMilliseconds awakenTime        = currentTime;
 
-void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeout)
-{
-    // TODO(#5556): Integrate timer platform details with WatchableEventManager.
-    mSystemLayer->GetTimeout(nextTimeout);
+    Timer * timer = mTimerList.Earliest();
+    if (timer && Clock::IsEarlier(timer->mAwakenTime, awakenTime))
+    {
+        awakenTime = timer->mAwakenTime;
+    }
+
+    const Clock::MonotonicMilliseconds sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : 0;
+    timeval nextTimeout;
+    MillisecondsToTimeval(sleepTime, nextTimeout);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
+    chip::Mdns::GetMdnsTimeout(nextTimeout);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+
     if (nextTimeout.tv_sec || nextTimeout.tv_usec)
     {
         evtimer_add(mTimeoutEvent, &nextTimeout);
@@ -104,7 +121,18 @@ void WatchableEventManager::WaitForEvents()
 
 void WatchableEventManager::HandleEvents()
 {
-    mSystemLayer->HandleTimeout();
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+    mHandleSelectThread = pthread_self();
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+
+    // Obtain the list of currently expired timers. Any new timers added by timer callback are NOT handled on this pass,
+    // since that could result in infinite handling of new timers blocking any other progress.
+    Timer::List expiredTimers(mTimerList.ExtractEarlier(1 + Clock::GetMonotonicMilliseconds()));
+    Timer * timer = nullptr;
+    while ((timer = expiredTimers.PopEarliest()) != nullptr)
+    {
+        timer->HandleComplete();
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
     chip::Mdns::HandleMdnsTimeout();
@@ -116,6 +144,10 @@ void WatchableEventManager::HandleEvents()
         mActiveSockets                  = watcher->mActiveNext;
         watcher->InvokeCallback();
     }
+
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+    mHandleSelectThread = PTHREAD_NULL;
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 }
 
 CHIP_ERROR WatchableEventManager::Shutdown()
@@ -125,6 +157,15 @@ CHIP_ERROR WatchableEventManager::Shutdown()
     mTimeoutEvent = nullptr;
     event_base_free(mEventBase);
     mEventBase = nullptr;
+
+    Timer * timer;
+    while ((timer = mTimerList.PopEarliest()) != nullptr)
+    {
+        timer->Clear();
+        timer->Release();
+    }
+
+    mSystemLayer = nullptr;
     return CHIP_NO_ERROR;
 }
 
@@ -133,14 +174,14 @@ void WatchableEventManager::Signal()
     /*
      * Wake up the I/O thread by writing a single byte to the wake pipe.
      *
-     * If p WakeIOThread() is being called from within an I/O event callback, then writing to the wake pipe can be skipped,
+     * If this is being called from within an I/O event callback, then writing to the wake pipe can be skipped,
      * since the I/O thread is already awake.
      *
      * Furthermore, we don't care if this write fails as the only reasonably likely failure is that the pipe is full, in which
      * case the select calling thread is going to wake up anyway.
      */
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-    if (pthread_equal(mSystemLayer->mHandleSelectThread, pthread_self()))
+    if (pthread_equal(mHandleSelectThread, pthread_self()))
     {
         return;
     }
@@ -150,8 +191,37 @@ void WatchableEventManager::Signal()
     CHIP_ERROR status = mWakeEvent.Notify();
     if (status != CHIP_NO_ERROR)
     {
-        ChipLogError(chipSystemLayer, "System wake event notify failed: %" CHIP_ERROR_FORMAT, ChipError::FormatError(status));
+        ChipLogError(chipSystemLayer, "System wake event notify failed: %" CHIP_ERROR_FORMAT, status.Format());
     }
+}
+
+CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, Timers::OnCompleteFunct onComplete, void * appState)
+{
+    // Note: the libevent implementation currently uses a single libevent timer, playing the same role as the select() timeout.
+    // A more ‘native' implementation would have Timer contain a libevent timer and callback data for each CHIP timer.
+    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delayMilliseconds = 0);
+
+    CancelTimer(onComplete, appState);
+
+    Timer * timer = Timer::New(*mSystemLayer, delayMilliseconds, onComplete, appState);
+    VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    if (mTimerList.Add(timer) == timer)
+    {
+        // The new timer is the earliest, so the time until the next event has probably changed.
+        Signal();
+    }
+    return CHIP_NO_ERROR;
+}
+
+void WatchableEventManager::CancelTimer(Timers::OnCompleteFunct onComplete, void * appState)
+{
+    Timer * timer = mTimerList.Remove(onComplete, appState);
+    VerifyOrReturn(timer != nullptr);
+
+    timer->Clear();
+    timer->Release();
+    Signal();
 }
 
 // static

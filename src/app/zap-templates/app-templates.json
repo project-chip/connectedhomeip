@@ -5,6 +5,7 @@
         "partials/helper.js",
         "common/ListHelper.js",
         "common/StringHelper.js",
+        "common/ChipTypesHelper.js",
         "templates/app/helper.js",
         "templates/chip/helper.js"
     ],
@@ -37,16 +38,6 @@
             "path": "templates/app/callback-stub-src.zapt",
             "name": "ZCL callback-stub source",
             "output": "callback-stub.cpp"
-        },
-        {
-            "path": "templates/app/chip-zcl-zpro-codec-api.zapt",
-            "name": "CHIP ZCL API Header",
-            "output": "chip-zcl-zpro-codec-api.h"
-        },
-        {
-            "path": "templates/app/encoder-src.zapt",
-            "name": "CHIP ZCL API",
-            "output": "encoder.cpp"
         },
         {
             "path": "templates/app/endpoint_config.zapt",

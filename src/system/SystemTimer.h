@@ -21,6 +21,8 @@
  *      This file defines the chip::System::Timer class and its
  *      related types used for representing an in-progress one-shot
  *      timer.
+ *
+ *      Some platforms use this to implement System::Layer timer events.
  */
 
 #pragma once
@@ -33,6 +35,7 @@
 
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
+#include <system/SystemMutex.h>
 #include <system/SystemObject.h>
 #include <system/SystemStats.h>
 
@@ -40,49 +43,119 @@
 #include <dispatch/dispatch.h>
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
+#include <mutex>
+#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
+
 namespace chip {
 namespace System {
 
-class Layer;
+namespace Timers {
+
+typedef void (*OnCompleteFunct)(Layer * aLayer, void * appState);
+
+} // namespace Timers
+
+#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
 /**
- * @class Timer
- *
- * @brief
- *  This is an internal class to CHIP System Layer, used to represent an in-progress one-shot timer. There is no real public
- *  interface available for the application layer. The static public methods used to acquire current system time are intended for
- *  internal use.
- *
+ * This is an Object-pool based class that System::Layer implementations can use to assist in providing timer functions.
  */
 class DLL_EXPORT Timer : public Object
 {
-    friend class Layer;
-
 public:
-    static bool IsEarlier(const Clock::MonotonicMilliseconds & first, const Clock::MonotonicMilliseconds & second);
+    class List
+    {
+    public:
+        List() : mHead(nullptr) {}
+        List(Timer * head) : mHead(head) {}
+        bool Empty() const { return mHead == nullptr; }
+        Timer * Add(Timer * add);
+        Timer * Remove(Timer * remove);
+        Timer * Remove(Timers::OnCompleteFunct onComplete, void * appState);
+        Timer * PopEarliest();
+        Timer * PopIfEarlier(Clock::MonotonicMilliseconds t);
+        Timer * ExtractEarlier(Clock::MonotonicMilliseconds t);
+        Timer * Earliest() const { return mHead; }
 
-    typedef void (*OnCompleteFunct)(Layer * aLayer, void * aAppState, CHIP_ERROR aError);
-    OnCompleteFunct OnComplete;
+    protected:
+        Timer * mHead;
+        List(const List &) = delete;
+        List & operator=(const List &) = delete;
+    };
+    class MutexedList : private List
+    {
+    public:
+        MutexedList() = default;
+        CHIP_ERROR Init();
+        bool Empty() const
+        {
+            std::lock_guard<Mutex> lock(mMutex);
+            return mHead == nullptr;
+        }
+        Timer * Add(Timer * add)
+        {
+            std::lock_guard<Mutex> lock(mMutex);
+            return List::Add(add);
+        }
+        Timer * Remove(Timer * remove)
+        {
+            std::lock_guard<Mutex> lock(mMutex);
+            return List::Remove(remove);
+        }
+        Timer * Remove(Timers::OnCompleteFunct onComplete, void * appState)
+        {
+            std::lock_guard<Mutex> lock(mMutex);
+            return List::Remove(onComplete, appState);
+        }
+        Timer * PopEarliest()
+        {
+            std::lock_guard<Mutex> lock(mMutex);
+            return List::PopEarliest();
+        }
+        Timer * PopIfEarlier(Clock::MonotonicMilliseconds t)
+        {
+            std::lock_guard<Mutex> lock(mMutex);
+            return List::PopIfEarlier(t);
+        }
+        Timer * ExtractEarlier(Clock::MonotonicMilliseconds t)
+        {
+            std::lock_guard<Mutex> lock(mMutex);
+            return List::ExtractEarlier(t);
+        }
+        Timer * Earliest() const
+        {
+            std::lock_guard<Mutex> lock(mMutex);
+            return mHead;
+        }
 
-    CHIP_ERROR Start(uint32_t aDelayMilliseconds, OnCompleteFunct aOnComplete, void * aAppState);
-    CHIP_ERROR Cancel();
+    private:
+        mutable Mutex mMutex;
+        MutexedList(const MutexedList &) = delete;
+        MutexedList & operator=(const MutexedList &) = delete;
+    };
 
-    static void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
+    Timer() = default;
+
+    static Timer * New(System::Layer & systemLayer, uint32_t delayMilliseconds, Timers::OnCompleteFunct onComplete,
+                       void * appState);
+    void Clear();
+
+    static void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark)
+    {
+        sPool.GetStatistics(aNumInUse, aHighWatermark);
+    }
 
 private:
-    static ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
+    friend class WatchableEventManager;
 
-    Clock::MonotonicMilliseconds mAwakenTime;
+    static ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
 
     void HandleComplete();
 
-    CHIP_ERROR ScheduleWork(OnCompleteFunct aOnComplete, void * aAppState);
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    Timers::OnCompleteFunct mOnComplete;
+    Clock::MonotonicMilliseconds mAwakenTime;
     Timer * mNextTimer;
-
-    static CHIP_ERROR HandleExpiredTimers(Layer & aLayer);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_source_t mTimerSource = nullptr;
@@ -93,10 +166,7 @@ private:
     Timer & operator=(const Timer &) = delete;
 };
 
-inline void Timer::GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark)
-{
-    sPool.GetStatistics(aNumInUse, aHighWatermark);
-}
+#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
 } // namespace System
 } // namespace chip

@@ -55,21 +55,12 @@ using TestContext = chip::Test::MessagingContext;
 namespace {
 TransportMgrBase gTransportMgr;
 Test::LoopbackTransport gLoopback;
+chip::Test::IOContext gIOContext;
 
-OperationalCredentialSet commissionerDevOpCred;
-OperationalCredentialSet accessoryDevOpCred;
-
-ChipCertificateSet commissionerCertificateSet;
-ChipCertificateSet accessoryCertificateSet;
-
-P256SerializedKeypair commissionerOpKeysSerialized;
-P256SerializedKeypair accessoryOpKeysSerialized;
-
-P256Keypair commissionerOpKeys;
-P256Keypair accessoryOpKeys;
-
-CertificateKeyId trustedRootId = CertificateKeyId(sTestCert_Root01_SubjectKeyId);
-uint8_t commissionerCredentialsIndex;
+FabricTable gCommissionerFabrics;
+FabricIndex gCommissionerFabricIndex;
+FabricTable gDeviceFabrics;
+FabricIndex gDeviceFabricIndex;
 
 NodeId Node01_01 = 0xDEDEDEDE00010001;
 } // namespace
@@ -88,16 +79,6 @@ public:
 
     uint32_t mNumPairingErrors   = 0;
     uint32_t mNumPairingComplete = 0;
-};
-
-class TestCASESessionDestinationId : public CASESession
-{
-public:
-    CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::P256PublicKeySpan & rootPubkey, NodeId nodeId,
-                                     FabricId fabricId, const ByteSpan & ipk, MutableByteSpan & destinationId)
-    {
-        return CASESession::GenerateDestinationID(random, rootPubkey, nodeId, fabricId, ipk, destinationId);
-    }
 };
 
 class TestCASESessionIPK : public CASESession
@@ -127,60 +108,48 @@ private:
 
 static CHIP_ERROR InitCredentialSets()
 {
-    commissionerDevOpCred.Release();
-    accessoryDevOpCred.Release();
-    commissionerCertificateSet.Release();
-    accessoryCertificateSet.Release();
+    FabricInfo commissionerFabric;
 
-    ReturnErrorOnFailure(
-        commissionerOpKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
-
-    memcpy((uint8_t *) (commissionerOpKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
-    memcpy((uint8_t *) (commissionerOpKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
+    P256SerializedKeypair opKeysSerialized;
+    memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
+    memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
            sTestCert_Node01_01_PrivateKey_Len);
 
-    ReturnErrorOnFailure(commissionerOpKeys.Deserialize(commissionerOpKeysSerialized));
+    ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
 
-    ReturnErrorOnFailure(
-        accessoryOpKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
+    P256Keypair opKey;
+    ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));
+    ReturnErrorOnFailure(commissionerFabric.SetEphemeralKey(&opKey));
 
-    memcpy((uint8_t *) (accessoryOpKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
-    memcpy((uint8_t *) (accessoryOpKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
+    ReturnErrorOnFailure(commissionerFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
+
+    uint8_t certChainBuf[kMaxCHIPCertLength * 2];
+    MutableByteSpan certChain(certChainBuf);
+
+    ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(ByteSpan(sTestCert_Node01_01_DER, sTestCert_Node01_01_DER_Len),
+                                                         ByteSpan(sTestCert_ICA01_DER, sTestCert_ICA01_DER_Len), certChain));
+    ReturnErrorOnFailure(commissionerFabric.SetOperationalCertsFromCertArray(certChain));
+
+    ReturnErrorOnFailure(gCommissionerFabrics.AddNewFabric(commissionerFabric, &gCommissionerFabricIndex));
+
+    FabricInfo deviceFabric;
+
+    memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
+    memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
            sTestCert_Node01_01_PrivateKey_Len);
 
-    ReturnErrorOnFailure(accessoryOpKeys.Deserialize(accessoryOpKeysSerialized));
+    ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
 
-    ReturnErrorOnFailure(commissionerCertificateSet.Init(kStandardCertsCount));
+    ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));
+    ReturnErrorOnFailure(deviceFabric.SetEphemeralKey(&opKey));
 
-    ReturnErrorOnFailure(accessoryCertificateSet.Init(kStandardCertsCount));
+    ReturnErrorOnFailure(deviceFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
 
-    // Add the trusted root certificate to the certificate set.
-    ReturnErrorOnFailure(commissionerCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,
-                                                             BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
+    ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(ByteSpan(sTestCert_Node01_01_DER, sTestCert_Node01_01_DER_Len),
+                                                         ByteSpan(sTestCert_ICA01_DER, sTestCert_ICA01_DER_Len), certChain));
+    ReturnErrorOnFailure(deviceFabric.SetOperationalCertsFromCertArray(certChain));
 
-    ReturnErrorOnFailure(accessoryCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,
-                                                          BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
-
-    ReturnErrorOnFailure(commissionerCertificateSet.LoadCert(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len,
-                                                             BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
-
-    ReturnErrorOnFailure(accessoryCertificateSet.LoadCert(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len,
-                                                          BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor)));
-
-    ReturnErrorOnFailure(commissionerDevOpCred.Init(&commissionerCertificateSet, 1));
-    commissionerCredentialsIndex = static_cast<uint8_t>(commissionerDevOpCred.GetCertCount() - 1U);
-
-    ReturnErrorOnFailure(commissionerDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_01_Chip,
-                                                            static_cast<uint16_t>(sTestCert_Node01_01_Chip_Len)));
-
-    ReturnErrorOnFailure(commissionerDevOpCred.SetDevOpCredKeypair(trustedRootId, &commissionerOpKeys));
-
-    ReturnErrorOnFailure(accessoryDevOpCred.Init(&accessoryCertificateSet, 1));
-
-    ReturnErrorOnFailure(accessoryDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_01_Chip,
-                                                         static_cast<uint16_t>(sTestCert_Node01_01_Chip_Len)));
-
-    ReturnErrorOnFailure(accessoryDevOpCred.SetDevOpCredKeypair(trustedRootId, &accessoryOpKeys));
+    ReturnErrorOnFailure(gDeviceFabrics.AddNewFabric(deviceFabric, &gDeviceFabricIndex));
 
     return CHIP_NO_ERROR;
 }
@@ -190,9 +159,11 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
     TestCASESessionIPK pairing;
+    FabricTable fabrics;
 
-    NL_TEST_ASSERT(inSuite, pairing.ListenForSessionEstablishment(&accessoryDevOpCred, 0, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, pairing.ListenForSessionEstablishment(&accessoryDevOpCred, 0, &delegate) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairing.ListenForSessionEstablishment(0, nullptr, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, pairing.ListenForSessionEstablishment(0, nullptr, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, pairing.ListenForSessionEstablishment(0, &fabrics, &delegate) == CHIP_NO_ERROR);
 }
 
 void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
@@ -202,16 +173,21 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
     CASESession pairing;
+    FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
     NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
     ExchangeContext * context = ctx.NewExchangeToLocal(&pairing);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                            commissionerCredentialsIndex, Node01_01, 0, nullptr, nullptr) != CHIP_NO_ERROR);
+                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), nullptr, Node01_01, 0, nullptr,
+                                            nullptr) != CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                            commissionerCredentialsIndex, Node01_01, 0, context, &delegate) == CHIP_NO_ERROR);
+                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0, nullptr,
+                                            nullptr) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0, context,
+                                            &delegate) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
 
@@ -225,8 +201,7 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * context1  = ctx.NewExchangeToLocal(&pairing1);
 
     NL_TEST_ASSERT(inSuite,
-                   pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                             commissionerCredentialsIndex, Node01_01, 0, context1,
+                   pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0, context1,
                                              &delegate) == CHIP_ERROR_BAD_REQUEST);
     gLoopback.mMessageSendError = CHIP_NO_ERROR;
 }
@@ -252,12 +227,14 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
 
     ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
 
+    FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    NL_TEST_ASSERT(inSuite, fabric != nullptr);
+
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.ListenForSessionEstablishment(&accessoryDevOpCred, 0, &delegateAccessory) == CHIP_NO_ERROR);
+                   pairingAccessory.ListenForSessionEstablishment(0, &gDeviceFabrics, &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                                        commissionerCredentialsIndex, Node01_01, 0, contextCommissioner,
-                                                        &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
+                                                        contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
@@ -273,7 +250,7 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
 void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
     TestCASESecurePairingDelegate delegateCommissioner;
-    CASESession pairingCommissioner;
+    TestCASESessionIPK pairingCommissioner;
     CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
 }
 
@@ -288,17 +265,21 @@ public:
         memset(valuesize, 0, sizeof(valuesize));
     }
 
-    ~TestPersistentStorageDelegate()
+    ~TestPersistentStorageDelegate() { Cleanup(); }
+
+    void Cleanup()
     {
         for (int i = 0; i < 16; i++)
         {
             if (keys[i] != nullptr)
             {
                 chip::Platform::MemoryFree(keys[i]);
+                keys[i] = nullptr;
             }
             if (values[i] != nullptr)
             {
                 chip::Platform::MemoryFree(values[i]);
+                values[i] = nullptr;
             }
         }
     }
@@ -348,16 +329,17 @@ private:
     uint16_t valuesize[16];
 };
 
+TestPersistentStorageDelegate gCommissionerStorageDelegate;
+TestPersistentStorageDelegate gDeviceStorageDelegate;
+
 TestCASEServerIPK gPairingServer;
 
 void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext)
 {
     TestCASESecurePairingDelegate delegateCommissioner;
 
-    auto * pairingCommissioner = chip::Platform::New<CASESession>();
+    auto * pairingCommissioner = chip::Platform::New<TestCASESessionIPK>();
 
-    FabricTable fabricTable;
-    TestPersistentStorageDelegate storageDelegate;
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     gLoopback.mSentMessageCount = 0;
@@ -366,57 +348,30 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     SessionIDAllocator idAllocator;
 
-    fabricTable.Init(&storageDelegate);
-
-    FabricInfo * fabric = fabricTable.AssignFabricIndex(0);
-
-    NL_TEST_ASSERT(inSuite, fabric->SetOperationalKey(accessoryOpKeys) == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, fabric->SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)) == CHIP_NO_ERROR);
-
-    uint8_t chipCert[kMaxCHIPCertLength * 2];
-    MutableByteSpan chipCertSpan(chipCert, sizeof(chipCert));
-    NL_TEST_ASSERT(inSuite,
-                   ConvertX509CertsToChipCertArray(ByteSpan(sTestCert_Node01_01_DER, sTestCert_Node01_01_DER_Len),
-                                                   ByteSpan(sTestCert_ICA01_DER, sTestCert_ICA01_DER_Len),
-                                                   chipCertSpan) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, fabric->SetOperationalCertsFromCertArray(chipCertSpan) == CHIP_NO_ERROR);
-
-    fabricTable.Store(0);
-    fabricTable.ReleaseFabricIndex(0);
-
-    fabricTable.LoadFromStorage(0);
-    fabric = fabricTable.FindFabricWithIndex(0);
-
-    ChipCertificateSet certificates;
-    OperationalCredentialSet credentials;
-    CertificateKeyId rootKeyId;
-    uint8_t credentialsIndex;
-    NL_TEST_ASSERT(inSuite, fabric->GetCredentials(credentials, certificates, rootKeyId, credentialsIndex) == CHIP_NO_ERROR);
-
     NL_TEST_ASSERT(inSuite,
                    gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &gTransportMgr,
-                                                                &ctx.GetSecureSessionManager(), &fabricTable,
+                                                                &ctx.GetSecureSessionManager(), &gDeviceFabrics,
                                                                 &idAllocator) == CHIP_NO_ERROR);
 
     ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(pairingCommissioner);
 
+    FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    NL_TEST_ASSERT(inSuite, fabric != nullptr);
+
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &credentials,
-                                                         credentialsIndex, Node01_01, 0, contextCommissioner,
-                                                         &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
+                                                         contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
-    auto * pairingCommissioner1 = chip::Platform::New<CASESession>();
+    auto * pairingCommissioner1 = chip::Platform::New<TestCASESessionIPK>();
     NL_TEST_ASSERT(inSuite, pairingCommissioner1->MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
     ExchangeContext * contextCommissioner1 = ctx.NewExchangeToLocal(pairingCommissioner1);
 
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner1->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &credentials,
-                                                          credentialsIndex, Node01_01, 0, contextCommissioner1,
-                                                          &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner1->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
+                                                          contextCommissioner1, &delegateCommissioner) == CHIP_NO_ERROR);
 
     chip::Platform::Delete(pairingCommissioner);
     chip::Platform::Delete(pairingCommissioner1);
@@ -442,8 +397,8 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     TestCASESecurePairingDelegate delegateCommissioner;
 
     // Allocate on the heap to avoid stack overflow in some restricted test scenarios (e.g. QEMU)
-    auto * testPairingSession1 = chip::Platform::New<CASESession>();
-    auto * testPairingSession2 = chip::Platform::New<CASESession>();
+    auto * testPairingSession1 = chip::Platform::New<TestCASESessionIPK>();
+    auto * testPairingSession2 = chip::Platform::New<TestCASESessionIPK>();
 
     CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, *testPairingSession1, delegateCommissioner);
     CASE_SecurePairingDeserialize(inSuite, inContext, *testPairingSession1, *testPairingSession2);
@@ -477,39 +432,6 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     chip::Platform::Delete(testPairingSession2);
 }
 
-void CASE_DestinationIDGenerationTest(nlTestSuite * inSuite, void * inContext)
-{
-    TestCASESessionDestinationId pairingCommissioner;
-
-    uint8_t random[kSigmaParamRandomNumberSize]        = { 0x7e, 0x17, 0x12, 0x31, 0x56, 0x8d, 0xfa, 0x17, 0x20, 0x6b, 0x3a,
-                                                    0xcc, 0xf8, 0xfa, 0xec, 0x2f, 0x4d, 0x21, 0xb5, 0x80, 0x11, 0x31,
-                                                    0x96, 0xf4, 0x7c, 0x7c, 0x4d, 0xeb, 0x81, 0x0a, 0x73, 0xdc };
-    uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
-    NodeId nodeId                                      = 0xCD5544AA7B13EF14;
-    FabricId fabricId                                  = 0x2906C908D115D362;
-    uint8_t rootPubkey[kP256_PublicKey_Length] = { 0x04, 0x4a, 0x9f, 0x42, 0xb1, 0xca, 0x48, 0x40, 0xd3, 0x72, 0x92, 0xbb, 0xc7,
-                                                   0xf6, 0xa7, 0xe1, 0x1e, 0x22, 0x20, 0x0c, 0x97, 0x6f, 0xc9, 0x00, 0xdb, 0xc9,
-                                                   0x8a, 0x7a, 0x38, 0x3a, 0x64, 0x1c, 0xb8, 0x25, 0x4a, 0x2e, 0x56, 0xd4, 0xe2,
-                                                   0x95, 0xa8, 0x47, 0x94, 0x3b, 0x4e, 0x38, 0x97, 0xc4, 0xa7, 0x73, 0xe9, 0x30,
-                                                   0x27, 0x7b, 0x4d, 0x9f, 0xbe, 0xde, 0x8a, 0x05, 0x26, 0x86, 0xbf, 0xac, 0xfa };
-    P256PublicKeySpan rootPubkeySpan(rootPubkey);
-    uint8_t destinationIdentifierTestVector[kSHA256_Hash_Length] = { 0xc8, 0xe1, 0x70, 0x0d, 0x12, 0x5a, 0xff, 0xbc,
-                                                                     0xea, 0xda, 0x34, 0x2a, 0x0d, 0x00, 0xdb, 0x7c,
-                                                                     0xa0, 0x65, 0x05, 0xae, 0x5d, 0x0b, 0x29, 0x87,
-                                                                     0xf3, 0xaf, 0x4b, 0x77, 0xe3, 0x94, 0x05, 0x1d };
-
-    uint8_t ipk[] = { 0x4a, 0x71, 0xcd, 0xd7, 0xb2, 0xa3, 0xca, 0x90, 0x24, 0xf9, 0x6f, 0x3c, 0x96, 0xa1, 0x9d, 0xee };
-
-    {
-        MutableByteSpan destinationIdSpan(destinationIdentifier, sizeof(destinationIdentifier));
-        NL_TEST_ASSERT(inSuite,
-                       pairingCommissioner.GenerateDestinationID(ByteSpan(random, sizeof(random)), rootPubkeySpan, nodeId, fabricId,
-                                                                 ByteSpan(ipk, sizeof(ipk)), destinationIdSpan) == CHIP_NO_ERROR);
-    }
-
-    NL_TEST_ASSERT(inSuite, memcmp(destinationIdentifier, destinationIdentifierTestVector, sizeof(destinationIdentifier)) == 0);
-}
-
 // Test Suite
 
 /**
@@ -523,7 +445,6 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Handshake",   CASE_SecurePairingHandshakeTest),
     NL_TEST_DEF("ServerHandshake", CASE_SecurePairingHandshakeServerTest),
     NL_TEST_DEF("Serialize",   CASE_SecurePairingSerializeTest),
-    NL_TEST_DEF("DestinationID Generation", CASE_DestinationIDGenerationTest),
 
     NL_TEST_SENTINEL()
 };
@@ -555,8 +476,9 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
 
     gTransportMgr.Init(&gLoopback);
+    ReturnErrorOnFailure(gIOContext.Init(&sSuite));
 
-    ReturnErrorOnFailure(ctx.Init(&sSuite, &gTransportMgr));
+    ReturnErrorOnFailure(ctx.Init(&sSuite, &gTransportMgr, &gIOContext));
 
     ctx.SetSourceNodeId(kPlaceholderNodeId);
     ctx.SetDestinationNodeId(kPlaceholderNodeId);
@@ -565,6 +487,9 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ctx.SetFabricIndex(kUndefinedFabricIndex);
 
     gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());
+
+    gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
+    gDeviceFabrics.Init(&gDeviceStorageDelegate);
 
     return InitCredentialSets();
 }
@@ -584,10 +509,11 @@ int CASE_TestSecurePairing_Setup(void * inContext)
 int CASE_TestSecurePairing_Teardown(void * inContext)
 {
     reinterpret_cast<TestContext *>(inContext)->Shutdown();
-    commissionerDevOpCred.Release();
-    accessoryDevOpCred.Release();
-    commissionerCertificateSet.Release();
-    accessoryCertificateSet.Release();
+    gIOContext.Shutdown();
+    gCommissionerStorageDelegate.Cleanup();
+    gDeviceStorageDelegate.Cleanup();
+    gCommissionerFabrics.Reset();
+    gDeviceFabrics.Reset();
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }

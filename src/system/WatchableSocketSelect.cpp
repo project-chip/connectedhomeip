@@ -34,7 +34,7 @@ namespace System {
 
 CHIP_ERROR WatchableSocket::OnAttach()
 {
-    mSharedState->Reset(mFD);
+    mSharedState->ResetRequests(mFD);
 
     VerifyOrReturnError(mAttachedNext == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mAttachedNext                  = mSharedState->mAttachedSockets;
@@ -45,7 +45,7 @@ CHIP_ERROR WatchableSocket::OnAttach()
 CHIP_ERROR WatchableSocket::OnRelease()
 {
     VerifyOrReturnError(mFD >= 0, CHIP_ERROR_INCORRECT_STATE);
-    mSharedState->Reset(mFD);
+    mSharedState->ResetRequests(mFD);
 
     WatchableSocket ** pp = &mSharedState->mAttachedSockets;
     while (*pp != nullptr)
@@ -65,22 +65,22 @@ CHIP_ERROR WatchableSocket::OnRelease()
 
 CHIP_ERROR WatchableSocket::OnRequestCallbackOnPendingRead()
 {
-    return mSharedState->Set(mFD, &mSharedState->mRequest.mReadSet);
+    return mSharedState->SetRequest(mFD, &mSharedState->mRequest.mReadSet);
 }
 
 CHIP_ERROR WatchableSocket::OnRequestCallbackOnPendingWrite()
 {
-    return mSharedState->Set(mFD, &mSharedState->mRequest.mWriteSet);
+    return mSharedState->SetRequest(mFD, &mSharedState->mRequest.mWriteSet);
 }
 
 CHIP_ERROR WatchableSocket::OnClearCallbackOnPendingRead()
 {
-    return mSharedState->Clear(mFD, &mSharedState->mRequest.mReadSet);
+    return mSharedState->ClearRequest(mFD, &mSharedState->mRequest.mReadSet);
 }
 
 CHIP_ERROR WatchableSocket::OnClearCallbackOnPendingWrite()
 {
-    return mSharedState->Clear(mFD, &mSharedState->mRequest.mWriteSet);
+    return mSharedState->ClearRequest(mFD, &mSharedState->mRequest.mWriteSet);
 }
 
 /**

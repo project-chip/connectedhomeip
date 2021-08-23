@@ -33,41 +33,16 @@ using namespace chip::app::Clusters;
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
-    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    if (clusterId == OnOff::Id)
+    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::Ids::OnOff)
     {
-        if (attributeId != OnOff::Attributes::Ids::OnOff)
-        {
-            ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-            return;
-        }
-
+        ChipLogProgress(Zcl, "Cluster OnOff: attribute OnOff set to %" PRIu8, *value);
         LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
                                      AppEvent::kEventType_Lighting, size, value);
     }
-    else if (clusterId == LevelControl::Id)
+    else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::Ids::CurrentLevel)
     {
-        if (attributeId != LevelControl::Attributes::Ids::CurrentLevel)
-        {
-            ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-            return;
-        }
-
-        ChipLogProgress(Zcl, "Value: %u, length %u", *value, size);
-        if (size == 1)
-        {
-            LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, AppEvent::kEventType_Lighting, size, value);
-        }
-        else
-        {
-            ChipLogError(Zcl, "wrong length for level: %d", size);
-        }
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-        return;
+        ChipLogProgress(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %" PRIu8, *value);
+        LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, AppEvent::kEventType_Lighting, size, value);
     }
 }
 

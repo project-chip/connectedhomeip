@@ -29,14 +29,12 @@ namespace chip {
 class RendezvousServer : public SessionEstablishmentDelegate
 {
 public:
-    CHIP_ERROR WaitForPairing(const RendezvousParameters & params, Messaging::ExchangeManager * exchangeManager,
-                              TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, Transport::FabricInfo * fabric);
+    CHIP_ERROR WaitForPairing(const RendezvousParameters & params, uint32_t pbkdf2IterCount, const ByteSpan & salt,
+                              uint16_t passcodeID, Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
+                              SecureSessionMgr * sessionMgr);
 
-    CHIP_ERROR Init(AppDelegate * delegate, PersistentStorageDelegate * storage, SessionIDAllocator * idAllocator)
+    CHIP_ERROR Init(AppDelegate * delegate, SessionIDAllocator * idAllocator)
     {
-        VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mStorage = storage;
-
         VerifyOrReturnError(idAllocator != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         mIDAllocator = idAllocator;
 
@@ -56,13 +54,10 @@ public:
 
 private:
     AppDelegate * mDelegate;
-    PersistentStorageDelegate * mStorage          = nullptr;
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
     PASESession mPairingSession;
     SecureSessionMgr * mSessionMgr = nullptr;
-
-    Transport::FabricInfo * mFabric = nullptr;
 
     SessionIDAllocator * mIDAllocator = nullptr;
 

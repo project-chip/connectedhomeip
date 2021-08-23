@@ -5,30 +5,20 @@ steps:
       entrypoint: "./scripts/run_in_build_env.sh"
       args:
           [
-              "./scripts/build/build_examples.py --platform all build
-              --copy-artifacts-to /workspace/artifacts/",
+              "./scripts/build/build_examples.py --platform all
+              --enable-flashbundle build --create-archives /workspace/artifacts/",
           ]
       timeout: 7200s
-
-    # Final steps: upload artifacts. Use this because the artifacts/objects command does not seem to
-    # support recursive copies.
-    #
-    # This has the unfortunate sideffect that 'artifacts' will not be visible as part of the
-    # build run information.
-    - name: "gcr.io/cloud-builders/gsutil"
-      args:
-          [
-              "-m",
-              "cp",
-              "-r",
-              "artifacts/*",
-              "gs://matter-build-automation-artifacts/$PROJECT_ID/$COMMIT_SHA/",
-          ]
 
 logsBucket: matter-build-automation-build-logs
 
 # Global timeout for all steps
 timeout: 7200s
+
+artifacts:
+    objects:
+        location: "gs://matter-build-automation-artifacts/$PROJECT_ID/$COMMIT_SHA/"
+        paths: ["/workspace/artifacts/*.tar.gz"]
 
 # Using higher CPU machines generally speeds up builds by > 4x (faster as we spend more time
 # building instead of docker download/checkout/bootstrap)

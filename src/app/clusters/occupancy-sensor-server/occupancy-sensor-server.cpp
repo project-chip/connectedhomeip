@@ -62,7 +62,7 @@ using namespace chip;
 //******************************************************************************
 // Plugin init function
 //******************************************************************************
-void emberAfOccupancySensingClusterServerInitCallback(chip::EndpointId endpoint)
+void emberAfOccupancySensingClusterServerInitCallback(EndpointId endpoint)
 {
     HalOccupancySensorType deviceType;
 
@@ -119,7 +119,7 @@ void halOccupancyStateChangedCallback(EndpointId endpoint, HalOccupancyState occ
 
 void emberAfPluginOccupancyClusterServerPostInitCallback(EndpointId endpoint) {}
 
-HalOccupancySensorType __attribute__((weak)) halOccupancyGetSensorType(chip::EndpointId endpoint)
+HalOccupancySensorType __attribute__((weak)) halOccupancyGetSensorType(EndpointId endpoint)
 {
     return HAL_OCCUPANCY_SENSOR_TYPE_PIR;
 }

@@ -53,6 +53,8 @@
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -64,7 +66,12 @@
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/clusters/temperature-measurement-server/temperature-measurement-server.h>
 
+#if CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
+
 using namespace ::chip;
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
@@ -323,12 +330,14 @@ class SetupListModel : public ListScreen::Model
 public:
     SetupListModel()
     {
-        std::string resetWiFi              = "Reset WiFi";
-        std::string resetToFactory         = "Reset to factory";
-        std::string forceWifiCommissioning = "Force WiFi commissioning";
+        std::string resetWiFi                      = "Reset WiFi";
+        std::string resetToFactory                 = "Reset to factory";
+        std::string forceWifiCommissioningBasic    = "Force WiFi commissioning (basic)";
+        std::string forceWifiCommissioningEnhanced = "Force WiFi commissioning (enhanced)";
         options.emplace_back(resetWiFi);
         options.emplace_back(resetToFactory);
-        options.emplace_back(forceWifiCommissioning);
+        options.emplace_back(forceWifiCommissioningBasic);
+        options.emplace_back(forceWifiCommissioningEnhanced);
     }
     virtual std::string GetTitle() { return "Setup"; }
     virtual int GetItemCount() { return options.size(); }
@@ -339,7 +348,7 @@ public:
         if (i == 0)
         {
             ConnectivityMgr().ClearWiFiStationProvision();
-            OpenDefaultPairingWindow(ResetFabrics::kYes);
+            OpenBasicCommissioningWindow(ResetFabrics::kYes);
         }
         else if (i == 1)
         {
@@ -347,8 +356,13 @@ public:
         }
         else if (i == 2)
         {
-            app::Mdns::AdvertiseCommissionableNode();
-            OpenDefaultPairingWindow(ResetFabrics::kYes, PairingWindowAdvertisement::kMdns);
+            app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledBasic);
+            OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
+        }
+        else if (i == 3)
+        {
+            app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledEnhanced);
+            OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout, PairingWindowAdvertisement::kMdns);
         }
     }
 
@@ -547,7 +561,7 @@ std::string createSetupPayload()
 
     if (err != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "Couldn't get payload string %" CHIP_ERROR_FORMAT, ChipError::FormatError(err));
+        ESP_LOGE(TAG, "Couldn't get payload string %" CHIP_ERROR_FORMAT, err.Format());
     }
     return result;
 };
@@ -593,6 +607,9 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
@@ -618,6 +635,9 @@ extern "C" void app_main()
     // Init ZCL Data Model and CHIP App Server
     AppCallbacks callbacks;
     InitServer(&callbacks);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     SetupPretendDevices();
     SetupInitialLevelControlValues(/* endpointId = */ 1);

@@ -76,7 +76,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [controller setListenPort:kLocalPort];
     [controller setPairingDelegate:pairing queue:callbackQueue];
 
-    BOOL started = [controller startup:nil];
+    BOOL started = [controller startup:nil vendorId:0];
     XCTAssertTrue(started);
 
     NSError * error;
@@ -134,7 +134,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-{{>test_cluster tests="TestCluster, Test_TC_OO_1_1, Test_TC_OO_2_1, Test_TC_OO_2_2, Test_TC_DM_1_1, Test_TC_DM_3_1, Test_TC_CC_3_4, Test_TC_CC_5, Test_TC_CC_6, Test_TC_CC_7, Test_TC_WNCV_1_1, Test_TC_WNCV_2_1, Test_TC_BI_1_1"}}
+{{>test_cluster tests="TestCluster, Test_TC_OO_1_1, Test_TC_OO_2_1, Test_TC_OO_2_2, Test_TC_DM_1_1, Test_TC_DM_3_1, Test_TC_CC_3_4, Test_TC_CC_5, Test_TC_CC_6, Test_TC_CC_7, Test_TC_CC_8, Test_TC_WNCV_1_1, Test_TC_WNCV_2_1, Test_TC_BI_1_1, Test_TC_FLW_1_1, Test_TC_TM_1_1, Test_TC_OCC_1_1"}}
 
 {{#chip_client_clusters}}
 {{#unless (isStrEqual "Test Cluster" name)}}

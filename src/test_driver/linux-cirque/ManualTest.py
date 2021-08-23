@@ -46,7 +46,8 @@ CHIP_PORT = 5540
 #############################################################
 
 CIRQUE_URL = "http://localhost:5000"
-CHIP_REPO = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "..", "..")
+CHIP_REPO = os.path.join(os.path.abspath(
+    os.path.dirname(__file__)), "..", "..", "..")
 
 logger = logging.getLogger('CHIPCirqueTest')
 logger.setLevel(logging.INFO)
@@ -56,6 +57,7 @@ sh.setFormatter(
     logging.Formatter(
         '%(asctime)s [%(name)s] %(levelname)s %(message)s'))
 logger.addHandler(sh)
+
 
 class TestManually(CHIPVirtualHome):
     def __init__(self, device_config):
@@ -73,7 +75,8 @@ class TestManually(CHIPVirtualHome):
     def wait_for_interrupt(self):
         self.logger.info("Finished setting up environment.")
         for device in self.non_ap_devices:
-            self.logger.info("Device: {} (Type: {}, Container: {})".format(device["type"], device["type"], device["id"][:10]))
+            self.logger.info("Device: {} (Type: {}, Container: {})".format(
+                device["type"], device["type"], device["id"][:10]))
         self.logger.info("Press Ctrl-C to stop the test.")
         self.logger.info("Container will be cleaned when the test finished.")
         try:
@@ -82,16 +85,18 @@ class TestManually(CHIPVirtualHome):
         except KeyboardInterrupt:
             self.logger.info("KeyboardInterrupt received, quit now")
 
+
 def _parse_mount_dir(config):
     for v in config.values():
         if "Mount" not in v.get("capability", {}):
             continue
         _mount_pairs = v.get("mount_pairs", [])
         for mount in _mount_pairs:
-            mount[0] = mount[0].format(chip_repo = CHIP_REPO)
-            mount[1] = mount[1].format(chip_repo = CHIP_REPO)
+            mount[0] = mount[0].format(chip_repo=CHIP_REPO)
+            mount[1] = mount[1].format(chip_repo=CHIP_REPO)
         v["mount_pairs"] = _mount_pairs
     return config
+
 
 if __name__ == "__main__":
     optParser = OptionParser()

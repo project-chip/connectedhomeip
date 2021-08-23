@@ -18,6 +18,8 @@
 function atomicType(arg)
 {
   switch (arg.name) {
+  case 'boolean':
+    return 'bool';
   case 'action_id':
   case 'cluster_id':
   case 'command_id':

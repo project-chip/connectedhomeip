@@ -14,7 +14,7 @@
 
 import os
 from pathlib import Path
-import serial # type: ignore
+import serial  # type: ignore
 import importlib
 
 from pw_hdlc.rpc import HdlcRpcClient, default_channels
@@ -88,4 +88,5 @@ def _validate_config(config):
     required_keys = ["device_tty", "baud"]  # A placeholder.
     for key in required_keys:
         if key not in config:
-            raise Error("Required key %s missing from config %s" % (key, config))
+            raise Error("Required key %s missing from config %s" %
+                        (key, config))

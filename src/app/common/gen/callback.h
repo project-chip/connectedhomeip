@@ -82,7 +82,7 @@ void emberAfGroupsClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfScenesClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief On/off Cluster Init
+/** @brief On/Off Cluster Init
  *
  * Cluster Init
  *
@@ -265,6 +265,14 @@ void emberAfBridgedDeviceBasicClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfSwitchClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief AdministratorCommissioning Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAdministratorCommissioningClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Operational Credentials Cluster Init
  *
@@ -942,7 +950,6 @@ void emberAfPowerConfigurationClusterClientManufacturerSpecificAttributeChangedC
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -957,7 +964,6 @@ void emberAfPowerConfigurationClusterServerMessageSentCallback(const chip::Messa
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1082,7 +1088,6 @@ void emberAfDeviceTemperatureConfigurationClusterClientManufacturerSpecificAttri
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1097,7 +1102,6 @@ void emberAfDeviceTemperatureConfigurationClusterServerMessageSentCallback(const
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1220,7 +1224,6 @@ void emberAfIdentifyClusterClientManufacturerSpecificAttributeChangedCallback(ch
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1234,7 +1237,6 @@ void emberAfIdentifyClusterServerMessageSentCallback(const chip::MessageSendDest
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1354,7 +1356,6 @@ void emberAfGroupsClusterClientManufacturerSpecificAttributeChangedCallback(chip
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1368,7 +1369,6 @@ void emberAfGroupsClusterServerMessageSentCallback(const chip::MessageSendDestin
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1488,7 +1488,6 @@ void emberAfScenesClusterClientManufacturerSpecificAttributeChangedCallback(chip
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1502,7 +1501,6 @@ void emberAfScenesClusterServerMessageSentCallback(const chip::MessageSendDestin
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1557,10 +1555,10 @@ void emberAfScenesClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfScenesClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// On/off Cluster
+// On/Off Cluster
 //
 
-/** @brief On/off Cluster Server Init
+/** @brief On/Off Cluster Server Init
  *
  * Server Init
  *
@@ -1568,7 +1566,7 @@ void emberAfScenesClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfOnOffClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief On/off Cluster Client Init
+/** @brief On/Off Cluster Client Init
  *
  * Client Init
  *
@@ -1576,7 +1574,7 @@ void emberAfOnOffClusterServerInitCallback(chip::EndpointId endpoint);
  */
 void emberAfOnOffClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief On/off Cluster Server Attribute Changed
+/** @brief On/Off Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
@@ -1585,7 +1583,7 @@ void emberAfOnOffClusterClientInitCallback(chip::EndpointId endpoint);
  */
 void emberAfOnOffClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
-/** @brief On/off Cluster Client Attribute Changed
+/** @brief On/Off Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
@@ -1594,7 +1592,7 @@ void emberAfOnOffClusterServerAttributeChangedCallback(chip::EndpointId endpoint
  */
 void emberAfOnOffClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
-/** @brief On/off Cluster Server Manufacturer Specific Attribute Changed
+/** @brief On/Off Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
  *
@@ -1605,7 +1603,7 @@ void emberAfOnOffClusterClientAttributeChangedCallback(chip::EndpointId endpoint
 void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 
-/** @brief On/off Cluster Client Manufacturer Specific Attribute Changed
+/** @brief On/Off Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
  *
@@ -1616,11 +1614,10 @@ void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(chip:
 void emberAfOnOffClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 
-/** @brief On/off Cluster Server Message Sent
+/** @brief On/Off Cluster Server Message Sent
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1630,11 +1627,10 @@ void emberAfOnOffClusterClientManufacturerSpecificAttributeChangedCallback(chip:
 void emberAfOnOffClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
                                                   uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief On/off Cluster Client Message Sent
+/** @brief On/Off Cluster Client Message Sent
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1644,7 +1640,7 @@ void emberAfOnOffClusterServerMessageSentCallback(const chip::MessageSendDestina
 void emberAfOnOffClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
                                                   uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief On/off Cluster Server Pre Attribute Changed
+/** @brief On/Off Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -1658,7 +1654,7 @@ EmberAfStatus emberAfOnOffClusterServerPreAttributeChangedCallback(chip::Endpoin
                                                                    EmberAfAttributeType attributeType, uint16_t size,
                                                                    uint8_t * value);
 
-/** @brief On/off Cluster Client Pre Attribute Changed
+/** @brief On/Off Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -1672,7 +1668,7 @@ EmberAfStatus emberAfOnOffClusterClientPreAttributeChangedCallback(chip::Endpoin
                                                                    EmberAfAttributeType attributeType, uint16_t size,
                                                                    uint8_t * value);
 
-/** @brief On/off Cluster Server Tick
+/** @brief On/Off Cluster Server Tick
  *
  * Server Tick
  *
@@ -1680,7 +1676,7 @@ EmberAfStatus emberAfOnOffClusterClientPreAttributeChangedCallback(chip::Endpoin
  */
 void emberAfOnOffClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief On/off Cluster Client Tick
+/** @brief On/Off Cluster Client Tick
  *
  * Client Tick
  *
@@ -1754,7 +1750,6 @@ void emberAfOnOffSwitchConfigurationClusterClientManufacturerSpecificAttributeCh
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1769,7 +1764,6 @@ void emberAfOnOffSwitchConfigurationClusterServerMessageSentCallback(const chip:
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1892,7 +1886,6 @@ void emberAfLevelControlClusterClientManufacturerSpecificAttributeChangedCallbac
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -1906,7 +1899,6 @@ void emberAfLevelControlClusterServerMessageSentCallback(const chip::MessageSend
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2026,7 +2018,6 @@ void emberAfAlarmsClusterClientManufacturerSpecificAttributeChangedCallback(chip
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2040,7 +2031,6 @@ void emberAfAlarmsClusterServerMessageSentCallback(const chip::MessageSendDestin
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2158,7 +2148,6 @@ void emberAfTimeClusterClientManufacturerSpecificAttributeChangedCallback(chip::
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2172,7 +2161,6 @@ void emberAfTimeClusterServerMessageSentCallback(const chip::MessageSendDestinat
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2292,7 +2280,6 @@ void emberAfBinaryInputBasicClusterClientManufacturerSpecificAttributeChangedCal
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2307,7 +2294,6 @@ void emberAfBinaryInputBasicClusterServerMessageSentCallback(const chip::Message
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2430,7 +2416,6 @@ void emberAfPowerProfileClusterClientManufacturerSpecificAttributeChangedCallbac
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2444,7 +2429,6 @@ void emberAfPowerProfileClusterServerMessageSentCallback(const chip::MessageSend
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2564,7 +2548,6 @@ void emberAfApplianceControlClusterClientManufacturerSpecificAttributeChangedCal
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2579,7 +2562,6 @@ void emberAfApplianceControlClusterServerMessageSentCallback(const chip::Message
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2702,7 +2684,6 @@ void emberAfDescriptorClusterClientManufacturerSpecificAttributeChangedCallback(
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2716,7 +2697,6 @@ void emberAfDescriptorClusterServerMessageSentCallback(const chip::MessageSendDe
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2836,7 +2816,6 @@ void emberAfPollControlClusterClientManufacturerSpecificAttributeChangedCallback
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2850,7 +2829,6 @@ void emberAfPollControlClusterServerMessageSentCallback(const chip::MessageSendD
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2968,7 +2946,6 @@ void emberAfBasicClusterClientManufacturerSpecificAttributeChangedCallback(chip:
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -2982,7 +2959,6 @@ void emberAfBasicClusterServerMessageSentCallback(const chip::MessageSendDestina
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3104,7 +3080,6 @@ void emberAfOtaSoftwareUpdateProviderClusterClientManufacturerSpecificAttributeC
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3119,7 +3094,6 @@ void emberAfOtaSoftwareUpdateProviderClusterServerMessageSentCallback(const chip
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3244,7 +3218,6 @@ void emberAfOtaSoftwareUpdateRequestorClusterClientManufacturerSpecificAttribute
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3259,7 +3232,6 @@ void emberAfOtaSoftwareUpdateRequestorClusterServerMessageSentCallback(const chi
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3382,7 +3354,6 @@ void emberAfGeneralCommissioningClusterClientManufacturerSpecificAttributeChange
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3397,7 +3368,6 @@ void emberAfGeneralCommissioningClusterServerMessageSentCallback(const chip::Mes
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3520,7 +3490,6 @@ void emberAfNetworkCommissioningClusterClientManufacturerSpecificAttributeChange
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3535,7 +3504,6 @@ void emberAfNetworkCommissioningClusterServerMessageSentCallback(const chip::Mes
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3658,7 +3626,6 @@ void emberAfDiagnosticLogsClusterClientManufacturerSpecificAttributeChangedCallb
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3673,7 +3640,6 @@ void emberAfDiagnosticLogsClusterServerMessageSentCallback(const chip::MessageSe
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3796,7 +3762,6 @@ void emberAfGeneralDiagnosticsClusterClientManufacturerSpecificAttributeChangedC
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3811,7 +3776,6 @@ void emberAfGeneralDiagnosticsClusterServerMessageSentCallback(const chip::Messa
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3934,7 +3898,6 @@ void emberAfSoftwareDiagnosticsClusterClientManufacturerSpecificAttributeChanged
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -3949,7 +3912,6 @@ void emberAfSoftwareDiagnosticsClusterServerMessageSentCallback(const chip::Mess
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4072,7 +4034,6 @@ void emberAfThreadNetworkDiagnosticsClusterClientManufacturerSpecificAttributeCh
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4087,7 +4048,6 @@ void emberAfThreadNetworkDiagnosticsClusterServerMessageSentCallback(const chip:
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4210,7 +4170,6 @@ void emberAfWiFiNetworkDiagnosticsClusterClientManufacturerSpecificAttributeChan
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4225,7 +4184,6 @@ void emberAfWiFiNetworkDiagnosticsClusterServerMessageSentCallback(const chip::M
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4350,7 +4308,6 @@ void emberAfEthernetNetworkDiagnosticsClusterClientManufacturerSpecificAttribute
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4365,7 +4322,6 @@ void emberAfEthernetNetworkDiagnosticsClusterServerMessageSentCallback(const chi
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4488,7 +4444,6 @@ void emberAfBridgedDeviceBasicClusterClientManufacturerSpecificAttributeChangedC
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4503,7 +4458,6 @@ void emberAfBridgedDeviceBasicClusterServerMessageSentCallback(const chip::Messa
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4626,7 +4580,6 @@ void emberAfSwitchClusterClientManufacturerSpecificAttributeChangedCallback(chip
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4640,7 +4593,6 @@ void emberAfSwitchClusterServerMessageSentCallback(const chip::MessageSendDestin
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4693,6 +4645,144 @@ void emberAfSwitchClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfSwitchClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// AdministratorCommissioning Cluster
+//
+
+/** @brief AdministratorCommissioning Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAdministratorCommissioningClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief AdministratorCommissioning Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfAdministratorCommissioningClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief AdministratorCommissioning Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfAdministratorCommissioningClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId);
+
+/** @brief AdministratorCommissioning Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfAdministratorCommissioningClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId);
+
+/** @brief AdministratorCommissioning Cluster Server Manufacturer Specific Attribute Changed
+ *
+ * Server Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfAdministratorCommissioningClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                                chip::AttributeId attributeId,
+                                                                                                uint16_t manufacturerCode);
+
+/** @brief AdministratorCommissioning Cluster Client Manufacturer Specific Attribute Changed
+ *
+ * Client Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfAdministratorCommissioningClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                                chip::AttributeId attributeId,
+                                                                                                uint16_t manufacturerCode);
+
+/** @brief AdministratorCommissioning Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfAdministratorCommissioningClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                                       EmberStatus status);
+
+/** @brief AdministratorCommissioning Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfAdministratorCommissioningClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                                       EmberStatus status);
+
+/** @brief AdministratorCommissioning Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfAdministratorCommissioningClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                        chip::AttributeId attributeId,
+                                                                                        EmberAfAttributeType attributeType,
+                                                                                        uint16_t size, uint8_t * value);
+
+/** @brief AdministratorCommissioning Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfAdministratorCommissioningClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                        chip::AttributeId attributeId,
+                                                                                        EmberAfAttributeType attributeType,
+                                                                                        uint16_t size, uint8_t * value);
+
+/** @brief AdministratorCommissioning Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfAdministratorCommissioningClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief AdministratorCommissioning Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfAdministratorCommissioningClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Operational Credentials Cluster
@@ -4760,7 +4850,6 @@ void emberAfOperationalCredentialsClusterClientManufacturerSpecificAttributeChan
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4775,7 +4864,6 @@ void emberAfOperationalCredentialsClusterServerMessageSentCallback(const chip::M
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4898,7 +4986,6 @@ void emberAfFixedLabelClusterClientManufacturerSpecificAttributeChangedCallback(
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -4912,7 +4999,6 @@ void emberAfFixedLabelClusterServerMessageSentCallback(const chip::MessageSendDe
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5032,7 +5118,6 @@ void emberAfShadeConfigurationClusterClientManufacturerSpecificAttributeChangedC
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5047,7 +5132,6 @@ void emberAfShadeConfigurationClusterServerMessageSentCallback(const chip::Messa
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5170,7 +5254,6 @@ void emberAfDoorLockClusterClientManufacturerSpecificAttributeChangedCallback(ch
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5184,7 +5267,6 @@ void emberAfDoorLockClusterServerMessageSentCallback(const chip::MessageSendDest
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5304,7 +5386,6 @@ void emberAfWindowCoveringClusterClientManufacturerSpecificAttributeChangedCallb
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5319,7 +5400,6 @@ void emberAfWindowCoveringClusterServerMessageSentCallback(const chip::MessageSe
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5442,7 +5522,6 @@ void emberAfBarrierControlClusterClientManufacturerSpecificAttributeChangedCallb
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5457,7 +5536,6 @@ void emberAfBarrierControlClusterServerMessageSentCallback(const chip::MessageSe
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5582,7 +5660,6 @@ void emberAfPumpConfigurationAndControlClusterClientManufacturerSpecificAttribut
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5597,7 +5674,6 @@ void emberAfPumpConfigurationAndControlClusterServerMessageSentCallback(const ch
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5720,7 +5796,6 @@ void emberAfThermostatClusterClientManufacturerSpecificAttributeChangedCallback(
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5734,7 +5809,6 @@ void emberAfThermostatClusterServerMessageSentCallback(const chip::MessageSendDe
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5854,7 +5928,6 @@ void emberAfFanControlClusterClientManufacturerSpecificAttributeChangedCallback(
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5868,7 +5941,6 @@ void emberAfFanControlClusterServerMessageSentCallback(const chip::MessageSendDe
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -5988,7 +6060,6 @@ void emberAfDehumidificationControlClusterClientManufacturerSpecificAttributeCha
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6003,7 +6074,6 @@ void emberAfDehumidificationControlClusterServerMessageSentCallback(const chip::
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6126,7 +6196,6 @@ void emberAfThermostatUserInterfaceConfigurationClusterClientManufacturerSpecifi
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6141,7 +6210,6 @@ void emberAfThermostatUserInterfaceConfigurationClusterServerMessageSentCallback
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6260,7 +6328,6 @@ void emberAfColorControlClusterClientManufacturerSpecificAttributeChangedCallbac
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6274,7 +6341,6 @@ void emberAfColorControlClusterServerMessageSentCallback(const chip::MessageSend
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6394,7 +6460,6 @@ void emberAfBallastConfigurationClusterClientManufacturerSpecificAttributeChange
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6409,7 +6474,6 @@ void emberAfBallastConfigurationClusterServerMessageSentCallback(const chip::Mes
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6532,7 +6596,6 @@ void emberAfIlluminanceMeasurementClusterClientManufacturerSpecificAttributeChan
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6547,7 +6610,6 @@ void emberAfIlluminanceMeasurementClusterServerMessageSentCallback(const chip::M
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6670,7 +6732,6 @@ void emberAfIlluminanceLevelSensingClusterClientManufacturerSpecificAttributeCha
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6685,7 +6746,6 @@ void emberAfIlluminanceLevelSensingClusterServerMessageSentCallback(const chip::
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6808,7 +6868,6 @@ void emberAfTemperatureMeasurementClusterClientManufacturerSpecificAttributeChan
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6823,7 +6882,6 @@ void emberAfTemperatureMeasurementClusterServerMessageSentCallback(const chip::M
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6946,7 +7004,6 @@ void emberAfPressureMeasurementClusterClientManufacturerSpecificAttributeChanged
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -6961,7 +7018,6 @@ void emberAfPressureMeasurementClusterServerMessageSentCallback(const chip::Mess
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7084,7 +7140,6 @@ void emberAfFlowMeasurementClusterClientManufacturerSpecificAttributeChangedCall
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7099,7 +7154,6 @@ void emberAfFlowMeasurementClusterServerMessageSentCallback(const chip::MessageS
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7224,7 +7278,6 @@ void emberAfRelativeHumidityMeasurementClusterClientManufacturerSpecificAttribut
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7239,7 +7292,6 @@ void emberAfRelativeHumidityMeasurementClusterServerMessageSentCallback(const ch
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7362,7 +7414,6 @@ void emberAfOccupancySensingClusterClientManufacturerSpecificAttributeChangedCal
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7377,7 +7428,6 @@ void emberAfOccupancySensingClusterServerMessageSentCallback(const chip::Message
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7500,7 +7550,6 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterClientManufacturerSpeci
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7515,7 +7564,6 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterServerMessageSentCallba
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7634,7 +7682,6 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterClientManufacturerSpecif
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7649,7 +7696,6 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterServerMessageSentCallbac
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7770,7 +7816,6 @@ void emberAfEthyleneConcentrationMeasurementClusterClientManufacturerSpecificAtt
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7785,7 +7830,6 @@ void emberAfEthyleneConcentrationMeasurementClusterServerMessageSentCallback(con
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7908,7 +7952,6 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterClientManufacturerSpecif
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -7923,7 +7966,6 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterServerMessageSentCallbac
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8044,7 +8086,6 @@ void emberAfHydrogenConcentrationMeasurementClusterClientManufacturerSpecificAtt
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8059,7 +8100,6 @@ void emberAfHydrogenConcentrationMeasurementClusterServerMessageSentCallback(con
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8182,7 +8222,6 @@ void emberAfHydrogenSulphideConcentrationMeasurementClusterClientManufacturerSpe
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8197,7 +8236,6 @@ void emberAfHydrogenSulphideConcentrationMeasurementClusterServerMessageSentCall
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8316,7 +8354,6 @@ void emberAfNitricOxideConcentrationMeasurementClusterClientManufacturerSpecific
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8331,7 +8368,6 @@ void emberAfNitricOxideConcentrationMeasurementClusterServerMessageSentCallback(
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8454,7 +8490,6 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterClientManufacturerSpec
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8469,7 +8504,6 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterServerMessageSentCallb
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8590,7 +8624,6 @@ void emberAfOxygenConcentrationMeasurementClusterClientManufacturerSpecificAttri
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8605,7 +8638,6 @@ void emberAfOxygenConcentrationMeasurementClusterServerMessageSentCallback(const
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8730,7 +8762,6 @@ void emberAfOzoneConcentrationMeasurementClusterClientManufacturerSpecificAttrib
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8745,7 +8776,6 @@ void emberAfOzoneConcentrationMeasurementClusterServerMessageSentCallback(const 
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8868,7 +8898,6 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterClientManufacturerSpecif
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -8883,7 +8912,6 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterServerMessageSentCallbac
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9002,7 +9030,6 @@ void emberAfDissolvedOxygenConcentrationMeasurementClusterClientManufacturerSpec
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9017,7 +9044,6 @@ void emberAfDissolvedOxygenConcentrationMeasurementClusterServerMessageSentCallb
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9138,7 +9164,6 @@ void emberAfBromateConcentrationMeasurementClusterClientManufacturerSpecificAttr
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9153,7 +9178,6 @@ void emberAfBromateConcentrationMeasurementClusterServerMessageSentCallback(cons
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9276,7 +9300,6 @@ void emberAfChloraminesConcentrationMeasurementClusterClientManufacturerSpecific
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9291,7 +9314,6 @@ void emberAfChloraminesConcentrationMeasurementClusterServerMessageSentCallback(
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9416,7 +9438,6 @@ void emberAfChlorineConcentrationMeasurementClusterClientManufacturerSpecificAtt
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9431,7 +9452,6 @@ void emberAfChlorineConcentrationMeasurementClusterServerMessageSentCallback(con
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9554,7 +9574,6 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientManufactur
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9569,7 +9588,6 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerMessageSen
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9690,7 +9708,6 @@ void emberAfFluorideConcentrationMeasurementClusterClientManufacturerSpecificAtt
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9705,7 +9722,6 @@ void emberAfFluorideConcentrationMeasurementClusterServerMessageSentCallback(con
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9828,7 +9844,6 @@ void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientManufacturerSpec
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9843,7 +9858,6 @@ void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerMessageSentCallb
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9962,7 +9976,6 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientManufacture
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -9977,7 +9990,6 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerMessageSent
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10096,7 +10108,6 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientManufactur
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10111,7 +10122,6 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerMessageSen
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10230,7 +10240,6 @@ void emberAfTurbidityConcentrationMeasurementClusterClientManufacturerSpecificAt
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10245,7 +10254,6 @@ void emberAfTurbidityConcentrationMeasurementClusterServerMessageSentCallback(co
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10370,7 +10378,6 @@ void emberAfCopperConcentrationMeasurementClusterClientManufacturerSpecificAttri
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10385,7 +10392,6 @@ void emberAfCopperConcentrationMeasurementClusterServerMessageSentCallback(const
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10510,7 +10516,6 @@ void emberAfLeadConcentrationMeasurementClusterClientManufacturerSpecificAttribu
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10525,7 +10530,6 @@ void emberAfLeadConcentrationMeasurementClusterServerMessageSentCallback(const c
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10648,7 +10652,6 @@ void emberAfManganeseConcentrationMeasurementClusterClientManufacturerSpecificAt
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10663,7 +10666,6 @@ void emberAfManganeseConcentrationMeasurementClusterServerMessageSentCallback(co
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10788,7 +10790,6 @@ void emberAfSulfateConcentrationMeasurementClusterClientManufacturerSpecificAttr
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10803,7 +10804,6 @@ void emberAfSulfateConcentrationMeasurementClusterServerMessageSentCallback(cons
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10926,7 +10926,6 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterClientManufacture
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -10941,7 +10940,6 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterServerMessageSent
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11060,7 +11058,6 @@ void emberAfBromoformConcentrationMeasurementClusterClientManufacturerSpecificAt
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11075,7 +11072,6 @@ void emberAfBromoformConcentrationMeasurementClusterServerMessageSentCallback(co
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11198,7 +11194,6 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientManufacture
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11213,7 +11208,6 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerMessageSent
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11332,7 +11326,6 @@ void emberAfChloroformConcentrationMeasurementClusterClientManufacturerSpecificA
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11347,7 +11340,6 @@ void emberAfChloroformConcentrationMeasurementClusterServerMessageSentCallback(c
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11472,7 +11464,6 @@ void emberAfSodiumConcentrationMeasurementClusterClientManufacturerSpecificAttri
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11487,7 +11478,6 @@ void emberAfSodiumConcentrationMeasurementClusterServerMessageSentCallback(const
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11610,7 +11600,6 @@ void emberAfIasZoneClusterClientManufacturerSpecificAttributeChangedCallback(chi
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11624,7 +11613,6 @@ void emberAfIasZoneClusterServerMessageSentCallback(const chip::MessageSendDesti
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11744,7 +11732,6 @@ void emberAfIasAceClusterClientManufacturerSpecificAttributeChangedCallback(chip
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11758,7 +11745,6 @@ void emberAfIasAceClusterServerMessageSentCallback(const chip::MessageSendDestin
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11876,7 +11862,6 @@ void emberAfIasWdClusterClientManufacturerSpecificAttributeChangedCallback(chip:
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -11890,7 +11875,6 @@ void emberAfIasWdClusterServerMessageSentCallback(const chip::MessageSendDestina
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12010,7 +11994,6 @@ void emberAfWakeOnLanClusterClientManufacturerSpecificAttributeChangedCallback(c
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12024,7 +12007,6 @@ void emberAfWakeOnLanClusterServerMessageSentCallback(const chip::MessageSendDes
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12144,7 +12126,6 @@ void emberAfTvChannelClusterClientManufacturerSpecificAttributeChangedCallback(c
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12158,7 +12139,6 @@ void emberAfTvChannelClusterServerMessageSentCallback(const chip::MessageSendDes
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12278,7 +12258,6 @@ void emberAfTargetNavigatorClusterClientManufacturerSpecificAttributeChangedCall
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12293,7 +12272,6 @@ void emberAfTargetNavigatorClusterServerMessageSentCallback(const chip::MessageS
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12416,7 +12394,6 @@ void emberAfMediaPlaybackClusterClientManufacturerSpecificAttributeChangedCallba
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12431,7 +12408,6 @@ void emberAfMediaPlaybackClusterServerMessageSentCallback(const chip::MessageSen
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12552,7 +12528,6 @@ void emberAfMediaInputClusterClientManufacturerSpecificAttributeChangedCallback(
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12566,7 +12541,6 @@ void emberAfMediaInputClusterServerMessageSentCallback(const chip::MessageSendDe
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12686,7 +12660,6 @@ void emberAfLowPowerClusterClientManufacturerSpecificAttributeChangedCallback(ch
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12700,7 +12673,6 @@ void emberAfLowPowerClusterServerMessageSentCallback(const chip::MessageSendDest
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12820,7 +12792,6 @@ void emberAfKeypadInputClusterClientManufacturerSpecificAttributeChangedCallback
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12834,7 +12805,6 @@ void emberAfKeypadInputClusterServerMessageSentCallback(const chip::MessageSendD
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12954,7 +12924,6 @@ void emberAfContentLauncherClusterClientManufacturerSpecificAttributeChangedCall
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -12969,7 +12938,6 @@ void emberAfContentLauncherClusterServerMessageSentCallback(const chip::MessageS
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13092,7 +13060,6 @@ void emberAfAudioOutputClusterClientManufacturerSpecificAttributeChangedCallback
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13106,7 +13073,6 @@ void emberAfAudioOutputClusterServerMessageSentCallback(const chip::MessageSendD
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13226,7 +13192,6 @@ void emberAfApplicationLauncherClusterClientManufacturerSpecificAttributeChanged
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13241,7 +13206,6 @@ void emberAfApplicationLauncherClusterServerMessageSentCallback(const chip::Mess
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13364,7 +13328,6 @@ void emberAfApplicationBasicClusterClientManufacturerSpecificAttributeChangedCal
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13379,7 +13342,6 @@ void emberAfApplicationBasicClusterServerMessageSentCallback(const chip::Message
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13502,7 +13464,6 @@ void emberAfAccountLoginClusterClientManufacturerSpecificAttributeChangedCallbac
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13516,7 +13477,6 @@ void emberAfAccountLoginClusterServerMessageSentCallback(const chip::MessageSend
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13636,7 +13596,6 @@ void emberAfTestClusterClusterClientManufacturerSpecificAttributeChangedCallback
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13650,7 +13609,6 @@ void emberAfTestClusterClusterServerMessageSentCallback(const chip::MessageSendD
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13770,7 +13728,6 @@ void emberAfMessagingClusterClientManufacturerSpecificAttributeChangedCallback(c
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13784,7 +13741,6 @@ void emberAfMessagingClusterServerMessageSentCallback(const chip::MessageSendDes
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13904,7 +13860,6 @@ void emberAfApplianceIdentificationClusterClientManufacturerSpecificAttributeCha
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -13919,7 +13874,6 @@ void emberAfApplianceIdentificationClusterServerMessageSentCallback(const chip::
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14042,7 +13996,6 @@ void emberAfMeterIdentificationClusterClientManufacturerSpecificAttributeChanged
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14057,7 +14010,6 @@ void emberAfMeterIdentificationClusterServerMessageSentCallback(const chip::Mess
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14180,7 +14132,6 @@ void emberAfApplianceEventsAndAlertClusterClientManufacturerSpecificAttributeCha
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14195,7 +14146,6 @@ void emberAfApplianceEventsAndAlertClusterServerMessageSentCallback(const chip::
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14318,7 +14268,6 @@ void emberAfApplianceStatisticsClusterClientManufacturerSpecificAttributeChanged
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14333,7 +14282,6 @@ void emberAfApplianceStatisticsClusterServerMessageSentCallback(const chip::Mess
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14456,7 +14404,6 @@ void emberAfElectricalMeasurementClusterClientManufacturerSpecificAttributeChang
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14471,7 +14418,6 @@ void emberAfElectricalMeasurementClusterServerMessageSentCallback(const chip::Me
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14594,7 +14540,6 @@ void emberAfBindingClusterClientManufacturerSpecificAttributeChangedCallback(chi
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14608,7 +14553,6 @@ void emberAfBindingClusterServerMessageSentCallback(const chip::MessageSendDesti
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14728,7 +14672,6 @@ void emberAfGroupKeyManagementClusterClientManufacturerSpecificAttributeChangedC
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14743,7 +14686,6 @@ void emberAfGroupKeyManagementClusterServerMessageSentCallback(const chip::Messa
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14866,7 +14808,6 @@ void emberAfSampleMfgSpecificClusterClusterClientManufacturerSpecificAttributeCh
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -14881,7 +14822,6 @@ void emberAfSampleMfgSpecificClusterClusterServerMessageSentCallback(const chip:
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -15006,7 +14946,6 @@ void emberAfSampleMfgSpecificCluster2ClusterClientManufacturerSpecificAttributeC
  *
  * Server Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -15021,7 +14960,6 @@ void emberAfSampleMfgSpecificCluster2ClusterServerMessageSentCallback(const chip
  *
  * Client Message Sent
  *
- * @param type               The type of message sent
  * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
@@ -15545,7 +15483,7 @@ bool emberAfPollControlClusterCheckInCallback(chip::EndpointId endpoint, chip::a
  * @brief  Cluster CheckInResponse Command callback (from client)
  */
 bool emberAfPollControlClusterCheckInResponseCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                      uint8_t startFastPolling, uint16_t fastPollTimeout);
+                                                      bool startFastPolling, uint16_t fastPollTimeout);
 /**
  * @brief  Cluster FastPollStop Command callback (from client)
  */
@@ -15579,10 +15517,11 @@ bool emberAfBasicClusterLeaveCallback(chip::EndpointId endpoint, chip::app::Comm
 /**
  * @brief  Cluster QueryImage Command callback (from client)
  */
-bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
-    chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType,
-    uint16_t hardwareVersion, uint32_t currentVersion, /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported,
-    uint8_t * location, uint8_t requestorCanConsent, chip::ByteSpan metadataForProvider);
+bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                               uint16_t vendorId, uint16_t productId, uint16_t imageType,
+                                                               uint16_t hardwareVersion, uint32_t currentVersion,
+                                                               uint8_t protocolsSupported, uint8_t * location,
+                                                               bool requestorCanConsent, chip::ByteSpan metadataForProvider);
 /**
  * @brief  Cluster ApplyUpdateRequest Command callback (from client)
  */
@@ -15602,8 +15541,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(chip::End
                                                                        chip::app::CommandSender * commandObj, uint8_t status,
                                                                        uint32_t delayedActionTime, uint8_t * imageURI,
                                                                        uint32_t softwareVersion, chip::ByteSpan updateToken,
-                                                                       uint8_t userConsentNeeded,
-                                                                       chip::ByteSpan metadataForRequestor);
+                                                                       bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 /**
  * @brief  Cluster ApplyUpdateRequestResponse Command callback (from server)
  */
@@ -15797,15 +15735,22 @@ bool emberAfBridgedDeviceBasicClusterLeaveCallback(chip::EndpointId endpoint, ch
  */
 bool emberAfBridgedDeviceBasicClusterReachableChangedCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
 /**
- * @brief  Cluster SetFabric Command callback (from client)
+ * @brief  Cluster OpenCommissioningWindow Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                           uint16_t VendorId);
+bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
+    chip::EndpointId endpoint, chip::app::CommandHandler * commandObj, uint16_t CommissioningTimeout, chip::ByteSpan PAKEVerifier,
+    uint16_t Discriminator, uint32_t Iterations, chip::ByteSpan Salt, uint16_t PasscodeID);
 /**
- * @brief  Cluster SetFabricResponse Command callback (from server)
+ * @brief  Cluster OpenBasicCommissioningWindow Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                   chip::FabricId FabricId);
+bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(chip::EndpointId endpoint,
+                                                                                  chip::app::CommandHandler * commandObj,
+                                                                                  uint16_t CommissioningTimeout);
+/**
+ * @brief  Cluster RevokeCommissioning Command callback (from client)
+ */
+bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(chip::EndpointId endpoint,
+                                                                         chip::app::CommandHandler * commandObj);
 /**
  * @brief  Cluster OpCSRRequest Command callback (from client)
  */
@@ -15823,6 +15768,11 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(chip::EndpointId endpoin
                                                         chip::ByteSpan NOCArray, chip::ByteSpan IPKValue,
                                                         chip::NodeId CaseAdminNode, uint16_t AdminVendorId);
 /**
+ * @brief  Cluster UpdateNOC Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterUpdateNOCCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
+                                                           chip::ByteSpan NOCArray);
+/**
  * @brief  Cluster NOCResponse Command callback (from server)
  */
 bool emberAfOperationalCredentialsClusterNOCResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
@@ -15836,12 +15786,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::Endpoin
  * @brief  Cluster RemoveFabric Command callback (from client)
  */
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                              chip::FabricId FabricId, chip::NodeId NodeId, uint16_t VendorId);
-/**
- * @brief  Cluster RemoveAllFabrics Command callback (from client)
- */
-bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::EndpointId endpoint,
-                                                                  chip::app::CommandHandler * commandObj);
+                                                              uint8_t FabricIndex);
 /**
  * @brief  Cluster AddTrustedRootCertificate Command callback (from client)
  */
@@ -16441,13 +16386,13 @@ bool emberAfIasAceClusterGetBypassedZoneListCallback(chip::EndpointId endpoint, 
  * @brief  Cluster GetZoneStatusResponse Command callback (from server)
  */
 bool emberAfIasAceClusterGetZoneStatusResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                       uint8_t zoneStatusComplete, uint8_t numberOfZones,
+                                                       bool zoneStatusComplete, uint8_t numberOfZones,
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * zoneStatusResult);
 /**
  * @brief  Cluster GetZoneStatus Command callback (from client)
  */
 bool emberAfIasAceClusterGetZoneStatusCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                               uint8_t startingZoneId, uint8_t maxNumberOfZoneIds, uint8_t zoneStatusMaskFlag,
+                                               uint8_t startingZoneId, uint8_t maxNumberOfZoneIds, bool zoneStatusMaskFlag,
                                                uint16_t zoneStatusMask);
 /**
  * @brief  Cluster StartWarning Command callback (from client)
@@ -16624,7 +16569,7 @@ bool emberAfKeypadInputClusterSendKeyResponseCallback(chip::EndpointId endpoint,
  * @brief  Cluster LaunchContent Command callback (from client)
  */
 bool emberAfContentLauncherClusterLaunchContentCallback(chip::EndpointId endpoint, chip::app::CommandHandler * commandObj,
-                                                        uint8_t autoPlay, uint8_t * data);
+                                                        bool autoPlay, uint8_t * data);
 /**
  * @brief  Cluster LaunchContentResponse Command callback (from server)
  */
@@ -17093,7 +17038,6 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
  * indicates that the message sent notification has been handled and should not
  * be handled by the application framework.
  *
- * @param type   Ver.: always
  * @param destination   Ver.: always
  * @param apsFrame   Ver.: always
  * @param msgLen   Ver.: always
@@ -17182,19 +17126,6 @@ void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::Cluster
 EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                    uint8_t * buffer, uint16_t maxReadLength, int32_t index = -1);
-
-/** @brief Write Attributes Response
- *
- * This function is called by the application framework when a Write Attributes
- * Response command is received from an external device.  The application should
- * return true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of write attribute status records.
- * Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfWriteAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 /** @brief External Attribute Write
  *

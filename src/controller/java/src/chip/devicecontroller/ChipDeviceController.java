@@ -21,6 +21,8 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.util.Log;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
+import chip.devicecontroller.mdns.ChipMdnsCallback;
+import chip.devicecontroller.mdns.ServiceResolver;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -31,8 +33,9 @@ public class ChipDeviceController {
   private BluetoothGatt bleGatt;
   private CompletionListener completionListener;
 
-  public ChipDeviceController() {
-    deviceControllerPtr = newDeviceController();
+  public ChipDeviceController(
+      KeyValueStoreManager manager, ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback) {
+    deviceControllerPtr = newDeviceController(manager, resolver, chipMdnsCallback);
   }
 
   public void setCompletionListener(CompletionListener listener) {
@@ -228,7 +231,8 @@ public class ChipDeviceController {
     return isActive(deviceControllerPtr, deviceId);
   }
 
-  private native long newDeviceController();
+  private native long newDeviceController(
+      KeyValueStoreManager manager, ServiceResolver resolver, ChipMdnsCallback chipMdnsCallback);
 
   private native void pairDevice(
       long deviceControllerPtr, long deviceId, int connectionId, long pinCode, byte[] csrNonce);
@@ -261,18 +265,6 @@ public class ChipDeviceController {
   private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
 
   private native boolean isActive(long deviceControllerPtr, long deviceId);
-
-  public static native void setKeyValueStoreManager(KeyValueStoreManager manager);
-
-  public static native void setServiceResolver(ServiceResolver resolver);
-
-  public static native void handleServiceResolve(
-      String instanceName,
-      String serviceType,
-      String address,
-      int port,
-      long callbackHandle,
-      long contextHandle);
 
   static {
     System.loadLibrary("CHIPController");

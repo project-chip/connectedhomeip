@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file declares an implementation of WatchableEvents using libevent.
+ *      This file declares an implementation of WatchableEventManager using libevent.
  */
 
 #pragma once

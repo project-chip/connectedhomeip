@@ -21,6 +21,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <support/CodeUtils.h>
+#include <support/ScopedBuffer.h>
 #include <support/ThreadOperationalDataset.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -101,17 +102,43 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         params.inetLayer       = &chip::DeviceLayer::InetLayer;
         params.pairingDelegate = &gPairingDelegate;
 
+        chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
+
+        chip::Crypto::P256Keypair ephemeralKey;
+        err = ephemeralKey.Initialize();
+        SuccessOrExit(err);
+
         err = gOperationalCredentialsIssuer.Initialize(gServerStorage);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Operational credentials issuer initialization failed: %s", chip::ErrorStr(err));
+            ExitNow();
         }
-        else
-        {
-            params.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;
 
-            err = result->Init(localDeviceId, params);
+        VerifyOrExit(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), err = CHIP_ERROR_NO_MEMORY);
+
+        {
+            chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
+            chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+            chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+            err = gOperationalCredentialsIssuer.GenerateNOCChainAfterValidation(localDeviceId, 0, ephemeralKey.Pubkey(), rcacSpan,
+                                                                                icacSpan, nocSpan);
+            SuccessOrExit(err);
+
+            params.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;
+            params.ephemeralKeypair               = &ephemeralKey;
+            params.controllerRCAC                 = rcacSpan;
+            params.controllerICAC                 = icacSpan;
+            params.controllerNOC                  = nocSpan;
+
+            err = result->Init(params);
         }
+    exit:
+        ChipLogProgress(Controller, "Commissioner initialization status: %s", chip::ErrorStr(err));
     });
 
     if (err != CHIP_NO_ERROR)
@@ -133,7 +160,7 @@ extern "C" chip::ChipError::StorageType pychip_internal_Commissioner_Unpair(chip
 
     chip::python::ChipMainThreadScheduleAndWait([&]() { err = commissioner->UnpairDevice(remoteDeviceId); });
 
-    return chip::ChipError::AsInteger(err);
+    return err.AsInteger();
 }
 
 extern "C" chip::ChipError::StorageType
@@ -154,5 +181,5 @@ pychip_internal_Commissioner_BleConnectForPairing(chip::Controller::DeviceCommis
         err = commissioner->PairDevice(remoteNodeId, params);
     });
 
-    return chip::ChipError::AsInteger(err);
+    return err.AsInteger();
 }

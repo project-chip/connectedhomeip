@@ -28,6 +28,7 @@
 #include <system/SystemLayer.h>
 
 namespace chip {
+
 namespace DeviceLayer {
 
 class PlatformManagerImpl;
@@ -36,6 +37,7 @@ class ConfigurationManagerImpl;
 class TraitManager;
 class ThreadStackManagerImpl;
 class TimeSyncManager;
+
 namespace Internal {
 class DeviceControlServer;
 class FabricProvisioningServer;
@@ -86,6 +88,11 @@ public:
      * that happen before either StartEventLoopTask or RunEventLoop will queue
      * the work up but that work will NOT run until one of those functions is
      * called.
+     *
+     * ScheduleWork can be called safely on any thread without locking the
+     * stack.  When called from a thread that is not doing the stack work item
+     * processing, the callback function may be called (on the work item
+     * processing thread) before ScheduleWork returns.
      */
     void ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
     /**
@@ -169,15 +176,14 @@ private:
     friend class Internal::GenericThreadStackManagerImpl_OpenThread_LwIP;
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
-    // Parentheses used to fix clang parsing issue with these declarations
-    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::PostEvent)(::chip::System::Layer & aLayer,
-                                                                       ::chip::System::Object & aTarget,
-                                                                       ::chip::System::EventType aType, uintptr_t aArgument);
-    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::DispatchEvents)(::chip::System::Layer & aLayer);
-    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::DispatchEvent)(::chip::System::Layer & aLayer,
-                                                                           ::chip::System::Event aEvent);
-    friend ::CHIP_ERROR(::chip::System::Platform::Eventing::StartTimer)(::chip::System::Layer & aLayer, uint32_t aMilliseconds);
+    friend class System::PlatformEventing;
 
+    /*
+     * PostEvent can be called safely on any thread without locking the stack.
+     * When called from a thread that is not doing the stack work item
+     * processing, the event might get dispatched (on the work item processing
+     * thread) before PostEvent returns.
+     */
     void PostEvent(const ChipDeviceEvent * event);
     void DispatchEvent(const ChipDeviceEvent * event);
     CHIP_ERROR StartChipTimer(uint32_t durationMS);

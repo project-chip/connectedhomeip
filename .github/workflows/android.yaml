@@ -54,51 +54,7 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build arm libs
-              timeout-minutes: 2
+            - name: Build android examples
               run: |
-                  ./scripts/examples/android_app.sh
-              env:
-                BUILD_TYPE: android_arm
-                TARGET_CPU: arm
-            - name: Build arm App
-              timeout-minutes: 5
-              run: |
-                  yes | "$ANDROID_HOME"/tools/bin/sdkmanager --licenses
-                  cd src/android/CHIPTool
-                  ./gradlew build
-              env:
-                BUILD_TYPE: android_arm
-                TARGET_CPU: arm
-            - name: Build arm64 libs
-              timeout-minutes: 2
-              run: |
-                  ./scripts/examples/android_app.sh
-              env:
-                BUILD_TYPE: android_arm64
-                TARGET_CPU: arm64
-            - name: Build arm64 App
-              timeout-minutes: 5
-              run: |
-                  yes | "$ANDROID_HOME"/tools/bin/sdkmanager --licenses
-                  cd src/android/CHIPTool
-                  ./gradlew build
-              env:
-                BUILD_TYPE: android_arm64
-                TARGET_CPU: arm64
-            - name: Build x64 libs
-              timeout-minutes: 2
-              run: |
-                  ./scripts/examples/android_app.sh
-              env:
-                BUILD_TYPE: android_x64
-                TARGET_CPU: x64
-            - name: Build x64 App
-              timeout-minutes: 5
-              run: |
-                  yes | "$ANDROID_HOME"/tools/bin/sdkmanager --licenses
-                  cd src/android/CHIPTool
-                  ./gradlew build
-              env:
-                BUILD_TYPE: android_x64
-                TARGET_CPU: x64
+                ./scripts/run_in_build_env.sh \
+                  "./scripts/build/build_examples.py --platform android build"

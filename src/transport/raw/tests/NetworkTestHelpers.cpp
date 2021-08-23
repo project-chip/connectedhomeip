@@ -47,6 +47,7 @@ CHIP_ERROR IOContext::Shutdown()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ShutdownNetwork();
+    gSystemLayer.Shutdown();
     Platform::MemoryShutdown();
 
     return err;
@@ -55,11 +56,8 @@ CHIP_ERROR IOContext::Shutdown()
 void IOContext::DriveIO()
 {
     // Set the select timeout to 100ms
-    struct timeval aSleepTime;
-    aSleepTime.tv_sec  = 0;
-    aSleepTime.tv_usec = 100 * 1000;
-
-    ServiceEvents(aSleepTime);
+    constexpr uint32_t kSleepTimeMilliseconds = 100;
+    ServiceEvents(kSleepTimeMilliseconds);
 }
 
 void IOContext::DriveIOUntil(unsigned maxWaitMs, std::function<bool(void)> completionFunction)

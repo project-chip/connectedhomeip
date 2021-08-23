@@ -19,6 +19,8 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighting-common REALPATH)
+get_filename_component(LIGHTING_GEN_DIR ${CHIP_ROOT}/zzz_generated/lighting-app/ REALPATH)
+set(LIGHTING_GEN_SRC ${LIGHTING_GEN_DIR}/zap-generated/)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
@@ -34,6 +36,12 @@ if(BOARD STREQUAL "nrf5340dk_nrf5340_cpuapp")
     list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-bt_private_addresses.conf)
 endif()
 
+option(BUILD_WITH_DFU "Build target with Device Firmware Upgrade support" OFF)
+if(BUILD_WITH_DFU)
+    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-dfu_support.conf)
+    set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static.yml)
+endif()
+
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
@@ -46,6 +54,7 @@ target_compile_options(app PRIVATE -Werror)
 target_include_directories(app PRIVATE
                            main/include
                            ${LIGHTING_COMMON}
+                           ${LIGHTING_GEN_DIR}
                            ${NLIO_ROOT}
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)
@@ -55,9 +64,9 @@ target_sources(app PRIVATE
                main/LightingManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${LIGHTING_COMMON}/gen/attribute-size.cpp
-               ${LIGHTING_COMMON}/gen/callback-stub.cpp
-               ${LIGHTING_COMMON}/gen/IMClusterCommandHandler.cpp
+               ${LIGHTING_GEN_SRC}/attribute-size.cpp
+               ${LIGHTING_GEN_SRC}/callback-stub.cpp
+               ${LIGHTING_GEN_SRC}/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
                ${CHIP_ROOT}/src/app/common/gen/attributes/Accessors.cpp
@@ -87,6 +96,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/server/RendezvousServer.cpp
                ${CHIP_ROOT}/src/app/server/Server.cpp
                ${CHIP_ROOT}/src/app/server/StorablePeerConnection.cpp
+               ${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/administrator-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
                ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
@@ -103,6 +113,10 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
                )
+
+if(BUILD_WITH_DFU)
+    target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)
+endif()
 
 if (BOARD STREQUAL "nrf52840dongle_nrf52840")
   target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUTrigger.cpp)

@@ -47,7 +47,7 @@ limitations under the License.
             <arg name="imageType" type="INT16U"/>
             <arg name="hardwareVersion" type="INT16U"/>
             <arg name="currentVersion" type="INT32U"/>
-            <arg name="protocolsSupported" type="OTADownloadProtocol" array="true"/>
+            <arg name="protocolsSupported" type="OTADownloadProtocol"/> <!-- TODO(#8605): add array="true" when lists are supported -->
             <arg name="location" type="CHAR_STRING" length="2"/>
             <arg name="requestorCanConsent" type="BOOLEAN"/>
             <arg name="metadataForProvider" type="OCTET_STRING" length="512"/>

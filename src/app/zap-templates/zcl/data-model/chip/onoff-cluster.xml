@@ -37,7 +37,7 @@ limitations under the License.
   </bitmap>
 
   <cluster>
-    <name>On/off</name>
+    <name>On/Off</name>
     <domain>General</domain>
     <code>0x0006</code>
     <define>ON_OFF_CLUSTER</define>

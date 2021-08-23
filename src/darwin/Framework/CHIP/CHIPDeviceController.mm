@@ -23,7 +23,7 @@
 #import "CHIPOperationalCredentialsDelegate.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 #import "CHIPSetupPayload.h"
-#import "gen/CHIPClustersObjc.h"
+#import <zap-generated/CHIPClustersObjc.h>
 
 #import "CHIPDeviceConnectionBridge.h"
 
@@ -48,8 +48,6 @@ static NSString * const kErrorNotRunning = @"Controller is not running. Call sta
 static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 @interface CHIPDeviceController ()
-
-@property (nonatomic, readonly, strong, nonnull) NSRecursiveLock * lock;
 
 // queue used to serialize all work performed by the CHIPDeviceController
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
@@ -127,7 +125,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     return YES;
 }
 
-- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate vendorId:(uint16_t)vendorId
 {
     chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
@@ -175,7 +173,33 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         params.operationalCredentialsDelegate = _operationalCredentialsDelegate;
 
-        errorCode = _cppCommissioner->Init(_localDeviceId, params);
+        chip::Crypto::P256Keypair ephemeralKey;
+        errorCode = ephemeralKey.Initialize();
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+            return;
+        }
+
+        NSMutableData * nocBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
+        chip::MutableByteSpan noc((uint8_t *) [nocBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
+
+        NSMutableData * rcacBuffer = [[NSMutableData alloc] initWithLength:chip::Controller::kMaxCHIPDERCertLength];
+        chip::MutableByteSpan rcac((uint8_t *) [rcacBuffer mutableBytes], chip::Controller::kMaxCHIPDERCertLength);
+
+        chip::MutableByteSpan icac;
+
+        errorCode = _operationalCredentialsDelegate->GenerateNOCChainAfterValidation(
+            _localDeviceId, 0, ephemeralKey.Pubkey(), rcac, icac, noc);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+            return;
+        }
+
+        params.ephemeralKeypair = &ephemeralKey;
+        params.controllerRCAC = rcac;
+        params.controllerICAC = icac;
+        params.controllerNOC = noc;
+        params.controllerVendorId = vendorId;
+
+        errorCode = _cppCommissioner->Init(params);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return;
         }
@@ -377,9 +401,10 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
                      queue:(dispatch_queue_t)queue
          completionHandler:(CHIPDeviceConnectionCallback)completionHandler
 {
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     if (![self isRunning]) {
         NSError * error;
-        [self checkForError:CHIP_ERROR_INCORRECT_STATE logMsg:kErrorNotRunning error:&error];
+        [self checkForError:errorCode logMsg:kErrorNotRunning error:&error];
         dispatch_async(queue, ^{
             completionHandler(nil, error);
         });
@@ -387,8 +412,10 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     }
 
     dispatch_async(_chipWorkQueue, ^{
-        CHIPDeviceConnectionBridge * connectionBridge = new CHIPDeviceConnectionBridge(completionHandler, queue);
-        CHIP_ERROR errorCode = connectionBridge->connect(self->_cppCommissioner, deviceID);
+        if ([self isRunning]) {
+            CHIPDeviceConnectionBridge * connectionBridge = new CHIPDeviceConnectionBridge(completionHandler, queue);
+            errorCode = connectionBridge->connect(self->_cppCommissioner, deviceID);
+        }
 
         NSError * error;
         if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:&error]) {
