@@ -43,8 +43,10 @@ private:
 
     static int UploadConfirmHandler(uint32_t offset, uint32_t size, void * arg);
     static void OnBleDisconnect(bt_conn * conn, uint8_t reason);
+    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     bool mIsEnabled;
+    bool mIsAdvertisingEnabled;
     bt_conn_cb mBleConnCallbacks;
     DFUOverSMPRestartAdvertisingHandler restartAdvertisingCallback;
 
