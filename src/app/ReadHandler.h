@@ -47,7 +47,7 @@ namespace app {
  *         for the relevant data, and sending a reply.
  *
  */
-class ReadHandler
+class ReadHandler : public Messaging::ExchangeDelegate
 {
 public:
     /**
@@ -56,14 +56,12 @@ public:
      *  construction until a call to Shutdown is made to terminate the
      *  instance.
      *
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
-     *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(InteractionModelDelegate * apDelegate);
+    CHIP_ERROR Init(InteractionModelDelegate * apDelegate, Messaging::ExchangeContext * apExchangeContext);
 
     /**
      *  Shut down the ReadHandler. This terminates this instance
@@ -76,14 +74,11 @@ public:
      *  guarantees that it will call Shutdown on itself when processing is done (including if OnReadRequest
      *  returns an error).
      *
-     *  @param[in]    apExchangeContext    A pointer to the ExchangeContext.
-     *  @param[in]    aPayload             A payload that has read request data
-     *
      *  @retval #Others If fails to process read request
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR OnReadRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnReadRequest(System::PacketBufferHandle && aPayload);
 
     /**
      *  Send ReportData to initiator
@@ -98,7 +93,7 @@ public:
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
     bool IsReportable() const { return mState == HandlerState::Reportable; }
-
+    bool IsReporting() const { return mState == HandlerState::Reporting; }
     virtual ~ReadHandler() = default;
 
     ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
@@ -121,11 +116,18 @@ private:
         Uninitialized = 0, ///< The handler has not been initialized
         Initialized,       ///< The handler has been initialized and is ready
         Reportable,        ///< The handler has received read request and is waiting for the data to send to be available
+        Reporting,         ///< The handler is reporting
     };
 
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser);
     CHIP_ERROR ProcessEventPathList(EventPathList::Parser & aEventPathListParser);
+    CHIP_ERROR OnStatusReport(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
+    CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
@@ -147,6 +149,7 @@ private:
 
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
+    InteractionModelDelegate * mpDelegate = nullptr;
 };
 } // namespace app
 } // namespace chip

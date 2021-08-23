@@ -25,6 +25,7 @@
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
+#include <protocols/secure_channel/StatusReport.h>
 
 namespace chip {
 namespace app {
@@ -52,14 +53,18 @@ exit:
 void ReadClient::Shutdown()
 {
     AbortExistingExchangeContext();
-    ShutdownInternal();
+    ShutdownInternal(CHIP_NO_ERROR);
 }
 
-void ReadClient::ShutdownInternal()
+void ReadClient::ShutdownInternal(CHIP_ERROR aError)
 {
     mpExchangeMgr = nullptr;
     mpExchangeCtx = nullptr;
-    mpDelegate    = nullptr;
+    if (mpDelegate != nullptr)
+    {
+        mpDelegate->ReadDone(this, aError);
+        mpDelegate = nullptr;
+    }
     MoveToState(ClientState::Uninitialized);
 }
 
@@ -161,6 +166,40 @@ exit:
     return err;
 }
 
+CHIP_ERROR ReadClient::SendStatusReport(CHIP_ERROR aError, bool aExpectResponse)
+{
+    Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
+    uint32_t protocolId                                     = Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm();
+    uint16_t protocolCode                                   = to_underlying(Protocols::InteractionModel::ProtocolCode::Success);
+    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    if (aError != CHIP_NO_ERROR)
+    {
+        generalCode  = Protocols::SecureChannel::GeneralStatusCode::kFailure;
+        protocolCode = to_underlying(Protocols::InteractionModel::ProtocolCode::InvalidSubscription);
+    }
+
+    ChipLogProgress(DataManagement, "SendStatusReport with error %s", ErrorStr(aError));
+    Protocols::SecureChannel::StatusReport report(generalCode, protocolId, protocolCode);
+
+    Encoding::LittleEndian::PacketBufferWriter buf(System::PacketBufferHandle::New(kMaxSecureSduLengthBytes));
+    report.WriteToBuffer(buf);
+    System::PacketBufferHandle msgBuf = buf.Finalize();
+    VerifyOrReturnLogError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    if (aExpectResponse)
+    {
+        ReturnLogErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msgBuf),
+                                                           Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
+    }
+    else
+    {
+        ReturnLogErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msgBuf)));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ReadClient::GenerateEventPathList(ReadRequest::Builder & aRequest, EventPathParams * apEventPathParamsList,
                                              size_t aEventPathParamsListSize, EventNumber & aEventNumber)
 {
@@ -226,31 +265,24 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
                                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData),
-                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrExit(!IsFree(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData), err = CHIP_ERROR_INVALID_MESSAGE_TYPE)
+    //  on server, please compare exchange context for first status report
     err = ProcessReportData(std::move(aPayload));
+    if (err != CHIP_NO_ERROR)
+    {
+        mpDelegate->ReportError(this, err);
+    }
+    else
+    {
+        mpDelegate->ReportProcessed(this);
+    }
+    err = SendStatusReport(err, false);
 
 exit:
     ChipLogFunctError(err);
-
-    MoveToState(ClientState::Initialized);
-
-    if (mpDelegate != nullptr)
-    {
-        if (err != CHIP_NO_ERROR)
-        {
-            mpDelegate->ReportError(this, err);
-        }
-        else
-        {
-            mpDelegate->ReportProcessed(this);
-        }
-    }
-
-    // TODO(#7521): Should close it after checking moreChunkedMessages flag is not set.
-    ShutdownInternal();
+    ShutdownInternal(err);
 
     return err;
 }
@@ -352,9 +384,12 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
                     apExchangeContext->GetExchangeId());
     if (nullptr != mpDelegate)
     {
-        mpDelegate->ReportError(this, CHIP_ERROR_TIMEOUT);
+        if (ClientState::AwaitingResponse == mState)
+        {
+            mpDelegate->ReportError(this, CHIP_ERROR_TIMEOUT);
+        }
     }
-    ShutdownInternal();
+    ShutdownInternal(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader)
