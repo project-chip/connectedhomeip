@@ -44,7 +44,6 @@
 #include <support/UnitTestRegistration.h>
 
 #include <system/SystemError.h>
-#include <system/SystemTimer.h>
 
 #include <nlunit-test.h>
 
@@ -498,7 +497,6 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     UDPEndPoint * testUDPEP = nullptr;
     TCPEndPoint * testTCPEP = nullptr;
     CHIP_ERROR err          = CHIP_NO_ERROR;
-    char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
     for (int i = 0; i < INET_CONFIG_NUM_RAW_ENDPOINTS + 1; i++)
@@ -521,9 +519,12 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
+    char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
         err = gSystemLayer.StartTimer(10, HandleTimer, &numTimersTest[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
+#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
     ShutdownNetwork();
     ShutdownSystemLayer();

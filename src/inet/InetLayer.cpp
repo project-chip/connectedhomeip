@@ -32,7 +32,7 @@
  *        * Raw network transport
  *
  *      For BSD/POSIX Sockets (CHIP_SYSTEM_CONFIG_USE_SOCKETS), event readiness
- *      notification is handled via file descriptors, using System::WatchableSocket.
+ *      notification is handled via file descriptors, using a System::Layer API.
  *
  *      For LwIP (CHIP_SYSTEM_CONFIG_USE_LWIP), event readiness notification is handled
  *      via events / messages and platform- and system-specific hooks for the event
@@ -48,8 +48,6 @@
 #include "InetFaultInjection.h"
 
 #include <platform/LockTracker.h>
-
-#include <system/SystemTimer.h>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -276,7 +274,7 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     err = InitQueueLimiter();
     SuccessOrExit(err);
 
-    mSystemLayer->WatchableEventsManager().AddEventHandlerDelegate(sInetEventHandlerDelegate);
+    mSystemLayer->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     State = kState_Initialized;

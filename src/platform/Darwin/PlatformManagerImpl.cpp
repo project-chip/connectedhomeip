@@ -51,7 +51,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
-    SystemLayer.WatchableEventsManager().SetDispatchQueue(GetWorkQueue());
+    SystemLayer.SetDispatchQueue(GetWorkQueue());
 
 exit:
     return err;

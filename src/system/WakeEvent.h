@@ -28,13 +28,13 @@
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #include <core/CHIPError.h>
-#include <system/WatchableSocket.h>
+#include <system/SocketEvents.h>
 
 namespace chip {
 namespace System {
 
+class Layer;
 class WakeEventTest;
-class WatchableEventManager;
 
 /**
  * @class WakeEvent
@@ -45,8 +45,8 @@ class WatchableEventManager;
 class WakeEvent
 {
 public:
-    CHIP_ERROR Open(WatchableEventManager & watchState); /**< Initialize the pipeline */
-    void Close();                                        /**< Close both ends of the pipeline. */
+    CHIP_ERROR Open(Layer & systemLayer); /**< Initialize the pipeline */
+    void Close(Layer & systemLayer);      /**< Close both ends of the pipeline. */
 
     CHIP_ERROR Notify(); /**< Set the event. */
     void Confirm();      /**< Clear the event. */
@@ -54,13 +54,14 @@ public:
 private:
     friend class WakeEventTest;
 
-    int GetReadFD() const { return mFD.GetFD(); }
-    static void Confirm(WatchableSocket & socket) { reinterpret_cast<WakeEvent *>(socket.GetCallbackData())->Confirm(); }
+    int GetReadFD() const { return mReadFD; }
+    static void Confirm(System::SocketEvents events, intptr_t data) { reinterpret_cast<WakeEvent *>(data)->Confirm(); }
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
     int mWriteFD;
 #endif
-    WatchableSocket mFD;
+    int mReadFD;
+    SocketWatchToken mReadWatch;
 };
 
 } // namespace System
