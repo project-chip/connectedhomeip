@@ -360,7 +360,7 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & opCertArray, Validatio
         if (ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabric) == CHIP_NO_ERROR &&
             icacFabric != kUndefinedRawFabricId)
         {
-            ReturnErrorCodeIf(icacFabric != rawPeerId.GetRawFabricId(), CHIP_ERROR_INVALID_CASE_PARAMETER);
+            ReturnErrorCodeIf(icacFabric != rawPeerId.GetRawFabricId(), CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
         }
     }
 

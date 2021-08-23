@@ -239,6 +239,8 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     mLocalId  = fabric->GetPeerId();
     mVendorId = fabric->GetVendorId();
 
+    mRawFabricId = fabric->GetRawFabricId();
+
     ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64, mFabricIndex,
                     ChipLogValueX64(GetCompressedFabricId()));
 

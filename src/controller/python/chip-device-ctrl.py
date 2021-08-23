@@ -855,15 +855,20 @@ class DeviceMgrCmd(Cmd):
                 print("Unexpected argument: " + args[1])
                 return
 
-            fabricid = self.devCtrl.GetCompressedFabricId()
+            compressed_fabricid = self.devCtrl.GetCompressedFabricId()
+            raw_fabricid = self.devCtrl.GetRawFabricId()
         except exceptions.ChipStackException as ex:
             print("An exception occurred during reading FabricID:")
             print(str(ex))
             return
 
         print("Get fabric ID complete")
-        print("Compressed Fabric ID: " +
-              hex(fabricid) + " (" + str(fabricid) + ")")
+
+        print("Raw Fabric ID: 0x{:016x}".format(raw_fabricid)
+              + " (" + str(raw_fabricid) + ")")
+
+        print("Compressed Fabric ID: 0x{:016x}".format(compressed_fabricid)
+              + " (" + str(compressed_fabricid) + ")")
 
     def do_history(self, line):
         """

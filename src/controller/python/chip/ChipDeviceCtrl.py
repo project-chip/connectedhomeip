@@ -285,6 +285,19 @@ class ChipDeviceController(object):
         else:
             raise self._ChipStack.ErrorToException(res)
 
+    def GetRawFabricId(self):
+        fabricid = c_uint64(0)
+
+        res = self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetRawFabricId(
+                self.devCtrl, pointer(fabricid))
+        )
+
+        if res == 0:
+            return fabricid.value
+        else:
+            raise self._ChipStack.ErrorToException(res)
+
     def GetClusterHandler(self):
         return self._Cluster
 

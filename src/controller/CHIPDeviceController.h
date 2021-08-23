@@ -294,6 +294,11 @@ public:
      */
     uint64_t GetCompressedFabricId() const { return mLocalId.GetCompressedFabricId(); }
 
+    /**
+     * @brief Get the raw Fabric ID assigned to the device.
+     */
+    uint64_t GetRawFabricId() const { return mRawFabricId; }
+
 protected:
     enum class State
     {
@@ -312,7 +317,8 @@ protected:
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
-    PeerId mLocalId = PeerId();
+    PeerId mLocalId       = PeerId();
+    FabricId mRawFabricId = kUndefinedRawFabricId;
 
     DeviceTransportMgr * mTransportMgr                             = nullptr;
     SecureSessionMgr * mSessionMgr                                 = nullptr;

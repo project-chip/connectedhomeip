@@ -98,6 +98,8 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
                                                                  uint16_t * outPort);
 ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl,
                                                                      uint64_t * outFabricId);
+ChipError::StorageType pychip_DeviceController_GetRawFabricId(chip::Controller::DeviceCommissioner * devCtrl,
+                                                              uint64_t * outFabricId);
 
 // Rendezvous
 ChipError::StorageType pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
@@ -245,6 +247,13 @@ ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Contr
                                                                      uint64_t * outFabricId)
 {
     *outFabricId = devCtrl->GetCompressedFabricId();
+    return CHIP_NO_ERROR.AsInteger();
+}
+
+ChipError::StorageType pychip_DeviceController_GetRawFabricId(chip::Controller::DeviceCommissioner * devCtrl,
+                                                              uint64_t * outFabricId)
+{
+    *outFabricId = devCtrl->GetRawFabricId();
     return CHIP_NO_ERROR.AsInteger();
 }
 
