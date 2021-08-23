@@ -61,16 +61,25 @@ def getGlobalTemplatesTargets():
 
 def getSpecificTemplatesTargets():
     targets = []
-    targets.append(['src/controller/data_model/controller-clusters.zap',
-                   '-t', 'src/app/common/templates/templates.json'])
-    targets.append(['src/controller/data_model/controller-clusters.zap',
-                   '-t', 'examples/chip-tool/templates/templates.json'])
-    targets.append(['src/controller/data_model/controller-clusters.zap',
-                   '-t', 'src/controller/python/templates/templates.json'])
-    targets.append(['src/controller/data_model/controller-clusters.zap',
-                   '-t', 'src/darwin/Framework/CHIP/templates/templates.json'])
-    targets.append(['src/controller/data_model/controller-clusters.zap',
-                   '-t', 'src/controller/java/templates/templates.json'])
+
+    # Mapping of required template and output directory
+    templates = {
+        'src/app/common/templates/templates.json': 'zzz_generated/app-common/app-common/zap-generated',
+        'examples/chip-tool/templates/templates.json': None,
+        'src/controller/python/templates/templates.json': None,
+        'src/darwin/Framework/CHIP/templates/templates.json': None,
+        'src/controller/java/templates/templates.json': None,
+    }
+
+    for template, output_dir in templates.items():
+        target = ['src/controller/data_model/controller-clusters.zap', '-t', template]
+        if output_dir is not None:
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+            target.extend(['-o', output_dir])
+
+        targets.append(target)
+
     return targets
 
 
