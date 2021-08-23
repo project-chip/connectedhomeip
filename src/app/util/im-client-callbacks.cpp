@@ -20,7 +20,7 @@
 #include <cinttypes>
 
 #include <app/Command.h>
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>

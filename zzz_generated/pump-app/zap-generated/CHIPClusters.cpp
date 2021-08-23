@@ -27,7 +27,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <app/chip-zcl-zpro-codec.h>
-#include <app/common/gen/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/util/basic-types.h>
 
 #include <app/InteractionModelEngine.h>

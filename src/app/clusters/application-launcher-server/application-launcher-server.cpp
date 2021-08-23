@@ -24,10 +24,10 @@
 
 #include <app/CommandHandler.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/util/af.h>
 
 using namespace chip;

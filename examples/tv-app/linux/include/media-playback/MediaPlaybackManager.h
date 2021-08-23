@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/clusters/media-playback-server/media-playback-server.h>
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/util/af-types.h>
 
 #include <core/CHIPError.h>

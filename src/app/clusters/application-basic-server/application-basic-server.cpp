@@ -23,7 +23,7 @@
  ******************************************************************************/
 
 #include <app/CommandHandler.h>
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/util/af.h>
 #include <string>
 

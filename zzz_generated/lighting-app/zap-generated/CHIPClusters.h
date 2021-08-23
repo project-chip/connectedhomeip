@@ -20,8 +20,8 @@
 // Prevent multiple inclusion
 #pragma once
 
-#include <app/common/gen/ids/Clusters.h>
-#include <app/common/gen/ids/Commands.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
 
 #include <controller/CHIPCluster.h>
 #include <core/CHIPCallback.h>

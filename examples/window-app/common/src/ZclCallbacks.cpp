@@ -24,8 +24,8 @@
 #include <WindowApp.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 

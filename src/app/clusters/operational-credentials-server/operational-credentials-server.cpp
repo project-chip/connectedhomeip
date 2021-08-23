@@ -21,13 +21,13 @@
  ***************************************************************************/
 
 #include <app/CommandHandler.h>
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/attributes/Accessors.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/server/Mdns.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
