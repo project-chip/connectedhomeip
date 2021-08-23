@@ -40,7 +40,6 @@
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/SystemTimer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
@@ -262,7 +261,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     err                            = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
+    SessionHandle session = ctx.GetSessionLocalToPeer();
     err = readClient.SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session, nullptr /*apEventPathParamsList*/,
                                      0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
                                      0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
@@ -389,7 +388,7 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     err                            = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
+    SessionHandle session = ctx.GetSessionLocalToPeer();
     err = readClient.SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session, nullptr /*apEventPathParamsList*/,
                                      0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
                                      0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
@@ -578,7 +577,7 @@ void TestReadInteraction::TestReadEventRoundtrip(nlTestSuite * apSuite, void * a
     eventPathParams[1].mClusterId  = kTestClusterId;
     eventPathParams[1].mEventId    = kTestEventIdCritical;
 
-    SecureSessionHandle session = ctx.GetSessionLocalToPeer();
+    SessionHandle session = ctx.GetSessionLocalToPeer();
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(),
                                                                             &session, eventPathParams, 2, nullptr, 1, 0);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

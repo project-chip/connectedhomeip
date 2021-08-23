@@ -397,8 +397,8 @@ CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 
 void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
 {
-    ChipLogProgress(chipTool, "OnAddressUpdateComplete: %s", ErrorStr(err));
-    if (err != CHIP_NO_ERROR)
+    ChipLogProgress(chipTool, "OnAddressUpdateComplete: %" PRIx64 ": %s", nodeId, ErrorStr(err));
+    if (err != CHIP_NO_ERROR && nodeId == mRemoteId)
     {
         // Set exit status only if the address update failed.
         // Otherwise wait for OnCommissioningComplete() callback.

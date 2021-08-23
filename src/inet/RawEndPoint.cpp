@@ -48,7 +48,6 @@
 #endif                             // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <system/WatchableSocket.h>
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif // HAVE_SYS_SOCKET_H
@@ -216,17 +215,16 @@ CHIP_ERROR RawEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, Int
     ReturnErrorOnFailure(IPEndPointBasis::Bind(addrType, addr, 0, intfId));
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = SystemLayer().WatchableEventsManager().GetDispatchQueue();
+    dispatch_queue_t dispatchQueue = SystemLayer().GetDispatchQueue();
     if (dispatchQueue != nullptr)
     {
-        unsigned long fd = static_cast<unsigned long>(mSocket.GetFD());
+        unsigned long fd = static_cast<unsigned long>(mSocket);
 
         mReadableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fd, 0, dispatchQueue);
         ReturnErrorCodeIf(mReadableSource == nullptr, CHIP_ERROR_NO_MEMORY);
 
         dispatch_source_set_event_handler(mReadableSource, ^{
-            this->mSocket.SetPendingIO(System::SocketEventFlags::kRead);
-            this->HandlePendingIO();
+            this->HandlePendingIO(System::SocketEventFlags::kRead);
         });
 
         dispatch_resume(mReadableSource);
@@ -332,17 +330,17 @@ CHIP_ERROR RawEndPoint::BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & 
         goto ret;
     }
 
-    if (::setsockopt(mSocket.GetFD(), IPPROTO_IPV6, IPV6_MULTICAST_IF, &lIfIndex, sizeof(lIfIndex)) != 0)
+    if (::setsockopt(mSocket, IPPROTO_IPV6, IPV6_MULTICAST_IF, &lIfIndex, sizeof(lIfIndex)) != 0)
     {
         goto optfail;
     }
 
-    if (::setsockopt(mSocket.GetFD(), IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &sInt255, sizeof(sInt255)) != 0)
+    if (::setsockopt(mSocket, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &sInt255, sizeof(sInt255)) != 0)
     {
         goto optfail;
     }
 
-    if (::setsockopt(mSocket.GetFD(), IPPROTO_IPV6, IPV6_UNICAST_HOPS, &sInt255, sizeof(sInt255)) != 0)
+    if (::setsockopt(mSocket, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &sInt255, sizeof(sInt255)) != 0)
     {
         goto optfail;
     }
@@ -352,7 +350,9 @@ CHIP_ERROR RawEndPoint::BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & 
 
 optfail:
     res = chip::System::MapErrorPOSIX(errno);
-    mSocket.Close();
+    SystemLayer().StopWatchingSocket(&mWatch);
+    close(mSocket);
+    mSocket   = INET_INVALID_SOCKET_FD;
     mAddrType = kIPAddressType_Unknown;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -424,8 +424,8 @@ CHIP_ERROR RawEndPoint::Listen(IPEndPointBasis::OnMessageReceivedFunct onMessage
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Wait for ability to read on this endpoint.
-    mSocket.SetCallback(HandlePendingIO, reinterpret_cast<intptr_t>(this));
-    ReturnErrorOnFailure(mSocket.RequestCallbackOnPendingRead());
+    ReturnErrorOnFailure(SystemLayer().SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
+    ReturnErrorOnFailure(SystemLayer().RequestCallbackOnPendingRead(mWatch));
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return CHIP_NO_ERROR;
@@ -465,14 +465,12 @@ void RawEndPoint::Close()
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-        if (mSocket.HasFD())
+        if (mSocket != INET_INVALID_SOCKET_FD)
         {
-            mSocket.Close();
+            SystemLayer().StopWatchingSocket(&mWatch);
+            close(mSocket);
+            mSocket = INET_INVALID_SOCKET_FD;
         }
-
-        // Clear any results from select() that indicate pending I/O for the socket.
-        mSocket.ClearPendingIO();
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
         if (mReadableSource)
@@ -719,7 +717,7 @@ CHIP_ERROR RawEndPoint::SetICMPFilter(uint8_t numICMPTypes, const uint8_t * aICM
     {
         ICMP6_FILTER_SETPASSALL(&filter);
     }
-    if (setsockopt(mSocket.GetFD(), IPPROTO_ICMPV6, ICMP6_FILTER, &filter, sizeof(filter)) == -1)
+    if (setsockopt(mSocket, IPPROTO_ICMPV6, ICMP6_FILTER, &filter, sizeof(filter)) == -1)
     {
         return chip::System::MapErrorPOSIX(errno);
     }
@@ -1024,21 +1022,19 @@ CHIP_ERROR RawEndPoint::GetSocket(IPAddressType aAddressType)
 }
 
 // static
-void RawEndPoint::HandlePendingIO(System::WatchableSocket & socket)
+void RawEndPoint::HandlePendingIO(System::SocketEvents events, intptr_t data)
 {
-    reinterpret_cast<RawEndPoint *>(socket.GetCallbackData())->HandlePendingIO();
+    reinterpret_cast<RawEndPoint *>(data)->HandlePendingIO(events);
 }
 
-void RawEndPoint::HandlePendingIO()
+void RawEndPoint::HandlePendingIO(System::SocketEvents events)
 {
-    if (mState == kState_Listening && OnMessageReceived != nullptr && mSocket.HasPendingRead())
+    if (mState == kState_Listening && OnMessageReceived != nullptr && events.Has(System::SocketEventFlags::kRead))
     {
         const uint16_t lPort = 0;
 
         IPEndPointBasis::HandlePendingIO(lPort);
     }
-
-    mSocket.ClearPendingIO();
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

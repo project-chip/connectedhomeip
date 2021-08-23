@@ -26,14 +26,14 @@
 namespace chip {
 namespace Messaging {
 
-CHIP_ERROR ApplicationExchangeDispatch::PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
+CHIP_ERROR ApplicationExchangeDispatch::PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader,
                                                        System::PacketBufferHandle && message,
                                                        EncryptedPacketBufferHandle & preparedMessage)
 {
     return mSessionMgr->BuildEncryptedMessagePayload(session, payloadHeader, std::move(message), preparedMessage);
 }
 
-CHIP_ERROR ApplicationExchangeDispatch::SendPreparedMessage(SecureSessionHandle session,
+CHIP_ERROR ApplicationExchangeDispatch::SendPreparedMessage(SessionHandle session,
                                                             const EncryptedPacketBufferHandle & preparedMessage) const
 {
     return mSessionMgr->SendPreparedMessage(session, preparedMessage);

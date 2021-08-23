@@ -29,7 +29,6 @@
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/SystemTimer.h>
 
 #include "AllInterfaceListener.h"
 #include "PacketReporter.h"

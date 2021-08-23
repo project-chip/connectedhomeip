@@ -142,7 +142,7 @@ class ChipClusters:
 {{#if isWritableAttribute}}
     def Cluster{{asUpperCamelCase parent.name}}_WriteAttribute{{asUpperCamelCase name}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: {{ asPythonType chipType }}):
 {{#if (isCharString type)}}
-        value = value.encode("utf-8") + b'\x00'
+        value = value.encode("utf-8")
 {{/if}}
         return self._chipLib.chip_ime_WriteAttribute_{{asUpperCamelCase parent.name}}_{{asUpperCamelCase name}}(device, ZCLendpoint, ZCLgroupid, value{{#if (isString type)}}, len(value){{/if}})
 {{/if}}

@@ -12,11 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
 from typing import Set
-
-from builders.builder import Builder
 
 from builders.android import AndroidBoard, AndroidBuilder
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
@@ -24,6 +20,8 @@ from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
 from builders.host import HostBuilder, HostApp
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgBuilder
+from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
+from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 
 from .targets import Application, Board, Platform
 
@@ -87,6 +85,8 @@ _MATCHERS = {
     Platform.EFR32: Matcher(Efr32Builder),
     Platform.NRF: Matcher(NrfConnectBuilder),
     Platform.ANDROID: Matcher(AndroidBuilder),
+    Platform.INFINEON: Matcher(InfineonBuilder),
+    Platform.TELINK: Matcher(TelinkBuilder),
 }
 
 # Matrix of what can be compiled and what build options are required
@@ -96,6 +96,8 @@ _MATCHERS[Platform.HOST].AcceptApplication(
     Application.ALL_CLUSTERS, app=HostApp.ALL_CLUSTERS)
 _MATCHERS[Platform.HOST].AcceptApplication(
     Application.CHIP_TOOL, app=HostApp.CHIP_TOOL)
+_MATCHERS[Platform.HOST].AcceptApplication(
+    Application.THERMOSTAT, app=HostApp.THERMOSTAT)
 
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.DEVKITC, board=Esp32Board.DevKitC)
 _MATCHERS[Platform.ESP32].AcceptBoard(Board.M5STACK, board=Esp32Board.M5Stack)
@@ -109,6 +111,8 @@ _MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
     Application.LOCK, Board.DEVKITC, app=Esp32App.LOCK)
 _MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
     Application.BRIDGE, Board.DEVKITC, app=Esp32App.BRIDGE)
+_MATCHERS[Platform.ESP32].AcceptApplicationForBoard(
+    Application.TEMPERATURE_MEASUREMENT, Board.DEVKITC, app=Esp32App.TEMPERATURE_MEASUREMENT)
 
 _MATCHERS[Platform.QPG].AcceptApplication(Application.LOCK)
 _MATCHERS[Platform.QPG].AcceptBoard(Board.QPG6100)
@@ -128,10 +132,20 @@ _MATCHERS[Platform.NRF].AcceptApplication(Application.LOCK, app=NrfApp.LOCK)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.LIGHT, app=NrfApp.LIGHT)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.SHELL, app=NrfApp.SHELL)
 
+_MATCHERS[Platform.TELINK].AcceptBoard(
+    Board.TLSR9518ADK80D, board=TelinkBoard.TLSR9518ADK80D)
+_MATCHERS[Platform.TELINK].AcceptApplication(
+    Application.LIGHT, app=TelinkApp.LIGHT)
+
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM, board=AndroidBoard.ARM)
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.ARM64, board=AndroidBoard.ARM64)
 _MATCHERS[Platform.ANDROID].AcceptBoard(Board.X64, board=AndroidBoard.X64)
 _MATCHERS[Platform.ANDROID].AcceptApplication(Application.CHIP_TOOL)
+
+_MATCHERS[Platform.INFINEON].AcceptApplication(
+    Application.LOCK, app=InfineonApp.LOCK)
+_MATCHERS[Platform.INFINEON].AcceptBoard(
+    Board.P6BOARD, board=InfineonBoard.P6BOARD)
 
 
 class BuilderFactory:

@@ -27,6 +27,8 @@
 #define sleep unistd_sleep
 #include <app/server/Mdns.h>
 #include <app/server/Server.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/CHIPDeviceLayer.h>
 #undef sleep
 
@@ -71,6 +73,7 @@ static mbed::Timeout sFunctionTimer;
 // TODO: change EventQueue default event size
 static events::EventQueue sAppEventQueue;
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -118,6 +121,9 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));

@@ -110,9 +110,6 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
         return err;
     }
 
-    // Initializing the KeyPair.
-    Initialize();
-
     NodeId assignedId;
     if (mNodeIdRequested)
     {
@@ -216,11 +213,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     initParams.inetLayer                      = inetLayer;
     initParams.bleLayer                       = GetJNIBleLayer();
 
-    *errInfoOnFailure = wrapper->OpCredsIssuer().Initialize(*initParams.storageDelegate);
-    if (*errInfoOnFailure != CHIP_NO_ERROR)
-    {
-        return nullptr;
-    }
+    wrapper->InitializeOperationalCredentialsIssuer();
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
     if (!noc.Alloc(kMaxCHIPDERCertLength))
@@ -297,7 +290,7 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
     env->CallVoidMethod(mJavaObjectRef, onCommissioningCompleteMethod, static_cast<jlong>(deviceId), error.AsInteger());
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::Initialize()
+CHIP_ERROR AndroidDeviceControllerWrapper::InitializeOperationalCredentialsIssuer()
 {
     chip::Crypto::P256SerializedKeypair serializedKey;
     uint16_t keySize = static_cast<uint16_t>(sizeof(serializedKey));

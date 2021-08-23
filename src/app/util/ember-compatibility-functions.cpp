@@ -39,7 +39,7 @@
 #include <app/common/gen/att-storage.h>
 #include <app/common/gen/attribute-type.h>
 
-#include <gen/endpoint_config.h>
+#include <zap-generated/endpoint_config.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -94,8 +94,8 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
                       "chip::Cluster is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::AttributeId, uint32_t>::value,
                       "chip::AttributeId is expected to be uint32_t, change this when necessary");
-        static_assert(std::is_same<chip::FieldId, uint32_t>::value,
-                      "chip::FieldId is expected to be uint32_t, change this when necessary");
+        static_assert(std::is_same<chip::AttributeId, uint32_t>::value,
+                      "chip::AttributeId is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::EventId, uint32_t>::value,
                       "chip::EventId is expected to be uint32_t, change this when necessary");
         static_assert(std::is_same<chip::CommandId, uint32_t>::value,
@@ -195,7 +195,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
 {
     ChipLogDetail(DataManagement,
                   "Received Cluster Command: Cluster=" ChipLogFormatMEI " NodeId=0x" ChipLogFormatX64 " Endpoint=%" PRIx16
-                  " FieldId=%" PRIx32 " ListIndex=%" PRIx16,
+                  " AttributeId=%" PRIx32 " ListIndex=%" PRIx16,
                   ChipLogValueMEI(aClusterInfo.mClusterId), ChipLogValueX64(aClusterInfo.mNodeId), aClusterInfo.mEndpointId,
                   aClusterInfo.mFieldId, aClusterInfo.mListIndex);
 
@@ -410,6 +410,40 @@ CHIP_ERROR prepareWriteData(EmberAfAttributeType expectedType, TLV::TLVReader & 
 }
 } // namespace
 
+static Protocols::InteractionModel::ProtocolCode
+WriteSingleClusterDataInternal(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+{
+    // Passing nullptr as buf to emberAfReadAttribute means we only need attribute type here, and ember will not do data read &
+    // copy in this case.
+    const EmberAfAttributeMetadata * attributeMetadata = emberAfLocateAttributeMetadata(
+        aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId, CLUSTER_MASK_SERVER, 0);
+
+    if (attributeMetadata == nullptr)
+    {
+        return Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute;
+    }
+
+    CHIP_ERROR preparationError = CHIP_NO_ERROR;
+    uint16_t dataLen            = 0;
+    if ((preparationError = prepareWriteData(attributeMetadata->attributeType, aReader, dataLen)) != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "Failed to preapre data to write: %s", ErrorStr(preparationError));
+        return Protocols::InteractionModel::ProtocolCode::InvalidValue;
+    }
+
+    if (dataLen > attributeMetadata->size)
+    {
+        ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
+        return Protocols::InteractionModel::ProtocolCode::InvalidValue;
+    }
+
+    // TODO (#8442): emberAfWriteAttributeExternal is doing additional ACL check, however true ACL support is missing in ember /
+    // IM. Should invesgate this function and integrate ACL support with related interactions.
+    return ToInteractionModelProtocolCode(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
+                                                                        aClusterInfo.mFieldId, CLUSTER_MASK_SERVER, 0,
+                                                                        attributeData, attributeMetadata->attributeType));
+}
+
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     AttributePathParams attributePathParams;
@@ -419,37 +453,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     attributePathParams.mFieldId    = aClusterInfo.mFieldId;
     attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
 
-    EmberAfAttributeType attributeType = ZCL_UNKNOWN_ATTRIBUTE_TYPE;
-
-    // Passing nullptr as buf to emberAfReadAttribute means we only need attribute type here, and ember will not do data read &
-    // copy in this case.
-    EmberAfStatus status = emberAfReadAttribute(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mFieldId,
-                                                CLUSTER_MASK_SERVER, nullptr, 0, &attributeType);
-    Protocols::InteractionModel::ProtocolCode imCode = Protocols::InteractionModel::ProtocolCode::Success;
-
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        return apWriteHandler->AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kFailure,
-                                                      Protocols::SecureChannel::Id,
-                                                      Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute);
-    }
-
-    CHIP_ERROR preparationError = CHIP_NO_ERROR;
-    uint16_t dataLen            = 0;
-    if ((preparationError = prepareWriteData(attributeType, aReader, dataLen)) == CHIP_NO_ERROR)
-    {
-        // TODO (#8442): emberAfWriteAttributeExternal is doing additional ACL check, however true ACL support is missing in ember /
-        // IM. Should invesgate this function and integrate ACL support with related interactions.
-        imCode = ToInteractionModelProtocolCode(emberAfWriteAttributeExternal(aClusterInfo.mEndpointId, aClusterInfo.mClusterId,
-                                                                              aClusterInfo.mFieldId, CLUSTER_MASK_SERVER, 0,
-                                                                              attributeData, attributeType));
-    }
-    else
-    {
-        ChipLogError(Zcl, "Failed to preapre data to write: %s", ErrorStr(preparationError));
-        imCode = Protocols::InteractionModel::ProtocolCode::InvalidValue;
-    }
-
+    auto imCode = WriteSingleClusterDataInternal(aClusterInfo, aReader, apWriteHandler);
     return apWriteHandler->AddAttributeStatusCode(attributePathParams,
                                                   imCode == Protocols::InteractionModel::ProtocolCode::Success
                                                       ? Protocols::SecureChannel::GeneralStatusCode::kSuccess

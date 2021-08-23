@@ -26,6 +26,7 @@ chip_test_suite("tests") {
     "TestPeerConnections.cpp",
     "TestSecureSession.cpp",
     "TestSecureSessionMgr.cpp",
+    "TestSessionHandle.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

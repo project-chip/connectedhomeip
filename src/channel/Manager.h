@@ -58,7 +58,7 @@ public:
         });
     }
 
-    void OnNewConnection(SecureSessionHandle session, ExchangeManager * mgr) override
+    void OnNewConnection(SessionHandle session, ExchangeManager * mgr) override
     {
         mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
             if (context->MatchesSession(session, mgr->GetSessionMgr()))
@@ -70,7 +70,7 @@ public:
         });
     }
 
-    void OnConnectionExpired(SecureSessionHandle session, ExchangeManager * mgr) override
+    void OnConnectionExpired(SessionHandle session, ExchangeManager * mgr) override
     {
         mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
             if (context->MatchesSession(session, mgr->GetSessionMgr()))

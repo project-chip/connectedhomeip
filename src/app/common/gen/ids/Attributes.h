@@ -301,8 +301,10 @@ static constexpr AttributeId Reachable               = 0x00000011;
 namespace GeneralCommissioning {
 namespace Attributes {
 namespace Ids {
-static constexpr AttributeId FabricId   = 0x00000000;
-static constexpr AttributeId Breadcrumb = 0x00000001;
+static constexpr AttributeId Breadcrumb                 = 0x00000000;
+static constexpr AttributeId BasicCommissioningInfoList = 0x00000001;
+static constexpr AttributeId RegulatoryConfigList       = 0x00000002;
+static constexpr AttributeId LocationCapabilityList     = 0x00000003;
 } // namespace Ids
 } // namespace Attributes
 } // namespace GeneralCommissioning

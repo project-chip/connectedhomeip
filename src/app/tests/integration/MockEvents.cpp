@@ -31,7 +31,6 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
 static uint64_t kLivenessDeviceStatus = chip::TLV::ContextTag(1);

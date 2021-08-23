@@ -1519,15 +1519,15 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "FabricId",
-                    "attributeId": 0x00000000,
-                    "type": "bytes",
-                },
-                0x00000001: {
                     "attributeName": "Breadcrumb",
-                    "attributeId": 0x00000001,
+                    "attributeId": 0x00000000,
                     "type": "int",
                     "writable": True,
+                },
+                0x00000001: {
+                    "attributeName": "BasicCommissioningInfoList",
+                    "attributeId": 0x00000001,
+                    "type": "",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -2188,6 +2188,30 @@ class ChipClusters:
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
                     "type": "int",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
+    _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO = {
+            "clusterName": "OnOffSwitchConfiguration",
+            "clusterId": 0x00000007,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "SwitchType",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x00000010: {
+                    "attributeName": "SwitchActions",
+                    "attributeId": 0x00000010,
+                    "type": "int",
+                    "writable": True,
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -2865,6 +2889,26 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000003: {
+                    "attributeName": "AbsMinHeatSetpointLimit",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                },
+                0x00000004: {
+                    "attributeName": "AbsMaxHeatSetpointLimit",
+                    "attributeId": 0x00000004,
+                    "type": "int",
+                },
+                0x00000005: {
+                    "attributeName": "AbsMinCoolSetpointLimit",
+                    "attributeId": 0x00000005,
+                    "type": "int",
+                },
+                0x00000006: {
+                    "attributeName": "AbsMaxCoolSetpointLimit",
+                    "attributeId": 0x00000006,
+                    "type": "int",
+                },
                 0x00000011: {
                     "attributeName": "OccupiedCoolingSetpoint",
                     "attributeId": 0x00000011,
@@ -2874,6 +2918,30 @@ class ChipClusters:
                 0x00000012: {
                     "attributeName": "OccupiedHeatingSetpoint",
                     "attributeId": 0x00000012,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000015: {
+                    "attributeName": "MinHeatSetpointLimit",
+                    "attributeId": 0x00000015,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000016: {
+                    "attributeName": "MaxHeatSetpointLimit",
+                    "attributeId": 0x00000016,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000017: {
+                    "attributeName": "MinCoolSetpointLimit",
+                    "attributeId": 0x00000017,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000018: {
+                    "attributeName": "MaxCoolSetpointLimit",
+                    "attributeId": 0x00000018,
                     "type": "int",
                     "writable": True,
                 },
@@ -3523,6 +3591,7 @@ class ChipClusters:
     0x00000029: _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
     0x00000406: _OCCUPANCY_SENSING_CLUSTER_INFO,
     0x00000006: _ON_OFF_CLUSTER_INFO,
+    0x00000007: _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
     0x0000003E: _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
     0x00000403: _PRESSURE_MEASUREMENT_CLUSTER_INFO,
     0x00000200: _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
@@ -3576,6 +3645,7 @@ class ChipClusters:
         "OtaSoftwareUpdateProvider": _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
         "OccupancySensing": _OCCUPANCY_SENSING_CLUSTER_INFO,
         "OnOff": _ON_OFF_CLUSTER_INFO,
+        "OnOffSwitchConfiguration": _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
         "OperationalCredentials": _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
         "PressureMeasurement": _PRESSURE_MEASUREMENT_CLUSTER_INFO,
         "PumpConfigurationAndControl": _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
@@ -4342,12 +4412,12 @@ class ChipClusters:
     def ClusterBasic_ReadAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_UserLabel(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_WriteAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
-        value = value.encode("utf-8") + b'\x00'
+        value = value.encode("utf-8")
         return self._chipLib.chip_ime_WriteAttribute_Basic_UserLabel(device, ZCLendpoint, ZCLgroupid, value, len(value))
     def ClusterBasic_ReadAttributeLocation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_Location(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_WriteAttributeLocation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
-        value = value.encode("utf-8") + b'\x00'
+        value = value.encode("utf-8")
         return self._chipLib.chip_ime_WriteAttribute_Basic_Location(device, ZCLendpoint, ZCLgroupid, value, len(value))
     def ClusterBasic_ReadAttributeHardwareVersion(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Basic_HardwareVersion(device, ZCLendpoint, ZCLgroupid)
@@ -4402,7 +4472,7 @@ class ChipClusters:
     def ClusterBridgedDeviceBasic_ReadAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_UserLabel(device, ZCLendpoint, ZCLgroupid)
     def ClusterBridgedDeviceBasic_WriteAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
-        value = value.encode("utf-8") + b'\x00'
+        value = value.encode("utf-8")
         return self._chipLib.chip_ime_WriteAttribute_BridgedDeviceBasic_UserLabel(device, ZCLendpoint, ZCLgroupid, value, len(value))
     def ClusterBridgedDeviceBasic_ReadAttributeHardwareVersion(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_BridgedDeviceBasic_HardwareVersion(device, ZCLendpoint, ZCLgroupid)
@@ -4642,12 +4712,12 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
     def ClusterFlowMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_FlowMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-    def ClusterGeneralCommissioning_ReadAttributeFabricId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralCommissioning_ReadAttributeBreadcrumb(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_Breadcrumb(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralCommissioning_WriteAttributeBreadcrumb(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_GeneralCommissioning_Breadcrumb(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterGeneralCommissioning_ReadAttributeBasicCommissioningInfoList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_BasicCommissioningInfoList(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralCommissioning_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralDiagnostics_ReadAttributeNetworkInterfaces(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -4728,6 +4798,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_OnOff_FeatureMap(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOffSwitchConfiguration_ReadAttributeSwitchType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchType(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOffSwitchConfiguration_ReadAttributeSwitchActions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchActions(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOffSwitchConfiguration_WriteAttributeSwitchActions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_OnOffSwitchConfiguration_SwitchActions(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterOnOffSwitchConfiguration_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOperationalCredentials_ReadAttributeFabricsList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_FabricsList(device, ZCLendpoint, ZCLgroupid)
     def ClusterOperationalCredentials_ReadAttributeSupportedFabrics(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -4899,12 +4977,12 @@ class ChipClusters:
     def ClusterTestCluster_ReadAttributeCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_CharString(device, ZCLendpoint, ZCLgroupid)
     def ClusterTestCluster_WriteAttributeCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
-        value = value.encode("utf-8") + b'\x00'
+        value = value.encode("utf-8")
         return self._chipLib.chip_ime_WriteAttribute_TestCluster_CharString(device, ZCLendpoint, ZCLgroupid, value, len(value))
     def ClusterTestCluster_ReadAttributeLongCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_LongCharString(device, ZCLendpoint, ZCLgroupid)
     def ClusterTestCluster_WriteAttributeLongCharString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: bytes):
-        value = value.encode("utf-8") + b'\x00'
+        value = value.encode("utf-8")
         return self._chipLib.chip_ime_WriteAttribute_TestCluster_LongCharString(device, ZCLendpoint, ZCLgroupid, value, len(value))
     def ClusterTestCluster_ReadAttributeUnsupported(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TestCluster_Unsupported(device, ZCLendpoint, ZCLgroupid)
@@ -4916,6 +4994,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_LocalTemperature(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_ConfigureAttributeLocalTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
         return self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterThermostat_ReadAttributeAbsMinHeatSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMinHeatSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeAbsMaxHeatSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMaxHeatSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeAbsMinCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMinCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeAbsMaxCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMaxCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_ReadAttributeOccupiedCoolingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_WriteAttributeOccupiedCoolingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
@@ -4924,6 +5010,22 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedHeatingSetpoint(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_WriteAttributeOccupiedHeatingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
         return self._chipLib.chip_ime_WriteAttribute_Thermostat_OccupiedHeatingSetpoint(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterThermostat_ReadAttributeMinHeatSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_MinHeatSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_WriteAttributeMinHeatSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_MinHeatSetpointLimit(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterThermostat_ReadAttributeMaxHeatSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_MaxHeatSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_WriteAttributeMaxHeatSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxHeatSetpointLimit(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterThermostat_ReadAttributeMinCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_MinCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_WriteAttributeMinCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_MinCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid, value)
+    def ClusterThermostat_ReadAttributeMaxCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_MaxCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_WriteAttributeMaxCoolSetpointLimit(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
+        return self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointLimit(device, ZCLendpoint, ZCLgroupid, value)
     def ClusterThermostat_ReadAttributeControlSequenceOfOperation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_WriteAttributeControlSequenceOfOperation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, value: int):
@@ -5900,15 +6002,15 @@ class ChipClusters:
         # Cluster GeneralCommissioning Command SetRegulatoryConfig
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig.restype = ctypes.c_uint32
-        # Cluster GeneralCommissioning ReadAttribute FabricId
-        self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning ReadAttribute Breadcrumb
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_Breadcrumb.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_Breadcrumb.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning WriteAttribute Breadcrumb
         self._chipLib.chip_ime_WriteAttribute_GeneralCommissioning_Breadcrumb.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
         self._chipLib.chip_ime_WriteAttribute_GeneralCommissioning_Breadcrumb.restype = ctypes.c_uint32
+        # Cluster GeneralCommissioning ReadAttribute BasicCommissioningInfoList
+        self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_BasicCommissioningInfoList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_BasicCommissioningInfoList.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision.restype = ctypes.c_uint32
@@ -6195,6 +6297,19 @@ class ChipClusters:
         # Cluster OnOff ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster OnOffSwitchConfiguration
+        # Cluster OnOffSwitchConfiguration ReadAttribute SwitchType
+        self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchType.restype = ctypes.c_uint32
+        # Cluster OnOffSwitchConfiguration ReadAttribute SwitchActions
+        self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchActions.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_SwitchActions.restype = ctypes.c_uint32
+        # Cluster OnOffSwitchConfiguration WriteAttribute SwitchActions
+        self._chipLib.chip_ime_WriteAttribute_OnOffSwitchConfiguration_SwitchActions.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_WriteAttribute_OnOffSwitchConfiguration_SwitchActions.restype = ctypes.c_uint32
+        # Cluster OnOffSwitchConfiguration ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OnOffSwitchConfiguration_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OperationalCredentials
         # Cluster OperationalCredentials Command AddNOC
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddNOC.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint16]
@@ -6573,6 +6688,18 @@ class ChipClusters:
         # Cluster Thermostat ConfigureAttribute LocalTemperature
         self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_int16]
         self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute AbsMinHeatSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMinHeatSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMinHeatSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute AbsMaxHeatSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMaxHeatSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMaxHeatSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute AbsMinCoolSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMinCoolSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMinCoolSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute AbsMaxCoolSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMaxCoolSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_AbsMaxCoolSetpointLimit.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute OccupiedCoolingSetpoint
         self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint.restype = ctypes.c_uint32
@@ -6585,6 +6712,30 @@ class ChipClusters:
         # Cluster Thermostat WriteAttribute OccupiedHeatingSetpoint
         self._chipLib.chip_ime_WriteAttribute_Thermostat_OccupiedHeatingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
         self._chipLib.chip_ime_WriteAttribute_Thermostat_OccupiedHeatingSetpoint.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute MinHeatSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MinHeatSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MinHeatSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute MinHeatSetpointLimit
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MinHeatSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MinHeatSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute MaxHeatSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MaxHeatSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MaxHeatSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute MaxHeatSetpointLimit
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxHeatSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxHeatSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute MinCoolSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MinCoolSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MinCoolSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute MinCoolSetpointLimit
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MinCoolSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MinCoolSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute MaxCoolSetpointLimit
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MaxCoolSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_MaxCoolSetpointLimit.restype = ctypes.c_uint32
+        # Cluster Thermostat WriteAttribute MaxCoolSetpointLimit
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointLimit.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_WriteAttribute_Thermostat_MaxCoolSetpointLimit.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute ControlSequenceOfOperation
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation.restype = ctypes.c_uint32

@@ -611,6 +611,8 @@ tests:
       attribute: "octet_string"
       arguments:
           value: "TestValueLongerThan10"
+      response:
+          error: true
 
     - label: "Read attribute OCTET_STRING"
       command: "readAttribute"
@@ -662,20 +664,22 @@ tests:
       command: "writeAttribute"
       attribute: "char_string"
       arguments:
-          value: "☉Test☉"
+          value: "☉T☉"
 
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
       attribute: "char_string"
       disabled: true
       response:
-          value: "☉Test☉"
+          value: "☉T☉"
 
-    - label: "Write attribute CHAR_STRING"
+    - label: "Write attribute CHAR_STRING - Value too long"
       command: "writeAttribute"
       attribute: "char_string"
       arguments:
           value: "☉TestValueLongerThan10☉"
+      response:
+          error: true
 
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
@@ -684,7 +688,7 @@ tests:
       response:
           value: "☉TestVal"
 
-    - label: "Write attribute CHAR_STRING"
+    - label: "Write attribute CHAR_STRING - Empty"
       command: "writeAttribute"
       attribute: "char_string"
       arguments:

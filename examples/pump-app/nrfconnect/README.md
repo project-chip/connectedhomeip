@@ -66,15 +66,15 @@ LE advertising manually after powering up the device by pressing **Button 4**.
 
 ### Bluetooth LE rendezvous
 
-In this example, the commissioning procedure is done over Bluetooth LE between a
-CHIP device and the CHIP controller, where the controller has the commissioner
-role.
+In this example, the commissioning procedure (called rendezvous) is done over
+Bluetooth LE between a CHIP device and the CHIP controller, where the controller
+has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the CHIP device. The data payload is encoded within a QR code, printed to
-the UART console, and shared using an NFC tag. NFC tag emulation starts
-automatically when Bluetooth LE advertising is started and stays enabled until
-Bluetooth LE advertising timeout expires.
+the UART console, and shared using an NFC tag. For security reasons, you must
+start NFC tag emulation manually after powering up the device by pressing
+**Button 4**.
 
 #### Thread provisioning
 
@@ -99,10 +99,10 @@ more information.
 
 The example supports building and running on the following devices:
 
-| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                   |
-| ----------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
-| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
+| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                      |
+| ----------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840-DK_top-view-small.jpg" alt="nRF52840 DK"/></details> |
+| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340-DK_top-view-small.jpg" alt="nRF5340 DK"/></details>    |
 
 <hr>
 
@@ -159,7 +159,7 @@ opposite one.
 the test mode using the default configuration.
 
 **Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
-enables Bluetooth LE advertising for the predefined period of time.
+enables Bluetooth LE advertising for the predefined period of time (15 minutes by default).
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the

@@ -35,7 +35,6 @@
 #include <platform/internal/BLEManager.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/SystemTimer.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"

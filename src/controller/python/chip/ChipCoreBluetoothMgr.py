@@ -44,7 +44,6 @@ from .ChipBleUtility import (
     BleDisconnectEventStruct,
     BleRxEventStruct,
     BleSubscribeEventStruct,
-    BleDeviceIdentificationInfo,
     ParseServiceData,
 )
 

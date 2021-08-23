@@ -43,13 +43,12 @@ public:
     ~AndroidDeviceControllerWrapper();
 
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
-    chip::Controller::ExampleOperationalCredentialsIssuer & OpCredsIssuer() { return mOpCredsIssuer; }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
     jobject JavaObjectRef() { return mJavaObjectRef; }
     jlong ToJNIHandle();
 
     void CallJavaMethod(const char * methodName, jint argument);
-    CHIP_ERROR Initialize();
+    CHIP_ERROR InitializeOperationalCredentialsIssuer();
 
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;

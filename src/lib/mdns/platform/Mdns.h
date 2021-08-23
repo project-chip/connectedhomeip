@@ -107,7 +107,7 @@ using MdnsBrowseCallback = void (*)(void * context, MdnsService * services, size
 using MdnsAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
 
 /**
- * This function intializes the mdns module
+ * This function initializes the mdns module
  *
  * @param[in] initCallback    The callback for notifying the initialization result.
  * @param[in] errorCallback   The callback for notifying internal errors.
@@ -118,6 +118,15 @@ using MdnsAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
  *
  */
 CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context);
+
+/**
+ * This function shuts down the mdns module
+ *
+ * @retval CHIP_NO_ERROR  The shutdown succeeds.
+ * @retval Error code     The shutdown fails
+ *
+ */
+CHIP_ERROR ChipMdnsShutdown();
 
 /**
  * This function publishes an service via mDNS.

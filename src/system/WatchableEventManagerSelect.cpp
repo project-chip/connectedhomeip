@@ -23,10 +23,10 @@
 
 #include <platform/LockTracker.h>
 #include <support/CodeUtils.h>
+#include <support/TimeUtils.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 #include <system/WatchableEventManager.h>
-#include <system/WatchableSocket.h>
 
 #include <errno.h>
 
@@ -56,19 +56,20 @@ CHIP_ERROR WatchableEventManager::Init(Layer & systemLayer)
     RegisterPOSIXErrorFormatter();
 
     mSystemLayer = &systemLayer;
-    mMaxFd       = -1;
-    FD_ZERO(&mRequest.mReadSet);
-    FD_ZERO(&mRequest.mWriteSet);
-    FD_ZERO(&mRequest.mErrorSet);
 
     ReturnErrorOnFailure(mTimerList.Init());
+
+    for (auto & w : mSocketWatchPool)
+    {
+        w.Clear();
+    }
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = PTHREAD_NULL;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
-    return mWakeEvent.Open(*this);
+    return mWakeEvent.Open(systemLayer);
 }
 
 CHIP_ERROR WatchableEventManager::Shutdown()
@@ -88,7 +89,7 @@ CHIP_ERROR WatchableEventManager::Shutdown()
 
         timer->Release();
     }
-    mWakeEvent.Close();
+    mWakeEvent.Close(*mSystemLayer);
     mSystemLayer = nullptr;
     return CHIP_NO_ERROR;
 }
@@ -119,7 +120,7 @@ void WatchableEventManager::Signal()
     }
 }
 
-CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, Timers::OnCompleteFunct onComplete, void * appState)
+CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
 {
     CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delayMilliseconds = 0);
 
@@ -160,7 +161,7 @@ CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, Timers:
     return CHIP_NO_ERROR;
 }
 
-void WatchableEventManager::CancelTimer(Timers::OnCompleteFunct onComplete, void * appState)
+void WatchableEventManager::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
     Timer * timer = mTimerList.Remove(onComplete, appState);
     VerifyOrReturn(timer != nullptr);
@@ -179,7 +180,7 @@ void WatchableEventManager::CancelTimer(Timers::OnCompleteFunct onComplete, void
     Signal();
 }
 
-CHIP_ERROR WatchableEventManager::ScheduleWork(Timers::OnCompleteFunct onComplete, void * appState)
+CHIP_ERROR WatchableEventManager::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
     CancelTimer(onComplete, appState);
 
@@ -203,6 +204,90 @@ CHIP_ERROR WatchableEventManager::ScheduleWork(Timers::OnCompleteFunct onComplet
         // The new timer is the earliest, so the time until the next event has probably changed.
         Signal();
     }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WatchableEventManager::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)
+{
+    // Find a free slot.
+    SocketWatch * watch = nullptr;
+    for (auto & w : mSocketWatchPool)
+    {
+        if (w.mFD == fd)
+        {
+            // Duplicate registration is an error.
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        else if ((w.mFD == kInvalidFd) && (watch == nullptr))
+        {
+            watch = &w;
+        }
+    }
+    VerifyOrReturnError(watch != nullptr, CHIP_ERROR_ENDPOINT_POOL_FULL);
+
+    watch->mFD = fd;
+
+    *tokenOut = reinterpret_cast<SocketWatchToken>(watch);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WatchableEventManager::SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data)
+{
+    SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
+    VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    watch->mCallback     = callback;
+    watch->mCallbackData = data;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WatchableEventManager::RequestCallbackOnPendingRead(SocketWatchToken token)
+{
+    SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
+    VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    watch->mPendingIO.Set(SocketEventFlags::kRead);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WatchableEventManager::RequestCallbackOnPendingWrite(SocketWatchToken token)
+{
+    SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
+    VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    watch->mPendingIO.Set(SocketEventFlags::kWrite);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WatchableEventManager::ClearCallbackOnPendingRead(SocketWatchToken token)
+{
+    SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
+    VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    watch->mPendingIO.Clear(SocketEventFlags::kRead);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WatchableEventManager::ClearCallbackOnPendingWrite(SocketWatchToken token)
+{
+    SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
+    VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    watch->mPendingIO.Clear(SocketEventFlags::kWrite);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WatchableEventManager::StopWatchingSocket(SocketWatchToken * tokenInOut)
+{
+    SocketWatch * watch = reinterpret_cast<SocketWatch *>(*tokenInOut);
+    *tokenInOut         = InvalidSocketWatchToken();
+
+    VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(watch->mFD >= 0, CHIP_ERROR_INCORRECT_STATE);
+
+    watch->Clear();
+
+    // Wake the thread calling select so that it stops selecting on the socket.
+    Signal();
+
     return CHIP_NO_ERROR;
 }
 
@@ -237,88 +322,50 @@ SocketEvents WatchableEventManager::SocketEventsFromFDs(int socket, const fd_set
     return res;
 }
 
-bool WatchableEventManager::HasAnyRequest(int fd)
-{
-    return FD_ISSET(fd, &mRequest.mReadSet) || FD_ISSET(fd, &mRequest.mWriteSet) || FD_ISSET(fd, &mRequest.mErrorSet);
-}
-
-CHIP_ERROR WatchableEventManager::SetRequest(int fd, fd_set * fds)
-{
-    FD_SET(fd, fds);
-    if (fd > mMaxFd)
-    {
-        mMaxFd = fd;
-    }
-    // Wake the thread calling select so that it starts selecting on the new socket.
-    Signal();
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR WatchableEventManager::ClearRequest(int fd, fd_set * fds)
-{
-    FD_CLR(fd, fds);
-    if (fd == mMaxFd)
-    {
-        MaybeLowerMaxFd();
-    }
-    // Wake the thread calling select so that it starts selecting on the new socket.
-    Signal();
-    return CHIP_NO_ERROR;
-}
-
-void WatchableEventManager::ResetRequests(int fd)
-{
-    FD_CLR(fd, &mRequest.mReadSet);
-    FD_CLR(fd, &mRequest.mWriteSet);
-    FD_CLR(fd, &mRequest.mErrorSet);
-    if (fd == mMaxFd)
-    {
-        MaybeLowerMaxFd();
-    }
-}
-
-void WatchableEventManager::MaybeLowerMaxFd()
-{
-    int fd;
-    for (fd = mMaxFd; fd >= 0; --fd)
-    {
-        if (HasAnyRequest(fd))
-        {
-            break;
-        }
-    }
-    mMaxFd = fd;
-}
-
 void WatchableEventManager::PrepareEvents()
 {
     assertChipStackLockedByCurrentThread();
 
-    // Max out this duration and let CHIP set it appropriately.
-    mNextTimeout.tv_sec  = DEFAULT_MIN_SLEEP_PERIOD;
-    mNextTimeout.tv_usec = 0;
-    PrepareEventsWithTimeout(mNextTimeout);
-}
-
-void WatchableEventManager::PrepareEventsWithTimeout(struct timeval & nextTimeout)
-{
+    constexpr Clock::MonotonicMilliseconds kMaxTimeout =
+        static_cast<Clock::MonotonicMilliseconds>(DEFAULT_MIN_SLEEP_PERIOD) * kMillisecondsPerSecond;
     const Clock::MonotonicMilliseconds currentTime = Clock::GetMonotonicMilliseconds();
-    Clock::MonotonicMilliseconds awakenTime        = currentTime + TimevalToMilliseconds(nextTimeout);
+    Clock::MonotonicMilliseconds awakenTime        = currentTime + kMaxTimeout;
 
     Timer * timer = mTimerList.Earliest();
-    if (timer && Clock::IsEarlier(timer->mAwakenTime, awakenTime))
+    if (timer && Clock::IsEarlier(timer->AwakenTime(), awakenTime))
     {
-        awakenTime = timer->mAwakenTime;
+        awakenTime = timer->AwakenTime();
     }
 
     const Clock::MonotonicMilliseconds sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : 0;
-    MillisecondsToTimeval(sleepTime, nextTimeout);
+    MillisecondsToTimeval(sleepTime, mNextTimeout);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
-    chip::Mdns::GetMdnsTimeout(nextTimeout);
+    chip::Mdns::GetMdnsTimeout(mNextTimeout);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
-    mSelected = mRequest;
+    mMaxFd = -1;
+    FD_ZERO(&mSelected.mReadSet);
+    FD_ZERO(&mSelected.mWriteSet);
+    FD_ZERO(&mSelected.mErrorSet);
+    for (auto & w : mSocketWatchPool)
+    {
+        if (w.mFD != kInvalidFd)
+        {
+            if (mMaxFd < w.mFD)
+            {
+                mMaxFd = w.mFD;
+            }
+            if (w.mPendingIO.Has(SocketEventFlags::kRead))
+            {
+                FD_SET(w.mFD, &mSelected.mReadSet);
+            }
+            if (w.mPendingIO.Has(SocketEventFlags::kWrite))
+            {
+                FD_SET(w.mFD, &mSelected.mWriteSet);
+            }
+        }
+    }
 }
 
 void WatchableEventManager::WaitForEvents()
@@ -351,16 +398,15 @@ void WatchableEventManager::HandleEvents()
         timer->HandleComplete();
     }
 
-    for (WatchableSocket * watchable = mAttachedSockets; watchable != nullptr; watchable = watchable->mAttachedNext)
+    for (auto & w : mSocketWatchPool)
     {
-        watchable->SetPendingIO(
-            SocketEventsFromFDs(watchable->GetFD(), mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet));
-    }
-    for (WatchableSocket * watchable = mAttachedSockets; watchable != nullptr; watchable = watchable->mAttachedNext)
-    {
-        if (watchable->mPendingIO.HasAny())
+        if (w.mFD != kInvalidFd)
         {
-            watchable->InvokeCallback();
+            SocketEvents events = SocketEventsFromFDs(w.mFD, mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet);
+            if (events.HasAny() && w.mCallback != nullptr)
+            {
+                w.mCallback(events, w.mCallbackData);
+            }
         }
     }
 
@@ -380,6 +426,14 @@ void WatchableEventManager::HandleTimerComplete(Timer * timer)
     timer->HandleComplete();
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
+void WatchableEventManager::SocketWatch::Clear()
+{
+    mFD = kInvalidFd;
+    mPendingIO.ClearAll();
+    mCallback     = nullptr;
+    mCallbackData = 0;
+}
 
 } // namespace System
 } // namespace chip
