@@ -69,7 +69,9 @@ public:
     static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     static const Key kConfigKey_WiFiStationSecType;
+#endif
     static const Key kConfigKey_OperationalDeviceId;
     static const Key kConfigKey_OperationalDeviceCert;
     static const Key kConfigKey_OperationalDeviceICACerts;

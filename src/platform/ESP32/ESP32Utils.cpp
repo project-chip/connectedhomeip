@@ -30,13 +30,16 @@
 #include <platform/ESP32/ESP32Utils.h>
 
 #include "esp_event.h"
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include "esp_netif.h"
 #include "esp_netif_net_stack.h"
 #include "esp_wifi.h"
+#endif
 
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
 {
     wifi_mode_t curWiFiMode;
@@ -304,6 +307,7 @@ CHIP_ERROR ESP32Utils::ClearWiFiStationProvision(void)
 
     return CHIP_NO_ERROR;
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
 {
