@@ -71,7 +71,7 @@ constexpr uint8_t kFrameControlGlobalCommand = 0x00;
 // Pick source endpoint as 1 for now
 constexpr EndpointId kSourceEndpoint = 1;
 
-[[maybe_unused]] const uint8_t kReportingDirectionReported = 0x00;
+constexpr uint8_t kReportingDirectionReported = 0x00;
 } // namespace
 
 using namespace app::Clusters;
@@ -85,6 +85,120 @@ namespace Controller {
 // TODO(#4503): Commands should take group id as an argument.
 
 // OnOff Cluster Commands
+CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::Ids::Off,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    // Command takes no arguments.
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
+CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::Ids::On,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    // Command takes no arguments.
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
+CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    app::CommandSender * sender = nullptr;
+    TLV::TLVWriter * writer     = nullptr;
+    uint8_t argSeqNumber        = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OnOff::Commands::Ids::Toggle,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewCommandSender(&sender));
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    // Command takes no arguments.
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender, onSuccessCallback, onFailureCallback);
+
+    err = mDevice->SendCommands(sender);
+
+exit:
+    // On error, we are responsible to close the sender.
+    if (err != CHIP_NO_ERROR && sender != nullptr)
+    {
+        sender->Shutdown();
+    }
+    return err;
+}
+
 // OnOff Cluster Attributes
 CHIP_ERROR OnOffCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
@@ -102,6 +216,26 @@ CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCall
     attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              BasicAttributeFilter<BooleanAttributeCallback>);
+}
+
+CHIP_ERROR OnOffCluster::ConfigureAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportOnOffOnOff", OnOff::Id);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put32(Globals::Commands::Ids::ConfigureReporting)
+        .Put8(kReportingDirectionReported)
+        .Put32(OnOff::Attributes::Ids::OnOff)
+        .Put8(16)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
 CHIP_ERROR OnOffCluster::ReadAttributeGlobalSceneControl(Callback::Cancelable * onSuccessCallback,
