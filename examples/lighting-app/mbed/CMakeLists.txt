@@ -42,16 +42,15 @@ target_include_directories(${APP_TARGET} PRIVATE
 
 target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/main/LightingManager.cpp               
+               ${CMAKE_CURRENT_SOURCE_DIR}/main/LightingManager.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
-               ${LIGHTING_GEN_SRC}/attribute-size.cpp               
+               ${LIGHTING_GEN_SRC}/attribute-size.cpp
                ${LIGHTING_GEN_SRC}/callback-stub.cpp
                ${LIGHTING_GEN_SRC}/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
-               ${CHIP_ROOT}/src/app-common/zap-generated/attributes/Accessors.cpp
+               ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
-               ${CHIP_ROOT}/src/app-common/zap-generated/attributes/Accessors.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
