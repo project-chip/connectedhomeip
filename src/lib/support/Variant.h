@@ -60,6 +60,14 @@ struct VariantCurry<T, Ts...>
         else
             VariantCurry<Ts...>::Copy(that_t, that_v, this_v);
     }
+
+    inline static bool Equal(std::size_t type_t, const void * that_v, const void * this_v)
+    {
+        if (type_t == T::VariantId)
+            return *reinterpret_cast<const T *>(this_v) == *reinterpret_cast<const T *>(that_v);
+        else
+            return VariantCurry<Ts...>::Equal(type_t, that_v, this_v);
+    }
 };
 
 template <>
@@ -68,6 +76,7 @@ struct VariantCurry<>
     inline static void Destroy(std::size_t id, void * data) {}
     inline static void Move(std::size_t that_t, void * that_v, void * this_v) {}
     inline static void Copy(std::size_t that_t, const void * that_v, void * this_v) {}
+    inline static bool Equal(std::size_t type_t, const void * that_v, const void * this_v) { assert(false); }
 };
 
 } // namespace Internal
@@ -134,6 +143,10 @@ public:
         Curry::Destroy(that.mTypeId, &that.mData);
         that.mTypeId = kInvalidType;
         return *this;
+    }
+
+    bool operator==(const Variant & other) const {
+        return GetType() == other.GetType() && Curry::Equal(mTypeId, &other.mData, &mData);
     }
 
     template <typename T>

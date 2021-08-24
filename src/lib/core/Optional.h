@@ -25,6 +25,8 @@
 
 #include <assert.h>
 
+#include <lib/support/Variant.h>
+
 namespace chip {
 
 /**
@@ -35,69 +37,48 @@ template <class T>
 class Optional
 {
 public:
-    constexpr Optional() : mHasValue(false) {}
-    explicit Optional(const T & value) : mValue(value), mHasValue(true) {}
+    constexpr Optional() {
+        mVariant.template Set<None>();
+    }
+    explicit Optional(const T & value) {
+        mVariant.template Set<Some>(value);
+    }
 
     constexpr Optional(const Optional & other) = default;
     constexpr Optional(Optional && other)      = default;
-
-    /**
-     * Assignment operator implementation.
-     *
-     * NOTE: Manually implemented instead of =default  since other::mValue may not be initialized
-     * if it has no value.
-     */
-    constexpr Optional & operator=(const Optional & other)
-    {
-        if (other.HasValue())
-        {
-            SetValue(other.Value());
-        }
-        else
-        {
-            ClearValue();
-        }
-        return *this;
-    }
+    constexpr Optional & operator=(const Optional & other) = default;
 
     /** Make the optional contain a specific value */
     constexpr void SetValue(const T & value)
     {
-        mValue    = value;
-        mHasValue = true;
+        mVariant.template Set<Some>(value);
     }
 
     /** Invalidate the value inside the optional. Optional now has no value */
-    constexpr void ClearValue() { mHasValue = false; }
+    constexpr void ClearValue() {
+        mVariant.template Set<None>();
+    }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
     const T & Value() const
     {
         assert(HasValue());
-        return mValue;
+        return mVariant.template Get<Some>().mValue;
     }
 
     /** Gets the current value of the optional if the optional has a value;
         otherwise returns the provided default value. */
     const T & ValueOr(const T & defaultValue) const
     {
-        if (HasValue())
-        {
-            return mValue;
-        }
-        return defaultValue;
+        return HasValue() ? Value() : defaultValue;
     }
 
     /** Checks if the optional contains a value or not */
-    constexpr bool HasValue() const { return mHasValue; }
-
-    /** Comparison operator, handling missing values. */
-    bool operator==(const Optional & other) const
-    {
-        return (mHasValue == other.mHasValue) && (!other.mHasValue || (mValue == other.mValue));
+    constexpr bool HasValue() const {
+        return !mVariant.template Is<None>();
     }
 
-    /** Comparison operator, handling missing values. */
+    bool operator==(const Optional & other) const { return mVariant == other.mVariant; }
     bool operator!=(const Optional & other) const { return !(*this == other); }
 
     /** Convenience method to create an optional without a valid value. */
@@ -107,8 +88,21 @@ public:
     static Optional<T> Value(const T & value) { return Optional(value); }
 
 private:
-    T mValue;       ///< Value IFF optional contains a value
-    bool mHasValue; ///< True IFF optional contains a value
+    struct None
+    {
+        static constexpr const std::size_t VariantId = 1;
+        bool operator==(const None &) const { return true; }
+    };
+
+    struct Some
+    {
+        static constexpr const std::size_t VariantId = 2;
+        Some(const T & value) : mValue(value) {}
+        bool operator==(const Some & other) const { return mValue == other.mValue; }
+        T mValue;
+    };
+
+    Variant<None, Some> mVariant;
 };
 
 } // namespace chip
