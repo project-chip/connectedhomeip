@@ -85,7 +85,7 @@ extern "C" void app_main()
         return;
     }
 
-    InitServer();
+    chip::Server::GetServer().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
