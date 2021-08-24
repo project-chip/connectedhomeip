@@ -35,7 +35,7 @@ chip::System::SocketWatchToken token;
 /**
  * Enters commissioning mode, opens commissioning window, logs onboarding payload.
  * If non-null selectedCommissioner is provided, sends user directed commissioning
- * request to the selectedCommissioner and advertises self commissionable node over DNS-SD
+ * request to the selectedCommissioner and advertises self as commissionable node over DNS-SD
  */
 void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommissioner = nullptr)
 {
@@ -63,9 +63,11 @@ void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommission
  * Accepts user input of selected commissioner and calls PrepareForCommissioning with
  * the selected commissioner
  */
-void RequestUserDirectedCommisisioning(System::SocketEvents events, intptr_t data)
+void RequestUserDirectedCommissioning(System::SocketEvents events, intptr_t data)
 {
-    // Accept user selection for commissioner to request commissioning from
+    // Accept user selection for commissioner to request commissioning from.
+    // Assuming kernel has line buffering, this will unblock on '\n' character
+    // on stdin i.e. when user hits 'Enter'
     int selectedCommissionerNumber = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES;
     scanf("%d", &selectedCommissionerNumber);
     chip::DeviceLayer::SystemLayer.StopWatchingSocket(&token);
@@ -97,11 +99,11 @@ void InitCommissioningFlow(intptr_t commandArg)
             Zcl, "%d commissioner(s) discovered. Select one (by number# above) to request commissioning from: ", commissionerCount);
 
         // Setup for async/non-blocking user input from stdin
-        int flags = fcntl(0, F_GETFL, 0);
+        int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
         VerifyOrReturn(fcntl(0, F_SETFL, flags | O_NONBLOCK) == 0,
                        ChipLogError(Zcl, "Could not set non-blocking mode for user input!"));
-        ReturnOnFailure(chip::DeviceLayer::SystemLayer.StartWatchingSocket(0, &token));
-        ReturnOnFailure(chip::DeviceLayer::SystemLayer.SetCallback(token, RequestUserDirectedCommisisioning, (intptr_t) NULL));
+        ReturnOnFailure(chip::DeviceLayer::SystemLayer.StartWatchingSocket(STDIN_FILENO, &token));
+        ReturnOnFailure(chip::DeviceLayer::SystemLayer.SetCallback(token, RequestUserDirectedCommissioning, (intptr_t) NULL));
         ReturnOnFailure(chip::DeviceLayer::SystemLayer.RequestCallbackOnPendingRead(token));
     }
     else
@@ -131,7 +133,7 @@ int main(int argc, char * argv[])
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to run TV Casting App:: %s", ErrorStr(err));
+        ChipLogError(Zcl, "Failed to run TV Casting App: %s", ErrorStr(err));
         // End the program with non zero error code to indicate an error.
         return 1;
     }
