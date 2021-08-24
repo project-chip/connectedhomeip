@@ -18,7 +18,7 @@
 
 #pragma once
 
-// ---- Lock Example App Config ----
+// ---- Pump Controller Example App Config ----
 
 #define START_BUTTON DK_BTN2
 #define START_BUTTON_MASK DK_BTN2_MSK
@@ -32,5 +32,5 @@
 #define SYSTEM_STATE_LED DK_LED1
 #define PUMP_STATE_LED DK_LED2
 
-// Time it takes in ms for the simulated actuator to move from one state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 2000
+// Time it takes in ms for the simulated pump to move from one state to another.
+#define PUMP_START_PERIOS_MS 2000

@@ -48,7 +48,7 @@ LOG_MODULE_DECLARE(app);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 
 static LEDWidget sStatusLED;
-static LEDWidget sLockLED;
+static LEDWidget sPumpStateLED;
 static LEDWidget sUnusedLED;
 static LEDWidget sUnusedLED_1;
 
@@ -70,8 +70,8 @@ int AppTask::Init()
     LEDWidget::InitGpio();
 
     sStatusLED.Init(SYSTEM_STATE_LED);
-    sLockLED.Init(LOCK_STATE_LED);
-    sLockLED.Set(!PumpMgr().IsUnlocked());
+    sPumpStateLED.Init(PUMP_STATE_LED);
+    sPumpStateLED.Set(!PumpMgr().IsStopped());
 
     sUnusedLED.Init(DK_LED3);
     sUnusedLED_1.Init(DK_LED4);
@@ -180,25 +180,25 @@ int AppTask::StartApp()
         }
 
         sStatusLED.Animate();
-        sLockLED.Animate();
+        sPumpStateLED.Animate();
         sUnusedLED.Animate();
         sUnusedLED_1.Animate();
     }
 }
 
-void AppTask::LockActionEventHandler(AppEvent * aEvent)
+void AppTask::StartActionEventHandler(AppEvent * aEvent)
 {
     PumpManager::Action_t action = PumpManager::INVALID_ACTION;
     int32_t actor                = 0;
 
-    if (aEvent->Type == AppEvent::kEventType_Lock)
+    if (aEvent->Type == AppEvent::kEventType_Start)
     {
-        action = static_cast<PumpManager::Action_t>(aEvent->LockEvent.Action);
-        actor  = aEvent->LockEvent.Actor;
+        action = static_cast<PumpManager::Action_t>(aEvent->StartEvent.Action);
+        actor  = aEvent->StartEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        action = PumpMgr().IsUnlocked() ? PumpManager::LOCK_ACTION : PumpManager::UNLOCK_ACTION;
+        action = PumpMgr().IsStopped() ? PumpManager::START_ACTION : PumpManager::STOP_ACTION;
         actor  = AppEvent::kEventType_Button;
     }
 
@@ -211,11 +211,11 @@ void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
     AppEvent button_event;
     button_event.Type = AppEvent::kEventType_Button;
 
-    if (LOCK_BUTTON_MASK & button_state & has_changed)
+    if (START_BUTTON_MASK & button_state & has_changed)
     {
-        button_event.ButtonEvent.PinNo  = LOCK_BUTTON;
+        button_event.ButtonEvent.PinNo  = START_BUTTON;
         button_event.ButtonEvent.Action = BUTTON_PUSH_EVENT;
-        button_event.Handler            = LockActionEventHandler;
+        button_event.Handler            = StartActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
 
@@ -269,12 +269,12 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
         // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
         sStatusLED.Set(false);
-        sLockLED.Set(false);
+        sPumpStateLED.Set(false);
         sUnusedLED_1.Set(false);
         sUnusedLED.Set(false);
 
         sStatusLED.Blink(500);
-        sLockLED.Blink(500);
+        sPumpStateLED.Blink(500);
         sUnusedLED.Blink(500);
         sUnusedLED_1.Blink(500);
     }
@@ -334,8 +334,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             sUnusedLED.Set(false);
             sUnusedLED_1.Set(false);
 
-            // Set lock status LED back to show state of lock.
-            sLockLED.Set(!PumpMgr().IsUnlocked());
+            // Set pump state LED back to show state of pump.
+            sPumpStateLED.Set(!PumpMgr().IsStopped());
 
             sAppTask.CancelTimer();
 
@@ -438,34 +438,34 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 
 void AppTask::ActionInitiated(PumpManager::Action_t aAction, int32_t aActor)
 {
-    // If the action has been initiated by the lock, update the bolt lock trait
+    // If the action has been initiated by the pump, update the pump trait
     // and start flashing the LEDs rapidly to indicate action initiation.
-    if (aAction == PumpManager::LOCK_ACTION)
+    if (aAction == PumpManager::START_ACTION)
     {
-        LOG_INF("Lock Action has been initiated");
+        LOG_INF("Pump Start Action has been initiated");
     }
-    else if (aAction == PumpManager::UNLOCK_ACTION)
+    else if (aAction == PumpManager::STOP_ACTION)
     {
-        LOG_INF("Unlock Action has been initiated");
+        LOG_INF("Pump Stop Action has been initiated");
     }
 
-    sLockLED.Blink(50, 50);
+    sPumpStateLED.Blink(50, 50);
 }
 
 void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
 {
-    // if the action has been completed by the lock, update the bolt lock trait.
-    // Turn on the lock LED if in a LOCKED state OR
-    // Turn off the lock LED if in an UNLOCKED state.
-    if (aAction == PumpManager::LOCK_ACTION)
+    // If the action has been completed by the pump, update the pump trait.
+    // Turn on the pump state LED if in a STARTED state OR
+    // Turn off the pump state LED if in a STOPPED state.
+    if (aAction == PumpManager::START_ACTION)
     {
-        LOG_INF("Lock Action has been completed");
-        sLockLED.Set(true);
+        LOG_INF("Pump Start Action has been completed");
+        sPumpStateLED.Set(true);
     }
-    else if (aAction == PumpManager::UNLOCK_ACTION)
+    else if (aAction == PumpManager::STOP_ACTION)
     {
-        LOG_INF("Unlock Action has been completed");
-        sLockLED.Set(false);
+        LOG_INF("Pump Stop Action has been completed");
+        sPumpStateLED.Set(false);
     }
 
     if (aActor == AppEvent::kEventType_Button)
@@ -474,13 +474,13 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
     }
 }
 
-void AppTask::PostLockActionRequest(int32_t aActor, PumpManager::Action_t aAction)
+void AppTask::PostStartActionRequest(int32_t aActor, PumpManager::Action_t aAction)
 {
     AppEvent event;
-    event.Type             = AppEvent::kEventType_Lock;
-    event.LockEvent.Actor  = aActor;
-    event.LockEvent.Action = aAction;
-    event.Handler          = LockActionEventHandler;
+    event.Type             = AppEvent::kEventType_Start;
+    event.StartEvent.Actor  = aActor;
+    event.StartEvent.Action = aAction;
+    event.Handler          = StartActionEventHandler;
     PostEvent(&event);
 }
 
@@ -506,7 +506,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState()
 {
-    uint8_t newValue = !PumpMgr().IsUnlocked();
+    uint8_t newValue = !PumpMgr().IsStopped();
 
     // write the new on/off value
     EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
