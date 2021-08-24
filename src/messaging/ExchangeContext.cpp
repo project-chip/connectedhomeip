@@ -42,7 +42,6 @@
 #include <protocols/secure_channel/Constants.h>
 #include <support/Defer.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/SystemTimer.h>
 
 using namespace chip::Encoding;
 using namespace chip::Inet;

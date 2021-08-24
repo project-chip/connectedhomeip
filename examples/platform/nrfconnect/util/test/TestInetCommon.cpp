@@ -46,7 +46,6 @@
 #include <support/CHIPMem.h>
 #include <support/ErrorStr.h>
 #include <support/ScopedBuffer.h>
-#include <system/SystemTimer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <arpa/inet.h>
@@ -114,7 +113,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
     FD_ZERO(&exceptFDs);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    if (gSystemLayer.State() == System::kLayerState_Initialized)
+    if (gSystemLayer.State() == System::LayerState::kInitialized)
         gSystemLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -131,7 +130,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-    if (gSystemLayer.State() == System::kLayerState_Initialized)
+    if (gSystemLayer.State() == System::LayerState::kInitialized)
     {
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

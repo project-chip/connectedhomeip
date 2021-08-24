@@ -96,9 +96,6 @@ buildconfig_header("system_buildconfig") {
   }
 
   defines += [ "CHIP_SYSTEM_WATCHABLE_EVENT_MANAGER_CONFIG_FILE=<system/WatchableEventManager${chip_system_config_event_loop}.h>" ]
-  if (chip_system_config_use_sockets) {
-    defines += [ "CHIP_SYSTEM_WATCHABLE_SOCKET_CONFIG_FILE=<system/WatchableSocket${chip_system_config_event_loop}.h>" ]
-  }
 }
 
 config("system_config") {
@@ -168,14 +165,14 @@ static_library("system") {
   allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]
 
   if (chip_system_config_use_sockets) {
-    sources += [
-      "WatchableSocket${chip_system_config_event_loop}.cpp",
-      "WatchableSocket${chip_system_config_event_loop}.h",
-      "WatchableSocket.h",
-    ]
+    sources += [ "SocketEvents.h" ]
     if (chip_system_config_event_loop == "Libevent") {
       libs = [ "event" ]
     }
+  }
+
+  if (chip_system_config_use_lwip) {
+    sources += [ "LwIPEventSupport.h" ]
   }
 
   if (chip_with_nlfaultinjection) {

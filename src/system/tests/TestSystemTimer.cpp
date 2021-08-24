@@ -35,7 +35,6 @@
 #include <support/UnitTestRegistration.h>
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
-#include <system/SystemTimer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>
@@ -59,7 +58,7 @@ static void ServiceEvents(Layer & aLayer)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (aLayer.State() == kLayerState_Initialized)
+    if (aLayer.State() == LayerState::kInitialized)
     {
         aLayer.WatchableEventsManager().HandlePlatformTimer();
     }
