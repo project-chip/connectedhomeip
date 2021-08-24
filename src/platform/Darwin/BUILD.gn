@@ -39,6 +39,8 @@ static_library("Darwin") {
     "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
+    "CHIPP256KeypairNativeBridge.cpp",
+    "CHIPP256KeypairNativeBridge.h",
     "CHIPPlatformConfig.h",
     "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",
@@ -57,8 +59,6 @@ static_library("Darwin") {
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
-    "CHIPP256KeypairNativeBridge.h",
-    "CHIPP256KeypairNativeBridge.cpp",
   ]
 
   deps = [
