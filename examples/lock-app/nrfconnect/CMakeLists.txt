@@ -51,7 +51,7 @@ include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 
 target_include_directories(app PRIVATE
                            main/include
-                           ${GEN_DIR}/app-generated
+                           ${GEN_DIR}/app-common
                            ${GEN_DIR}/lock-app
                            ${NLIO_ROOT}
                            ${NRFCONNECT_COMMON}/util/include
