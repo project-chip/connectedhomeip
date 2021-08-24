@@ -878,8 +878,8 @@ static void OnGroupKeyManagementGroupsListAttributeResponse(void * context, uint
     for (uint16_t i = 0; i < count; i++)
     {
         ChipLogProgress(chipTool, "GroupState[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  VendorId: %" PRIu16 "", entries[i].VendorId);
-        ChipLogProgress(chipTool, "  VendorGroupId: %" PRIu16 "", entries[i].VendorGroupId);
+        ChipLogProgress(chipTool, "  FabricIndex: %" PRIu16 "", entries[i].FabricIndex);
+        ChipLogProgress(chipTool, "  GroupId: %" PRIu16 "", entries[i].GroupId);
         ChipLogProgress(chipTool, "  GroupKeySetIndex: %" PRIu16 "", entries[i].GroupKeySetIndex);
     }
 
@@ -894,7 +894,7 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(void * context, u
     for (uint16_t i = 0; i < count; i++)
     {
         ChipLogProgress(chipTool, "GroupKey[%" PRIu16 "]:", i);
-        ChipLogProgress(chipTool, "  VendorId: %" PRIu16 "", entries[i].VendorId);
+        ChipLogProgress(chipTool, "  FabricIndex: %" PRIu16 "", entries[i].FabricIndex);
         ChipLogProgress(chipTool, "  GroupKeyIndex: %" PRIu16 "", entries[i].GroupKeyIndex);
         ChipLogProgress(Zcl, "  GroupKeyRoot: %zu", entries[i].GroupKeyRoot.size());
         ChipLogProgress(chipTool, "  GroupKeyEpochStartTime: %" PRIu64 "", entries[i].GroupKeyEpochStartTime);
@@ -1145,7 +1145,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | FlowMeasurement                                                     | 0x0404 |
 | GeneralCommissioning                                                | 0x0030 |
 | GeneralDiagnostics                                                  | 0x0033 |
-| GroupKeyManagement                                                  | 0xF004 |
+| GroupKeyManagement                                                  | 0x003F |
 | Groups                                                              | 0x0004 |
 | Identify                                                            | 0x0003 |
 | KeypadInput                                                         | 0x0509 |
@@ -1198,7 +1198,7 @@ constexpr chip::ClusterId kFixedLabelClusterId                           = 0x004
 constexpr chip::ClusterId kFlowMeasurementClusterId                      = 0x0404;
 constexpr chip::ClusterId kGeneralCommissioningClusterId                 = 0x0030;
 constexpr chip::ClusterId kGeneralDiagnosticsClusterId                   = 0x0033;
-constexpr chip::ClusterId kGroupKeyManagementClusterId                   = 0xF004;
+constexpr chip::ClusterId kGroupKeyManagementClusterId                   = 0x003F;
 constexpr chip::ClusterId kGroupsClusterId                               = 0x0004;
 constexpr chip::ClusterId kIdentifyClusterId                             = 0x0003;
 constexpr chip::ClusterId kKeypadInputClusterId                          = 0x0509;
@@ -11005,15 +11005,209 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster GroupKeyManagement                                          | 0xF004 |
+| Cluster GroupKeyManagement                                          | 0x003F |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * AssignKey                                                         |   0x03 |
+| * RemoveAllKeys                                                     |   0x02 |
+| * RemoveKey                                                         |   0x01 |
+| * RevokeKey                                                         |   0x04 |
+| * SetKey                                                            |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Groups                                                            | 0x0000 |
 | * GroupKeys                                                         | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command AssignKey
+ */
+class GroupKeyManagementAssignKey : public ModelCommand
+{
+public:
+    GroupKeyManagementAssignKey() : ModelCommand("assign-key")
+    {
+        AddArgument("FabricIndex", 0, UINT16_MAX, &mFabricIndex);
+        AddArgument("GroupId", 0, UINT16_MAX, &mGroupId);
+        AddArgument("KeySetIndex", 0, UINT16_MAX, &mKeySetIndex);
+        ModelCommand::AddArguments();
+    }
+    ~GroupKeyManagementAssignKey()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x03) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GroupKeyManagementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.AssignKey(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mFabricIndex, mGroupId, mKeySetIndex);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint16_t mFabricIndex;
+    uint16_t mGroupId;
+    uint16_t mKeySetIndex;
+};
+
+/*
+ * Command RemoveAllKeys
+ */
+class GroupKeyManagementRemoveAllKeys : public ModelCommand
+{
+public:
+    GroupKeyManagementRemoveAllKeys() : ModelCommand("remove-all-keys")
+    {
+        AddArgument("FabricIndex", 0, UINT16_MAX, &mFabricIndex);
+        ModelCommand::AddArguments();
+    }
+    ~GroupKeyManagementRemoveAllKeys()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x02) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GroupKeyManagementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.RemoveAllKeys(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mFabricIndex);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint16_t mFabricIndex;
+};
+
+/*
+ * Command RemoveKey
+ */
+class GroupKeyManagementRemoveKey : public ModelCommand
+{
+public:
+    GroupKeyManagementRemoveKey() : ModelCommand("remove-key")
+    {
+        AddArgument("FabricIndex", 0, UINT16_MAX, &mFabricIndex);
+        AddArgument("KeySetIndex", 0, UINT16_MAX, &mKeySetIndex);
+        ModelCommand::AddArguments();
+    }
+    ~GroupKeyManagementRemoveKey()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GroupKeyManagementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.RemoveKey(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mFabricIndex, mKeySetIndex);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint16_t mFabricIndex;
+    uint16_t mKeySetIndex;
+};
+
+/*
+ * Command RevokeKey
+ */
+class GroupKeyManagementRevokeKey : public ModelCommand
+{
+public:
+    GroupKeyManagementRevokeKey() : ModelCommand("revoke-key")
+    {
+        AddArgument("FabricIndex", 0, UINT16_MAX, &mFabricIndex);
+        AddArgument("GroupId", 0, UINT16_MAX, &mGroupId);
+        AddArgument("KeySetIndex", 0, UINT16_MAX, &mKeySetIndex);
+        ModelCommand::AddArguments();
+    }
+    ~GroupKeyManagementRevokeKey()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x04) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GroupKeyManagementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.RevokeKey(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mFabricIndex, mGroupId, mKeySetIndex);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint16_t mFabricIndex;
+    uint16_t mGroupId;
+    uint16_t mKeySetIndex;
+};
+
+/*
+ * Command SetKey
+ */
+class GroupKeyManagementSetKey : public ModelCommand
+{
+public:
+    GroupKeyManagementSetKey() : ModelCommand("set-key")
+    {
+        AddArgument("FabricIndex", 0, UINT16_MAX, &mFabricIndex);
+        AddArgument("KeySetIndex", 0, UINT16_MAX, &mKeySetIndex);
+        AddArgument("KeyRoot", &mKeyRoot);
+        AddArgument("EpochStartTime", &mEpochStartTime);
+        AddArgument("SecurityPolicy", 0, UINT8_MAX, &mSecurityPolicy);
+        ModelCommand::AddArguments();
+    }
+    ~GroupKeyManagementSetKey()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GroupKeyManagementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.SetKey(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mFabricIndex, mKeySetIndex, mKeyRoot,
+                              mEpochStartTime, mSecurityPolicy);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint16_t mFabricIndex;
+    uint16_t mKeySetIndex;
+    chip::ByteSpan mKeyRoot;
+    chip::ByteSpan mEpochStartTime;
+    uint8_t mSecurityPolicy;
+};
 
 /*
  * Discover Attributes
@@ -11065,7 +11259,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF004) command (0x00) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11100,7 +11294,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF004) command (0x00) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -11135,7 +11329,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF004) command (0x00) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -25098,6 +25292,11 @@ void registerClusterGroupKeyManagement(Commands & commands)
     const char * clusterName = "GroupKeyManagement";
 
     commands_list clusterCommands = {
+        make_unique<GroupKeyManagementAssignKey>(),           //
+        make_unique<GroupKeyManagementRemoveAllKeys>(),       //
+        make_unique<GroupKeyManagementRemoveKey>(),           //
+        make_unique<GroupKeyManagementRevokeKey>(),           //
+        make_unique<GroupKeyManagementSetKey>(),              //
         make_unique<DiscoverGroupKeyManagementAttributes>(),  //
         make_unique<ReadGroupKeyManagementGroups>(),          //
         make_unique<ReadGroupKeyManagementGroupKeys>(),       //

@@ -208,6 +208,12 @@
 #define CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER
 #endif
 
+#if defined(ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_SERVER) || defined(ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER { ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID, 63, "Group Key Management" },
+#else
+#define CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_FIXED_LABEL_CLUSTER_SERVER) || defined(ZCL_USING_FIXED_LABEL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER { ZCL_FIXED_LABEL_CLUSTER_ID, 64, "Fixed Label" },
 #else
@@ -706,12 +712,6 @@
 #define CHIP_PRINTCLUSTER_BINDING_CLUSTER
 #endif
 
-#if defined(ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_SERVER) || defined(ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER { ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID, 61444, "Group Key Management" },
-#else
-#define CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER
-#endif
-
 #if defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_SERVER) || defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER { ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID, 64512, "Sample Mfg Specific Cluster" },
 #else
@@ -756,6 +756,7 @@
     CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
+    CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
@@ -828,7 +829,6 @@
     CHIP_PRINTCLUSTER_APPLIANCE_STATISTICS_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_BINDING_CLUSTER                                                                                              \
-    CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2
 

@@ -481,6 +481,14 @@
 #define ZCL_SUPPORTED_FABRICS_ATTRIBUTE_ID (0x0002)
 #define ZCL_COMMISSIONED_FABRICS_ATTRIBUTE_ID (0x0003)
 
+// Attribute ids for cluster: Group Key Management
+
+// Client attributes
+
+// Server attributes
+#define ZCL_GROUPS_ATTRIBUTE_ID (0x0000)
+#define ZCL_GROUPKEYS_ATTRIBUTE_ID (0x0001)
+
 // Attribute ids for cluster: Fixed Label
 
 // Client attributes
@@ -1522,14 +1530,6 @@
 // Client attributes
 
 // Server attributes
-
-// Attribute ids for cluster: Group Key Management
-
-// Client attributes
-
-// Server attributes
-#define ZCL_GROUPS_ATTRIBUTE_ID (0x0000)
-#define ZCL_GROUPKEYS_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Sample Mfg Specific Cluster
 

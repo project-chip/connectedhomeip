@@ -482,6 +482,15 @@ static constexpr AttributeId CommissionedFabrics = 0x00000003;
 } // namespace Attributes
 } // namespace OperationalCredentials
 
+namespace GroupKeyManagement {
+namespace Attributes {
+namespace Ids {
+static constexpr AttributeId Groups    = 0x00000000;
+static constexpr AttributeId GroupKeys = 0x00000001;
+} // namespace Ids
+} // namespace Attributes
+} // namespace GroupKeyManagement
+
 namespace FixedLabel {
 namespace Attributes {
 namespace Ids {
@@ -1546,15 +1555,6 @@ static constexpr AttributeId RmsVoltageSwellPeriodPhaseC              = 0x00000A
 } // namespace Ids
 } // namespace Attributes
 } // namespace ElectricalMeasurement
-
-namespace GroupKeyManagement {
-namespace Attributes {
-namespace Ids {
-static constexpr AttributeId Groups    = 0x00000000;
-static constexpr AttributeId GroupKeys = 0x00000001;
-} // namespace Ids
-} // namespace Attributes
-} // namespace GroupKeyManagement
 
 namespace SampleMfgSpecificCluster {
 namespace Attributes {

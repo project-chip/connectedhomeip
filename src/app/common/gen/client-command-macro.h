@@ -2346,6 +2346,69 @@
                                                                                                                                    \
                                   ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID, "u", TrustedRootIdentifier);
 
+/** @brief Command description for SetKey
+ *
+ * Command: SetKey
+ * @param fabricIndex INT16U
+ * @param keySetIndex INT16U
+ * @param keyRoot OCTET_STRING
+ * @param epochStartTime OCTET_STRING
+ * @param securityPolicy GroupKeySecurityPolicy
+ */
+#define emberAfFillCommandGroup                                                                                                    \
+    Key ManagementClusterSetKey(fabricIndex, keySetIndex, keyRoot, epochStartTime, securityPolicy) emberAfFillExternalBuffer(      \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_SET_KEY_COMMAND_ID, "uuuuu", fabricIndex, keySetIndex, keyRoot, epochStartTime, securityPolicy);
+
+/** @brief Command description for RemoveKey
+ *
+ * Command: RemoveKey
+ * @param fabricIndex INT16U
+ * @param keySetIndex INT16U
+ */
+#define emberAfFillCommandGroup                                                                                                    \
+    Key ManagementClusterRemoveKey(fabricIndex, keySetIndex)                                                                       \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_REMOVE_KEY_COMMAND_ID, "uu", fabricIndex, keySetIndex);
+
+/** @brief Command description for RemoveAllKeys
+ *
+ * Command: RemoveAllKeys
+ * @param fabricIndex INT16U
+ */
+#define emberAfFillCommandGroup                                                                                                    \
+    Key ManagementClusterRemoveAllKeys(fabricIndex) emberAfFillExternalBuffer(mask,                                                \
+                                                                                                                                   \
+                                                                              ZCL_REMOVE_ALL_KEYS_COMMAND_ID, "u", fabricIndex);
+
+/** @brief Command description for AssignKey
+ *
+ * Command: AssignKey
+ * @param fabricIndex INT16U
+ * @param groupId INT16U
+ * @param keySetIndex INT16U
+ */
+#define emberAfFillCommandGroup                                                                                                    \
+    Key ManagementClusterAssignKey(fabricIndex, groupId, keySetIndex)                                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ASSIGN_KEY_COMMAND_ID, "uuu", fabricIndex, groupId, keySetIndex);
+
+/** @brief Command description for RevokeKey
+ *
+ * Command: RevokeKey
+ * @param fabricIndex INT16U
+ * @param groupId INT16U
+ * @param keySetIndex INT16U
+ */
+#define emberAfFillCommandGroup                                                                                                    \
+    Key ManagementClusterRevokeKey(fabricIndex, groupId, keySetIndex)                                                              \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_REVOKE_KEY_COMMAND_ID, "uuu", fabricIndex, groupId, keySetIndex);
+
 /** @brief Command description for LockDoor
  *
  * Command: LockDoor

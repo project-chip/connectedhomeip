@@ -142,7 +142,7 @@ typedef struct _FabricDescriptor
 // Struct for GroupKey
 typedef struct _GroupKey
 {
-    uint16_t VendorId;
+    uint16_t FabricIndex;
     uint16_t GroupKeyIndex;
     chip::ByteSpan GroupKeyRoot;
     uint64_t GroupKeyEpochStartTime;
@@ -152,8 +152,8 @@ typedef struct _GroupKey
 // Struct for GroupState
 typedef struct _GroupState
 {
-    uint16_t VendorId;
-    uint16_t VendorGroupId;
+    uint16_t FabricIndex;
+    uint16_t GroupId;
     uint16_t GroupKeySetIndex;
 } EmberAfGroupState;
 

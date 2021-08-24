@@ -745,10 +745,10 @@ void GroupKeyManagementClusterGroupsListAttributeFilter(TLV::TLVReader * tlvData
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
-        data[i].VendorId = emberAfGetInt16u(message, 0, 2);
+        data[i].FabricIndex = emberAfGetInt16u(message, 0, 2);
         message += 2;
         CHECK_MESSAGE_LENGTH_VOID(2);
-        data[i].VendorGroupId = emberAfGetInt16u(message, 0, 2);
+        data[i].GroupId = emberAfGetInt16u(message, 0, 2);
         message += 2;
         CHECK_MESSAGE_LENGTH_VOID(2);
         data[i].GroupKeySetIndex = emberAfGetInt16u(message, 0, 2);
@@ -780,7 +780,7 @@ void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvD
     for (size_t i = 0; i < count; i++)
     {
         CHECK_MESSAGE_LENGTH_VOID(2);
-        data[i].VendorId = emberAfGetInt16u(message, 0, 2);
+        data[i].FabricIndex = emberAfGetInt16u(message, 0, 2);
         message += 2;
         CHECK_MESSAGE_LENGTH_VOID(2);
         data[i].GroupKeyIndex = emberAfGetInt16u(message, 0, 2);

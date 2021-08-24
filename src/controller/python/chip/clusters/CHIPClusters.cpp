@@ -2952,6 +2952,60 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRe
 // End of Cluster GeneralDiagnostics
 // Cluster GroupKeyManagement
 
+chip::ChipError::StorageType chip_ime_AppendCommand_GroupKeyManagement_AssignKey(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                 uint16_t fabricIndex, uint16_t groupId,
+                                                                                 uint16_t keySetIndex)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GroupKeyManagementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.AssignKey(nullptr, nullptr, fabricIndex, groupId, keySetIndex).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_GroupKeyManagement_RemoveAllKeys(chip::Controller::Device * device,
+                                                                                     chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                     uint16_t fabricIndex)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GroupKeyManagementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.RemoveAllKeys(nullptr, nullptr, fabricIndex).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_GroupKeyManagement_RemoveKey(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                 uint16_t fabricIndex, uint16_t keySetIndex)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GroupKeyManagementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.RemoveKey(nullptr, nullptr, fabricIndex, keySetIndex).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_GroupKeyManagement_RevokeKey(chip::Controller::Device * device,
+                                                                                 chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                 uint16_t fabricIndex, uint16_t groupId,
+                                                                                 uint16_t keySetIndex)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GroupKeyManagementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.RevokeKey(nullptr, nullptr, fabricIndex, groupId, keySetIndex).AsInteger();
+}
+chip::ChipError::StorageType chip_ime_AppendCommand_GroupKeyManagement_SetKey(chip::Controller::Device * device,
+                                                                              chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                              uint16_t fabricIndex, uint16_t keySetIndex,
+                                                                              const uint8_t * keyRoot, uint32_t keyRoot_Len,
+                                                                              const uint8_t * epochStartTime,
+                                                                              uint32_t epochStartTime_Len, uint8_t securityPolicy)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    chip::Controller::GroupKeyManagementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster
+        .SetKey(nullptr, nullptr, fabricIndex, keySetIndex, chip::ByteSpan(keyRoot, keyRoot_Len),
+                chip::ByteSpan(epochStartTime, epochStartTime_Len), securityPolicy)
+        .AsInteger();
+}
+
 chip::ChipError::StorageType chip_ime_ReadAttribute_GroupKeyManagement_Groups(chip::Controller::Device * device,
                                                                               chip::EndpointId ZCLendpointId,
                                                                               chip::GroupId /* ZCLgroupId */)

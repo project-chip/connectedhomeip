@@ -2726,14 +2726,78 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public void assignKey(
+        DefaultClusterCallback callback, int fabricIndex, int groupId, int keySetIndex) {
+      assignKey(chipClusterPtr, callback, fabricIndex, groupId, keySetIndex);
+    }
+
+    public void removeAllKeys(DefaultClusterCallback callback, int fabricIndex) {
+      removeAllKeys(chipClusterPtr, callback, fabricIndex);
+    }
+
+    public void removeKey(DefaultClusterCallback callback, int fabricIndex, int keySetIndex) {
+      removeKey(chipClusterPtr, callback, fabricIndex, keySetIndex);
+    }
+
+    public void revokeKey(
+        DefaultClusterCallback callback, int fabricIndex, int groupId, int keySetIndex) {
+      revokeKey(chipClusterPtr, callback, fabricIndex, groupId, keySetIndex);
+    }
+
+    public void setKey(
+        DefaultClusterCallback callback,
+        int fabricIndex,
+        int keySetIndex,
+        byte[] keyRoot,
+        byte[] epochStartTime,
+        int securityPolicy) {
+      setKey(
+          chipClusterPtr,
+          callback,
+          fabricIndex,
+          keySetIndex,
+          keyRoot,
+          epochStartTime,
+          securityPolicy);
+    }
+
+    private native void assignKey(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int fabricIndex,
+        int groupId,
+        int keySetIndex);
+
+    private native void removeAllKeys(
+        long chipClusterPtr, DefaultClusterCallback callback, int fabricIndex);
+
+    private native void removeKey(
+        long chipClusterPtr, DefaultClusterCallback callback, int fabricIndex, int keySetIndex);
+
+    private native void revokeKey(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int fabricIndex,
+        int groupId,
+        int keySetIndex);
+
+    private native void setKey(
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        int fabricIndex,
+        int keySetIndex,
+        byte[] keyRoot,
+        byte[] epochStartTime,
+        int securityPolicy);
+
     public static class GroupsAttribute {
-      public int vendorId;
-      public int vendorGroupId;
+      public int fabricIndex;
+      public int groupId;
       public int groupKeySetIndex;
 
-      public GroupsAttribute(int vendorId, int vendorGroupId, int groupKeySetIndex) {
-        this.vendorId = vendorId;
-        this.vendorGroupId = vendorGroupId;
+      public GroupsAttribute(int fabricIndex, int groupId, int groupKeySetIndex) {
+        this.fabricIndex = fabricIndex;
+        this.groupId = groupId;
         this.groupKeySetIndex = groupKeySetIndex;
       }
     }
@@ -2745,19 +2809,19 @@ public class ChipClusters {
     }
 
     public static class GroupKeysAttribute {
-      public int vendorId;
+      public int fabricIndex;
       public int groupKeyIndex;
       public byte[] groupKeyRoot;
       public long groupKeyEpochStartTime;
       public int groupKeySecurityPolicy;
 
       public GroupKeysAttribute(
-          int vendorId,
+          int fabricIndex,
           int groupKeyIndex,
           byte[] groupKeyRoot,
           long groupKeyEpochStartTime,
           int groupKeySecurityPolicy) {
-        this.vendorId = vendorId;
+        this.fabricIndex = fabricIndex;
         this.groupKeyIndex = groupKeyIndex;
         this.groupKeyRoot = groupKeyRoot;
         this.groupKeyEpochStartTime = groupKeyEpochStartTime;
