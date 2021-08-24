@@ -265,17 +265,17 @@ void ChipLinuxAppMainLoop()
     std::thread shellThread([]() { Engine::Root().RunMainLoop(); });
     chip::Shell::RegisterCommissioneeCommands();
 #endif
+    uint16_t securePort   = CHIP_PORT;
+    uint16_t unsecurePort = CHIP_UDC_PORT;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     // use a different service port to make testing possible with other sample devices running on same host
-    ServerConfigParams params;
-    params.securedServicePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
-    params.unsecuredServicePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
-    SetServerConfig(params);
+    securePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
+    unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     // Init ZCL Data Model and CHIP App Server
-    InitServer();
+    chip::Server::GetServer().Init(nullptr, securePort, unsecurePort);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
