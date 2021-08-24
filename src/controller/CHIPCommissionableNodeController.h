@@ -37,11 +37,19 @@ namespace Controller {
 class DLL_EXPORT CommissionableNodeController : public AbstractMdnsDiscoveryController
 {
 public:
-    CommissionableNodeController(){};
+    CommissionableNodeController(chip::Mdns::Resolver * resolver = &chip::Mdns::Resolver::Instance()) :
+        AbstractMdnsDiscoveryController(resolver){};
     virtual ~CommissionableNodeController() {}
 
     CHIP_ERROR DiscoverCommissioners(Mdns::DiscoveryFilter discoveryFilter = Mdns::DiscoveryFilter());
 
+    /**
+     * @return
+     *   Pointer to DiscoveredNodeData at index idx in the list of commissioners discovered
+     *   by the CHIPCommissionableNodeController, if the node is a valid node.
+     *   Otherwise, returns nullptr
+     *   See Resolver.h IsValid()
+     */
     const Mdns::DiscoveredNodeData * GetDiscoveredCommissioner(int idx);
 
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override

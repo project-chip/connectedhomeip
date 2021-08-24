@@ -27,6 +27,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
+#include <support/BytesToHex.h>
 
 namespace chip {
 namespace Mdns {
@@ -97,7 +98,9 @@ struct DiscoveredNodeData
     bool supportsTcp;
     uint32_t mrpRetryIntervalIdle;
     uint32_t mrpRetryIntervalActive;
+    uint16_t port;
     int numIPs;
+    Inet::InterfaceId interfaceId[kMaxIPAddresses];
     Inet::IPAddress ipAddress[kMaxIPAddresses];
 
     void Reset()
@@ -137,6 +140,68 @@ struct DiscoveredNodeData
     {
         return mrpRetryIntervalActive != kUndefinedRetryInterval ? Optional<uint32_t>{ mrpRetryIntervalActive }
                                                                  : Optional<uint32_t>{};
+    }
+
+    void LogDetail() const
+    {
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+        if (rotatingIdLen > 0)
+        {
+            char rotatingIdString[chip::Mdns::kMaxRotatingIdLen * 2 + 1] = "";
+            Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
+            ChipLogDetail(Discovery, "Rotating ID: %s", rotatingIdString);
+        }
+#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
+        if (strlen(deviceName) != 0)
+        {
+            ChipLogDetail(Discovery, "Device Name: %s", deviceName);
+        }
+        if (vendorId > 0)
+        {
+            ChipLogDetail(Discovery, "Vendor ID: %u", vendorId);
+        }
+        if (productId > 0)
+        {
+            ChipLogDetail(Discovery, "Product ID: %u", productId);
+        }
+        if (deviceType > 0)
+        {
+            ChipLogDetail(Discovery, "Device Type: %u", deviceType);
+        }
+        if (longDiscriminator > 0)
+        {
+            ChipLogDetail(Discovery, "Long Discriminator: %u", longDiscriminator);
+        }
+        if (additionalPairing > 0)
+        {
+            ChipLogDetail(Discovery, "Additional Pairing: %u", additionalPairing);
+        }
+        if (strlen(pairingInstruction) != 0)
+        {
+            ChipLogDetail(Discovery, "Pairing Instruction: %s", pairingInstruction);
+        }
+        if (pairingHint > 0)
+        {
+            ChipLogDetail(Discovery, "Pairing Hint: 0x%x", pairingHint);
+        }
+        if (!IsHost(""))
+        {
+            ChipLogDetail(Discovery, "Hostname: %s", hostName);
+        }
+        for (int j = 0; j < numIPs; j++)
+        {
+#if CHIP_DETAIL_LOGGING
+            char buf[Inet::kMaxIPAddressStringLength];
+            char * ipAddressOut = ipAddress[j].ToString(buf);
+            ChipLogDetail(Discovery, "IP Address #%d: %s", j + 1, ipAddressOut);
+            (void) ipAddressOut;
+#endif // CHIP_DETAIL_LOGGING
+        }
+        if (port > 0)
+        {
+            ChipLogDetail(Discovery, "Port: %u", port);
+        }
+        ChipLogDetail(Discovery, "Commissioning Mode: %u", commissioningMode);
     }
 };
 
