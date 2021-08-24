@@ -15,21 +15,16 @@
  *    limitations under the License.
  */
 
-#include <lib/shell/Engine.h>
-
-#include <lib/core/CHIPCore.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/TimeUtils.h>
-#include <platform/CHIPDeviceLayer.h>
-
 #include <inttypes.h>
 #include <stdarg.h>
 
 #include "ChipShellMbedCollection.h"
 
-#include <inet/InetError.h>
-#include <inet/InetLayer.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/shell/Engine.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/TimeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
@@ -38,92 +33,34 @@
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
-#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
 
+#include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
+
 #include <rtos/EventFlags.h>
 
 #include <platform/mbed/MbedConfig.h>
-
-#include "netdb.h"
-#include <common.h>
-#include <net_socket.h>
 
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::System;
 using namespace chip::Inet;
 using namespace chip::Transport;
+using namespace chip::secure_channel;
+using namespace chip::Protocols::Echo;
 using namespace chip::System::Platform::Clock;
 using namespace mbed;
 using namespace rtos;
 
-static chip::Shell::Engine sShellDateSubcommands;
-static chip::Shell::Engine sShellNetworkSubcommands;
-static chip::Shell::Engine sShellSocketSubcommands;
-static chip::Shell::Engine sShellServerSubcommands;
+static Engine sShellDateSubcommands;
+static Engine sShellNetworkSubcommands;
+static Engine sShellServerSubcommands;
 
-constexpr size_t kMaxTcpActiveConnectionCount = 2;
-constexpr size_t kMaxTcpPendingPackets        = 2;
-
-EventFlags socketEvent;
-uint32_t socketMsgReceiveFlag           = 0x1;
-uint32_t socketConnectionCompeletedFlag = 0x2;
-
-void HandleDNSResolveComplete(void * appState, CHIP_ERROR error, uint8_t addrCount, IPAddress * addrArray)
-{
-
-    if (addrCount > 0)
-    {
-        char destAddrStr[64];
-        for (int i = 0; i < addrCount; i++)
-        {
-            addrArray[i].ToString(destAddrStr, sizeof(destAddrStr));
-            streamer_printf(streamer_get(), "INFO: %d   DNS name resolution complete: %s\r\n", i, destAddrStr);
-        }
-    }
-    else
-        streamer_printf(streamer_get(), "ERROR: DNS name resolution return no addresses\r\n");
-}
-
-void OnTcpMessageSent(Inet::TCPEndPoint * endPoint, uint16_t Length)
-{
-    streamer_printf(streamer_get(), "INFO: TCP socket message sent\r\n");
-}
-
-CHIP_ERROR OnTcpMessageReceived(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle && buffer)
-{
-    streamer_t * sout = streamer_get();
-
-    streamer_printf(sout, "INFO: TCP socket message received\r\n");
-    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
-                    strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
-    buffer.FreeHead();
-    socketEvent.set(socketMsgReceiveFlag);
-    return CHIP_NO_ERROR;
-}
-
-void OnConnectionCompleted(Inet::TCPEndPoint * endPoint, CHIP_ERROR error)
-{
-    streamer_printf(streamer_get(), "INFO: TCP socket connection completed\r\n");
-    socketEvent.set(socketConnectionCompeletedFlag);
-}
-
-void OnUdpMessageReceived(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle && buffer,
-                          const Inet::IPPacketInfo * pktInfo)
-{
-    char peerAddrStr[PeerAddress::kMaxToStringSize];
-    streamer_t * sout       = streamer_get();
-    PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
-    peerAddress.ToString(peerAddrStr, sizeof(peerAddrStr));
-
-    streamer_printf(sout, "INFO: UDP socket message received from %s\r\n", peerAddrStr);
-    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
-                    strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
-    buffer.FreeHead();
-    socketEvent.set(socketMsgReceiveFlag);
-}
+constexpr size_t kMaxTcpActiveConnectionCount  = 2;
+constexpr size_t kMaxTcpPendingPackets         = 2;
+constexpr uint32_t gResponseReceivedTimeoutlMs = 5000;
 
 CHIP_ERROR cmd_common_help_iterator(shell_command_t * command, void * arg)
 {
@@ -234,7 +171,6 @@ CHIP_ERROR cmd_network_help(int argc, char ** argv)
 CHIP_ERROR cmd_network_interface(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    InterfaceIterator intIterator;
     InterfaceAddressIterator addrIterator;
     IPAddress addr;
     IPPrefix addrWithPrefix;
@@ -247,33 +183,31 @@ CHIP_ERROR cmd_network_interface(int argc, char ** argv)
     VerifyOrExit(argc == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
     streamer_printf(sout, "    Current interface:\r\n");
-    for (; intIterator.HasCurrent(); intIterator.Next())
+    for (; addrIterator.HasCurrent(); addrIterator.Next())
     {
-        intId = intIterator.GetInterface();
+        intId = addrIterator.GetInterface();
         if (intId == INET_NULL_INTERFACEID)
         {
             streamer_printf(sout, "ERROR: get interface failed\r\n");
             ExitNow(error = CHIP_ERROR_INTERNAL;);
         }
 
-        error = intIterator.GetInterfaceName(intName, sizeof(intName));
+        error = addrIterator.GetInterfaceName(intName, sizeof(intName));
         if (error != CHIP_NO_ERROR)
         {
             streamer_printf(sout, "ERROR: get interface name failed\r\n");
             ExitNow();
         }
         streamer_printf(sout, "     interface id: %d, interface name: %s, interface state: %s\r\n", intId, intName,
-                        intIterator.IsUp() ? "UP" : "DOWN");
-        if (addrIterator.HasCurrent())
-        {
-            addr = addrIterator.GetAddress();
-            addrIterator.GetAddressWithPrefix(addrWithPrefix);
-            char addrStr[80];
-            addrWithPrefix.IPAddr.ToString(addrStr, sizeof(addrStr));
-            streamer_printf(sout, "     interface address: %s/%d, %s broadcast addr\r\n", addrStr, addrWithPrefix.Length,
-                            addrIterator.HasBroadcastAddress() ? "has" : "no");
-            addrIterator.Next();
-        }
+                        addrIterator.IsUp() ? "UP" : "DOWN");
+
+        addr = addrIterator.GetAddress();
+        addrIterator.GetAddressWithPrefix(addrWithPrefix);
+        char addrStr[80];
+        addrWithPrefix.IPAddr.ToString(addrStr, sizeof(addrStr));
+        streamer_printf(sout, "     interface address: %s/%d, %s broadcast addr, support multicast %s\r\n", addrStr,
+                        addrWithPrefix.Length, addrIterator.HasBroadcastAddress() ? "has" : "no",
+                        addrIterator.SupportsMulticast() ? "yes" : "no");
 
         intCounter++;
     }
@@ -348,47 +282,142 @@ exit:
     return error;
 }
 
-/* Socket commands */
-CHIP_ERROR cmd_socket_dispatch(int argc, char ** argv)
+struct ChipClient
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    error = sShellSocketSubcommands.ExecCommand(argc, argv);
-
-exit:
-    return error;
-}
-
-CHIP_ERROR cmd_socket_help(int argc, char ** argv)
-{
-    sShellSocketSubcommands.ForEachCommand(cmd_common_help_iterator, nullptr);
-    return CHIP_NO_ERROR;
-}
-
-struct ChipSocket
-{
-    ChipSocket() {}
-    ~ChipSocket() {}
+    ChipClient() {}
+    ~ChipClient() {}
 
     union
     {
-        TCPEndPoint * tcpSocket;
-        UDPEndPoint * udpSocket;
+        TCPEndPoint * tcp;
+        UDPEndPoint * udp;
     };
     Type type;
+    PacketBufferHandle buffer;
+    bool response;
+
+    void Free()
+    {
+
+        if (type == Type::kTcp && tcp != nullptr)
+        {
+            tcp->Free();
+            tcp = nullptr;
+        }
+        else if (type == Type::kUdp && udp != nullptr)
+        {
+            udp->Free();
+            udp = nullptr;
+        }
+
+        type     = Type::kUndefined;
+        response = false;
+        buffer   = nullptr;
+    }
 };
 
-static CHIP_ERROR socket_echo_parse_args(char ** argv, ChipSocket & sock, IPAddress & addr, uint16_t & port, char ** msg)
+static ChipClient gChipClient;
+
+void HandleResponseTimerComplete(System::Layer * aSystemLayer, void * aAppState)
+{
+    streamer_printf(streamer_get(), "ERROR: Received client response failed\r\n");
+    gChipClient.Free();
+}
+
+void HandleDNSResolveComplete(void * appState, CHIP_ERROR error, uint8_t addrCount, IPAddress * addrArray)
+{
+    if (addrCount > 0)
+    {
+        char destAddrStr[64];
+        for (int i = 0; i < addrCount; i++)
+        {
+            addrArray[i].ToString(destAddrStr, sizeof(destAddrStr));
+            streamer_printf(streamer_get(), "INFO: %d DNS name resolution complete: %s\r\n", i, destAddrStr);
+        }
+    }
+    else
+    {
+        streamer_printf(streamer_get(), "ERROR: DNS name resolution return no addresses\r\n");
+    }
+}
+
+CHIP_ERROR OnTcpMessageReceived(TCPEndPoint * endPoint, System::PacketBufferHandle && buffer)
+{
+    DeviceLayer::SystemLayer.CancelTimer(HandleResponseTimerComplete, nullptr);
+
+    streamer_t * sout = streamer_get();
+    streamer_printf(sout, "INFO: TCP message received\r\n");
+    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
+                    strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
+    buffer.FreeHead();
+    gChipClient.Free();
+    return CHIP_NO_ERROR;
+}
+
+void OnTcpConnectionCompleted(TCPEndPoint * endPoint, CHIP_ERROR error)
+{
+    streamer_t * sout = streamer_get();
+
+    if (error == CHIP_NO_ERROR)
+    {
+        streamer_printf(streamer_get(), "INFO: TCP connection completed\r\n");
+        streamer_printf(sout, "INFO: TCP client send message\r\n");
+        auto err = endPoint->Send(std::move(gChipClient.buffer));
+        if (err != CHIP_NO_ERROR)
+        {
+            streamer_printf(sout, "ERROR: TCP client send failed\r\n");
+            gChipClient.Free();
+        }
+
+        if (gChipClient.response)
+        {
+            DeviceLayer::SystemLayer.StartTimer(gResponseReceivedTimeoutlMs, HandleResponseTimerComplete, nullptr);
+        }
+        else
+        {
+            gChipClient.Free();
+        }
+    }
+    else
+    {
+        streamer_printf(streamer_get(), "ERROR: TCP client connection failed\r\n");
+        gChipClient.Free();
+    }
+}
+
+void OnUdpMessageReceived(IPEndPointBasis * endPoint, System::PacketBufferHandle && buffer, const IPPacketInfo * pktInfo)
+{
+    DeviceLayer::SystemLayer.CancelTimer(HandleResponseTimerComplete, nullptr);
+
+    char peerAddrStr[PeerAddress::kMaxToStringSize];
+    streamer_t * sout       = streamer_get();
+    PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
+    peerAddress.ToString(peerAddrStr, sizeof(peerAddrStr));
+
+    streamer_printf(sout, "INFO: UDP message received from %s\r\n", peerAddrStr);
+    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
+                    strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
+    buffer.FreeHead();
+    gChipClient.Free();
+}
+
+void OnUdpMReceiveError(IPEndPointBasis * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo)
+{
+    DeviceLayer::SystemLayer.CancelTimer(HandleResponseTimerComplete, nullptr);
+
+    streamer_printf(streamer_get(), "ERROR: UDP receive failed\r\n");
+    gChipClient.Free();
+}
+
+static CHIP_ERROR network_client_parse_args(char ** argv, Type & type, IPAddress & addr, uint16_t & port, char ** msg)
 {
     if (strcmp(argv[0], "UDP") == 0)
     {
-        sock.type = Type::kUdp;
+        type = Type::kUdp;
     }
     else if (strcmp(argv[0], "TCP") == 0)
     {
-        sock.type = Type::kTcp;
+        type = Type::kTcp;
     }
     else
     {
@@ -406,137 +435,124 @@ static CHIP_ERROR socket_echo_parse_args(char ** argv, ChipSocket & sock, IPAddr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR cmd_socket_client(int argc, char ** argv)
+CHIP_ERROR cmd_network_client(int argc, char ** argv)
 {
+    InterfaceIterator networkInterface;
     CHIP_ERROR error = CHIP_NO_ERROR;
     char * msg;
     uint16_t msgLen;
-    ChipSocket sock;
     uint16_t port;
     char addrStr[16];
-    bool waitForResponse = false;
-
-    PacketBufferHandle buffer;
+    Type type;
+    IPAddress addr;
 
     streamer_t * sout = streamer_get();
-    IPAddress addr;
+
+    if (!networkInterface.IsUp())
+    {
+        streamer_printf(sout, "ERROR: no network connection\r\n");
+        ExitNow(error = CHIP_ERROR_NOT_CONNECTED;);
+    }
 
     VerifyOrExit(argc > 3, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = socket_echo_parse_args(argv, sock, addr, port, &msg);
+    error = network_client_parse_args(argv, type, addr, port, &msg);
     if (error != CHIP_NO_ERROR)
     {
-        sock.type = Type::kUndefined;
-        streamer_printf(sout, "ERROR: wrong command arguments. Check socket help\r\n");
+        streamer_printf(sout, "ERROR: wrong command arguments. Check network help\r\n");
         ExitNow();
     }
 
-    if ((argc == 5) && (strcmp(argv[4], "wait") == 0))
+    gChipClient.Free();
+
+    if ((argc == 5) && (strcmp(argv[4], "-r") == 0))
     {
-        waitForResponse = true;
+        gChipClient.response = true;
     }
 
     msgLen = strlen(msg);
 
-    buffer = PacketBufferHandle::NewWithData(msg, msgLen);
-    if (buffer.IsNull())
+    gChipClient.buffer = PacketBufferHandle::NewWithData(msg, msgLen);
+    if (gChipClient.buffer.IsNull())
     {
         streamer_printf(sout, "ERROR: create message buffer failed\r\n");
         ExitNow(error = CHIP_ERROR_INTERNAL;);
     }
 
-    if (sock.type == Type::kTcp)
+    gChipClient.type = type;
+
+    if (type == Type::kTcp)
     {
-        error = DeviceLayer::InetLayer.NewTCPEndPoint(&sock.tcpSocket);
+        error = DeviceLayer::InetLayer.NewTCPEndPoint(&gChipClient.tcp);
         if (error != CHIP_NO_ERROR)
         {
-            streamer_printf(sout, "ERROR: Create TCP socket failed\r\n");
+            streamer_printf(sout, "ERROR: Create TCP endpoint failed\r\n");
             ExitNow();
         }
 
-        sock.tcpSocket->OnConnectComplete = OnConnectionCompleted;
-
-        if (waitForResponse)
+        gChipClient.tcp->OnConnectComplete = OnTcpConnectionCompleted;
+        if (gChipClient.response)
         {
-            sock.tcpSocket->OnDataReceived = OnTcpMessageReceived;
+            gChipClient.tcp->OnDataReceived = OnTcpMessageReceived;
         }
-
-        socketEvent.clear();
 
         streamer_printf(sout, "INFO: connect to TCP server address: %s port: %d\r\n", addr.ToString(addrStr, sizeof(addrStr)),
                         port);
-        error = sock.tcpSocket->Connect(addr, port, 0);
+        error = gChipClient.tcp->Connect(addr, port, 0);
         if (error != CHIP_NO_ERROR)
         {
-            streamer_printf(sout, "ERROR: TCP socket connect failed\r\n");
-            ExitNow();
-        }
-
-        if (socketEvent.wait_all(socketConnectionCompeletedFlag, 5000) & osFlagsError)
-        {
-            streamer_printf(sout, "ERROR: TCP socket connection is not completed\r\n");
-            ExitNow(error = CHIP_ERROR_DEVICE_CONNECT_TIMEOUT;);
-        }
-
-        socketEvent.clear();
-
-        streamer_printf(sout, "INFO: TCP socket send message\r\n");
-        error = sock.tcpSocket->Send(std::move(buffer));
-        if (error != CHIP_NO_ERROR)
-        {
-            streamer_printf(sout, "ERROR: TCP socket send failed\r\n");
+            streamer_printf(sout, "ERROR: TCP client connect failed\r\n");
             ExitNow();
         }
     }
     else
     {
-        error = DeviceLayer::InetLayer.NewUDPEndPoint(&sock.udpSocket);
+        error = DeviceLayer::InetLayer.NewUDPEndPoint(&gChipClient.udp);
         if (error != CHIP_NO_ERROR)
         {
             streamer_printf(sout, "ERROR: Create UDP endpoint failed\r\n");
             ExitNow();
         }
 
-        if (waitForResponse)
+        if (gChipClient.response)
         {
-            sock.udpSocket->Listen(OnUdpMessageReceived, nullptr);
+            gChipClient.udp->mState = IPEndPointBasis::kState_Bound;
+            error                   = gChipClient.udp->Listen(OnUdpMessageReceived, OnUdpMReceiveError, nullptr);
+            if (error != CHIP_NO_ERROR)
+            {
+                streamer_printf(sout, "ERROR: UDP endpoint listen failed\r\n");
+                ExitNow();
+            }
         }
 
-        socketEvent.clear();
-
-        error = sock.udpSocket->SendTo(addr, port, std::move(buffer));
+        error = gChipClient.udp->SendTo(addr, port, std::move(gChipClient.buffer));
         if (error != CHIP_NO_ERROR)
         {
-            streamer_printf(sout, "ERROR: UDP socket send failed\r\n");
+            streamer_printf(sout, "ERROR: UDP client send failed\r\n");
             ExitNow();
         }
-    }
 
-    if (waitForResponse && (socketEvent.wait_all(socketMsgReceiveFlag, 5000) & osFlagsError))
-    {
-        streamer_printf(sout, "ERROR: socket message does not received\r\n");
-        error = CHIP_ERROR_TIMEOUT;
+        if (gChipClient.response)
+        {
+            DeviceLayer::SystemLayer.StartTimer(gResponseReceivedTimeoutlMs, HandleResponseTimerComplete, nullptr);
+        }
     }
 
 exit:
-    if (sock.type == Type::kTcp && sock.tcpSocket)
+    if (error != CHIP_NO_ERROR)
     {
-        sock.tcpSocket->Free();
+        gChipClient.Free();
     }
-    else if (sock.type == Type::kUdp && sock.udpSocket)
-    {
-        sock.udpSocket->Free();
-    }
+
     return error;
 }
 
-CHIP_ERROR cmd_socket_example(int argc, char ** argv)
+CHIP_ERROR cmd_network_example(int argc, char ** argv)
 {
-    CHIP_ERROR error       = CHIP_NO_ERROR;
-    TCPEndPoint * endPoint = nullptr;
-    PacketBufferHandle buffer;
-    const uint16_t port = 80;
+    InterfaceIterator networkInterface;
+    CHIP_ERROR error    = CHIP_NO_ERROR;
     IPAddress IPaddr[5] = { IPAddress::Any };
+    const uint16_t port = 80;
     bool async_dummy    = false;
     char destAddrStr[64];
 
@@ -548,66 +564,50 @@ CHIP_ERROR cmd_socket_example(int argc, char ** argv)
     uint16_t msgLen = sizeof(msg);
 
     streamer_t * sout = streamer_get();
-    streamer_printf(sout, "TCP  test host : %s\r\n", hostname);
 
-    TcpListenParameters params(&DeviceLayer::InetLayer);
-    params.GetInetLayer()->ResolveHostAddress(hostname, 4, IPaddr, HandleDNSResolveComplete, &async_dummy);
+    if (!networkInterface.IsUp())
+    {
+        streamer_printf(sout, "ERROR: no network connection\r\n");
+        ExitNow(error = CHIP_ERROR_NOT_CONNECTED;);
+    }
 
-    error = params.GetInetLayer()->NewTCPEndPoint(&endPoint);
+    streamer_printf(sout, "TCP test host : %s\r\n", hostname);
+
+    DeviceLayer::InetLayer.ResolveHostAddress(hostname, 4, IPaddr, HandleDNSResolveComplete, &async_dummy);
+
+    gChipClient.Free();
+    error = DeviceLayer::InetLayer.NewTCPEndPoint(&gChipClient.tcp);
     if (error != CHIP_NO_ERROR)
     {
-        streamer_printf(sout, "ERROR: Create socket failed\r\n");
+        streamer_printf(sout, "ERROR: Create TCP endpoint failed\r\n");
         ExitNow();
     }
 
-    endPoint->OnDataSent        = OnTcpMessageSent;
-    endPoint->OnDataReceived    = OnTcpMessageReceived;
-    endPoint->OnConnectComplete = OnConnectionCompleted;
-
-    socketEvent.clear();
-
-    IPaddr[0].ToString(destAddrStr, sizeof(destAddrStr));
-
-    streamer_printf(sout, "INFO: connect to TCP server address: %s port: %d\r\n", destAddrStr, port);
-    error = endPoint->Connect(IPaddr[0], port, 0);
-    if (error != CHIP_NO_ERROR)
-    {
-        streamer_printf(sout, "ERROR: socket connect failed\r\n");
-        ExitNow();
-    }
-
-    if (socketEvent.wait_all(socketConnectionCompeletedFlag, 5000) & osFlagsError)
-    {
-        streamer_printf(sout, "ERROR: socket connection is not completed\r\n");
-    }
-
-    buffer = PacketBufferHandle::NewWithData(msg, msgLen);
-    if (buffer.IsNull())
+    gChipClient.type                   = Type::kTcp;
+    gChipClient.tcp->OnDataReceived    = OnTcpMessageReceived;
+    gChipClient.tcp->OnConnectComplete = OnTcpConnectionCompleted;
+    gChipClient.buffer                 = PacketBufferHandle::NewWithData(msg, msgLen);
+    if (gChipClient.buffer.IsNull())
     {
         streamer_printf(sout, "ERROR: create message buffer failed\r\n");
         ExitNow(error = CHIP_ERROR_INTERNAL;);
     }
+    gChipClient.response = true;
 
-    socketEvent.clear();
+    IPaddr[0].ToString(destAddrStr, sizeof(destAddrStr));
 
-    streamer_printf(sout, "INFO: send HTTP message: \r\n%s", msg);
-    error = endPoint->Send(std::move(buffer));
+    streamer_printf(sout, "INFO: connect to TCP server address: %s port: %d\r\n", destAddrStr, port);
+    error = gChipClient.tcp->Connect(IPaddr[0], port, 0);
     if (error != CHIP_NO_ERROR)
     {
-        streamer_printf(sout, "ERROR: socket send failed\r\n");
+        streamer_printf(sout, "ERROR: TCP client connect failed\r\n");
         ExitNow();
     }
 
-    if (socketEvent.wait_all(socketMsgReceiveFlag, 5000) & osFlagsError)
-    {
-        streamer_printf(sout, "ERROR: socket message does not received\r\n");
-        error = CHIP_ERROR_TIMEOUT;
-    }
-
 exit:
-    if (endPoint != nullptr)
+    if (error != CHIP_NO_ERROR)
     {
-        endPoint->Free();
+        gChipClient.Free();
     }
 
     return error;
@@ -631,7 +631,11 @@ public:
         TransportMgr<TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> * tcp;
     };
 
-    SecureSessionMgr * sessionManager;
+    EchoServer echoServer;
+    SecurePairingUsingTestSecret testPairing;
+    SecureSessionMgr sessionManager;
+    Messaging::ExchangeManager exchangeManager;
+    MessageCounterManager messageCounterManager;
 
     Type type     = Type::kUndefined;
     uint16_t port = CHIP_PORT;
@@ -683,46 +687,37 @@ CHIP_ERROR cmd_server_help(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-class ServerCallback : public SecureSessionMgrDelegate
+// Callback handler when a CHIP EchoRequest is received.
+void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
 {
-public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           const Transport::PeerAddress & source, System::PacketBufferHandle && buffer, SecureSessionMgr * mgr)
-    {
-        char src_addr[PeerAddress::kMaxToStringSize];
-        streamer_t * sout     = streamer_get();
-        auto state            = mgr->GetPeerConnectionState(session);
-        const size_t data_len = buffer->DataLength();
+    streamer_t * sout = streamer_get();
 
-        state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
-        streamer_printf(sout, "INFO: received %d bytes from: %s\r\n", data_len, src_addr);
-        streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
-                        strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
-    }
+    char src_addr[PeerAddress::kMaxToStringSize];
+    // auto state            = mgr->GetPeerConnectionState(session);
+    const size_t data_len = payload->DataLength();
 
-    void OnReceiveError(CHIP_ERROR error, const PeerAddress & source, SecureSessionMgr * mgr)
-    {
-        streamer_printf(streamer_get(), "ERROR: packet received error: %s\r\n", ErrorStr(error));
-    }
+    // state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
-    {
-        streamer_printf(streamer_get(), "INFO: Received a new connection\r\n");
-    }
-};
-
-static ServerCallback gCallbacks;
-static SecurePairingUsingTestSecret gTestPairing;
+    streamer_printf(sout, "INFO: received %d bytes\r\n", data_len);
+    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
+                    strstr((char *) payload->Start(), "\n") - (char *) payload->Start(), (char *) payload->Start());
+}
 
 CHIP_ERROR cmd_server_on(int argc, char ** argv)
 {
+    InterfaceIterator networkInterface;
     CHIP_ERROR error = CHIP_NO_ERROR;
-    secure_channel::MessageCounterManager gMessageCounterManager;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
     FabricTable fabrics;
     const chip::FabricIndex gFabricIndex = 0;
 
     streamer_t * sout = streamer_get();
+
+    if (!networkInterface.IsUp())
+    {
+        streamer_printf(sout, "ERROR: no network connection\r\n");
+        ExitNow(error = CHIP_ERROR_NOT_CONNECTED;);
+    }
 
     VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -742,20 +737,13 @@ CHIP_ERROR cmd_server_on(int argc, char ** argv)
     }
     else
     {
-        streamer_printf(sout, "ERROR: wrong command arguments. Check socket help\r\n");
+        streamer_printf(sout, "ERROR: wrong command arguments. Check network help\r\n");
         ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT;);
     }
 
     if (argc > 1)
     {
         gChipServer.port = atoi(argv[1]);
-    }
-
-    gChipServer.sessionManager = new SecureSessionMgr();
-    if (gChipServer.sessionManager == nullptr)
-    {
-        streamer_printf(sout, "ERROR: Sesion manager create failed\r\n");
-        ExitNow(error = CHIP_ERROR_INTERNAL;);
     }
 
     if (gChipServer.type == Type::kUdp)
@@ -769,18 +757,11 @@ CHIP_ERROR cmd_server_on(int argc, char ** argv)
         error = gChipServer.udp->Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
                                           .SetAddressType(Inet::kIPAddressType_IPv4)
                                           .SetListenPort(gChipServer.port));
-        if (error != CHIP_NO_ERROR)
-        {
-            streamer_printf(sout, "ERROR: UDP manager intialization failed\r\n");
-            ExitNow();
-        }
+        SuccessOrExit(error);
 
-        error = gChipServer.sessionManager->Init(&DeviceLayer::SystemLayer, gChipServer.udp, &fabrics, &gMessageCounterManager);
-        if (error != CHIP_NO_ERROR)
-        {
-            streamer_printf(sout, "ERROR: Session manager intialization failed\r\n");
-            ExitNow();
-        }
+        error = gChipServer.sessionManager.Init(&DeviceLayer::SystemLayer, gChipServer.udp, &fabrics,
+                                                &gChipServer.messageCounterManager);
+        SuccessOrExit(error);
     }
     else
     {
@@ -793,29 +774,27 @@ CHIP_ERROR cmd_server_on(int argc, char ** argv)
         error = gChipServer.tcp->Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
                                           .SetAddressType(Inet::kIPAddressType_IPv4)
                                           .SetListenPort(gChipServer.port));
-        if (error != CHIP_NO_ERROR)
-        {
-            streamer_printf(sout, "ERROR: TCP manager intialization failed\r\n");
-            ExitNow();
-        }
+        SuccessOrExit(error);
 
-        error = gChipServer.sessionManager->Init(&DeviceLayer::SystemLayer, gChipServer.tcp, &fabrics, &gMessageCounterManager);
-        if (error != CHIP_NO_ERROR)
-        {
-            streamer_printf(sout, "ERROR: Session manager intialization failed\r\n");
-            ExitNow();
-        }
+        error = gChipServer.sessionManager.Init(&DeviceLayer::SystemLayer, gChipServer.tcp, &fabrics,
+                                                &gChipServer.messageCounterManager);
+        SuccessOrExit(error);
     }
 
-    gChipServer.sessionManager->SetDelegate(&gCallbacks);
+    error = gChipServer.exchangeManager.Init(&gChipServer.sessionManager);
+    SuccessOrExit(error);
 
-    error = gChipServer.sessionManager->NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
-                                                   chip::SecureSession::SessionRole::kResponder, gFabricIndex);
-    if (error != CHIP_NO_ERROR)
-    {
-        streamer_printf(sout, "ERROR: set new pairing failed\r\n");
-        ExitNow();
-    }
+    error = gChipServer.messageCounterManager.Init(&gChipServer.exchangeManager);
+    SuccessOrExit(error);
+
+    error = gChipServer.echoServer.Init(&gChipServer.exchangeManager);
+    SuccessOrExit(error);
+
+    error = gChipServer.sessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gChipServer.testPairing,
+                                                  chip::SecureSession::SessionRole::kResponder, gFabricIndex);
+    SuccessOrExit(error);
+
+    gChipServer.echoServer.SetEchoRequestReceived(HandleEchoRequestReceived);
 
     gChipServer.state = ChipServer::CHIP_SERVER_ON;
 
@@ -824,11 +803,6 @@ CHIP_ERROR cmd_server_on(int argc, char ** argv)
 exit:
     if (error != CHIP_NO_ERROR)
     {
-        if (gChipServer.sessionManager)
-        {
-            delete gChipServer.sessionManager;
-        }
-
         if (gChipServer.type == Type::kUdp && gChipServer.udp)
         {
             delete gChipServer.udp;
@@ -852,10 +826,10 @@ CHIP_ERROR cmd_server_off(int argc, char ** argv)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (gChipServer.sessionManager)
-    {
-        delete gChipServer.sessionManager;
-    }
+    gChipServer.echoServer.Shutdown();
+    gChipServer.messageCounterManager.Shutdown();
+    gChipServer.exchangeManager.Shutdown();
+    gChipServer.sessionManager.Shutdown();
 
     if (gChipServer.type == Type::kUdp && gChipServer.udp)
     {
@@ -885,25 +859,20 @@ static const shell_command_t cmds_date[] = { { &cmd_date_set, "set", "Set date/t
 static const shell_command_t cmds_test_config = { &cmd_device_test_config, "testconfig",
                                                   "Test the configuration implementation. Usage: device testconfig" };
 
-static const shell_command_t cmds_network_root = { &cmd_network_dispatch, "network", "Network interface layer commands" };
+static const shell_command_t cmds_network_root = { &cmd_network_dispatch, "network", "Network commands" };
 
-static const shell_command_t cmds_network[] = { { &cmd_network_interface, "interface",
-                                                  "Display current network interface details" },
-                                                { &cmd_network_idToName, "idToName", "Display interface name by id" },
-                                                { &cmd_network_nameToId, "nameToId", "Display interface id by name" },
-                                                { &cmd_network_help, "help", "Display help for each network subcommands" } };
-
-static const shell_command_t cmds_socket_root = { &cmd_socket_dispatch, "socket", "Socket layer commands" };
-
-static const shell_command_t cmds_socket[] = {
-    { &cmd_socket_client, "client",
-      "Create client and send test message to server via specific socket.\n"
-      "\tUsage: socket client <type>[UDP/TCP] <ip> <port> <message> <wait for response flag>[wait - optional]\n"
-      "\tExample: socket client TCP 127.0.0.1 7 Hello wait" },
-    { &cmd_socket_example, "example",
-      "Socket example which sends HTTP request to ifconfig.io and receives a response.\n"
-      "\tUsage: socket example" },
-    { &cmd_socket_help, "help", "Display help for each socket subcommands" }
+static const shell_command_t cmds_network[] = {
+    { &cmd_network_interface, "interface", "Display current network interface details" },
+    { &cmd_network_idToName, "idToName", "Display interface name by id" },
+    { &cmd_network_nameToId, "nameToId", "Display interface id by name" },
+    { &cmd_network_client, "client",
+      "Create client and send test message to server via specific endpoint.\n"
+      "\tUsage: network client <type>[UDP/TCP] <ip> <port> <message> <response flag>[optional]\n"
+      "\tExample: network client TCP 127.0.0.1 7 Hello -r" },
+    { &cmd_network_example, "example",
+      "Network communication example which sends HTTP request to ifconfig.io and receives a response.\n"
+      "\tUsage: network example" },
+    { &cmd_network_help, "help", "Display help for each network subcommands" }
 };
 
 static const shell_command_t cmds_server_root = { &cmd_server_dispatch, "server", "Enable/disable CHIP server" };
@@ -921,11 +890,9 @@ void cmd_mbed_init()
 {
     sShellDateSubcommands.RegisterCommands(cmds_date, ArraySize(cmds_date));
     sShellNetworkSubcommands.RegisterCommands(cmds_network, ArraySize(cmds_network));
-    sShellSocketSubcommands.RegisterCommands(cmds_socket, ArraySize(cmds_socket));
     sShellServerSubcommands.RegisterCommands(cmds_server, ArraySize(cmds_server));
     Engine::Root().RegisterCommands(&cmds_date_root, 1);
     Engine::Root().RegisterCommands(&cmds_test_config, 1);
     Engine::Root().RegisterCommands(&cmds_network_root, 1);
-    Engine::Root().RegisterCommands(&cmds_socket_root, 1);
     Engine::Root().RegisterCommands(&cmds_server_root, 1);
 }

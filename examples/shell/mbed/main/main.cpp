@@ -29,6 +29,7 @@
 #endif
 
 #include "ChipShellMbedCollection.h"
+#include "rtos/Thread.h"
 #include <ChipShellCollection.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -36,9 +37,12 @@
 using namespace chip;
 using namespace chip::Shell;
 
+rtos::Thread shellThread{ osPriorityNormal, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE,
+                          /* memory provided */ nullptr, "Shell" };
+
 int main()
 {
-    chip::Logging::SetLogFilter(chip::Logging::LogCategory::kLogCategory_Progress);
+    // chip::Logging::SetLogFilter(chip::Logging::LogCategory::kLogCategory_Progress);
 
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PlatformMgr().InitChipStack();
@@ -67,6 +71,12 @@ int main()
     cmd_send_init();
     cmd_mbed_init();
 
-    Engine::Root().RunMainLoop();
+    auto error = shellThread.start([] { Engine::Root().RunMainLoop(); });
+    if (error != osOK)
+    {
+        ChipLogError(Shell, "Run shell thread failed: %d", error);
+        return error;
+    }
+
     return 0;
 }
