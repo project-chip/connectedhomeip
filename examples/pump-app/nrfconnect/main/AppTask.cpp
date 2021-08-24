@@ -459,12 +459,12 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
     // Turn off the pump state LED if in a STOPPED state.
     if (aAction == PumpManager::START_ACTION)
     {
-        LOG_INF("Start Action has been completed");
+        LOG_INF("Pump Start Action has been completed");
         sPumpStateLED.Set(true);
     }
     else if (aAction == PumpManager::STOP_ACTION)
     {
-        LOG_INF("Stop Action has been completed");
+        LOG_INF("Pump Stop Action has been completed");
         sPumpStateLED.Set(false);
     }
 

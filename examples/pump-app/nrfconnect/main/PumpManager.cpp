@@ -74,7 +74,7 @@ bool PumpManager::InitiateAction(int32_t aActor, Action_t aAction)
     State_t new_state;
 
     // Initiate Start/Stop Action only when the previous one is complete.
-    if (mState == kState_StartCompleted && aAction == START_ACTION)
+    if (mState == kState_StartCompleted && aAction == STOP_ACTION)
     {
         action_initiated = true;
         mCurrentActor    = aActor;
@@ -163,10 +163,10 @@ void PumpManager::PumpStartTimerEventHandler(AppEvent * aEvent)
         pump->mState    = kState_StartCompleted;
         actionCompleted = START_ACTION;
     }
-    else if (pump->mState == kState_StartInitiated)
+    else if (pump->mState == kState_StopInitiated)
     {
-        pump->mState    = kState_StartCompleted;
-        actionCompleted = START_ACTION;
+        pump->mState    = kState_StopCompleted;
+        actionCompleted = STOP_ACTION;
     }
 
     if (actionCompleted != INVALID_ACTION)
