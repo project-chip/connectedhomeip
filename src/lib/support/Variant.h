@@ -21,7 +21,6 @@
 #include <core/CHIPCore.h>
 
 #include <algorithm>
-#include <cassert>
 #include <new>
 #include <type_traits>
 #include <typeinfo>
@@ -29,7 +28,7 @@
 
 namespace chip {
 
-namespace Internal {
+namespace VariantInternal {
 
 template <typename... Ts>
 struct VariantCurry;
@@ -60,6 +59,26 @@ struct VariantCurry<T, Ts...>
         else
             VariantCurry<Ts...>::Copy(that_t, that_v, this_v);
     }
+
+    inline static bool Equal(std::size_t type_t, const void * that_v, const void * this_v)
+    {
+        if (type_t == T::VariantId) {
+#if defined __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
+            // this line is guard by type_t == T::VariantId, but GCC may not able to correctly recognize the condition
+            // and raise a false positive warning
+            return *reinterpret_cast<const T *>(this_v) == *reinterpret_cast<const T *>(that_v);
+#if defined __GNUC__
+#pragma GCC diagnostic pop
+#endif
+        }
+        else
+        {
+            return VariantCurry<Ts...>::Equal(type_t, that_v, this_v);
+        }
+    }
 };
 
 template <>
@@ -68,9 +87,14 @@ struct VariantCurry<>
     inline static void Destroy(std::size_t id, void * data) {}
     inline static void Move(std::size_t that_t, void * that_v, void * this_v) {}
     inline static void Copy(std::size_t that_t, const void * that_v, void * this_v) {}
+    inline static bool Equal(std::size_t type_t, const void * that_v, const void * this_v)
+    {
+        VerifyOrDie(false);
+        return false;
+    }
 };
 
-} // namespace Internal
+} // namespace VariantInternal
 
 /**
  * @brief
@@ -101,7 +125,7 @@ private:
     static constexpr std::size_t kInvalidType = SIZE_MAX;
 
     using Data  = typename std::aligned_storage<kDataSize, kDataAlign>::type;
-    using Curry = Internal::VariantCurry<Ts...>;
+    using Curry = VariantInternal::VariantCurry<Ts...>;
 
     std::size_t mTypeId;
     Data mData;
@@ -134,6 +158,11 @@ public:
         Curry::Destroy(that.mTypeId, &that.mData);
         that.mTypeId = kInvalidType;
         return *this;
+    }
+
+    bool operator==(const Variant & other) const
+    {
+        return GetType() == other.GetType() && Curry::Equal(mTypeId, &other.mData, &mData);
     }
 
     template <typename T>
