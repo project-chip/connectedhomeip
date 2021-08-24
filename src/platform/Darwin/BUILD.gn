@@ -57,6 +57,8 @@ static_library("Darwin") {
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
+    "CHIPP256KeypairNativeBridge.h",
+    "CHIPP256KeypairNativeBridge.cpp",
   ]
 
   deps = [

@@ -43,19 +43,28 @@ static BOOL isRunningTests(void)
     return (environment[@"XCTestConfigurationFilePath"] != nil);
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::init(CHIPPersistentStorageDelegateBridge * storage)
+CHIP_ERROR CHIPOperationalCredentialsDelegate::init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner)
 {
     if (storage == nil) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    CHIP_ERROR err = CHIP_NO_ERROR;
     mStorage = storage;
 
-    CHIP_ERROR err = LoadKeysFromKeyChain();
+    if (!nocSigner || nocSigner->Initialize() != CHIP_NO_ERROR)
+    {
+        CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate: No NOC Signer provided, using self managed keys");
+        err = LoadKeysFromKeyChain();
 
-    if (err != CHIP_NO_ERROR) {
-        // Generate keys if keys could not be loaded
-        err = GenerateKeys();
+        if (err != CHIP_NO_ERROR) {
+            // Generate keys if keys could not be loaded
+            err = GenerateKeys();
+        }
+    }
+    else
+    {
+        mIssuerKey = std::move(nocSigner);
     }
 
     if (err == CHIP_NO_ERROR) {
@@ -101,11 +110,11 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadKeysFromKeyChain()
     CFDataRef keyDataRef;
     OSStatus status = SecItemCopyMatching((CFDictionaryRef) query, (CFTypeRef *) &keyDataRef);
     if (status == errSecItemNotFound || keyDataRef == nil) {
-        CHIP_LOG_ERROR("Did not find an existing key in the keychain");
+        CHIP_LOG_ERROR("Did not find self managed keys in the keychain");
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
-    CHIP_LOG_ERROR("Found an existing keypair in the keychain");
+    CHIP_LOG_ERROR("Found an existing self managed keypair in the keychain");
     NSData * keyData = CFBridgingRelease(keyDataRef);
 
     NSData * keypairData = [[NSData alloc] initWithBase64EncodedData:keyData options:0];
@@ -120,19 +129,20 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadKeysFromKeyChain()
     serialized.SetLength([keypairData length]);
 
     CHIP_LOG_ERROR("Deserializing the key");
-    return mIssuerKey.Deserialize(serialized);
+    mIssuerKey.reset(new chip::Crypto::P256Keypair());
+    return mIssuerKey->Deserialize(serialized);
 }
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateKeys()
 {
-    CHIP_LOG_ERROR("Generating keys for the CA");
-    CHIP_ERROR errorCode = mIssuerKey.Initialize();
-    if (errorCode != CHIP_NO_ERROR) {
+    CHIP_LOG_ERROR("Generating self managed keys for the CA");
+    mIssuerKey.reset(new chip::Crypto::P256Keypair());
+    CHIP_ERROR errorCode = mIssuerKey->Initialize();    if (errorCode != CHIP_NO_ERROR) {
         return errorCode;
     }
 
     chip::Crypto::P256SerializedKeypair serializedKey;
-    errorCode = mIssuerKey.Serialize(serializedKey);
+    errorCode = mIssuerKey->Serialize(serializedKey);
 
     NSData * keypairData = [NSData dataWithBytes:serializedKey.Bytes() length:serializedKey.Length()];
 
@@ -157,7 +167,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateKeys()
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
 {
-    CHIP_LOG_ERROR("Deleting current CA keys");
+    CHIP_LOG_ERROR("Deleting self managed CA keys");
     OSStatus status = noErr;
 
     const NSDictionary * deleteParams = @{
@@ -192,7 +202,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     }
 
     X509CertRequestParams noc_request = { 1, mIssuerId, validityStart, validityEnd, true, fabricId, true, nodeId };
-    ReturnErrorOnFailure(NewNodeOperationalX509Cert(noc_request, CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuerKey, noc));
+    ReturnErrorOnFailure(NewNodeOperationalX509Cert(noc_request, CertificateIssuerLevel::kIssuerIsRootCA, pubkey, *mIssuerKey, noc));
     icac.reduce_size(0);
 
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
@@ -208,7 +218,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     }
 
     X509CertRequestParams rcac_request = { 0, mIssuerId, validityStart, validityEnd, true, fabricId, false, 0 };
-    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuerKey, rcac));
+    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, *mIssuerKey, rcac));
 
     VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
     PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
