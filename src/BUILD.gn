@@ -30,7 +30,6 @@ config("includes") {
     "include",
     ".",
     "${root_gen_dir}/include",
-
   ]
 
   # TODO: generated file dependency should be a lib NOT an include
