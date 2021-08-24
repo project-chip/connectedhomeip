@@ -39,7 +39,7 @@ _zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 #
 #  include_dirs
 #    Additional include directories
-# 
+#
 # Forwards all the remaining variables to the source_set.
 #
 template("chip_data_model") {

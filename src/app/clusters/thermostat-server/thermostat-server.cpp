@@ -20,7 +20,6 @@
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
-#include <app/CommandHandler.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -29,6 +28,7 @@
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/CommandHandler.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;

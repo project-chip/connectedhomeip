@@ -20,13 +20,13 @@
  * @brief Implementation for the Test Server Cluster
  ***************************************************************************/
 
-#include <app/CommandHandler.h>
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/ids/Commands.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <core/CHIPSafeCasts.h>

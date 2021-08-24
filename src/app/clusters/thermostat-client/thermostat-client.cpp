@@ -17,10 +17,10 @@
 
 #include <app/util/af.h>
 
-#include <app/CommandHandler.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/CommandHandler.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 

@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/CommandHandler.h>
 #include <app-common/zap-generated/enums.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 
 namespace chip {

@@ -21,11 +21,11 @@
 #include "AppTask.h"
 #include "LightingManager.h"
 
-#include <app/chip-zcl-zpro-codec.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app/chip-zcl-zpro-codec.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>

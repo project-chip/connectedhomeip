@@ -47,11 +47,11 @@
 #include "identify.h"
 
 // this file contains all the common includes for clusters in the util
-#include <app/CommandHandler.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 #include <app/util/common.h>
 #include <support/CodeUtils.h>
