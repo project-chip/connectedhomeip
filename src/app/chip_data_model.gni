@@ -37,6 +37,9 @@ _zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 #  use_default_client_callbacks
 #    Include CHIPClientCallbacks.cpp.
 #
+#  include_dirs
+#    Additional include directories
+# 
 # Forwards all the remaining variables to the source_set.
 #
 template("chip_data_model") {
@@ -44,6 +47,10 @@ template("chip_data_model") {
 
   config("${_data_model_name}_config") {
     include_dirs = []
+
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
 
     if (defined(invoker.zap_pregenerated_dir)) {
       include_dirs += [ "${invoker.zap_pregenerated_dir}/.." ]

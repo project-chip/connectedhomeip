@@ -18,6 +18,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/bridge-app/bridge-common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/bridge-app"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       SRC_DIRS

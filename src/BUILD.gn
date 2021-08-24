@@ -30,7 +30,11 @@ config("includes") {
     "include",
     ".",
     "${root_gen_dir}/include",
+
   ]
+
+  # TODO: generated file dependency should be a lib NOT an include
+  include_dirs += [ "${chip_root}/zzz_generated/app-common" ]
 
   defines = [ "CHIP_HAVE_CONFIG_H=1" ]
 }
