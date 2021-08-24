@@ -121,7 +121,7 @@ int main(int argc, char * argv[])
     }
 
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
-    InitServer();
+    chip::Server::GetServer().Init();
 
     exchangeMgr = chip::ExchangeManager();
     err         = exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id, &bdxServer);

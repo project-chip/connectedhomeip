@@ -114,7 +114,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
 
     // Loop through fabrics
     uint8_t fabricIndex = 0;
-    for (auto & pairing : GetGlobalFabricTable())
+    for (auto & pairing : Server::GetServer().GetFabricTable())
     {
         NodeId nodeId               = pairing.GetNodeId();
         uint64_t fabricId           = pairing.GetFabricId();
@@ -170,7 +170,7 @@ static FabricInfo * retrieveCurrentFabric()
 
     FabricIndex index = emberAfCurrentCommand()->source->GetSecureSession().GetFabricIndex();
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding fabric with fabricIndex %d", index);
-    return GetGlobalFabricTable().FindFabricWithIndex(index);
+    return Server::GetServer().GetFabricTable().FindFabricWithIndex(index);
 }
 
 // TODO: The code currently has two sources of truths for fabrics, the pairing table + the attributes. There should only be one,
@@ -217,7 +217,7 @@ OpCredsFabricTableDelegate gFabricDelegate;
 void emberAfPluginOperationalCredentialsServerInitCallback(void)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.");
-    GetGlobalFabricTable().SetFabricDelegate(&gFabricDelegate);
+    Server::GetServer().GetFabricTable().SetFabricDelegate(&gFabricDelegate);
     writeFabricsIntoFabricsListAttribute();
 }
 
@@ -227,7 +227,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(EndpointId endpoin
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
 
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    CHIP_ERROR err       = GetGlobalFabricTable().Delete(fabricIndex);
+    CHIP_ERROR err       = Server::GetServer().GetFabricTable().Delete(fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
@@ -253,7 +253,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(EndpointId en
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
     // Persist updated fabric
-    err = GetGlobalFabricTable().Store(fabric->GetFabricIndex());
+    err = Server::GetServer().GetFabricTable().Store(fabric->GetFabricIndex());
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
@@ -342,10 +342,10 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(EndpointId endpoint, app
 
     gFabricBeingCommissioned.SetVendorId(adminVendorId);
 
-    err = GetGlobalFabricTable().AddNewFabric(gFabricBeingCommissioned, &fabricIndex);
+    err = Server::GetServer().GetFabricTable().AddNewFabric(gFabricBeingCommissioned, &fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
-    err = GetGlobalFabricTable().Store(fabricIndex);
+    err = Server::GetServer().GetFabricTable().Store(fabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     // We might have a new operational identity, so we should start advertising it right away.
