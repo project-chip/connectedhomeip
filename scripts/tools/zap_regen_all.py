@@ -72,7 +72,8 @@ def getSpecificTemplatesTargets():
     }
 
     for template, output_dir in templates.items():
-        target = ['src/controller/data_model/controller-clusters.zap', '-t', template]
+        target = [
+            'src/controller/data_model/controller-clusters.zap', '-t', template]
         if output_dir is not None:
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
