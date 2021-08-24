@@ -27,7 +27,9 @@
 using namespace chip;
 using namespace chip::Controller;
 
-#define TV_DEVICE_TYPE 35
+constexpr int kTvDeviceType                         = 35;
+constexpr uint16_t commissioningWindowTimeoutInSec  = 3 * 60;
+constexpr uint32_t commissionerDiscoveryTimeoutInMs = 5 * 1000;
 
 CommissionableNodeController commissionableNodeController;
 chip::System::SocketWatchToken token;
@@ -41,7 +43,7 @@ void PrepareForCommissioning(const Mdns::DiscoveredNodeData * selectedCommission
 {
     // Enter commissioning mode, open commissioning window
     InitServer();
-    ReturnOnFailure(OpenBasicCommissioningWindow(ResetFabrics::kYes, 3 * 60));
+    ReturnOnFailure(OpenBasicCommissioningWindow(ResetFabrics::kYes, commissioningWindowTimeoutInSec));
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
@@ -70,6 +72,7 @@ void RequestUserDirectedCommissioning(System::SocketEvents events, intptr_t data
     // on stdin i.e. when user hits 'Enter'
     int selectedCommissionerNumber = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES;
     scanf("%d", &selectedCommissionerNumber);
+    printf("%d\n", selectedCommissionerNumber);
     chip::DeviceLayer::SystemLayer.StopWatchingSocket(&token);
 
     const Mdns::DiscoveredNodeData * selectedCommissioner =
@@ -121,11 +124,12 @@ int main(int argc, char * argv[])
 
     // Send discover commissioners request
     SuccessOrExit(err = commissionableNodeController.DiscoverCommissioners(
-                      Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, TV_DEVICE_TYPE)));
+                      Mdns::DiscoveryFilter(Mdns::DiscoveryFilterType::kDeviceType, kTvDeviceType)));
 
     // Give commissioners some time to respond and then ScheduleWork to initiate commissioning
     DeviceLayer::SystemLayer.StartTimer(
-        5 * 1000, [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
+        commissionerDiscoveryTimeoutInMs,
+        [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
 
     // TBD: Content casting commands
 

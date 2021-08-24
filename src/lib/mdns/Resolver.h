@@ -190,10 +190,12 @@ struct DiscoveredNodeData
         }
         for (int j = 0; j < numIPs; j++)
         {
+#if CHIP_DETAIL_LOGGING
             char buf[Inet::kMaxIPAddressStringLength];
-            char * ipAddressOut = ipAddress[j].ToString(buf, sizeof(buf));
+            char * ipAddressOut = ipAddress[j].ToString(buf);
             ChipLogDetail(Discovery, "IP Address #%d: %s", j + 1, ipAddressOut);
             (void) ipAddressOut;
+#endif // CHIP_DETAIL_LOGGING
         }
         if (port > 0)
         {
