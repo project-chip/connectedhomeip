@@ -1,8 +1,8 @@
 # Commissioning nRF Connect Accessory using Android CHIPTool
 
-You can use [CHIPTool](android_chiptool_building.md) for Android
-smartphones to commission a Nordic Semiconductor device running an nRF Connect
-platform example onto a CHIP-enabled Thread network.
+You can use [CHIPTool](android_chiptool_building.md) for Android smartphones to
+commission a Nordic Semiconductor device running an nRF Connect platform example
+onto a CHIP-enabled Thread network.
 
 This guide references the nRF52840 DK and the door lock example application
 based on the nRF Connect platform, but the instructions are also valid for the
