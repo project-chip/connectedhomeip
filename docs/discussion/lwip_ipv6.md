@@ -1,52 +1,27 @@
-# LwIP changes for CHIP
+# LwIP changes for Matter
 
-LwIP is the network layer used in the CHIP platform. Although it has some good
-IPv6 support, there are areas that are lacking that we should implement for
-CHIP. The recommendations here are listed roughly from most to least important.
+LwIP is one of the network layers used in the Matter platform. Although it has
+some good IPv6 support, there are areas that are lacking that we should
+implement for Matter. The recommendations here are listed roughly from most to
+least important.
 
 ## Route Information Options (RIO)
 
 The specification requires devices to store route options from Route
 Information Options (RIO) sent in router advertisements. This functionality is
 not currently present in upstream LwIP. The patch to add this is relatively
-small, but we may need to upstream this in order to require its use in CHIP. It
-can be added to the CHIP version, but not all platforms use the same middleware.
+small, but we may need to upstream this in order to require its use in Matter.
+Platforms would need to incorporate this into their own middleware
 
 ### Recommendation:
 
--   write a RIO patch, add to CHIP middleware, upstream to lwip
+-   write a RIO patch, upstream to lwip
     -   Ensure patch is RFC compliant (especially re: expiry)
-
-## DNS
-
-LwIP’s DNS handling isn’t great and breaks down when the router supports
-IPv4/IPv6. There is a single list of DNS servers, DHCP, SLAAC and DHCPv6 all
-update the list without locks. Basically, whatever wrote to the list last gets
-to set the list. Although there is handling for IP type (requesting A or AAAA
-records), there isn’t handling to specify an IPv6 or IPv4 server specifically,
-which can be challenging since not all servers serve all record types.
-
-The design of the weave connectivity manager moves the DNS selection to the
-upper layers by stopping lwip from directly changing the DNS list and hooking to
-the DNS selection. This means the DNS selection policy isn’t hard-coded into the
-lwip layer. This seems like a good model for CHIP going forward.
-
-Additionally, we should ensure that CHIP uses non-blocking DNS APIs.
-
-### Recommendation:
-
--   bug fix for DHCPv6 to avoid it setting bad addresses.
-    -   note - fixed in
-        https://git.savannah.nongnu.org/cgit/lwip.git/commit/?id=941300c21c45a4dbf1c074b29a9ca3c88c9f6553,
-        but not yet released as a part of an official release.
--   Create a patch to add hooks to the SetDns and GetDns functions so logic for
-    selecting the DNS server can be moved into the manager layer (possibly
-    already in CHIP, but not present in other middleware)
 
 ## Address Scopes
 
 Link local addresses are less common on IPv4, which normally rely on NAT at the
-router to do address translation. CHIP mandates the use of IPv6 link local
+router to do address translation. Matter mandates the use of IPv6 link local
 addresses for communication to nodes on the same network (wifi or thread). When
 there is more than one netif in the system (ex. loopback, softAP, STA), the link
 local address needs more information to determine which link the address is
@@ -67,37 +42,22 @@ assertion on ip address sizes that disallow the use of a scope tag).
 
 ### Recommendation:
 
--   Update CHIP lwip version for scopes support, ensure CHIP code works with
-    scopes on our various platforms OR alternate: bring netif sendto up through
-    the api / sockets layers
--   Audit CHIP code to ensure LL addresses are properly scoped to their netif in
-    all areas (DNS returned addresses especially)
+-   Ensure Matter SDK code works with scopes on our various platforms OR
+    alternate: bring netif sendto up through the api / sockets layers
+-   Audit Matter code to ensure LL addresses are properly scoped to their netif
+    in all areas (DNS returned addresses especially)
 
 ## Duplicate address detection
 
 The DAD in LwIP is actually implemented correctly right now, but there are
 routers that incorrectly implement multicast for IPv6 and send packets back to
-the sender. This triggers the LwIP DAD because it doesn’t check the source. In
-our previous products, we fixed this as the wifi layer as a filter, but it’s
-easy enough to add the fix into the LwIP layer. This would help implementers so
-they don’t all have to debug the same issues. Recommendation:
+the sender. This triggers the LwIP DAD because it doesn’t check the source. This
+can be fixed in the wifi layer as a filter, but it’s easy enough to add the fix
+into the LwIP layer. This would help implementers so they don’t all have to
+debug the same issues. Recommendation:
 
 -   Create an LwIP patch to check NS/NA packets for source and discard if they
-    originate from the same device. Upstream and add to CHIP.
-
-## IPv6 Ping
-
-LwIP will automatically respond to pings, but has no built-in way to send them.
-The current ping implementation is a contrib app that only works for IPv4.
-Extending the app is challenging for two reasons: 1) IPv6 checksum needs access
-to the pbuf for calculation, which the app doesn’t have and 2) IPv6 has a lot
-more ICMP traffic for SLAAC that the app would have to be updated to disregard.
-Instead, it might be better to build this into the ICMP layer itself.
-
-### Recommendation:
-
--   Add an ASYNC send_icmp6_ping function and add a hook to check ping
-    responses. Upstream patch if possible. OR write an external ICMP6 ping util
+    originate from the same device. Upstream and offer patch to vendors.
 
 ## Timers, including TCP
 
@@ -137,3 +97,46 @@ pools based on usage patterns.
     pbuf allocations.
 -   Add more pbuf allocation types to allow finer-grained recording of “reason”
     for a pbuf alloc
+
+## IPv6 Ping
+
+Although ping is not required for Matter, it is very helpful for debugging
+networking issues. Having a reliable ping would be beneficial for a lot of
+developers.
+
+LwIP will automatically respond to pings, but has no built-in way to send them.
+The current ping implementation is a contrib app that only works for IPv4.
+Extending the app is challenging for two reasons: 1) IPv6 checksum needs access
+to the pbuf for calculation, which the app doesn’t have and 2) IPv6 has a lot
+more ICMP traffic for SLAAC that the app would have to be updated to disregard.
+Instead, it might be better to build this into the ICMP layer itself.
+
+### Recommendation:
+
+-   Add an ASYNC send_icmp6_ping function and add a hook to check ping
+    responses. Upstream patch if possible. OR write an external ICMP6 ping util
+
+## DNS
+
+LwIP’s DNS handling isn’t great and breaks down when the router supports
+IPv4/IPv6. There is a single list of DNS servers, DHCP, SLAAC and DHCPv6 all
+update the list without locks. Basically, whatever wrote to the list last gets
+to set the list. Although there is handling for IP type (requesting A or AAAA
+records), there isn’t handling to specify an IPv6 or IPv4 server specifically,
+which can be challenging since not all servers serve all record types.
+
+The design of the weave connectivity manager moves the DNS selection to the
+upper layers by stopping lwip from directly changing the DNS list and hooking to
+the DNS selection. This means the DNS selection policy isn’t hard-coded into the
+lwip layer. This seems like a good model for CHIP going forward.
+
+Additionally, we should ensure that CHIP uses non-blocking DNS APIs.
+
+### Recommendation:
+
+-   bug fix for DHCPv6 to avoid it setting bad addresses.
+    -   note - fixed in
+        https://git.savannah.nongnu.org/cgit/lwip.git/commit/?id=941300c21c45a4dbf1c074b29a9ca3c88c9f6553,
+        but not yet released as a part of an official release.
+-   Create a patch to add hooks to the SetDns and GetDns functions so logic for
+    selecting the DNS server can be moved into the manager layer
