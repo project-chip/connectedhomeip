@@ -55,10 +55,6 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/retransmit/tests",
     ]
 
-    if (chip_device_platform != "fake") {
-      deps += [ "${chip_root}/src/protocols/secure_channel/tests" ]
-    }
-
     if (current_os != "zephyr") {
       deps += [ "${chip_root}/src/lib/mdns/minimal/records/tests" ]
     }
