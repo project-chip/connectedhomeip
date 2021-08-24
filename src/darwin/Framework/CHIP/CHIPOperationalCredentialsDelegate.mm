@@ -52,7 +52,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::init(CHIPPersistentStorageDelegat
     CHIP_ERROR err = CHIP_NO_ERROR;
     mStorage = storage;
 
-    if (!nocSigner || nocSigner->Initialize() != CHIP_NO_ERROR) {
+    if (!nocSigner) {
         CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate: No NOC Signer provided, using self managed keys");
         err = LoadKeysFromKeyChain();
 

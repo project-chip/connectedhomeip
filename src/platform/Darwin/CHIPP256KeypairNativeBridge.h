@@ -21,7 +21,7 @@
 namespace chip {
 namespace Crypto {
 
-// This class allows briding a Darwin P256KeypairBase implementation to
+// This class allows bridging a Darwin P256KeypairBase implementation to
 // the expected P256Keypair implementation in libChip.
 //
 // TODO: The Darwin layer is not able to directly extend P256Keypair for some reason.
