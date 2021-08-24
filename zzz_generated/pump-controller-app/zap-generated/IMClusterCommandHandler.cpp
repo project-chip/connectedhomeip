@@ -20,11 +20,11 @@
 #include <cinttypes>
 #include <cstdint>
 
+#include "app/util/util.h"
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
-#include "app/util/util.h"
 
 #include <app/InteractionModelEngine.h>
 
