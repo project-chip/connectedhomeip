@@ -1463,17 +1463,6 @@
 #endif // CHIP_CONFIG_DEBUG_CERT_VALIDATION
 
 /**
- *  @def CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
- *
- *  @brief
- *    EC curve to be used to generate chip operational device certificate.
- *
- */
-#ifndef CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
-#define CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID (chip::Profiles::Security::kChipCurveId_prime256v1)
-#endif // CHIP_CONFIG_OPERATIONAL_DEVICE_CERT_CURVE_ID
-
-/**
  *  @def CHIP_CONFIG_OP_DEVICE_CERT_VALID_DATE_NOT_BEFORE
  *
  *  @brief
@@ -1574,42 +1563,6 @@
 #ifndef CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER "GlobalMCTR"
 #endif // CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER
-
-/**
- *  @def CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
- *
- *  @brief
- *    Default ECDH curve to be used when initiating a CASE session, if not overridden by the application.
- *
- */
-#ifndef CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
-#if CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_secp224r1)
-#elif CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_prime256v1)
-#elif CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP192R1
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_prime192v1)
-#else
-#define CHIP_CONFIG_DEFAULT_CASE_CURVE_ID (chip::Profiles::Security::kChipCurveId_secp160r1)
-#endif
-#endif // CHIP_CONFIG_DEFAULT_CASE_CURVE_ID
-
-/**
- *  @def CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
- *
- *  @brief
- *    Default set of ECDH curves allowed to be used in a CASE session (initiating or responding), if not overridden by the
- * application.
- *
- */
-#ifndef CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
-#if CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP224R1 || CHIP_CONFIG_SUPPORT_ELLIPTIC_CURVE_SECP256R1
-#define CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES                                                                                    \
-    (chip::Profiles::Security::kChipCurveSet_secp224r1 | chip::Profiles::Security::kChipCurveSet_prime256v1)
-#else
-#define CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES (chip::Profiles::Security::kChipCurveSet_All)
-#endif
-#endif // CHIP_CONFIG_DEFAULT_CASE_ALLOWED_CURVES
 
 /**
  * @def CHIP_CONFIG_LEGACY_CASE_AUTH_DELEGATE
