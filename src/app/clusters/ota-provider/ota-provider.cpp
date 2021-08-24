@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app/CommandHandler.h>
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -24,6 +23,7 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 
 #include <support/Span.h>

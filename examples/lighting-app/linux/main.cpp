@@ -19,9 +19,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include <app/chip-zcl-zpro-codec.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/chip-zcl-zpro-codec.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>

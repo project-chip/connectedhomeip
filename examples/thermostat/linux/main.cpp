@@ -19,11 +19,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include <app/Command.h>
-#include <app/chip-zcl-zpro-codec.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/Command.h>
+#include <app/chip-zcl-zpro-codec.h>
 #include <app/server/Mdns.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>

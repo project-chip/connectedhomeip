@@ -21,9 +21,9 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/CommandHandler.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 #include <string>
 
