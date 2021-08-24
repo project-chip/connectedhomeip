@@ -147,6 +147,24 @@ struct ExpectedCall
         }
         return true;
     }
+    void PrintForDebugging()
+    {
+        ChipLogProgress(Discovery, "Call type %d", static_cast<int>(callType));
+        ChipLogProgress(Discovery, "protocol %d", static_cast<int>(protocol));
+        ChipLogProgress(Discovery, "instanceName = %s", instanceName);
+        ChipLogProgress(Discovery, "hostName = %s", hostName);
+        ChipLogProgress(Discovery, "serviceName = %s", serviceName);
+        ChipLogProgress(Discovery, "num subtypes = %lu", static_cast<unsigned long>(numSubtypes));
+        for (size_t i = 0; i < numSubtypes; ++i)
+        {
+            ChipLogProgress(Discovery, "\t%s", subtype[i].name);
+        }
+        ChipLogProgress(Discovery, "num txt = %lu", static_cast<unsigned long>(numTxt));
+        for (size_t i = 0; i < numSubtypes; ++i)
+        {
+            ChipLogProgress(Discovery, "\t%s = %s", txt[i].key, txt[i].value);
+        }
+    }
 
     static constexpr size_t kMaxTxtRecords          = 10;
     static constexpr size_t kMaxSubtypes            = 10;
