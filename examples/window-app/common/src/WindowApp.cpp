@@ -29,7 +29,6 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WindowCovering;
 
-
 void WindowApp::Timer::Timeout()
 {
     mIsActive = false;
@@ -59,7 +58,7 @@ WindowApp::Cover * WindowApp::GetCover(chip::EndpointId endpoint)
 {
     for (uint16_t i = 0; i < WINDOW_COVER_COUNT; ++i)
     {
-        if(mCoverList[i].mEndpoint == endpoint)
+        if (mCoverList[i].mEndpoint == endpoint)
         {
             return &mCoverList[i];
         }
@@ -153,7 +152,7 @@ void WindowApp::Finish()
 
 void WindowApp::DispatchEvent(const WindowApp::Event & event)
 {
-    Cover *cover = nullptr;
+    Cover * cover = nullptr;
 
     switch (event.mId)
     {
@@ -252,7 +251,7 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
     case EventId::LiftUp:
     case EventId::LiftDown:
         cover = GetCover(event.mEndpoint);
-        if(cover)
+        if (cover)
         {
             cover->GotoLift(event.mId);
         }
@@ -261,7 +260,7 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
     case EventId::TiltUp:
     case EventId::TiltDown:
         cover = GetCover(event.mEndpoint);
-        if(cover)
+        if (cover)
         {
             cover->GotoTilt(event.mId);
         }
@@ -269,7 +268,7 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
 
     case EventId::StopMotion:
         cover = GetCover(event.mEndpoint);
-        if(cover)
+        if (cover)
         {
             cover->StopMotion();
         }
