@@ -133,8 +133,10 @@ typedef struct _ExtendedDiscoverAttributesInfoRecord
 // Struct for FabricDescriptor
 typedef struct _FabricDescriptor
 {
-    chip::FabricId FabricId;
+    uint8_t FabricIndex;
+    chip::ByteSpan RootPublicKey;
     uint16_t VendorId;
+    chip::FabricId FabricId;
     chip::NodeId NodeId;
     chip::ByteSpan Label;
 } EmberAfFabricDescriptor;
@@ -186,6 +188,13 @@ typedef struct _MediaPlaybackPosition
     uint64_t updatedAt;
     uint64_t position;
 } EmberAfMediaPlaybackPosition;
+
+// Struct for NOCStruct
+typedef struct _NOCStruct
+{
+    uint8_t FabricIndex;
+    chip::ByteSpan NOC;
+} EmberAfNOCStruct;
 
 // Struct for NavigateTargetTargetInfo
 typedef struct _NavigateTargetTargetInfo

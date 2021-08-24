@@ -64,7 +64,16 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(ch
                                                                               chip::Callback::Cancelable * onFailureCallback);
 typedef void (*GeneralCommissioningBasicCommissioningInfoListListAttributeCallback)(void * context, uint16_t count,
                                                                                     _BasicCommissioningInfoType * entries);
+void OperationalCredentialsClusterNOCsListAttributeFilter(chip::TLV::TLVReader * data,
+                                                          chip::Callback::Cancelable * onSuccessCallback,
+                                                          chip::Callback::Cancelable * onFailureCallback);
+typedef void (*OperationalCredentialsNOCsListAttributeCallback)(void * context, uint16_t count, _NOCStruct * entries);
 void OperationalCredentialsClusterFabricsListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                  chip::Callback::Cancelable * onSuccessCallback,
                                                                  chip::Callback::Cancelable * onFailureCallback);
 typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(void * context, uint16_t count, _FabricDescriptor * entries);
+void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                             chip::Callback::Cancelable * onSuccessCallback,
+                                                                             chip::Callback::Cancelable * onFailureCallback);
+typedef void (*OperationalCredentialsTrustedRootCertificatesListAttributeCallback)(void * context, uint16_t count,
+                                                                                   chip::ByteSpan * entries);

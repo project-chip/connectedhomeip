@@ -2322,6 +2322,16 @@ EmberAfStatus SetCommissionedFabrics(chip::EndpointId endpoint, uint8_t commissi
     return emberAfWriteServerAttribute(endpoint, OperationalCredentials::Id, Ids::CommissionedFabrics,
                                        (uint8_t *) &commissionedFabrics, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
+EmberAfStatus GetCurrentFabricIndex(chip::EndpointId endpoint, uint8_t * currentFabricIndex)
+{
+    return emberAfReadServerAttribute(endpoint, OperationalCredentials::Id, Ids::CurrentFabricIndex, (uint8_t *) currentFabricIndex,
+                                      sizeof(*currentFabricIndex));
+}
+EmberAfStatus SetCurrentFabricIndex(chip::EndpointId endpoint, uint8_t currentFabricIndex)
+{
+    return emberAfWriteServerAttribute(endpoint, OperationalCredentials::Id, Ids::CurrentFabricIndex,
+                                       (uint8_t *) &currentFabricIndex, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
 } // namespace Attributes
 } // namespace OperationalCredentials
 

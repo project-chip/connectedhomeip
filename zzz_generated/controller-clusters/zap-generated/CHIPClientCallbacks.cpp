@@ -860,12 +860,18 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
     _FabricDescriptor data[count];
     for (size_t i = 0; i < count; i++)
     {
-        CHECK_MESSAGE_LENGTH_VOID(8);
-        data[i].FabricId = emberAfGetInt64u(message, 0, 8);
-        message += 8;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].FabricIndex = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 2, &data[i].RootPublicKey));
+        messageLen = static_cast<uint16_t>(messageLen - 2);
+        message += 2;
         CHECK_MESSAGE_LENGTH_VOID(2);
         data[i].VendorId = emberAfGetInt16u(message, 0, 2);
         message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(8);
+        data[i].FabricId = emberAfGetInt64u(message, 0, 8);
+        message += 8;
         CHECK_MESSAGE_LENGTH_VOID(8);
         data[i].NodeId = emberAfGetInt64u(message, 0, 8);
         message += 8;

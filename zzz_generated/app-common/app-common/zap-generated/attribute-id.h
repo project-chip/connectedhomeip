@@ -477,9 +477,12 @@
 // Client attributes
 
 // Server attributes
+#define ZCL_NOCS_ATTRIBUTE_ID (0x0000)
 #define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
 #define ZCL_SUPPORTED_FABRICS_ATTRIBUTE_ID (0x0002)
 #define ZCL_COMMISSIONED_FABRICS_ATTRIBUTE_ID (0x0003)
+#define ZCL_TRUSTED_ROOTS_ATTRIBUTE_ID (0x0004)
+#define ZCL_CURRENT_FABRIC_INDEX_ATTRIBUTE_ID (0x0005)
 
 // Attribute ids for cluster: Fixed Label
 

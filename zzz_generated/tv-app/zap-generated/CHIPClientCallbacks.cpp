@@ -405,6 +405,38 @@ void GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter(TL
     cb->mCall(cb->mContext, count, data);
 }
 
+void OperationalCredentialsClusterNOCsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = Encoding::LittleEndian::Read16(message);
+    _NOCStruct data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].FabricIndex = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 2, &data[i].NOC));
+        messageLen = static_cast<uint16_t>(messageLen - 2);
+        message += 2;
+    }
+    Callback::Callback<OperationalCredentialsNOCsListAttributeCallback> * cb =
+        Callback::Callback<OperationalCredentialsNOCsListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
 void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
@@ -425,12 +457,18 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
     _FabricDescriptor data[count];
     for (size_t i = 0; i < count; i++)
     {
-        CHECK_MESSAGE_LENGTH_VOID(8);
-        data[i].FabricId = emberAfGetInt64u(message, 0, 8);
-        message += 8;
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i].FabricIndex = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 2, &data[i].RootPublicKey));
+        messageLen = static_cast<uint16_t>(messageLen - 2);
+        message += 2;
         CHECK_MESSAGE_LENGTH_VOID(2);
         data[i].VendorId = emberAfGetInt16u(message, 0, 2);
         message += 2;
+        CHECK_MESSAGE_LENGTH_VOID(8);
+        data[i].FabricId = emberAfGetInt64u(message, 0, 8);
+        message += 8;
         CHECK_MESSAGE_LENGTH_VOID(8);
         data[i].NodeId = emberAfGetInt64u(message, 0, 8);
         message += 8;
@@ -440,6 +478,37 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
     }
     Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
         Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                             Callback::Cancelable * onSuccessCallback,
+                                                                             Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = Encoding::LittleEndian::Read16(message);
+    chip::ByteSpan data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_STATUS_VOID(ReadByteSpan(message, messageLen, &data[i]));
+        uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
+        messageLen           = static_cast<uint16_t>(messageLen - entryLength);
+        message += entryLength;
+    }
+    Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback> * cb =
+        Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, count, data);
 }
 
