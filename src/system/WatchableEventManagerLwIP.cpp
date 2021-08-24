@@ -278,7 +278,7 @@ CHIP_ERROR WatchableEventManager::HandlePlatformTimer()
     // The platform timer API has MSEC resolution so expire any timer with less than 1 msec remaining.
     size_t timersHandled = 0;
     Timer * timer        = nullptr;
-    while ((timersHandled < Timer::sPool.Size()) && ((timer = mTimerList.PopIfEarlier(currentTime + 1)) != nullptr))
+    while ((timersHandled < CHIP_SYSTEM_CONFIG_NUM_TIMERS) && ((timer = mTimerList.PopIfEarlier(currentTime + 1)) != nullptr))
     {
         mHandlingTimerComplete = true;
         timer->HandleComplete();

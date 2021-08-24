@@ -192,9 +192,7 @@ class ObjectPool
 {
 public:
     void Reset();
-    size_t Size();
 
-    T * Get(const Layer & aLayer, size_t aIndex);
     T * TryCreate(Layer & aLayer);
     void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
 
@@ -231,6 +229,8 @@ private:
 
     using Lambda = bool (*)(void *, void *);
     bool ForEachActiveObjectInner(void * context, Lambda lambda);
+
+    T * Back();
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     std::mutex mMutex;
@@ -272,34 +272,10 @@ inline void ObjectPool<T, N>::Reset()
 
 /**
  *  @brief
- *      Returns the number of objects that can be simultaneously retained from a pool.
+ *      Returns a pointer the last active object in the pool or \c NULL if no active object.
  */
 template <class T, unsigned int N>
-inline size_t ObjectPool<T, N>::Size()
-{
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    size_t count = 0;
-    std::lock_guard<std::mutex> lock(mMutex);
-    Object * p = mDummyHead.mNext;
-
-    while (p)
-    {
-        count++;
-        p = p->mNext;
-    }
-
-    return count;
-#else
-    return N;
-#endif
-}
-
-/**
- *  @brief
- *      Returns a pointer the object at \c aIndex or \c NULL if the object is not retained by \c aLayer.
- */
-template <class T, unsigned int N>
-inline T * ObjectPool<T, N>::Get(const Layer & aLayer, size_t aIndex)
+inline T * ObjectPool<T, N>::Back()
 {
     T * lReturn = nullptr;
 
@@ -308,24 +284,29 @@ inline T * ObjectPool<T, N>::Get(const Layer & aLayer, size_t aIndex)
         std::lock_guard<std::mutex> lock(mMutex);
         Object * p = mDummyHead.mNext;
 
-        while (aIndex > 0)
+        while (p && p->mNext)
         {
-            if (p == nullptr)
-                break;
             p = p->mNext;
-            aIndex--;
         }
 
         lReturn = static_cast<T *>(p);
     }
 #else
-    if (aIndex < N)
-        lReturn = &reinterpret_cast<T *>(mArena.uMemory)[aIndex];
+    int index      = N - 1;
+    while (index >= 0)
+    {
+        lReturn = &reinterpret_cast<T *>(mArena.uMemory)[index];
+
+        if (lReturn && lReturn->mSystemLayer)
+            break;
+
+        index--;
+    }
 #endif
 
     (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
 
-    return (lReturn != nullptr) && lReturn->IsRetained(aLayer) ? lReturn : nullptr;
+    return (lReturn && lReturn->mSystemLayer) ? lReturn : nullptr;
 }
 
 /**
