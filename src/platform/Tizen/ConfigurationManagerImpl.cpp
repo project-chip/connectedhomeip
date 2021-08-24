@@ -43,14 +43,7 @@ ConfigurationManagerImpl ConfigurationManagerImpl::sInstance;
 
 CHIP_ERROR ConfigurationManagerImpl::_Init(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::_Init();
 }
 
 CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)

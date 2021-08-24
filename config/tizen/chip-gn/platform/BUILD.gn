@@ -36,7 +36,7 @@ config("tizen_sdk_config") {
     ]
   }
 
-  if (chip_mdns != "none") {
+  if (chip_mdns == "platform") {
     pkg_config("nsd-dns-sd") {
       packages = [ "nsd-dns-sd" ]
     }
@@ -67,7 +67,7 @@ source_set("tizen") {
     ":capi-appfw-preference",
   ]
 
-  if (chip_mdns != "none") {
+  if (chip_mdns == "platform") {
     public_configs += [ ":nsd-dns-sd" ]
   }
 

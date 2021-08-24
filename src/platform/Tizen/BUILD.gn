@@ -52,13 +52,14 @@ static_library("Tizen") {
 
   deps = [ "${chip_root}/src/setup_payload" ]
 
-  public_deps = [ "${chip_root}/src/platform:platform_base" ]
-
-  public_deps += [ "${chip_root}/${tizen_root}:tizen" ]
+  public_deps = [
+    "${chip_root}/${tizen_root}:tizen",
+    "${chip_root}/src/platform:platform_base",
+  ]
 
   public_configs = []
 
-  if (chip_mdns != "none") {
+  if (chip_mdns == "platform") {
     sources += [ "MdnsImpl.cpp" ]
 
     deps += [ "${chip_root}/src/lib/mdns:platform_header" ]

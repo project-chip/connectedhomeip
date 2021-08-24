@@ -133,7 +133,10 @@ source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {root}/examples/lighting-app/telink'
 
 # Generating tizen-tizen-light
-gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" arm_arch="armv7-a" import("//build_overrides/build.gni") target_cflags=[ "--sysroot=TEST_TIZEN_HOME" ] target_ldflags=[ "--sysroot=TEST_TIZEN_HOME" ] custom_toolchain="${build_root}/toolchain/custom" target_cc="TEST_TIZEN_HOME/bin/arm-linux-gnueabi-gcc" target_cxx="TEST_TIZEN_HOME/bin/arm-linux-gnueabi-g++" target_ar="TEST_TIZEN_HOME/bin/arm-linux-gnueabi-ar"' {out}/tizen-tizen-light
+bash -c 'export PKG_CONFIG_SYSROOT_DIR=$TIZEN_HOME;
+export PKG_CONFIG_LIBDIR=$TIZEN_HOME/usr/lib/pkgconfig;
+export PKG_CONFIG_PATH=$TIZEN_HOME/usr/lib/pkgconfig;
+gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '"'"'--args=target_os="tizen" target_cpu="arm" arm_arch="armv7-a" import("//build_overrides/build.gni") target_cflags=[ "--sysroot=TEST_TIZEN_HOME", "-Wno-sign-compare" ] target_ldflags=[ "--sysroot=TEST_TIZEN_HOME" ] custom_toolchain="${build_root}/toolchain/custom" target_cc="TEST_TIZEN_HOME/bin/arm-linux-gnueabi-gcc" target_cxx="TEST_TIZEN_HOME/bin/arm-linux-gnueabi-g++" target_ar="TEST_TIZEN_HOME/bin/arm-linux-gnueabi-ar"'"'"' {out}/tizen-tizen-light'
 
 # Building {real_platform}-native-all_clusters
 ninja -C {out}/{real_platform}-native-all_clusters

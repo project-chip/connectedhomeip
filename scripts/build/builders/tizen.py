@@ -14,9 +14,11 @@
 
 import logging
 import os
+import shlex
+
 from enum import Enum, auto
 
-from .gn import GnBuilder
+from .builder import Builder
 
 
 class TizenApp(Enum):
@@ -34,14 +36,8 @@ class TizenApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
-    def FlashBundleName(self):
-        if self == TizenApp.LIGHT:
-            return 'lighting_app.flashbundle.txt'
-        else:
-            raise Exception('Unknown app type: %r' % self)
 
-
-class TizenBuilder(GnBuilder):
+class TizenBuilder(Builder):
 
     def __init__(self,
                  root,
@@ -52,14 +48,38 @@ class TizenBuilder(GnBuilder):
             root=os.path.join(root, 'examples', app.ExampleName(), 'linux'),
             runner=runner,
             output_prefix=output_prefix)
-
         self.app = app
-        tizen_home = os.environ['TIZEN_HOME']
-        os.environ['PKG_CONFIG_SYSROOT_DIR'] = tizen_home
-        os.environ['PKG_CONFIG_LIBDIR'] = tizen_home + '/usr/lib/pkgconfig'
-        os.environ['PKG_CONFIG_PATH'] = tizen_home + '/usr/lib/pkgconfig'
-        self.gn_build_args = ['target_os="tizen" target_cpu="arm" arm_arch="armv7-a" import("//build_overrides/build.gni") target_cflags=[ "--sysroot=' + tizen_home + '" ] target_ldflags=[ "--sysroot=' + tizen_home +
-                              '" ] custom_toolchain="${build_root}/toolchain/custom" target_cc="' + tizen_home + '/bin/arm-linux-gnueabi-gcc" target_cxx="' + tizen_home + '/bin/arm-linux-gnueabi-g++" target_ar="' + tizen_home + '/bin/arm-linux-gnueabi-ar"']
+
+    def generate(self):
+        if not os.path.exists(self.output_dir):
+            if not self._runner.dry_run:
+                if 'TIZEN_HOME' not in os.environ:
+                    raise Exception(
+                        "Environment TIZEN_HOME missing, cannot build tizen libraries")
+
+            tizen_home = os.environ['TIZEN_HOME']
+            cmd = '''\
+export PKG_CONFIG_SYSROOT_DIR=$TIZEN_HOME;
+export PKG_CONFIG_LIBDIR=$TIZEN_HOME/usr/lib/pkgconfig;
+export PKG_CONFIG_PATH=$TIZEN_HOME/usr/lib/pkgconfig;
+gn gen --check --fail-on-unused-args --root=%s '--args=target_os="tizen" \
+target_cpu="arm" arm_arch="armv7-a" import("//build_overrides/build.gni") \
+target_cflags=[ "--sysroot=%s", "-Wno-sign-compare" ] \
+target_ldflags=[ "--sysroot=%s" ] \
+custom_toolchain="${build_root}/toolchain/custom" \
+target_cc="%s/bin/arm-linux-gnueabi-gcc" \
+target_cxx="%s/bin/arm-linux-gnueabi-g++" \
+target_ar="%s/bin/arm-linux-gnueabi-ar"' %s''' % (
+                self.root, tizen_home, tizen_home, tizen_home, tizen_home, tizen_home, self.output_dir)
+
+            self._Execute(['bash', '-c', cmd],
+                          title='Generating ' + self.identifier)
+
+    def _build(self):
+        logging.info('Compiling Telink at %s', self.output_dir)
+
+        self._Execute(['ninja', '-C', self.output_dir],
+                      title='Building ' + self.identifier)
 
     def build_outputs(self):
         items = {
@@ -70,12 +90,5 @@ class TizenBuilder(GnBuilder):
                 os.path.join(self.output_dir,
                              '%s.out.map' % self.app.AppNamePrefix()),
         }
-
-        # Figure out flash bundle files and build accordingly
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:
-            for line in f.readlines():
-                name = line.strip()
-                items['flashbundle/%s' %
-                      name] = os.path.join(self.output_dir, name)
 
         return items

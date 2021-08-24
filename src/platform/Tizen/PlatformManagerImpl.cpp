@@ -35,18 +35,9 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    CHIP_ERROR err;
+    ReturnErrorOnFailure(Internal::PosixConfig::Init());
 
-    // Initialize the configuration system.
-    err = Internal::PosixConfig::Init();
-    SuccessOrExit(err);
-    // Call _InitChipStack() on the generic implementation base class
-    // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
 }
 
 } // namespace DeviceLayer

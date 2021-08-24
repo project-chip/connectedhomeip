@@ -23,21 +23,6 @@
 #include <dlog.h>
 #include <stdio.h>
 
-#ifdef LOG_TAG
-#undef LOG_TAG
-#endif
-#define LOG_TAG "CHIP"
-
-#ifndef LOGD
-#define LOGD(fmt, args...) dlog_print(DLOG_DEBUG, LOG_TAG, fmt, ##args)
-#endif
-#ifndef LOGE
-#define LOGE(fmt, args...) dlog_print(DLOG_ERROR, LOG_TAG, fmt, ##args)
-#endif
-#ifndef LOGI
-#define LOGI(fmt, args...) dlog_print(DLOG_INFO, LOG_TAG, fmt, ##args)
-#endif
-
 namespace chip {
 namespace Logging {
 namespace Platform {
@@ -47,6 +32,7 @@ namespace Platform {
  */
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
+    constexpr const char * kLogTag                = "CHIP";
     char msgBuf[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = {
         0,
     };
@@ -55,14 +41,14 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     switch (category)
     {
     case kLogCategory_Error:
-        LOGE("%s: %s", module, msgBuf);
+        dlog_print(DLOG_ERROR, kLogTag, "%s: %s", module, msgBuf);
         break;
     case kLogCategory_Detail:
-        LOGD("%s: %s", module, msgBuf);
+        dlog_print(DLOG_DEBUG, kLogTag, "%s: %s", module, msgBuf);
         break;
     case kLogCategory_Progress:
     default:
-        LOGI("%s: %s", module, msgBuf);
+        dlog_print(DLOG_INFO, kLogTag, "%s: %s", module, msgBuf);
         break;
     }
 }
