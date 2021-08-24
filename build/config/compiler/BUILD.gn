@@ -146,6 +146,7 @@ config("disabled_warnings") {
   cflags = [
     "-Wno-deprecated-declarations",
     "-Wno-unknown-warning-option",
+    "-Wno-maybe-uninitialized",
     "-Wno-missing-field-initializers",
     "-Wno-unused-parameter",
   ]

@@ -21,7 +21,6 @@
 #include <core/CHIPCore.h>
 
 #include <algorithm>
-#include <cassert>
 #include <new>
 #include <type_traits>
 #include <typeinfo>
@@ -29,7 +28,7 @@
 
 namespace chip {
 
-namespace Internal {
+namespace VariantInternal {
 
 template <typename... Ts>
 struct VariantCurry;
@@ -56,9 +55,25 @@ struct VariantCurry<T, Ts...>
     inline static void Copy(std::size_t that_t, const void * that_v, void * this_v)
     {
         if (that_t == T::VariantId)
+        {
             new (this_v) T(*reinterpret_cast<const T *>(that_v));
+        }
         else
+        {
             VariantCurry<Ts...>::Copy(that_t, that_v, this_v);
+        }
+    }
+
+    inline static bool Equal(std::size_t type_t, const void * that_v, const void * this_v)
+    {
+        if (type_t == T::VariantId)
+        {
+            return *reinterpret_cast<const T *>(this_v) == *reinterpret_cast<const T *>(that_v);
+        }
+        else
+        {
+            return VariantCurry<Ts...>::Equal(type_t, that_v, this_v);
+        }
     }
 };
 
@@ -68,9 +83,14 @@ struct VariantCurry<>
     inline static void Destroy(std::size_t id, void * data) {}
     inline static void Move(std::size_t that_t, void * that_v, void * this_v) {}
     inline static void Copy(std::size_t that_t, const void * that_v, void * this_v) {}
+    inline static bool Equal(std::size_t type_t, const void * that_v, const void * this_v)
+    {
+        VerifyOrDie(false);
+        return false;
+    }
 };
 
-} // namespace Internal
+} // namespace VariantInternal
 
 /**
  * @brief
@@ -101,7 +121,7 @@ private:
     static constexpr std::size_t kInvalidType = SIZE_MAX;
 
     using Data  = typename std::aligned_storage<kDataSize, kDataAlign>::type;
-    using Curry = Internal::VariantCurry<Ts...>;
+    using Curry = VariantInternal::VariantCurry<Ts...>;
 
     std::size_t mTypeId;
     Data mData;
@@ -134,6 +154,11 @@ public:
         Curry::Destroy(that.mTypeId, &that.mData);
         that.mTypeId = kInvalidType;
         return *this;
+    }
+
+    bool operator==(const Variant & other) const
+    {
+        return GetType() == other.GetType() && Curry::Equal(mTypeId, &other.mData, &mData);
     }
 
     template <typename T>
