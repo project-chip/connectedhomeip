@@ -128,7 +128,9 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     return YES;
 }
 
-- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate vendorId:(uint16_t)vendorId nocSigner:(id<CHIPKeypair>)nocSigner
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+       vendorId:(uint16_t)vendorId
+      nocSigner:(id<CHIPKeypair>)nocSigner
 {
     chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
 
@@ -150,8 +152,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         // create a CHIPP256KeypairBridge here and pass it to the operationalCredentialsDelegate
         std::unique_ptr<chip::Crypto::CHIPP256KeypairNativeBridge> nativeBridge = nullptr;
-        if (nocSigner != nil)
-        {
+        if (nocSigner != nil) {
             _keypairBridge.Init(nocSigner);
             nativeBridge.reset(new chip::Crypto::CHIPP256KeypairNativeBridge(_keypairBridge));
         }

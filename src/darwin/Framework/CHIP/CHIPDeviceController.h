@@ -100,7 +100,9 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  * @param[in] vendorId The vendor ID of the commissioner application
  * @param[in] nocSigner The CHIPKeypair that is used to to generate and sign Node Operational Credentials
  */
-- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate vendorId:(uint16_t)vendorId nocSigner:(nullable id<CHIPKeypair>)nocSigner;
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
+       vendorId:(uint16_t)vendorId
+      nocSigner:(nullable id<CHIPKeypair>)nocSigner;
 
 /**
  * Shutdown the CHIP Stack. Repeated calls to shutdown without calls to startup in between are NO-OPs.

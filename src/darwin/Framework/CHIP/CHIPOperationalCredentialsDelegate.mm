@@ -52,8 +52,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::init(CHIPPersistentStorageDelegat
     CHIP_ERROR err = CHIP_NO_ERROR;
     mStorage = storage;
 
-    if (!nocSigner || nocSigner->Initialize() != CHIP_NO_ERROR)
-    {
+    if (!nocSigner || nocSigner->Initialize() != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate: No NOC Signer provided, using self managed keys");
         err = LoadKeysFromKeyChain();
 
@@ -61,9 +60,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::init(CHIPPersistentStorageDelegat
             // Generate keys if keys could not be loaded
             err = GenerateKeys();
         }
-    }
-    else
-    {
+    } else {
         mIssuerKey = std::move(nocSigner);
     }
 
@@ -137,7 +134,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateKeys()
 {
     CHIP_LOG_ERROR("Generating self managed keys for the CA");
     mIssuerKey.reset(new chip::Crypto::P256Keypair());
-    CHIP_ERROR errorCode = mIssuerKey->Initialize();    if (errorCode != CHIP_NO_ERROR) {
+    CHIP_ERROR errorCode = mIssuerKey->Initialize();
+    if (errorCode != CHIP_NO_ERROR) {
         return errorCode;
     }
 
@@ -202,7 +200,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     }
 
     X509CertRequestParams noc_request = { 1, mIssuerId, validityStart, validityEnd, true, fabricId, true, nodeId };
-    ReturnErrorOnFailure(NewNodeOperationalX509Cert(noc_request, CertificateIssuerLevel::kIssuerIsRootCA, pubkey, *mIssuerKey, noc));
+    ReturnErrorOnFailure(
+        NewNodeOperationalX509Cert(noc_request, CertificateIssuerLevel::kIssuerIsRootCA, pubkey, *mIssuerKey, noc));
     icac.reduce_size(0);
 
     uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));

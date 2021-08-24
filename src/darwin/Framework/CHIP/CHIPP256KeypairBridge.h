@@ -25,9 +25,9 @@ NS_ASSUME_NONNULL_BEGIN
 class CHIPP256KeypairBridge : public chip::Crypto::P256KeypairBase
 {
 public:
-    ~CHIPP256KeypairBridge() {};
+    ~CHIPP256KeypairBridge(){};
 
-    CHIP_ERROR Init(id<CHIPKeypair>keypair);
+    CHIP_ERROR Init(id<CHIPKeypair> keypair);
 
     bool HasKeypair() const { return mKeypair != nil; };
 
@@ -43,7 +43,8 @@ public:
 
     CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, chip::Crypto::P256ECDSASignature & out_signature) override;
 
-    CHIP_ERROR ECDH_derive_secret(const chip::Crypto::P256PublicKey & remote_public_key, chip::Crypto::P256ECDHDerivedSecret & out_secret) const override;
+    CHIP_ERROR ECDH_derive_secret(const chip::Crypto::P256PublicKey & remote_public_key,
+                                  chip::Crypto::P256ECDHDerivedSecret & out_secret) const override;
 
     const chip::Crypto::P256PublicKey & Pubkey() const override { return mPubkey; };
 
