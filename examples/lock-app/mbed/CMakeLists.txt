@@ -6,8 +6,7 @@ cmake_minimum_required(VERSION 3.19.0)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 get_filename_component(MBED_COMMON ${CHIP_ROOT}/examples/platform/mbed REALPATH)
-get_filename_component(LOCK_GEN_DIR ${CHIP_ROOT}/zzz_generated/lock-app/ REALPATH)
-set(LOCK_GEN_SRC ${LOCK_GEN_DIR}/zap-generated/)
+get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.in
@@ -36,7 +35,8 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${MBED_COMMON}/util/include
                            ${CHIP_ROOT}/src/app
                            ${CHIP_ROOT}/third_party/nlio/repo/include
-                           ${LOCK_GEN_DIR}
+                           ${GEN_DIR}/app-common
+                           ${GEN_DIR}/lock-app
 )
 
 target_sources(${APP_TARGET} PRIVATE
@@ -44,9 +44,9 @@ target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/BoltLockManager.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
-               ${LOCK_GEN_SRC}/attribute-size.cpp
-               ${LOCK_GEN_SRC}/callback-stub.cpp
-               ${LOCK_GEN_SRC}/IMClusterCommandHandler.cpp
+               ${GEN_DIR}/lock-app/zap-generated/attribute-size.cpp
+               ${GEN_DIR}/lock-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/lock-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
                ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
