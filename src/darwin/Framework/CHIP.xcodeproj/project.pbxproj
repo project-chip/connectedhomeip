@@ -614,6 +614,7 @@
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
 					"$(CHIP_ROOT)/src/controller/data_model",
+					"$(CHIP_ROOT)/zzz_generated/app-common",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -756,6 +757,7 @@
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
 					"$(CHIP_ROOT)/src/controller/data_model",
+					"$(CHIP_ROOT)/zzz_generated/app-common",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
