@@ -53,8 +53,8 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
     private var barcodeDetector: BarcodeDetector? = null
     private var cameraStarted = false
 
-    private var qrCodeEdit: EditText? = null
-    private var qrCodeSubmit: Button? = null
+    private var manualCodeEditText: EditText? = null
+    private var manualCodeBtn: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,8 +70,8 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
     ): View {
         return inflater.inflate(R.layout.barcode_fragment, container, false).apply {
             cameraSourceView = findViewById(R.id.camera_view)
-            qrCodeEdit = findViewById(R.id.edit_qtcode)
-            qrCodeSubmit = findViewById(R.id.btn_qtcode)
+            manualCodeEditText = findViewById(R.id.manualCodeEditText)
+            manualCodeBtn = findViewById(R.id.manualCodeBtn)
         }
     }
 
@@ -108,8 +108,8 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
             .build()
 
         //workaround: can not use gms to scan the code in China, added a EditText to debug
-        qrCodeSubmit?.setOnClickListener {
-            var qrCode = qrCodeEdit?.text.toString()
+        manualCodeBtn?.setOnClickListener {
+            var qrCode = manualCodeEditText?.text.toString()
             Log.d(TAG, "Submit Code:$qrCode")
             handleInputQrCode(qrCode)
         }
