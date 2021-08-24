@@ -23,7 +23,4 @@ chip_data_model("data_model") {
 
   use_default_client_callbacks = true
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
-
-  # TODO: generated file dependency should be a lib NOT an include
-  include_dirs = [ "${chip_root}/zzz_generated/app-common" ]
 }
