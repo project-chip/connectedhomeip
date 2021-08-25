@@ -62,16 +62,13 @@ class Board(IntEnum):
     # Telink platform
     TLSR9518ADK80D = auto()
 
-    # Android platform
+    # Android, Tizen platform
     ARM = auto()
     ARM64 = auto()
     X64 = auto()
 
     # Infineon board
     P6BOARD = auto()
-
-    # Tizen platform
-    TIZEN = auto()
 
     @property
     def ArgName(self):

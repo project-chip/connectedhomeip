@@ -22,7 +22,7 @@ from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgBuilder
 from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
-from builders.tizen import TizenBuilder, TizenApp
+from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 
 from .targets import Application, Board, Platform
 
@@ -152,7 +152,7 @@ _MATCHERS[Platform.INFINEON].AcceptApplication(
 _MATCHERS[Platform.INFINEON].AcceptBoard(
     Board.P6BOARD, board=InfineonBoard.P6BOARD)
 
-_MATCHERS[Platform.TIZEN].AcceptBoard(Board.TIZEN)
+_MATCHERS[Platform.TIZEN].AcceptBoard(Board.ARM, board=TizenBoard.ARM)
 _MATCHERS[Platform.TIZEN].AcceptApplication(
     Application.LIGHT, app=TizenApp.LIGHT)
 

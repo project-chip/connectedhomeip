@@ -14,7 +14,6 @@
 
 import logging
 import os
-import shlex
 
 from enum import Enum, auto
 
@@ -37,18 +36,36 @@ class TizenApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
 
+class TizenBoard(Enum):
+    ARM = auto()
+
+    def TargetCpuName(self):
+        if self == TizenBoard.ARM:
+            return 'arm'
+        else:
+            raise Exception('Unknown board type: %r' % self)
+
+    def AbiName(self):
+        if self == TizenBoard.ARM:
+            return 'armv7-a'
+        else:
+            raise Exception('Unknown board type: %r' % self)
+
+
 class TizenBuilder(Builder):
 
     def __init__(self,
                  root,
                  runner,
                  output_prefix: str,
-                 app: TizenApp = TizenApp.LIGHT):
+                 app: TizenApp = TizenApp.LIGHT,
+                 board: TizenBoard = TizenBoard.ARM):
         super(TizenBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExampleName(), 'linux'),
             runner=runner,
             output_prefix=output_prefix)
         self.app = app
+        self.board = board
 
     def generate(self):
         if not os.path.exists(self.output_dir):
@@ -57,20 +74,28 @@ class TizenBuilder(Builder):
                     raise Exception(
                         "Environment TIZEN_HOME missing, cannot build tizen libraries")
 
-            tizen_home = os.environ['TIZEN_HOME']
             cmd = '''\
 export PKG_CONFIG_SYSROOT_DIR=$TIZEN_HOME;
 export PKG_CONFIG_LIBDIR=$TIZEN_HOME/usr/lib/pkgconfig;
 export PKG_CONFIG_PATH=$TIZEN_HOME/usr/lib/pkgconfig;
-gn gen --check --fail-on-unused-args --root=%s '--args=target_os="tizen" \
-target_cpu="arm" arm_arch="armv7-a" import("//build_overrides/build.gni") \
-target_cflags=[ "--sysroot=%s", "-Wno-sign-compare" ] \
-target_ldflags=[ "--sysroot=%s" ] \
-custom_toolchain="${build_root}/toolchain/custom" \
-target_cc="%s/bin/arm-linux-gnueabi-gcc" \
-target_cxx="%s/bin/arm-linux-gnueabi-g++" \
-target_ar="%s/bin/arm-linux-gnueabi-ar"' %s''' % (
-                self.root, tizen_home, tizen_home, tizen_home, tizen_home, tizen_home, self.output_dir)
+gn gen --check --fail-on-unused-args --root=%s \
+--args=\'import("//build_overrides/build.gni")''' % self.root
+
+            tizen_home = os.environ['TIZEN_HOME']
+            gn_args = {}
+            gn_args['target_os'] = '"tizen"'
+            gn_args['target_cpu'] = '"%s"' % self.board.TargetCpuName()
+            gn_args['arm_arch'] = '"%s"' % self.board.AbiName()
+            gn_args['target_cflags'] = '[ "--sysroot=%s" ]' % tizen_home
+            gn_args['target_ldflags'] = '[ "--sysroot=%s" ]' % tizen_home
+            gn_args['custom_toolchain'] = '"${build_root}/toolchain/custom"'
+            gn_args['target_cc'] = '"%s/bin/arm-linux-gnueabi-gcc"' % tizen_home
+            gn_args['target_cxx'] = '"%s/bin/arm-linux-gnueabi-g++"' % tizen_home
+            gn_args['target_ar'] = '"%s/bin/arm-linux-gnueabi-ar"' % tizen_home
+
+            cmd += ' %s\' %s' % (' '.join([
+                '%s=%s' % (key, value)
+                for key, value in gn_args.items()]), self.output_dir)
 
             self._Execute(['bash', '-c', cmd],
                           title='Generating ' + self.identifier)
