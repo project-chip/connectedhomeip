@@ -939,6 +939,45 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(void * cont
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
+static void OnPowerSourceActiveWiredFaultsListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
+{
+    ChipLogProgress(chipTool, "OnPowerSourceActiveWiredFaultsListAttributeResponse: %" PRIu16 " entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "ENUM8[%" PRIu16 "]: %" PRIu8 "", i, entries[i]);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
+{
+    ChipLogProgress(chipTool, "OnPowerSourceActiveBatteryFaultsListAttributeResponse: %" PRIu16 " entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "ENUM8[%" PRIu16 "]: %" PRIu8 "", i, entries[i]);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnPowerSourceActiveBatteryChargeFaultsListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
+{
+    ChipLogProgress(chipTool, "OnPowerSourceActiveBatteryChargeFaultsListAttributeResponse: %" PRIu16 " entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "ENUM8[%" PRIu16 "]: %" PRIu8 "", i, entries[i]);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
 static void OnTvChannelTvChannelListListAttributeResponse(void * context, uint16_t count, _TvChannelInfo * entries)
 {
     ChipLogProgress(chipTool, "OnTvChannelTvChannelListListAttributeResponse: %" PRIu16 " entries", count);
@@ -1159,6 +1198,7 @@ static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeRespon
 | OnOff                                                               | 0x0006 |
 | OnOffSwitchConfiguration                                            | 0x0007 |
 | OperationalCredentials                                              | 0x003E |
+| PowerSource                                                         | 0x002F |
 | PressureMeasurement                                                 | 0x0403 |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | RelativeHumidityMeasurement                                         | 0x0405 |
@@ -1212,6 +1252,7 @@ constexpr chip::ClusterId kOccupancySensingClusterId                     = 0x040
 constexpr chip::ClusterId kOnOffClusterId                                = 0x0006;
 constexpr chip::ClusterId kOnOffSwitchConfigurationClusterId             = 0x0007;
 constexpr chip::ClusterId kOperationalCredentialsClusterId               = 0x003E;
+constexpr chip::ClusterId kPowerSourceClusterId                          = 0x002F;
 constexpr chip::ClusterId kPressureMeasurementClusterId                  = 0x0403;
 constexpr chip::ClusterId kPumpConfigurationAndControlClusterId          = 0x0200;
 constexpr chip::ClusterId kRelativeHumidityMeasurementClusterId          = 0x0405;
@@ -15194,6 +15235,1167 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster PowerSource                                                 | 0x002F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Status                                                            | 0x0000 |
+| * Order                                                             | 0x0001 |
+| * Description                                                       | 0x0002 |
+| * WiredAssessedInputVoltage                                         | 0x0003 |
+| * WiredAssessedInputFrequency                                       | 0x0004 |
+| * WiredCurrentType                                                  | 0x0005 |
+| * WiredAssessedCurrent                                              | 0x0006 |
+| * WiredNominalVoltage                                               | 0x0007 |
+| * WiredMaximumCurrent                                               | 0x0008 |
+| * WiredPresent                                                      | 0x0009 |
+| * ActiveWiredFaults                                                 | 0x000A |
+| * BatteryVoltage                                                    | 0x000B |
+| * BatteryPercentRemaining                                           | 0x000C |
+| * BatteryTimeRemaining                                              | 0x000D |
+| * BatteryChargeLevel                                                | 0x000E |
+| * BatteryReplacementNeeded                                          | 0x000F |
+| * BatteryReplaceability                                             | 0x0010 |
+| * BatteryPresent                                                    | 0x0011 |
+| * ActiveBatteryFaults                                               | 0x0012 |
+| * BatteryReplacementDescription                                     | 0x0013 |
+| * BatteryCommonDesignation                                          | 0x0014 |
+| * BatteryAnsiDesignation                                            | 0x0015 |
+| * BatteryIecDesignation                                             | 0x0016 |
+| * BatteryApprovedChemistry                                          | 0x0017 |
+| * BatteryCapacity                                                   | 0x0018 |
+| * BatteryQuantity                                                   | 0x0019 |
+| * BatteryChargeState                                                | 0x001A |
+| * BatteryTimeToFullCharge                                           | 0x001B |
+| * BatteryFunctionalWhileCharging                                    | 0x001C |
+| * BatteryChargingCurrent                                            | 0x001D |
+| * ActiveBatteryChargeFaults                                         | 0x001E |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Discover Attributes
+ */
+class DiscoverPowerSourceAttributes : public ModelCommand
+{
+public:
+    DiscoverPowerSourceAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverPowerSourceAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Status
+ */
+class ReadPowerSourceStatus : public ModelCommand
+{
+public:
+    ReadPowerSourceStatus() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "status");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceStatus()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Order
+ */
+class ReadPowerSourceOrder : public ModelCommand
+{
+public:
+    ReadPowerSourceOrder() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "order");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceOrder()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeOrder(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute Description
+ */
+class ReadPowerSourceDescription : public ModelCommand
+{
+public:
+    ReadPowerSourceDescription() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "description");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceDescription()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeDescription(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute WiredAssessedInputVoltage
+ */
+class ReadPowerSourceWiredAssessedInputVoltage : public ModelCommand
+{
+public:
+    ReadPowerSourceWiredAssessedInputVoltage() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wired-assessed-input-voltage");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceWiredAssessedInputVoltage()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeWiredAssessedInputVoltage(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute WiredAssessedInputFrequency
+ */
+class ReadPowerSourceWiredAssessedInputFrequency : public ModelCommand
+{
+public:
+    ReadPowerSourceWiredAssessedInputFrequency() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wired-assessed-input-frequency");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceWiredAssessedInputFrequency()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeWiredAssessedInputFrequency(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute WiredCurrentType
+ */
+class ReadPowerSourceWiredCurrentType : public ModelCommand
+{
+public:
+    ReadPowerSourceWiredCurrentType() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wired-current-type");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceWiredCurrentType()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeWiredCurrentType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute WiredAssessedCurrent
+ */
+class ReadPowerSourceWiredAssessedCurrent : public ModelCommand
+{
+public:
+    ReadPowerSourceWiredAssessedCurrent() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wired-assessed-current");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceWiredAssessedCurrent()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeWiredAssessedCurrent(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute WiredNominalVoltage
+ */
+class ReadPowerSourceWiredNominalVoltage : public ModelCommand
+{
+public:
+    ReadPowerSourceWiredNominalVoltage() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wired-nominal-voltage");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceWiredNominalVoltage()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeWiredNominalVoltage(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute WiredMaximumCurrent
+ */
+class ReadPowerSourceWiredMaximumCurrent : public ModelCommand
+{
+public:
+    ReadPowerSourceWiredMaximumCurrent() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wired-maximum-current");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceWiredMaximumCurrent()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeWiredMaximumCurrent(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute WiredPresent
+ */
+class ReadPowerSourceWiredPresent : public ModelCommand
+{
+public:
+    ReadPowerSourceWiredPresent() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wired-present");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceWiredPresent()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeWiredPresent(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ActiveWiredFaults
+ */
+class ReadPowerSourceActiveWiredFaults : public ModelCommand
+{
+public:
+    ReadPowerSourceActiveWiredFaults() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "active-wired-faults");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceActiveWiredFaults()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeActiveWiredFaults(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<PowerSourceActiveWiredFaultsListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<PowerSourceActiveWiredFaultsListAttributeCallback>(
+            OnPowerSourceActiveWiredFaultsListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryVoltage
+ */
+class ReadPowerSourceBatteryVoltage : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryVoltage() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-voltage");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryVoltage()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryVoltage(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryPercentRemaining
+ */
+class ReadPowerSourceBatteryPercentRemaining : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryPercentRemaining() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-percent-remaining");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryPercentRemaining()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryPercentRemaining(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryTimeRemaining
+ */
+class ReadPowerSourceBatteryTimeRemaining : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryTimeRemaining() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-time-remaining");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryTimeRemaining()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryTimeRemaining(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryChargeLevel
+ */
+class ReadPowerSourceBatteryChargeLevel : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryChargeLevel() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-charge-level");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryChargeLevel()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryChargeLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryReplacementNeeded
+ */
+class ReadPowerSourceBatteryReplacementNeeded : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryReplacementNeeded() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-replacement-needed");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryReplacementNeeded()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryReplacementNeeded(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryReplaceability
+ */
+class ReadPowerSourceBatteryReplaceability : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryReplaceability() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-replaceability");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryReplaceability()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryReplaceability(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryPresent
+ */
+class ReadPowerSourceBatteryPresent : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryPresent() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-present");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryPresent()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryPresent(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ActiveBatteryFaults
+ */
+class ReadPowerSourceActiveBatteryFaults : public ModelCommand
+{
+public:
+    ReadPowerSourceActiveBatteryFaults() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "active-battery-faults");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceActiveBatteryFaults()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeActiveBatteryFaults(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>(
+            OnPowerSourceActiveBatteryFaultsListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryReplacementDescription
+ */
+class ReadPowerSourceBatteryReplacementDescription : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryReplacementDescription() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-replacement-description");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryReplacementDescription()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryReplacementDescription(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryCommonDesignation
+ */
+class ReadPowerSourceBatteryCommonDesignation : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryCommonDesignation() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-common-designation");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryCommonDesignation()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryCommonDesignation(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryAnsiDesignation
+ */
+class ReadPowerSourceBatteryAnsiDesignation : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryAnsiDesignation() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-ansi-designation");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryAnsiDesignation()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryAnsiDesignation(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryIecDesignation
+ */
+class ReadPowerSourceBatteryIecDesignation : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryIecDesignation() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-iec-designation");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryIecDesignation()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryIecDesignation(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryApprovedChemistry
+ */
+class ReadPowerSourceBatteryApprovedChemistry : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryApprovedChemistry() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-approved-chemistry");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryApprovedChemistry()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryApprovedChemistry(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryCapacity
+ */
+class ReadPowerSourceBatteryCapacity : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryCapacity() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-capacity");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryCapacity()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryCapacity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryQuantity
+ */
+class ReadPowerSourceBatteryQuantity : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryQuantity() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-quantity");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryQuantity()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryQuantity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryChargeState
+ */
+class ReadPowerSourceBatteryChargeState : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryChargeState() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-charge-state");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryChargeState()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryChargeState(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryTimeToFullCharge
+ */
+class ReadPowerSourceBatteryTimeToFullCharge : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryTimeToFullCharge() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-time-to-full-charge");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryTimeToFullCharge()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryTimeToFullCharge(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryFunctionalWhileCharging
+ */
+class ReadPowerSourceBatteryFunctionalWhileCharging : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryFunctionalWhileCharging() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-functional-while-charging");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryFunctionalWhileCharging()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryFunctionalWhileCharging(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute BatteryChargingCurrent
+ */
+class ReadPowerSourceBatteryChargingCurrent : public ModelCommand
+{
+public:
+    ReadPowerSourceBatteryChargingCurrent() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "battery-charging-current");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceBatteryChargingCurrent()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeBatteryChargingCurrent(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ActiveBatteryChargeFaults
+ */
+class ReadPowerSourceActiveBatteryChargeFaults : public ModelCommand
+{
+public:
+    ReadPowerSourceActiveBatteryChargeFaults() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "active-battery-charge-faults");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceActiveBatteryChargeFaults()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeActiveBatteryChargeFaults(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<PowerSourceActiveBatteryChargeFaultsListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>(
+            OnPowerSourceActiveBatteryChargeFaultsListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadPowerSourceClusterRevision : public ModelCommand
+{
+public:
+    ReadPowerSourceClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster PressureMeasurement                                         | 0x0403 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -25335,6 +26537,48 @@ void registerClusterOperationalCredentials(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterPowerSource(Commands & commands)
+{
+    const char * clusterName = "PowerSource";
+
+    commands_list clusterCommands = {
+        make_unique<DiscoverPowerSourceAttributes>(),                 //
+        make_unique<ReadPowerSourceStatus>(),                         //
+        make_unique<ReadPowerSourceOrder>(),                          //
+        make_unique<ReadPowerSourceDescription>(),                    //
+        make_unique<ReadPowerSourceWiredAssessedInputVoltage>(),      //
+        make_unique<ReadPowerSourceWiredAssessedInputFrequency>(),    //
+        make_unique<ReadPowerSourceWiredCurrentType>(),               //
+        make_unique<ReadPowerSourceWiredAssessedCurrent>(),           //
+        make_unique<ReadPowerSourceWiredNominalVoltage>(),            //
+        make_unique<ReadPowerSourceWiredMaximumCurrent>(),            //
+        make_unique<ReadPowerSourceWiredPresent>(),                   //
+        make_unique<ReadPowerSourceActiveWiredFaults>(),              //
+        make_unique<ReadPowerSourceBatteryVoltage>(),                 //
+        make_unique<ReadPowerSourceBatteryPercentRemaining>(),        //
+        make_unique<ReadPowerSourceBatteryTimeRemaining>(),           //
+        make_unique<ReadPowerSourceBatteryChargeLevel>(),             //
+        make_unique<ReadPowerSourceBatteryReplacementNeeded>(),       //
+        make_unique<ReadPowerSourceBatteryReplaceability>(),          //
+        make_unique<ReadPowerSourceBatteryPresent>(),                 //
+        make_unique<ReadPowerSourceActiveBatteryFaults>(),            //
+        make_unique<ReadPowerSourceBatteryReplacementDescription>(),  //
+        make_unique<ReadPowerSourceBatteryCommonDesignation>(),       //
+        make_unique<ReadPowerSourceBatteryAnsiDesignation>(),         //
+        make_unique<ReadPowerSourceBatteryIecDesignation>(),          //
+        make_unique<ReadPowerSourceBatteryApprovedChemistry>(),       //
+        make_unique<ReadPowerSourceBatteryCapacity>(),                //
+        make_unique<ReadPowerSourceBatteryQuantity>(),                //
+        make_unique<ReadPowerSourceBatteryChargeState>(),             //
+        make_unique<ReadPowerSourceBatteryTimeToFullCharge>(),        //
+        make_unique<ReadPowerSourceBatteryFunctionalWhileCharging>(), //
+        make_unique<ReadPowerSourceBatteryChargingCurrent>(),         //
+        make_unique<ReadPowerSourceActiveBatteryChargeFaults>(),      //
+        make_unique<ReadPowerSourceClusterRevision>(),                //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterPressureMeasurement(Commands & commands)
 {
     const char * clusterName = "PressureMeasurement";
@@ -25782,6 +27026,7 @@ void registerClusters(Commands & commands)
     registerClusterOnOff(commands);
     registerClusterOnOffSwitchConfiguration(commands);
     registerClusterOperationalCredentials(commands);
+    registerClusterPowerSource(commands);
     registerClusterPressureMeasurement(commands);
     registerClusterPumpConfigurationAndControl(commands);
     registerClusterRelativeHumidityMeasurement(commands);

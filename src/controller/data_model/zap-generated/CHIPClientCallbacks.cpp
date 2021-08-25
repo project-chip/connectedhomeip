@@ -876,6 +876,94 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
     cb->mCall(cb->mContext, count, data);
 }
 
+void PowerSourceClusterActiveWiredFaultsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = Encoding::LittleEndian::Read16(message);
+    uint8_t data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i] = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+    }
+    Callback::Callback<PowerSourceActiveWiredFaultsListAttributeCallback> * cb =
+        Callback::Callback<PowerSourceActiveWiredFaultsListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = Encoding::LittleEndian::Read16(message);
+    uint8_t data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i] = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+    }
+    Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback> * cb =
+        Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
+void PowerSourceClusterActiveBatteryChargeFaultsListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                    Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback)
+{
+    // TODO: Add actual support for array and lists.
+    const uint8_t * message = nullptr;
+    uint16_t messageLen     = 0;
+    EmberAfStatus res       = PrepareListFromTLV(tlvData, message, messageLen);
+    if (res != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, res);
+        return;
+    }
+
+    CHECK_MESSAGE_LENGTH_VOID(2);
+    uint16_t count = Encoding::LittleEndian::Read16(message);
+    uint8_t data[count];
+    for (size_t i = 0; i < count; i++)
+    {
+        CHECK_MESSAGE_LENGTH_VOID(1);
+        data[i] = emberAfGetInt8u(message, 0, 1);
+        message += 1;
+    }
+    Callback::Callback<PowerSourceActiveBatteryChargeFaultsListAttributeCallback> * cb =
+        Callback::Callback<PowerSourceActiveBatteryChargeFaultsListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, count, data);
+}
+
 void TvChannelClusterTvChannelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)
 {
