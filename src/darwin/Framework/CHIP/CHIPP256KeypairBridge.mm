@@ -87,7 +87,8 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg
         CHIP_LOG_ERROR("ECDSA sign msg failure: unexpected signature size %tu vs %tu ", signature.length, out_signature.Capacity());
         return CHIP_ERROR_NO_MEMORY;
     }
-    std::memmove(out_signature, signature.bytes, signature.length);
+    out_signature.SetLength(signature.length);
+    std::memcpy(out_signature, signature.bytes, signature.length);
     return CHIP_NO_ERROR;
 }
 
@@ -107,7 +108,8 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_hash(const uint8_t * hash, size_t h
             "ECDSA sign hash failure: unexpected signature size %tu vs %tu ", signature.length, out_signature.Capacity());
         return CHIP_ERROR_NO_MEMORY;
     }
-    std::memmove(out_signature, signature.bytes, signature.length);
+    out_signature.SetLength(signature.length);
+    std::memcpy(out_signature, signature.bytes, signature.length);
     return CHIP_NO_ERROR;
 }
 
@@ -131,12 +133,14 @@ CHIP_ERROR CHIPP256KeypairBridge::setPubkey()
 
     NSData * pubkeyData = (__bridge_transfer NSData *) SecKeyCopyExternalRepresentation(pubkeyRef, nil);
     if (!pubkeyData) {
-        CHIP_LOG_ERROR("Unable to copy external representation for pubkey ref, returning empty Pubkey");
+        CHIP_LOG_ERROR("Unable to copy external representation for pubkey ref, cannot initialize pubkey");
         return CHIP_ERROR_INTERNAL;
     }
-
-    uint8_t pubkeyBytes[kP256_PublicKey_Length];
-    std::memmove(&pubkeyBytes, pubkeyData.bytes, pubkeyData.length);
+    if (pubkeyData.length != kP256_PublicKey_Length) {
+        CHIP_LOG_ERROR("Unexpected pubkey length, cannot initialize pubkey");
+        return CHIP_ERROR_INTERNAL;
+    }
+    chip::FixedByteSpan<kP256_PublicKey_Length> pubkeyBytes((const uint8_t *) pubkeyData.bytes);
     mPubkey = P256PublicKey(pubkeyBytes);
 
     return CHIP_NO_ERROR;

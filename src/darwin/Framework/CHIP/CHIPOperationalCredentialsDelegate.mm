@@ -54,6 +54,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::init(CHIPPersistentStorageDelegat
 
     if (!nocSigner) {
         CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate: No NOC Signer provided, using self managed keys");
+
+        mIssuerKey.reset(new chip::Crypto::P256Keypair());
         err = LoadKeysFromKeyChain();
 
         if (err != CHIP_NO_ERROR) {
@@ -126,14 +128,12 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadKeysFromKeyChain()
     serialized.SetLength([keypairData length]);
 
     CHIP_LOG_ERROR("Deserializing the key");
-    mIssuerKey.reset(new chip::Crypto::P256Keypair());
     return mIssuerKey->Deserialize(serialized);
 }
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateKeys()
 {
     CHIP_LOG_ERROR("Generating self managed keys for the CA");
-    mIssuerKey.reset(new chip::Crypto::P256Keypair());
     CHIP_ERROR errorCode = mIssuerKey->Initialize();
     if (errorCode != CHIP_NO_ERROR) {
         return errorCode;

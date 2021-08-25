@@ -151,7 +151,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate);
 
         // create a CHIPP256KeypairBridge here and pass it to the operationalCredentialsDelegate
-        std::unique_ptr<chip::Crypto::CHIPP256KeypairNativeBridge> nativeBridge = nullptr;
+        std::unique_ptr<chip::Crypto::CHIPP256KeypairNativeBridge> nativeBridge;
         if (nocSigner != nil) {
             _keypairBridge.Init(nocSigner);
             nativeBridge.reset(new chip::Crypto::CHIPP256KeypairNativeBridge(_keypairBridge));

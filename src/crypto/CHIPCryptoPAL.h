@@ -344,19 +344,19 @@ public:
      * @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Initialize() override;
+    CHIP_ERROR Initialize() override;
 
     /**
      * @brief Serialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
+    CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
 
     /**
      * @brief Deserialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input) override;
+    CHIP_ERROR Deserialize(P256SerializedKeypair & input) override;
 
     /**
      * @brief Generate a new Certificate Signing Request (CSR).

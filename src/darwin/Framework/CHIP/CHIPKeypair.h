@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @brief A function to sign a hash using ECDSA
  * @param hash Hash that needs to be signed
  *
- * @return Returns a the signature. The signature consists of: 2 EC elements (r and s), in raw <r,s> point form (see SEC1).
+ * @return Returns A signature that consists of: 2 EC elements (r and s), in raw <r,s> point form (see SEC1).
  **/
 - (NSData *)ECDSA_sign_hash:(NSData *)hash;
 

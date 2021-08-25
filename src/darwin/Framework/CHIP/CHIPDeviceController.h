@@ -98,7 +98,7 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
  *
  * @param[in] storageDelegate The delegate for persistent storage
  * @param[in] vendorId The vendor ID of the commissioner application
- * @param[in] nocSigner The CHIPKeypair that is used to to generate and sign Node Operational Credentials
+ * @param[in] nocSigner The CHIPKeypair that is used to generate and sign Node Operational Credentials
  */
 - (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
        vendorId:(uint16_t)vendorId
