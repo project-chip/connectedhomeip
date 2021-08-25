@@ -59,10 +59,31 @@ CHIP_ERROR CheckExpected(CallType type, const MdnsService * service)
         {
             continue;
         }
-        if (test::expectedCalls->CheckMatch(type, service))
+        if (test::expectedCalls[i].CheckMatch(type, service))
         {
             return CHIP_NO_ERROR;
         }
+    }
+    ChipLogError(Discovery, "Unexpected event of type %d", static_cast<int>(type));
+    ChipLogProgress(Discovery, "mName = %s", service->mName);
+    ChipLogProgress(Discovery, "mHostName = %s", service->mHostName);
+    ChipLogProgress(Discovery, "mType = %s", service->mType);
+    ChipLogProgress(Discovery, "mProtocol = %d", static_cast<int>(service->mProtocol));
+    ChipLogProgress(Discovery, "num subtypes = %lu", static_cast<unsigned long>(service->mSubTypeSize));
+    for (size_t i = 0; i < service->mSubTypeSize; ++i)
+    {
+        ChipLogProgress(Discovery, "\t%s", service->mSubTypes[i]);
+    }
+    ChipLogProgress(Discovery, "num text entries = %lu", static_cast<unsigned long>(service->mTextEntrySize));
+    for (size_t i = 0; i < service->mSubTypeSize; ++i)
+    {
+        ChipLogProgress(Discovery, "\t%s", service->mTextEntries[i].mKey);
+    }
+    ChipLogProgress(Discovery, "\nExpected:");
+    for (size_t i = 0; i < test::numExpectedCalls; ++i)
+    {
+        ChipLogProgress(Discovery, "Call %lu", static_cast<unsigned long>(i));
+        test::expectedCalls[i].PrintForDebugging();
     }
     return CHIP_ERROR_UNEXPECTED_EVENT;
 }
