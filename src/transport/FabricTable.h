@@ -94,14 +94,11 @@ public:
         ReleaseOperationalCerts();
     }
 
-    NodeId GetNodeId() const { return mOperationalId.GetNodeId(); }
-    FabricId GetFabricId() const { return mOperationalId.GetFabricId(); }
-
-    uint64_t GetCompressedFabricId() const { return mCompressedFabricId; }
-
+    PeerId GetPeerId() const { return mOperationalId; }
+    FabricId GetFabricId() const { return mFabricId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
-
     uint16_t GetVendorId() const { return mVendorId; }
+
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
     Crypto::P256Keypair * GetOperationalKey()
@@ -123,12 +120,6 @@ public:
     bool AreCredentialsAvailable() const
     {
         return (mRootCert != nullptr && mOperationalCerts != nullptr && mRootCertLen != 0 && mOperationalCertsLen != 0);
-    }
-
-    const uint8_t * GetTrustedRoot(uint16_t & size)
-    {
-        size = mRootCertLen;
-        return mRootCert;
     }
 
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
@@ -176,7 +167,7 @@ public:
     }
 
     CHIP_ERROR VerifyCredentials(const ByteSpan & noc, Credentials::ValidationContext & context, PeerId & nocPeerId,
-                                 Crypto::P256PublicKey & nocPubkey);
+                                 FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const;
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -225,7 +216,8 @@ private:
     uint16_t mRootCertAllocatedLen = 0;
     uint8_t * mOperationalCerts    = nullptr;
     uint16_t mOperationalCertsLen  = 0;
-    uint64_t mCompressedFabricId   = 0;
+
+    FabricId mFabricId = 0;
 
     static constexpr size_t KeySize();
 
@@ -235,10 +227,13 @@ private:
     CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, FabricIndex id);
 
-    void SetOperationalId(PeerId id) { mOperationalId = id; }
-
     void ReleaseOperationalCerts();
     void ReleaseRootCert();
+
+    /* Generate a compressed peer ID (containing compressed fabric ID) using provided fabric ID, node ID and
+       root public key of the fabric. The generated compressed ID is returned via compressedPeerId
+       output parameter */
+    CHIP_ERROR GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const;
 
     struct StorableFabricInfo
     {
@@ -267,7 +262,7 @@ public:
     /**
      * Gets called when a fabric is deleted from KVS store.
      **/
-    virtual void OnFabricDeletedFromStorage(FabricIndex fabricId) = 0;
+    virtual void OnFabricDeletedFromStorage(FabricIndex fabricIndex) = 0;
 
     /**
      * Gets called when a fabric is loaded into Fabric Table from KVS store.
@@ -368,9 +363,9 @@ public:
      */
     CHIP_ERROR AddNewFabric(FabricInfo & fabric, FabricIndex * assignedIndex);
 
-    void ReleaseFabricIndex(FabricIndex fabricId);
+    void ReleaseFabricIndex(FabricIndex fabricIndex);
 
-    FabricInfo * FindFabricWithIndex(FabricIndex fabricId);
+    FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
 
     FabricIndex FindDestinationIDCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
                                            const ByteSpan * ipkList, size_t ipkListEntries);

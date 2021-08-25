@@ -439,8 +439,8 @@ void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param)
 
 PeerConnectionState * SecureSessionMgr::GetPeerConnectionState(SessionHandle session)
 {
-    return mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(session.mPeerNodeId), session.mPeerKeyId.ValueOr(0),
-                                                    nullptr);
+    return mPeerConnections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(session.mPeerNodeId),
+                                                              session.mLocalKeyId.ValueOr(0), nullptr);
 }
 
 } // namespace chip

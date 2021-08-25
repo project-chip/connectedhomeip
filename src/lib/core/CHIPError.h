@@ -2165,6 +2165,14 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_INVALID_PUBLIC_KEY                          CHIP_CORE_ERROR(0xc5)
 
 /**
+ * @def CHIP_ERROR_FABRIC_MISMATCH_ON_ICA
+ *
+ * @brief
+ *   The fabric ID in ICA certificate doesn't match the one in NOC.
+ */
+#define CHIP_ERROR_FABRIC_MISMATCH_ON_ICA                          CHIP_CORE_ERROR(0xc6)
+
+/**
  *  @}
  */
 
