@@ -86,7 +86,7 @@ void ReadClient::MoveToState(const ClientState aTargetState)
                   GetStateStr());
 }
 
-CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,
+CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
                                        EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
                                        AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
                                        EventNumber aEventNumber, uint32_t timeout)
@@ -134,14 +134,7 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex,
         SuccessOrExit(err);
     }
 
-    if (apSecureSession != nullptr)
-    {
-        mpExchangeCtx = mpExchangeMgr->NewContext(*apSecureSession, this);
-    }
-    else
-    {
-        mpExchangeCtx = mpExchangeMgr->NewContext(SessionHandle(aNodeId, 0, 0, aFabricIndex), this);
-    }
+    mpExchangeCtx = mpExchangeMgr->NewContext(apSecureSession.ValueOr(SessionHandle(aNodeId, 0, 0, aFabricIndex)), this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(timeout);
 

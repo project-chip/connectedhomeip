@@ -343,9 +343,9 @@ public:
 
     NodeId GetDeviceId() const { return mDeviceId; }
 
-    bool MatchesSession(SessionHandle session) const { return mSecureSession == session; }
+    bool MatchesSession(SessionHandle session) const { return mSecureSession.HasValue() && mSecureSession.Value() == session; }
 
-    SessionHandle GetSecureSession() const { return mSecureSession; }
+    SessionHandle GetSecureSession() const { return mSecureSession.Value(); }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
@@ -451,7 +451,7 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    SessionHandle mSecureSession = {};
+    Optional<SessionHandle> mSecureSession = Optional<SessionHandle>::Missing();
 
     uint8_t mSequenceNumber = 0;
 

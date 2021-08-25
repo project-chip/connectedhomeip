@@ -317,9 +317,9 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(InteractionModel, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
-CHIP_ERROR InteractionModelEngine::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,
-                                                   EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
-                                                   AttributePathParams * apAttributePathParamsList,
+CHIP_ERROR InteractionModelEngine::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex,
+                                                   Optional<SessionHandle> apSecureSession, EventPathParams * apEventPathParamsList,
+                                                   size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
                                                    size_t aAttributePathParamsListSize, EventNumber aEventNumber,
                                                    uint64_t aAppIdentifier)
 {

@@ -75,7 +75,7 @@ public:
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * aSecureSession,
+    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> aSecureSession,
                                EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
                                AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
                                EventNumber aEventNumber, uint32_t timeout = kImMessageTimeoutMsec);

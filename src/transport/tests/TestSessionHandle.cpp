@@ -37,24 +37,8 @@
 
 using namespace chip;
 
-void TestInitialState(nlTestSuite * inSuite, void * inContext)
-{
-    SessionHandle session;
-
-    NL_TEST_ASSERT(inSuite, session.GetPeerNodeId() == kPlaceholderNodeId);
-    NL_TEST_ASSERT(inSuite, session.GetFabricIndex() == Transport::kUndefinedFabricIndex);
-    NL_TEST_ASSERT(inSuite, !session.HasFabricIndex());
-    NL_TEST_ASSERT(inSuite, !session.GetLocalKeyId().HasValue());
-    NL_TEST_ASSERT(inSuite, !session.GetPeerKeyId().HasValue());
-}
-
 void TestMatchSession(nlTestSuite * inSuite, void * inContext)
 {
-    SessionHandle session1;
-    SessionHandle session2;
-    NL_TEST_ASSERT(inSuite, session1 == session2);
-    NL_TEST_ASSERT(inSuite, session1.MatchIncomingSession(session2));
-
     SessionHandle session3(chip::kTestDeviceNodeId, 1, 1, 0);
     SessionHandle session4(chip::kTestDeviceNodeId, 1, 2, 0);
     NL_TEST_ASSERT(inSuite, !(session3 == session4));
@@ -69,7 +53,6 @@ void TestMatchSession(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("InitialState",    TestInitialState),
     NL_TEST_DEF("MatchSession",    TestMatchSession),
     NL_TEST_SENTINEL()
 };
