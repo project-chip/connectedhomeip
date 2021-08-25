@@ -145,7 +145,8 @@ public:
         return *this;
     }
 
-    bool operator==(const Variant & other) const {
+    bool operator==(const Variant & other) const
+    {
         return GetType() == other.GetType() && Curry::Equal(mTypeId, &other.mData, &mData);
     }
 

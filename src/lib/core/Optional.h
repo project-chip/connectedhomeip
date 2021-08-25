@@ -37,27 +37,18 @@ template <class T>
 class Optional
 {
 public:
-    constexpr Optional() {
-        mVariant.template Set<None>();
-    }
-    explicit Optional(const T & value) {
-        mVariant.template Set<Some>(value);
-    }
+    constexpr Optional() { mVariant.template Set<None>(); }
+    explicit Optional(const T & value) { mVariant.template Set<Some>(value); }
 
     constexpr Optional(const Optional & other) = default;
     constexpr Optional(Optional && other)      = default;
     constexpr Optional & operator=(const Optional & other) = default;
 
     /** Make the optional contain a specific value */
-    constexpr void SetValue(const T & value)
-    {
-        mVariant.template Set<Some>(value);
-    }
+    constexpr void SetValue(const T & value) { mVariant.template Set<Some>(value); }
 
     /** Invalidate the value inside the optional. Optional now has no value */
-    constexpr void ClearValue() {
-        mVariant.template Set<None>();
-    }
+    constexpr void ClearValue() { mVariant.template Set<None>(); }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
     const T & Value() const
@@ -68,15 +59,10 @@ public:
 
     /** Gets the current value of the optional if the optional has a value;
         otherwise returns the provided default value. */
-    const T & ValueOr(const T & defaultValue) const
-    {
-        return HasValue() ? Value() : defaultValue;
-    }
+    const T & ValueOr(const T & defaultValue) const { return HasValue() ? Value() : defaultValue; }
 
     /** Checks if the optional contains a value or not */
-    constexpr bool HasValue() const {
-        return !mVariant.template Is<None>();
-    }
+    constexpr bool HasValue() const { return !mVariant.template Is<None>(); }
 
     bool operator==(const Optional & other) const { return mVariant == other.mVariant; }
     bool operator!=(const Optional & other) const { return !(*this == other); }
