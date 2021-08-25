@@ -747,6 +747,9 @@ CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & i
             interface = InterfaceId(currentId);
             return CHIP_NO_ERROR;
         }
+#if __MBED__
+        CloseIOCTLSocket();
+#endif
     }
     interface = InterfaceId::Null();
     return INET_ERROR_UNKNOWN_INTERFACE;
