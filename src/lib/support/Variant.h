@@ -62,7 +62,8 @@ struct VariantCurry<T, Ts...>
 
     inline static bool Equal(std::size_t type_t, const void * that_v, const void * this_v)
     {
-        if (type_t == T::VariantId) {
+        if (type_t == T::VariantId)
+        {
 #if defined __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wuninitialized"
