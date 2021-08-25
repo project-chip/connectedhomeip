@@ -18,8 +18,8 @@
 #include <AppConfig.h>
 #include <LcdPainter.h>
 #include <WindowAppImpl.h>
-#include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <core/CHIPError.h>
 #include <lcd.h>
