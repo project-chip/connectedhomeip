@@ -10,6 +10,7 @@ RUN wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.13.0/
     && rm zephyr-toolchain-riscv64-0.13.0-linux-x86_64-setup.run
 
 # Setup Zephyr
+# @todo: Add --mr=zephyr-v2.7.0 to west init command (line 26) as soon as this version would be released
 ARG ZEPHYR_PROJECT_DIR=/opt/telink/zephyrproject
 ENV PATH="/root/.local/bin:${PATH}"
 RUN apt update \
@@ -22,7 +23,6 @@ RUN apt update \
     libsdl2-dev \
     && pip3 install --user -U west \
     && pip3 install pyelftools \
-    # @todo: Add --mr=zephyr-v2.7.0 as soon as this version would be released
     && west init ${ZEPHYR_PROJECT_DIR} \
     && cd ${ZEPHYR_PROJECT_DIR} && west update && west zephyr-export \
     && python3 -m pip install -U pip \
