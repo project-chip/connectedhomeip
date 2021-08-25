@@ -53,6 +53,10 @@ logs).
 > Note: The container (as well as the networks) will be preserved for debugging.
 > You may need to clean it by yourself.
 
+> Binary paths are hard-coded in the relevant unit tests, generally
+> with code of the form  `os.path.join(CHIP_REPO, ...`. The hardcoded paths
+> follow use the binary path valid after `gn_build.sh`.
+
 ## Run specific test
 
 You can run a single cirque test by:
@@ -131,5 +135,4 @@ It will print the container id in log, you can execute commands inside them.
 After you finished you test, press `Ctrl-C` and it will clean up testing
 environment.
 
-Refer to `test-manual.py`, `ManualTest.sh`, and tolologies file under
-`topologies` for detail.
+Refer to `ManualTest.py`, and tolologies file under `topologies` for detail.
