@@ -285,11 +285,11 @@ class ChipDeviceController(object):
         else:
             raise self._ChipStack.ErrorToException(res)
 
-    def GetRawFabricId(self):
+    def GetFabricId(self):
         fabricid = c_uint64(0)
 
         res = self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_GetRawFabricId(
+            lambda: self._dmLib.pychip_DeviceController_GetFabricId(
                 self.devCtrl, pointer(fabricid))
         )
 

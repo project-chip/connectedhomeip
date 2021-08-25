@@ -57,7 +57,7 @@ CHIP_ERROR FabricInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
     info->mFabric   = Encoding::LittleEndian::HostSwap16(mFabric);
     info->mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
 
-    info->mRawFabricId = Encoding::LittleEndian::HostSwap64(mRawFabricId);
+    info->mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
 
     size_t stringLength = strnlen(mFabricLabel, kFabricLabelMaxLengthInBytes);
     memcpy(info->mFabricLabel, mFabricLabel, stringLength);
@@ -123,15 +123,12 @@ CHIP_ERROR FabricInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     uint16_t rootCertLen, opCertsLen;
     size_t stringLength;
 
-    RawPeerId rawPeerId;
+    NodeId nodeId;
 
     SuccessOrExit(err = kvs->SyncGetKeyValue(key, info, infoSize));
 
-    mRawFabricId = Encoding::LittleEndian::HostSwap64(info->mRawFabricId);
-
-    rawPeerId.SetNodeId(Encoding::LittleEndian::HostSwap64(info->mNodeId));
-    rawPeerId.SetRawFabricId(mRawFabricId);
-
+    mFabricId   = Encoding::LittleEndian::HostSwap64(info->mFabricId);
+    nodeId      = Encoding::LittleEndian::HostSwap64(info->mNodeId);
     id          = Encoding::LittleEndian::HostSwap16(info->mFabric);
     mVendorId   = Encoding::LittleEndian::HostSwap16(info->mVendorId);
     rootCertLen = Encoding::LittleEndian::HostSwap16(info->mRootCertLen);
@@ -161,7 +158,7 @@ CHIP_ERROR FabricInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     // The compressed fabric ID doesn't change for a fabric over time.
     // Computing it here will save computational overhead when it's accessed by other
     // parts of the code.
-    SuccessOrExit(err = GetCompressedId(rawPeerId, &mOperationalId));
+    SuccessOrExit(err = GetCompressedId(mFabricId, nodeId, &mOperationalId));
 
     SuccessOrExit(err = SetOperationalCertsFromCertArray(ByteSpan(info->mOperationalCerts, opCertsLen)));
 
@@ -173,14 +170,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR FabricInfo::GetCompressedId(const RawPeerId & rawPeerId, PeerId * compressedPeerId) const
+CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId * compressedPeerId) const
 {
     ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    CompressedFabricId fabricId = 0;
-    MutableByteSpan compressedFabricId(reinterpret_cast<uint8_t *>(&fabricId), sizeof(fabricId));
-    ReturnErrorOnFailure(GenerateCompressedFabricId(mRootPubkey, rawPeerId.GetRawFabricId(), compressedFabricId));
-    compressedPeerId->SetCompressedFabricId(fabricId);
-    compressedPeerId->SetNodeId(rawPeerId.GetNodeId());
+    CompressedFabricId compressedFabricId = 0;
+    MutableByteSpan fabricIdSpan(reinterpret_cast<uint8_t *>(&compressedFabricId), sizeof(compressedFabricId));
+    ReturnErrorOnFailure(GenerateCompressedFabricId(mRootPubkey, fabricId, fabricIdSpan));
+    compressedPeerId->SetCompressedFabricId(compressedFabricId);
+    compressedPeerId->SetNodeId(nodeId);
     return CHIP_NO_ERROR;
 }
 
@@ -316,7 +313,7 @@ CHIP_ERROR FabricInfo::SetOperationalCertsFromCertArray(const ByteSpan & certArr
 }
 
 CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & opCertArray, ValidationContext & context, PeerId & nocPeerId,
-                                         FabricId & rawFabricId, Crypto::P256PublicKey & nocPubkey) const
+                                         FabricId & fabricId, Crypto::P256PublicKey & nocPubkey) const
 {
     // TODO - Optimize credentials verification logic
     //        The certificate chain construction and verification is a compute and memory intensive operation.
@@ -351,22 +348,20 @@ CHIP_ERROR FabricInfo::VerifyCredentials(const ByteSpan & opCertArray, Validatio
     // It confirms that the certs link correctly (noc -> icac -> rcac), and have been correctly signed.
     ReturnErrorOnFailure(certificates.FindValidCert(nocSubjectDN, nocSubjectKeyId, context, &resultCert));
 
-    RawPeerId rawPeerId;
-    ReturnErrorOnFailure(ExtractPeerIdFromOpCert(certificates.GetCertSet()[nocCertIndex], &rawPeerId));
+    NodeId nodeId;
+    ReturnErrorOnFailure(ExtractNodeIdFabricIdFromOpCert(certificates.GetCertSet()[nocCertIndex], &nodeId, &fabricId));
 
     if (!icac.empty())
     {
-        FabricId icacFabric = kUndefinedRawFabricId;
-        if (ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabric) == CHIP_NO_ERROR &&
-            icacFabric != kUndefinedRawFabricId)
+        FabricId icacFabric = kUndefinedFabricId;
+        if (ExtractFabricIdFromCert(certificates.GetCertSet()[1], &icacFabric) == CHIP_NO_ERROR && icacFabric != kUndefinedFabricId)
         {
-            ReturnErrorCodeIf(icacFabric != rawPeerId.GetRawFabricId(), CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
+            ReturnErrorCodeIf(icacFabric != fabricId, CHIP_ERROR_FABRIC_MISMATCH_ON_ICA);
         }
     }
 
-    ReturnErrorOnFailure(GetCompressedId(rawPeerId, &nocPeerId));
-    nocPubkey   = P256PublicKey(certificates.GetCertSet()[nocCertIndex].mPublicKey);
-    rawFabricId = rawPeerId.GetRawFabricId();
+    ReturnErrorOnFailure(GetCompressedId(fabricId, nodeId, &nocPeerId));
+    nocPubkey = P256PublicKey(certificates.GetCertSet()[nocCertIndex].mPublicKey);
 
     return CHIP_NO_ERROR;
 }
@@ -384,7 +379,7 @@ CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpa
 
     bbuf.Put(random.data(), random.size());
     bbuf.Put(mRootPubkey.ConstBytes(), mRootPubkey.Length());
-    bbuf.Put64(mRawFabricId);
+    bbuf.Put64(mFabricId);
     bbuf.Put64(destNodeId);
 
     size_t written = 0;
@@ -500,7 +495,7 @@ CHIP_ERROR FabricInfo::SetFabricInfo(FabricInfo & newFabric)
 
     ChipLogProgress(Discovery, "Verifying the received credentials");
     ReturnErrorOnFailure(VerifyCredentials(ByteSpan(newFabric.mOperationalCerts, newFabric.mOperationalCertsLen), validContext,
-                                           mOperationalId, mRawFabricId, pubkey));
+                                           mOperationalId, mFabricId, pubkey));
 
     SetOperationalCertsFromCertArray(ByteSpan(newFabric.mOperationalCerts, newFabric.mOperationalCertsLen));
     SetVendorId(newFabric.GetVendorId());

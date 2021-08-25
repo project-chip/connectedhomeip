@@ -109,7 +109,7 @@ public:
     Command(const char * commandName) : mName(commandName) {}
     virtual ~Command() {}
 
-    void SetExecutionContext(ExecutionContext & execContext) { memcpy(&mExecContext, &execContext, sizeof(execContext)); }
+    void SetExecutionContext(ExecutionContext & execContext) { mExecContext = execContext; }
 
     const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;

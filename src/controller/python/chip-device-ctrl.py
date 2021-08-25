@@ -856,7 +856,7 @@ class DeviceMgrCmd(Cmd):
                 return
 
             compressed_fabricid = self.devCtrl.GetCompressedFabricId()
-            raw_fabricid = self.devCtrl.GetRawFabricId()
+            raw_fabricid = self.devCtrl.GetFabricId()
         except exceptions.ChipStackException as ex:
             print("An exception occurred during reading FabricID:")
             print(str(ex))

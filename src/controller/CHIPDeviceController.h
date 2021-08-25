@@ -297,7 +297,7 @@ public:
     /**
      * @brief Get the raw Fabric ID assigned to the device.
      */
-    uint64_t GetRawFabricId() const { return mRawFabricId; }
+    uint64_t GetFabricId() const { return mFabricId; }
 
 protected:
     enum class State
@@ -317,8 +317,8 @@ protected:
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
-    PeerId mLocalId       = PeerId();
-    FabricId mRawFabricId = kUndefinedRawFabricId;
+    PeerId mLocalId    = PeerId();
+    FabricId mFabricId = kUndefinedFabricId;
 
     DeviceTransportMgr * mTransportMgr                             = nullptr;
     SecureSessionMgr * mSessionMgr                                 = nullptr;

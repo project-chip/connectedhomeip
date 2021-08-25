@@ -24,9 +24,10 @@ namespace chip {
 using CompressedFabricId = uint64_t;
 using FabricId           = uint64_t;
 
-constexpr CompressedFabricId kUndefinedFabricId = 0ULL;
-constexpr FabricId kUndefinedRawFabricId        = 0ULL;
-constexpr uint16_t kUndefinedVendorId           = 0U;
+constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
+
+constexpr FabricId kUndefinedFabricId = 0ULL;
+constexpr uint16_t kUndefinedVendorId = 0U;
 
 /// A peer is identified by a node id within a compressed fabric ID
 class PeerId
@@ -60,34 +61,7 @@ public:
 private:
     NodeId mNodeId = kUndefinedNodeId;
 
-    CompressedFabricId mCompressedFabricId = kUndefinedFabricId;
-};
-
-class RawPeerId
-{
-public:
-    RawPeerId() {}
-
-    NodeId GetNodeId() const { return mNodeId; }
-    RawPeerId & SetNodeId(NodeId id)
-    {
-        mNodeId = id;
-        return *this;
-    }
-
-    FabricId GetRawFabricId() const { return mFabricId; }
-    RawPeerId & SetRawFabricId(FabricId id)
-    {
-        mFabricId = id;
-        return *this;
-    }
-
-    bool operator==(const RawPeerId & other) const { return (mNodeId == other.mNodeId) && (mFabricId == other.mFabricId); }
-    bool operator!=(const RawPeerId & other) const { return (mNodeId != other.mNodeId) || (mFabricId != other.mFabricId); }
-
-private:
-    NodeId mNodeId     = kUndefinedNodeId;
-    FabricId mFabricId = kUndefinedRawFabricId;
+    CompressedFabricId mCompressedFabricId = kUndefinedCompressedFabricId;
 };
 
 } // namespace chip
