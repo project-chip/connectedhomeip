@@ -32,6 +32,7 @@
         "onoff-cluster.xml",
         "operational-credentials-cluster.xml",
         "pressure-measurement-cluster.xml",
+        "power-source-cluster.xml",
         "pump-configuration-and-control-cluster.xml",
         "pump-controller-device.xml",
         "pump-device.xml",
