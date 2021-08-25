@@ -36,8 +36,8 @@
 #include <lib/support/TypeTraits.h>
 #include <protocols/interaction_model/Constants.h>
 
-#include <app/common/gen/att-storage.h>
-#include <app/common/gen/attribute-type.h>
+#include <app-common/zap-generated/att-storage.h>
+#include <app-common/zap-generated/attribute-type.h>
 
 #include <zap-generated/endpoint_config.h>
 

@@ -1,4 +1,4 @@
-# Mark all files in the "gen" folders as auto-generated to hide them in diffs
+# Mark all files in generated folders as auto-generated to hide them in diffs
 **/gen/** linguist-generated
 # Same for files in zap-generated folders
 **/zap-generated/** linguist-generated

@@ -5,11 +5,11 @@
  *    This file contains definitions for accessors around clusters attributes.
  */
 
-#include <app/common/gen/attributes/Accessors.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/ids/Attributes.h>
-#include <app/common/gen/ids/Clusters.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af.h>
 
 namespace chip {

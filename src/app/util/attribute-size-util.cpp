@@ -41,12 +41,12 @@
 
 #include <app/util/af.h>
 
-#include <app/common/gen/attribute-type.h>
+#include <app-common/zap-generated/attribute-type.h>
 
 using namespace chip;
 
 static const uint8_t attributeSizes[] = {
-#include <app/common/gen/attribute-size.h>
+#include <app-common/zap-generated/attribute-size.h>
 };
 
 uint8_t emberAfGetDataSize(uint8_t dataType)
