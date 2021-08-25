@@ -316,21 +316,35 @@ function chip_available_cluster_commands(options)
   return promise;
 }
 
+/**
+ * Check if there are any client clusters whose server sides have list attributes.
+ *
+ */
+function chip_has_client_cluster_with_server_list_attribute(options)
+{
+  let clientClusters = Clusters.getClientClusters();
+  let attributeLists
+      = clientClusters.then(clusters => Promise.all(clusters.map(cluster => Clusters.getServerAttributes(cluster.name))));
+  let haveServerAttribute = attributeLists.then(attrLists => attrLists.some(attrList => attrList.some(attr => attr.isList)));
+  return asPromise.call(this, haveServerAttribute);
+}
+
 //
 // Module exports
 //
-exports.chip_clusters                   = chip_clusters;
-exports.chip_has_clusters               = chip_has_clusters;
-exports.chip_client_clusters            = chip_client_clusters;
-exports.chip_has_client_clusters        = chip_has_client_clusters;
-exports.chip_server_clusters            = chip_server_clusters;
-exports.chip_has_server_clusters        = chip_has_server_clusters;
-exports.chip_cluster_commands           = chip_cluster_commands;
-exports.chip_cluster_command_arguments  = chip_cluster_command_arguments;
-exports.chip_server_global_responses    = chip_server_global_responses;
-exports.chip_cluster_responses          = chip_cluster_responses;
-exports.chip_cluster_response_arguments = chip_cluster_response_arguments
-exports.chip_attribute_list_entryTypes  = chip_attribute_list_entryTypes;
-exports.chip_server_cluster_attributes  = chip_server_cluster_attributes;
-exports.chip_server_has_list_attributes = chip_server_has_list_attributes;
-exports.chip_available_cluster_commands = chip_available_cluster_commands;
+exports.chip_clusters                                      = chip_clusters;
+exports.chip_has_clusters                                  = chip_has_clusters;
+exports.chip_client_clusters                               = chip_client_clusters;
+exports.chip_has_client_clusters                           = chip_has_client_clusters;
+exports.chip_server_clusters                               = chip_server_clusters;
+exports.chip_has_server_clusters                           = chip_has_server_clusters;
+exports.chip_cluster_commands                              = chip_cluster_commands;
+exports.chip_cluster_command_arguments                     = chip_cluster_command_arguments;
+exports.chip_server_global_responses                       = chip_server_global_responses;
+exports.chip_cluster_responses                             = chip_cluster_responses;
+exports.chip_cluster_response_arguments                    = chip_cluster_response_arguments
+exports.chip_attribute_list_entryTypes                     = chip_attribute_list_entryTypes;
+exports.chip_server_cluster_attributes                     = chip_server_cluster_attributes;
+exports.chip_server_has_list_attributes                    = chip_server_has_list_attributes;
+exports.chip_available_cluster_commands                    = chip_available_cluster_commands;
+exports.chip_has_client_cluster_with_server_list_attribute = chip_has_client_cluster_with_server_list_attribute

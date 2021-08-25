@@ -348,31 +348,6 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
-static EmberAfStatus PrepareListFromTLV(TLV::TLVReader * tlvData, const uint8_t *& message, uint16_t & messageLen)
-{
-    CHIP_ERROR tlvError = CHIP_NO_ERROR;
-    TLV::TLVReader reader;
-    TLV::TLVType type;
-    reader.Init(*tlvData);
-    reader.EnterContainer(type);
-    tlvError = reader.Next();
-    if (tlvError != CHIP_NO_ERROR && tlvError != CHIP_END_OF_TLV && CanCastTo<uint16_t>(reader.GetLength()))
-    {
-        return EMBER_ZCL_STATUS_INVALID_VALUE;
-    }
-    if (tlvError == CHIP_NO_ERROR)
-    {
-        tlvError   = reader.GetDataPtr(message);
-        messageLen = static_cast<uint16_t>(reader.GetLength());
-    }
-    if (tlvError != CHIP_NO_ERROR)
-    {
-        return EMBER_ZCL_STATUS_INVALID_VALUE;
-    }
-    reader.ExitContainer(type);
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
-
 bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "emberAfReportAttributeCallback:");
