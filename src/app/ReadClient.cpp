@@ -267,9 +267,10 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(!IsFree(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData), err = CHIP_ERROR_INVALID_MESSAGE_TYPE)
-    //  on server, please compare exchange context for first status report
-    err = ProcessReportData(std::move(aPayload));
+    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData),
+                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE)
+        //  on server, please compare exchange context for first status report
+        err = ProcessReportData(std::move(aPayload));
     if (err != CHIP_NO_ERROR)
     {
         mpDelegate->ReportError(this, err);
