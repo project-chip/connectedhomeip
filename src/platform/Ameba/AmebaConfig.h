@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include "chip_porting.h"
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <string.h>
 
