@@ -82,6 +82,12 @@ jobs:
             - name: Build example nRF Connect SDK Shell on nRF5340 DK
               timeout-minutes: 5
               run: scripts/examples/nrfconnect_example.sh shell nrf5340dk_nrf5340_cpuapp
+            - name: Build example nRF Connect SDK Pump App on nRF52840 DK
+              timeout-minutes: 5
+              run: scripts/examples/nrfconnect_example.sh pump-app nrf52840dk_nrf52840
+            - name: Build example nRF Connect SDK Pump Controller App on nRF52840 DK
+              timeout-minutes: 5
+              run: scripts/examples/nrfconnect_example.sh pump-controller-app nrf52840dk_nrf52840
             - name: Run unit tests for Zephyr native_posix_64 platform
               timeout-minutes: 5
               run:
