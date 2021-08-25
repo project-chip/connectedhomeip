@@ -25,6 +25,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <support/ErrorStr.h>
 
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
@@ -318,6 +319,14 @@ struct ChipClient
 
 static ChipClient gChipClient;
 
+void HandleMessageReceived(System::PacketBufferHandle && buffer)
+{
+    streamer_t * sout = streamer_get();
+
+    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
+                    strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
+}
+
 void HandleResponseTimerComplete(System::Layer * aSystemLayer, void * aAppState)
 {
     streamer_printf(streamer_get(), "ERROR: Received client response failed\r\n");
@@ -326,18 +335,27 @@ void HandleResponseTimerComplete(System::Layer * aSystemLayer, void * aAppState)
 
 void HandleDNSResolveComplete(void * appState, CHIP_ERROR error, uint8_t addrCount, IPAddress * addrArray)
 {
-    if (addrCount > 0)
+    streamer_t * sout = streamer_get();
+
+    if (error != CHIP_NO_ERROR)
     {
-        char destAddrStr[64];
-        for (int i = 0; i < addrCount; i++)
+        if (addrCount > 0)
         {
-            addrArray[i].ToString(destAddrStr, sizeof(destAddrStr));
-            streamer_printf(streamer_get(), "INFO: %d DNS name resolution complete: %s\r\n", i, destAddrStr);
+            char destAddrStr[64];
+            for (int i = 0; i < addrCount; i++)
+            {
+                addrArray[i].ToString(destAddrStr, sizeof(destAddrStr));
+                streamer_printf(sout, "INFO: %d DNS name resolution complete: %s\r\n", i, destAddrStr);
+            }
+        }
+        else
+        {
+            streamer_printf(sout, "INFO: DNS name resolution return no addresses\r\n");
         }
     }
     else
     {
-        streamer_printf(streamer_get(), "ERROR: DNS name resolution return no addresses\r\n");
+        streamer_printf(sout, "ERROR: DNS resolve failed: %s\r\n", ErrorStr(error));
     }
 }
 
@@ -345,11 +363,8 @@ CHIP_ERROR OnTcpMessageReceived(TCPEndPoint * endPoint, System::PacketBufferHand
 {
     DeviceLayer::SystemLayer.CancelTimer(HandleResponseTimerComplete, nullptr);
 
-    streamer_t * sout                  = streamer_get();
-    System::PacketBufferHandle message = buffer.PopHead();
-    streamer_printf(sout, "INFO: TCP message received\r\n");
-    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
-                    strstr((char *) message->Start(), "\n") - (char *) message->Start(), (char *) message->Start());
+    streamer_printf(streamer_get(), "INFO: TCP message received\r\n");
+    HandleMessageReceived(std::move(buffer));
     gChipClient.Free();
     return CHIP_NO_ERROR;
 }
@@ -380,7 +395,7 @@ void OnTcpConnectionCompleted(TCPEndPoint * endPoint, CHIP_ERROR error)
     }
     else
     {
-        streamer_printf(streamer_get(), "ERROR: TCP client connection failed\r\n");
+        streamer_printf(streamer_get(), "ERROR: TCP client connection failed: %s\r\n", ErrorStr(error));
         gChipClient.Free();
     }
 }
@@ -393,19 +408,17 @@ void OnUdpMessageReceived(IPEndPointBasis * endPoint, System::PacketBufferHandle
     streamer_t * sout       = streamer_get();
     PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
     peerAddress.ToString(peerAddrStr, sizeof(peerAddrStr));
-    System::PacketBufferHandle message = buffer.PopHead();
 
     streamer_printf(sout, "INFO: UDP message received from %s\r\n", peerAddrStr);
-    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
-                    strstr((char *) message->Start(), "\n") - (char *) message->Start(), (char *) message->Start());
+    HandleMessageReceived(std::move(buffer));
     gChipClient.Free();
 }
 
-void OnUdpMReceiveError(IPEndPointBasis * endPoint, CHIP_ERROR err, const IPPacketInfo * pktInfo)
+void OnUdpMReceiveError(IPEndPointBasis * endPoint, CHIP_ERROR error, const IPPacketInfo * pktInfo)
 {
     DeviceLayer::SystemLayer.CancelTimer(HandleResponseTimerComplete, nullptr);
 
-    streamer_printf(streamer_get(), "ERROR: UDP receive failed\r\n");
+    streamer_printf(streamer_get(), "ERROR: UDP receive failed: %s\r\n", ErrorStr(error));
     gChipClient.Free();
 }
 
@@ -890,7 +903,7 @@ static const shell_command_t cmds_server_root = { &cmd_server_dispatch, "server"
 
 static const shell_command_t cmds_server[] = { { &cmd_server_on, "on",
                                                  "Create CHIP server for communication testing.\n"
-                                                 "\tUsage: server on <type> <port>[optional - default 11097]\n"
+                                                 "\tUsage: server on <type> <port>[optional]\n"
                                                  "\tExample: server on UDP 7" },
                                                { &cmd_server_off, "off",
                                                  "Shutdown current CHIP server instance.\n"
