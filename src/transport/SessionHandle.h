@@ -24,8 +24,6 @@ class SecureSessionMgr;
 class SessionHandle
 {
 public:
-    SessionHandle() : mPeerNodeId(kPlaceholderNodeId), mFabric(Transport::kUndefinedFabricIndex) {}
-
     SessionHandle(NodeId peerNodeId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric) {}
 
     SessionHandle(NodeId peerNodeId, uint16_t localKeyId, uint16_t peerKeyId, FabricIndex fabric) :
@@ -63,6 +61,12 @@ public:
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     const Optional<uint16_t> & GetPeerKeyId() const { return mPeerKeyId; }
     const Optional<uint16_t> & GetLocalKeyId() const { return mLocalKeyId; }
+
+    // TODO: currently SessionHandle is not able to identify a unauthenticated session, create an empty handle for it
+    static SessionHandle TemporaryUnauthenticatedSession()
+    {
+        return SessionHandle(kPlaceholderNodeId, Transport::kUndefinedFabricIndex);
+    }
 
 private:
     friend class SecureSessionMgr;

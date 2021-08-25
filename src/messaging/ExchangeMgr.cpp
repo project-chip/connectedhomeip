@@ -315,7 +315,7 @@ void ExchangeManager::OnConnectionExpired(SessionHandle session)
     }
 
     mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec->mSecureSession == session)
+        if (ec->mSecureSession.HasValue() && ec->mSecureSession.Value() == session)
         {
             ec->OnConnectionExpired();
             // Continue to iterate because there can be multiple exchanges

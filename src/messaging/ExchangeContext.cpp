@@ -93,6 +93,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     Transport::PeerConnectionState * state = nullptr;
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(mSecureSession.HasValue(), CHIP_ERROR_CONNECTION_ABORTED);
 
     // Don't let method get called on a freed object.
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
@@ -104,7 +105,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     bool reliableTransmissionRequested = true;
 
-    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
+    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession.Value());
     // If sending via UDP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
     if (state != nullptr && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
     {
@@ -141,7 +142,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     {
         // Create a new scope for `err`, to avoid shadowing warning previous `err`.
-        CHIP_ERROR err = mDispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
+        CHIP_ERROR err = mDispatch->SendMessage(mSecureSession.Value(), mExchangeId, IsInitiator(), GetReliableMessageContext(),
                                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
         if (err != CHIP_NO_ERROR && IsResponseExpected())
         {
@@ -233,9 +234,9 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Sess
 {
     VerifyOrDie(mExchangeMgr == nullptr);
 
-    mExchangeMgr   = em;
-    mExchangeId    = ExchangeId;
-    mSecureSession = session;
+    mExchangeMgr = em;
+    mExchangeId  = ExchangeId;
+    mSecureSession.SetValue(session);
     mFlags.Set(Flags::kFlagInitiator, Initiator);
     mDelegate = delegate;
 
@@ -305,7 +306,7 @@ bool ExchangeContext::MatchExchange(SessionHandle session, const PacketHeader & 
         (mExchangeId == payloadHeader.GetExchangeID())
 
         // AND The Session ID associated with the incoming message matches the Session ID associated with the exchange.
-        && (mSecureSession.MatchIncomingSession(session))
+        && (mSecureSession.HasValue() && mSecureSession.Value().MatchIncomingSession(session))
 
         // AND The message was sent by an initiator and the exchange context is a responder (IsInitiator==false)
         //    OR The message was sent by a responder and the exchange context is an initiator (IsInitiator==true) (for the broadcast
@@ -320,7 +321,7 @@ void ExchangeContext::OnConnectionExpired()
     // connection state) value, because it's still referencing the now-expired
     // connection.  This will mean that no more messages can be sent via this
     // exchange, which seems fine given the semantics of connection expiration.
-    mSecureSession = SessionHandle();
+    mSecureSession.ClearValue();
 
     if (!IsResponseExpected())
     {

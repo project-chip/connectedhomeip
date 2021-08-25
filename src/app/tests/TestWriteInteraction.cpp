@@ -217,7 +217,8 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
     AddAttributeDataElement(apSuite, apContext, writeClientHandle);
 
     SessionHandle session = ctx.GetSessionLocalToPeer();
-    err                   = writeClientHandle.SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session);
+    err                   = writeClientHandle.SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(),
+                                             Optional<SessionHandle>::Value(session));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // The internal WriteClient should be nullptr once we SendWriteRequest.
     NL_TEST_ASSERT(apSuite, nullptr == writeClientHandle.mpWriteClient);
@@ -306,7 +307,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
     SessionHandle session = ctx.GetSessionLocalToPeer();
 
-    err = writeClient.SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session);
+    err = writeClient.SendWriteRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), Optional<SessionHandle>::Value(session));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, delegate.mGotResponse);

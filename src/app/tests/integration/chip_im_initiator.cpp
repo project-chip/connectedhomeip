@@ -126,7 +126,8 @@ CHIP_ERROR SendCommandRequest(chip::app::CommandSender * commandSender)
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr, gMessageTimeoutMsec);
+    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, chip::Optional<chip::SessionHandle>::Missing(),
+                                            gMessageTimeoutMsec);
     SuccessOrExit(err);
 
 exit:
@@ -163,7 +164,8 @@ CHIP_ERROR SendBadCommandRequest(chip::app::CommandSender * commandSender)
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr, gMessageTimeoutMsec);
+    err = commandSender->SendCommandRequest(chip::kTestDeviceNodeId, gFabricIndex, chip::Optional<chip::SessionHandle>::Missing(),
+                                            gMessageTimeoutMsec);
     SuccessOrExit(err);
 
 exit:
@@ -199,7 +201,8 @@ CHIP_ERROR SendReadRequest()
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
-        chip::kTestDeviceNodeId, gFabricIndex, nullptr, eventPathParams, 2, &attributePathParams, 1, number, gMessageTimeoutMsec);
+        chip::kTestDeviceNodeId, gFabricIndex, chip::Optional<chip::SessionHandle>::Missing(), eventPathParams, 2,
+        &attributePathParams, 1, number, gMessageTimeoutMsec);
     SuccessOrExit(err);
 
 exit:
@@ -236,7 +239,8 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
 
     SuccessOrExit(err = writer->PutBoolean(chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), true));
     SuccessOrExit(err = apWriteClient->FinishAttribute());
-    SuccessOrExit(err = apWriteClient.SendWriteRequest(chip::kTestDeviceNodeId, gFabricIndex, nullptr, gMessageTimeoutMsec));
+    SuccessOrExit(err = apWriteClient.SendWriteRequest(chip::kTestDeviceNodeId, gFabricIndex,
+                                                       chip::Optional<chip::SessionHandle>::Missing(), gMessageTimeoutMsec));
 
     gWriteCount++;
 

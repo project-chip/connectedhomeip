@@ -55,7 +55,7 @@ public:
     //
     // If SendCommandRequest is never called, or the call fails, the API
     // consumer is responsible for calling Shutdown on the CommandSender.
-    CHIP_ERROR SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * secureSession,
+    CHIP_ERROR SendCommandRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> secureSession,
                                   uint32_t timeout = kImMessageTimeoutMsec);
 
 private:
