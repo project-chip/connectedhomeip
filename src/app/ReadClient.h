@@ -82,6 +82,7 @@ public:
 
     uint64_t GetAppIdentifier() const { return mAppIdentifier; }
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+    CHIP_ERROR SendStatusReport(CHIP_ERROR aError, bool aExpectResponse);
 
 private:
     friend class TestReadInteraction;
@@ -136,7 +137,7 @@ private:
      * Internal shutdown method that we use when we know what's going on with
      * our exchange and don't need to manually close it.
      */
-    void ShutdownInternal();
+    void ShutdownInternal(CHIP_ERROR aError);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;

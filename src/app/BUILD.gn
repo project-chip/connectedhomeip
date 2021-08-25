@@ -115,6 +115,7 @@ static_library("app") {
     ":app_buildconfig",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]

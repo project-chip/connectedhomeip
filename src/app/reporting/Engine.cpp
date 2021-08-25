@@ -284,14 +284,9 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     ChipLogDetail(DataManagement, "<RE> ReportsInFlight = %" PRIu32 " with readHandler %" PRIu32 ", RE has %s", mNumReportsInFlight,
                   mCurReadHandlerIdx, mMoreChunkedMessages ? "more messages" : "no more messages");
 
-    if (!mMoreChunkedMessages)
-    {
-        OnReportConfirm();
-    }
-
 exit:
     ChipLogFunctError(err);
-    if (!mMoreChunkedMessages || err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         apReadHandler->Shutdown();
     }
