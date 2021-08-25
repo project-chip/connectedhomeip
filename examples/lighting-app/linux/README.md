@@ -141,7 +141,7 @@ details.
     `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
 
 -   To use the chip-rpc console after it has been installed run:
-    `python3 -m chip-rpc.console -s localhost:33000 -o /<YourFolder>/pw_log.out`
+    `python3 -m chip_rpc.console -s localhost:33000 -o /<YourFolder>/pw_log.out`
 
 -   Then you can Get and Set the light using the RPCs:
     `rpcs.chip.rpc.Lighting.Get()`
