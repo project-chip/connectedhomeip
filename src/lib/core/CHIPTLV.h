@@ -845,6 +845,77 @@ protected:
 };
 
 /**
+ * A TLVReader that is backed by a single contiguous buffer.  This exposes some
+ * additional methods that point directly into that buffer.
+ */
+class ContiguousBufferTLVReader : public TLVReader
+{
+public:
+    ContiguousBufferTLVReader() : TLVReader() {}
+
+    /**
+     * Init with input buffer as ptr + length pair.
+     */
+    void Init(const uint8_t * data, size_t dataLen) { TLVReader::Init(data, dataLen); }
+
+    /**
+     * Init with input buffer as ByteSpan.
+     */
+    void Init(const ByteSpan & data) { Init(data.data(), data.size()); }
+
+    /**
+     * Init with input buffer as byte array.
+     */
+    template <size_t N>
+    void Init(const uint8_t (&data)[N])
+    {
+        Init(data, N);
+    }
+
+    /**
+     * Allow opening a container, wit ha new ContiguousBufferTLVReader reading
+     * that container.  See TLVReader::OpenContainer for details.
+     */
+    CHIP_ERROR OpenContainer(ContiguousBufferTLVReader & containerReader);
+
+    /**
+     * Get the value of the current UTF8 string as a Span<const char> pointing
+     * into the TLV data.  Consumers may need to copy the data elsewhere as
+     * needed (e.g. before releasing the reader and its backing buffer if they
+     * plan to use the data after that point).
+     *
+     * @param[out] data                     A Span<const char> representing the string data.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV UTF8 string, or
+     *                                      the reader is not positioned on an element.
+     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely (i.e. the string length was "too big").
+     * @retval other                        Other CHIP or platform error codes returned by the configured
+     *                                      TLVBackingStore.
+     *
+     */
+    CHIP_ERROR GetStringView(Span<const char> & data);
+
+    /**
+     * Get the value of the current octet string as a ByteSpan pointing into the
+     * TLV data.  Consumers may need to copy the data elsewhere as needed
+     * (e.g. before releasing the reader and its backing buffer if they plan to
+     * use the data after that point).
+     *
+     * @param[out] data                     A ByteSpan representing the string data.
+     *
+     * @retval #CHIP_NO_ERROR              If the method succeeded.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV octet string, or
+     *                                      the reader is not positioned on an element.
+     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely (i.e. the string length was "too big").
+     * @retval other                        Other CHIP or platform error codes returned by the configured
+     *                                      TLVBackingStore.
+     *
+     */
+    CHIP_ERROR GetByteView(ByteSpan & data);
+};
+
+/**
  * Provides a memory efficient encoder for writing data in CHIP TLV format.
  *
  * TLVWriter implements a forward-only, stream-style encoder for CHIP TLV data.  Applications
