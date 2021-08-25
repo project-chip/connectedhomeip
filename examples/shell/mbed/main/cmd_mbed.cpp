@@ -345,11 +345,11 @@ CHIP_ERROR OnTcpMessageReceived(TCPEndPoint * endPoint, System::PacketBufferHand
 {
     DeviceLayer::SystemLayer.CancelTimer(HandleResponseTimerComplete, nullptr);
 
-    streamer_t * sout = streamer_get();
+    streamer_t * sout                  = streamer_get();
+    System::PacketBufferHandle message = buffer.PopHead();
     streamer_printf(sout, "INFO: TCP message received\r\n");
     streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
-                    strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
-    buffer.FreeHead();
+                    strstr((char *) message->Start(), "\n") - (char *) message->Start(), (char *) message->Start());
     gChipClient.Free();
     return CHIP_NO_ERROR;
 }
@@ -393,11 +393,11 @@ void OnUdpMessageReceived(IPEndPointBasis * endPoint, System::PacketBufferHandle
     streamer_t * sout       = streamer_get();
     PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
     peerAddress.ToString(peerAddrStr, sizeof(peerAddrStr));
+    System::PacketBufferHandle message = buffer.PopHead();
 
     streamer_printf(sout, "INFO: UDP message received from %s\r\n", peerAddrStr);
     streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
-                    strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
-    buffer.FreeHead();
+                    strstr((char *) message->Start(), "\n") - (char *) message->Start(), (char *) message->Start());
     gChipClient.Free();
 }
 
@@ -514,10 +514,17 @@ CHIP_ERROR cmd_network_client(int argc, char ** argv)
             ExitNow();
         }
 
+        error = gChipClient.udp->Bind(IPAddressType::kIPAddressType_IPv4, Inet::IPAddress::Any, CHIP_PORT,
+                                      networkInterface.GetInterfaceId());
+        if (error != CHIP_NO_ERROR)
+        {
+            streamer_printf(sout, "ERROR: UDP endpoint bind failed\r\n");
+            ExitNow();
+        }
+
         if (gChipClient.response)
         {
-            gChipClient.udp->mState = IPEndPointBasis::kState_Bound;
-            error                   = gChipClient.udp->Listen(OnUdpMessageReceived, OnUdpMReceiveError, nullptr);
+            error = gChipClient.udp->Listen(OnUdpMessageReceived, OnUdpMReceiveError, nullptr);
             if (error != CHIP_NO_ERROR)
             {
                 streamer_printf(sout, "ERROR: UDP endpoint listen failed\r\n");
@@ -536,6 +543,10 @@ CHIP_ERROR cmd_network_client(int argc, char ** argv)
         {
             DeviceLayer::SystemLayer.StartTimer(gResponseReceivedTimeoutlMs, HandleResponseTimerComplete, nullptr);
         }
+        else
+        {
+            gChipClient.Free();
+        }
     }
 
 exit:
@@ -550,10 +561,10 @@ exit:
 CHIP_ERROR cmd_network_example(int argc, char ** argv)
 {
     InterfaceIterator networkInterface;
-    CHIP_ERROR error    = CHIP_NO_ERROR;
-    IPAddress IPaddr[5] = { IPAddress::Any };
-    const uint16_t port = 80;
-    bool async_dummy    = false;
+    CHIP_ERROR error               = CHIP_NO_ERROR;
+    const size_t maxIPAddress      = 5;
+    const uint16_t port            = 80;
+    IPAddress IPaddr[maxIPAddress] = { IPAddress::Any };
     char destAddrStr[64];
 
     const char hostname[] = "ifconfig.io";
@@ -573,7 +584,7 @@ CHIP_ERROR cmd_network_example(int argc, char ** argv)
 
     streamer_printf(sout, "TCP test host : %s\r\n", hostname);
 
-    DeviceLayer::InetLayer.ResolveHostAddress(hostname, 4, IPaddr, HandleDNSResolveComplete, &async_dummy);
+    DeviceLayer::InetLayer.ResolveHostAddress(hostname, maxIPAddress, IPaddr, HandleDNSResolveComplete, nullptr);
 
     gChipClient.Free();
     error = DeviceLayer::InetLayer.NewTCPEndPoint(&gChipClient.tcp);
