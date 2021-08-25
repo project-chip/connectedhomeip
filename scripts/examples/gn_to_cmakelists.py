@@ -18,6 +18,9 @@
 
 ##
 #    @file
+#
+# generate CMakeLists.txt from gn system, so that we can build and debug evertying in Android Studio
+#
 # Usage: gn_to_cmake.py <json_file_name>
 
 # gn gen out/config --ide=json --json-ide-script=//scripts/examples/gn_to_cmake.py
