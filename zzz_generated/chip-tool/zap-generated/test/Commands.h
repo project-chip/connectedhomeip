@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "TestCommand.h"
+#include <commands/tests/TestCommand.h>
 
 class TV_TargetNavigatorCluster : public TestCommand
 {
