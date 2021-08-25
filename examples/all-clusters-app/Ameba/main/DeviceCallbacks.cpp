@@ -73,7 +73,7 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
     }
 }
 
-void IdentifyTimerHandler(Layer * systemLayer, void * appState, Error error)
+void IdentifyTimerHandler(Layer * systemLayer, void * appState, CHIP_ERROR error)
 {
     if (identifyTimerCount)
     {

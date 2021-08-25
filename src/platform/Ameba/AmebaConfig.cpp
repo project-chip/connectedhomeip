@@ -221,7 +221,7 @@ bool AmebaConfig::ConfigValueExists(Key key)
 {
     // TODO
     // Check if configuration value exists
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return 45;
 }
 
 CHIP_ERROR AmebaConfig::EnsureNamespace(const char * ns)

@@ -60,7 +60,7 @@ uint64_t GetClock_MonotonicHiRes(void)
     return xTaskGetTickCount() * 1000;
 }
 
-Error GetClock_RealTime(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTime(uint64_t & curTime)
 {
     time_t seconds;
     struct rtkTimeVal tv;
@@ -79,7 +79,7 @@ Error GetClock_RealTime(uint64_t & curTime)
     return CHIP_NO_ERROR;
 }
 
-Error GetClock_RealTimeMS(uint64_t & curTime)
+CHIP_ERROR GetClock_RealTimeMS(uint64_t & curTime)
 {
     time_t seconds;
     struct rtkTimeVal tv;
@@ -99,7 +99,7 @@ Error GetClock_RealTimeMS(uint64_t & curTime)
     return CHIP_NO_ERROR;
 }
 
-Error SetClock_RealTime(uint64_t newCurTime)
+CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)
 {
     rtc_init();
     rtc_write(newCurTime);
