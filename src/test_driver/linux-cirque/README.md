@@ -53,9 +53,9 @@ logs).
 > Note: The container (as well as the networks) will be preserved for debugging.
 > You may need to clean it by yourself.
 
-> Binary paths are hard-coded in the relevant unit tests, generally
-> with code of the form  `os.path.join(CHIP_REPO, ...`. The hardcoded paths
-> follow use the binary path valid after `gn_build.sh`.
+> Binary paths are hard-coded in the relevant unit tests, generally with code of
+> the form `os.path.join(CHIP_REPO, ...`. The hardcoded paths follow use the
+> binary path valid after `gn_build.sh`.
 
 ## Run specific test
 
