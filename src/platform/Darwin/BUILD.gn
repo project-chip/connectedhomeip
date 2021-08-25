@@ -39,6 +39,8 @@ static_library("Darwin") {
     "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
+    "CHIPP256KeypairNativeBridge.cpp",
+    "CHIPP256KeypairNativeBridge.h",
     "CHIPPlatformConfig.h",
     "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",
