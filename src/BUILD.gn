@@ -84,7 +84,8 @@ if (chip_build_tests) {
       deps += [ "${chip_root}/src/lib/mdns/minimal/tests" ]
     }
 
-    if (chip_device_platform != "esp32" && chip_device_platform != "efr32" && chip_device_platform != "ameba") {
+    if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
+        chip_device_platform != "ameba") {
       deps += [ "${chip_root}/src/platform/tests" ]
     }
 
