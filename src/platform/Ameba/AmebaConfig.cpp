@@ -76,10 +76,10 @@ const AmebaConfig::Key AmebaConfig::kConfigKey_Breadcrumb                  = { k
 CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, bool & val)
 {
     uint32_t intVal;
-    int32_t success=0;
+    int32_t success = 0;
 
     success = getPref_u32(key.Namespace, key.Name, kPrefsTypeBoolean, &intVal);
-    val = (intVal != 0);
+    val     = (intVal != 0);
 
     if (success == 1)
         return CHIP_NO_ERROR;
@@ -89,8 +89,8 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, bool & val)
 
 CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint32_t & val)
 {
-    int32_t success=0;
-    success = getPref_u32(key.Namespace, key.Name, kPrefsTypeInteger, &val);
+    int32_t success = 0;
+    success         = getPref_u32(key.Namespace, key.Name, kPrefsTypeInteger, &val);
 
     if (success == 1)
         return CHIP_NO_ERROR;
@@ -107,7 +107,7 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint64_t & val)
 
 CHIP_ERROR AmebaConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    int32_t ret       = 0;
+    int32_t ret = 0;
 
     ret = getPref_str(key.Namespace, key.Name, kPrefsTypeString, buf, &outLen);
 
@@ -170,7 +170,7 @@ CHIP_ERROR AmebaConfig::WriteConfigValue(Key key, uint64_t val)
 CHIP_ERROR AmebaConfig::WriteConfigValueStr(Key key, const char * str)
 {
     int32_t success;
-    char * _str       = (char *) malloc(strlen(str) + 1);
+    char * _str = (char *) malloc(strlen(str) + 1);
 
     if (_str == NULL)
     {
