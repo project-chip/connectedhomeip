@@ -86,6 +86,12 @@ public class ChipDeviceController {
     }
   }
 
+  public void pairDeviceWithAddress(
+      long deviceId, String address, int port, int discriminator, long pinCode, byte[] csrNonce) {
+    pairDeviceWithAddress(
+        deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce);
+  }
+
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
   }
@@ -236,6 +242,15 @@ public class ChipDeviceController {
 
   private native void pairDevice(
       long deviceControllerPtr, long deviceId, int connectionId, long pinCode, byte[] csrNonce);
+
+  private native void pairDeviceWithAddress(
+      long deviceControllerPtr,
+      long deviceId,
+      String address,
+      int port,
+      int discriminator,
+      long pinCode,
+      byte[] csrNonce);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
 

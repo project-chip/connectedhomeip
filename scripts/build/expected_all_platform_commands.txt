@@ -105,19 +105,19 @@ export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
 west build --cmake-only -d /OUTPUT/DIR/nrf-nrf5340-pump_controller -b nrf5340dk_nrf5340_cpuapp /TEST/BUILD/ROOT/examples/pump-controller-app/nrfconnect'
 
 # Generating android-arm-chip_tool
-gn gen --check --fail-on-unused-args {out}/android-arm-chip_tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME"'
+gn gen --check --fail-on-unused-args {out}/android-arm-chip_tool '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating android-arm64-chip_tool
-gn gen --check --fail-on-unused-args {out}/android-arm64-chip_tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME"'
+gn gen --check --fail-on-unused-args {out}/android-arm64-chip_tool '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating android-x64-chip_tool
-gn gen --check --fail-on-unused-args {out}/android-x64-chip_tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME"'
+gn gen --check --fail-on-unused-args {out}/android-x64-chip_tool '--args=target_os="android" target_cpu="x64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_use_clusters_for_ip_commissioning="true"'
 
 # Accepting NDK licenses
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'

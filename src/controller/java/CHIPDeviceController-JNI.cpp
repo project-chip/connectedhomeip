@@ -291,6 +291,39 @@ JNI_METHOD(void, pairDevice)
     }
 }
 
+JNI_METHOD(void, pairDeviceWithAddress)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port, jint discriminator, jint pinCode,
+ jbyteArray csrNonce)
+{
+    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "pairDeviceWithAddress() called");
+
+    Inet::IPAddress addr;
+    JniUtfString addrJniString(env, address);
+    VerifyOrReturn(Inet::IPAddress::FromString(addrJniString.c_str(), addr),
+                   ChipLogError(Controller, "Failed to parse IP address."), ThrowError(env, CHIP_ERROR_INVALID_ARGUMENT));
+
+    RendezvousParameters params = RendezvousParameters()
+                                      .SetDiscriminator(discriminator)
+                                      .SetSetupPINCode(pinCode)
+                                      .SetPeerAddress(Transport::PeerAddress::UDP(addr, port));
+    if (csrNonce != nullptr)
+    {
+        JniByteArray jniCsrNonce(env, csrNonce);
+        params.SetCSRNonce(jniCsrNonce.byteSpan());
+    }
+    err = wrapper->Controller()->PairDevice(deviceId, params);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to pair the device.");
+        ThrowError(env, err);
+    }
+}
+
 JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
