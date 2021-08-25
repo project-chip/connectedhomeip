@@ -258,7 +258,8 @@ void ChannelContext::EnterCasePairingState()
     auto & prepare              = GetPrepareVars();
     prepare.mCasePairingSession = Platform::New<CASESession>();
 
-    ExchangeContext * ctxt = mExchangeManager->NewContext(SessionHandle(), prepare.mCasePairingSession);
+    ExchangeContext * ctxt =
+        mExchangeManager->NewContext(SessionHandle::TemporaryUnauthenticatedSession(), prepare.mCasePairingSession);
     VerifyOrReturn(ctxt != nullptr);
 
     // TODO: currently only supports IP/UDP paring
