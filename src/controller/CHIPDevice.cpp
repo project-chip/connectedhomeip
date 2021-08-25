@@ -405,7 +405,8 @@ CHIP_ERROR Device::OpenPairingWindow(uint16_t timeout, PairingWindowOption optio
 CHIP_ERROR Device::CloseSession()
 {
     ReturnErrorCodeIf(mState != ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
-    if (mSecureSession.HasValue()) {
+    if (mSecureSession.HasValue())
+    {
         mSessionManager->ExpirePairing(mSecureSession.Value());
     }
     mState = ConnectionState::NotConnected;
