@@ -45,14 +45,14 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 1
+          value: 0
 
     - label: "write the default value to optional global attribute: FeatureMap"
       disabled: true
       command: "writeAttribute"
       attribute: "FeatureMap"
       arguments:
-          value: 0
+          value: 5
       response:
           error: 1
 
@@ -60,4 +60,4 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 1
+          value: 0
