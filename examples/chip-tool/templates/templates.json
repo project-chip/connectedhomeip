@@ -42,7 +42,7 @@
         {
             "path": "tests-commands.zapt",
             "name": "Tests Commands header",
-            "output": "tests/Commands.h"
+            "output": "test/Commands.h"
         }
     ]
 }
