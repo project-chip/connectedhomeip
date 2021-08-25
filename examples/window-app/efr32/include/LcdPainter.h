@@ -24,6 +24,8 @@
 enum class LcdIcon
 {
     None = 0,
+    One,
+    Two,
     Lift,
     Tilt
 };

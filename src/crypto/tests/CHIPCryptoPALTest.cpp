@@ -1769,6 +1769,7 @@ static void TestX509_PKCS7Extraction(nlTestSuite * inSuite, void * inContext)
     status = memcmp(certificate_blob_root, x509list[2], x509list[2].Length());
     NL_TEST_ASSERT(inSuite, status == 0);
 }
+#endif // CHIP_CRYPTO_OPENSSL
 
 static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
 {
@@ -1795,7 +1796,6 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(publicKey.ConstBytes(), certPubkey, certPubkeyLen) == 0);
     }
 }
-#endif // CHIP_CRYPTO_OPENSSL
 
 /**
  *   Test Suite. It lists all the test functions.
@@ -1856,8 +1856,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2p_spake2p PointIsValid", TestSPAKE2P_spake2p_PointIsValid),
     NL_TEST_DEF("Test Spake2+ against RFC test vectors", TestSPAKE2P_RFC),
     NL_TEST_DEF("Test compressed fabric identifier", TestCompressedFabricIdentifier),
-#if CHIP_CRYPTO_OPENSSL
     NL_TEST_DEF("Test Pubkey Extraction from x509 Certificate", TestPubkey_x509Extraction),
+#if CHIP_CRYPTO_OPENSSL
     NL_TEST_DEF("Test x509 Certificate Extraction from PKCS7", TestX509_PKCS7Extraction),
 #endif // CHIP_CRYPTO_OPENSSL
     NL_TEST_SENTINEL()
