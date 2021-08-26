@@ -1,19 +1,20 @@
 # Matter nRF Connect Pump Example Application
 
-The nRF Connect Pump Example demonstrates how to remotely control a pump
-device with basic start/stop functionality. It uses buttons to test changing the pump state and device
-states and LEDs to show the state of these changes. This example is inherited from the "lock-app" example
-but modified to simulate a pump device and can be used as
-a reference for creating your own pump application.
+The nRF Connect Pump Example demonstrates how to remotely control a pump device
+with basic start/stop functionality. It uses buttons to test changing the pump
+state and device states and LEDs to show the state of these changes. This
+example is inherited from the "lock-app" example but modified to simulate a pump
+device and can be used as a reference for creating your own pump application.
 
 <p align="center">
   <img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
   <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
 </p>
 
-The example is based on [Matter](https://github.com/project-chip/connectedhomeip)
-and Nordic Semiconductor's nRF Connect SDK, and supports remote access and
-control of a simulated pump over a low-power, 802.15.4 Thread network.
+The example is based on
+[Matter](https://github.com/project-chip/connectedhomeip) and Nordic
+Semiconductor's nRF Connect SDK, and supports remote access and control of a
+simulated pump over a low-power, 802.15.4 Thread network.
 
 The example behaves as a Matter accessory, that is a device that can be paired
 into an existing Matter network and can be controlled by this network.
@@ -68,8 +69,8 @@ LE advertising manually after powering up the device by pressing **Button 4**.
 ### Bluetooth LE rendezvous
 
 In this example, the commissioning procedure (called rendezvous) is done over
-Bluetooth LE between a Matter device and the Matter controller, where the controller
-has the commissioner role.
+Bluetooth LE between a Matter device and the Matter controller, where the
+controller has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the Matter device. The data payload is encoded within a QR code, printed to
@@ -133,8 +134,8 @@ following states are possible:
 -   _Solid On_ &mdash; The device is fully provisioned and has full Thread
     network and service connectivity.
 
-**LED 2** simulates the pump motor and shows the state of the pump. The following
-states are possible:
+**LED 2** simulates the pump motor and shows the state of the pump. The
+following states are possible:
 
 -   _Solid On_ &mdash; The pump is running.
 
@@ -160,7 +161,8 @@ opposite one.
 the test mode using the default configuration.
 
 **Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
-enables Bluetooth LE advertising for the predefined period of time (15 minutes by default).
+enables Bluetooth LE advertising for the predefined period of time (15 minutes
+by default).
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
