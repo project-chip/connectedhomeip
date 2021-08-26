@@ -14911,7 +14911,7 @@ private:
     }
 }
 
-- (void)readAttributeBatteryAnsiDesignationWithResponseHandler:(ResponseHandler)responseHandler
+- (void)readAttributeBatteryANSIDesignationWithResponseHandler:(ResponseHandler)responseHandler
 {
     CHIPCharStringAttributeCallbackBridge * onSuccess
         = new CHIPCharStringAttributeCallbackBridge(responseHandler, [self callbackQueue]);
@@ -14929,7 +14929,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ReadAttributeBatteryAnsiDesignation(onSuccess->Cancel(), onFailure->Cancel());
+        err = self.cppCluster.ReadAttributeBatteryANSIDesignation(onSuccess->Cancel(), onFailure->Cancel());
     });
 
     if (err != CHIP_NO_ERROR) {
@@ -14939,7 +14939,7 @@ private:
     }
 }
 
-- (void)readAttributeBatteryIecDesignationWithResponseHandler:(ResponseHandler)responseHandler
+- (void)readAttributeBatteryIECDesignationWithResponseHandler:(ResponseHandler)responseHandler
 {
     CHIPCharStringAttributeCallbackBridge * onSuccess
         = new CHIPCharStringAttributeCallbackBridge(responseHandler, [self callbackQueue]);
@@ -14957,7 +14957,7 @@ private:
 
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
-        err = self.cppCluster.ReadAttributeBatteryIecDesignation(onSuccess->Cancel(), onFailure->Cancel());
+        err = self.cppCluster.ReadAttributeBatteryIECDesignation(onSuccess->Cancel(), onFailure->Cancel());
     });
 
     if (err != CHIP_NO_ERROR) {

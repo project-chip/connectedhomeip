@@ -9135,7 +9135,7 @@ CHIP_ERROR PowerSourceCluster::ReadAttributeBatteryCommonDesignation(Callback::C
                                              BasicAttributeFilter<Int32uAttributeCallback>);
 }
 
-CHIP_ERROR PowerSourceCluster::ReadAttributeBatteryAnsiDesignation(Callback::Cancelable * onSuccessCallback,
+CHIP_ERROR PowerSourceCluster::ReadAttributeBatteryANSIDesignation(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
@@ -9147,7 +9147,7 @@ CHIP_ERROR PowerSourceCluster::ReadAttributeBatteryAnsiDesignation(Callback::Can
                                              BasicAttributeFilter<CharStringAttributeCallback>);
 }
 
-CHIP_ERROR PowerSourceCluster::ReadAttributeBatteryIecDesignation(Callback::Cancelable * onSuccessCallback,
+CHIP_ERROR PowerSourceCluster::ReadAttributeBatteryIECDesignation(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;

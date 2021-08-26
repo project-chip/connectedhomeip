@@ -1179,8 +1179,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeActiveBatteryFaultsWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeBatteryReplacementDescriptionWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeBatteryCommonDesignationWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeBatteryAnsiDesignationWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeBatteryIecDesignationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryANSIDesignationWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBatteryIECDesignationWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeBatteryApprovedChemistryWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeBatteryCapacityWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeBatteryQuantityWithResponseHandler:(ResponseHandler)responseHandler;

@@ -2488,12 +2488,12 @@ class ChipClusters:
                     "type": "int",
                 },
                 0x00000015: {
-                    "attributeName": "BatteryAnsiDesignation",
+                    "attributeName": "BatteryANSIDesignation",
                     "attributeId": 0x00000015,
                     "type": "str",
                 },
                 0x00000016: {
-                    "attributeName": "BatteryIecDesignation",
+                    "attributeName": "BatteryIECDesignation",
                     "attributeId": 0x00000016,
                     "type": "str",
                 },
@@ -5144,10 +5144,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryReplacementDescription(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeBatteryCommonDesignation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryCommonDesignation(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryAnsiDesignation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryAnsiDesignation(device, ZCLendpoint, ZCLgroupid)
-    def ClusterPowerSource_ReadAttributeBatteryIecDesignation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryIecDesignation(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPowerSource_ReadAttributeBatteryANSIDesignation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryANSIDesignation(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPowerSource_ReadAttributeBatteryIECDesignation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryIECDesignation(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeBatteryApprovedChemistry(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryApprovedChemistry(device, ZCLendpoint, ZCLgroupid)
     def ClusterPowerSource_ReadAttributeBatteryCapacity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -6808,12 +6808,12 @@ class ChipClusters:
         # Cluster PowerSource ReadAttribute BatteryCommonDesignation
         self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryCommonDesignation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryCommonDesignation.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryAnsiDesignation
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryAnsiDesignation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryAnsiDesignation.restype = ctypes.c_uint32
-        # Cluster PowerSource ReadAttribute BatteryIecDesignation
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryIecDesignation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryIecDesignation.restype = ctypes.c_uint32
+        # Cluster PowerSource ReadAttribute BatteryANSIDesignation
+        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryANSIDesignation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryANSIDesignation.restype = ctypes.c_uint32
+        # Cluster PowerSource ReadAttribute BatteryIECDesignation
+        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryIECDesignation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryIECDesignation.restype = ctypes.c_uint32
         # Cluster PowerSource ReadAttribute BatteryApprovedChemistry
         self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryApprovedChemistry.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_PowerSource_BatteryApprovedChemistry.restype = ctypes.c_uint32

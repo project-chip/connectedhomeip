@@ -23426,7 +23426,7 @@ JNI_METHOD(void, PowerSourceCluster, readBatteryCommonDesignationAttribute)
     }
 }
 
-JNI_METHOD(void, PowerSourceCluster, readBatteryAnsiDesignationAttribute)
+JNI_METHOD(void, PowerSourceCluster, readBatteryANSIDesignationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23455,7 +23455,7 @@ JNI_METHOD(void, PowerSourceCluster, readBatteryAnsiDesignationAttribute)
         return;
     }
 
-    err = cppCluster->ReadAttributeBatteryAnsiDesignation(onSuccess->Cancel(), onFailure->Cancel());
+    err = cppCluster->ReadAttributeBatteryANSIDesignation(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR)
     {
         delete onSuccess;
@@ -23464,7 +23464,7 @@ JNI_METHOD(void, PowerSourceCluster, readBatteryAnsiDesignationAttribute)
     }
 }
 
-JNI_METHOD(void, PowerSourceCluster, readBatteryIecDesignationAttribute)
+JNI_METHOD(void, PowerSourceCluster, readBatteryIECDesignationAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
@@ -23493,7 +23493,7 @@ JNI_METHOD(void, PowerSourceCluster, readBatteryIecDesignationAttribute)
         return;
     }
 
-    err = cppCluster->ReadAttributeBatteryIecDesignation(onSuccess->Cancel(), onFailure->Cancel());
+    err = cppCluster->ReadAttributeBatteryIECDesignation(onSuccess->Cancel(), onFailure->Cancel());
     if (err != CHIP_NO_ERROR)
     {
         delete onSuccess;

@@ -527,7 +527,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-        case 0x0012: // Active Battery Faults
+        case 0x0012: // ActiveBatteryFaults
         {
             entryLength = 1;
             if (((index - 1) * entryLength) > (am->size - entryLength))
@@ -985,7 +985,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     case 0x002F: // Power Source Cluster
         switch (attributeId)
         {
-        case 0x0012: // Active Battery Faults
+        case 0x0012: // ActiveBatteryFaults
             // uint8_t
             entryLength = 1;
             break;

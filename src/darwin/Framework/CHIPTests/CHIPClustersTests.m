@@ -10952,18 +10952,18 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterPowerSourceReadAttributeBatteryAnsiDesignationWithResponseHandler
+- (void)testSendClusterPowerSourceReadAttributeBatteryANSIDesignationWithResponseHandler
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"PowerSourceReadAttributeBatteryAnsiDesignationWithResponseHandler"];
+        [self expectationWithDescription:@"PowerSourceReadAttributeBatteryANSIDesignationWithResponseHandler"];
 
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeBatteryAnsiDesignationWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"PowerSource BatteryAnsiDesignation Error: %@", err);
+    [cluster readAttributeBatteryANSIDesignationWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"PowerSource BatteryANSIDesignation Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
@@ -10971,18 +10971,18 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterPowerSourceReadAttributeBatteryIecDesignationWithResponseHandler
+- (void)testSendClusterPowerSourceReadAttributeBatteryIECDesignationWithResponseHandler
 {
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"PowerSourceReadAttributeBatteryIecDesignationWithResponseHandler"];
+        [self expectationWithDescription:@"PowerSourceReadAttributeBatteryIECDesignationWithResponseHandler"];
 
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPPowerSource * cluster = [[CHIPPowerSource alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttributeBatteryIecDesignationWithResponseHandler:^(NSError * err, NSDictionary * values) {
-        NSLog(@"PowerSource BatteryIecDesignation Error: %@", err);
+    [cluster readAttributeBatteryIECDesignationWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"PowerSource BatteryIECDesignation Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

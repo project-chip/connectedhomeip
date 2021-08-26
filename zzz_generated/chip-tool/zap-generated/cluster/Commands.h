@@ -15767,8 +15767,8 @@ private:
 | * ActiveBatteryFaults                                               | 0x0012 |
 | * BatteryReplacementDescription                                     | 0x0013 |
 | * BatteryCommonDesignation                                          | 0x0014 |
-| * BatteryAnsiDesignation                                            | 0x0015 |
-| * BatteryIecDesignation                                             | 0x0016 |
+| * BatteryANSIDesignation                                            | 0x0015 |
+| * BatteryIECDesignation                                             | 0x0016 |
 | * BatteryApprovedChemistry                                          | 0x0017 |
 | * BatteryCapacity                                                   | 0x0018 |
 | * BatteryQuantity                                                   | 0x0019 |
@@ -16527,18 +16527,18 @@ private:
 };
 
 /*
- * Attribute BatteryAnsiDesignation
+ * Attribute BatteryANSIDesignation
  */
-class ReadPowerSourceBatteryAnsiDesignation : public ModelCommand
+class ReadPowerSourceBatteryANSIDesignation : public ModelCommand
 {
 public:
-    ReadPowerSourceBatteryAnsiDesignation() : ModelCommand("read")
+    ReadPowerSourceBatteryANSIDesignation() : ModelCommand("read")
     {
-        AddArgument("attr-name", "battery-ansi-designation");
+        AddArgument("attr-name", "battery-ansidesignation");
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceBatteryAnsiDesignation()
+    ~ReadPowerSourceBatteryANSIDesignation()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -16550,7 +16550,7 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBatteryAnsiDesignation(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttributeBatteryANSIDesignation(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -16561,18 +16561,18 @@ private:
 };
 
 /*
- * Attribute BatteryIecDesignation
+ * Attribute BatteryIECDesignation
  */
-class ReadPowerSourceBatteryIecDesignation : public ModelCommand
+class ReadPowerSourceBatteryIECDesignation : public ModelCommand
 {
 public:
-    ReadPowerSourceBatteryIecDesignation() : ModelCommand("read")
+    ReadPowerSourceBatteryIECDesignation() : ModelCommand("read")
     {
-        AddArgument("attr-name", "battery-iec-designation");
+        AddArgument("attr-name", "battery-iecdesignation");
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceBatteryIecDesignation()
+    ~ReadPowerSourceBatteryIECDesignation()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -16584,7 +16584,7 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBatteryIecDesignation(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttributeBatteryIECDesignation(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
     }
 
 private:
@@ -27229,8 +27229,8 @@ void registerClusterPowerSource(Commands & commands)
         make_unique<ReadPowerSourceActiveBatteryFaults>(),            //
         make_unique<ReadPowerSourceBatteryReplacementDescription>(),  //
         make_unique<ReadPowerSourceBatteryCommonDesignation>(),       //
-        make_unique<ReadPowerSourceBatteryAnsiDesignation>(),         //
-        make_unique<ReadPowerSourceBatteryIecDesignation>(),          //
+        make_unique<ReadPowerSourceBatteryANSIDesignation>(),         //
+        make_unique<ReadPowerSourceBatteryIECDesignation>(),          //
         make_unique<ReadPowerSourceBatteryApprovedChemistry>(),       //
         make_unique<ReadPowerSourceBatteryCapacity>(),                //
         make_unique<ReadPowerSourceBatteryQuantity>(),                //

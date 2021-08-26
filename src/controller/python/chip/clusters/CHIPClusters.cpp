@@ -4392,25 +4392,25 @@ chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_BatteryCommonDes
         .AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_BatteryAnsiDesignation(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_BatteryANSIDesignation(chip::Controller::Device * device,
                                                                                        chip::EndpointId ZCLendpointId,
                                                                                        chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::PowerSourceCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeBatteryAnsiDesignation(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+    return cluster.ReadAttributeBatteryANSIDesignation(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
         .AsInteger();
 }
 
-chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_BatteryIecDesignation(chip::Controller::Device * device,
+chip::ChipError::StorageType chip_ime_ReadAttribute_PowerSource_BatteryIECDesignation(chip::Controller::Device * device,
                                                                                       chip::EndpointId ZCLendpointId,
                                                                                       chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     chip::Controller::PowerSourceCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeBatteryIecDesignation(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
+    return cluster.ReadAttributeBatteryIECDesignation(gCharStringAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel())
         .AsInteger();
 }
 

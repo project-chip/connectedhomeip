@@ -1056,9 +1056,9 @@ public:
                                                           Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeBatteryCommonDesignation(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeBatteryAnsiDesignation(Callback::Cancelable * onSuccessCallback,
+    CHIP_ERROR ReadAttributeBatteryANSIDesignation(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeBatteryIecDesignation(Callback::Cancelable * onSuccessCallback,
+    CHIP_ERROR ReadAttributeBatteryIECDesignation(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeBatteryApprovedChemistry(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback);

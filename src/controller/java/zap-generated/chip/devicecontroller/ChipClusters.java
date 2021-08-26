@@ -4186,12 +4186,12 @@ public class ChipClusters {
       readBatteryCommonDesignationAttribute(chipClusterPtr, callback);
     }
 
-    public void readBatteryAnsiDesignationAttribute(CharStringAttributeCallback callback) {
-      readBatteryAnsiDesignationAttribute(chipClusterPtr, callback);
+    public void readBatteryANSIDesignationAttribute(CharStringAttributeCallback callback) {
+      readBatteryANSIDesignationAttribute(chipClusterPtr, callback);
     }
 
-    public void readBatteryIecDesignationAttribute(CharStringAttributeCallback callback) {
-      readBatteryIecDesignationAttribute(chipClusterPtr, callback);
+    public void readBatteryIECDesignationAttribute(CharStringAttributeCallback callback) {
+      readBatteryIECDesignationAttribute(chipClusterPtr, callback);
     }
 
     public void readBatteryApprovedChemistryAttribute(LongAttributeCallback callback) {
@@ -4292,10 +4292,10 @@ public class ChipClusters {
     private native void readBatteryCommonDesignationAttribute(
         long chipClusterPtr, LongAttributeCallback callback);
 
-    private native void readBatteryAnsiDesignationAttribute(
+    private native void readBatteryANSIDesignationAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
 
-    private native void readBatteryIecDesignationAttribute(
+    private native void readBatteryIECDesignationAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
 
     private native void readBatteryApprovedChemistryAttribute(
