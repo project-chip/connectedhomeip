@@ -15,8 +15,9 @@
 name: Build example - Mbed OS
 
 on:
-    push:
-    pull_request:
+# TODO: automated builds disabled due to pdoc3/mbed-tools conflict
+#    push:
+#    pull_request:
     workflow_dispatch:
 
 concurrency:
