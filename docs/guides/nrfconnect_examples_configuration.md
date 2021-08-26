@@ -107,7 +107,7 @@ them default values for any application.
 
 The application configuration is specified using Kconfig configuration files
 (`*.conf`), where available Kconfig options can be used and their default values
-overrided. Typically, there are many files having impact on the final
+overridden. Typically, there are many files having impact on the final
 configuration shape.
 
 There is no need to modify all these files separately. See the following list
