@@ -19,7 +19,6 @@ config("config") {
   #    zzz_generated/controller-clusters depend on src/controller
   #    src/controller neeeds zzz_generated/controller-cluster for includes
   include_dirs = [ "${chip_root}/zzz_generated/" ]
-
 }
 
 static_library("controller") {
