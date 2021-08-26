@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "ReportingCommand.h"
+#include <commands/reporting/ReportingCommand.h>
 
 typedef void (*UnsupportedAttributeCallback)(void * context);
 

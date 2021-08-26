@@ -32,17 +32,17 @@
         {
             "path": "commands.zapt",
             "name": "Cluster Commands header",
-            "output": "examples/chip-tool/commands/clusters/Commands.h"
+            "output": "cluster/Commands.h"
         },
         {
             "path": "reporting-commands.zapt",
             "name": "Reporting Commands header",
-            "output": "examples/chip-tool/commands/reporting/Commands.h"
+            "output": "reporting/Commands.h"
         },
         {
             "path": "tests-commands.zapt",
             "name": "Tests Commands header",
-            "output": "examples/chip-tool/commands/tests/Commands.h"
+            "output": "test/Commands.h"
         }
     ]
 }
