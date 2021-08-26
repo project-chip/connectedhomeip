@@ -173,10 +173,6 @@ CHIP_ERROR cmd_network_interface(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     InterfaceAddressIterator addrIterator;
-    IPAddress addr;
-    IPPrefix addrWithPrefix;
-    char intName[IF_NAMESIZE];
-    InterfaceId intId;
     uint8_t intCounter = 0;
 
     streamer_t * sout = streamer_get();
@@ -186,13 +182,14 @@ CHIP_ERROR cmd_network_interface(int argc, char ** argv)
     streamer_printf(sout, "    Current interface:\r\n");
     for (; addrIterator.HasCurrent(); addrIterator.Next())
     {
-        intId = addrIterator.GetInterface();
+        auto intId = addrIterator.GetInterface();
         if (intId == INET_NULL_INTERFACEID)
         {
             streamer_printf(sout, "ERROR: get interface failed\r\n");
             ExitNow(error = CHIP_ERROR_INTERNAL;);
         }
 
+        char intName[IF_NAMESIZE];
         error = addrIterator.GetInterfaceName(intName, sizeof(intName));
         if (error != CHIP_NO_ERROR)
         {
@@ -202,7 +199,7 @@ CHIP_ERROR cmd_network_interface(int argc, char ** argv)
         streamer_printf(sout, "     interface id: %d, interface name: %s, interface state: %s\r\n", intId, intName,
                         addrIterator.IsUp() ? "UP" : "DOWN");
 
-        addr = addrIterator.GetAddress();
+        IPPrefix addrWithPrefix;
         addrIterator.GetAddressWithPrefix(addrWithPrefix);
         char addrStr[80];
         addrWithPrefix.IPAddr.ToString(addrStr, sizeof(addrStr));
@@ -225,9 +222,7 @@ exit:
 CHIP_ERROR cmd_network_idToName(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    char intName[IF_NAMESIZE];
     InterfaceId intId;
-
     streamer_t * sout = streamer_get();
 
     VerifyOrExit(argc == 1, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -239,6 +234,7 @@ CHIP_ERROR cmd_network_idToName(int argc, char ** argv)
         ExitNow(error = CHIP_ERROR_INTERNAL;);
     }
 
+    char intName[IF_NAMESIZE];
     error = GetInterfaceName(intId, intName, sizeof(intName));
     if (error != CHIP_NO_ERROR)
     {
@@ -254,16 +250,15 @@ exit:
 
 CHIP_ERROR cmd_network_nameToId(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    char intName[IF_NAMESIZE];
-    InterfaceId intId;
-
+    CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
 
     VerifyOrExit(argc == 1, error = CHIP_ERROR_INVALID_ARGUMENT);
 
+    char intName[IF_NAMESIZE];
     strncpy(intName, argv[0], IF_NAMESIZE);
 
+    InterfaceId intId;
     error = InterfaceNameToId(intName, intId);
     if (error != CHIP_NO_ERROR)
     {
@@ -322,7 +317,7 @@ static ChipClient gChipClient;
 void HandleMessageReceived(System::PacketBufferHandle && buffer)
 {
     streamer_t * sout = streamer_get();
-
+    streamer_printf(sout, "INFO: received %d bytes\r\n", buffer->DataLength());
     streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
                     strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
 }
@@ -578,7 +573,6 @@ CHIP_ERROR cmd_network_example(int argc, char ** argv)
     const size_t maxIPAddress      = 5;
     const uint16_t port            = 80;
     IPAddress IPaddr[maxIPAddress] = { IPAddress::Any };
-    char destAddrStr[64];
 
     const char hostname[] = "ifconfig.io";
     const char msg[]      = "GET / HTTP/1.1\r\n"
@@ -618,6 +612,7 @@ CHIP_ERROR cmd_network_example(int argc, char ** argv)
     }
     gChipClient.response = true;
 
+    char destAddrStr[64];
     IPaddr[0].ToString(destAddrStr, sizeof(destAddrStr));
 
     streamer_printf(sout, "INFO: connect to TCP server address: %s port: %d\r\n", destAddrStr, port);
@@ -667,11 +662,9 @@ public:
 
     void displayState()
     {
-        InterfaceAddressIterator intIterator;
-        char addrStr[16];
         streamer_t * sout = streamer_get();
 
-        if (state == CHIP_SERVER_OFF)
+        if (state != CHIP_SERVER_ON)
         {
             streamer_printf(sout, "INFO: CHIP server is disabled\r\n");
         }
@@ -679,15 +672,6 @@ public:
         {
             streamer_printf(sout, "INFO: %s CHIP server is enabled and listen on port %d\r\n", type == Type::kUdp ? "UDP" : "TCP",
                             port);
-            if (intIterator.IsUp())
-            {
-                streamer_printf(sout, "INFO: network interface IP address %s\r\n",
-                                intIterator.GetAddress().ToString(addrStr, sizeof(addrStr)));
-            }
-            else
-            {
-                streamer_printf(sout, "WARN: Network interface is down\r\n");
-            }
         }
     }
 };
@@ -712,19 +696,13 @@ CHIP_ERROR cmd_server_help(int argc, char ** argv)
 }
 
 // Callback handler when a CHIP EchoRequest is received.
-void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && payload)
+void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle && buffer)
 {
-    streamer_t * sout = streamer_get();
-
-    char src_addr[PeerAddress::kMaxToStringSize];
-    // auto state            = mgr->GetPeerConnectionState(session);
-    const size_t data_len = payload->DataLength();
-
-    // state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
-
-    streamer_printf(sout, "INFO: received %d bytes\r\n", data_len);
-    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
-                    strstr((char *) payload->Start(), "\n") - (char *) payload->Start(), (char *) payload->Start());
+    char peerAddrStr[PeerAddress::kMaxToStringSize];
+    auto state = ec->GetExchangeMgr()->GetSessionMgr()->GetPeerConnectionState(ec->GetSecureSession());
+    state->GetPeerAddress().ToString(peerAddrStr, sizeof(peerAddrStr));
+    streamer_printf(streamer_get(), "INFO: Received echo request from %s\r\n", peerAddrStr);
+    HandleMessageReceived(std::move(buffer));
 }
 
 CHIP_ERROR cmd_server_on(int argc, char ** argv)
