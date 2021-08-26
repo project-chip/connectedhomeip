@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,29 +17,27 @@
 
 #pragma once
 
+#include <app-common/zap-generated/enums.h>
 #include <app/util/basic-types.h>
 
-/** @brief Start Feedback.
- *
- * This function is called by the Identify plugin when identification begins.
- * It informs the Identify Feedback plugin that it should begin providing its
- * implemented feedback functionality (e.g. LED blinking, buzzer sounding, etc.)
- * until the Identify plugin tells it to stop.
- * The identify time is purely a matter of informational convenience; this plugin
- * does not need to know how long it will identify (the Identify plugin will
- * perform the necessary timekeeping.)
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param identityTime  Ver.: always
- */
-bool emberAfPluginIdentifyStartFeedbackCallback(chip::EndpointId endpoint, uint16_t identifyTime);
+struct Identify
+{
+    using onIdentifyStart    = void (*)(Identify *);
+    using onIdentifyStop     = onIdentifyStart;
+    using onEffectIdentifier = onIdentifyStart;
 
-/** @brief Stop Feedback.
- *
- * This function is called by the Identify plugin when identification is finished.
- * It tells the Identify Feedback plugin to stop providing its implemented feedback
- * functionality.
- *
- * @param endpoint The endpoint.  Ver.: always
- */
-bool emberAfPluginIdentifyStopFeedbackCallback(chip::EndpointId endpoint);
+    Identify(chip::EndpointId endpoint, onIdentifyStart onIdentifyStart, onIdentifyStop onIdentifyStop,
+             EmberAfIdentifyIdentifyType identifyType, onEffectIdentifier onEffectIdentifier = nullptr,
+             EmberAfIdentifyEffectIdentifier effectIdentifier = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK,
+             EmberAfIdentifyEffectVariant effectVariant       = EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT);
+    ~Identify();
+
+    chip::EndpointId mEndpoint;
+    onIdentifyStart mOnIdentifyStart = nullptr;
+    onIdentifyStop mOnIdentifyStop   = nullptr;
+    onEffectIdentifier mOnEffectIdentifier;
+    EmberAfIdentifyEffectIdentifier mCurrentEffectIdentifier;
+    EmberAfIdentifyEffectIdentifier mTargetEffectIdentifier;
+    uint8_t mEffectVariant;
+    bool mActive = false;
+};
