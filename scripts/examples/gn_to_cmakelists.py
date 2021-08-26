@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env -S python3 -B
 
 #
 #    Copyright (c) 2021-2021 Project CHIP Authors.
@@ -18,17 +18,18 @@
 
 ##
 #    @file
+# Generates CMakeLists based on gn json output.
+# Converts json build instructions (see https://gn.googlesource.com/gn/+/HEAD/docs/reference.md#ide-options)
+# into CMakeLists.txt compatible build instructions
 #
-# generate CMakeLists.txt from gn system, so that we can build and debug evertying in Android Studio
-#
-# Usage: gn_to_cmake.py <json_file_name>
+# Usage: gn_to_cmakelists.py <json_file_name>
 
-# gn gen out/config --ide=json --json-ide-script=//scripts/examples/gn_to_cmake.py
+# gn gen out/config --ide=json --json-ide-script=//scripts/examples/gn_to_cmakelists.py
 
 # or
 
 # gn gen out/config --ide=json
-# python gn/gn_to_cmake.py out/project.json
+# python gn/gn_to_cmakelists.py out/project.json
 #
 
 
@@ -678,8 +679,10 @@ def WriteTarget(out, target, project):
 
     # Non-library dependencies.
     if nonlibraries:
+        nonlibrarieslist = list(nonlibraries)
+        nonlibrarieslist.sort()
         out.write('add_dependencies("${target}"')
-        for nonlibrary in nonlibraries:
+        for nonlibrary in nonlibrarieslist:
             out.write('\n  "')
             out.write(nonlibrary)
             out.write('"')
@@ -717,7 +720,9 @@ def WriteTarget(out, target, project):
                 out.write(')\n')
                 system_libraries.append(system_library)
         out.write('target_link_libraries("${target}"')
-        for library in libraries:
+        librarieslist = list(libraries)
+        librarieslist.sort()
+        for library in librarieslist:
             out.write('\n  "')
             out.write(CMakeStringEscape(library))
             out.write('"')
