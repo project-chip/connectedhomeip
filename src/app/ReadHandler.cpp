@@ -88,11 +88,12 @@ CHIP_ERROR ReadHandler::OnStatusReport(Messaging::ExchangeContext * apExchangeCo
     Protocols::SecureChannel::StatusReport statusReport;
     err = statusReport.Parse(std::move(aPayload));
     SuccessOrExit(err);
-    ChipLogProgress(DataManagement, "in state %s, receive status report, protocol id is %" PRIu32 ", protocol code is %" PRIu16, GetStateStr(),
-                    statusReport.GetProtocolId(), statusReport.GetProtocolCode());
+    ChipLogProgress(DataManagement, "in state %s, receive status report, protocol id is %" PRIu32 ", protocol code is %" PRIu16,
+                    GetStateStr(), statusReport.GetProtocolId(), statusReport.GetProtocolCode());
     VerifyOrExit((statusReport.GetProtocolId() == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm()) &&
-                 (statusReport.GetProtocolCode() == to_underlying(Protocols::InteractionModel::ProtocolCode::Success)), err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(IsReporting(), err = CHIP_ERROR_INCORRECT_STATE) ;
+                     (statusReport.GetProtocolCode() == to_underlying(Protocols::InteractionModel::ProtocolCode::Success)),
+                 err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(IsReporting(), err = CHIP_ERROR_INCORRECT_STATE);
 
 exit:
     Shutdown();
