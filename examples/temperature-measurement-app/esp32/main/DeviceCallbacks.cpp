@@ -25,9 +25,9 @@
 #include "DeviceCallbacks.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include <BLEdeinit.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <BLEdeinit.h>
 #include <app/common/gen/attribute-id.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/server/Mdns.h>

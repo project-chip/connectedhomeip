@@ -30,9 +30,9 @@
 #include "WiFiWidget.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include <BLEdeinit.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <BLEdeinit.h>
 #include <app/Command.h>
 #include <app/server/Mdns.h>
 #include <app/util/basic-types.h>
