@@ -12,8 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Root directory for tizen.
-  tizen_root = "//config/tizen/chip-gn/platform"
-  tizen_home = ""
+import("tizen_toolchain.gni")
+
+tizen_toolchain("tizen_arm") {
+  toolchain_args = {
+    current_cpu = "arm"
+    arm_arch = "armv7-a"
+  }
 }

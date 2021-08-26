@@ -12,8 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Root directory for tizen.
-  tizen_root = "//config/tizen/chip-gn/platform"
-  tizen_home = ""
+import("//build_overrides/build.gni")
+import("//build_overrides/tizen.gni")
+
+import("${build_root}/toolchain/gcc_toolchain.gni")
+
+template("tizen_toolchain") {
+  _invoker_toolchain_args = invoker.toolchain_args
+
+  _tizen_toolchain_args = {
+    current_os = "tizen"
+    is_clang = true
+
+    forward_variables_from(_invoker_toolchain_args, "*")
+  }
+
+  gcc_toolchain(target_name) {
+    toolchain_args = _tizen_toolchain_args
+    ar = "$tizen_home/bin/arm-linux-gnueabi-ar"
+    cc = "$tizen_home/bin/arm-linux-gnueabi-gcc"
+    cxx = "$tizen_home/bin/arm-linux-gnueabi-g++"
+  }
 }

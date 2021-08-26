@@ -120,6 +120,11 @@ config("abi_default") {
 }
 
 config("target_default") {
+  if (current_os == "tizen") {
+    import("//build_overrides/tizen.gni")
+    target_cflags = [ "--sysroot=$tizen_home" ]
+    target_ldflags = [ "--sysroot=$tizen_home" ]
+  }
   if (current_toolchain == default_toolchain) {
     defines = target_defines
     cflags = target_cflags

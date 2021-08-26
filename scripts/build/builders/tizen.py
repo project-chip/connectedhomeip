@@ -45,12 +45,6 @@ class TizenBoard(Enum):
         else:
             raise Exception('Unknown board type: %r' % self)
 
-    def AbiName(self):
-        if self == TizenBoard.ARM:
-            return 'armv7-a'
-        else:
-            raise Exception('Unknown board type: %r' % self)
-
 
 class TizenBuilder(Builder):
 
@@ -78,30 +72,22 @@ class TizenBuilder(Builder):
 export PKG_CONFIG_SYSROOT_DIR=$TIZEN_HOME;
 export PKG_CONFIG_LIBDIR=$TIZEN_HOME/usr/lib/pkgconfig;
 export PKG_CONFIG_PATH=$TIZEN_HOME/usr/lib/pkgconfig;
-gn gen --check --fail-on-unused-args --root=%s \
---args=\'import("//build_overrides/build.gni")''' % self.root
+gn gen --check --fail-on-unused-args --root=%s '--args=''' % self.root
 
-            tizen_home = os.environ['TIZEN_HOME']
             gn_args = {}
-            gn_args['target_os'] = '"tizen"'
-            gn_args['target_cpu'] = '"%s"' % self.board.TargetCpuName()
-            gn_args['arm_arch'] = '"%s"' % self.board.AbiName()
-            gn_args['target_cflags'] = '[ "--sysroot=%s" ]' % tizen_home
-            gn_args['target_ldflags'] = '[ "--sysroot=%s" ]' % tizen_home
-            gn_args['custom_toolchain'] = '"${build_root}/toolchain/custom"'
-            gn_args['target_cc'] = '"%s/bin/arm-linux-gnueabi-gcc"' % tizen_home
-            gn_args['target_cxx'] = '"%s/bin/arm-linux-gnueabi-g++"' % tizen_home
-            gn_args['target_ar'] = '"%s/bin/arm-linux-gnueabi-ar"' % tizen_home
+            gn_args['target_os'] = 'tizen'
+            gn_args['target_cpu'] = self.board.TargetCpuName()
+            gn_args['tizen_home'] = os.environ['TIZEN_HOME']
 
             cmd += ' %s\' %s' % (' '.join([
-                '%s=%s' % (key, value)
+                '%s="%s"' % (key, value)
                 for key, value in gn_args.items()]), self.output_dir)
 
             self._Execute(['bash', '-c', cmd],
                           title='Generating ' + self.identifier)
 
     def _build(self):
-        logging.info('Compiling Telink at %s', self.output_dir)
+        logging.info('Compiling Tizen at %s', self.output_dir)
 
         self._Execute(['ninja', '-C', self.output_dir],
                       title='Building ' + self.identifier)
