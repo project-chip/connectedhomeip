@@ -49,7 +49,7 @@ public:
     void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
 
-    void ButtonEventHandler(const sl_button_t *buttonHandle, uint8_t btnAction);
+    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction);
 
 private:
     friend AppTask & GetAppTask(void);

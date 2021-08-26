@@ -136,6 +136,7 @@ template("efr32_sdk") {
       "CHIP_KVS_BASE_SECTOR_INDEX=((FLASH_SIZE/FLASH_PAGE_SIZE)-(CHIP_KVS_SECTOR_COUNT))",
       "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
       "__HEAP_SIZE=0",
+
       #"__STACK_SIZE=0",
     ]
 
@@ -203,7 +204,7 @@ template("efr32_sdk") {
       ]
 
       defines += [
-        "EFR32MG24", 
+        "EFR32MG24",
         "EFR32_SERIES2_CONFIG4_MICRO",
       ]
     }
@@ -213,7 +214,10 @@ template("efr32_sdk") {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
     }
 
-    cflags += [ "-Wno-maybe-uninitialized", "-Wno-shadow" ]
+    cflags += [
+      "-Wno-maybe-uninitialized",
+      "-Wno-shadow",
+    ]
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
@@ -231,8 +235,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/matter/efr32/sl_simple_button_instances.c",
       "${efr32_sdk_root}/matter/efr32/sl_simple_led_instances.c",
       "${efr32_sdk_root}/matter/efr32/sl_uartdrv_init.c",
-      "${efr32_sdk_root}/platform/bootloader/plugin/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
+      "${efr32_sdk_root}/platform/bootloader/plugin/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
       "${efr32_sdk_root}/platform/driver/button/src/sl_button.c",
       "${efr32_sdk_root}/platform/driver/button/src/sl_simple_button.c",
@@ -249,6 +253,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/emlib/src/em_core.c",
       "${efr32_sdk_root}/platform/emlib/src/em_crypto.c",
       "${efr32_sdk_root}/platform/emlib/src/em_emu.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_eusart.c",
       "${efr32_sdk_root}/platform/emlib/src/em_gpio.c",
       "${efr32_sdk_root}/platform/emlib/src/em_ldma.c",
       "${efr32_sdk_root}/platform/emlib/src/em_leuart.c",
@@ -260,11 +265,10 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/emlib/src/em_system.c",
       "${efr32_sdk_root}/platform/emlib/src/em_timer.c",
       "${efr32_sdk_root}/platform/emlib/src/em_usart.c",
-      "${efr32_sdk_root}/platform/emlib/src/em_eusart.c",
       "${efr32_sdk_root}/platform/peripheral/src/peripheral_sysrtc.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32/hal_efr.c",
-      "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti/sl_rail_util_pti.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_conversions_efr32.c",
+      "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti/sl_rail_util_pti.c",
       "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_nvic.c",
       "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager.c",
       "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu.c",
@@ -276,8 +280,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
-      "${efr32_sdk_root}/platform/service/system/src/sl_system_process_action.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_kernel.c",
+      "${efr32_sdk_root}/platform/service/system/src/sl_system_process_action.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay_armv6m_gcc.S",
       "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",
@@ -385,8 +389,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_driver_common.c",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_driver_init.c",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_trng.c",
-      "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_se_driver_signature.c",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_se_driver_builtin_keys.c",
+      "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_se_driver_signature.c",
       "${efr32_sdk_root}/util/third_party/freertos/CMSIS/Source/cmsis_os2.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/croutine.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/event_groups.c",
@@ -406,8 +410,8 @@ template("efr32_sdk") {
     if (defined(invoker.show_qr_code)) {
       if (invoker.show_qr_code) {
         sources += [
-          "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd_display.c",
           "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd.c",
+          "${efr32_sdk_root}/hardware/driver/memlcd/src/sl_memlcd_display.c",
           "${efr32_sdk_root}/platform/middleware/glib/dmd/display/dmd_memlcd.c",
           "${efr32_sdk_root}/platform/middleware/glib/glib/bmp.c",
           "${efr32_sdk_root}/platform/middleware/glib/glib/glib.c",
@@ -430,9 +434,9 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/src/sl_mx25_flash_shutdown_usart/sl_mx25_flash_shutdown.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Source/GCC/startup_efr32mg12p.c",
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Source/system_efr32mg12p.c",
-        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s1.c",
+        "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s1.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F/port.c",
       ]
@@ -498,8 +502,8 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager_key_handling.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager_signature.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/sl_se_manager_util.c",
-        "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_alt/source/sl_se_management.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_alt/source/sl_psa_its_nvm3.c",
+        "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_alt/source/sl_se_management.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/se_aes.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_mbedtls_support/src/se_jpake.c",
         "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_protocol_crypto/src/sli_radioaes_management.c",
@@ -520,7 +524,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
       ]
-    } 
+    }
 
     public_deps = [
       "${segger_rtt_root}:segger_rtt",

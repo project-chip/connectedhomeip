@@ -51,9 +51,9 @@ extern "C" {
 #endif // OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
 #endif // CHIP_ENABLE_OPENTHREAD
 
+#include "init_efrPlatform.h"
 #include "sl_component_catalog.h"
 #include "sl_system_init.h"
-#include "init_efrPlatform.h"
 
 #if DISPLAY_ENABLED
 #include "lcd.h"

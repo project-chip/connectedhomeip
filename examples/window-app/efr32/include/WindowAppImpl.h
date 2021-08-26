@@ -21,10 +21,10 @@
 #include <LEDWidget.h>
 #include <WindowApp.h>
 #include <queue.h>
+#include <sl_simple_button_instances.h>
 #include <string>
 #include <task.h>
 #include <timers.h>
-#include <sl_simple_button_instances.h>
 
 class WindowAppImpl : public WindowApp
 {
@@ -36,7 +36,7 @@ public:
     CHIP_ERROR Start() override;
     void Finish() override;
     void PostEvent(const WindowApp::Event & event) override;
-    friend void sl_button_on_change(const sl_button_t *handle);
+    friend void sl_button_on_change(const sl_button_t * handle);
 
 protected:
     struct Timer : public WindowApp::Timer
@@ -60,7 +60,7 @@ protected:
     WindowApp::Timer * CreateTimer(const char * name, uint32_t timeoutInMs, WindowApp::Timer::Callback callback,
                                    void * context) override;
     WindowApp::Button * CreateButton(WindowApp::Button::Id id, const char * name) override;
-    void OnButtonChange(const sl_button_t *handle);
+    void OnButtonChange(const sl_button_t * handle);
     void ProcessEvents();
     void DispatchEvent(const WindowApp::Event & event) override;
     void UpdateLEDs();

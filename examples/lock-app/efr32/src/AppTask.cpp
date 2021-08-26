@@ -104,7 +104,7 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    
+
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
                                   1,                // == default timer period (mS)
@@ -272,16 +272,16 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ButtonEventHandler(const sl_button_t *buttonHandle, uint8_t btnAction)
+void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
 {
     if (buttonHandle == NULL)
     {
         return;
     }
 
-    AppEvent button_event              = {};
-    button_event.Type                  = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.Action    = btnAction;
+    AppEvent button_event           = {};
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Action = btnAction;
 
     if (buttonHandle == APP_LOCK_BUTTON && btnAction == SL_SIMPLE_BUTTON_PRESSED)
     {
@@ -486,22 +486,23 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         if (xPortIsInsideInterrupt())
         {
             BaseType_t higherPrioTaskWoken = pdFALSE;
-            status = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
 
-            #ifdef portYIELD_FROM_ISR
+#ifdef portYIELD_FROM_ISR
             portYIELD_FROM_ISR(higherPrioTaskWoken);
-            #elif portEND_SWITCHING_ISR // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
-                        portEND_SWITCHING_ISR(higherPrioTaskWoken);
-            #else                       // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
-            #error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
-            #endif // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+#elif portEND_SWITCHING_ISR // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+            portEND_SWITCHING_ISR(higherPrioTaskWoken);
+#else                       // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+#error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
+#endif // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
         }
         else
         {
             status = xQueueSend(sAppEventQueue, aEvent, 1);
         }
 
-        if (!status) EFR32_LOG("Failed to post event to app task event queue");
+        if (!status)
+            EFR32_LOG("Failed to post event to app task event queue");
     }
 }
 

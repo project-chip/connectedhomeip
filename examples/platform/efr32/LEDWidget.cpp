@@ -28,7 +28,7 @@ void LEDWidget::InitGpio(void)
     sl_simple_led_init_instances();
 }
 
-void LEDWidget::Init(const sl_led_t* led)
+void LEDWidget::Init(const sl_led_t * led)
 {
     mLastChangeTimeUS = 0;
     mBlinkOnTimeMS    = 0;
@@ -39,7 +39,7 @@ void LEDWidget::Init(const sl_led_t* led)
 }
 
 void LEDWidget::Invert(void)
-{   
+{
     if (mLed)
     {
         sl_led_toggle(mLed);
@@ -51,7 +51,7 @@ void LEDWidget::Set(bool state)
     mLastChangeTimeUS = mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
     if (mLed)
     {
-        state ?  sl_led_turn_on(mLed) : sl_led_turn_off(mLed);
+        state ? sl_led_turn_on(mLed) : sl_led_turn_off(mLed);
     }
 }
 

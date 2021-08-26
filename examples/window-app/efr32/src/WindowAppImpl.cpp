@@ -193,7 +193,26 @@ void WindowAppImpl::PostEvent(const WindowApp::Event & event)
 {
     if (mQueue)
     {
-        if (!xQueueSend(mQueue, &event, 1))
+        BaseType_t status;
+        if (xPortIsInsideInterrupt())
+        {
+            BaseType_t higherPrioTaskWoken = pdFALSE;
+            status                         = xQueueSendFromISR(mQueue, &event, &higherPrioTaskWoken);
+
+#ifdef portYIELD_FROM_ISR
+            portYIELD_FROM_ISR(higherPrioTaskWoken);
+#elif portEND_SWITCHING_ISR // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+            portEND_SWITCHING_ISR(higherPrioTaskWoken);
+#else                       // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+#error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
+#endif // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+        }
+        else
+        {
+            status = xQueueSend(mQueue, &event, 1);
+        }
+
+        if (!status)
         {
             EFR32_LOG("Failed to post event to app task event queue");
         }
@@ -351,9 +370,9 @@ void WindowAppImpl::OnMainLoop()
 //------------------------------------------------------------------------------
 WindowAppImpl::Button::Button(WindowApp::Button::Id id, const char * name) : WindowApp::Button(id, name) {}
 
-void WindowAppImpl::OnButtonChange(const sl_button_t *handle)
+void WindowAppImpl::OnButtonChange(const sl_button_t * handle)
 {
-    WindowApp::Button *btn = static_cast<Button *>((handle == &sl_button_btn0) ? sInstance.mButtonUp : sInstance.mButtonDown);
+    WindowApp::Button * btn = static_cast<Button *>((handle == &sl_button_btn0) ? sInstance.mButtonUp : sInstance.mButtonDown);
 
     if (sl_button_get_state(handle) == SL_SIMPLE_BUTTON_PRESSED)
     {
@@ -366,8 +385,8 @@ void WindowAppImpl::OnButtonChange(const sl_button_t *handle)
 }
 
 // Silabs button callback from button event ISR
-void sl_button_on_change(const sl_button_t *handle)
+void sl_button_on_change(const sl_button_t * handle)
 {
-    WindowAppImpl *app = static_cast<WindowAppImpl*>(&WindowAppImpl::sInstance);
+    WindowAppImpl * app = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
     app->OnButtonChange(handle);
 }

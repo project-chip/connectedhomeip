@@ -35,9 +35,9 @@
 #include <AppTask.h>
 
 #include "AppConfig.h"
+#include "init_efrPlatform.h"
 #include "sl_simple_button_instances.h"
 #include "sl_system_kernel.h"
-#include "init_efrPlatform.h"
 #include <app/server/Server.h>
 
 #ifdef HEAP_MONITORING
@@ -187,7 +187,7 @@ int main(void)
     appError(ret);
 }
 
-void sl_button_on_change(const sl_button_t *handle)
+void sl_button_on_change(const sl_button_t * handle)
 {
     GetAppTask().ButtonEventHandler(handle, sl_button_get_state(handle));
 }

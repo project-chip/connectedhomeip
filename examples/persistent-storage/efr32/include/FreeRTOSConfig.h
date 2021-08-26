@@ -150,13 +150,13 @@ application. */
 
 /* Energy saving modes. */
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-#define configUSE_TICKLESS_IDLE                       1
+#define configUSE_TICKLESS_IDLE 1
 #else
-#define configUSE_TICKLESS_IDLE                       0
+#define configUSE_TICKLESS_IDLE 0
 #endif
 
 /* Definition used by Keil to replace default system clock source. */
-#define configOVERRIDE_DEFAULT_TICK_CONFIGURATION     1
+#define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1
 
 /* Hook function related definitions. */
 #define configUSE_TICK_HOOK (1)
@@ -207,12 +207,12 @@ to all Cortex-M ports, and do not rely on any particular library functions. */
 #define configKERNEL_INTERRUPT_PRIORITY (255)
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY    48//96
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY 48 // 96
 #define configENABLE_FPU 0
 #define configENABLE_MPU 0
 /* FreeRTOS Secure Side Only and TrustZone Security Extension */
-#define configRUN_FREERTOS_SECURE_ONLY                1
-#define configENABLE_TRUSTZONE                        0
+#define configRUN_FREERTOS_SECURE_ONLY 1
+#define configENABLE_TRUSTZONE 0
 /* FreeRTOS MPU specific definitions. */
 #define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS (0)
 
@@ -229,8 +229,8 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configUSE_MUTEXES (1)
 #define configUSE_RECURSIVE_MUTEXES (1)
 #define configUSE_COUNTING_SEMAPHORES (1)
-#define configUSE_TASK_NOTIFICATIONS            1
-#define configUSE_TRACE_FACILITY                1
+#define configUSE_TASK_NOTIFICATIONS 1
+#define configUSE_TRACE_FACILITY 1
 #define configQUEUE_REGISTRY_SIZE (10)
 #define configUSE_QUEUE_SETS (0)
 #define configUSE_NEWLIB_REENTRANT (0)
@@ -256,7 +256,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define INCLUDE_eTaskGetState (1)
 #define INCLUDE_xEventGroupSetBitFromISR (1)
 #define INCLUDE_xEventGroupSetBitsFromISR (1)
-#define INCLUDE_xSemaphoreGetMutexHolder  (1)
+#define INCLUDE_xSemaphoreGetMutexHolder (1)
 #define INCLUDE_xTimerPendFunctionCall (1)
 #define INCLUDE_xTaskGetHandle (1)
 
@@ -282,13 +282,12 @@ standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
 /* Ensure Cortex-M port compatibility. */
-#define SysTick_Handler                         xPortSysTickHandler
+#define SysTick_Handler xPortSysTickHandler
 
 /* Thread local storage pointers used by the SDK */
 #ifndef configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS
-  #define configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS 0
+#define configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS 0
 #endif
-
 
 #if defined(__GNUC__)
 /* For the linker. */

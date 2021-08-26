@@ -260,7 +260,8 @@
                 "BRD4164A",
                 "BRD4166A",
                 "BRD4170A",
-                "BRD4180A"
+                "BRD4186A",
+                "BRD4187A"
             ],
             "default": "BRD4166A"
         },
