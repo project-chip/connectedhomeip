@@ -33,6 +33,7 @@
 #include <support/RandUtils.h>
 
 #include "AppMain.h"
+#include "shell_extension/control.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -55,6 +56,7 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    RegisterControlCommands();
     ChipLinuxAppMainLoop();
     return 0;
 }

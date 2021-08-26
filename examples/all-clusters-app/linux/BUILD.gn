@@ -23,9 +23,13 @@ executable("chip-all-clusters-app") {
 
   deps = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/shell_extension",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
   ]
+
+  include_dirs =
+      [ "${chip_root}/examples/all-clusters-app/all-clusters-common" ]
 
   cflags = [ "-Wconversion" ]
 
