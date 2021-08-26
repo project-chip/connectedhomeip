@@ -1,2 +1,2 @@
-mbed-tools>=7.0.0
+mbed-tools==7.31.1
 prettytable==0.7.2

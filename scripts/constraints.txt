@@ -96,13 +96,17 @@ kconfiglib==13.7.1
     # via -r requirements.esp32.txt
 lockfile==0.12.2
     # via -r requirements.txt
+mako==1.1.5
+    # via pdoc3
+markdown==3.3.4
+    # via pdoc3
 markupsafe==2.0.1
     # via
     #   jinja2
     #   mako
 matplotlib-inline==0.1.2
     # via ipython
-mbed-tools==7.32.0
+mbed-tools==7.31.1
     # via -r requirements.mbed.txt
 mobly==1.11
     # via -r requirements.txt
@@ -114,6 +118,8 @@ pandas==1.3.2 ; platform_machine != "aarch64"
     # via -r requirements.txt
 parso==0.8.2
     # via jedi
+pdoc3==0.10.0
+    # via mbed-tools
 pep517==0.11.0
     # via pip-tools
 pexpect==4.8.0
