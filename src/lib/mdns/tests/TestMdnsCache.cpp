@@ -69,7 +69,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
         CHIP_ERROR result;
 
         // ml -- why doesn't adding 2 uint16_t give a uint16_t?
-        peerId.SetNodeId(id + i);
+        peerId.SetNodeId((NodeId) id + i);
         result = tMdnsCache.Insert(peerId, addr, (uint16_t)(port + i), iface, 1000 * ttl);
         if (i < sizeOfCache)
         {
@@ -89,7 +89,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     {
         CHIP_ERROR result;
 
-        peerId.SetNodeId(id + i);
+        peerId.SetNodeId((NodeId) id + i);
         result = tMdnsCache.Insert(peerId, addr, (uint16_t)(port + i), iface, 1000 * ttl);
         NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
     }
@@ -99,7 +99,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     {
         CHIP_ERROR result;
 
-        peerId.SetNodeId(id + i);
+        peerId.SetNodeId((NodeId) id + i);
         result = tMdnsCache.Delete(peerId);
         NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
     }
@@ -113,7 +113,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     {
         CHIP_ERROR result;
 
-        peerId.SetNodeId(id + i);
+        peerId.SetNodeId((NodeId) id + i);
         result = tMdnsCache.Insert(peerId, addrV6, (uint16_t)(port + i), iface, 1000 * ttl);
         NL_TEST_ASSERT(inSuite, result == CHIP_NO_ERROR);
     }
