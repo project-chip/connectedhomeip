@@ -899,6 +899,11 @@ exit:
 
 CHIP_ERROR ContiguousBufferTLVReader::OpenContainer(ContiguousBufferTLVReader & containerReader)
 {
+    // We are going to initialize containerReader by calling our superclass
+    // OpenContainer method.  The superclass only knows how to initialize
+    // members the superclass knows about, so we assert that we don't have any
+    // extra members that need initializing.  If such members ever get added,
+    // they would need to be initialized in this method.
     static_assert(sizeof(ContiguousBufferTLVReader) == sizeof(TLVReader), "We have state the superclass is not initializing?");
     return TLVReader::OpenContainer(containerReader);
 }

@@ -845,8 +845,10 @@ protected:
 };
 
 /**
- * A TLVReader that is backed by a single contiguous buffer.  This exposes some
- * additional methods that point directly into that buffer.
+ * A TLVReader that is guaranteed to be backed by a single contiguous buffer.
+ * This allows it to expose some additional methods that allow consumers to
+ * directly access the data in that buffer in a safe way that is guaranteed to
+ * work as long as the reader object stays in scope.
  */
 class ContiguousBufferTLVReader : public TLVReader
 {
@@ -873,7 +875,7 @@ public:
     }
 
     /**
-     * Allow opening a container, wit ha new ContiguousBufferTLVReader reading
+     * Allow opening a container, with a new ContiguousBufferTLVReader reading
      * that container.  See TLVReader::OpenContainer for details.
      */
     CHIP_ERROR OpenContainer(ContiguousBufferTLVReader & containerReader);
