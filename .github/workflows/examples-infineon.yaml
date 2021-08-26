@@ -16,7 +16,11 @@ name: Build example - Infineon P6
 
 on:
     push:
+        paths:
+          - '!**.md'
     pull_request:
+        paths:
+          - '!**.md'
     workflow_dispatch:
 
 concurrency:
