@@ -1,6 +1,6 @@
 # Matter nRF Connect Pump Example Application
 
-The nRF Connect Pump Example demonstrates how to remotely control a pump
+The nRF Connect Pump Controller Example demonstrates how to implement a pump controller client
 device with basic start/stop functionality. It uses buttons to test changing the pump state and device
 states and LEDs to show the state of these changes. This example is inherited from the "lock-app" example
 but modified to simulate a pump device and can be used as

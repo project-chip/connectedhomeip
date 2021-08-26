@@ -81,6 +81,25 @@ public:
 private:
 };
 
+class DLL_EXPORT OnOffCluster : public ClusterBase
+{
+public:
+    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
+    ~OnOffCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR On(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR Toggle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+};
+
 class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
 {
 public:
