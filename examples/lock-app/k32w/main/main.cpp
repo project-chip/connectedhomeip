@@ -188,6 +188,23 @@ exit:
     return;
 }
 
+/**
+ * Glue function called directly by the OpenThread stack
+ * when system event processing work is pending.
+ */
+extern "C" void otSysEventSignalPending(void)
+{
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+    /* make sure that 15.4 radio is initialized before waking up the Thread task */
+    if (dualModeStates.threadInitialized == TRUE)
+#endif
+    {
+        BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
+        portYIELD_FROM_ISR(yieldRequired);
+    }
+}
+
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
 uint32_t dm_switch_get15_4InitWakeUpTime(void)
 {
@@ -311,20 +328,6 @@ extern "C" void App_AllowDeviceToSleep()
 extern "C" void App_DisallowDeviceToSleep()
 {
     PWR_PreventEnterLowPower(true);
-}
-
-/**
- * Glue function called directly by the OpenThread stack
- * when system event processing work is pending.
- */
-extern "C" void otSysEventSignalPending(void)
-{
-    /* make sure that 15.4 radio is initialized before waking up the Thread task */
-    if (dualModeStates.threadInitialized == TRUE)
-    {
-        BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
-        portYIELD_FROM_ISR(yieldRequired);
-    }
 }
 
 static void BOARD_SetClockForWakeup(void)
