@@ -27,6 +27,9 @@ jobs:
         name: Telink
         env:
             BUILD_TYPE: telink
+            GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
+            GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+            GH_EVENT_PARENT: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -42,4 +45,15 @@ jobs:
               with:
                   submodules: true
             - name: Build example Telink Lighting App on TLSR9518ADK80D
-              run: scripts/examples/telink_example.sh lighting-app tlsr9518adk80d
+              run: |
+                  scripts/examples/telink_example.sh lighting-app tlsr9518adk80d
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d lighting-app \
+                    examples/lighting-app/telink/build/tlsr9518adk80d/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+            - name: Uploading Size Reports
+              uses: actions/upload-artifact@v2
+              with:
+                  name: Size,Telink-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
+                  path: |
+                      /tmp/bloat_reports/

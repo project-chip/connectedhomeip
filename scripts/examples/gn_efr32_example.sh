@@ -20,23 +20,21 @@ set -e
 
 # Build script for GN EFT32 examples GitHub workflow.
 
-source "$(dirname "$0")/../../scripts/activate.sh"
+chip_root="$(dirname "$0")/../.."
+source "$chip_root/scripts/activate.sh"
 
 set -x
 env
 
-if [ -z "$3" ]; then
-    gn gen --check --fail-on-unused-args --root="$1" --args="" "$2"/"$EFR32_BOARD"/
-    ninja -v -C "$2"/"$EFR32_BOARD"/
-    #print stats
-    arm-none-eabi-size -A "$2"/"$EFR32_BOARD"/*.out
+root="$1"
+out="$2"
+shift 2
+if [ -n "$1" ]; then
+    board="$1"
+    shift
 else
-    if [ -z "$4" ]; then
-        gn gen --check --fail-on-unused-args --root="$1" --args="efr32_board=\"$3\"" "$2/$3"
-    else
-        gn gen --check --fail-on-unused-args --root="$1" --args="efr32_board=\"$3\"" "$2/$3" "$4"
-    fi
-    ninja -v -C "$2/$3"
-    #print stats
-    arm-none-eabi-size -A "$2"/"$3"/*.out
+    board="$EFR32_BOARD"
 fi
+
+gn gen --check --fail-on-unused-args --root="$root" --args="efr32_board=\"$board\"" "$out/$board" "$@"
+ninja -v -C "$out/$board"

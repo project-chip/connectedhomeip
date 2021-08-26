@@ -48,4 +48,6 @@ rm -f "$root"/sdkconfig
     echo "build $sdkconfig_name failed"
     exit 1
 }
-cp "$root"/build/chip-"$app".elf "$root"/build/"${sdkconfig_name%".defaults"}"-chip-"$app".elf
+config="${sdkconfig_name%.defaults}"
+output="$root"/build/"$config"-chip-"$app".elf
+cp "$root"/build/chip-"$app".elf "$output"
