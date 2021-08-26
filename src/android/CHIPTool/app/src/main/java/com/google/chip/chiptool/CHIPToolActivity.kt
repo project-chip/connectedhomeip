@@ -81,6 +81,7 @@ class CHIPToolActivity :
   }
 
   override fun onCommissioningComplete(code: Int) {
+    ChipClient.getDeviceController(this).close()
     if (code == 0) {
       showFragment(OnOffClientFragment.newInstance(), false)
     } else {
