@@ -186,7 +186,7 @@ static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appS
             // This tick writes the new attribute, which will trigger the Attribute
             // Changed callback below, which in turn will schedule or cancel the tick.
             // Because of this, the tick does not have to be scheduled here.
-            (void) Clusters::Identify::Attributes::SetIdentifyTime(endpoint, identifyTime == 0 ? 0 : identifyTime - 1);
+            (void) Clusters::Identify::Attributes::SetIdentifyTime(endpoint, static_cast<uint16_t>(identifyTime == 0 ? 0 : identifyTime - 1));
         }
         else
         {
@@ -293,8 +293,8 @@ bool emberAfIdentifyClusterTriggerEffectCallback(EndpointId endpoint, CommandHan
     return true;
 }
 
-Identify::Identify(chip::EndpointId endpoint, onIdentifyStart onIdentifyStart, onIdentifyStop onIdentifyStop,
-                   EmberAfIdentifyIdentifyType identifyType, onEffectIdentifier onEffectIdentifier,
+Identify::Identify(chip::EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
+                   EmberAfIdentifyIdentifyType identifyType, onEffectIdentifierCb onEffectIdentifier,
                    EmberAfIdentifyEffectIdentifier effectIdentifier, EmberAfIdentifyEffectVariant effectVariant) :
     mEndpoint(endpoint),
     mOnIdentifyStart(onIdentifyStart), mOnIdentifyStop(onIdentifyStop), mOnEffectIdentifier(onEffectIdentifier),
