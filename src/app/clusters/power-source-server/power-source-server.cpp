@@ -34,12 +34,12 @@
 
 #include "power-source-server.h"
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 #include <app/CommandHandler.h>
-#include <app/common/gen/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af-types.h>
@@ -48,9 +48,6 @@
 #include <lib/support/TypeTraits.h>
 #include <string.h>
 
-#ifdef EMBER_AF_PLUGIN_SCENES
-#include <app/clusters/scenes/scenes.h>
-#endif // EMBER_AF_PLUGIN_SCENES
 
 using namespace chip;
 
