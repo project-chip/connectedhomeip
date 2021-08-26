@@ -35,9 +35,9 @@
 #include "power-source-server.h"
 
 #include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 
 #include <app/CommandHandler.h>
 #include <app/reporting/reporting.h>
@@ -47,7 +47,6 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/TypeTraits.h>
 #include <string.h>
-
 
 using namespace chip;
 
