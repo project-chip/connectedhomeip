@@ -112,7 +112,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/inc",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/inc",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src/",
-      "${efr32_sdk_root}/util/third_party/freertos/CMSIS/Include",
+      "${efr32_sdk_root}/util/third_party/freertos/cmsis/Include",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/include",
     ]
 
@@ -391,7 +391,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_psa_trng.c",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_se_driver_builtin_keys.c",
       "${efr32_sdk_root}/util/third_party/crypto/sl_component/sl_psa_driver/src/sli_se_driver_signature.c",
-      "${efr32_sdk_root}/util/third_party/freertos/CMSIS/Source/cmsis_os2.c",
+      "${efr32_sdk_root}/util/third_party/freertos/cmsis/Source/cmsis_os2.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/croutine.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/event_groups.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/list.c",
