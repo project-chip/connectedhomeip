@@ -132,7 +132,8 @@ _MATCHERS[Platform.NRF].AcceptApplication(Application.LOCK, app=NrfApp.LOCK)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.LIGHT, app=NrfApp.LIGHT)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.SHELL, app=NrfApp.SHELL)
 _MATCHERS[Platform.NRF].AcceptApplication(Application.PUMP, app=NrfApp.PUMP)
-_MATCHERS[Platform.NRF].AcceptApplication(Application.PUMP_CONTROLLER, app=NrfApp.PUMP_CONTROLLER)
+_MATCHERS[Platform.NRF].AcceptApplication(
+    Application.PUMP_CONTROLLER, app=NrfApp.PUMP_CONTROLLER)
 
 _MATCHERS[Platform.TELINK].AcceptBoard(
     Board.TLSR9518ADK80D, board=TelinkBoard.TLSR9518ADK80D)
