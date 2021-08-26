@@ -28,7 +28,7 @@
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="ch" /><!-- Process CHIP URIs -->
+                <data android:scheme="mt" /><!-- Process Matter URIs -->
             </intent-filter>
         </activity>
     </application>

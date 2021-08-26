@@ -265,12 +265,11 @@ public:
      *   This function update the device informations asynchronously using mdns.
      *   If new device informations has been found, it will be persisted.
      *
-     * @param[in] deviceId  Node ID for the CHIP devicex
-     * @param[in] fabricId  The fabricId used for mdns resolution
+     * @param[in] deviceId  Node ID for the CHIP device
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR UpdateDevice(NodeId deviceId, uint64_t fabricId);
+    CHIP_ERROR UpdateDevice(NodeId deviceId);
 
     void PersistDevice(Device * device);
 
@@ -291,13 +290,14 @@ public:
     CHIP_ERROR ServiceEvents();
 
     /**
-     * @brief Get the Fabric ID assigned to the device.
-     *
-     * @param[out] fabricId   Fabric ID of the device.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * @brief Get the Compressed Fabric ID assigned to the device.
      */
-    CHIP_ERROR GetFabricId(uint64_t & fabricId);
+    uint64_t GetCompressedFabricId() const { return mLocalId.GetCompressedFabricId(); }
+
+    /**
+     * @brief Get the raw Fabric ID assigned to the device.
+     */
+    uint64_t GetFabricId() const { return mFabricId; }
 
 protected:
     enum class State
@@ -317,7 +317,9 @@ protected:
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
-    NodeId mLocalDeviceId;
+    PeerId mLocalId    = PeerId();
+    FabricId mFabricId = kUndefinedFabricId;
+
     DeviceTransportMgr * mTransportMgr                             = nullptr;
     SecureSessionMgr * mSessionMgr                                 = nullptr;
     Messaging::ExchangeManager * mExchangeMgr                      = nullptr;

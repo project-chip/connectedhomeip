@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
-#include <app/common/gen/attributes/Accessors.h>
 #include <app/util/af.h>
 
 using namespace chip;

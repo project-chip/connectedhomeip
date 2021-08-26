@@ -45,7 +45,7 @@
 // for pulling in defines dealing with EITHER server or client
 #include <app/util/af-main.h>
 
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 
 // the EM260 host needs to include the config file
 #ifdef EZSP_HOST

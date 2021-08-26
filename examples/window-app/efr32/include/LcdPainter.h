@@ -18,12 +18,14 @@
 
 #pragma once
 
-#include <app/common/gen/enums.h>
+#include <app-common/zap-generated/enums.h>
 #include <stdint.h>
 
 enum class LcdIcon
 {
     None = 0,
+    One,
+    Two,
     Lift,
     Tilt
 };

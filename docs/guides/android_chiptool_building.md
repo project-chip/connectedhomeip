@@ -62,7 +62,13 @@ Complete the following steps to build CHIPTool:
 
 1. Check out the CHIP repository.
 
-2. In the command line, run the following command from the top CHIP directory:
+2. Run bootstrap (**only required first time**)
+
+    ```shell
+    source scripts/bootstrap.sh
+    ```
+
+3. In the command line, run the following command from the top CHIP directory:
 
     ```shell
     TARGET_CPU=arm64 ./scripts/examples/android_app.sh
@@ -70,10 +76,10 @@ Complete the following steps to build CHIPTool:
 
     See the table above for other values of `TARGET_CPU`.
 
-3. Open the project in Android Studio and run **Sync Project with Gradle
+4. Open the project in Android Studio and run **Sync Project with Gradle
    Files**.
 
-4. Use one of the following options to build an Android package:
+5. Use one of the following options to build an Android package:
 
     - Click **Make Project** in Android Studio.
     - Run the following command in the command line:

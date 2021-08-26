@@ -975,18 +975,13 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
     InetLayer & lInetLayer = *reinterpret_cast<InetLayer *>(aAppState);
     bool lTimerRequired    = lInetLayer.IsIdleTimerRunning();
 
-    for (size_t i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
-    {
-        TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*aSystemLayer, i);
-
-        if (lEndPoint == nullptr)
-            continue;
+    TCPEndPoint::sPool.ForEachActiveObject([&](TCPEndPoint * lEndPoint) {
         if (!lEndPoint->IsCreatedByInetLayer(lInetLayer))
-            continue;
+            return true;
         if (!lEndPoint->IsConnected())
-            continue;
+            return true;
         if (lEndPoint->mIdleTimeout == 0)
-            continue;
+            return true;
 
         if (lEndPoint->mRemainingIdleTime == 0)
         {
@@ -996,7 +991,9 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
         {
             --lEndPoint->mRemainingIdleTime;
         }
-    }
+
+        return true;
+    });
 
     if (lTimerRequired)
     {

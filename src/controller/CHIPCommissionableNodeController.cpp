@@ -27,7 +27,7 @@ namespace Controller {
 CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Mdns::DiscoveryFilter discoveryFilter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
-    return chip::Mdns::Resolver::Instance().FindCommissioners(discoveryFilter);
+    return mResolver->FindCommissioners(discoveryFilter);
 }
 
 const Mdns::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)

@@ -18,8 +18,7 @@ cmake_minimum_required(VERSION 3.13.1)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
-get_filename_component(LIGHTING_GEN_DIR ${CHIP_ROOT}/zzz_generated/lighting-app/ REALPATH)
-set(LIGHTING_GEN_SRC ${LIGHTING_GEN_DIR}/zap-generated/)
+get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 set(CONF_FILE ${CHIP_ROOT}/config/telink/app/zephyr.conf prj.conf)
 
@@ -35,7 +34,8 @@ target_compile_options(app PRIVATE -fpermissive)
 
 target_include_directories(app PRIVATE
                            include
-                           ${LIGHTING_GEN_DIR}
+                           ${GEN_DIR}/app-common
+                           ${GEN_DIR}/lighting-app
                            ${NLIO_ROOT}
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
@@ -45,15 +45,14 @@ target_sources(app PRIVATE
                src/LightingManager.cpp
                src/main.cpp
                src/ZclCallbacks.cpp
-               ${LIGHTING_GEN_SRC}/attribute-size.cpp
-               ${LIGHTING_GEN_SRC}/callback-stub.cpp
-               ${LIGHTING_GEN_SRC}/IMClusterCommandHandler.cpp
+               ${GEN_DIR}/lighting-app/zap-generated/attribute-size.cpp
+               ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
-               ${CHIP_ROOT}/src/app/common/gen/attributes/Accessors.cpp               
+               ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
-               ${CHIP_ROOT}/src/app/common/gen/attributes/Accessors.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp

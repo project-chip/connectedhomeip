@@ -141,12 +141,13 @@ class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionA
 {
 public:
     static constexpr uint8_t kTxtMaxNumber  = 9;
-    static constexpr uint8_t kTxtMaxKeySize = MaxStringLength("D", "VP", "CM", "DT", "DN", "RI", "PI", "PH"); // possible keys
+    static constexpr uint8_t kTxtMaxKeySize = MaxStringLength("D", "VP", "CM", "AP", "DT", "DN", "RI", "PI", "PH"); // possible keys
     static constexpr uint8_t kTxtMaxValueSize =
         std::max({ kKeyDiscriminatorMaxLength, kKeyVendorProductMaxLength, kKeyAdditionalCommissioningMaxLength,
                    kKeyCommissioningModeMaxLength, kKeyDeviceTypeMaxLength, kKeyDeviceNameMaxLength, kKeyRotatingIdMaxLength,
                    kKeyPairingInstructionMaxLength, kKeyPairingHintMaxLength });
-    static constexpr size_t kTxtTotalKeySize   = TotalStringLength("D", "VP", "CM", "DT", "DN", "RI", "PI", "PH"); // possible keys
+    static constexpr size_t kTxtTotalKeySize =
+        TotalStringLength("D", "VP", "CM", "AP", "DT", "DN", "RI", "PI", "PH"); // possible keys
     static constexpr size_t kTxtTotalValueSize = kKeyDiscriminatorMaxLength + kKeyVendorProductMaxLength +
         kKeyAdditionalCommissioningMaxLength + kKeyCommissioningModeMaxLength + kKeyDeviceTypeMaxLength + kKeyDeviceNameMaxLength +
         kKeyRotatingIdMaxLength + kKeyPairingInstructionMaxLength + kKeyPairingHintMaxLength;

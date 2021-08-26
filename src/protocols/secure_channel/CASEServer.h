@@ -63,8 +63,6 @@ private:
     uint16_t mSessionKeyId         = 0;
     SecureSessionMgr * mSessionMgr = nullptr;
 
-    FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
-
     Transport::FabricTable * mFabrics = nullptr;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);

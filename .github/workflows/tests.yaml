@@ -156,11 +156,11 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Run Build Test Server
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
             - name: Build chip-tool
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                   # config_pair_with_random_id=false so CI runs faster.
                   scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP} config_pair_with_random_id=false
@@ -170,7 +170,7 @@ jobs:
                   # actually succeeded, because that just wastes space.
                   rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Test Suites
-              timeout-minutes: 25
+              timeout-minutes: 35
               run: |
                   scripts/tests/test_suites.sh
             - name: Uploading core files

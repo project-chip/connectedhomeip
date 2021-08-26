@@ -841,7 +841,7 @@ CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::T
  * structure other than parsing it.
  *
  * This function can be used to extract Fabric ID from an ICA certificate.
- * These certificates may not contain a NodeID, so ExtractPeerIdFromOpCert()
+ * These certificates may not contain a NodeID, so ExtractNodeIdFabricIdFromOpCert()
  * cannot be used for such certificates.
  *
  * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have RDN
@@ -850,7 +850,7 @@ CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::T
 CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * fabricId);
 
 /**
- * Extract a PeerId from an operational certificate that has already been
+ * Extract Node ID and Fabric ID from an operational certificate that has already been
  * parsed.
  *
  * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have at
@@ -858,27 +858,27 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
  * validation (e.g. checkign that there is exactly one RDN of each type) is
  * performed.
  */
-CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, PeerId * peerId);
+CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, NodeId * nodeId, FabricId * fabricId);
 
 /**
- * Extract a PeerId from an operational certificate in ByteSpan TLV-encoded
+ * Extract Node ID and Fabric ID from an operational certificate in ByteSpan TLV-encoded
  * form.  This does not perform any sort of validation on the certificate
  * structure other than parsing it.
  *
  * Can return any error that can be returned from parsing the cert or from the
- * ChipCertificateData* version of ExtractPeerIdFromOpCert.
+ * ChipCertificateData* version of ExtractNodeIdFabricIdFromOpCert.
  */
-CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId);
+CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nodeId, FabricId * fabricId);
 
 /**
- * Extract a PeerId from an operational certificate array in ByteSpan
+ * Extract Node ID and Fabric ID from an operational certificate array in ByteSpan
  * TLV-encoded form.  This does not perform any sort of validation on the
  * certificate structure other than parsing it.
  *
  * Can return any error that can be returned from parsing the array or from the
- * ChipCertificateData* version of ExtractPeerIdFromOpCert.
+ * ChipCertificateData* version of ExtractNodeIdFabricIdFromOpCert.
  */
-CHIP_ERROR ExtractPeerIdFromOpCertArray(const ByteSpan & opcertarray, PeerId * peerId);
+CHIP_ERROR ExtractNodeIdFabricIdFromOpCertArray(const ByteSpan & opcertarray, NodeId * nodeId, FabricId * fabricId);
 
 } // namespace Credentials
 } // namespace chip

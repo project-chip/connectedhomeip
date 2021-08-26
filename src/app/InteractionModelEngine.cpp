@@ -240,9 +240,9 @@ CHIP_ERROR InteractionModelEngine::OnReadRequest(Messaging::ExchangeContext * ap
     {
         if (readHandler.IsFree())
         {
-            err = readHandler.Init(mpDelegate);
+            err = readHandler.Init(mpDelegate, apExchangeContext);
             SuccessOrExit(err);
-            err               = readHandler.OnReadRequest(apExchangeContext, std::move(aPayload));
+            err               = readHandler.OnReadRequest(std::move(aPayload));
             apExchangeContext = nullptr;
             break;
         }
