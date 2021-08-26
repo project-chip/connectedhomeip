@@ -41,12 +41,12 @@
 
 #include <app/util/af.h>
 
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/CommandHandler.h>
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/attributes/Accessors.h>
-#include <app/common/gen/cluster-id.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
@@ -1532,7 +1532,7 @@ static void startColorLoop(EndpointId endpoint, uint8_t startFromStartHue)
     uint16_t currentHue = 0;
     Attributes::GetEnhancedCurrentHue(endpoint, &currentHue);
 
-    u_int16_t startHue = 0x2300;
+    uint16_t startHue = 0x2300;
     if (startFromStartHue)
     {
         Attributes::GetColorLoopStartEnhancedHue(endpoint, &startHue);

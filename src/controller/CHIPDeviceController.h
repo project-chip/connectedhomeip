@@ -32,7 +32,7 @@
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
 #include <controller/OperationalCredentialsDelegate.h>
-#include <controller/data_model/gen/CHIPClientCallbacks.h>
+#include <controller/data_model/zap-generated/CHIPClientCallbacks.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
@@ -265,12 +265,11 @@ public:
      *   This function update the device informations asynchronously using mdns.
      *   If new device informations has been found, it will be persisted.
      *
-     * @param[in] deviceId  Node ID for the CHIP devicex
-     * @param[in] fabricId  The fabricId used for mdns resolution
+     * @param[in] deviceId  Node ID for the CHIP device
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR UpdateDevice(NodeId deviceId, uint64_t fabricId);
+    CHIP_ERROR UpdateDevice(NodeId deviceId);
 
     void PersistDevice(Device * device);
 
@@ -291,21 +290,14 @@ public:
     CHIP_ERROR ServiceEvents();
 
     /**
-     * @brief
-     *   Allow the CHIP Stack to process any pending events
-     *   This can be called in an event handler loop to trigger callbacks within the CHIP stack
-     * @return CHIP_ERROR   The return status
+     * @brief Get the Compressed Fabric ID assigned to the device.
      */
-    CHIP_ERROR ServiceEventSignal();
+    uint64_t GetCompressedFabricId() const { return mLocalId.GetCompressedFabricId(); }
 
     /**
-     * @brief Get the Fabric ID assigned to the device.
-     *
-     * @param[out] fabricId   Fabric ID of the device.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * @brief Get the raw Fabric ID assigned to the device.
      */
-    CHIP_ERROR GetFabricId(uint64_t & fabricId);
+    uint64_t GetFabricId() const { return mFabricId; }
 
 protected:
     enum class State
@@ -325,7 +317,9 @@ protected:
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
-    NodeId mLocalDeviceId;
+    PeerId mLocalId    = PeerId();
+    FabricId mFabricId = kUndefinedFabricId;
+
     DeviceTransportMgr * mTransportMgr                             = nullptr;
     SecureSessionMgr * mSessionMgr                                 = nullptr;
     Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
@@ -346,7 +340,7 @@ protected:
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
-    uint16_t FindDeviceIndex(SecureSessionHandle session);
+    uint16_t FindDeviceIndex(SessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     void ReleaseDeviceById(NodeId remoteDeviceId);
@@ -356,15 +350,10 @@ protected:
 
     void PersistNextKeyId();
 
-    FabricIndex mFabricIndex = 1;
+    FabricIndex mFabricIndex = Transport::kMinValidFabricIndex;
     Transport::FabricTable mFabrics;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
-
-    Credentials::ChipCertificateSet mCertificates;
-    Credentials::OperationalCredentialSet mCredentials;
-    Credentials::CertificateKeyId mRootKeyId;
-    uint8_t mCredentialsIndex;
 
     SessionIDAllocator mIDAllocator;
 
@@ -384,8 +373,8 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
-    void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
 
     void ReleaseAllDevices();
 

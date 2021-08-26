@@ -239,12 +239,20 @@ public final class AndroidChipStack {
 
   public static void onNotifyChipConnectionClosed(int connId) {
     ChipDeviceController deviceController = AndroidChipStack.getInstance().getConnection(connId);
-    deviceController.onNotifyChipConnectionClosed(connId);
+    if (deviceController != null) {
+      deviceController.onNotifyChipConnectionClosed(connId);
+    } else {
+      Log.i(TAG, "Tried to notify connection closed, but BLE connection was not found.");
+    }
   }
 
   public static boolean onSendCharacteristic(
       int connId, byte[] svcId, byte[] charId, byte[] characteristicData) {
     ChipDeviceController deviceController = AndroidChipStack.getInstance().getConnection(connId);
+    if (deviceController == null) {
+      Log.i(TAG, "Tried to send characteristic, but BLE connection was not found.");
+      return false;
+    }
     BluetoothGatt bluetoothGatt = deviceController.getBluetoothGatt();
     if (bluetoothGatt == null) {
       return false;
@@ -276,6 +284,10 @@ public final class AndroidChipStack {
 
   public static boolean onSubscribeCharacteristic(int connId, byte[] svcId, byte[] charId) {
     ChipDeviceController deviceController = AndroidChipStack.getInstance().getConnection(connId);
+    if (deviceController == null) {
+      Log.i(TAG, "Tried to send characteristic, but BLE connection was not found.");
+      return false;
+    }
     BluetoothGatt bluetoothGatt = deviceController.getBluetoothGatt();
     if (bluetoothGatt == null) {
       return false;
@@ -312,6 +324,10 @@ public final class AndroidChipStack {
 
   public static boolean onUnsubscribeCharacteristic(int connId, byte[] svcId, byte[] charId) {
     ChipDeviceController deviceController = AndroidChipStack.getInstance().getConnection(connId);
+    if (deviceController == null) {
+      Log.i(TAG, "Tried to unsubscribe characteristic, but BLE connection was not found.");
+      return false;
+    }
     BluetoothGatt bluetoothGatt = deviceController.getBluetoothGatt();
     if (bluetoothGatt == null) {
       return false;
@@ -348,7 +364,11 @@ public final class AndroidChipStack {
 
   public static boolean onCloseConnection(int connId) {
     ChipDeviceController deviceController = AndroidChipStack.getInstance().getConnection(connId);
-    deviceController.onCloseBleComplete(connId);
+    if (deviceController != null) {
+      deviceController.onCloseBleComplete(connId);
+    } else {
+      Log.i(TAG, "Tried to close BLE connection, but connection was not found.");
+    }
     return true;
   }
 

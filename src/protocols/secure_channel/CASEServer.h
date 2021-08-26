@@ -34,8 +34,6 @@ public:
         {
             mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1);
         }
-
-        mCredentials.Release();
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
@@ -65,12 +63,7 @@ private:
     uint16_t mSessionKeyId         = 0;
     SecureSessionMgr * mSessionMgr = nullptr;
 
-    FabricIndex mFabricIndex = Transport::kUndefinedFabricIndex;
-
     Transport::FabricTable * mFabrics = nullptr;
-    Credentials::ChipCertificateSet mCertificates;
-    Credentials::OperationalCredentialSet mCredentials;
-    Credentials::CertificateKeyId mRootKeyId;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
 

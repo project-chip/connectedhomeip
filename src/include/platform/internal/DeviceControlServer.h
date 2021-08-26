@@ -45,7 +45,7 @@ public:
 private:
     // ===== Members for internal use by the following friends.
     static DeviceControlServer sInstance;
-    friend void CommissioningTimerFunction(System::Layer * layer, void * aAppState);
+    friend void HandleArmFailSafe(System::Layer * layer, void * aAppState);
     void CommissioningFailedTimerComplete();
 
     // ===== Private members reserved for use by this class only.

@@ -50,6 +50,9 @@ static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
 static constexpr uint32_t kMaxCHIPCertLength = 400;
 static constexpr uint32_t kMaxDERCertLength  = 600;
 
+// The certificate array has additional overhead due to array encoding
+static constexpr uint32_t kMaxCHIPOpCertArrayLength = (2 * kMaxCHIPCertLength + 32);
+
 // The decode buffer is used to reconstruct TBS section of X.509 certificate, which doesn't include signature.
 static constexpr uint32_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Crypto::kMax_ECDSA_Signature_Length_Der;
 
@@ -665,7 +668,7 @@ CHIP_ERROR ExtractCertsFromCertArray(const ByteSpan & opCertArray, ByteSpan & no
  * @brief Convert CHIP certificate to the standard X.509 DER encoded certificate.
  *
  * @param chipCert        CHIP certificate in CHIP TLV encoding.
- * @param x509Cet         Buffer to store converted certificate in X.509 DER format.
+ * @param x509Cert        Buffer to store converted certificate in X.509 DER format.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
@@ -833,7 +836,21 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1::AS
 CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::TLVWriter & writer, uint64_t tag);
 
 /**
- * Extract a PeerId from an operational certificate that has already been
+ * Extract the FabricID from a CHIP certificate in ByteSpan TLV-encoded
+ * form.  This does not perform any sort of validation on the certificate
+ * structure other than parsing it.
+ *
+ * This function can be used to extract Fabric ID from an ICA certificate.
+ * These certificates may not contain a NodeID, so ExtractNodeIdFabricIdFromOpCert()
+ * cannot be used for such certificates.
+ *
+ * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have RDN
+ * corresponding to FabricID.
+ */
+CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * fabricId);
+
+/**
+ * Extract Node ID and Fabric ID from an operational certificate that has already been
  * parsed.
  *
  * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert does not have at
@@ -841,27 +858,27 @@ CHIP_ERROR ConvertECDSASignatureDERToRaw(ASN1::ASN1Reader & reader, chip::TLV::T
  * validation (e.g. checkign that there is exactly one RDN of each type) is
  * performed.
  */
-CHIP_ERROR ExtractPeerIdFromOpCert(const ChipCertificateData & opcert, PeerId * peerId);
+CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, NodeId * nodeId, FabricId * fabricId);
 
 /**
- * Extract a PeerId from an operational certificate in ByteSpan TLV-encoded
+ * Extract Node ID and Fabric ID from an operational certificate in ByteSpan TLV-encoded
  * form.  This does not perform any sort of validation on the certificate
  * structure other than parsing it.
  *
  * Can return any error that can be returned from parsing the cert or from the
- * ChipCertificateData* version of ExtractPeerIdFromOpCert.
+ * ChipCertificateData* version of ExtractNodeIdFabricIdFromOpCert.
  */
-CHIP_ERROR ExtractPeerIdFromOpCert(const ByteSpan & opcert, PeerId * peerId);
+CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nodeId, FabricId * fabricId);
 
 /**
- * Extract a PeerId from an operational certificate array in ByteSpan
+ * Extract Node ID and Fabric ID from an operational certificate array in ByteSpan
  * TLV-encoded form.  This does not perform any sort of validation on the
  * certificate structure other than parsing it.
  *
  * Can return any error that can be returned from parsing the array or from the
- * ChipCertificateData* version of ExtractPeerIdFromOpCert.
+ * ChipCertificateData* version of ExtractNodeIdFabricIdFromOpCert.
  */
-CHIP_ERROR ExtractPeerIdFromOpCertArray(const ByteSpan & opcertarray, PeerId * peerId);
+CHIP_ERROR ExtractNodeIdFabricIdFromOpCertArray(const ByteSpan & opcertarray, NodeId * nodeId, FabricId * fabricId);
 
 } // namespace Credentials
 } // namespace chip

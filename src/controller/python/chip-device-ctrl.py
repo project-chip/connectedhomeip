@@ -40,10 +40,8 @@ import base64
 import textwrap
 import time
 import string
-import re
 import traceback
 from cmd import Cmd
-from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 from chip.setup_payload import SetupPayload
 
 # Extend sys.path with one or more directories, relative to the location of the
@@ -469,12 +467,12 @@ class DeviceMgrCmd(Cmd):
                 print("Connecting to device at " + addrStr)
                 pincode = ctypes.c_uint32(
                     int(setupPayload.attributes['SetUpPINCode']))
-                if self.devCtrl.ConnectIP(addrStrStorage, pincode, nodeid):
+                try:
+                    self.devCtrl.ConnectIP(addrStrStorage, pincode, nodeid)
                     print("Connected")
                     return 0
-                else:
-                    print("Unable to connect")
-                    return 1
+                except Exception as ex:
+                    print(f"Unable to connect on network: {ex}")
             else:
                 print("Unable to locate device on network")
 
@@ -484,11 +482,12 @@ class DeviceMgrCmd(Cmd):
                 int(setupPayload.attributes['Discriminator']))
             pincode = ctypes.c_uint32(
                 int(setupPayload.attributes['SetUpPINCode']))
-            if self.devCtrl.ConnectBLE(longDiscriminator, pincode, nodeid):
+            try:
+                self.devCtrl.ConnectBLE(longDiscriminator, pincode, nodeid)
                 print("Connected")
                 return 0
-            else:
-                print("Unable to connect")
+            except Exception as ex:
+                print(f"Unable to connect: {ex}")
         return -1
 
     def do_connect(self, line):
@@ -496,6 +495,7 @@ class DeviceMgrCmd(Cmd):
         connect -ip <ip address> <setup pin code> [<nodeid>]
         connect -ble <discriminator> <setup pin code> [<nodeid>]
         connect -qr <qr code> [<nodeid>]
+        connect -code <manual pairing code> [<nodeid>]
 
         connect command is used for establishing a rendezvous session to the device.
         currently, only connect using setupPinCode is supported.
@@ -522,11 +522,22 @@ class DeviceMgrCmd(Cmd):
                     "utf-8"), int(args[2]), nodeid)
             elif args[0] == "-ble" and len(args) >= 3:
                 self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
-            elif args[0] == '-qr' and len(args) >= 2:
+            elif args[0] in ['-qr', '-code'] and len(args) >= 2:
                 if len(args) == 3:
                     nodeid = int(args[2])
                 print("Parsing QR code {}".format(args[1]))
-                setupPayload = SetupPayload().ParseQrCode(args[1])
+
+                setupPayload = None
+                if args[0] == '-qr':
+                    setupPayload = SetupPayload().ParseQrCode(args[1])
+                elif args[0] == '-code':
+                    setupPayload = SetupPayload(
+                    ).ParseManualPairingCode(args[1])
+
+                if not int(setupPayload.attributes.get("RendezvousInformation", 0)):
+                    print("No rendezvous information provided, default to all.")
+                    setupPayload.attributes["RendezvousInformation"] = 0b111
+                setupPayload.Print()
                 self.ConnectFromSetupPayload(setupPayload, nodeid)
             else:
                 print("Usage:")
@@ -848,7 +859,7 @@ class DeviceMgrCmd(Cmd):
         """
           get-fabricid
 
-          Read the current Fabric Id of the controller device, return 0 if not available.
+          Read the current Compressed Fabric Id of the controller device, return 0 if not available.
         """
         try:
             args = shlex.split(line)
@@ -857,14 +868,20 @@ class DeviceMgrCmd(Cmd):
                 print("Unexpected argument: " + args[1])
                 return
 
-            fabricid = self.devCtrl.GetFabricId()
+            compressed_fabricid = self.devCtrl.GetCompressedFabricId()
+            raw_fabricid = self.devCtrl.GetFabricId()
         except exceptions.ChipStackException as ex:
             print("An exception occurred during reading FabricID:")
             print(str(ex))
             return
 
         print("Get fabric ID complete")
-        print("Fabric ID: " + hex(fabricid))
+
+        print("Raw Fabric ID: 0x{:016x}".format(raw_fabricid)
+              + " (" + str(raw_fabricid) + ")")
+
+        print("Compressed Fabric ID: 0x{:016x}".format(compressed_fabricid)
+              + " (" + str(compressed_fabricid) + ")")
 
     def do_history(self, line):
         """

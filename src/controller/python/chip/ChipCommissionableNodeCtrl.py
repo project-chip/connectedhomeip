@@ -25,8 +25,6 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-import time
-from threading import Thread
 from ctypes import *
 from .ChipStack import *
 from .exceptions import *

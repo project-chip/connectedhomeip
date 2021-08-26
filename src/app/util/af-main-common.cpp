@@ -95,7 +95,7 @@
 //#include "app/framework/security/af-security.h"
 //#include "app/framework/security/crypto-state.h"
 #include "app/util/common.h"
-#include <app/common/gen/callback.h>
+#include <app-common/zap-generated/callback.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/config.h>

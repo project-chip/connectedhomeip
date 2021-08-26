@@ -234,7 +234,9 @@ combination with JLinkRTTClient as follows:
 
     **Push Button0 and Button1** Switch between lift and tilt
 
-        - Pressing both buttons at the same time switches between lift and tilt modes. Most window covering types support either lift only, or tilt only, but type 0x08 suport both (default)
+        - Pressing and release both buttons at the same time: switches between lift and tilt modes. Most window covering types support either lift only, or tilt only, but type 0x08 suport both (default)
+
+        - Pressing and hold both buttons at the same time: Cycles betwen window covering 1, and window covering 2.
 
 *   Once the device is provisioned, it will join the Thread network is
     established, look for the RTT log

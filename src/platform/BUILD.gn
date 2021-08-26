@@ -236,7 +236,6 @@ if (chip_device_platform != "none") {
       "../include/platform/PlatformManager.h",
       "../include/platform/SoftwareUpdateManagerImpl.h",
       "../include/platform/ThreadStackManager.h",
-      "../include/platform/TimeSyncManager.h",
       "../include/platform/internal/BLEManager.h",
       "../include/platform/internal/CHIPDeviceLayerInternal.h",
       "../include/platform/internal/DeviceControlServer.h",
@@ -261,8 +260,8 @@ if (chip_device_platform != "none") {
       "GeneralUtils.cpp",
       "Globals.cpp",
       "LockTracker.cpp",
+      "LwIPEventSupport.cpp",
       "PersistedStorage.cpp",
-      "SystemEventSupport.cpp",
       "TestIdentity.cpp",
     ]
 

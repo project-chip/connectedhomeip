@@ -52,10 +52,8 @@
 namespace chip {
 namespace app {
 
-constexpr size_t kMaxSecureSduLengthBytes = 1024;
-/* TODO: https://github.com/project-chip/connectedhomeip/issues/7489 */
-constexpr uint32_t kImMessageTimeoutMsec = 12000;
-constexpr FieldId kRootFieldId           = 0;
+static constexpr size_t kMaxSecureSduLengthBytes = 1024;
+static constexpr FieldId kRootFieldId            = 0;
 
 /**
  * @class InteractionModelEngine
@@ -112,7 +110,7 @@ public:
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * apSecureSession,
+    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,
                                EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
                                AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
                                EventNumber aEventNumber, uint64_t aAppIdentifier = 0);

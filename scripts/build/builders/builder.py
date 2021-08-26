@@ -115,6 +115,7 @@ class Builder(ABC):
                 os.makedirs(target_dir_full_name)
 
             shutil.copyfile(source_name, target_full_name)
+            shutil.copymode(source_name, target_full_name)
 
     def SetIdentifier(self, platform: str, board: str, app: str):
         self.identifier = '-'.join([platform, board, app])

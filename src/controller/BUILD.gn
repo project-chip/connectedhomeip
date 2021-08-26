@@ -22,6 +22,7 @@ static_library("controller") {
     "CHIPCluster.cpp",
     "CHIPCluster.h",
     "CHIPCommissionableNodeController.cpp",
+    "CHIPCommissionableNodeController.h",
     "CHIPDevice.cpp",
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",

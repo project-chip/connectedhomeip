@@ -93,4 +93,5 @@ private:
     LEDWidget mActionLED;
     std::string mQRCode;
     Timer mIconTimer;
+    LcdIcon mIcon = LcdIcon::None;
 };

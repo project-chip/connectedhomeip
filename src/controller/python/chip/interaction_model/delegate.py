@@ -15,7 +15,7 @@
 '''
 
 from construct import Struct, Int64ul, Int32ul, Int16ul, Int8ul
-from ctypes import CFUNCTYPE, c_void_p, c_size_t, c_uint32, c_uint64, c_uint8, c_uint16, c_ssize_t
+from ctypes import CFUNCTYPE, c_void_p, c_uint32, c_uint64, c_uint8, c_uint16, c_ssize_t
 import ctypes
 import chip.native
 import threading

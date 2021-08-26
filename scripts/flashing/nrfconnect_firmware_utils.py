@@ -47,7 +47,6 @@ operations:
                         Do not reset device after flashing
 """
 
-import errno
 import os
 import sys
 

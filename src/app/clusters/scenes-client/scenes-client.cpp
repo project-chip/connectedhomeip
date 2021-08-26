@@ -42,7 +42,7 @@
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
-#include "gen/command-id.h"
+#include <zap-generated/command-id.h>
 
 using namespace chip;
 

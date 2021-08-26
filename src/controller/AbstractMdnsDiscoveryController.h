@@ -40,7 +40,8 @@ constexpr uint16_t kMdnsPort = 5353;
 class DLL_EXPORT AbstractMdnsDiscoveryController : public Mdns::ResolverDelegate
 {
 public:
-    AbstractMdnsDiscoveryController(){};
+    AbstractMdnsDiscoveryController(chip::Mdns::Resolver * resolver = &chip::Mdns::Resolver::Instance()) { mResolver = resolver; }
+
     virtual ~AbstractMdnsDiscoveryController() {}
 
     void OnNodeDiscoveryComplete(const chip::Mdns::DiscoveredNodeData & nodeData) override;
@@ -50,6 +51,7 @@ protected:
     CHIP_ERROR SetUpNodeDiscovery();
     const Mdns::DiscoveredNodeData * GetDiscoveredNode(int idx);
     virtual DiscoveredNodeList GetDiscoveredNodes() = 0;
+    chip::Mdns::Resolver * mResolver;
 };
 
 } // namespace Controller

@@ -1,8 +1,8 @@
 {{> header}}
 {{#if (chip_has_client_clusters)}}
 
-#include "gen/CHIPClusters.h"
-#include "gen/CHIPClientCallbacks.h"
+#include <zap-generated/CHIPClusters.h>
+#include <zap-generated/CHIPClientCallbacks.h>
 
 #include <controller/java/CHIPJNIError.h>
 #include <controller/java/JniReferences.h>

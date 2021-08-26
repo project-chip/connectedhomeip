@@ -27,8 +27,6 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-import time
-from threading import Thread
 from ctypes import *
 from .ChipStack import *
 from .clusters.CHIPClusters import *
@@ -274,6 +272,19 @@ class ChipDeviceController(object):
                 self.devCtrl)
         )
 
+    def GetCompressedFabricId(self):
+        fabricid = c_uint64(0)
+
+        res = self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetCompressedFabricId(
+                self.devCtrl, pointer(fabricid))
+        )
+
+        if res == 0:
+            return fabricid.value
+        else:
+            raise self._ChipStack.ErrorToException(res)
+
     def GetFabricId(self):
         fabricid = c_uint64(0)
 
@@ -472,6 +483,6 @@ class ChipDeviceController(object):
             self._dmLib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
             self._dmLib.pychip_GetCommandSenderHandle.restype = c_uint64
 
-            self._dmLib.pychip_DeviceController_GetFabricId.argtypes = [
+            self._dmLib.pychip_DeviceController_GetCompressedFabricId.argtypes = [
                 c_void_p, POINTER(c_uint64)]
-            self._dmLib.pychip_DeviceController_GetFabricId.restype = c_uint32
+            self._dmLib.pychip_DeviceController_GetCompressedFabricId.restype = c_uint32

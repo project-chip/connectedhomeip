@@ -19,6 +19,7 @@ import os
 from pathlib import Path
 import sys
 import subprocess
+import logging
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
@@ -33,8 +34,24 @@ def checkPythonVersion():
 
 def getGlobalTemplatesTargets():
     targets = []
-    targets.extend([[str(filepath)]
-                   for filepath in Path('./examples').rglob('*.zap')])
+
+    for filepath in Path('./examples').rglob('*.zap'):
+        example_name = filepath.as_posix()
+        example_name = example_name[example_name.index('examples/') + 9:]
+        example_name = example_name[:example_name.index('/')]
+
+        logging.info("Found example %s (via %s)" %
+                     (example_name, str(filepath)))
+
+        # The name zap-generated is to make includes clear by using
+        # a name like <zap-generated/foo.h>
+        output_dir = os.path.join(
+            'zzz_generated', example_name, 'zap-generated')
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        targets.append([str(filepath), '-o', output_dir])
+
     targets.extend([[str(filepath)]
                    for filepath in Path('./src/darwin').rglob('*.zap')])
     targets.extend([[str(filepath)] for filepath in Path(
@@ -44,16 +61,26 @@ def getGlobalTemplatesTargets():
 
 def getSpecificTemplatesTargets():
     targets = []
-    targets.append(['src/controller/data_model/controller-clusters.zap',
-                   '-t', 'src/app/common/templates/templates.json'])
-    targets.append(['src/controller/data_model/controller-clusters.zap',
-                   '-t', 'examples/chip-tool/templates/templates.json'])
-    targets.append(['src/controller/data_model/controller-clusters.zap',
-                   '-t', 'src/controller/python/templates/templates.json'])
-    targets.append(['src/controller/data_model/controller-clusters.zap',
-                   '-t', 'src/darwin/Framework/CHIP/templates/templates.json'])
-    targets.append(['src/controller/data_model/controller-clusters.zap',
-                   '-t', 'src/controller/java/templates/templates.json'])
+
+    # Mapping of required template and output directory
+    templates = {
+        'src/app/common/templates/templates.json': 'zzz_generated/app-common/app-common/zap-generated',
+        'examples/chip-tool/templates/templates.json': 'zzz_generated/chip-tool/zap-generated',
+        'src/controller/python/templates/templates.json': None,
+        'src/darwin/Framework/CHIP/templates/templates.json': None,
+        'src/controller/java/templates/templates.json': None,
+    }
+
+    for template, output_dir in templates.items():
+        target = [
+            'src/controller/data_model/controller-clusters.zap', '-t', template]
+        if output_dir is not None:
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+            target.extend(['-o', output_dir])
+
+        targets.append(target)
+
     return targets
 
 
@@ -65,6 +92,10 @@ def getTargets():
 
 
 def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s %(name)s %(levelname)-7s %(message)s'
+    )
     checkPythonVersion()
     os.chdir(CHIP_ROOT_DIR)
 

@@ -20,14 +20,14 @@
  * @brief Implementation for the Operational Credentials Cluster
  ***************************************************************************/
 
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/attributes/Accessors.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-#include <app/common/gen/enums.h>
 #include <app/server/Mdns.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
@@ -116,7 +116,7 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     uint8_t fabricIndex = 0;
     for (auto & pairing : GetGlobalFabricTable())
     {
-        NodeId nodeId               = pairing.GetNodeId();
+        NodeId nodeId               = pairing.GetPeerId().GetNodeId();
         uint64_t fabricId           = pairing.GetFabricId();
         uint16_t vendorId           = pairing.GetVendorId();
         const uint8_t * fabricLabel = pairing.GetFabricLabel();
@@ -195,8 +195,8 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric 0x%" PRIX16 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
                        ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
-                       fabric->GetVendorId());
+                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
+                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         writeFabricsIntoFabricsListAttribute();
     }
 
@@ -206,8 +206,8 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Fabric %" PRIX16 " was persisted to storage. FabricId %0x" ChipLogFormatX64
                        ", NodeId %0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
-                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()), ChipLogValueX64(fabric->GetNodeId()),
-                       fabric->GetVendorId());
+                       fabric->GetFabricIndex(), ChipLogValueX64(fabric->GetFabricId()),
+                       ChipLogValueX64(fabric->GetPeerId().GetNodeId()), fabric->GetVendorId());
         writeFabricsIntoFabricsListAttribute();
     }
 };
@@ -421,14 +421,14 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(EndpointId endpoin
 
     VerifyOrExit(csr.Alloc(Crypto::kMAX_CSR_Length), err = CHIP_ERROR_NO_MEMORY);
 
-    if (gFabricBeingCommissioned.GetEphemeralKey() == nullptr)
+    if (gFabricBeingCommissioned.GetOperationalKey() == nullptr)
     {
         Crypto::P256Keypair keypair;
         keypair.Initialize();
         SuccessOrExit(err = gFabricBeingCommissioned.SetEphemeralKey(&keypair));
     }
 
-    err = gFabricBeingCommissioned.GetEphemeralKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
+    err = gFabricBeingCommissioned.GetOperationalKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: NewCertificateSigningRequest returned %d", err);
     SuccessOrExit(err);
     VerifyOrExit(csrLength < UINT8_MAX, err = CHIP_ERROR_INTERNAL);

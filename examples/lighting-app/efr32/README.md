@@ -287,7 +287,7 @@ via 2002::2
     `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
 
 -   To use the chip-rpc console after it has been installed run:
-    `python3 -m chip-rpc.console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
+    `python3 -m chip_rpc.console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
 -   Then you can simulate a button press or realease using the following command
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for

@@ -24,7 +24,6 @@
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/SystemTimer.h>
 
 using namespace chip::TLV;
 

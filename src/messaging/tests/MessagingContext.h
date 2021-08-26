@@ -77,8 +77,8 @@ public:
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
     secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
 
-    SecureSessionHandle GetSessionLocalToPeer();
-    SecureSessionHandle GetSessionPeerToLocal();
+    SessionHandle GetSessionLocalToPeer();
+    SessionHandle GetSessionPeerToLocal();
 
     Messaging::ExchangeContext * NewExchangeToPeer(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewExchangeToLocal(Messaging::ExchangeDelegate * delegate);
