@@ -108,7 +108,6 @@ private:
     TestObject & operator=(const TestObject &) = delete;
 };
 
-static std::mutex sMutex;
 ObjectPool<TestObject, TestObject::kPoolSize> TestObject::sPool;
 
 CHIP_ERROR TestObject::Init()
@@ -211,14 +210,6 @@ void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
     });
     NL_TEST_ASSERT(lContext.mTestSuite, i == kPoolSize);
 
-    for (i = 0; i < kPoolSize; ++i)
-    {
-        TestObject * lGotten = sPool.Back();
-        NL_TEST_ASSERT(lContext.mTestSuite, lGotten != nullptr);
-        lGotten->Release();
-    }
-
-    NL_TEST_ASSERT(lContext.mTestSuite, sPool.Back() == nullptr);
     lLayer.Shutdown();
 }
 
@@ -256,8 +247,6 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
 
     for (i = 0; i < kNumObjects; ++i)
     {
-        std::lock_guard<std::mutex> lck(sMutex);
-
         lObject = nullptr;
         while (lObject == nullptr)
         {
@@ -271,13 +260,10 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
         lObject->Delay(lContext.mAccumulator);
     }
 
-    // For each iteration, take one more object, and free one starting from the end
-    // of the pool
+    // For each iteration, take one more object, and free it form the pool
 
     for (i = 0; i < kLoopIterations; ++i)
     {
-        std::lock_guard<std::mutex> lck(sMutex);
-
         lObject = nullptr;
         while (lObject == nullptr)
         {
@@ -290,12 +276,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
         lObject->Init();
         lObject->Delay(lContext.mAccumulator);
 
-        lObject = sPool.Back();
-
-        if (lObject != nullptr)
-        {
-            lObject->Release();
-        }
+        lObject->Release();
     }
 
     lLayer.Shutdown();
@@ -385,7 +366,6 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
 
     // Take all objects one at a time and check the watermark
     // increases monotonically
-
     for (int i = 0; i < kNumObjects; ++i)
     {
         lObject = sPool.TryCreate(lLayer);
@@ -401,47 +381,20 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     }
 
     // Fail an allocation and check that both stats don't change
-
-    lObject = sPool.TryCreate(lLayer);
-    NL_TEST_ASSERT(lContext.mTestSuite, lObject == nullptr);
+    NL_TEST_ASSERT(lContext.mTestSuite, sPool.TryCreate(lLayer) == nullptr);
 
     sPool.GetStatistics(lNumInUse, lHighWatermark);
     NL_TEST_ASSERT(lContext.mTestSuite, lNumInUse == kNumObjects);
     NL_TEST_ASSERT(lContext.mTestSuite, lHighWatermark == kNumObjects);
 
-    // Free all objects one at a time and check that the watermark does not
+    // Free the last object and check that the watermark does not
     // change.
+    lObject->Release();
+    NL_TEST_ASSERT(lContext.mTestSuite, !lObject->IsRetained(lLayer));
 
-    for (int i = 0; i < kNumObjects; ++i)
-    {
-        lObject = sPool.Back();
-
-        NL_TEST_ASSERT(lContext.mTestSuite, lObject != nullptr);
-
-        lObject->Release();
-        NL_TEST_ASSERT(lContext.mTestSuite, !lObject->IsRetained(lLayer));
-
-        sPool.GetStatistics(lNumInUse, lHighWatermark);
-        NL_TEST_ASSERT(lContext.mTestSuite, lNumInUse == (kNumObjects - i - 1));
-        NL_TEST_ASSERT(lContext.mTestSuite, lHighWatermark == kNumObjects);
-    }
-
-    // Take all objects one at a time again and check the watermark
-    // does not move
-
-    for (int i = 0; i < kNumObjects; ++i)
-    {
-        lObject = sPool.TryCreate(lLayer);
-
-        NL_TEST_ASSERT(lContext.mTestSuite, lObject->IsRetained(lLayer));
-        NL_TEST_ASSERT(lContext.mTestSuite, &(lObject->SystemLayer()) == &lLayer);
-
-        sPool.GetStatistics(lNumInUse, lHighWatermark);
-        NL_TEST_ASSERT(lContext.mTestSuite, lNumInUse == (i + 1));
-        NL_TEST_ASSERT(lContext.mTestSuite, lHighWatermark == kNumObjects);
-
-        lObject->Init();
-    }
+    sPool.GetStatistics(lNumInUse, lHighWatermark);
+    NL_TEST_ASSERT(lContext.mTestSuite, lNumInUse == (kNumObjects - 1));
+    NL_TEST_ASSERT(lContext.mTestSuite, lHighWatermark == kNumObjects);
 
     lLayer.Shutdown();
 }

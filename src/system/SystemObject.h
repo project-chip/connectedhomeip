@@ -230,8 +230,6 @@ private:
     using Lambda = bool (*)(void *, void *);
     bool ForEachActiveObjectInner(void * context, Lambda lambda);
 
-    T * Back();
-
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     std::mutex mMutex;
     Object mDummyHead;
@@ -265,48 +263,9 @@ inline void ObjectPool<T, N>::Reset()
     memset(mArena.uMemory, 0, N * sizeof(T));
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    mHighWatermark = 0;
+    mHighWatermark      = 0;
 #endif
 #endif
-}
-
-/**
- *  @brief
- *      Returns a pointer the last active object in the pool or \c NULL if no active object.
- */
-template <class T, unsigned int N>
-inline T * ObjectPool<T, N>::Back()
-{
-    T * lReturn = nullptr;
-
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    {
-        std::lock_guard<std::mutex> lock(mMutex);
-        Object * p = mDummyHead.mNext;
-
-        while (p && p->mNext)
-        {
-            p = p->mNext;
-        }
-
-        lReturn = static_cast<T *>(p);
-    }
-#else
-    int index      = N - 1;
-    while (index >= 0)
-    {
-        lReturn = &reinterpret_cast<T *>(mArena.uMemory)[index];
-
-        if (lReturn && lReturn->mSystemLayer)
-            break;
-
-        index--;
-    }
-#endif
-
-    (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
-
-    return (lReturn && lReturn->mSystemLayer) ? lReturn : nullptr;
 }
 
 /**
