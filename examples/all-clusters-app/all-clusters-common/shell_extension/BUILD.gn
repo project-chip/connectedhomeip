@@ -18,20 +18,20 @@ import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/lib.gni")
 
 source_set("shell_extension") {
-    sources = [
-        "control.cpp",
-        "control.hpp",
-    ]
+  sources = [
+    "control.cpp",
+    "control.hpp",
+  ]
 
-    public_deps = [
-        "${chip_root}/src/controller",
-        "${chip_root}/src/lib",
-        "${chip_root}/src/lib/shell",
-        "${chip_root}/src/lib/shell:shell_core",
-    ]
+  public_deps = [
+    "${chip_root}/src/controller",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/lib/shell:shell_core",
+  ]
 
-    include_dirs = [
-        ".",
-        "${chip_root}/zzz_generated/all-clusters-app",
-    ]
+  include_dirs = [
+    ".",
+    "${chip_root}/zzz_generated/all-clusters-app",
+  ]
 }
