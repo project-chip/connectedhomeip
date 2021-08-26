@@ -20,8 +20,8 @@
 
 #include <inttypes.h>
 
-#include "core/CHIPConfig.h"
 #include "ServiceNaming.h"
+#include "core/CHIPConfig.h"
 #include "lib/core/CHIPSafeCasts.h"
 #include "lib/mdns/TxtFields.h"
 #include "lib/mdns/platform/Mdns.h"

@@ -17,14 +17,14 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
 #include <core/CHIPConfig.h>
+#include <core/CHIPError.h>
 #include <inet/InetInterface.h>
 #include <lib/mdns/Advertiser.h>
+#include <lib/mdns/MdnsCache.h>
 #include <lib/mdns/Resolver.h>
 #include <lib/mdns/platform/Mdns.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <lib/mdns/MdnsCache.h>
 
 // Enable detailed mDNS logging for publish
 #undef DETAIL_LOGGING
@@ -100,7 +100,7 @@ private:
 
     static DiscoveryImplPlatform sManager;
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    static MdnsCache <CHIP_CONFIG_MDNS_CACHE_SIZE> sMdnsCache;
+    static MdnsCache<CHIP_CONFIG_MDNS_CACHE_SIZE> sMdnsCache;
 #endif
 };
 
