@@ -102,7 +102,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(EndpointI
  *
  *
  * @param updateToken Identifier for the Software Image that was applied. Should be 32 octets long.
- * @param currentVersion The current SoftwareVersion value. Should match the SoftwarVersion attribute in the
+ * @param softwareVersion The current SoftwareVersion value. Should match the SoftwarVersion attribute in the
  *                       OTA Requestor's Basic Information Cluster.
  */
 
@@ -143,7 +143,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(chip::En
  * @param imageType A Vendor-specific numerical value that may help an OTA Provider select the correct payload.
  * @param hardwareVersion The OTA Requestor’s hardware version. Should match the HardwareVersion attribute of the Client's Basic
  *                        Information Cluster.
- * @param currentVersion The current version running on the OTA Requestor. Should match the SoftwareVersion attribute of the
+ * @param softwareVersion The current version running on the OTA Requestor. Should match the SoftwareVersion attribute of the
  * Client's Basic Information Cluster.
  * @param protocolsSupported A list of OTADownloadProtocol enum values indicating download protocols supported by the OTA Requestor
  *                           (max length 8 entries).
