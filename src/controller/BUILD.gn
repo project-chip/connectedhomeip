@@ -48,5 +48,7 @@ static_library("controller") {
     "${chip_root}/src/transport",
   ]
 
+  include_dirs = [ "${chip_root}/zzz_generated/controller-clusters" ]
+
   defines = []
 }
