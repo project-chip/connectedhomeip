@@ -103,8 +103,17 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
+#include "RTE_Components.h"
+#include CMSIS_device_header
+
+#include "em_assert.h"
 #include "em_device.h"
-#include <stdio.h>
+
+#if defined(SL_COMPONENT_CATALOG_PRESENT)
+#include "sl_component_catalog.h"
+#endif
 
 /*-----------------------------------------------------------
  * Application specific definitions.
@@ -126,6 +135,7 @@ extern "C" {
  *  See the comments at the top of main.c, main_full.c and main_low_power.c for
  *  more information.
  */
+
 #define configCREATE_LOW_POWER_DEMO (0)
 
 /* Some configuration is dependent on the demo being built. */
@@ -138,18 +148,21 @@ though that is faster than would normally be warranted by a real
 application. */
 #define configTICK_RATE_HZ (1000)
 
-/* The full demo always has tasks to run so the tick will never be turned
-off.  The blinky demo will use the default tickless idle implementation to
-turn the tick off. */
-#define configUSE_TICKLESS_IDLE (0)
+/* Energy saving modes. */
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+#define configUSE_TICKLESS_IDLE 1
+#else
+#define configUSE_TICKLESS_IDLE 0
+#endif
 
-#define configTOTAL_HEAP_SIZE ((size_t)(16 * 1024))
+/* Definition used by Keil to replace default system clock source. */
+#define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1
 
 /* Hook function related definitions. */
 #define configUSE_TICK_HOOK (1)
 #define configCHECK_FOR_STACK_OVERFLOW (2)
 #define configUSE_MALLOC_FAILED_HOOK (1)
-#define configUSE_IDLE_HOOK (0)
+#define configUSE_IDLE_HOOK (1)
 
 #define configENERGY_MODE (sleepEM1)
 
@@ -170,7 +183,7 @@ runs at 32768/8=4096Hz.  Ensure the tick rate is a multiple of the clock. */
 #define configUSE_TICK_HOOK (0)
 #define configCHECK_FOR_STACK_OVERFLOW (0)
 #define configUSE_MALLOC_FAILED_HOOK (0)
-#define configUSE_IDLE_HOOK (0)
+#define configUSE_IDLE_HOOK (1)
 
 #define configENERGY_MODE (sleepEM3)
 #endif
@@ -185,57 +198,46 @@ runs at 32768/8=4096Hz.  Ensure the tick rate is a multiple of the clock. */
 
 /* Software timer related definitions. */
 #define configUSE_TIMERS (1)
-#define configTIMER_TASK_PRIORITY (configMAX_PRIORITIES - 1) /* Highest priority */
+#define configTIMER_TASK_PRIORITY (40) /* Highest priority */
 #define configTIMER_QUEUE_LENGTH (10)
 #define configTIMER_TASK_STACK_DEPTH (1024)
 
-/* Cortex-M specific definitions. */
-#ifdef __NVIC_PRIO_BITS
-/* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
-#define configPRIO_BITS (__NVIC_PRIO_BITS)
-#else
-#define configPRIO_BITS 3 /* 7 priority levels */
-#endif
-
-/* The lowest interrupt priority that can be used in a call to a "set priority"
-function. */
-#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY (0x07)
-
-/* The highest interrupt priority that can be used by any interrupt service
-routine that makes calls to interrupt safe FreeRTOS API functions.  DO NOT CALL
-INTERRUPT SAFE FREERTOS API FUNCTIONS FROM ANY INTERRUPT THAT HAS A HIGHER
-PRIORITY THAN THIS! (higher priorities are lower numeric values. */
-#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY (0x03)
-
 /* Interrupt priorities used by the kernel port layer itself.  These are generic
 to all Cortex-M ports, and do not rely on any particular library functions. */
-#define configKERNEL_INTERRUPT_PRIORITY (configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
+#define configKERNEL_INTERRUPT_PRIORITY (255)
 /* !!!! configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to zero !!!!
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
-
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY 48
+#define configENABLE_FPU 0
+#define configENABLE_MPU 0
+/* FreeRTOS Secure Side Only and TrustZone Security Extension */
+#define configRUN_FREERTOS_SECURE_ONLY 1
+#define configENABLE_TRUSTZONE 0
 /* FreeRTOS MPU specific definitions. */
-#define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS (1)
+#define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS (0)
 
 #define configCPU_CLOCK_HZ (SystemCoreClock)
 #define configUSE_PREEMPTION (1)
 #define configUSE_TIME_SLICING (1)
-#define configUSE_PORT_OPTIMISED_TASK_SELECTION (1)
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION (0)
 #define configUSE_TICKLESS_IDLE_SIMPLE_DEBUG (1) /* See into vPortSuppressTicksAndSleep source code for explanation */
-#define configMAX_PRIORITIES (8)
-#define configMINIMAL_STACK_SIZE (120) /* Number of words to use for Idle and Timer stacks */
+#define configMAX_PRIORITIES (56)
+#define configMINIMAL_STACK_SIZE (140) /* Number of words to use for Idle and Timer stacks */
 #define configMAX_TASK_NAME_LEN (10)
 #define configUSE_16_BIT_TICKS (0)
-#define configIDLE_SHOULD_YIELD (0)
+#define configIDLE_SHOULD_YIELD (1)
 #define configUSE_MUTEXES (1)
 #define configUSE_RECURSIVE_MUTEXES (1)
 #define configUSE_COUNTING_SEMAPHORES (1)
-#define configUSE_ALTERNATIVE_API (0) /* Deprecated! */
+#define configUSE_TASK_NOTIFICATIONS 1
+#define configUSE_TRACE_FACILITY 1
 #define configQUEUE_REGISTRY_SIZE (10)
 #define configUSE_QUEUE_SETS (0)
-#define configUSE_NEWLIB_REENTRANT (0)
+#define configUSE_NEWLIB_REENTRANT (1)
 #define configENABLE_BACKWARD_COMPATIBILITY (1)
 #define configSUPPORT_STATIC_ALLOCATION (1)
+#define configSUPPORT_DYNAMIC_ALLOCATION (1)
+#define configTOTAL_HEAP_SIZE ((size_t)(16 * 1024))
 
 /* Optional functions - most linkers will remove unused functions anyway. */
 #define INCLUDE_vTaskPrioritySet (1)
@@ -253,14 +255,17 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define INCLUDE_pcTaskGetTaskName (1)
 #define INCLUDE_eTaskGetState (1)
 #define INCLUDE_xEventGroupSetBitFromISR (1)
+#define INCLUDE_xEventGroupSetBitsFromISR (1)
+#define INCLUDE_xSemaphoreGetMutexHolder (1)
 #define INCLUDE_xTimerPendFunctionCall (1)
+#define INCLUDE_xTaskGetHandle (1)
 
 /* Stop if an assertion fails. */
 #define configASSERT(x)                                                                                                            \
     if ((x) == 0)                                                                                                                  \
     {                                                                                                                              \
         taskDISABLE_INTERRUPTS();                                                                                                  \
-        printf("\nFREE ASSERT ( %s ) %s %d\n", #x, __FILE__, __LINE__);                                                            \
+        printf("\nFREERTOS ASSERT ( %s )\n", #x);                                                                                  \
         for (;;)                                                                                                                   \
             ;                                                                                                                      \
     }
@@ -276,7 +281,13 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
-#define xPortSysTickHandler SysTick_Handler
+/* Ensure Cortex-M port compatibility. */
+#define SysTick_Handler xPortSysTickHandler
+
+/* Thread local storage pointers used by the SDK */
+#ifndef configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS
+#define configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS 0
+#endif
 
 #if defined(__GNUC__)
 /* For the linker. */
