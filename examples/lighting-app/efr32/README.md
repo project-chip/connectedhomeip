@@ -288,7 +288,7 @@ via 2002::2
 -   You can also Get and Set the light directly using the RPCs:
     `rpcs.chip.rpc.Lighting.Get()`
 
-    `rpcs.chip.rpc.Lighting.Set(on=True)`
+    `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
 
 ## Memory settings
 

@@ -19,8 +19,6 @@
 #if CONFIG_ENABLE_PW_RPC
 #include "PigweedLoggerMutex.h"
 #include "RpcService.h"
-#include "button_service/button_service.rpc.pb.h"
-#include "device_service/device_service.rpc.pb.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
@@ -29,6 +27,10 @@
 #include "pw_log/log.h"
 #include "pw_rpc/server.h"
 #include "pw_sys_io/sys_io.h"
+#include "rpc_services/Button.h"
+#include "rpc_services/Device.h"
+#include "rpc_services/Lighting.h"
+
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "ScreenManager.h"
@@ -72,35 +74,10 @@ constexpr size_t kScanRecordsMax = sizeof(chip_rpc_ScanResults().aps) / sizeof(c
 chip_rpc_ScanResults out_scan_records;
 wifi_ap_record_t scan_records[kScanRecordsMax];
 
-class Device final : public generated::Device<Device>
+class Esp32Button final : public Button
 {
 public:
-    pw::Status FactoryReset(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
-    {
-        chip::DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
-        return pw::OkStatus();
-    }
-    pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
-    {
-        return pw::Status::Unimplemented();
-    }
-    pw::Status TriggerOta(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
-    {
-        return pw::Status::Unimplemented();
-    }
-    pw::Status GetDeviceInfo(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceInfo & response)
-    {
-        response.vendor_id        = 1234;
-        response.product_id       = 5678;
-        response.software_version = 0;
-        return pw::OkStatus();
-    }
-};
-
-class Button final : public generated::Button<Button>
-{
-public:
-    pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response)
+    pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
 #if CONFIG_DEVICE_TYPE_M5STACK
         if (request.pushed)
@@ -111,6 +88,17 @@ public:
 #else  // CONFIG_DEVICE_TYPE_M5STACK
         return pw::Status::Unimplemented();
 #endif // CONFIG_DEVICE_TYPE_M5STACK
+    }
+};
+
+class Esp32Device final : public Device
+{
+public:
+    pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    {
+        esp_restart();
+        // WILL NOT RETURN
+        return pw::OkStatus();
     }
 };
 
@@ -299,14 +287,16 @@ constexpr uint8_t kRpcTaskPriority  = 5;
 
 TaskHandle_t rpcTaskHandle;
 
-Button button_service;
-Device device_service;
+Esp32Button button_service;
+Esp32Device device_service;
+Lighting lighting_service;
 Wifi wifi_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
     server.RegisterService(button_service);
     server.RegisterService(device_service);
+    server.RegisterService(lighting_service);
     server.RegisterService(wifi_service);
 }
 
