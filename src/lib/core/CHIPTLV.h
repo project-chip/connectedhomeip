@@ -892,8 +892,6 @@ public:
      * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV UTF8 string, or
      *                                      the reader is not positioned on an element.
      * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely (i.e. the string length was "too big").
-     * @retval other                        Other CHIP or platform error codes returned by the configured
-     *                                      TLVBackingStore.
      *
      */
     CHIP_ERROR GetStringView(Span<const char> & data);
@@ -910,8 +908,6 @@ public:
      * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV octet string, or
      *                                      the reader is not positioned on an element.
      * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely (i.e. the string length was "too big").
-     * @retval other                        Other CHIP or platform error codes returned by the configured
-     *                                      TLVBackingStore.
      *
      */
     CHIP_ERROR GetByteView(ByteSpan & data);
