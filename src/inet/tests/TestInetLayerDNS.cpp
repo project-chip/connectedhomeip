@@ -41,7 +41,6 @@
 #include <support/UnitTestRegistration.h>
 
 #include <system/SystemClock.h>
-#include <system/SystemTimer.h>
 
 #include "TestInetCommon.h"
 #include "TestSetupSignalling.h"

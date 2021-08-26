@@ -29,6 +29,9 @@
 #include <app/common/gen/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <platform/CHIPDeviceLayer.h>
 
 #include <dk_buttons_and_leds.h>
@@ -56,6 +59,7 @@ static bool sHaveServiceConnectivity = false;
 
 static k_timer sFunctionTimer;
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -94,10 +98,13 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 
-#if defined(CONFIG_CHIP_NFC_COMMISSIONING) || defined(CONFIG_MCUMGR_SMP_BT)
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 #endif
     return 0;
@@ -385,25 +392,13 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     }
 }
 
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
 void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
 {
     if (event->Type != DeviceEventType::kCHIPoBLEAdvertisingChange)
         return;
 
-    if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
-    {
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-        NFCMgr().StopTagEmulation();
-#endif
-#ifdef CONFIG_MCUMGR_SMP_BT
-        // After CHIPoBLE advertising stop, start advertising SMP in case Thread is enabled or there are no active CHIPoBLE
-        // connections (exclude the case when CHIPoBLE advertising is stopped on the connection time)
-        if (GetDFUOverSMP().IsEnabled() && (ConnectivityMgr().IsThreadProvisioned() || ConnectivityMgr().NumBLEConnections() == 0))
-            sAppTask.RequestSMPAdvertisingStart();
-#endif
-    }
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-    else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+    if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
     {
         if (NFCMgr().IsTagEmulationStarted())
         {
@@ -414,8 +409,12 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
             ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
         }
     }
-#endif
+    else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+    {
+        NFCMgr().StopTagEmulation();
+    }
 }
+#endif
 
 void AppTask::CancelTimer()
 {

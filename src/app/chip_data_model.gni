@@ -158,7 +158,10 @@ template("chip_data_model") {
       ]
 
       if (_use_default_client_callbacks) {
-        sources += [ "${invoker.zap_pregenerated_dir}/CHIPClientCallbacks.cpp" ]
+        sources += [
+          "${_app_root}/util/im-client-callbacks.cpp",
+          "${invoker.zap_pregenerated_dir}/CHIPClientCallbacks.cpp",
+        ]
       }
 
       if (_use_default_im_dispatch) {

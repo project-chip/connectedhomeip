@@ -54,26 +54,17 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
     ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // TODO - Use section [4.368] and definition of `Destination Identifier` to find fabric ID for CASE SigmaR1 message
-    mFabricIndex = kMinValidFabricIndex;
-
-    Transport::FabricInfo * fabric = mFabrics->FindFabricWithIndex(mFabricIndex);
-    ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (!fabric->IsInitialized() || !fabric->AreCredentialsAvailable())
-    {
-        ReturnErrorOnFailure(mFabrics->LoadFromStorage(mFabricIndex));
-        fabric = mFabrics->FindFabricWithIndex(mFabricIndex);
-    }
-    ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    uint8_t credentialsIndex;
-    ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId, credentialsIndex));
+    // Mark any PASE sessions used for commissioning as stale.
+    // This is a workaround, as we currently don't have a way to identify
+    // secure sessions established via PASE protocol.
+    // TODO - Identify which PASE base secure channel was used
+    //        for commissioning and drop it once commissioning is complete.
+    mSessionMgr->ExpireAllPairings(kUndefinedNodeId, kUndefinedFabricIndex);
 
     ReturnErrorOnFailure(mIDAllocator->Allocate(mSessionKeyId));
 
     // Setup CASE state machine using the credentials for the current fabric.
-    ReturnErrorOnFailure(GetSession().ListenForSessionEstablishment(&mCredentials, mSessionKeyId, this));
+    ReturnErrorOnFailure(GetSession().ListenForSessionEstablishment(mSessionKeyId, mFabrics, this));
 
     // Hand over the exchange context to the CASE session.
     ec->SetDelegate(&GetSession());
@@ -112,8 +103,6 @@ void CASEServer::Cleanup()
     mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1, this);
 
     mFabricIndex = Transport::kUndefinedFabricIndex;
-    mCredentials.Release();
-    mCertificates.Release();
     GetSession().Clear();
 }
 

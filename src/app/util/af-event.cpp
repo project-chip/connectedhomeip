@@ -43,7 +43,6 @@
 #include <app/util/attribute-storage.h>
 
 #include <platform/CHIPDeviceLayer.h>
-#include <system/SystemTimer.h>
 
 #define EMBER_MAX_EVENT_CONTROL_DELAY_MS (UINT32_MAX / 2)
 #define EMBER_MAX_EVENT_CONTROL_DELAY_QS (EMBER_MAX_EVENT_CONTROL_DELAY_MS >> 8)
@@ -51,7 +50,7 @@
 
 #include <app/common/gen/callback.h>
 
-#include "gen/af-gen-event.h"
+#include <zap-generated/af-gen-event.h>
 
 using namespace chip;
 

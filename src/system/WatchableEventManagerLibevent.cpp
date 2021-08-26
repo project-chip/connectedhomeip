@@ -25,7 +25,10 @@
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 #include <system/WatchableEventManager.h>
-#include <system/WatchableSocket.h>
+
+#include <algorithm>
+#include <fcntl.h>
+#include <unistd.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
@@ -59,8 +62,6 @@ System::SocketEvents SocketEventsFromLibeventFlags(short eventFlags)
         .Set(SocketEventFlags::kWrite, eventFlags & EV_WRITE);
 }
 
-void TimeoutCallbackHandler(evutil_socket_t fd, short eventFlags, void * data) {}
-
 } // anonymous namespace
 
 CHIP_ERROR WatchableEventManager::Init(System::Layer & systemLayer)
@@ -76,96 +77,68 @@ CHIP_ERROR WatchableEventManager::Init(System::Layer & systemLayer)
     }
 #endif // CHIP_CONFIG_LIBEVENT_DEBUG_CHECKS
 
-    mEventBase     = event_base_new();
-    mTimeoutEvent  = evtimer_new(mEventBase, TimeoutCallbackHandler, event_self_cbarg());
-    mActiveSockets = nullptr;
-    mSystemLayer   = &systemLayer;
+    mSystemLayer = &systemLayer;
+    mEventBase   = event_base_new();
+    VerifyOrReturnError(mEventBase != nullptr, CHIP_ERROR_NO_MEMORY);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+    mMdnsTimeoutEvent = evtimer_new(mEventBase, MdnsTimeoutCallbackHandler, this);
+    VerifyOrReturnError(mMdnsTimeoutEvent != nullptr, CHIP_ERROR_NO_MEMORY);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = PTHREAD_NULL;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-    return mTimerList.Init();
+    Mutex::Init(mTimerListMutex);
+
+    return CHIP_NO_ERROR;
 }
 
-void WatchableEventManager::PrepareEvents()
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+
+// static
+void WatchableEventManager::MdnsTimeoutCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
 {
-    const Clock::MonotonicMilliseconds currentTime = Clock::GetMonotonicMilliseconds();
-    Clock::MonotonicMilliseconds awakenTime        = currentTime;
-
-    Timer * timer = mTimerList.Earliest();
-    if (timer && Clock::IsEarlier(timer->mAwakenTime, awakenTime))
-    {
-        awakenTime = timer->mAwakenTime;
-    }
-
-    const Clock::MonotonicMilliseconds sleepTime = (awakenTime > currentTime) ? (awakenTime - currentTime) : 0;
-    timeval nextTimeout;
-    MillisecondsToTimeval(sleepTime, nextTimeout);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
-    chip::Mdns::GetMdnsTimeout(nextTimeout);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
-    if (nextTimeout.tv_sec || nextTimeout.tv_usec)
-    {
-        evtimer_add(mTimeoutEvent, &nextTimeout);
-    }
+    reinterpret_cast<WatchableEventManager *>(data)->MdnsTimeoutCallbackHandler();
 }
 
-void WatchableEventManager::WaitForEvents()
-{
-    VerifyOrDie(mEventBase != nullptr);
-    event_base_loop(mEventBase, EVLOOP_ONCE);
-}
-
-void WatchableEventManager::HandleEvents()
+void WatchableEventManager::MdnsTimeoutCallbackHandler()
 {
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = pthread_self();
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
-    // Obtain the list of currently expired timers. Any new timers added by timer callback are NOT handled on this pass,
-    // since that could result in infinite handling of new timers blocking any other progress.
-    Timer::List expiredTimers(mTimerList.ExtractEarlier(1 + Clock::GetMonotonicMilliseconds()));
-    Timer * timer = nullptr;
-    while ((timer = expiredTimers.PopEarliest()) != nullptr)
-    {
-        timer->HandleComplete();
-    }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
     chip::Mdns::HandleMdnsTimeout();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
-
-    while (mActiveSockets != nullptr)
-    {
-        WatchableSocket * const watcher = mActiveSockets;
-        mActiveSockets                  = watcher->mActiveNext;
-        watcher->InvokeCallback();
-    }
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     mHandleSelectThread = PTHREAD_NULL;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
 CHIP_ERROR WatchableEventManager::Shutdown()
 {
     event_base_loopbreak(mEventBase);
-    event_free(mTimeoutEvent);
-    mTimeoutEvent = nullptr;
-    event_base_free(mEventBase);
-    mEventBase = nullptr;
 
-    Timer * timer;
-    while ((timer = mTimerList.PopEarliest()) != nullptr)
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+    if (mMdnsTimeoutEvent != nullptr)
     {
-        timer->Clear();
-        timer->Release();
+        event_free(mMdnsTimeoutEvent);
+        mMdnsTimeoutEvent = nullptr;
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
 
+    mTimerListMutex.Lock();
+    mTimers.clear();
+    mTimerListMutex.Unlock();
+
+    mSocketWatches.clear();
+
+    event_base_free(mEventBase);
+    mEventBase   = nullptr;
     mSystemLayer = nullptr;
+
     return CHIP_NO_ERROR;
 }
 
@@ -195,73 +168,252 @@ void WatchableEventManager::Signal()
     }
 }
 
-CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, Timers::OnCompleteFunct onComplete, void * appState)
+CHIP_ERROR WatchableEventManager::StartTimer(uint32_t delayMilliseconds, TimerCompleteCallback onComplete, void * appState)
 {
-    // Note: the libevent implementation currently uses a single libevent timer, playing the same role as the select() timeout.
-    // A more ‘native' implementation would have Timer contain a libevent timer and callback data for each CHIP timer.
-    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delayMilliseconds = 0);
-
-    CancelTimer(onComplete, appState);
-
-    Timer * timer = Timer::New(*mSystemLayer, delayMilliseconds, onComplete, appState);
-    VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    if (mTimerList.Add(timer) == timer)
+    std::lock_guard<Mutex> lock(mTimerListMutex);
+    mTimers.push_back(std::make_unique<LibeventTimer>(this, onComplete, appState));
+    LibeventTimer * timer = mTimers.back().get();
+    if (timer == nullptr)
     {
-        // The new timer is the earliest, so the time until the next event has probably changed.
-        Signal();
+        mTimers.pop_back();
+        return CHIP_ERROR_NO_MEMORY;
     }
+
+    event * e = evtimer_new(mEventBase, TimerCallbackHandler, timer);
+    VerifyOrReturnError(e != nullptr, CHIP_ERROR_NO_MEMORY);
+    timer->mEvent = e;
+
+    timeval delay;
+    MillisecondsToTimeval(delayMilliseconds, delay);
+    int status = evtimer_add(e, &delay);
+    VerifyOrReturnError(status == 0, CHIP_ERROR_INTERNAL);
+
     return CHIP_NO_ERROR;
 }
 
-void WatchableEventManager::CancelTimer(Timers::OnCompleteFunct onComplete, void * appState)
+void WatchableEventManager::CancelTimer(TimerCompleteCallback onComplete, void * appState)
 {
-    Timer * timer = mTimerList.Remove(onComplete, appState);
-    VerifyOrReturn(timer != nullptr);
-
-    timer->Clear();
-    timer->Release();
-    Signal();
+    std::lock_guard<Mutex> lock(mTimerListMutex);
+    auto it = std::find_if(mTimers.begin(), mTimers.end(), [onComplete, appState](const std::unique_ptr<LibeventTimer> & timer) {
+        return timer->mOnComplete == onComplete && timer->mCallbackData == appState;
+    });
+    if (it != mTimers.end())
+    {
+        LibeventTimer * timer = it->get();
+        mActiveTimers.remove(timer);
+        mTimers.remove_if([timer](const std::unique_ptr<LibeventTimer> & t) { return t.get() == timer; });
+    }
 }
 
 // static
-void WatchableEventManager::LibeventCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
+void WatchableEventManager::TimerCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
 {
-    WatchableSocket * const watcher = reinterpret_cast<WatchableSocket *>(data);
-    VerifyOrDie(watcher != nullptr);
-    VerifyOrDie(watcher->mFD == fd);
-
-    watcher->mPendingIO = SocketEventsFromLibeventFlags(eventFlags);
-
-    // Add to active list.
-    WatchableSocket ** pp = &watcher->mSharedState->mActiveSockets;
-    while (*pp != nullptr)
+    // Copy the necessary timer information and remove it from the list.
+    LibeventTimer * timer            = reinterpret_cast<LibeventTimer *>(data);
+    Layer * systemLayer              = timer->mEventManager->mSystemLayer;
+    TimerCompleteCallback onComplete = timer->mOnComplete;
+    void * callbackData              = timer->mCallbackData;
+    systemLayer->CancelTimer(onComplete, callbackData);
+    if (onComplete)
     {
-        if (*pp == watcher)
-        {
-            return;
-        }
-        pp = &(*pp)->mActiveNext;
+        onComplete(systemLayer, callbackData);
     }
-    *pp                  = watcher;
-    watcher->mActiveNext = nullptr;
 }
 
-void WatchableEventManager::RemoveFromQueueIfPresent(WatchableSocket * watcher)
+WatchableEventManager::LibeventTimer::~LibeventTimer()
 {
-    VerifyOrDie(watcher != nullptr);
-    VerifyOrDie(watcher->mSharedState == this);
-
-    WatchableSocket ** pp = &mActiveSockets;
-    while (*pp != nullptr)
+    mEventManager = nullptr;
+    mOnComplete   = nullptr;
+    mCallbackData = nullptr;
+    if (mEvent)
     {
-        if (*pp == watcher)
+        if (evtimer_pending(mEvent, nullptr))
         {
-            *pp = watcher->mActiveNext;
-            return;
+            event_del(mEvent);
         }
-        pp = &(*pp)->mActiveNext;
+        event_free(mEvent);
+        mEvent = nullptr;
     }
+};
+
+CHIP_ERROR WatchableEventManager::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)
+{
+    mSocketWatches.push_back(std::make_unique<SocketWatch>(this, fd));
+    SocketWatch * watch = mSocketWatches.back().get();
+    if (watch == nullptr)
+    {
+        mSocketWatches.pop_back();
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    *tokenOut = reinterpret_cast<SocketWatchToken>(watch);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WatchableEventManager::SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data)
+{
+    SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
+    VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    watch->mCallback     = callback;
+    watch->mCallbackData = data;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WatchableEventManager::RequestCallbackOnPendingRead(SocketWatchToken token)
+{
+    return SetWatch(token, EV_READ);
+}
+
+CHIP_ERROR WatchableEventManager::RequestCallbackOnPendingWrite(SocketWatchToken token)
+{
+    return SetWatch(token, EV_WRITE);
+}
+
+CHIP_ERROR WatchableEventManager::ClearCallbackOnPendingRead(SocketWatchToken token)
+{
+    return ClearWatch(token, EV_READ);
+}
+
+CHIP_ERROR WatchableEventManager::ClearCallbackOnPendingWrite(SocketWatchToken token)
+{
+    return ClearWatch(token, EV_WRITE);
+}
+
+CHIP_ERROR WatchableEventManager::StopWatchingSocket(SocketWatchToken * tokenInOut)
+{
+    SocketWatch * watch = reinterpret_cast<SocketWatch *>(*tokenInOut);
+    VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    *tokenInOut = InvalidSocketWatchToken();
+
+    mActiveSocketWatches.remove(watch);
+    mSocketWatches.remove_if([watch](const std::unique_ptr<SocketWatch> & w) { return w.get() == watch; });
+    return CHIP_NO_ERROR;
+}
+
+SocketWatchToken InvalidSocketWatchToken()
+{
+    return reinterpret_cast<SocketWatchToken>(nullptr);
+}
+
+CHIP_ERROR WatchableEventManager::SetWatch(SocketWatchToken token, short eventFlags)
+{
+    SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
+    VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const short oldFlags = watch->mEvent ? event_get_events(watch->mEvent) : 0;
+    return UpdateWatch(watch, static_cast<short>(EV_PERSIST | oldFlags | eventFlags));
+}
+
+CHIP_ERROR WatchableEventManager::ClearWatch(SocketWatchToken token, short eventFlags)
+{
+    SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
+    VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const short oldFlags = watch->mEvent ? event_get_events(watch->mEvent) : 0;
+    return UpdateWatch(watch, static_cast<short>(EV_PERSIST | (oldFlags & ~eventFlags)));
+}
+
+CHIP_ERROR WatchableEventManager::UpdateWatch(SocketWatch * watch, short eventFlags)
+{
+    if (watch->mEvent != nullptr)
+    {
+        if (event_get_events(watch->mEvent) == eventFlags)
+        {
+            // No update needed.
+            return CHIP_NO_ERROR;
+        }
+        if (event_pending(watch->mEvent, EV_TIMEOUT | EV_READ | EV_WRITE | EV_SIGNAL, nullptr))
+        {
+            event_del(watch->mEvent);
+        }
+        event_free(watch->mEvent);
+        watch->mEvent = nullptr;
+    }
+
+    if (eventFlags)
+    {
+        // libevent requires the socket to already be non-blocking.
+        int flags = ::fcntl(watch->mFD, F_GETFL, 0);
+        if ((flags & O_NONBLOCK) == 0)
+        {
+            int status = ::fcntl(watch->mFD, F_SETFL, flags | O_NONBLOCK);
+            VerifyOrReturnError(status == 0, chip::System::MapErrorPOSIX(errno));
+        }
+        watch->mEvent = event_new(mEventBase, watch->mFD, eventFlags, SocketCallbackHandler, watch);
+        VerifyOrReturnError(watch->mEvent != nullptr, CHIP_ERROR_NO_MEMORY);
+        int status = event_add(watch->mEvent, nullptr);
+        VerifyOrReturnError(status == 0, CHIP_ERROR_INTERNAL);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+// static
+void WatchableEventManager::SocketCallbackHandler(evutil_socket_t fd, short eventFlags, void * data)
+{
+    SocketWatch * const watch = reinterpret_cast<SocketWatch *>(data);
+    VerifyOrDie(watch != nullptr);
+    VerifyOrDie(watch->mFD == fd);
+
+    watch->mPendingIO = SocketEventsFromLibeventFlags(eventFlags);
+    watch->mEventManager->mActiveSocketWatches.push_back(watch);
+}
+
+WatchableEventManager::SocketWatch::~SocketWatch()
+{
+    mEventManager = nullptr;
+    mFD           = kInvalidFd;
+    mCallback     = nullptr;
+    mCallbackData = 0;
+    if (mEvent)
+    {
+        if (event_pending(mEvent, EV_TIMEOUT | EV_READ | EV_WRITE | EV_SIGNAL, nullptr))
+        {
+            event_del(mEvent);
+        }
+        event_free(mEvent);
+        mEvent = nullptr;
+    }
+}
+
+void WatchableEventManager::PrepareEvents()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__ && !__MBED__
+    timeval mdnsTimeout = { 0, 0 };
+    chip::Mdns::GetMdnsTimeout(mdnsTimeout);
+    if (mdnsTimeout.tv_sec || mdnsTimeout.tv_usec)
+    {
+        evtimer_add(mMdnsTimeoutEvent, &mdnsTimeout);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS && !__ZEPHYR__
+}
+
+void WatchableEventManager::WaitForEvents()
+{
+    VerifyOrDie(mEventBase != nullptr);
+    event_base_loop(mEventBase, EVLOOP_ONCE);
+}
+
+void WatchableEventManager::HandleEvents()
+{
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+    mHandleSelectThread = pthread_self();
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+
+    while (!mActiveSocketWatches.empty())
+    {
+        SocketWatch * const watch = mActiveSocketWatches.front();
+        mActiveSocketWatches.pop_front();
+        if (watch->mPendingIO.HasAny() && watch->mCallback != nullptr)
+        {
+            watch->mCallback(watch->mPendingIO, watch->mCallbackData);
+        }
+    }
+
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
+    mHandleSelectThread = PTHREAD_NULL;
+#endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 }
 
 } // namespace System

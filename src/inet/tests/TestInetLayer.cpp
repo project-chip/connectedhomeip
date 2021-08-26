@@ -40,8 +40,6 @@
 #include <inet/InetArgParser.h>
 #include <support/CodeUtils.h>
 
-#include <system/SystemTimer.h>
-
 #include "TestInetCommon.h"
 #include "TestInetCommonOptions.h"
 #include "TestInetLayerCommon.hpp"

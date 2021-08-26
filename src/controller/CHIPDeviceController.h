@@ -32,7 +32,7 @@
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
 #include <controller/OperationalCredentialsDelegate.h>
-#include <controller/data_model/gen/CHIPClientCallbacks.h>
+#include <controller/data_model/zap-generated/CHIPClientCallbacks.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
@@ -291,14 +291,6 @@ public:
     CHIP_ERROR ServiceEvents();
 
     /**
-     * @brief
-     *   Allow the CHIP Stack to process any pending events
-     *   This can be called in an event handler loop to trigger callbacks within the CHIP stack
-     * @return CHIP_ERROR   The return status
-     */
-    CHIP_ERROR ServiceEventSignal();
-
-    /**
      * @brief Get the Fabric ID assigned to the device.
      *
      * @param[out] fabricId   Fabric ID of the device.
@@ -346,7 +338,7 @@ protected:
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
-    uint16_t FindDeviceIndex(SecureSessionHandle session);
+    uint16_t FindDeviceIndex(SessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     void ReleaseDeviceById(NodeId remoteDeviceId);
@@ -356,15 +348,10 @@ protected:
 
     void PersistNextKeyId();
 
-    FabricIndex mFabricIndex = 1;
+    FabricIndex mFabricIndex = Transport::kMinValidFabricIndex;
     Transport::FabricTable mFabrics;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
-
-    Credentials::ChipCertificateSet mCertificates;
-    Credentials::OperationalCredentialSet mCredentials;
-    Credentials::CertificateKeyId mRootKeyId;
-    uint8_t mCredentialsIndex;
 
     SessionIDAllocator mIDAllocator;
 
@@ -384,8 +371,8 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
-    void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
 
     void ReleaseAllDevices();
 
@@ -618,7 +605,7 @@ private:
     UserDirectedCommissioningServer * mUdcServer = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
     DeviceTransportMgr * mUdcTransportMgr = nullptr;
-    uint16_t mUdcListenPort               = CHIP_PORT + 1;
+    uint16_t mUdcListenPort               = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void PersistDeviceList();

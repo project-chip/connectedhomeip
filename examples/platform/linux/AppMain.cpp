@@ -56,9 +56,10 @@
 #include "Options.h"
 
 using namespace chip;
+using namespace chip::Credentials;
+using namespace chip::DeviceLayer;
 using namespace chip::Inet;
 using namespace chip::Transport;
-using namespace chip::DeviceLayer;
 
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
@@ -145,6 +146,7 @@ exit:
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Messaging;
 using namespace ::chip::Controller;
@@ -186,8 +188,10 @@ CHIP_ERROR InitCommissioner()
 
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
 
-    ReturnErrorOnFailure(gCommissioner.SetUdpListenPort(CHIP_PORT + 2));
-    ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(CHIP_PORT + 3));
+    // use a different listen port for the commissioner.
+    ReturnErrorOnFailure(gCommissioner.SetUdpListenPort(LinuxDeviceOptions::GetInstance().securedCommissionerPort));
+    // No need to explicitly set the UDC port since we will use default
+    ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort));
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
@@ -232,11 +236,19 @@ void ChipLinuxAppMainLoop()
     chip::Shell::RegisterCommissioneeCommands();
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    // use a different service port to make testing possible with other sample devices running on same host
+    ServerConfigParams params;
+    params.securedServicePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
+    params.unsecuredServicePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
+    SetServerConfig(params);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
     // Init ZCL Data Model and CHIP App Server
     InitServer();
 
     // Initialize device attestation config
-    Credentials::SetDeviceAttestationCredentialsProvider(Credentials::Examples::GetExampleDACProvider());
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     InitCommissioner();

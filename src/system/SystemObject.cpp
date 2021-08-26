@@ -35,7 +35,6 @@
 // Include local headers
 #include <stddef.h>
 #include <stdlib.h>
-#include <string.h>
 
 namespace chip {
 namespace System {
@@ -52,6 +51,13 @@ DLL_EXPORT void Object::Release()
     if (oldCount == 1)
     {
         this->mSystemLayer = nullptr;
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+        std::lock_guard<std::mutex> lock(*mMutexRef);
+        this->mPrev->mNext = this->mNext;
+        if (this->mNext)
+            this->mNext->mPrev = this->mPrev;
+        delete this;
+#endif
         __sync_synchronize();
     }
     else if (oldCount == 0)
@@ -81,7 +87,7 @@ DLL_EXPORT bool Object::TryCreate(Layer & aLayer, size_t aOctets)
 void Object::DeferredRelease(Object::ReleaseDeferralErrorTactic aTactic)
 {
     Layer & lSystemLayer = *this->mSystemLayer;
-    CHIP_ERROR lError    = lSystemLayer.WatchableEventsManager().PostEvent(*this, chip::System::kEvent_ReleaseObj, 0);
+    CHIP_ERROR lError    = lSystemLayer.PostEvent(*this, chip::System::kEvent_ReleaseObj, 0);
 
     if (lError != CHIP_NO_ERROR)
     {

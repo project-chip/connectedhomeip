@@ -44,7 +44,6 @@
 #include <support/UnitTestRegistration.h>
 
 #include <system/SystemError.h>
-#include <system/SystemTimer.h>
 
 #include <nlunit-test.h>
 
@@ -488,6 +487,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     testTCPEP1->Shutdown();
 }
 
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 // Test the InetLayer resource limitation
 static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
@@ -496,8 +496,7 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 #endif //
     UDPEndPoint * testUDPEP = nullptr;
     TCPEndPoint * testTCPEP = nullptr;
-    CHIP_ERROR err;
-    char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
+    CHIP_ERROR err          = CHIP_NO_ERROR;
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
     for (int i = 0; i < INET_CONFIG_NUM_RAW_ENDPOINTS + 1; i++)
@@ -520,13 +519,17 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
+    char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
         err = gSystemLayer.StartTimer(10, HandleTimer, &numTimersTest[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
+#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
 
     ShutdownNetwork();
     ShutdownSystemLayer();
 }
+#endif
 
 // Test Suite
 
@@ -541,7 +544,9 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
                                  NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
                                  NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
                                  NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointInternal),
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
                                  NL_TEST_DEF("InetEndPoint::TestEndPointLimit", TestInetEndPointLimit),
+#endif
                                  NL_TEST_SENTINEL() };
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

@@ -36,7 +36,7 @@
 #include <controller/CHIPDeviceController.h>
 
 #include <app/common/gen/enums.h>
-#include <controller/data_model/gen/CHIPClusters.h>
+#include <controller/data_model/zap-generated/CHIPClusters.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -232,12 +232,12 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
     ReturnErrorOnFailure(ConvertX509CertsToChipCertArray(params.controllerNOC, params.controllerICAC, chipCertSpan));
     ReturnErrorOnFailure(newFabric.SetOperationalCertsFromCertArray(chipCertSpan));
     newFabric.SetVendorId(params.controllerVendorId);
-    ReturnErrorOnFailure(mFabrics.AddNewFabric(newFabric, &mFabricIndex));
-    ChipLogProgress(Controller, "Joined new fabric at index %d", mFabricIndex);
 
     Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(fabric->GetCredentials(mCredentials, mCertificates, mRootKeyId, mCredentialsIndex));
+
+    ReturnErrorOnFailure(fabric->SetFabricInfo(newFabric));
+    ChipLogProgress(Controller, "Joined the fabric at index %d", mFabricIndex);
 
     mLocalDeviceId = fabric->GetNodeId();
     mVendorId      = fabric->GetVendorId();
@@ -468,19 +468,6 @@ CHIP_ERROR DeviceController::ServiceEvents()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::ServiceEventSignal()
-{
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-
-#if CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
-    DeviceLayer::SystemLayer.WatchableEventsManager().Signal();
-#else
-    ReturnErrorOnFailure(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-#endif // CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DeviceController::GetFabricId(uint64_t & fabricId)
 {
     Transport::FabricInfo * fabric = mFabrics.FindFabricWithIndex(mFabricIndex);
@@ -515,7 +502,7 @@ void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(Controller, "Time out! failed to receive response from Exchange: %p", ec);
 }
 
-void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
+void DeviceController::OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNewConnection was called in incorrect state"));
 
@@ -526,7 +513,7 @@ void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::E
     mActiveDevices[index].OnNewConnection(session);
 }
 
-void DeviceController::OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
+void DeviceController::OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
 
@@ -582,7 +569,7 @@ void DeviceController::ReleaseAllDevices()
     }
 }
 
-uint16_t DeviceController::FindDeviceIndex(SecureSessionHandle session)
+uint16_t DeviceController::FindDeviceIndex(SessionHandle session)
 {
     uint16_t i = 0;
     while (i < kNumMaxActiveDevices)
@@ -725,14 +712,13 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
     return ControllerDeviceInitParams{
-        .transportMgr     = mTransportMgr,
-        .sessionMgr       = mSessionMgr,
-        .exchangeMgr      = mExchangeMgr,
-        .inetLayer        = mInetLayer,
-        .storageDelegate  = mStorageDelegate,
-        .credentials      = &mCredentials,
-        .credentialsIndex = mCredentialsIndex,
-        .idAllocator      = &mIDAllocator,
+        .transportMgr    = mTransportMgr,
+        .sessionMgr      = mSessionMgr,
+        .exchangeMgr     = mExchangeMgr,
+        .inetLayer       = mInetLayer,
+        .storageDelegate = mStorageDelegate,
+        .idAllocator     = &mIDAllocator,
+        .fabricsTable    = &mFabrics,
     };
 }
 
@@ -905,7 +891,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         }
     }
 #endif
-    exchangeCtxt = mExchangeMgr->NewContext(SecureSessionHandle(), &mPairingSession);
+    exchangeCtxt = mExchangeMgr->NewContext(SessionHandle(), &mPairingSession);
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
     err = mIDAllocator.Allocate(keyID);

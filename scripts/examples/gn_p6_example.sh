@@ -41,8 +41,12 @@ env
 
 # Build steps
 EXAMPLE_DIR=$1
-OUTPUT_DIR=out/lock_app_p6
+OUTPUT_DIR=out/example_app
 P6_BOARD=CY8CKIT-062S2-43012
+
+if [[ ! -z "$2" ]]; then
+    OUTPUT_DIR=$2
+fi
 
 gn gen --check --fail-on-unused-args "$OUTPUT_DIR" --root="$EXAMPLE_DIR" --args="p6_board=\"$P6_BOARD\""
 ninja -C "$OUTPUT_DIR"

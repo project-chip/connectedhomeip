@@ -27,6 +27,12 @@
 #include <transport/raw/BLE.h>
 #include <transport/raw/UDP.h>
 
+struct ServerConfigParams
+{
+    uint16_t securedServicePort   = CHIP_PORT;
+    uint16_t unsecuredServicePort = CHIP_UDC_PORT;
+};
+
 constexpr size_t kMaxBlePendingPackets = 1;
 
 using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
@@ -39,6 +45,14 @@ using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
                                             chip::Transport::BLE<kMaxBlePendingPackets>
 #endif
                                             >;
+/**
+ * Currently, this method must be called BEFORE InitServer.
+ * In the future, it would be nice to be able to call it
+ * at any time but that requires handling for changes to every
+ * field on ServerConfigParams (restarting port listener, etc).
+ *
+ */
+void SetServerConfig(ServerConfigParams params);
 
 /**
  * Initialize DataModelHandler and start CHIP datamodel server, the server

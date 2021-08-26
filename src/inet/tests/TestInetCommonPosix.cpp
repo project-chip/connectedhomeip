@@ -471,11 +471,11 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (gSystemLayer.State() == System::kLayerState_Initialized)
+    if (gSystemLayer.State() == System::LayerState::kInitialized)
     {
         static uint32_t sRemainingSystemLayerEventDelay = 0;
 
-        if (gSystemLayer.State() == System::kLayerState_Initialized)
+        if (gSystemLayer.State() == System::LayerState::kInitialized)
         {
             if (sRemainingSystemLayerEventDelay == 0)
             {

@@ -982,6 +982,114 @@ private:
     }
 };
 
+class TV_WakeOnLanCluster : public TestCommand
+{
+public:
+    TV_WakeOnLanCluster() : TestCommand("TV_WakeOnLanCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "TV_WakeOnLanCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterWakeOnLanCommandReadAttribute_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "TV_WakeOnLanCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    // Test Read mac address
+    using SuccessCallback_0 = void (*)(void * context, chip::ByteSpan wakeOnLanMacAddress);
+    chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{
+        OnTestSendClusterWakeOnLanCommandReadAttribute_0_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
+        OnTestSendClusterWakeOnLanCommandReadAttribute_0_FailureResponse, this
+    };
+    bool mIsFailureExpected_0 = 0;
+
+    CHIP_ERROR TestSendClusterWakeOnLanCommandReadAttribute_0()
+    {
+        ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Sending command...");
+
+        chip::Controller::WakeOnLanCluster cluster;
+        cluster.Associate(mDevice, 1);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeWakeOnLanMacAddress(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterWakeOnLanCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Failure Response");
+
+        TV_WakeOnLanCluster * runner = reinterpret_cast<TV_WakeOnLanCluster *>(context);
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterWakeOnLanCommandReadAttribute_0_SuccessResponse(void * context, chip::ByteSpan wakeOnLanMacAddress)
+    {
+        ChipLogProgress(chipTool, "Wake on LAN - Read mac address: Success Response");
+
+        TV_WakeOnLanCluster * runner = reinterpret_cast<TV_WakeOnLanCluster *>(context);
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        chip::ByteSpan wakeOnLanMacAddressArgument =
+            chip::ByteSpan(chip::Uint8::from_const_char("00:00:00:00:00"), strlen("00:00:00:00:00"));
+        if (!wakeOnLanMacAddress.data_equal(wakeOnLanMacAddressArgument))
+        {
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "00:00:00:00:00");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
 class TV_ApplicationBasicCluster : public TestCommand
 {
 public:
@@ -8681,7 +8789,7 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_91{
         OnTestSendClusterTestClusterCommandWriteAttribute_91_FailureResponse, this
     };
-    bool mIsFailureExpected_91 = 0;
+    bool mIsFailureExpected_91 = true;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_91()
     {
@@ -9198,7 +9306,7 @@ private:
 
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        chip::ByteSpan charStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("☉Test☉"), strlen("☉Test☉"));
+        chip::ByteSpan charStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("☉T☉"), strlen("☉T☉"));
         err = cluster.WriteAttributeCharString(mOnSuccessCallback_99.Cancel(), mOnFailureCallback_99.Cancel(), charStringArgument);
 
         return err;
@@ -9236,7 +9344,7 @@ private:
         runner->NextTest();
     }
 
-    // Test Write attribute CHAR_STRING
+    // Test Write attribute CHAR_STRING - Value too long
     using SuccessCallback_100 = void (*)(void * context, chip::ByteSpan charString);
     chip::Callback::Callback<SuccessCallback_100> mOnSuccessCallback_100{
         OnTestSendClusterTestClusterCommandWriteAttribute_100_SuccessResponse, this
@@ -9244,11 +9352,11 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_100{
         OnTestSendClusterTestClusterCommandWriteAttribute_100_FailureResponse, this
     };
-    bool mIsFailureExpected_100 = 0;
+    bool mIsFailureExpected_100 = true;
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_100()
     {
-        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Sending command...");
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Value too long: Sending command...");
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -9265,7 +9373,7 @@ private:
 
     static void OnTestSendClusterTestClusterCommandWriteAttribute_100_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Failure Response");
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Value too long: Failure Response");
 
         TestCluster * runner = reinterpret_cast<TestCluster *>(context);
 
@@ -9281,7 +9389,7 @@ private:
 
     static void OnTestSendClusterTestClusterCommandWriteAttribute_100_SuccessResponse(void * context, chip::ByteSpan charString)
     {
-        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Success Response");
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Value too long: Success Response");
 
         TestCluster * runner = reinterpret_cast<TestCluster *>(context);
 
@@ -9295,7 +9403,7 @@ private:
         runner->NextTest();
     }
 
-    // Test Write attribute CHAR_STRING
+    // Test Write attribute CHAR_STRING - Empty
     using SuccessCallback_101 = void (*)(void * context, chip::ByteSpan charString);
     chip::Callback::Callback<SuccessCallback_101> mOnSuccessCallback_101{
         OnTestSendClusterTestClusterCommandWriteAttribute_101_SuccessResponse, this
@@ -9307,7 +9415,7 @@ private:
 
     CHIP_ERROR TestSendClusterTestClusterCommandWriteAttribute_101()
     {
-        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Sending command...");
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Empty: Sending command...");
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(mDevice, 1);
@@ -9323,7 +9431,7 @@ private:
 
     static void OnTestSendClusterTestClusterCommandWriteAttribute_101_FailureResponse(void * context, uint8_t status)
     {
-        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Failure Response");
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Empty: Failure Response");
 
         TestCluster * runner = reinterpret_cast<TestCluster *>(context);
 
@@ -9339,7 +9447,7 @@ private:
 
     static void OnTestSendClusterTestClusterCommandWriteAttribute_101_SuccessResponse(void * context, chip::ByteSpan charString)
     {
-        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING: Success Response");
+        ChipLogProgress(chipTool, "Test Cluster - Write attribute CHAR_STRING - Empty: Success Response");
 
         TestCluster * runner = reinterpret_cast<TestCluster *>(context);
 
@@ -19312,6 +19420,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TV_ApplicationLauncherCluster>(),
         make_unique<TV_KeypadInputCluster>(),
         make_unique<TV_AccountLoginCluster>(),
+        make_unique<TV_WakeOnLanCluster>(),
         make_unique<TV_ApplicationBasicCluster>(),
         make_unique<TV_MediaPlaybackCluster>(),
         make_unique<TV_TvChannelCluster>(),
