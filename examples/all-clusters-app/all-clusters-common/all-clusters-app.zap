@@ -85,7 +85,7 @@
           "mfgCode": null,
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "IdentifyQueryResponse",
@@ -107,6 +107,21 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "identify type",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1465,7 +1480,7 @@
           ],
           "attributes": [
             {
-              "name": "Breadcrumb",
+              "name": "FabricId",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -1480,7 +1495,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BasicCommissioningInfoList",
+              "name": "Breadcrumb",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -6346,7 +6361,7 @@
           "mfgCode": null,
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "IdentifyQueryResponse",
@@ -7889,7 +7904,7 @@
           ],
           "attributes": [
             {
-              "name": "Breadcrumb",
+              "name": "FabricId",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -7904,7 +7919,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BasicCommissioningInfoList",
+              "name": "Breadcrumb",
               "code": 1,
               "mfgCode": null,
               "side": "server",
