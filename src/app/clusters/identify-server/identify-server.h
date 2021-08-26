@@ -22,20 +22,20 @@
 
 struct Identify
 {
-    using onIdentifyStart    = void (*)(Identify *);
-    using onIdentifyStop     = onIdentifyStart;
-    using onEffectIdentifier = onIdentifyStart;
+    using onIdentifyStartCb    = void (*)(Identify *);
+    using onIdentifyStopCb     = onIdentifyStartCb;
+    using onEffectIdentifierCb = onIdentifyStartCb;
 
-    Identify(chip::EndpointId endpoint, onIdentifyStart onIdentifyStart, onIdentifyStop onIdentifyStop,
-             EmberAfIdentifyIdentifyType identifyType, onEffectIdentifier onEffectIdentifier = nullptr,
+    Identify(chip::EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
+             EmberAfIdentifyIdentifyType identifyType, onEffectIdentifierCb onEffectIdentifier = nullptr,
              EmberAfIdentifyEffectIdentifier effectIdentifier = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK,
              EmberAfIdentifyEffectVariant effectVariant       = EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT);
     ~Identify();
 
     chip::EndpointId mEndpoint;
-    onIdentifyStart mOnIdentifyStart = nullptr;
-    onIdentifyStop mOnIdentifyStop   = nullptr;
-    onEffectIdentifier mOnEffectIdentifier;
+    onIdentifyStartCb mOnIdentifyStart = nullptr;
+    onIdentifyStopCb mOnIdentifyStop   = nullptr;
+    onEffectIdentifierCb mOnEffectIdentifier;
     EmberAfIdentifyEffectIdentifier mCurrentEffectIdentifier;
     EmberAfIdentifyEffectIdentifier mTargetEffectIdentifier;
     uint8_t mEffectVariant;
