@@ -54,11 +54,11 @@ limitations under the License.
     </command>
 
     <command source="client" code="0x04" name="MediaPrevious" optional="false">
-      <description>Upon receipt, this SHALL cause the handler to be invoked for "Previous". User experience is context-specific. This will often Go back to the previous media playback item.</description>
+      <description>Upon receipt, this SHALL cause the handler to be invoked for \"Previous\". User experience is context-specific. This will often Go back to the previous media playback item.</description>
     </command>
 
     <command source="client" code="0x05" name="MediaNext" optional="false">
-      <description>Upon receipt, this SHALL cause the handler to be invoked for "Next". User experience is context-specific. This will often Go forward to the next media playback item.</description>
+      <description>Upon receipt, this SHALL cause the handler to be invoked for \"Next\". User experience is context-specific. This will often Go forward to the next media playback item.</description>
     </command>
 
     <command source="client" code="0x06" name="MediaRewind" optional="false">
