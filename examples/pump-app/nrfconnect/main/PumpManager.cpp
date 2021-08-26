@@ -36,7 +36,7 @@ void PumpManager::Init()
     k_timer_init(&sStartTimer, &PumpManager::TimerEventHandler, nullptr);
     k_timer_user_data_set(&sStartTimer, this);
 
-    mState              = kState_StartCompleted;
+    mState               = kState_StartCompleted;
     mAutoStartTimerArmed = false;
     mAutoRestart         = false;
     mAutoStartDuration   = 0;

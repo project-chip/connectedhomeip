@@ -477,10 +477,10 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
 void AppTask::PostStartActionRequest(int32_t aActor, PumpManager::Action_t aAction)
 {
     AppEvent event;
-    event.Type             = AppEvent::kEventType_Start;
+    event.Type              = AppEvent::kEventType_Start;
     event.StartEvent.Actor  = aActor;
     event.StartEvent.Action = aAction;
-    event.Handler          = StartActionEventHandler;
+    event.Handler           = StartActionEventHandler;
     PostEvent(&event);
 }
 

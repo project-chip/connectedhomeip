@@ -72,7 +72,7 @@ private:
 
     static void TimerEventHandler(k_timer * timer);
     static void AutoRestartTimerEventHandler(AppEvent * aEvent);
-    
+
     static void PumpStartTimerEventHandler(AppEvent * aEvent);
 
     static PumpManager sPump;
