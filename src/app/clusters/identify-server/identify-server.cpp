@@ -186,7 +186,8 @@ static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appS
             // This tick writes the new attribute, which will trigger the Attribute
             // Changed callback below, which in turn will schedule or cancel the tick.
             // Because of this, the tick does not have to be scheduled here.
-            (void) Clusters::Identify::Attributes::SetIdentifyTime(endpoint, static_cast<uint16_t>(identifyTime == 0 ? 0 : identifyTime - 1));
+            (void) Clusters::Identify::Attributes::SetIdentifyTime(endpoint,
+                                                                   static_cast<uint16_t>(identifyTime == 0 ? 0 : identifyTime - 1));
         }
         else
         {
