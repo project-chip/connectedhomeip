@@ -22,9 +22,9 @@
 #include "ButtonHandler.h"
 #include "LEDWidget.h"
 #include "qrcodegen.h"
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Mdns.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>

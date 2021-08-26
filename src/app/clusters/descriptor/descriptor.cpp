@@ -20,10 +20,10 @@
  * @brief Implementation for the Descriptor Server Cluster
  ***************************************************************************/
 
-#include <app/common/gen/af-structs.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/ids/Attributes.h>
-#include <app/common/gen/ids/Clusters.h>
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <support/CodeUtils.h>

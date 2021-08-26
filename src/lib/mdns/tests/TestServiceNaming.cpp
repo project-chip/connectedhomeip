@@ -34,12 +34,14 @@ void TestMakeInstanceName(nlTestSuite * inSuite, void * inContext)
     char buffer[128];
 
     NL_TEST_ASSERT(inSuite,
-                   MakeInstanceName(buffer, sizeof(buffer), PeerId().SetFabricId(0x1234).SetNodeId(0x5678)) == CHIP_NO_ERROR);
+                   MakeInstanceName(buffer, sizeof(buffer), PeerId().SetCompressedFabricId(0x1234).SetNodeId(0x5678)) ==
+                       CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "0000000000001234-0000000000005678") == 0);
 
     NL_TEST_ASSERT(inSuite,
                    MakeInstanceName(buffer, sizeof(buffer),
-                                    PeerId().SetFabricId(0x1122334455667788ULL).SetNodeId(0x123456789abcdefULL)) == CHIP_NO_ERROR);
+                                    PeerId().SetCompressedFabricId(0x1122334455667788ULL).SetNodeId(0x123456789abcdefULL)) ==
+                       CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "1122334455667788-0123456789ABCDEF") == 0);
 
     // insufficient buffer size:
@@ -61,12 +63,12 @@ void TestExtractIdFromInstanceName(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName(nullptr, &peerId) == CHIP_ERROR_INVALID_ARGUMENT);
 
     NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("ABCDEF1234567890-1234567890ABCDEF", &peerId) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, peerId == PeerId().SetFabricId(0xABCDEF1234567890ULL).SetNodeId(0x1234567890ABCDEFULL));
+    NL_TEST_ASSERT(inSuite, peerId == PeerId().SetCompressedFabricId(0xABCDEF1234567890ULL).SetNodeId(0x1234567890ABCDEFULL));
 
     // ending in period (partial name) is acceptable
     NL_TEST_ASSERT(inSuite,
                    ExtractIdFromInstanceName("1122334455667788-AABBCCDDEEFF1122.some.suffix.here", &peerId) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, peerId == PeerId().SetFabricId(0x1122334455667788ULL).SetNodeId(0xaabbccddeeff1122ULL));
+    NL_TEST_ASSERT(inSuite, peerId == PeerId().SetCompressedFabricId(0x1122334455667788ULL).SetNodeId(0xaabbccddeeff1122ULL));
 
     // Invalid: non hex character
     NL_TEST_ASSERT(inSuite, ExtractIdFromInstanceName("1x22334455667788-AABBCCDDEEDD1122", &peerId) != CHIP_NO_ERROR);

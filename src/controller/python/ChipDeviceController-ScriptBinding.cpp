@@ -96,6 +96,8 @@ ChipError::StorageType pychip_DeviceController_DeleteDeviceController(chip::Cont
 ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl,
                                                                  chip::NodeId nodeId, char * outAddress, uint64_t maxAddressLen,
                                                                  uint16_t * outPort);
+ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                     uint64_t * outFabricId);
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId);
 
 // Rendezvous
@@ -240,9 +242,17 @@ ChipError::StorageType pychip_DeviceController_GetAddressAndPort(chip::Controlle
     return CHIP_NO_ERROR.AsInteger();
 }
 
+ChipError::StorageType pychip_DeviceController_GetCompressedFabricId(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                     uint64_t * outFabricId)
+{
+    *outFabricId = devCtrl->GetCompressedFabricId();
+    return CHIP_NO_ERROR.AsInteger();
+}
+
 ChipError::StorageType pychip_DeviceController_GetFabricId(chip::Controller::DeviceCommissioner * devCtrl, uint64_t * outFabricId)
 {
-    return devCtrl->GetFabricId(*outFabricId).AsInteger();
+    *outFabricId = devCtrl->GetFabricId();
+    return CHIP_NO_ERROR.AsInteger();
 }
 
 const char * pychip_DeviceController_ErrorToString(ChipError::StorageType err)
@@ -431,7 +441,7 @@ void pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(
 ChipError::StorageType pychip_Resolver_ResolveNode(uint64_t fabricid, chip::NodeId nodeid)
 {
     return Mdns::Resolver::Instance()
-        .ResolveNodeId(PeerId().SetNodeId(nodeid).SetFabricId(fabricid), Inet::kIPAddressType_Any)
+        .ResolveNodeId(PeerId().SetNodeId(nodeid).SetCompressedFabricId(fabricid), Inet::kIPAddressType_Any)
         .AsInteger();
 }
 

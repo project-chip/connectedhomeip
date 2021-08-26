@@ -27,23 +27,27 @@
 #include <app/MessageDef/EventPath.h>
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
+#include <protocols/secure_channel/StatusReport.h>
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate)
+CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate, Messaging::ExchangeContext * apExchangeContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
-    VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeCtx              = nullptr;
+    VerifyOrReturnError(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    mpExchangeCtx              = apExchangeContext;
     mSuppressResponse          = true;
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
     MoveToState(HandlerState::Initialized);
+    mpDelegate = apDelegate;
+    if (apExchangeContext != nullptr)
+    {
+        apExchangeContext->SetDelegate(this);
+    }
 
-exit:
-    ChipLogFunctError(err);
     return err;
 }
 
@@ -56,16 +60,15 @@ void ReadHandler::Shutdown()
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
+    mpDelegate                 = nullptr;
 }
 
-CHIP_ERROR ReadHandler::OnReadRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnReadRequest(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
 
-    mpExchangeCtx = apExchangeContext;
-    err           = ProcessReadRequest(std::move(aPayload));
-
+    err = ProcessReadRequest(std::move(aPayload));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogFunctError(err);
@@ -75,22 +78,99 @@ CHIP_ERROR ReadHandler::OnReadRequest(Messaging::ExchangeContext * apExchangeCon
     return err;
 }
 
+CHIP_ERROR ReadHandler::OnStatusReport(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    Protocols::SecureChannel::StatusReport statusReport;
+    err = statusReport.Parse(std::move(aPayload));
+    SuccessOrExit(err);
+    ChipLogProgress(DataManagement, "Receive Status Report, protocol id is %" PRIu32 ", protocol code is %" PRIu16,
+                    statusReport.GetProtocolId(), statusReport.GetProtocolCode());
+    if ((statusReport.GetProtocolId() == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm()) &&
+        (statusReport.GetProtocolCode() == to_underlying(Protocols::InteractionModel::ProtocolCode::Success)))
+    {
+        switch (mState)
+        {
+        case HandlerState::Reporting:
+            InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+            break;
+        case HandlerState::Reportable:
+        case HandlerState::Initialized:
+        case HandlerState::Uninitialized:
+        default:
+            err = CHIP_ERROR_INCORRECT_STATE;
+            break;
+        }
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+exit:
+    Shutdown();
+    return err;
+}
+
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(IsReportable(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload));
-
-    if (err != CHIP_NO_ERROR)
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+    if (err == CHIP_NO_ERROR)
     {
-        mpExchangeCtx->Close();
+        MoveToState(HandlerState::Reporting);
     }
 
 exit:
     ChipLogFunctError(err);
-    Shutdown();
+    if (err != CHIP_NO_ERROR)
+    {
+        Shutdown();
+    }
     return err;
+}
+
+CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (aPayloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+    {
+        err = OnStatusReport(apExchangeContext, std::move(aPayload));
+    }
+    else
+    {
+        err = OnUnknownMsgType(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
+    }
+    return err;
+}
+
+CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                         const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+{
+    ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
+    if (IsReporting())
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
+    Shutdown();
+    return CHIP_ERROR_INVALID_MESSAGE_TYPE;
+}
+
+void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
+{
+    ChipLogProgress(DataManagement, "Time out! failed to receive status response from Exchange: %d",
+                    apExchangeContext->GetExchangeId());
+    if (IsReporting())
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
+    Shutdown();
 }
 
 CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayload)
@@ -279,6 +359,9 @@ const char * ReadHandler::GetStateStr() const
 
     case HandlerState::Reportable:
         return "Reportable";
+
+    case HandlerState::Reporting:
+        return "Reporting";
     }
 #endif // CHIP_DETAIL_LOGGING
     return "N/A";
