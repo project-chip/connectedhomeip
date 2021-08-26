@@ -1656,7 +1656,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Wired Assessed Input Voltage",
+              "name": "WiredAssessedInputVoltage",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -1671,7 +1671,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Wired Assessed Input Frequency",
+              "name": "WiredAssessedInputFrequency",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -1686,7 +1686,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Wired Current Type",
+              "name": "WiredCurrentType",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -1701,7 +1701,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Wired Assessed Current",
+              "name": "WiredAssessedCurrent",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -1716,7 +1716,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Wired Nominal Voltage",
+              "name": "WiredNominalVoltage",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -1731,7 +1731,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Wired Maximum Current",
+              "name": "WiredMaximumCurrent",
               "code": 8,
               "mfgCode": null,
               "side": "server",
@@ -1746,7 +1746,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Wired Present",
+              "name": "WiredPresent",
               "code": 9,
               "mfgCode": null,
               "side": "server",
@@ -1761,7 +1761,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Active Wired Faults",
+              "name": "ActiveWiredFaults",
               "code": 10,
               "mfgCode": null,
               "side": "server",
@@ -1776,7 +1776,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Voltage",
+              "name": "BatteryVoltage",
               "code": 11,
               "mfgCode": null,
               "side": "server",
@@ -1791,7 +1791,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Percent Remaining",
+              "name": "BatteryPercentRemaining",
               "code": 12,
               "mfgCode": null,
               "side": "server",
@@ -1806,7 +1806,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Time Remaining",
+              "name": "BatteryTimeRemaining",
               "code": 13,
               "mfgCode": null,
               "side": "server",
@@ -1821,7 +1821,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Charge Level",
+              "name": "BatteryChargeLevel",
               "code": 14,
               "mfgCode": null,
               "side": "server",
@@ -1836,7 +1836,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Replacement Needed",
+              "name": "BatteryReplacementNeeded",
               "code": 15,
               "mfgCode": null,
               "side": "server",
@@ -1851,7 +1851,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Replaceability",
+              "name": "BatteryReplaceability",
               "code": 16,
               "mfgCode": null,
               "side": "server",
@@ -1866,7 +1866,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Present",
+              "name": "BatteryPresent",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -1881,7 +1881,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Active Battery Faults",
+              "name": "ActiveBatteryFaults",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -1896,7 +1896,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Replacement Description",
+              "name": "BatteryReplacementDescription",
               "code": 19,
               "mfgCode": null,
               "side": "server",
@@ -1911,7 +1911,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Common Designation",
+              "name": "BatteryCommonDesignation",
               "code": 20,
               "mfgCode": null,
               "side": "server",
@@ -1926,7 +1926,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery ANSI Designation",
+              "name": "BatteryANSIDesignation",
               "code": 21,
               "mfgCode": null,
               "side": "server",
@@ -1941,7 +1941,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery IEC Designation",
+              "name": "BatteryIECDesignation",
               "code": 22,
               "mfgCode": null,
               "side": "server",
@@ -1956,7 +1956,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Approved Chemistry",
+              "name": "BatteryApprovedChemistry",
               "code": 23,
               "mfgCode": null,
               "side": "server",
@@ -1971,7 +1971,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Capacity",
+              "name": "BatteryCapacity",
               "code": 24,
               "mfgCode": null,
               "side": "server",
@@ -1986,7 +1986,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Quantity",
+              "name": "BatteryQuantity",
               "code": 25,
               "mfgCode": null,
               "side": "server",
@@ -2001,7 +2001,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Charge State",
+              "name": "BatteryChargeState",
               "code": 26,
               "mfgCode": null,
               "side": "server",
@@ -2016,7 +2016,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Time To Full Charge",
+              "name": "BatteryTimeToFullCharge",
               "code": 27,
               "mfgCode": null,
               "side": "server",
@@ -2031,7 +2031,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Functional While Charging",
+              "name": "BatteryFunctionalWhileCharging",
               "code": 28,
               "mfgCode": null,
               "side": "server",
@@ -2046,7 +2046,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Charging Current",
+              "name": "BatteryChargingCurrent",
               "code": 29,
               "mfgCode": null,
               "side": "server",
@@ -2061,7 +2061,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Active Battery Charge Faults",
+              "name": "ActiveBatteryChargeFaults",
               "code": 30,
               "mfgCode": null,
               "side": "server",

@@ -7915,7 +7915,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Voltage",
+              "name": "BatteryVoltage",
               "code": 11,
               "mfgCode": null,
               "side": "server",
@@ -7930,7 +7930,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Percent Remaining",
+              "name": "BatteryPercentRemaining",
               "code": 12,
               "mfgCode": null,
               "side": "server",
@@ -7945,7 +7945,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Time Remaining",
+              "name": "BatteryTimeRemaining",
               "code": 13,
               "mfgCode": null,
               "side": "server",
@@ -7960,7 +7960,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Charge Level",
+              "name": "BatteryChargeLevel",
               "code": 14,
               "mfgCode": null,
               "side": "server",
@@ -7975,7 +7975,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Active Battery Faults",
+              "name": "ActiveBatteryFaults",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -7990,7 +7990,7 @@
               "reportableChange": 0
             },
             {
-              "name": "Battery Charge State",
+              "name": "BatteryChargeState",
               "code": 26,
               "mfgCode": null,
               "side": "server",
