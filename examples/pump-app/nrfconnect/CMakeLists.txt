@@ -19,6 +19,7 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(PUMP_COMMON ${CHIP_ROOT}/examples/pump-controller-app/pump-controller-common REALPATH)
+get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
@@ -52,6 +53,8 @@ include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 target_include_directories(app PRIVATE 
                            main/include 
                            ${PUMP_COMMON} 
+                           ${GEN_DIR}/app-common
+                           ${GEN_DIR}/pump-app
                            ${NLIO_ROOT}
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)
@@ -61,9 +64,9 @@ target_sources(app PRIVATE
                main/PumpManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${PUMP_COMMON}/gen/attribute-size.cpp
-               ${PUMP_COMMON}/gen/callback-stub.cpp
-               ${PUMP_COMMON}/gen/IMClusterCommandHandler.cpp
+               ${GEN_DIR}/pump-app/zap-generated/attribute-size.cpp
+               ${GEN_DIR}/pump-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/pump-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
                ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
