@@ -110,6 +110,9 @@ public:
     // is larger than current self vended event number
     void MoveToNextScheduledDirtyPriority();
 
+    bool IsInitialReport() { return mInitialReport; }
+    void ClearInitialReport() { mInitialReport = false; }
+
 private:
     enum class HandlerState
     {
@@ -128,6 +131,7 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
     CHIP_ERROR OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                                 const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    void SetInitialReport() { mInitialReport = true; }
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
@@ -150,6 +154,7 @@ private:
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
     InteractionModelDelegate * mpDelegate = nullptr;
+    bool mInitialReport                   = false;
 };
 } // namespace app
 } // namespace chip
