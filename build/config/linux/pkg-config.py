@@ -78,6 +78,12 @@ def SetConfigPath(options):
     sysroot = options.sysroot
     assert sysroot
 
+    # Compute the library path name based on the architecture.
+    arch = options.arch
+    #if sysroot and not arch:
+    #  print("You must specify an architecture via -a if using a sysroot.")
+    #  sys.exit(1)
+    #
     libdir = sysroot + '/usr/' + options.system_libdir + '/pkgconfig'
     libdir += ':' + sysroot + '/usr/share/pkgconfig'
     os.environ['PKG_CONFIG_LIBDIR'] = libdir
@@ -143,6 +149,8 @@ def main():
                       dest='version_as_components')
     (options, args) = parser.parse_args()
 
+    options.sysroot = os.environ['PKG_CONFIG_SYSROOT_DIR']
+
     # Make a list of regular expressions to strip out.
     strip_out = []
     if options.strip_out != None:
@@ -154,6 +162,7 @@ def main():
         if options.debug:
             sys.stderr.write('PKG_CONFIG_LIBDIR=%s\n' % libdir)
         prefix = GetPkgConfigPrefixToStrip(options, args)
+
     else:
         prefix = ''
 

@@ -13,20 +13,25 @@
 # limitations under the License.
 
 declare_args() {
-  # Crypto implementation: mbedtls, openssl.
-  chip_crypto = ""
-  chip_with_se05x = 0
-  chip_with_se05x_da = 0
+  cc_webos = ""
+  cxx_webos = ""
+  ar_webos = ""
+  ld_webos = ""
 }
 
-if (chip_crypto == "") {
-  if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr" || current_os == "mbed") {
-    chip_crypto = "mbedtls"
-  } else {
-    chip_crypto = "mbedtls"
+import("//build/toolchain/gcc_toolchain.gni")
+
+template("webos_toolchain") {
+  print("WebOS_ToolChian")
+  gcc_toolchain(target_name) {
+    ar = ar_webos
+    cc = cc_webos + "  -O2 -Wno-format-security -Wno-error -Wno-cpp"
+    cxx = cxx_webos + " -O2 -Wno-format-security -Wno-error -Wno-cpp"
+    toolchain_args = {
+      current_cpu = "${current_cpu}"
+      current_os = invoker.current_os
+      is_clang = false
+      forward_variables_from(invoker.toolchain_args, "*")
+    }
   }
 }
-
-assert(chip_crypto == "mbedtls" || chip_crypto == "openssl",
-       "Please select a valid crypto implementation: mbedtls, openssl")

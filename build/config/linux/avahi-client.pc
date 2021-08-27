@@ -1,0 +1,9 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=@libdir@
+includedir=${prefix}/include
+Name: avahi-client
+Description: Avahi Multicast DNS Responder (Client Support)
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -lavahi-common -lavahi-client
+Cflags: -D_REENTRANT -I${includedir}
