@@ -318,8 +318,8 @@ void HandleMessageReceived(System::PacketBufferHandle && buffer)
 {
     streamer_t * sout = streamer_get();
     streamer_printf(sout, "INFO: received %d bytes\r\n", buffer->DataLength());
-    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
-                    strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
+    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n", strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(),
+                    (char *) buffer->Start());
 }
 
 void HandleResponseTimerComplete(System::Layer * aSystemLayer, void * aAppState)
@@ -332,7 +332,7 @@ void HandleDNSResolveComplete(void * appState, CHIP_ERROR error, uint8_t addrCou
 {
     streamer_t * sout = streamer_get();
 
-    if (error != CHIP_NO_ERROR)
+    if (error == CHIP_NO_ERROR)
     {
         if (addrCount > 0)
         {
