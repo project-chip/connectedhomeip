@@ -56,7 +56,7 @@ def getGlobalTemplatesTargets():
         [
             './src/controller/data_model/controller-clusters.zap',
             '-o',
-            os.path.join('zzz_generated/controller-clusters/controller-clusters/zap-generated')]])
+            os.path.join('zzz_generated/controller-clusters/zap-generated')]])
 
     return targets
 
