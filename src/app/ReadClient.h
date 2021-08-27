@@ -28,6 +28,7 @@
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequest.h>
+#include <app/ReadPrepareParams.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <messaging/ExchangeContext.h>
@@ -75,10 +76,7 @@ public:
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * aSecureSession,
-                               EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
-                               AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
-                               EventNumber aEventNumber, uint32_t timeout = kImMessageTimeoutMsec);
+    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
 
     uint64_t GetAppIdentifier() const { return mAppIdentifier; }
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
