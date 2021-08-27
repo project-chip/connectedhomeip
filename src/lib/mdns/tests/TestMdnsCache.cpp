@@ -62,7 +62,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
 
     Inet::IPAddress::FromString("1.0.0.1", addr);
 
-    peerId.SetFabricId(KNOWN_FABRIC);
+    peerId.SetCompressedFabricId(KNOWN_FABRIC);
 
     for (uint16_t i = 0; i < 10; i++)
     {
@@ -121,7 +121,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     tMdnsCache.DumpCache();
 
     NL_TEST_ASSERT(inSuite, tMdnsCache.Lookup(peerId, addr_out, port_out, iface_out) == CHIP_NO_ERROR);
-    peerId.SetFabricId(KNOWN_FABRIC + 1);
+    peerId.SetCompressedFabricId(KNOWN_FABRIC + 1);
     NL_TEST_ASSERT(inSuite, tMdnsCache.Lookup(peerId, addr_out, port_out, iface_out) != CHIP_NO_ERROR);
 }
 
