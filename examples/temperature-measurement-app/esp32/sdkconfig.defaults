@@ -72,3 +72,7 @@ CONFIG_TCP_SYNMAXRTX=6
 # Product id
 CONFIG_DEVICE_VENDOR_ID=0x235A
 CONFIG_DEVICE_PRODUCT_ID=0x4554
+
+# Main task needs a bit more stack than the default
+# default is 3584, bump this up to 4k.
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=4096
