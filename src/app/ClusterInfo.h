@@ -32,6 +32,25 @@ struct ClusterInfo
         kEventIdValid   = 0x03,
     };
 
+    bool IsAttributePathIncluded(const ClusterInfo & other) const
+    {
+        if ((other.mEndpointId != mEndpointId) || (other.mClusterId != mClusterId))
+        {
+            return false;
+        }
+
+        if (mFlags.Has(Flags::kFieldIdValid) && (mFieldId == 0xFFFFFFFF))
+        {
+            return true;
+        }
+
+        if (mFlags.Has(Flags::kFieldIdValid) && other.mFlags.Has(Flags::kFieldIdValid) && (mFieldId == other.mFieldId))
+        {
+            return true;
+        }
+        return false;
+    }
+
     ClusterInfo() {}
     bool IsDirty() { return mDirty; }
     void SetDirty() { mDirty = true; }
