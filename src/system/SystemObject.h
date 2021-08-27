@@ -213,7 +213,7 @@ public:
         Object * p = mDummyHead.mNext;
         while (p)
         {
-            if (!function(static_cast<T*>(p)))
+            if (!function(static_cast<T *>(p)))
             {
                 return false;
             }
