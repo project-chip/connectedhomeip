@@ -42,7 +42,7 @@ rtos::Thread shellThread{ osPriorityNormal, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_S
 
 int main()
 {
-    // chip::Logging::SetLogFilter(chip::Logging::LogCategory::kLogCategory_Progress);
+    chip::Logging::SetLogFilter(chip::Logging::LogCategory::kLogCategory_Progress);
 
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PlatformMgr().InitChipStack();
