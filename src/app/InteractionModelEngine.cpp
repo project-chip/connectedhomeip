@@ -177,7 +177,8 @@ CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteCli
     return CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext,
+                                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

@@ -29,7 +29,8 @@
 namespace chip {
 namespace bdx {
 
-CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle && payload)
+CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
+                                                  chip::System::PacketBufferHandle && payload)
 {
     if (mExchangeCtx == nullptr)
     {
