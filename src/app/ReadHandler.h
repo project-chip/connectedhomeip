@@ -154,7 +154,7 @@ private:
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
     InteractionModelDelegate * mpDelegate = nullptr;
-    bool mInitialReport = false;
+    bool mInitialReport                   = false;
 };
 } // namespace app
 } // namespace chip
