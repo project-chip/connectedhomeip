@@ -108,13 +108,19 @@ def ValidateRepoPath(context, parameter, value):
     default="-",
     type=click.File("wt"),
     help='Where to write the dry run output')
+@click.option(
+    '--no-log-timestamps',
+    default=False,
+    is_flag=True,
+    help='Skip timestaps in log output')
 @click.pass_context
 def main(context, log_level, platform, board, app, repo, out_prefix, clean,
-         dry_run, dry_run_output, enable_flashbundle):
+         dry_run, dry_run_output, enable_flashbundle, no_log_timestamps):
     # Ensures somewhat pretty logging of what is going on
-    coloredlogs.install(
-        level=__LOG_LEVELS__[log_level],
-        fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
+    log_fmt='%(asctime)s %(levelname)-7s %(message)s')
+    if no_log_timestamps:
+      log_fmt='%(levelname)-7s %(message)s')
+    coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     if not 'PW_PROJECT_ROOT' in os.environ:
         raise click.UsageError("""

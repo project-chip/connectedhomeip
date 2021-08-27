@@ -54,5 +54,5 @@ jobs:
               timeout-minutes: 10
               run: |
                 scripts/run_in_build_env.sh \
-                  "scripts/build/build_examples.py --platform infineon --app lock build"
+                  "scripts/build/build_examples.py --no-log-timestamps --platform infineon --app lock build"
 
