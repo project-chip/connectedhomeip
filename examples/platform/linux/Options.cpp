@@ -52,25 +52,26 @@ constexpr unsigned kAppUsageLength = 64;
 
 OptionDef sDeviceOptionDefs[] = {
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-                                  { "ble-device", kArgumentRequired, kDeviceOption_BleDevice },
+    { "ble-device", kArgumentRequired, kDeviceOption_BleDevice },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-                                  { "wifi", kNoArgument, kDeviceOption_WiFi },
+    { "wifi", kNoArgument, kDeviceOption_WiFi },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 #if CHIP_ENABLE_OPENTHREAD
-                                  { "thread", kNoArgument, kDeviceOption_Thread },
+    { "thread", kNoArgument, kDeviceOption_Thread },
 #endif // CHIP_ENABLE_OPENTHREAD
-                                  { "version", kArgumentRequired, kDeviceOption_Version },
-                                  { "vendor-id", kArgumentRequired, kDeviceOption_VendorID },
-                                  { "product-id", kArgumentRequired, kDeviceOption_ProductID },
-                                  { "custom-flow", kArgumentRequired, kDeviceOption_CustomFlow },
-                                  { "capabilities", kArgumentRequired, kDeviceOption_Capabilities },
-                                  { "discriminator", kArgumentRequired, kDeviceOption_Discriminator },
-                                  { "passcode", kArgumentRequired, kDeviceOption_Passcode },
-                                  { "secured-device-port", kArgumentRequired, kDeviceOption_SecuredDevicePort },
-                                  { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
-                                  { "unsecured-commissioner-port", kArgumentRequired, kDeviceOption_UnsecuredCommissionerPort },
-                                  {} };
+    { "version", kArgumentRequired, kDeviceOption_Version },
+    { "vendor-id", kArgumentRequired, kDeviceOption_VendorID },
+    { "product-id", kArgumentRequired, kDeviceOption_ProductID },
+    { "custom-flow", kArgumentRequired, kDeviceOption_CustomFlow },
+    { "capabilities", kArgumentRequired, kDeviceOption_Capabilities },
+    { "discriminator", kArgumentRequired, kDeviceOption_Discriminator },
+    { "passcode", kArgumentRequired, kDeviceOption_Passcode },
+    { "secured-device-port", kArgumentRequired, kDeviceOption_SecuredDevicePort },
+    { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
+    { "unsecured-commissioner-port", kArgumentRequired, kDeviceOption_UnsecuredCommissionerPort },
+    {}
+};
 
 const char * sDeviceOptionHelp =
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
