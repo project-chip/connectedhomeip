@@ -155,7 +155,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
 - (void)testSendClusterTestCluster_Reporting_0001_ConfigureOnOff_Test
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reportin OnOff configured"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reporting OnOff configured"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPOnOff * onOffCluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
@@ -191,7 +191,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
 - (void)testSendClusterTestCluster_Reporting_0003_StopReportOnOff_Test
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reportin OnOff cancelled"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reporting OnOff cancelled"];
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIPOnOff * onOffCluster = [[CHIPOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
