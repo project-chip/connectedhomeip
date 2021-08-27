@@ -117,12 +117,13 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     for (auto & pairing : GetGlobalFabricTable())
     {
         NodeId nodeId               = pairing.GetPeerId().GetNodeId();
+        uint64_t compressedabricId  = pairing.GetPeerId().GetCompressedFabricId();
         uint64_t fabricId           = pairing.GetFabricId();
         uint16_t vendorId           = pairing.GetVendorId();
         const uint8_t * fabricLabel = pairing.GetFabricLabel();
 
         // Skip over uninitialized fabrics
-        if (nodeId == kUndefinedNodeId || fabricId == kUndefinedFabricId || vendorId == kUndefinedVendorId)
+        if (nodeId == kUndefinedNodeId || compressedabricId == kUndefinedCompressedFabricId || vendorId == kUndefinedVendorId)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                            "OpCreds: Skipping over uninitialized fabric with fabricId 0x" ChipLogFormatX64
@@ -155,6 +156,15 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write fabrics count %" PRIu8 " in commissioned fabrics",
                        fabricIndex);
+        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
+
+    if (err == CHIP_NO_ERROR &&
+        app::Clusters::OperationalCredentials::Attributes::SetSupportedFabrics(0, CHIP_CONFIG_MAX_DEVICE_ADMINS) !=
+            EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write %" PRIu8 " in supported fabrics count attribute",
+                       CHIP_CONFIG_MAX_DEVICE_ADMINS);
         err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
