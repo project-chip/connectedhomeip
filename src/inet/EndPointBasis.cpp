@@ -39,7 +39,7 @@ void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    (void) mSocket.Init(aInetLayer.SystemLayer()->WatchableEventsManager());
+    mSocket = INET_INVALID_SOCKET_FD;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 

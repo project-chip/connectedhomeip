@@ -18,6 +18,7 @@
 #include <AppConfig.h>
 #include <LcdPainter.h>
 #include <WindowAppImpl.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/window-covering-server/window-covering-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <core/CHIPError.h>
@@ -27,14 +28,14 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <qrcodegen.h>
 
-#define APP_TASK_STACK_SIZE (1536)
+#define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 3000
-#define WINDOW_COVER_TYPE_CYCLE_TIMEOUT 3000
 #define LCD_ICON_TIMEOUT 1000
+
+using namespace chip::app::Clusters::WindowCovering;
 
 //------------------------------------------------------------------------------
 // Timers
@@ -60,7 +61,6 @@ void WindowAppImpl::Timer::Start()
 {
     if (xTimerIsTimerActive(mHandler))
     {
-        EFR32_LOG("Timer already started!");
         Stop();
     }
 
@@ -175,6 +175,7 @@ void WindowAppImpl::OnTaskCallback(void * parameter)
 
 void WindowAppImpl::OnIconTimeout(WindowApp::Timer & timer)
 {
+    sInstance.mIcon = LcdIcon::None;
     sInstance.UpdateLCD();
 }
 
@@ -243,7 +244,7 @@ void WindowAppImpl::PostEvent(const WindowApp::Event & event)
 
 void WindowAppImpl::ProcessEvents()
 {
-    WindowApp::Event event = WindowApp::Event::None;
+    WindowApp::Event event = EventId::None;
 
     BaseType_t received = xQueueReceive(mQueue, &event, pdMS_TO_TICKS(10));
     while (pdTRUE == received)
@@ -267,33 +268,39 @@ WindowApp::Button * WindowAppImpl::CreateButton(WindowApp::Button::Id id, const 
 void WindowAppImpl::DispatchEvent(const WindowApp::Event & event)
 {
     WindowApp::DispatchEvent(event);
-    switch (event)
+    switch (event.mId)
     {
-    case WindowApp::Event::ResetWarning:
-        EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_WINDOW_TIMEOUT);
+    case EventId::ResetWarning:
+        EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", LONG_PRESS_TIMEOUT);
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
         UpdateLEDs();
         break;
-    case WindowApp::Event::ResetCanceled:
+    case EventId::ResetCanceled:
         EFR32_LOG("Factory Reset has been Canceled");
         UpdateLEDs();
         break;
-    case WindowApp::Event::ProvisionedStateChanged:
+    case EventId::ProvisionedStateChanged:
         UpdateLEDs();
         UpdateLCD();
         break;
-    case WindowApp::Event::ConnectivityStateChanged:
-    case WindowApp::Event::BLEConnectionsChanged:
+    case EventId::ConnectivityStateChanged:
+    case EventId::BLEConnectionsChanged:
         UpdateLEDs();
         break;
-    case WindowApp::Event::CoverTypeChange:
-    case WindowApp::Event::LiftChanged:
-    case WindowApp::Event::TiltChanged:
+    case EventId::CoverTypeChange:
+    case EventId::LiftChanged:
+    case EventId::TiltChanged:
         UpdateLCD();
         break;
-    case WindowApp::Event::TiltModeChange:
+    case EventId::CoverChange:
         mIconTimer.Start();
+        mIcon = (GetCover().mEndpoint == 1) ? LcdIcon::One : LcdIcon::Two;
+        UpdateLCD();
+        break;
+    case EventId::TiltModeChange:
+        mIconTimer.Start();
+        mIcon = mTiltMode ? LcdIcon::Tilt : LcdIcon::Lift;
         UpdateLCD();
         break;
     default:
@@ -303,7 +310,8 @@ void WindowAppImpl::DispatchEvent(const WindowApp::Event & event)
 
 void WindowAppImpl::UpdateLEDs()
 {
-    if (mState.resetWarning)
+    Cover & cover = GetCover();
+    if (mResetWarning)
     {
         mStatusLED.Set(false);
         mStatusLED.Blink(500);
@@ -333,17 +341,16 @@ void WindowAppImpl::UpdateLEDs()
         }
 
         // Action LED
-        WindowCover & cover = WindowCover::Instance();
 
-        if (WindowApp::Event::None != mLiftAction || WindowApp::Event::None != mTiltAction)
+        if (EventId::None != cover.mLiftAction || EventId::None != cover.mTiltAction)
         {
             mActionLED.Blink(100);
         }
-        else if (cover.IsOpen())
+        else if (IsOpen(cover.mEndpoint))
         {
             mActionLED.Set(true);
         }
-        else if (cover.IsClosed())
+        else if (IsClosed(cover.mEndpoint))
         {
             mActionLED.Set(false);
         }
@@ -360,15 +367,13 @@ void WindowAppImpl::UpdateLCD()
 #ifdef DISPLAY_ENABLED
     if (mState.isThreadProvisioned)
     {
-        WindowCover & cover = WindowCover::Instance();
-        LcdIcon icon        = LcdIcon::None;
-        if (mIconTimer.mIsActive)
-        {
-            icon = mState.tiltMode ? LcdIcon::Tilt : LcdIcon::Lift;
-        }
-        uint16_t lift = cover.Lift().PositionValueGet();
-        uint16_t tilt = cover.Tilt().PositionValueGet();
-        LcdPainter::Paint(cover.TypeGet(), (uint8_t) lift, (uint8_t) tilt, icon);
+        Cover & cover      = GetCover();
+        EmberAfWcType type = TypeGet(cover.mEndpoint);
+        uint16_t lift      = 0;
+        uint16_t tilt      = 0;
+        Attributes::GetCurrentPositionLift(cover.mEndpoint, &lift);
+        Attributes::GetCurrentPositionTilt(cover.mEndpoint, &tilt);
+        LcdPainter::Paint(type, static_cast<uint8_t>(lift), static_cast<uint8_t>(tilt), mIcon);
     }
     else
     {

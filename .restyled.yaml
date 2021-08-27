@@ -65,6 +65,8 @@ exclude:
     - "third_party/bluez/repo/**/*"
     - "third_party/cirque/repo/**/*"
     - "third_party/nanopb/repo/**/*"
+    - "src/android/CHIPTool/gradlew" # gradle wrapper generated file
+    - "src/controller/python/chip/clusters/CHIPClusters.py" # generated file
 
 
 changed_paths:
@@ -198,3 +200,13 @@ restylers:
       include:
           - "**/*.sh"
           - "**/*.bash"
+    - name: autopep8
+      image: 'restyled/restyler-autopep8:v1.5.7'
+      command:
+        - autopep8
+        - '--in-place'
+      arguments: []
+      include:
+        - '**/*.py'
+      interpreters:
+        - python

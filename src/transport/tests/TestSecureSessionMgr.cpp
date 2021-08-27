@@ -62,12 +62,10 @@ const char LARGE_PAYLOAD[kMaxAppMessageLen + 1] = "test message";
 class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SessionHandle session,
                            const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
                            System::PacketBufferHandle && msgBuf) override
     {
-        NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
-        NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
         NL_TEST_ASSERT(mSuite, session == mRemoteToLocalSession); // Packet received by remote peer
 
         size_t data_len = msgBuf->DataLength();
@@ -86,7 +84,7 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    void OnNewConnection(SecureSessionHandle session) override
+    void OnNewConnection(SessionHandle session) override
     {
         // Preset the MessageCounter
         if (NewConnectionHandlerCallCount == 0)
@@ -95,11 +93,13 @@ public:
             mLocalToRemoteSession = session;
         NewConnectionHandlerCallCount++;
     }
-    void OnConnectionExpired(SecureSessionHandle session) override {}
+    void OnConnectionExpired(SessionHandle session) override { mOldConnectionDropped = true; }
+
+    bool mOldConnectionDropped = false;
 
     nlTestSuite * mSuite = nullptr;
-    SecureSessionHandle mRemoteToLocalSession;
-    SecureSessionHandle mLocalToRemoteSession;
+    SessionHandle mRemoteToLocalSession;
+    SessionHandle mLocalToRemoteSession;
     int ReceiveHandlerCallCount       = 0;
     int NewConnectionHandlerCallCount = 0;
 
@@ -158,12 +158,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    Transport::FabricInfo * fabric = fabrics.AssignFabricIndex(0, kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
-
-    fabric = fabrics.AssignFabricIndex(1, kDestinationNodeId);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
-
     SecurePairingUsingTestSecret pairing1(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -172,7 +166,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
+    SessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
@@ -254,12 +248,6 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    Transport::FabricInfo * fabric = fabrics.AssignFabricIndex(0, kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
-
-    fabric = fabrics.AssignFabricIndex(1, kDestinationNodeId);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
-
     SecurePairingUsingTestSecret pairing1(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -268,7 +256,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
+    SessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
@@ -334,12 +322,6 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    Transport::FabricInfo * fabric = fabrics.AssignFabricIndex(0, kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
-
-    fabric = fabrics.AssignFabricIndex(1, kDestinationNodeId);
-    NL_TEST_ASSERT(inSuite, fabric != nullptr);
-
     SecurePairingUsingTestSecret pairing1(1, 2);
     err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -348,7 +330,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
+    SessionHandle localToRemoteSession = callback.mLocalToRemoteSession;
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
@@ -379,50 +361,6 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     PacketHeader packetHeader;
 
-    // Change Destination Node ID
-    EncryptedPacketBufferHandle badDestNodeIdMsg = preparedMessage.CloneData();
-    NL_TEST_ASSERT(inSuite, badDestNodeIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, packetHeader.GetDestinationNodeId().Value() == kDestinationNodeId);
-    packetHeader.SetDestinationNodeId(kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, badDestNodeIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
-
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badDestNodeIdMsg);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
-
-    /* -------------------------------------------------------------------------------------------*/
-    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
-
-    // Change Source Node ID
-    EncryptedPacketBufferHandle badSrcNodeIdMsg = preparedMessage.CloneData();
-    NL_TEST_ASSERT(inSuite, badSrcNodeIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
-
-    packetHeader.SetSourceNodeId(kDestinationNodeId);
-    NL_TEST_ASSERT(inSuite, badSrcNodeIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
-
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, badSrcNodeIdMsg);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
-
-    /* -------------------------------------------------------------------------------------------*/
-    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
-
-    // Change Source Node ID
-    EncryptedPacketBufferHandle noDstNodeIdMsg = preparedMessage.CloneData();
-    NL_TEST_ASSERT(inSuite, noDstNodeIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
-
-    packetHeader.ClearDestinationNodeId();
-    NL_TEST_ASSERT(inSuite, noDstNodeIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
-
-    err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, noDstNodeIdMsg);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
-
-    /* -------------------------------------------------------------------------------------------*/
     state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
     // Change Message ID
@@ -464,6 +402,67 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
 }
 
+void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    TransportMgr<LoopbackTransport> transportMgr;
+    SecureSessionMgr secureSessionMgr;
+    secure_channel::MessageCounterManager gMessageCounterManager;
+
+    err = transportMgr.Init("LOOPBACK");
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    Transport::FabricTable fabrics;
+    err = secureSessionMgr.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &fabrics, &gMessageCounterManager);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    callback.mSuite = inSuite;
+
+    secureSessionMgr.SetDelegate(&callback);
+
+    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    // First pairing
+    SecurePairingUsingTestSecret pairing1(1, 1);
+    callback.mOldConnectionDropped = false;
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1, SecureSession::SessionRole::kInitiator, 1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
+
+    // New pairing with different peer node ID and different local key ID (same peer key ID)
+    SecurePairingUsingTestSecret pairing2(1, 2);
+    callback.mOldConnectionDropped = false;
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing2, SecureSession::SessionRole::kResponder, 0);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
+
+    // New pairing with undefined node ID and different local key ID (same peer key ID)
+    SecurePairingUsingTestSecret pairing3(1, 3);
+    callback.mOldConnectionDropped = false;
+    err = secureSessionMgr.NewPairing(peer, kUndefinedNodeId, &pairing3, SecureSession::SessionRole::kResponder, 0);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
+
+    // New pairing with same local key ID, and a given node ID
+    SecurePairingUsingTestSecret pairing4(1, 2);
+    callback.mOldConnectionDropped = false;
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing4, SecureSession::SessionRole::kResponder, 0);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
+
+    // New pairing with same local key ID, and undefined node ID
+    SecurePairingUsingTestSecret pairing5(1, 1);
+    callback.mOldConnectionDropped = false;
+    err = secureSessionMgr.NewPairing(peer, kUndefinedNodeId, &pairing5, SecureSession::SessionRole::kResponder, 0);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
+}
+
 // Test Suite
 
 /**
@@ -476,6 +475,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Message Self Test",              CheckMessageTest),
     NL_TEST_DEF("Send Encrypted Packet Test",     SendEncryptedPacketTest),
     NL_TEST_DEF("Send Bad Encrypted Packet Test", SendBadEncryptedPacketTest),
+    NL_TEST_DEF("Drop stale connection Test",     StaleConnectionDropTest),
 
     NL_TEST_SENTINEL()
 };
@@ -487,7 +487,7 @@ int Finalize(void * aContext);
 // clang-format off
 nlTestSuite sSuite =
 {
-    "Test-CHIP-Connection",
+    "Test-CHIP-SecureSessionMgr",
     &sTests[0],
     Initialize,
     Finalize

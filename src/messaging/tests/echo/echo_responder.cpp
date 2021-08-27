@@ -62,7 +62,6 @@ int main(int argc, char * argv[])
     bool disableEcho = false;
 
     chip::Transport::FabricTable fabrics;
-    chip::Transport::FabricInfo * fabricInfo = nullptr;
 
     const chip::FabricIndex gFabricIndex = 0;
 
@@ -83,9 +82,6 @@ int main(int argc, char * argv[])
     }
 
     InitializeChip();
-
-    fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, chip::kTestDeviceNodeId);
-    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     if (useTCP)
     {

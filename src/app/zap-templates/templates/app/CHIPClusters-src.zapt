@@ -11,10 +11,10 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <app/chip-zcl-zpro-codec.h>
-#include <app/common/gen/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/util/basic-types.h>
 
-#include <gen/CHIPClientCallbacks.h>
+#include <zap-generated/CHIPClientCallbacks.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/CodeUtils.h>
 #include <app/InteractionModelEngine.h>
@@ -55,8 +55,8 @@ namespace {
   // Pick source endpoint as 1 for now
   constexpr EndpointId kSourceEndpoint = 1;
 
-  const uint8_t kReportingDirectionReported = 0x00;
-}
+  [[maybe_unused]] const uint8_t kReportingDirectionReported = 0x00;
+} // namespace
 
 using namespace app::Clusters;
 using namespace System;
@@ -120,7 +120,7 @@ exit:
 
 {{/chip_cluster_commands}}
 // {{asUpperCamelCase name}} Cluster Attributes
-CHIP_ERROR {{asCamelCased name false}}Cluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR {{asUpperCamelCase name}}Cluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     COMMAND_HEADER("Discover{{asUpperCamelCase name}}Attributes", {{asUpperCamelCase name}}::Id);
     buf.Put8(kFrameControlGlobalCommand)

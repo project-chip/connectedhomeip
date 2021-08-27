@@ -60,6 +60,7 @@ InterfaceId FindValidInterfaceId()
     return INET_NULL_INTERFACEID;
 }
 
+#if INET_CONFIG_ENABLE_IPV4
 void TestIPv4(nlTestSuite * inSuite, void * inContext)
 {
     IPAddress ipAddress;
@@ -82,6 +83,7 @@ void TestIPv4(nlTestSuite * inSuite, void * inContext)
 
     responder.AddAllResponses(&packetInfo, &acc);
 }
+#endif // INET_CONFIG_ENABLE_IPV4
 
 void TestIPv6(nlTestSuite * inSuite, void * inContext)
 {
@@ -107,7 +109,9 @@ void TestIPv6(nlTestSuite * inSuite, void * inContext)
 }
 
 const nlTest sTests[] = {
+#if INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("TestIPv4", TestIPv4), //
+#endif                                 // INET_CONFIG_ENABLE_IPV4
     NL_TEST_DEF("TestIPv6", TestIPv6), //
     NL_TEST_SENTINEL()                 //
 };

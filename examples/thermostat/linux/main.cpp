@@ -19,10 +19,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/Command.h>
 #include <app/chip-zcl-zpro-codec.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
 #include <app/server/Mdns.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
@@ -50,6 +51,20 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
+}
+
+// emberAfPreAttributeChangeCallback() is called for every cluster.
+// As of 8/17/21 cluster specific PreAttributeChangeCalbacks are not yet implemented.
+
+EmberAfStatus emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                                uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    if (clusterId == ZCL_THERMOSTAT_CLUSTER_ID)
+    {
+        status = emberAfThermostatClusterServerPreAttributeChangedCallback(endpoint, attributeId, type, size, value);
+    }
+    return status;
 }
 
 int main(int argc, char * argv[])

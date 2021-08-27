@@ -69,16 +69,20 @@ public:
      *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReportError
      *  call happens with guarantee.
      *
+     *  Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
+     *  Default timeout value will be used otherwise.
+     *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SecureSessionHandle * aSecureSession,
+    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * aSecureSession,
                                EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
                                AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
-                               EventNumber aEventNumber);
+                               EventNumber aEventNumber, uint32_t timeout = kImMessageTimeoutMsec);
 
     uint64_t GetAppIdentifier() const { return mAppIdentifier; }
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+    CHIP_ERROR SendStatusReport(CHIP_ERROR aError, bool aExpectResponse);
 
 private:
     friend class TestReadInteraction;
@@ -99,7 +103,6 @@ private:
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apDelegate       InteractionModelDelegate set by application.
-     *  @param[in]    aAppState        Application defined object to distinguish different read requests.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
@@ -134,7 +137,7 @@ private:
      * Internal shutdown method that we use when we know what's going on with
      * our exchange and don't need to manually close it.
      */
-    void ShutdownInternal();
+    void ShutdownInternal(CHIP_ERROR aError);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;

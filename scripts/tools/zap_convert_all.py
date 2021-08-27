@@ -20,19 +20,27 @@ from pathlib import Path
 import sys
 import subprocess
 
-CHIP_ROOT_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '../..'))
+CHIP_ROOT_DIR = os.path.realpath(
+    os.path.join(os.path.dirname(__file__), '../..'))
+
 
 def checkPythonVersion():
     if sys.version_info[0] < 3:
-        print('Must use Python 3. Current version is ' + str(sys.version_info[0]))
+        print('Must use Python 3. Current version is ' +
+              str(sys.version_info[0]))
         exit(1)
+
 
 def getTargets():
     targets = []
-    targets.extend([[str(filepath)] for filepath in Path('./examples').rglob('*.zap')])
-    targets.extend([[str(filepath)] for filepath in Path('./src/darwin').rglob('*.zap')])
-    targets.extend([[str(filepath)] for filepath in Path('./src/controller/data_model').rglob('*.zap')])
+    targets.extend([[str(filepath)]
+                   for filepath in Path('./examples').rglob('*.zap')])
+    targets.extend([[str(filepath)]
+                   for filepath in Path('./src/darwin').rglob('*.zap')])
+    targets.extend([[str(filepath)] for filepath in Path(
+        './src/controller/data_model').rglob('*.zap')])
     return targets
+
 
 def main():
     checkPythonVersion()
@@ -41,6 +49,7 @@ def main():
     targets = getTargets()
     for target in targets:
         subprocess.check_call(['./scripts/tools/zap/convert.py'] + target)
+
 
 if __name__ == '__main__':
     main()

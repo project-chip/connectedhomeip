@@ -26,29 +26,18 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
+
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
 #include <support/ErrorStr.h>
 #include <system/SystemClock.h>
-
-// MCUMgr BT FOTA includes
-#ifdef CONFIG_MCUMGR_CMD_OS_MGMT
-#include "os_mgmt/os_mgmt.h"
-#endif
-#ifdef CONFIG_MCUMGR_CMD_IMG_MGMT
-#include "img_mgmt/img_mgmt.h"
-#endif
-#ifdef CONFIG_MCUMGR_SMP_BT
-#include <mgmt/mcumgr/smp_bt.h>
-#endif
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-#include <dfu/mcuboot.h>
-#endif
 
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
@@ -79,6 +68,7 @@ bool sHaveServiceConnectivity = false;
 
 } // namespace
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -104,20 +94,9 @@ int AppTask::Init()
     k_timer_init(&sFunctionTimer, &AppTask::TimerEventHandler, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
 
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-    // Check if the image is run in the REVERT mode and eventually
-    // confirm it to prevent reverting on the next boot.
-    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
-    {
-        if (boot_write_img_confirmed())
-        {
-            LOG_ERR("Confirming firmware image failed, it will be reverted on the next boot.");
-        }
-        else
-        {
-            LOG_INF("New firmware image confirmed.");
-        }
-    }
+#ifdef CONFIG_MCUMGR_SMP_BT
+    GetDFUOverSMP().Init(RequestSMPAdvertisingStart);
+    GetDFUOverSMP().ConfirmNewImage();
 #endif
 
     ret = LightingMgr().Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL);
@@ -128,10 +107,13 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#if defined(CONFIG_CHIP_NFC_COMMISSIONING)
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 #endif
 
@@ -311,13 +293,15 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     }
 }
 
-int AppTask::SoftwareUpdateConfirmationHandler(uint32_t offset, uint32_t size, void * arg)
+#ifdef CONFIG_MCUMGR_SMP_BT
+void AppTask::RequestSMPAdvertisingStart(void)
 {
-    // For now just print update progress and confirm data chunk without any additional checks.
-    LOG_INF("Software update progress %d B / %d B", offset, size);
-
-    return 0;
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_StartSMPAdvertising;
+    event.Handler = [](AppEvent *) { GetDFUOverSMP().StartBLEAdvertising(); };
+    sAppTask.PostEvent(&event);
 }
+#endif
 
 void AppTask::FunctionHandler(AppEvent * aEvent)
 {
@@ -346,22 +330,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
 
-#if defined(CONFIG_MCUMGR_SMP_BT) && defined(CONFIG_MCUMGR_CMD_IMG_MGMT) && defined(CONFIG_MCUMGR_CMD_OS_MGMT)
-            if (!sAppTask.mSoftwareUpdateEnabled)
-            {
-                sAppTask.mSoftwareUpdateEnabled = true;
-                os_mgmt_register_group();
-                img_mgmt_register_group();
-                img_mgmt_set_upload_cb(SoftwareUpdateConfirmationHandler, NULL);
-                smp_bt_register();
-
-                LOG_INF("Enabled software update");
-            }
-            else
-            {
-                LOG_INF("Software update is already enabled");
-            }
-
+#ifdef CONFIG_MCUMGR_SMP_BT
+            GetDFUOverSMP().StartServer();
 #else
             LOG_INF("Software update is disabled");
 #endif
@@ -382,7 +352,7 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
         return;
 
-    if (AddTestPairing() != CHIP_NO_ERROR)
+    if (AddTestCommissioning() != CHIP_NO_ERROR)
     {
         LOG_ERR("Failed to add test pairing");
     }
@@ -403,26 +373,22 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
         return;
 
-    // In case of having software update enabled, allow on starting BLE advertising after Thread provisioning.
-    if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() && !sAppTask.mSoftwareUpdateEnabled)
+    // Don't allow on starting Matter service BLE advertising after Thread provisioning.
+    if (ConnectivityMgr().IsThreadProvisioned())
     {
-        LOG_INF("NFC Tag emulation and BLE advertisement not started - device is commissioned to a Thread network.");
+        LOG_INF("NFC Tag emulation and Matter service BLE advertising not started - device is commissioned to a Thread network.");
         return;
     }
 
     if (ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
-        LOG_INF("BLE Advertisement is already enabled");
+        LOG_INF("BLE advertising is already enabled");
         return;
     }
 
-    if (OpenDefaultPairingWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
+    if (OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) != CHIP_NO_ERROR)
     {
-        LOG_INF("Enabled BLE Advertisement");
-    }
-    else
-    {
-        LOG_ERR("OpenDefaultPairingWindow() failed");
+        LOG_ERR("OpenBasicCommissioningWindow() failed");
     }
 }
 

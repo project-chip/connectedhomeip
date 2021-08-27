@@ -32,7 +32,7 @@
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
 #include <controller/OperationalCredentialsDelegate.h>
-#include <controller/data_model/gen/CHIPClientCallbacks.h>
+#include <controller/data_model/zap-generated/CHIPClientCallbacks.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
@@ -91,6 +91,17 @@ struct ControllerInitParams
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
+
+    /* The following keypair must correspond to the public key used for generating
+       controllerNOC. It's used by controller to establish CASE sessions with devices */
+    Crypto::P256Keypair * ephemeralKeypair = nullptr;
+
+    /* The following certificates must be in x509 DER format */
+    ByteSpan controllerNOC;
+    ByteSpan controllerICAC;
+    ByteSpan controllerRCAC;
+
+    uint16_t controllerVendorId;
 };
 
 enum CommissioningStage : uint8_t
@@ -210,7 +221,7 @@ public:
     DeviceController();
     virtual ~DeviceController() {}
 
-    CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
+    CHIP_ERROR Init(ControllerInitParams params);
 
     /**
      * @brief
@@ -254,12 +265,11 @@ public:
      *   This function update the device informations asynchronously using mdns.
      *   If new device informations has been found, it will be persisted.
      *
-     * @param[in] deviceId  Node ID for the CHIP devicex
-     * @param[in] fabricId  The fabricId used for mdns resolution
+     * @param[in] deviceId  Node ID for the CHIP device
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    CHIP_ERROR UpdateDevice(NodeId deviceId, uint64_t fabricId);
+    CHIP_ERROR UpdateDevice(NodeId deviceId);
 
     void PersistDevice(Device * device);
 
@@ -280,21 +290,14 @@ public:
     CHIP_ERROR ServiceEvents();
 
     /**
-     * @brief
-     *   Allow the CHIP Stack to process any pending events
-     *   This can be called in an event handler loop to trigger callbacks within the CHIP stack
-     * @return CHIP_ERROR   The return status
+     * @brief Get the Compressed Fabric ID assigned to the device.
      */
-    CHIP_ERROR ServiceEventSignal();
+    uint64_t GetCompressedFabricId() const { return mLocalId.GetCompressedFabricId(); }
 
     /**
-     * @brief Get the Fabric ID assigned to the device.
-     *
-     * @param[out] fabricId   Fabric ID of the device.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     * @brief Get the raw Fabric ID assigned to the device.
      */
-    CHIP_ERROR GetFabricId(uint64_t & fabricId);
+    uint64_t GetFabricId() const { return mFabricId; }
 
 protected:
     enum class State
@@ -314,7 +317,9 @@ protected:
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
-    NodeId mLocalDeviceId;
+    PeerId mLocalId    = PeerId();
+    FabricId mFabricId = kUndefinedFabricId;
+
     DeviceTransportMgr * mTransportMgr                             = nullptr;
     SecureSessionMgr * mSessionMgr                                 = nullptr;
     Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
@@ -335,7 +340,7 @@ protected:
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
-    uint16_t FindDeviceIndex(SecureSessionHandle session);
+    uint16_t FindDeviceIndex(SessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     void ReleaseDeviceById(NodeId remoteDeviceId);
@@ -345,17 +350,14 @@ protected:
 
     void PersistNextKeyId();
 
-    FabricIndex mFabricIndex = 0;
+    FabricIndex mFabricIndex = Transport::kMinValidFabricIndex;
     Transport::FabricTable mFabrics;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
-    Credentials::ChipCertificateSet mCertificates;
-    Credentials::OperationalCredentialSet mCredentials;
-    Credentials::CertificateKeyId mRootKeyId;
-    uint8_t mCredentialsIndex;
-
     SessionIDAllocator mIDAllocator;
+
+    uint16_t mVendorId;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     //////////// ResolverDelegate Implementation ///////////////
@@ -371,16 +373,12 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
-    void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnNewConnection(SessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnConnectionExpired(SessionHandle session, Messaging::ExchangeManager * mgr) override;
 
     void ReleaseAllDevices();
 
-    CHIP_ERROR LoadLocalCredentials(Transport::FabricInfo * fabric);
-
-    static void OnLocalNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                          const ByteSpan & rcac);
-    Callback::Callback<OnNOCChainGeneration> mLocalNOCChainCallback;
+    CHIP_ERROR ProcessControllerNOCChain(const ControllerInitParams & params);
 };
 
 /**
@@ -432,7 +430,7 @@ public:
     /**
      * Commissioner-specific initialization, includes parameters such as the pairing delegate.
      */
-    CHIP_ERROR Init(NodeId localDeviceId, CommissionerInitParams params);
+    CHIP_ERROR Init(CommissionerInitParams params);
 
     /**
      * @brief
@@ -609,7 +607,7 @@ private:
     UserDirectedCommissioningServer * mUdcServer = nullptr;
     // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
     DeviceTransportMgr * mUdcTransportMgr = nullptr;
-    uint16_t mUdcListenPort               = CHIP_PORT + 1;
+    uint16_t mUdcListenPort               = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void PersistDeviceList();
@@ -620,7 +618,7 @@ private:
 
     void OnSessionEstablishmentTimeout();
 
-    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, CHIP_ERROR aError);
+    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
     /* This function sends an OpCSR request to the device.
        The function does not hold a refernce to the device object.

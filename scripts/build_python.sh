@@ -39,12 +39,13 @@ OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 ENVIRONMENT_ROOT="$CHIP_ROOT/out/python_env"
 
 declare chip_detail_logging=false
+declare enable_pybindings=false
 declare chip_mdns
 declare clusters=true
 
 help() {
 
-    echo "Usage: $file_name [ options ... ] [ -chip_detail_logging ChipDetailLoggingValue  ] [ -chip_mdns ChipMDNSValue  ]"
+    echo "Usage: $file_name [ options ... ] [ -chip_detail_logging ChipDetailLoggingValue  ] [ -chip_mdns ChipMDNSValue  ] [-enable_pybindings EnableValue]"
 
     echo "General Options:
   -h, --help                Display this information.
@@ -55,6 +56,7 @@ Input Options:
                                                             By default it is minimal.
   -c, --clusters_for_ip_commissioning  true/false           Specify whether to use clusters for IP commissioning.
                                                             By default it is true.
+  -p, --enable_pybindings   EnableValue                     Specify whether to enable pybindings as python controller.
 "
 }
 
@@ -78,6 +80,10 @@ while (($#)); do
             clusters=$2
             shift
             ;;
+        --enable_pybindings | -p)
+            enable_pybindings=$2
+            shift
+            ;;
         -*)
             help
             echo "Unknown Option \"$1\""
@@ -88,25 +94,38 @@ while (($#)); do
 done
 
 # Print input values
-echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\""
+echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", enable_pybindings = $enable_pybindings"
 
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
 
 # Generates ninja files
 [[ -n "$chip_mdns" ]] && chip_mdns_arg="chip_mdns=\"$chip_mdns\"" || chip_mdns_arg=""
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging chip_use_clusters_for_ip_commissioning=$clusters $chip_mdns_arg"
+
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_use_clusters_for_ip_commissioning=$clusters $chip_mdns_arg"
 
 # Compiles python files
-ninja -C "$OUTPUT_ROOT" python
+# Check pybindings was requested
+if [ "$enable_pybindings" == true ]; then
+    ninja -v -C "$OUTPUT_ROOT" pycontroller
+else
+    ninja -v -C "$OUTPUT_ROOT" python
+fi
 
 # Create a virtual environment that has access to the built python tools
 virtualenv --clear "$ENVIRONMENT_ROOT"
 
 # Activate the new enviroment to register the python WHL
+
+if [ "$enable_pybindings" == true ]; then
+    WHEEL=$(ls "$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl | head -n 1)
+else
+    WHEEL=$(ls "$OUTPUT_ROOT"/controller/python/chip-*.whl | head -n 1)
+fi
+
 source "$ENVIRONMENT_ROOT"/bin/activate
 "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "$OUTPUT_ROOT"/controller/python/chip-*.whl
+"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "$WHEEL"
 
 echo ""
 echo_green "Compilation completed and WHL package installed in: "

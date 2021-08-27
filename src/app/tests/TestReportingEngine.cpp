@@ -49,7 +49,6 @@ static SecureSessionMgr gSessionManager;
 static Messaging::ExchangeManager gExchangeManager;
 static TransportMgr<Transport::UDP> gTransportManager;
 static secure_channel::MessageCounterManager gMessageCounterManager;
-static const FabricIndex gFabricIndex = 0;
 constexpr ClusterId kTestClusterId    = 6;
 constexpr EndpointId kTestEndpointId  = 1;
 constexpr chip::FieldId kTestFieldId1 = 1;
@@ -112,7 +111,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
 
     err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    Messaging::ExchangeContext * exchangeCtx = gExchangeManager.NewContext({ 0, 0, 0 }, nullptr);
+    Messaging::ExchangeContext * exchangeCtx = gExchangeManager.NewContext(SessionHandle(0, 0, 0, 0), nullptr);
     TestExchangeDelegate delegate;
     exchangeCtx->SetDelegate(&delegate);
 
@@ -134,10 +133,10 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    readHandler.OnReadRequest(exchangeCtx, std::move(readRequestbuf));
+    readHandler.OnReadRequest(std::move(readRequestbuf));
     reportingEngine.Init();
     err = reportingEngine.BuildAndSendSingleReportData(&readHandler);
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 }
 } // namespace reporting
 } // namespace app
@@ -149,9 +148,6 @@ void InitializeChip(nlTestSuite * apSuite)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
     chip::Transport::FabricTable fabrics;
-    chip::Transport::FabricInfo * fabricInfo = fabrics.AssignFabricIndex(chip::gFabricIndex, chip::kTestDeviceNodeId);
-
-    NL_TEST_ASSERT(apSuite, fabricInfo != nullptr);
 
     err = chip::Platform::MemoryInit();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

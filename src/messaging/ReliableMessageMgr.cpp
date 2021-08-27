@@ -234,7 +234,7 @@ void ReliableMessageMgr::ExpireTicks()
 #endif
 }
 
-void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError)
+void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState)
 {
     ReliableMessageMgr * manager = reinterpret_cast<ReliableMessageMgr *>(aAppState);
 

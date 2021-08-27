@@ -52,12 +52,12 @@ const FullQName kHostnameName       = FullQName(kHostnameParts);
 // Operational records and queries.
 const QNamePart kMatterOperationalQueryParts[3] = { "_matter", "_tcp", "local" };
 const FullQName kMatterOperationalQueryName     = FullQName(kMatterOperationalQueryParts);
-const PeerId kPeerId1                           = PeerId().SetFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
-const PeerId kPeerId2                           = PeerId().SetFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
-const PeerId kPeerId3                           = PeerId().SetFabricId(0x3333333333333333).SetNodeId(0x3333333333333333);
-const PeerId kPeerId4                           = PeerId().SetFabricId(0x4444444444444444).SetNodeId(0x4444444444444444);
-const PeerId kPeerId5                           = PeerId().SetFabricId(0x5555555555555555).SetNodeId(0x5555555555555555);
-const PeerId kPeerId6                           = PeerId().SetFabricId(0x6666666666666666).SetNodeId(0x6666666666666666);
+const PeerId kPeerId1                           = PeerId().SetCompressedFabricId(0xBEEFBEEFF00DF00D).SetNodeId(0x1111222233334444);
+const PeerId kPeerId2                           = PeerId().SetCompressedFabricId(0x5555666677778888).SetNodeId(0x1212343456567878);
+const PeerId kPeerId3                           = PeerId().SetCompressedFabricId(0x3333333333333333).SetNodeId(0x3333333333333333);
+const PeerId kPeerId4                           = PeerId().SetCompressedFabricId(0x4444444444444444).SetNodeId(0x4444444444444444);
+const PeerId kPeerId5                           = PeerId().SetCompressedFabricId(0x5555555555555555).SetNodeId(0x5555555555555555);
+const PeerId kPeerId6                           = PeerId().SetCompressedFabricId(0x6666666666666666).SetNodeId(0x6666666666666666);
 const QNamePart kInstanceNameParts1[]           = { "BEEFBEEFF00DF00D-1111222233334444", "_matter", "_tcp", "local" };
 const FullQName kInstanceName1                  = FullQName(kInstanceNameParts1);
 const QNamePart kInstanceNameParts2[]           = { "5555666677778888-1212343456567878", "_matter", "_tcp", "local" };
@@ -130,7 +130,8 @@ CommissionAdvertisingParameters commissionableNodeParamsSmall =
         .SetMac(ByteSpan(kMac))
         .SetLongDiscriminator(0xFFE)
         .SetShortDiscriminator(0xF)
-        .SetCommissioningMode(false, false);
+        .SetCommissioningMode(false)
+        .SetAdditionalCommissioning(false);
 const QNamePart txtCommissionableNodeParamsSmallParts[] = { "CM=0", "D=4094" };
 FullQName txtCommissionableNodeParamsSmallName          = FullQName(txtCommissionableNodeParamsSmallParts);
 TxtResourceRecord txtCommissionableNodeParamsSmall      = TxtResourceRecord(instanceName, txtCommissionableNodeParamsSmallName);
@@ -143,7 +144,8 @@ CommissionAdvertisingParameters commissionableNodeParamsLarge =
         .SetShortDiscriminator(2)
         .SetVendorId(chip::Optional<uint16_t>(555))
         .SetDeviceType(chip::Optional<uint16_t>(25))
-        .SetCommissioningMode(true, true)
+        .SetCommissioningMode(true)
+        .SetAdditionalCommissioning(true)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
         .SetPairingInstr(chip::Optional<const char *>("Pair me"))

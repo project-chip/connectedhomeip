@@ -131,7 +131,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char discriminatorBuf[kKeyDiscriminatorMaxLength + 1];
     char vendorProductBuf[kKeyVendorProductMaxLength + 1];
     char commissioningModeBuf[kKeyCommissioningModeMaxLength + 1];
-    char additionalPairingBuf[kKeyAdditionalPairingMaxLength + 1];
+    char additionalCommissioningingBuf[kKeyAdditionalCommissioningMaxLength + 1];
     char deviceTypeBuf[kKeyDeviceTypeMaxLength + 1];
     char deviceNameBuf[kKeyDeviceNameMaxLength + 1];
     char rotatingIdBuf[kKeyRotatingIdMaxLength + 1];
@@ -145,7 +145,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 1];
     char vendorSubType[kSubTypeVendorMaxLength + 1];
     char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 1];
-    char openWindowSubType[kSubTypeAdditionalPairingMaxLength + 1];
+    char additionalCommissioningSubType[kSubTypeAdditionalCommissioningMaxLength + 1];
     char deviceTypeSubType[kSubTypeDeviceTypeMaxLength + 1];
     // size of subTypes array should be count of SubTypes above
     const char * subTypes[kSubTypeMaxNumber];
@@ -215,11 +215,11 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         textEntries[textEntrySize++] = { "CM", reinterpret_cast<const uint8_t *>(commissioningModeBuf),
                                          strnlen(commissioningModeBuf, sizeof(commissioningModeBuf)) };
 
-        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
+        if (params.GetCommissioningMode() && params.GetAdditionalCommissioning())
         {
-            snprintf(additionalPairingBuf, sizeof(additionalPairingBuf), "1");
-            textEntries[textEntrySize++] = { "AP", reinterpret_cast<const uint8_t *>(additionalPairingBuf),
-                                             strnlen(additionalPairingBuf, sizeof(additionalPairingBuf)) };
+            snprintf(additionalCommissioningingBuf, sizeof(additionalCommissioningingBuf), "1");
+            textEntries[textEntrySize++] = { "AP", reinterpret_cast<const uint8_t *>(additionalCommissioningingBuf),
+                                             strnlen(additionalCommissioningingBuf, sizeof(additionalCommissioningingBuf)) };
         }
 
         if (params.GetRotatingId().HasValue())
@@ -259,12 +259,12 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         {
             subTypes[subTypeSize++] = commissioningModeSubType;
         }
-        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
+        if (params.GetCommissioningMode() && params.GetAdditionalCommissioning())
         {
-            if (MakeServiceSubtype(openWindowSubType, sizeof(openWindowSubType),
+            if (MakeServiceSubtype(additionalCommissioningSubType, sizeof(additionalCommissioningSubType),
                                    DiscoveryFilter(DiscoveryFilterType::kCommissioningModeFromCommand, 1)) == CHIP_NO_ERROR)
             {
-                subTypes[subTypeSize++] = openWindowSubType;
+                subTypes[subTypeSize++] = additionalCommissioningSubType;
             }
         }
     }
@@ -288,7 +288,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
     service.mTextEntries   = textEntries;
     service.mTextEntrySize = textEntrySize;
-    service.mPort          = CHIP_PORT;
+    service.mPort          = params.GetPort();
     service.mInterface     = INET_NULL_INTERFACEID;
     service.mSubTypes      = subTypes;
     service.mSubTypeSize   = subTypeSize;
@@ -403,7 +403,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), params.GetPeerId()));
     strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
-    service.mPort          = CHIP_PORT;
+    service.mPort          = params.GetPort();
     service.mTextEntries   = mrpRetryIntervalEntries;
     service.mTextEntrySize = textEntrySize;
     service.mInterface     = INET_NULL_INTERFACEID;
@@ -499,10 +499,14 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, MdnsService * resu
     DiscoveredNodeData data;
     Platform::CopyString(data.hostName, result->mHostName);
 
-    if (result->mAddress.HasValue())
+    if (result->mAddress.HasValue() && data.numIPs < DiscoveredNodeData::kMaxIPAddresses)
     {
-        data.ipAddress[data.numIPs++] = result->mAddress.Value();
+        data.ipAddress[data.numIPs]   = result->mAddress.Value();
+        data.interfaceId[data.numIPs] = result->mInterface;
+        data.numIPs++;
     }
+
+    data.port = result->mPort;
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {

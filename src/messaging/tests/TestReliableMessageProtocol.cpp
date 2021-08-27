@@ -127,7 +127,7 @@ public:
 class MockSessionEstablishmentExchangeDispatch : public Messaging::ExchangeMessageDispatch
 {
 public:
-    CHIP_ERROR PrepareMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
+    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
                               EncryptedPacketBufferHandle & preparedMessage) override
     {
         PacketHeader packetHeader;
@@ -139,7 +139,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const override
+    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const override
     {
         return gTransportMgr.SendMessage(Transport::PeerAddress(), preparedMessage.CastToWritable());
     }
@@ -242,7 +242,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockAppDelegate mockSender;
-    // TODO: temporarily create a SecureSessionHandle from node id, will be fix in PR 3602
+    // TODO: temporarily create a SessionHandle from node id, will be fix in PR 3602
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
@@ -277,7 +277,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -287,7 +287,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 
     // sleep another 65 ms to trigger second re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 3);
@@ -307,7 +307,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockAppDelegate mockSender;
-    // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
+    // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
@@ -339,7 +339,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -349,7 +349,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 
     // sleep another 65 ms to trigger second re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 3);
@@ -400,7 +400,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit table is empty, as we did not provide a message to retain
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
@@ -495,7 +495,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 2);
@@ -567,7 +567,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was sent and the ack was sent
     // and retransmit table was cleared
@@ -635,7 +635,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 2);
@@ -719,7 +719,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_NO_ERROR);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
 
     // Ensure the retransmit message was sent and the ack was sent
     // and retransmit table was cleared

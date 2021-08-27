@@ -49,8 +49,8 @@
 #include <support/ThreadOperationalDataset.h>
 #include <support/logging/CHIPLogging.h>
 
-#include <gen/CHIPClientCallbacks.h>
-#include <gen/CHIPClusters.h>
+#include <zap-generated/CHIPClientCallbacks.h>
+#include <zap-generated/CHIPClusters.h>
 
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
 #ifndef PTHREAD_NULL
@@ -225,7 +225,8 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     chip::Platform::MemoryShutdown();
 }
 
-JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
+JNI_METHOD(jlong, newDeviceController)
+(JNIEnv * env, jobject self, jobject keyValueStoreManager, jobject serviceResolver, jobject chipMdnsCallback)
 {
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -233,6 +234,10 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     long result                              = 0;
 
     ChipLogProgress(Controller, "newDeviceController() called");
+
+    DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeWithObject(keyValueStoreManager);
+    using ::chip::Mdns::InitializeWithObjects;
+    InitializeWithObjects(serviceResolver, chipMdnsCallback);
 
     wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, JniReferences::GetInstance().GetStackLock(), kLocalDeviceId,
                                                           &sSystemLayer, &sInetLayer, &err);
@@ -255,28 +260,6 @@ exit:
     }
 
     return result;
-}
-
-JNI_METHOD(void, setKeyValueStoreManager)(JNIEnv * env, jclass self, jobject manager)
-{
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeWithObject(manager);
-}
-
-JNI_METHOD(void, setServiceResolver)(JNIEnv * env, jclass self, jobject resolver)
-{
-    using namespace chip::Mdns;
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    InitializeWithObject(resolver);
-}
-
-JNI_METHOD(void, handleServiceResolve)
-(JNIEnv * env, jclass self, jstring instanceName, jstring serviceType, jstring address, jint port, jlong callbackHandle,
- jlong contextHandle)
-{
-    using namespace chip::Mdns;
-    StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
-    HandleResolve(instanceName, serviceType, address, port, callbackHandle, contextHandle);
 }
 
 JNI_METHOD(void, pairDevice)
@@ -454,8 +437,8 @@ JNI_METHOD(void, updateDevice)(JNIEnv * env, jobject self, jlong handle, jlong f
     StackLockGuard lock(JniReferences::GetInstance().GetStackLock());
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    CHIP_ERROR err = wrapper->Controller()->UpdateDevice(static_cast<chip::NodeId>(deviceId), static_cast<uint64_t>(fabricId));
 
+    CHIP_ERROR err = wrapper->Controller()->UpdateDevice(static_cast<chip::NodeId>(deviceId));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to update device");
@@ -1066,7 +1049,6 @@ void * IOThreadMain(void * arg)
     // Loop until we are told to exit.
     while (!quit.load(std::memory_order_relaxed))
     {
-        // TODO(#5556): add a timer for `sleepTime.tv_sec  = 10; sleepTime.tv_usec = 0;`
         watchState.PrepareEvents();
 
         // Unlock the stack so that Java threads can make API calls.

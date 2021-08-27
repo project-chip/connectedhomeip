@@ -203,12 +203,14 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     gMockTransportMgrDelegate.FinalizeMessageTest(tcp, addr);
 }
 
+#if INET_CONFIG_ENABLE_IPV4
 void CheckMessageTest4(nlTestSuite * inSuite, void * inContext)
 {
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
     CheckMessageTest(inSuite, inContext, addr);
 }
+#endif // INET_CONFIG_ENABLE_IPV4
 
 void CheckMessageTest6(nlTestSuite * inSuite, void * inContext)
 {

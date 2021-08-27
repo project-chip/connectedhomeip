@@ -44,10 +44,6 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-#             - name: Initialize CodeQL
-#               uses: github/codeql-action/init@v1
-#               with:
-#                   languages: "cpp, python"
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -87,6 +83,10 @@ jobs:
               timeout-minutes: 5
               run:
                   scripts/examples/gn_build_example.sh examples/bridge-app/linux out/bridge_debug
+            - name: Build example OTA Provider
+              timeout-minutes: 5
+              run:
+                  scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota_provider_debug
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -103,12 +103,3 @@ jobs:
                   path: |
                       out/all_clusters_debug/all-clusters-server
                       out/all_clusters_debug/all-clusters-server.map
-            - name: Remove third_party binaries for CodeQL Analysis
-              run: find out -type d -name "third_party" -exec rm -rf {} +
-            - name: Remove dbus binaries for CodeQL Analysis
-              run: find out -type d -name "dbus" -exec rm -rf {} +
-            - name: Remove gen binaries for CodeQL Analysis
-              run: find out -type d -name "gen" -exec rm -rf {} +
-#             - name: Perform CodeQL Analysis
-#               if: ${{ github.event_name == 'push' }}
-#               uses: github/codeql-action/analyze@v1

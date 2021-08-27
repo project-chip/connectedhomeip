@@ -170,7 +170,7 @@ static const nlTest sTests[] =
 // clang-format off
 static nlTestSuite sSuite =
 {
-    "Test-CHIP-SecureChannel",
+    "Test-CHIP-SecureSession",
     &sTests[0],
     nullptr,
     nullptr

@@ -229,6 +229,13 @@ public:
         memcpy(&bytes[0], &raw_value[0], N);
     }
 
+    template <size_t N>
+    constexpr P256PublicKey(const FixedByteSpan<N> & value)
+    {
+        static_assert(N == kP256_PublicKey_Length, "Can only initialize from proper sized byte span");
+        memcpy(&bytes[0], value.data(), N);
+    }
+
     SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
     size_t Length() const override { return kP256_PublicKey_Length; }
     operator uint8_t *() override { return bytes; }
@@ -305,7 +312,29 @@ struct alignas(size_t) P256KeypairContext
 
 typedef CapacityBoundBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length> P256SerializedKeypair;
 
-class P256Keypair : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
+class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
+{
+public:
+    /**
+     * @brief Initialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Initialize() = 0;
+
+    /**
+     * @brief Serialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const = 0;
+
+    /**
+     * @brief Deserialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input) = 0;
+};
+
+class P256Keypair : public P256KeypairBase
 {
 public:
     P256Keypair() {}
@@ -315,19 +344,19 @@ public:
      * @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Initialize();
+    CHIP_ERROR Initialize() override;
 
     /**
      * @brief Serialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const;
+    CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
 
     /**
      * @brief Deserialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input);
+    CHIP_ERROR Deserialize(P256SerializedKeypair & input) override;
 
     /**
      * @brief Generate a new Certificate Signing Request (CSR).
@@ -562,7 +591,7 @@ public:
      *
      * More data can be added before finish is called.
      *
-     * @param[inout] out_buffer Output buffer to receive the digest. `out_buffer` must
+     * @param[in,out] out_buffer Output buffer to receive the digest. `out_buffer` must
      * be at least `kSHA256_Hash_Length` bytes long. The `out_buffer` size
      * will be set to `kSHA256_Hash_Length` on success.
      *
@@ -574,7 +603,7 @@ public:
     /**
      * @brief Finalize the stream digest computation, getting the final digest.
      *
-     * @param[inout] out_buffer Output buffer to receive the digest. `out_buffer` must
+     * @param[in,out] out_buffer Output buffer to receive the digest. `out_buffer` must
      * be at least `kSHA256_Hash_Length` bytes long. The `out_buffer` size
      * will be set to `kSHA256_Hash_Length` on success.
      *

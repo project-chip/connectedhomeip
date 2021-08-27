@@ -38,8 +38,8 @@
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/FabricTable.h>
 #include <transport/PairingSession.h>
-#include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -88,16 +88,15 @@ public:
 
     /**
      * @brief
-     *   Initialize using operational credentials code and wait for session establishment requests.
+     *   Initialize using configured fabrics and wait for session establishment requests.
      *
-     * @param operationalCredentialSet      CHIP Certificate Set used to store the chain root of trust an validate peer node
-     *                                      certificates
      * @param myKeyId                       Key ID to be assigned to the secure session on the peer node
+     * @param fabrics                       Table of fabrics that are currently configured on the device
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR ListenForSessionEstablishment(Credentials::OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+    CHIP_ERROR ListenForSessionEstablishment(uint16_t myKeyId, Transport::FabricTable * fabrics,
                                              SessionEstablishmentDelegate * delegate);
 
     /**
@@ -105,11 +104,7 @@ public:
      *   Create and send session establishment request using device's operational credentials.
      *
      * @param peerAddress                   Address of peer with which to establish a session.
-     * @param operationalCredentialSet      CHIP Certificate Set used to store the chain root of trust an validate peer node
-     *                                      certificates
-     * @param opCredSetIndex                Index value used to choose the chain root of trust for establishing a session. Retrieve
-     *                                      this index value from an operationalCredentialSet's entry that matches the device's
-     *                                      operational credentials
+     * @param fabric                        The fabric that should be used for connecting with the peer
      * @param peerNodeId                    Node id of the peer node
      * @param myKeyId                       Key ID to be assigned to the secure session on the peer node
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
@@ -117,9 +112,8 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress,
-                                Credentials::OperationalCredentialSet * operationalCredentialSet, uint8_t opCredSetIndex,
-                                NodeId peerNodeId, uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
+    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, Transport::FabricInfo * fabric, NodeId peerNodeId,
+                                uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
                                 SessionEstablishmentDelegate * delegate);
 
     /**
@@ -134,35 +128,9 @@ public:
      */
     virtual CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override;
 
-    /**
-     * @brief
-     *  Return the associated secure session peer NodeId
-     *
-     * @return NodeId The associated peer NodeId
-     */
-    NodeId GetPeerNodeId() const { return mConnectionState.GetPeerNodeId(); }
-
-    /**
-     * @brief
-     *  Return the associated peer key id
-     *
-     * @return uint16_t The associated peer key id
-     */
-    uint16_t GetPeerKeyId() override { return mConnectionState.GetPeerKeyID(); }
-
-    /**
-     * @brief
-     *  Return the associated local key id
-     *
-     * @return uint16_t The assocated local key id
-     */
-    uint16_t GetLocalKeyId() override { return mConnectionState.GetLocalKeyID(); }
-
     const char * GetI2RSessionInfo() const override { return "Sigma I2R Key"; }
 
     const char * GetR2ISessionInfo() const override { return "Sigma R2I Key"; }
-
-    Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
     /**
      * @brief Serialize the Pairing Session to a string.
@@ -196,6 +164,12 @@ public:
         return &mMessageDispatch;
     }
 
+    FabricIndex GetFabricIndex() const
+    {
+        return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : Transport::kUndefinedFabricIndex;
+    }
+
+    // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
      **/
     void Clear();
@@ -209,8 +183,7 @@ private:
         kUnexpected           = 0xff,
     };
 
-    CHIP_ERROR Init(Credentials::OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
-                    SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SendSigmaR1();
     CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle & msg);
@@ -224,25 +197,15 @@ private:
     CHIP_ERROR SendSigmaR1Resume();
     CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
-protected:
-    CHIP_ERROR GenerateDestinationID(const ByteSpan & random, const Credentials::P256PublicKeySpan & rootPubkey, NodeId nodeId,
-                                     FabricId fabricId, const ByteSpan & ipk, MutableByteSpan & destinationId);
-
-private:
-    CHIP_ERROR FindDestinationIdCandidate(const ByteSpan & destinationId, const ByteSpan & initiatorRandom,
-                                          const ByteSpan * ipkList, size_t ipkListEntries);
     CHIP_ERROR ConstructSaltSigmaR2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                     MutableByteSpan & salt);
     CHIP_ERROR Validate_and_RetrieveResponderID(const ByteSpan & responderOpCert, Crypto::P256PublicKey & responderID);
     CHIP_ERROR ConstructSaltSigmaR3(const ByteSpan & ipk, MutableByteSpan & salt);
-    CHIP_ERROR ConstructTBS2Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
-    CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, uint16_t & tbsDataLen);
+    CHIP_ERROR ConstructTBS2Data(const ByteSpan & responderOpCert, uint8_t * tbsData, size_t & tbsDataLen);
+    CHIP_ERROR ConstructTBS3Data(const ByteSpan & responderOpCert, uint8_t * tbsData, size_t & tbsDataLen);
     CHIP_ERROR RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk);
 
-    uint16_t EstimateTLVStructOverhead(uint16_t dataLen, uint16_t nFields)
-    {
-        return static_cast<uint16_t>(dataLen + sizeof(uint64_t) * nFields);
-    }
+    constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields) { return dataLen + (sizeof(uint64_t) * nFields); }
 
     void SendErrorMsg(SigmaErrorType errorCode);
 
@@ -271,7 +234,6 @@ private:
     Crypto::P256Keypair mEphemeralKey;
 #endif
     Crypto::P256ECDHDerivedSecret mSharedSecret;
-    Credentials::OperationalCredentialSet * mOpCredSet;
     Credentials::CertificateKeyId mTrustedRootId;
     Credentials::ValidationContext mValidContext;
 
@@ -281,6 +243,9 @@ private:
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
     SessionEstablishmentExchangeDispatch mMessageDispatch;
 
+    Transport::FabricTable * mFabricsTable = nullptr;
+    Transport::FabricInfo * mFabricInfo    = nullptr;
+
     struct SigmaErrorMsg
     {
         SigmaErrorType error;
@@ -288,8 +253,6 @@ private:
 
 protected:
     bool mPairingComplete = false;
-
-    Transport::PeerConnectionState mConnectionState;
 
     virtual ByteSpan * GetIPKList() const
     {

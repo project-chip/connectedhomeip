@@ -307,7 +307,7 @@ CHIP_ERROR OperationalCredentialSet::FromSerializable(const OperationalCredentia
 
     SuccessOrExit(err = certificateSet.Init(kOperationalCertificatesMax));
 
-    err = certificateSet.LoadCert(serializable.mRootCertificate, serializable.mRootCertificateLen,
+    err = certificateSet.LoadCert(ByteSpan(serializable.mRootCertificate, serializable.mRootCertificateLen),
                                   BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
     SuccessOrExit(err);
 
@@ -315,7 +315,7 @@ CHIP_ERROR OperationalCredentialSet::FromSerializable(const OperationalCredentia
 
     if (serializable.mCACertificateLen != 0)
     {
-        err = certificateSet.LoadCert(serializable.mCACertificate, serializable.mCACertificateLen,
+        err = certificateSet.LoadCert(ByteSpan(serializable.mCACertificate, serializable.mCACertificateLen),
                                       BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
         SuccessOrExit(err);
     }

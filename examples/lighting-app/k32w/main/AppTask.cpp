@@ -22,13 +22,15 @@
 #include <app/server/Server.h>
 
 #include <app/server/OnboardingCodesUtil.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <support/ThreadOperationalDataset.h>
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
 #include "Keyboard.h"
@@ -61,6 +63,7 @@ static uint32_t eventMask = 0;
 extern "C" void K32WUartProcess(void);
 #endif
 
+using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -86,6 +89,9 @@ CHIP_ERROR AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
@@ -483,13 +489,13 @@ void AppTask::BleHandler(AppEvent * aEvent)
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
-        if (OpenDefaultPairingWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
+        if (OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
         {
             K32W_LOG("Started BLE Advertising!");
         }
         else
         {
-            K32W_LOG("OpenDefaultPairingWindow() failed");
+            K32W_LOG("OpenBasicCommissioningWindow() failed");
         }
     }
 }

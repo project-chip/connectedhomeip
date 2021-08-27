@@ -34,7 +34,7 @@ import memdf.collect
 import memdf.report
 import memdf.select
 
-from memdf import Config, DFs, SectionDF, SymbolDF
+from memdf import Config, DFs, SymbolDF
 
 
 def main(argv):

@@ -16,14 +16,14 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/att-storage.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
 #include <app/CommandHandler.h>
-#include <app/common/gen/att-storage.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/callback.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
-#include <app/common/gen/enums.h>
 #include <app/util/af.h>
 
 #include <support/Span.h>
@@ -87,7 +87,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(EndpointI
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
     }
 
-    status = delegate->HandleApplyUpdateRequest(updateToken, newVersion);
+    status = delegate->HandleApplyUpdateRequest(commandObj, updateToken, newVersion);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
@@ -182,8 +182,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(EndpointId endpoi
 
     ByteSpan locationSpan(location, locationLen);
 
-    status = delegate->HandleQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
-                                        locationSpan, clientCanConsent, metadataForProvider);
+    status = delegate->HandleQueryImage(commandObj, vendorId, productId, imageType, hardwareVersion, currentVersion,
+                                        protocolsSupported, locationSpan, clientCanConsent, metadataForProvider);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);

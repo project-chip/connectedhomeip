@@ -127,7 +127,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     uint32_t payloadSize = gSendArguments.GetPayloadSize();
 
     // Create a new exchange context.
-    auto * ec = gExchangeManager.NewContext({ kTestDeviceNodeId, 0, gFabricIndex }, &gMockAppDelegate);
+    auto * ec = gExchangeManager.NewContext(SessionHandle(kTestDeviceNodeId, 0, 0, gFabricIndex), &gMockAppDelegate);
     VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     payloadBuf = MessagePacketBuffer::New(payloadSize);
@@ -203,16 +203,12 @@ void ProcessCommand(streamer_t * stream, char * destination)
 
     Transport::FabricTable fabrics;
     Transport::PeerAddress peerAddress;
-    Transport::FabricInfo * fabricInfo = nullptr;
 
     if (!chip::Inet::IPAddress::FromString(destination, gDestAddr))
     {
         streamer_printf(stream, "Invalid CHIP Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
-
-    fabricInfo = fabrics.AssignFabricIndex(gFabricIndex, kTestControllerNodeId);
-    VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)

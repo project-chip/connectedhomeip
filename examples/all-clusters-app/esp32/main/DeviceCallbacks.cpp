@@ -30,9 +30,9 @@
 #include "WiFiWidget.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/Command.h>
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
 #include <app/server/Mdns.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
@@ -198,7 +198,7 @@ exit:
 }
 #endif
 
-void IdentifyTimerHandler(Layer * systemLayer, void * appState, CHIP_ERROR error)
+void IdentifyTimerHandler(Layer * systemLayer, void * appState)
 {
     statusLED1.Animate();
 

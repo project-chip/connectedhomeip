@@ -274,7 +274,8 @@ int main(int argc, char ** args)
                 .SetMac(chip::ByteSpan(gOptions.mac, 6))
                 .SetVendorId(gOptions.vendorId)
                 .SetProductId(gOptions.productId)
-                .SetCommissioningMode(gOptions.commissioningMode, gOptions.commissioningModeOpenWindow)
+                .SetCommissioningMode(gOptions.commissioningMode)
+                .SetAdditionalCommissioning(gOptions.commissioningModeOpenWindow)
                 .SetDeviceType(gOptions.deviceType)
                 .SetDeviceName(gOptions.deviceName)
                 .SetRotatingId(gOptions.rotatingId)
@@ -288,7 +289,7 @@ int main(int argc, char ** args)
                 .EnableIpV4(gOptions.enableIpV4)
                 .SetPort(CHIP_PORT)
                 .SetMac(chip::ByteSpan(gOptions.mac, 6))
-                .SetPeerId(PeerId().SetFabricId(gOptions.fabricId).SetNodeId(gOptions.nodeId)));
+                .SetPeerId(PeerId().SetCompressedFabricId(gOptions.fabricId).SetNodeId(gOptions.nodeId)));
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kCommissioner)
     {

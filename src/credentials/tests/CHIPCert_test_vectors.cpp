@@ -54,7 +54,7 @@ extern const uint8_t gTestCerts[] = {
 };
 // clang-format on
 
-extern const size_t gNumTestCerts = sizeof(gTestCerts) / sizeof(gTestCerts[0]);
+extern const size_t gNumTestCerts = ArraySize(gTestCerts);
 
 CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags, ByteSpan & cert)
 {
@@ -181,7 +181,7 @@ CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags
     SuccessOrExit(err);
 
     // Load it into the certificate set.
-    err = certSet.LoadCert(cert.data(), static_cast<uint32_t>(cert.size()), decodeFlags);
+    err = certSet.LoadCert(cert, decodeFlags);
     SuccessOrExit(err);
 
     // Get loaded certificate data.

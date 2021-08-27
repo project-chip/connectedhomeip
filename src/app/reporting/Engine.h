@@ -66,6 +66,13 @@ public:
     void Run();
 
     /**
+     * Should be invoked when the device receives a Status report, or when the Report data request times out.
+     * This allows the engine to do some clean-up.
+     *
+     */
+    void OnReportConfirm();
+
+    /**
      * Main work-horse function that executes the run-loop asynchronously on the CHIP thread
      */
     CHIP_ERROR ScheduleRun();
@@ -90,17 +97,10 @@ private:
     CHIP_ERROR SendReport(ReadHandler * apReadHandler, System::PacketBufferHandle && aPayload);
 
     /**
-     * Should be invoked when the device receives a Status report, or when the Report data request times out.
-     * This allows the engine to do some clean-up.
-     *
-     */
-    void OnReportConfirm();
-
-    /**
      * Generate and send the report data request when there exists subscription or read request
      *
      */
-    static void Run(System::Layer * aSystemLayer, void * apAppState, CHIP_ERROR);
+    static void Run(System::Layer * aSystemLayer, void * apAppState);
 
     /**
      * Boolean to show if more chunk message on the way

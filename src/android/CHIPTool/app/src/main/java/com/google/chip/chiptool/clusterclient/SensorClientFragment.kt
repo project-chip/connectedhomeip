@@ -22,7 +22,6 @@ import kotlinx.android.synthetic.main.sensor_client_fragment.view.*
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.concurrent.schedule
 
 private typealias ReadCallback = ChipClusters.IntegerAttributeCallback
 
@@ -56,15 +55,20 @@ class SensorClientFragment : Fragment() {
           watchSensorButtonUnchecked()
         }
       }
+      val currentTime = Calendar.getInstance().time.time
       sensorGraph.addSeries(sensorData)
-      sensorGraph.gridLabelRenderer.padding = 30
+      sensorGraph.viewport.isXAxisBoundsManual = true
+      sensorGraph.viewport.setMinX(currentTime.toDouble())
+      sensorGraph.viewport.setMaxX(currentTime.toDouble() + REFRESH_PERIOD_MS * MAX_DATA_POINTS)
+      sensorGraph.gridLabelRenderer.padding = 20
       sensorGraph.gridLabelRenderer.numHorizontalLabels = 4
+      sensorGraph.gridLabelRenderer.setHorizontalLabelsAngle(150)
       sensorGraph.gridLabelRenderer.labelFormatter = object : LabelFormatter {
         override fun setViewport(viewport: Viewport?) = Unit
         override fun formatLabel(value: Double, isValueX: Boolean): String {
           if (!isValueX)
-            return value.toString()
-          return SimpleDateFormat("H:m:s").format(Date(value.toLong())).toString()
+            return "%.2f".format(value)
+          return SimpleDateFormat("H:mm:ss").format(Date(value.toLong())).toString()
         }
       }
     }
@@ -129,7 +133,7 @@ class SensorClientFragment : Fragment() {
     val clusterConfig = CLUSTERS[clusterName]
     val clusterRead = clusterConfig!!["read"] as (Long, Int, ReadCallback) -> Unit
 
-    val device = ChipClient.getConnectedDevicePointer(deviceId)
+    val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
 
     clusterRead(device, endpointId, object : ReadCallback {
       override fun onSuccess(value: Int) {
@@ -151,11 +155,16 @@ class SensorClientFragment : Fragment() {
       )
 
       if (addToGraph) {
-        // Make the graph visible on the first sample
-        if (sensorData.isEmpty)
-          sensorGraph.visibility = View.VISIBLE
+        val isFirstSample = sensorData.isEmpty
         val dataPoint = DataPoint(Calendar.getInstance().time, value)
-        sensorData.appendData(dataPoint, false, MAX_DATA_POINTS)
+        sensorData.appendData(dataPoint, true, MAX_DATA_POINTS)
+        if (isFirstSample) {
+          // Make the graph visible on the first sample. Also, workaround a bug in graphview
+          // related to calculating the viewport when there is only one data point by
+          // duplicating the first sample.
+          sensorData.appendData(dataPoint, true, MAX_DATA_POINTS)
+          sensorGraph.visibility = View.VISIBLE
+        }
       }
     }
   }

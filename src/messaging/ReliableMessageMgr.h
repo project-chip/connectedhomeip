@@ -34,7 +34,6 @@
 #include <support/Pool.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/SystemTimer.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -102,7 +101,7 @@ public:
      * Handle physical wakeup of system due to ReliableMessageProtocol wakeup.
      *
      */
-    static void Timeout(System::Layer * aSystemLayer, void * aAppState, CHIP_ERROR aError);
+    static void Timeout(System::Layer * aSystemLayer, void * aAppState);
 
     /**
      *  Add a CHIP message into the retransmission table to be subsequently resent if a corresponding acknowledgment

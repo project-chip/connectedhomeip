@@ -61,6 +61,39 @@ void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jin
                                              argument);
 }
 
+CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChainAfterValidation(NodeId nodeId, FabricId fabricId,
+                                                                           const Crypto::P256PublicKey & pubkey,
+                                                                           MutableByteSpan & rcac, MutableByteSpan & icac,
+                                                                           MutableByteSpan & noc)
+{
+    ChipLogProgress(Controller, "Generating NOC");
+    chip::Credentials::X509CertRequestParams noc_request = { 1, mIssuerId, mNow, mNow + mValidity, true, fabricId, true, nodeId };
+    ReturnErrorOnFailure(
+        NewNodeOperationalX509Cert(noc_request, chip::Credentials::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuer, noc));
+    icac.reduce_size(0);
+
+    uint16_t rcacBufLen = static_cast<uint16_t>(std::min(rcac.size(), static_cast<size_t>(UINT16_MAX)));
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+                      err = SyncGetKeyValue(key, rcac.data(), rcacBufLen));
+    if (err == CHIP_NO_ERROR)
+    {
+        // Found root certificate in the storage.
+        rcac.reduce_size(rcacBufLen);
+        return CHIP_NO_ERROR;
+    }
+
+    ChipLogProgress(Controller, "Generating RCAC");
+    chip::Credentials::X509CertRequestParams rcac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
+    ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac));
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
+    PERSISTENT_KEY_OP(fabricId, kOperationalCredentialsRootCertificateStorage, key,
+                      err = SyncSetKeyValue(key, rcac.data(), static_cast<uint16_t>(rcac.size())));
+
+    return err;
+}
+
 // TODO Refactor this API to match latest spec, so that GenerateNodeOperationalCertificate receives the full CSR Elements data
 // payload.
 CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature,
@@ -77,10 +110,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
         return err;
     }
 
-    // Initializing the KeyPair.
-    Initialize();
-
-    chip::NodeId assignedId;
+    NodeId assignedId;
     if (mNodeIdRequested)
     {
         assignedId       = mNextRequestedNodeId;
@@ -91,12 +121,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
         assignedId = mNextAvailableNodeId++;
     }
 
-    chip::Credentials::X509CertRequestParams request = {
-        1, mIssuerId, mNow, mNow + mValidity, true, mNextFabricId, true, assignedId
-    };
-
     TLVReader reader;
-    reader.Init(csrElements.data(), static_cast<uint32_t>(csrElements.size()));
+    reader.Init(csrElements);
 
     if (reader.GetType() == kTLVType_NotSpecified)
     {
@@ -113,49 +139,31 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
     ByteSpan csr(reader.GetReadPoint(), reader.GetLength());
     reader.ExitContainer(containerType);
 
-    chip::P256PublicKey pubkey;
+    P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
 
     ChipLogProgress(chipTool, "VerifyCertificateSigningRequest");
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
+    Platform::ScopedMemoryBuffer<uint8_t> noc;
     ReturnErrorCodeIf(!noc.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    uint32_t nocLen = 0;
+    MutableByteSpan nocSpan(noc.Get(), kMaxCHIPDERCertLength);
 
-    CHIP_ERROR generateCert = NewNodeOperationalX509Cert(request, chip::Credentials::CertificateIssuerLevel::kIssuerIsRootCA,
-                                                         pubkey, mIssuer, noc.Get(), kMaxCHIPDERCertLength, nocLen);
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
+    Platform::ScopedMemoryBuffer<uint8_t> rcac;
     ReturnErrorCodeIf(!rcac.Alloc(kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    uint16_t rootCertBufLen = kMaxCHIPDERCertLength;
+    MutableByteSpan rcacSpan(rcac.Get(), kMaxCHIPDERCertLength);
 
-    PERSISTENT_KEY_OP(mNextFabricId, kOperationalCredentialsRootCertificateStorage, key,
-                      err = SyncGetKeyValue(key, rcac.Get(), rootCertBufLen));
-    if (err != CHIP_NO_ERROR)
-    {
-        // Storage doesn't have an existing root certificate. Let's create one and add it to the storage.
-        chip::Credentials::X509CertRequestParams rcac_request = { 0,    mIssuerId,     mNow,  mNow + mValidity,
-                                                                  true, mNextFabricId, false, 0 };
+    MutableByteSpan icacSpan;
 
-        uint32_t outCertLen = 0;
-        ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac.Get(), kMaxCHIPDERCertLength, outCertLen));
+    ReturnErrorOnFailure(GenerateNOCChainAfterValidation(assignedId, mNextFabricId, pubkey, rcacSpan, icacSpan, nocSpan));
 
-        VerifyOrReturnError(CanCastTo<uint16_t>(outCertLen), CHIP_ERROR_INVALID_ARGUMENT);
-        rootCertBufLen = static_cast<uint16_t>(outCertLen);
-        PERSISTENT_KEY_OP(mNextFabricId, kOperationalCredentialsRootCertificateStorage, key,
-                          err = SyncSetKeyValue(key, rcac.Get(), rootCertBufLen));
-        ReturnErrorOnFailure(err);
-    }
-
-    onCompletion->mCall(onCompletion->mContext, generateCert, ByteSpan(noc.Get(), nocLen), ByteSpan(),
-                        ByteSpan(rcac.Get(), rootCertBufLen));
+    onCompletion->mCall(onCompletion->mContext, CHIP_NO_ERROR, nocSpan, ByteSpan(), rcacSpan);
 
     jbyteArray javaCsr;
     JniReferences::GetInstance().GetEnvForCurrentThread()->ExceptionClear();
     JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csrElements.data(),
                                                csrElements.size(), javaCsr);
     JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, javaCsr);
-    return generateCert;
+    return CHIP_NO_ERROR;
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,
@@ -205,13 +213,45 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     initParams.inetLayer                      = inetLayer;
     initParams.bleLayer                       = GetJNIBleLayer();
 
-    *errInfoOnFailure = wrapper->OpCredsIssuer().Initialize(*initParams.storageDelegate);
+    wrapper->InitializeOperationalCredentialsIssuer();
+
+    Platform::ScopedMemoryBuffer<uint8_t> noc;
+    if (!noc.Alloc(kMaxCHIPDERCertLength))
+    {
+        *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
+        return nullptr;
+    }
+    MutableByteSpan nocSpan(noc.Get(), kMaxCHIPDERCertLength);
+
+    MutableByteSpan icacSpan;
+
+    Platform::ScopedMemoryBuffer<uint8_t> rcac;
+    if (!rcac.Alloc(kMaxCHIPDERCertLength))
+    {
+        *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
+        return nullptr;
+    }
+    MutableByteSpan rcacSpan(rcac.Get(), kMaxCHIPDERCertLength);
+
+    Crypto::P256Keypair ephemeralKey;
+    *errInfoOnFailure = ephemeralKey.Initialize();
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
     }
 
-    *errInfoOnFailure = wrapper->Controller()->Init(nodeId, initParams);
+    *errInfoOnFailure = wrapper->GenerateNOCChainAfterValidation(nodeId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
+    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+
+    initParams.ephemeralKeypair = &ephemeralKey;
+    initParams.controllerRCAC   = rcacSpan;
+    initParams.controllerICAC   = icacSpan;
+    initParams.controllerNOC    = nocSpan;
+
+    *errInfoOnFailure = wrapper->Controller()->Init(initParams);
 
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
@@ -250,7 +290,7 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
     env->CallVoidMethod(mJavaObjectRef, onCommissioningCompleteMethod, static_cast<jlong>(deviceId), error.AsInteger());
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::Initialize()
+CHIP_ERROR AndroidDeviceControllerWrapper::InitializeOperationalCredentialsIssuer()
 {
     chip::Crypto::P256SerializedKeypair serializedKey;
     uint16_t keySize = static_cast<uint16_t>(sizeof(serializedKey));

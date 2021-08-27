@@ -24,6 +24,10 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#ifdef CONFIG_MCUMGR_SMP_BT
+#include "DFUOverSMP.h"
+#endif
+
 struct k_timer;
 
 class AppTask
@@ -58,6 +62,10 @@ private:
     static void ButtonEventHandler(uint32_t buttons_state, uint32_t has_changed);
     static void TimerEventHandler(k_timer * timer);
 
+#ifdef CONFIG_MCUMGR_SMP_BT
+    static void RequestSMPAdvertisingStart(void);
+#endif
+
     void StartTimer(uint32_t aTimeoutInMs);
 
     enum Function_t
@@ -69,8 +77,8 @@ private:
         kFunction_Invalid
     };
 
-    Function_t mFunction;
-    bool mFunctionTimerActive;
+    Function_t mFunction      = kFunction_NoneSelected;
+    bool mFunctionTimerActive = false;
     static AppTask sAppTask;
 };
 

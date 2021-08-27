@@ -58,7 +58,7 @@ void MessageCounterManager::Shutdown()
     }
 }
 
-CHIP_ERROR MessageCounterManager::StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state)
+CHIP_ERROR MessageCounterManager::StartSync(SessionHandle session, Transport::PeerConnectionState * state)
 {
     // Initiate message counter synchronization if no message counter synchronization is in progress.
     Transport::PeerMessageCounter & counter = state->GetSessionMessageCounter().GetPeerMessageCounter();
@@ -70,7 +70,7 @@ CHIP_ERROR MessageCounterManager::StartSync(SecureSessionHandle session, Transpo
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, SecureSessionHandle session,
+CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, SessionHandle session,
                                                                    Transport::PeerConnectionState * state,
                                                                    const Transport::PeerAddress & peerAddress,
                                                                    System::PacketBufferHandle && msgBuf)
@@ -174,7 +174,7 @@ void MessageCounterManager::ProcessPendingMessages(NodeId peerNodeId)
     }
 }
 
-CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle session, Transport::PeerConnectionState * state)
+CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SessionHandle session, Transport::PeerConnectionState * state)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

@@ -31,7 +31,6 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
 static uint64_t kLivenessDeviceStatus = chip::TLV::ContextTag(1);
@@ -160,7 +159,7 @@ CHIP_ERROR MockEventGeneratorImpl::Init(chip::Messaging::ExchangeManager * apExc
     return err;
 }
 
-void MockEventGeneratorImpl::HandleNextEvent(chip::System::Layer * apSystemLayer, void * apAppState, CHIP_ERROR aErr)
+void MockEventGeneratorImpl::HandleNextEvent(chip::System::Layer * apSystemLayer, void * apAppState)
 {
     MockEventGeneratorImpl * generator = static_cast<MockEventGeneratorImpl *>(apAppState);
     if (gMockEventStop)

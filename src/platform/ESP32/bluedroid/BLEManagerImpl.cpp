@@ -35,7 +35,6 @@
 #include <platform/internal/BLEManager.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/SystemTimer.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"
@@ -188,7 +187,7 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError)
+void BLEManagerImpl::HandleAdvertisementTimer(System::Layer * systemLayer, void * context)
 {
     static_cast<BLEManagerImpl *>(context)->HandleAdvertisementTimer();
 }
@@ -204,7 +203,7 @@ void BLEManagerImpl::HandleAdvertisementTimer()
     }
 }
 
-void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context, CHIP_ERROR aError)
+void BLEManagerImpl::HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context)
 {
     static_cast<BLEManagerImpl *>(context)->HandleFastAdvertisementTimer();
 }

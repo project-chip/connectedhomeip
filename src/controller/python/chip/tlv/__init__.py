@@ -192,7 +192,8 @@ class TLVWriter(object):
             self.startStructure(tag)
             if type(val) == dict:
                 val = OrderedDict(
-                    sorted(val.items(), key=lambda item: tlvTagToSortKey(item[0]))
+                    sorted(val.items(),
+                           key=lambda item: tlvTagToSortKey(item[0]))
                 )
             for containedTag, containedVal in val.items():
                 self.put(containedTag, containedVal)
@@ -320,12 +321,14 @@ class TLVWriter(object):
                 and len(self._containerStack) != 0
                 and self._containerStack[0] == TLV_TYPE_STRUCTURE
             ):
-                raise ValueError("Attempt to encode anonymous tag within TLV structure")
+                raise ValueError(
+                    "Attempt to encode anonymous tag within TLV structure")
             controlByte |= TLV_TAG_CONTROL_ANONYMOUS
             return struct.pack("<B", controlByte)
         if isinstance(tag, int):
             if tag < 0 or tag > UINT8_MAX:
-                raise ValueError("Context-specific TLV tag number out of range")
+                raise ValueError(
+                    "Context-specific TLV tag number out of range")
             if len(self._containerStack) == 0:
                 raise ValueError(
                     "Attempt to encode context-specific TLV tag at top level"
@@ -420,7 +423,8 @@ class TLVReader(object):
         return out
 
     def _decodeControlByte(self, tlv, decoding):
-        (controlByte,) = struct.unpack("<B", tlv[self._bytesRead : self._bytesRead + 1])
+        (controlByte,) = struct.unpack(
+            "<B", tlv[self._bytesRead: self._bytesRead + 1])
         controlTypeIndex = controlByte & 0xE0
         decoding["tagControl"] = TagControls[controlTypeIndex]
         elementtypeIndex = controlByte & 0x1F
@@ -441,43 +445,51 @@ class TLVReader(object):
             decoding["tagLen"] = 0
         elif decoding["tagControl"] == "Context 1-byte":
             (decoding["tag"],) = struct.unpack(
-                "<B", tlv[self._bytesRead : self._bytesRead + 1]
+                "<B", tlv[self._bytesRead: self._bytesRead + 1]
             )
             decoding["tagLen"] = 1
             self._bytesRead += 1
         elif decoding["tagControl"] == "Common Profile 2-byte":
             profile = 0
-            (tag,) = struct.unpack("<H", tlv[self._bytesRead : self._bytesRead + 2])
+            (tag,) = struct.unpack(
+                "<H", tlv[self._bytesRead: self._bytesRead + 2])
             decoding["profileTag"] = (profile, tag)
             decoding["tagLen"] = 2
             self._bytesRead += 2
         elif decoding["tagControl"] == "Common Profile 4-byte":
             profile = 0
-            (tag,) = struct.unpack("<L", tlv[self._bytesRead : self._bytesRead + 4])
+            (tag,) = struct.unpack(
+                "<L", tlv[self._bytesRead: self._bytesRead + 4])
             decoding["profileTag"] = (profile, tag)
             decoding["tagLen"] = 4
             self._bytesRead += 4
         elif decoding["tagControl"] == "Implicit Profile 2-byte":
             profile = None
-            (tag,) = struct.unpack("<H", tlv[self._bytesRead : self._bytesRead + 2])
+            (tag,) = struct.unpack(
+                "<H", tlv[self._bytesRead: self._bytesRead + 2])
             decoding["profileTag"] = (profile, tag)
             decoding["tagLen"] = 2
             self._bytesRead += 2
         elif decoding["tagControl"] == "Implicit Profile 4-byte":
             profile = None
-            (tag,) = struct.unpack("<L", tlv[self._bytesRead : self._bytesRead + 4])
+            (tag,) = struct.unpack(
+                "<L", tlv[self._bytesRead: self._bytesRead + 4])
             decoding["profileTag"] = (profile, tag)
             decoding["tagLen"] = 4
             self._bytesRead += 4
         elif decoding["tagControl"] == "Fully Qualified 6-byte":
-            (profile,) = struct.unpack("<L", tlv[self._bytesRead : self._bytesRead + 4])
-            (tag,) = struct.unpack("<H", tlv[self._bytesRead + 4 : self._bytesRead + 6])
+            (profile,) = struct.unpack(
+                "<L", tlv[self._bytesRead: self._bytesRead + 4])
+            (tag,) = struct.unpack(
+                "<H", tlv[self._bytesRead + 4: self._bytesRead + 6])
             decoding["profileTag"] = (profile, tag)
             decoding["tagLen"] = 2
             self._bytesRead += 6
         elif decoding["tagControl"] == "Fully Qualified 8-byte":
-            (profile,) = struct.unpack("<L", tlv[self._bytesRead : self._bytesRead + 4])
-            (tag,) = struct.unpack("<L", tlv[self._bytesRead + 4 : self._bytesRead + 8])
+            (profile,) = struct.unpack(
+                "<L", tlv[self._bytesRead: self._bytesRead + 4])
+            (tag,) = struct.unpack(
+                "<L", tlv[self._bytesRead + 4: self._bytesRead + 8])
             decoding["profileTag"] = (profile, tag)
             decoding["tagLen"] = 4
             self._bytesRead += 8
@@ -488,25 +500,25 @@ class TLVReader(object):
         if "length" in decoding["type"]:
             if "1-byte" in decoding["type"]:
                 (decoding["strDataLen"],) = struct.unpack(
-                    "<B", tlv[self._bytesRead : self._bytesRead + 1]
+                    "<B", tlv[self._bytesRead: self._bytesRead + 1]
                 )
                 decoding["strDataLenLen"] = 1
                 self._bytesRead += 1
             elif "2-byte" in decoding["type"]:
                 (decoding["strDataLen"],) = struct.unpack(
-                    "<H", tlv[self._bytesRead : self._bytesRead + 2]
+                    "<H", tlv[self._bytesRead: self._bytesRead + 2]
                 )
                 decoding["strDataLenLen"] = 2
                 self._bytesRead += 2
             elif "4-byte" in decoding["type"]:
                 (decoding["strDataLen"],) = struct.unpack(
-                    "<L", tlv[self._bytesRead : self._bytesRead + 4]
+                    "<L", tlv[self._bytesRead: self._bytesRead + 4]
                 )
                 decoding["strDataLenLen"] = 4
                 self._bytesRead += 4
             elif "8-byte" in decoding["type"]:
                 (decoding["strDataLen"],) = struct.unpack(
-                    "<Q", tlv[self._bytesRead : self._bytesRead + 8]
+                    "<Q", tlv[self._bytesRead: self._bytesRead + 8]
                 )
                 decoding["strDataLenLen"] = 8
                 self._bytesRead += 8
@@ -539,58 +551,58 @@ class TLVReader(object):
             decoding["value"] = False
         elif decoding["type"] == "Unsigned Integer 1-byte value":
             (decoding["value"],) = struct.unpack(
-                "<B", tlv[self._bytesRead : self._bytesRead + 1]
+                "<B", tlv[self._bytesRead: self._bytesRead + 1]
             )
             self._bytesRead += 1
         elif decoding["type"] == "Signed Integer 1-byte value":
             (decoding["value"],) = struct.unpack(
-                "<b", tlv[self._bytesRead : self._bytesRead + 1]
+                "<b", tlv[self._bytesRead: self._bytesRead + 1]
             )
             self._bytesRead += 1
         elif decoding["type"] == "Unsigned Integer 2-byte value":
             (decoding["value"],) = struct.unpack(
-                "<H", tlv[self._bytesRead : self._bytesRead + 2]
+                "<H", tlv[self._bytesRead: self._bytesRead + 2]
             )
             self._bytesRead += 2
         elif decoding["type"] == "Signed Integer 2-byte value":
             (decoding["value"],) = struct.unpack(
-                "<h", tlv[self._bytesRead : self._bytesRead + 2]
+                "<h", tlv[self._bytesRead: self._bytesRead + 2]
             )
             self._bytesRead += 2
         elif decoding["type"] == "Unsigned Integer 4-byte value":
             (decoding["value"],) = struct.unpack(
-                "<L", tlv[self._bytesRead : self._bytesRead + 4]
+                "<L", tlv[self._bytesRead: self._bytesRead + 4]
             )
             self._bytesRead += 4
         elif decoding["type"] == "Signed Integer 4-byte value":
             (decoding["value"],) = struct.unpack(
-                "<l", tlv[self._bytesRead : self._bytesRead + 4]
+                "<l", tlv[self._bytesRead: self._bytesRead + 4]
             )
             self._bytesRead += 4
         elif decoding["type"] == "Unsigned Integer 8-byte value":
             (decoding["value"],) = struct.unpack(
-                "<Q", tlv[self._bytesRead : self._bytesRead + 8]
+                "<Q", tlv[self._bytesRead: self._bytesRead + 8]
             )
             self._bytesRead += 8
         elif decoding["type"] == "Signed Integer 8-byte value":
             (decoding["value"],) = struct.unpack(
-                "<q", tlv[self._bytesRead : self._bytesRead + 8]
+                "<q", tlv[self._bytesRead: self._bytesRead + 8]
             )
             self._bytesRead += 8
         elif decoding["type"] == "Floating Point 4-byte value":
             (decoding["value"],) = struct.unpack(
-                "<f", tlv[self._bytesRead : self._bytesRead + 4]
+                "<f", tlv[self._bytesRead: self._bytesRead + 4]
             )
             self._bytesRead += 4
         elif decoding["type"] == "Floating Point 8-byte value":
             (decoding["value"],) = struct.unpack(
-                "<d", tlv[self._bytesRead : self._bytesRead + 8]
+                "<d", tlv[self._bytesRead: self._bytesRead + 8]
             )
             self._bytesRead += 8
         elif "UTF-8 String" in decoding["type"]:
             (val,) = struct.unpack(
                 "<%ds" % decoding["strDataLen"],
-                tlv[self._bytesRead : self._bytesRead + decoding["strDataLen"]],
+                tlv[self._bytesRead: self._bytesRead + decoding["strDataLen"]],
             )
             try:
                 decoding["value"] = str(val, "utf-8")
@@ -600,7 +612,7 @@ class TLVReader(object):
         elif "Byte String" in decoding["type"]:
             (val,) = struct.unpack(
                 "<%ds" % decoding["strDataLen"],
-                tlv[self._bytesRead : self._bytesRead + decoding["strDataLen"]],
+                tlv[self._bytesRead: self._bytesRead + decoding["strDataLen"]],
             )
 
             decoding["value"] = val
@@ -611,7 +623,7 @@ class TLVReader(object):
     def _get(self, tlv, decodings, out):
         endOfEncoding = False
 
-        while len(tlv[self._bytesRead :]) > 0 and endOfEncoding == False:
+        while len(tlv[self._bytesRead:]) > 0 and endOfEncoding == False:
             decoding = {}
             self._decodeControlAndTag(tlv, decoding)
             self._decodeStrLength(tlv, decoding)

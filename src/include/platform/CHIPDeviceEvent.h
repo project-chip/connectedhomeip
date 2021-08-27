@@ -173,6 +173,13 @@ enum PublicEventTypes
     kCHIPoBLEConnectionEstablished,
 
     /**
+     * CHIPoBLE Connection Closed
+     *
+     * Signals that an external entity has closed existing CHIPoBLE connection with the device.
+     */
+    kCHIPoBLEConnectionClosed,
+
+    /**
      * Thread State Change
      *
      * Signals that a state change has occurred in the Thread stack.

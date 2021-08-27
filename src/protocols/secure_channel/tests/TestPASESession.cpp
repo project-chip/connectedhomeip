@@ -32,6 +32,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
+#include <support/UnitTestUtils.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
 using namespace chip;
@@ -42,11 +43,6 @@ using namespace chip::Protocols;
 
 using TestContext = chip::Test::MessagingContext;
 
-static void test_os_sleep_ms(uint64_t millisecs)
-{
-    usleep(static_cast<useconds_t>(millisecs * 1000));
-}
-
 class PASETestLoopbackTransport : public Test::LoopbackTransport
 {
     void MessageDropped() override
@@ -54,9 +50,9 @@ class PASETestLoopbackTransport : public Test::LoopbackTransport
         // Trigger a retransmit.
         if (mContext != nullptr)
         {
-            test_os_sleep_ms(65);
+            chip::test_utils::SleepMillis(65);
             ReliableMessageMgr * rm = mContext->GetExchangeManager().GetReliableMessageMgr();
-            ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm, CHIP_NO_ERROR);
+            ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm);
         }
     }
 

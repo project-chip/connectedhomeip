@@ -20,100 +20,103 @@ from abc import ABC, abstractmethod
 
 
 class Builder(ABC):
-  """Generic builder base class for CHIP.
+    """Generic builder base class for CHIP.
 
-  Provides ability to boostrap and copy output artifacts and subclasses can use
-  a generic shell runner.
+    Provides ability to boostrap and copy output artifacts and subclasses can use
+    a generic shell runner.
 
-  """
-
-  def __init__(self, root, runner, output_prefix: str = 'out'):
-    self.root = os.path.abspath(root)
-    self._runner = runner
-    self.output_prefix = output_prefix
-    self._enable_flashbundle = False
-
-    # Set post-init once actual build target is known
-    self.identifier = None
-    self.output_dir = None
-
-  def enable_flashbundle(self, enable_flashbundle: bool):
-    self._enable_flashbundle = enable_flashbundle
-
-  @abstractmethod
-  def generate(self):
-    """Generate the build files - generally the ninja/makefiles"""
-    raise NotImplementedError()
-
-  @abstractmethod
-  def _build(self):
-    """Perform an actual build"""
-    raise NotImplementedError()
-
-  def _generate_flashbundle(self):
-    """Perform an actual generating of flashbundle
-
-       May do nothing (and builder can choose not to implement this) if the
-       app does not need special steps for generating flashbundle. (e.g. the
-       example apps on Linux platform can run the ELF files directly.)
     """
-    pass
 
-  @abstractmethod
-  def build_outputs(self):
-    """Return a list of relevant output files after a build.
+    def __init__(self, root, runner, output_prefix: str = 'out'):
+        self.root = os.path.abspath(root)
+        self._runner = runner
+        self.output_prefix = output_prefix
+        self._enable_flashbundle = False
 
-       May use build output data (e.g. manifests), so this should be invoked
-       only after a build has succeeded.
-    """
-    raise NotImplementedError()
+        # Set post-init once actual build target is known
+        self.identifier = None
+        self.output_dir = None
 
-  def flashbundle(self):
-    """Return the files in flashbundle.
+    def enable_flashbundle(self, enable_flashbundle: bool):
+        self._enable_flashbundle = enable_flashbundle
 
-       Return an empty dict (and builder can choose not to implement this) if the
-       app does not need special files as flashbundle. (e.g. the example apps on
-       Linux platform can run the ELF files directly.)
+    @abstractmethod
+    def generate(self):
+        """Generate the build files - generally the ninja/makefiles"""
+        raise NotImplementedError()
 
-       May use data from do_generate_flashbundle, so this should be invoked only
-       after do_generate_flashbundle has succeeded.
-    """
-    return {}
+    @abstractmethod
+    def _build(self):
+        """Perform an actual build"""
+        raise NotImplementedError()
 
-  def outputs(self):
-    artifacts = self.build_outputs()
-    if self._enable_flashbundle:
-      artifacts.update(self.flashbundle())
-    return artifacts
+    def _generate_flashbundle(self):
+        """Perform an actual generating of flashbundle
 
-  def build(self):
-    self._build()
-    if self._enable_flashbundle:
-      self._generate_flashbundle()
+           May do nothing (and builder can choose not to implement this) if the
+           app does not need special steps for generating flashbundle. (e.g. the
+           example apps on Linux platform can run the ELF files directly.)
+        """
+        pass
 
-  def _Execute(self, cmdarray, cwd=None, title=None):
-    self._runner.Run(cmdarray, cwd=cwd, title=title)
+    @abstractmethod
+    def build_outputs(self):
+        """Return a list of relevant output files after a build.
 
-  def CompressArtifacts(self, target_file: str):
-    with tarfile.open(target_file, "w:gz") as tar:
-      for target_name, source_name in self.outputs().items():
-        logging.info(f'Adding {source_name} into {target_file}/{target_name}')
-        tar.add(source_name, target_name)
+           May use build output data (e.g. manifests), so this should be invoked
+           only after a build has succeeded.
+        """
+        raise NotImplementedError()
 
-  def CopyArtifacts(self, target_dir: str):
-    for target_name, source_name in self.outputs().items():
-      target_full_name = os.path.join(target_dir, target_name)
+    def flashbundle(self):
+        """Return the files in flashbundle.
 
-      logging.info('Copying %s into %s', source_name, target_name)
+           Return an empty dict (and builder can choose not to implement this) if the
+           app does not need special files as flashbundle. (e.g. the example apps on
+           Linux platform can run the ELF files directly.)
 
-      target_dir_full_name = os.path.dirname(target_full_name)
+           May use data from do_generate_flashbundle, so this should be invoked only
+           after do_generate_flashbundle has succeeded.
+        """
+        return {}
 
-      if not os.path.exists(target_dir_full_name):
-        logging.info('Creating subdirectory %s first', target_dir_full_name)
-        os.makedirs(target_dir_full_name)
+    def outputs(self):
+        artifacts = self.build_outputs()
+        if self._enable_flashbundle:
+            artifacts.update(self.flashbundle())
+        return artifacts
 
-      shutil.copyfile(source_name, target_full_name)
+    def build(self):
+        self._build()
+        if self._enable_flashbundle:
+            self._generate_flashbundle()
 
-  def SetIdentifier(self, platform: str, board: str, app: str):
-    self.identifier = '-'.join([platform, board, app])
-    self.output_dir = os.path.join(self.output_prefix, self.identifier)
+    def _Execute(self, cmdarray, cwd=None, title=None):
+        self._runner.Run(cmdarray, cwd=cwd, title=title)
+
+    def CompressArtifacts(self, target_file: str):
+        with tarfile.open(target_file, "w:gz") as tar:
+            for target_name, source_name in self.outputs().items():
+                logging.info(
+                    f'Adding {source_name} into {target_file}/{target_name}')
+                tar.add(source_name, target_name)
+
+    def CopyArtifacts(self, target_dir: str):
+        for target_name, source_name in self.outputs().items():
+            target_full_name = os.path.join(target_dir, target_name)
+
+            logging.info('Copying %s into %s', source_name, target_name)
+
+            target_dir_full_name = os.path.dirname(target_full_name)
+
+            if not os.path.exists(target_dir_full_name):
+                logging.info('Creating subdirectory %s first',
+                             target_dir_full_name)
+                os.makedirs(target_dir_full_name)
+
+            shutil.copyfile(source_name, target_full_name)
+            shutil.copymode(source_name, target_full_name)
+
+    def SetIdentifier(self, platform: str, board: str, app: str):
+        self.identifier = '-'.join([platform, board, app])
+        self.output_dir = os.path.join(self.output_prefix, self.identifier)

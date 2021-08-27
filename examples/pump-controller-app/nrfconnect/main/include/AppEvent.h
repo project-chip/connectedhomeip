@@ -31,6 +31,9 @@ struct AppEvent
         kEventType_Timer,
         kEventType_Lock,
         kEventType_Install,
+#ifdef CONFIG_MCUMGR_SMP_BT
+        kEventType_StartSMPAdvertising,
+#endif
     };
 
     uint16_t Type;

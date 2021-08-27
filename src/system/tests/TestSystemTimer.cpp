@@ -35,7 +35,6 @@
 #include <support/UnitTestRegistration.h>
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
-#include <system/SystemTimer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/init.h>
@@ -50,19 +49,17 @@
 using chip::ErrorStr;
 using namespace chip::System;
 
-static void ServiceEvents(Layer & aLayer, ::timeval & aSleepTime)
+static void ServiceEvents(Layer & aLayer)
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    aLayer.WatchableEventsManager().PrepareEventsWithTimeout(aSleepTime);
+    aLayer.WatchableEventsManager().PrepareEvents();
     aLayer.WatchableEventsManager().WaitForEvents();
     aLayer.WatchableEventsManager().HandleEvents();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (aLayer.State() == kLayerState_Initialized)
+    if (aLayer.State() == LayerState::kInitialized)
     {
-        // TODO: Currently timers are delayed by aSleepTime above. A improved solution would have a mechanism to reduce
-        // aSleepTime according to the next timer.
         aLayer.WatchableEventsManager().HandlePlatformTimer();
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -110,13 +107,13 @@ void TimerFailed(void * aState)
     sOverflowTestDone = true;
 }
 
-void HandleTimerFailed(Layer * inetLayer, void * aState, CHIP_ERROR aError)
+void HandleTimerFailed(Layer * inetLayer, void * aState)
 {
-    (void) inetLayer, (void) aError;
+    (void) inetLayer;
     TimerFailed(aState);
 }
 
-void HandleTimer10Success(Layer * inetLayer, void * aState, CHIP_ERROR aError)
+void HandleTimer10Success(Layer * inetLayer, void * aState)
 {
     TestContext & lContext = *static_cast<TestContext *>(aState);
     NL_TEST_ASSERT(lContext.mTestSuite, true);
@@ -138,10 +135,7 @@ static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
 
     while (!sOverflowTestDone)
     {
-        struct timeval sleepTime;
-        sleepTime.tv_sec  = 0;
-        sleepTime.tv_usec = 1000; // 1 ms tick
-        ServiceEvents(lSys, sleepTime);
+        ServiceEvents(lSys);
     }
 
     lSys.CancelTimer(HandleTimerFailed, aContext);
@@ -149,7 +143,7 @@ static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
     lSys.CancelTimer(HandleTimer10Success, aContext);
 }
 
-void HandleGreedyTimer(Layer * aLayer, void * aState, CHIP_ERROR aError)
+void HandleGreedyTimer(Layer * aLayer, void * aState)
 {
     static uint32_t sNumTimersHandled = 0;
     TestContext & lContext            = *static_cast<TestContext *>(aState);
@@ -168,13 +162,10 @@ static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     Layer & lSys           = *lContext.mLayer;
-    struct timeval sleepTime;
 
     lSys.StartTimer(0, HandleGreedyTimer, aContext);
 
-    sleepTime.tv_sec  = 0;
-    sleepTime.tv_usec = 1000; // 1 ms tick
-    ServiceEvents(lSys, sleepTime);
+    ServiceEvents(lSys);
 }
 
 // Test Suite

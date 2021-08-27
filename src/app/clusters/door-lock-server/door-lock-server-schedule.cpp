@@ -38,9 +38,9 @@
  ******************************************************************************/
 
 #include "door-lock-server.h"
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/cluster-id.h>
-#include <app/common/gen/command-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/command-id.h>
 #include <app/util/af.h>
 
 #include <app/CommandHandler.h>

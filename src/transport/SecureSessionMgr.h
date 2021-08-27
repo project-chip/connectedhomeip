@@ -38,7 +38,7 @@
 #include <transport/PairingSession.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecureSession.h>
-#include <transport/SecureSessionHandle.h>
+#include <transport/SessionHandle.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
@@ -141,8 +141,8 @@ public:
      * @param isDuplicate   The message is a duplicate of previously received message
      * @param msgBuf        The received message
      */
-    virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   SecureSessionHandle session, const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
+    virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SessionHandle session,
+                                   const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
                                    System::PacketBufferHandle && msgBuf)
     {}
 
@@ -161,7 +161,7 @@ public:
      *
      * @param session The handle to the secure session
      */
-    virtual void OnNewConnection(SecureSessionHandle session) {}
+    virtual void OnNewConnection(SessionHandle session) {}
 
     /**
      * @brief
@@ -169,7 +169,7 @@ public:
      *
      * @param session The handle to the secure session
      */
-    virtual void OnConnectionExpired(SecureSessionHandle session) {}
+    virtual void OnConnectionExpired(SessionHandle session) {}
 
     virtual ~SecureSessionMgrDelegate() {}
 };
@@ -191,16 +191,16 @@ public:
      *    3. Encode the packet header and prepend it to message.
      *   Returns a encrypted message in encryptedMessage.
      */
-    CHIP_ERROR BuildEncryptedMessagePayload(SecureSessionHandle session, PayloadHeader & payloadHeader,
+    CHIP_ERROR BuildEncryptedMessagePayload(SessionHandle session, PayloadHeader & payloadHeader,
                                             System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle & encryptedMessage);
 
     /**
      * @brief
      *   Send a prepared message to a currently connected peer.
      */
-    CHIP_ERROR SendPreparedMessage(SecureSessionHandle session, const EncryptedPacketBufferHandle & preparedMessage);
+    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage);
 
-    Transport::PeerConnectionState * GetPeerConnectionState(SecureSessionHandle session);
+    Transport::PeerConnectionState * GetPeerConnectionState(SessionHandle session);
 
     /**
      * @brief
@@ -223,7 +223,7 @@ public:
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
                           SecureSession::SessionRole direction, FabricIndex fabric);
 
-    void ExpirePairing(SecureSessionHandle session);
+    void ExpirePairing(SessionHandle session);
     void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
 
     /**
@@ -304,7 +304,7 @@ private:
     /**
      * Callback for timer expiry check
      */
-    static void ExpiryTimerCallback(System::Layer * layer, void * param, CHIP_ERROR error);
+    static void ExpiryTimerCallback(System::Layer * layer, void * param);
 
     void SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                System::PacketBufferHandle && msg);

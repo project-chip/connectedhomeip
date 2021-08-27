@@ -25,16 +25,20 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 
-#include <app/common/gen/attribute-id.h>
-#include <app/common/gen/attribute-type.h>
-#include <app/common/gen/cluster-id.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
 using namespace chip::TLV;
+using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 
 #include <platform/CHIPDeviceLayer.h>
@@ -100,6 +104,10 @@ CHIP_ERROR AppTask::Init()
 
     // Init ZCL Data Model
     InitServer();
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
     UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
@@ -244,7 +252,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     }
 }
 
-void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState, CHIP_ERROR aError)
+void AppTask::TimerEventHandler(chip::System::Layer * aLayer, void * aAppState)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
@@ -342,7 +350,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
                 if (!ConnectivityMgr().IsThreadProvisioned())
                 {
                     // Enable BLE advertisements and pairing window
-                    if (OpenDefaultPairingWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
+                    if (OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) == CHIP_NO_ERROR)
                     {
                         ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
                     }

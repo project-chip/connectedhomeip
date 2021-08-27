@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 
 class OnOffClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
-    get() = ChipClient.getDeviceController()
+    get() = ChipClient.getDeviceController(requireContext())
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
 
@@ -136,7 +136,7 @@ class OnOffClientFragment : Fragment() {
 
   private suspend fun sendLevelCommandClick() {
     val cluster = ChipClusters.LevelControlCluster(
-      ChipClient.getConnectedDevicePointer(deviceIdEd.text.toString().toLong()), 1
+      ChipClient.getConnectedDevicePointer(requireContext(), deviceIdEd.text.toString().toLong()), 1
     )
     cluster.moveToLevel(object : ChipClusters.DefaultClusterCallback {
       override fun onSuccess() {
@@ -193,7 +193,7 @@ class OnOffClientFragment : Fragment() {
 
   private suspend fun getOnOffClusterForDevice(): OnOffCluster {
     return OnOffCluster(
-      ChipClient.getConnectedDevicePointer(deviceIdEd.text.toString().toLong()), 1
+      ChipClient.getConnectedDevicePointer(requireContext(), deviceIdEd.text.toString().toLong()), 1
     )
   }
 

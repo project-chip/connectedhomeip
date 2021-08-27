@@ -827,7 +827,7 @@ INPUT                  = README.md \
                          CODE_OF_CONDUCT.md \
                          CONTRIBUTING.md \
                          docs/README.md \
-                         docs/BUILDING.md \
+                         docs/guides/BUILDING.md \
                          docs/VSCODE_DEVELOPMENT.md \
                          docs/PROJECT_FLOW.md \
                          docs/STYLE_GUIDE.md \
@@ -938,7 +938,8 @@ EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = NetworkProvisioningServer* \
                          */tests/* \
                          */dbus/* \
-                         */gen/*
+                         */gen/* \
+                         */zap-generated/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the

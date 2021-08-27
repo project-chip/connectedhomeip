@@ -45,7 +45,7 @@
 #include <app/util/af.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
-#include <app/common/gen/att-storage.h>
+#include <app-common/zap-generated/att-storage.h>
 #endif
 
 #if !defined(ATTRIBUTE_STORAGE_CONFIGURATION) && defined(EMBER_TEST)
@@ -58,7 +58,7 @@
 // we use the provider sample.
 #ifndef ATTRIBUTE_STORAGE_CONFIGURATION
 //  #error "Must define ATTRIBUTE_STORAGE_CONFIGURATION to specify the App. Builder default attributes file."
-#include "gen/endpoint_config.h"
+#include <zap-generated/endpoint_config.h>
 #else
 #include ATTRIBUTE_STORAGE_CONFIGURATION
 #endif
@@ -72,7 +72,7 @@
 #endif
 #endif
 
-#include <app/common/gen/attribute-type.h>
+#include <app-common/zap-generated/attribute-type.h>
 
 #define DECLARE_DYNAMIC_ENDPOINT(endpointName, clusterList)                                                                        \
     EmberAfEndpointType endpointName = { clusterList, sizeof(clusterList) / sizeof(EmberAfCluster), 0 }
