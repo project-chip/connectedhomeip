@@ -91,10 +91,7 @@ void ReadClient::MoveToState(const ClientState aTargetState)
                   GetStateStr());
 }
 
-CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * apSecureSession,
-                                       EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
-                                       AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
-                                       EventNumber aEventNumber, uint32_t timeout)
+CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 {
     // TODO: SendRequest parameter is too long, need to have the structure to represent it
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -120,24 +117,24 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex,
         err = request.Init(&writer);
         SuccessOrExit(err);
 
-        if (aEventPathParamsListSize != 0 && apEventPathParamsList != nullptr)
+        if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
         {
             EventPathList::Builder & eventPathListBuilder = request.CreateEventPathListBuilder();
             SuccessOrExit(err = eventPathListBuilder.GetError());
-            err = GenerateEventPathList(eventPathListBuilder, apEventPathParamsList, aEventPathParamsListSize);
+            err = GenerateEventPathList(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList, aReadPrepareParams.mEventPathParamsListSize);
             SuccessOrExit(err);
-            if (aEventNumber != 0)
+            if (aReadPrepareParams.mEventNumber != 0)
             {
                 // EventNumber is optional
-                request.EventNumber(aEventNumber);
+                request.EventNumber(aReadPrepareParams.mEventNumber);
             }
         }
 
-        if (aAttributePathParamsListSize != 0 && apAttributePathParamsList != nullptr)
+        if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
         {
             AttributePathList::Builder attributePathListBuilder = request.CreateAttributePathListBuilder();
             SuccessOrExit(err = attributePathListBuilder.GetError());
-            err = GenerateAttributePathList(attributePathListBuilder, apAttributePathParamsList, aAttributePathParamsListSize);
+            err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList, aReadPrepareParams.mAttributePathParamsListSize);
             SuccessOrExit(err);
         }
 
@@ -148,16 +145,9 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex,
         SuccessOrExit(err);
     }
 
-    if (apSecureSession != nullptr)
-    {
-        mpExchangeCtx = mpExchangeMgr->NewContext(*apSecureSession, this);
-    }
-    else
-    {
-        mpExchangeCtx = mpExchangeMgr->NewContext(SessionHandle(aNodeId, 0, 0, aFabricIndex), this);
-    }
+    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHandle, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mpExchangeCtx->SetResponseTimeout(timeout);
+    mpExchangeCtx->SetResponseTimeout(aReadPrepareParams.mTimeout);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));

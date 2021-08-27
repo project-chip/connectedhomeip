@@ -265,16 +265,13 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     CHIP_ERROR err    = CHIP_NO_ERROR;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadClient readClient;
-    EventNumber eventNumber = 0;
-
     chip::app::InteractionModelDelegate delegate;
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     err                            = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    SessionHandle session = ctx.GetSessionLocalToPeer();
-    err = readClient.SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session, nullptr /*apEventPathParamsList*/,
-                                     0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
-                                     0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
+    ReadPrepareParams readPrepareParams;
+    readPrepareParams.mSessionHandle = ctx.GetSessionLocalToPeer();
+    err = readClient.SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateReportData(apSuite, apContext, buf);
@@ -395,16 +392,14 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     app::ReadClient readClient;
     chip::app::InteractionModelDelegate delegate;
-    EventNumber eventNumber = 0;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     err                            = readClient.Init(&ctx.GetExchangeManager(), &delegate, 0 /* application identifier */);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    SessionHandle session = ctx.GetSessionLocalToPeer();
-    err = readClient.SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session, nullptr /*apEventPathParamsList*/,
-                                     0 /*aEventPathParamsListSize*/, nullptr /*apAttributePathParamsList*/,
-                                     0 /*aAttributePathParamsListSize*/, eventNumber /*aEventNumber*/);
+    ReadPrepareParams readPrepareParams;
+    readPrepareParams.mSessionHandle = ctx.GetSessionLocalToPeer();
+    err = readClient.SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/);
@@ -594,9 +589,12 @@ void TestReadInteraction::TestReadEventRoundtrip(nlTestSuite * apSuite, void * a
     eventPathParams[1].mClusterId  = kTestClusterId;
     eventPathParams[1].mEventId    = kTestEventIdCritical;
 
-    SessionHandle session = ctx.GetSessionLocalToPeer();
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(),
-                                                                            &session, eventPathParams, 2, nullptr, 1, 0);
+    ReadPrepareParams readPrepareParams;
+    readPrepareParams.mSessionHandle           = ctx.GetSessionLocalToPeer();
+    readPrepareParams.mpEventPathParamsList    = eventPathParams;
+    readPrepareParams.mEventPathParamsListSize = 2;
+
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
