@@ -53,6 +53,10 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate, Messaging::E
 
 void ReadHandler::Shutdown()
 {
+    if (IsReporting())
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpAttributeClusterInfoList);
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpEventClusterInfoList);
     mpExchangeCtx = nullptr;
@@ -84,28 +88,12 @@ CHIP_ERROR ReadHandler::OnStatusReport(Messaging::ExchangeContext * apExchangeCo
     Protocols::SecureChannel::StatusReport statusReport;
     err = statusReport.Parse(std::move(aPayload));
     SuccessOrExit(err);
-    ChipLogProgress(DataManagement, "Receive Status Report, protocol id is %" PRIu32 ", protocol code is %" PRIu16,
-                    statusReport.GetProtocolId(), statusReport.GetProtocolCode());
-    if ((statusReport.GetProtocolId() == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm()) &&
-        (statusReport.GetProtocolCode() == to_underlying(Protocols::InteractionModel::ProtocolCode::Success)))
-    {
-        switch (mState)
-        {
-        case HandlerState::Reporting:
-            InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
-            break;
-        case HandlerState::Reportable:
-        case HandlerState::Initialized:
-        case HandlerState::Uninitialized:
-        default:
-            err = CHIP_ERROR_INCORRECT_STATE;
-            break;
-        }
-    }
-    else
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    ChipLogProgress(DataManagement, "in state %s, receive status report, protocol id is %" PRIu32 ", protocol code is %" PRIu16,
+                    GetStateStr(), statusReport.GetProtocolId(), statusReport.GetProtocolCode());
+    VerifyOrExit((statusReport.GetProtocolId() == Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm()) &&
+                     (statusReport.GetProtocolCode() == to_underlying(Protocols::InteractionModel::ProtocolCode::Success)),
+                 err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(IsReporting(), err = CHIP_ERROR_INCORRECT_STATE);
 
 exit:
     Shutdown();
@@ -154,10 +142,6 @@ CHIP_ERROR ReadHandler::OnUnknownMsgType(Messaging::ExchangeContext * apExchange
                                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     ChipLogDetail(DataManagement, "Msg type %d not supported", aPayloadHeader.GetMessageType());
-    if (IsReporting())
-    {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
-    }
     Shutdown();
     return CHIP_ERROR_INVALID_MESSAGE_TYPE;
 }
@@ -166,10 +150,6 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive status response from Exchange: %d",
                     apExchangeContext->GetExchangeId());
-    if (IsReporting())
-    {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
-    }
     Shutdown();
 }
 
@@ -289,6 +269,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
         SuccessOrExit(err);
         mpAttributeClusterInfoList->SetDirty();
+        SetInitialReport();
     }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)

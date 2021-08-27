@@ -65,6 +65,9 @@ Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElemen
     err = attributePathBuilder.GetError();
     SuccessOrExit(err);
 
+    ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aClusterInfo.mClusterId,
+                  aClusterInfo.mFieldId);
+
     err = ReadSingleClusterData(aClusterInfo, aAttributeDataElementBuilder.GetWriter(), nullptr /* data exists */);
     SuccessOrExit(err);
     aAttributeDataElementBuilder.MoreClusterData(false);
@@ -98,15 +101,16 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
         if (clusterInfo->IsDirty())
         {
             AttributeDataElement::Builder attributeDataElementBuilder = attributeDataList.CreateAttributeDataElementBuilder();
-            ChipLogDetail(DataManagement, "<RE:Run> Cluster " ChipLogFormatMEI ", Field %" PRIx32 " is dirty",
-                          ChipLogValueMEI(clusterInfo->mClusterId), clusterInfo->mFieldId);
-            // Retrieve data for this cluster instance and clear its dirty flag.
-            err = RetrieveClusterData(attributeDataElementBuilder, *clusterInfo);
-            VerifyOrExit(err == CHIP_NO_ERROR,
-                         ChipLogError(DataManagement, "<RE:Run> Error retrieving data from cluster, aborting"));
-            attributeClean = false;
+            if (apReadHandler->IsInitialReport())
+            {
+                // Retrieve data for this cluster instance and clear its dirty flag.
+                err = RetrieveClusterData(attributeDataElementBuilder, *clusterInfo);
+                VerifyOrExit(err == CHIP_NO_ERROR,
+                             ChipLogError(DataManagement, "<RE:Run> Error retrieving data from cluster, aborting"));
+                attributeClean = false;
+            }
+            clusterInfo->ClearDirty();
         }
-
         clusterInfo = clusterInfo->mpNext;
     }
     attributeDataList.EndOfAttributeDataList();
@@ -323,8 +327,10 @@ void Engine::Run()
         if (readHandler->IsReportable())
         {
             CHIP_ERROR err = BuildAndSendSingleReportData(readHandler);
-            ChipLogFunctError(err);
-            return;
+            if (err != CHIP_NO_ERROR)
+            {
+                return;
+            }
         }
         numReadHandled++;
         mCurReadHandlerIdx = (mCurReadHandlerIdx + 1) % CHIP_IM_MAX_NUM_READ_HANDLER;
