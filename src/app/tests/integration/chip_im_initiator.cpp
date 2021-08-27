@@ -180,7 +180,7 @@ exit:
 
 CHIP_ERROR SendReadRequest()
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::ReadPrepareParams readPrepareParams;
     chip::app::EventPathParams eventPathParams[2];
     eventPathParams[0].mNodeId     = kTestNodeId;
@@ -198,10 +198,9 @@ CHIP_ERROR SendReadRequest()
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-
-    readPrepareParams.mSessionHandle = chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex);
-    readPrepareParams.mTimeout = gMessageTimeoutMsec;
-    readPrepareParams.mpEventPathParamsList = eventPathParams;
+    readPrepareParams.mSessionHandle           = chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex);
+    readPrepareParams.mTimeout                 = gMessageTimeoutMsec;
+    readPrepareParams.mpEventPathParamsList    = eventPathParams;
     readPrepareParams.mEventPathParamsListSize = 2;
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, gMessageTimeoutMsec);
     SuccessOrExit(err);

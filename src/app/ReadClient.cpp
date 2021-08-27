@@ -121,7 +121,8 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
         {
             EventPathList::Builder & eventPathListBuilder = request.CreateEventPathListBuilder();
             SuccessOrExit(err = eventPathListBuilder.GetError());
-            err = GenerateEventPathList(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList, aReadPrepareParams.mEventPathParamsListSize);
+            err = GenerateEventPathList(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
+                                        aReadPrepareParams.mEventPathParamsListSize);
             SuccessOrExit(err);
             if (aReadPrepareParams.mEventNumber != 0)
             {
@@ -134,7 +135,8 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
         {
             AttributePathList::Builder attributePathListBuilder = request.CreateAttributePathListBuilder();
             SuccessOrExit(err = attributePathListBuilder.GetError());
-            err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList, aReadPrepareParams.mAttributePathParamsListSize);
+            err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
+                                            aReadPrepareParams.mAttributePathParamsListSize);
             SuccessOrExit(err);
         }
 

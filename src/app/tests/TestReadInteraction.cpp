@@ -271,7 +271,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ReadPrepareParams readPrepareParams;
     readPrepareParams.mSessionHandle = ctx.GetSessionLocalToPeer();
-    err = readClient.SendReadRequest(readPrepareParams);
+    err                              = readClient.SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateReportData(apSuite, apContext, buf);
@@ -399,7 +399,7 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
 
     ReadPrepareParams readPrepareParams;
     readPrepareParams.mSessionHandle = ctx.GetSessionLocalToPeer();
-    err = readClient.SendReadRequest(readPrepareParams);
+    err                              = readClient.SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/);
