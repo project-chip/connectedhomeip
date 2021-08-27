@@ -186,13 +186,13 @@ private:
     CHIP_ERROR Init(uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SendSigmaR1();
-    CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleSigmaR1(System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleSigmaR1(System::PacketBufferHandle && msg);
     CHIP_ERROR SendSigmaR2();
-    CHIP_ERROR HandleSigmaR2_and_SendSigmaR3(System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleSigmaR2(System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR2_and_SendSigmaR3(System::PacketBufferHandle && msg);
+    CHIP_ERROR HandleSigmaR2(System::PacketBufferHandle && msg);
     CHIP_ERROR SendSigmaR3();
-    CHIP_ERROR HandleSigmaR3(System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR3(System::PacketBufferHandle && msg);
 
     CHIP_ERROR SendSigmaR1Resume();
     CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
