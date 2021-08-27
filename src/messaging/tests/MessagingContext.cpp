@@ -37,11 +37,12 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(mPeerAddress), GetDestinationNodeId(), &mPairingLocalToPeer,
-                                                      SecureSession::SessionRole::kInitiator, mSrcFabricIndex));
+    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(mPeerAddress), GetDestinationNodeId(),
+                                                      &mPairingLocalToPeer, SecureSession::SessionRole::kInitiator,
+                                                      mSrcFabricIndex));
 
-    return mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(mLocalAddress), GetSourceNodeId(), &mPairingPeerToLocal, SecureSession::SessionRole::kResponder,
-                                        mDestFabricIndex);
+    return mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(mLocalAddress), GetSourceNodeId(),
+                                        &mPairingPeerToLocal, SecureSession::SessionRole::kResponder, mDestFabricIndex);
 }
 
 // Shutdown all layers, finalize operations

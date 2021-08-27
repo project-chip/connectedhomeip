@@ -42,8 +42,8 @@ public:
  * @brief
  *   An UnauthenticatedSession stores the binding of TransportAddress, and message counters.
  *
- *   The entries are rotated using LRU, but entry can be hold by using UnauthenticatedSessionHandle, which increase the reference count by 1. If the
- *   reference count is not 0, the entry won't be pruned.
+ *   The entries are rotated using LRU, but entry can be hold by using UnauthenticatedSessionHandle, which increase the reference
+ * count by 1. If the reference count is not 0, the entry won't be pruned.
  */
 class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter>
 {
@@ -78,7 +78,8 @@ public:
     /**
      * Allocates a new session out of the internal resource pool.
      *
-     * @returns CHIP_NO_ERROR if new session created. May fail if maximum connection count has been reached (with CHIP_ERROR_NO_MEMORY).
+     * @returns CHIP_NO_ERROR if new session created. May fail if maximum connection count has been reached (with
+     * CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
     CHIP_ERROR AllocEntry(const PeerAddress & address, UnauthenticatedSession *& entry)
@@ -158,7 +159,7 @@ private:
     UnauthenticatedSession * FindLeastRecentUsedEntry()
     {
         UnauthenticatedSession * result = nullptr;
-        uint64_t oldestTimeMs   = std::numeric_limits<uint64_t>::max();
+        uint64_t oldestTimeMs           = std::numeric_limits<uint64_t>::max();
 
         mEntries.ForEachActiveObject([&](UnauthenticatedSession * entry) {
             if (entry->GetReferenceCount() == 0 && entry->GetLastActivityTimeMs() < oldestTimeMs)

@@ -28,7 +28,9 @@ class SessionHandle
 public:
     SessionHandle(NodeId peerNodeId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric) {}
 
-    SessionHandle(Transport::UnauthenticatedSessionHandle session) : mPeerNodeId(kPlaceholderNodeId), mFabric(Transport::kUndefinedFabricIndex), mUnauthenticatedSessionHandle(session) {}
+    SessionHandle(Transport::UnauthenticatedSessionHandle session) :
+        mPeerNodeId(kPlaceholderNodeId), mFabric(Transport::kUndefinedFabricIndex), mUnauthenticatedSessionHandle(session)
+    {}
 
     SessionHandle(NodeId peerNodeId, uint16_t localKeyId, uint16_t peerKeyId, FabricIndex fabric) :
         mPeerNodeId(peerNodeId), mFabric(fabric)
@@ -37,10 +39,7 @@ public:
         mPeerKeyId.SetValue(peerKeyId);
     }
 
-    bool IsSecure()
-    {
-        return !mUnauthenticatedSessionHandle.HasValue();
-    }
+    bool IsSecure() { return !mUnauthenticatedSessionHandle.HasValue(); }
 
     bool HasFabricIndex() const { return (mFabric != Transport::kUndefinedFabricIndex); }
     FabricIndex GetFabricIndex() const { return mFabric; }
@@ -71,10 +70,7 @@ public:
     const Optional<uint16_t> & GetPeerKeyId() const { return mPeerKeyId; }
     const Optional<uint16_t> & GetLocalKeyId() const { return mLocalKeyId; }
 
-    Transport::UnauthenticatedSessionHandle GetUnauthenticatedSession()
-    {
-        return mUnauthenticatedSessionHandle.Value();
-    }
+    Transport::UnauthenticatedSessionHandle GetUnauthenticatedSession() { return mUnauthenticatedSessionHandle.Value(); }
 
 private:
     friend class SecureSessionMgr;

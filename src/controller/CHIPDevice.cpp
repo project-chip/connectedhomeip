@@ -553,7 +553,8 @@ CHIP_ERROR Device::WarmupCASESession()
     // Create a UnauthenticatedSession for CASE pairing.
     // Don't use mSecureSession here, because mSecureSession is the secure session.
     Optional<SessionHandle> session = mSessionManager->CreateUnauthenticatedSession(mDeviceAddress);
-    if (!session.HasValue()) {
+    if (!session.HasValue())
+    {
         return CHIP_ERROR_NO_MEMORY;
     }
     Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(session.Value(), &mCASESession);

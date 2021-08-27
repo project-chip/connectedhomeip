@@ -194,8 +194,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     callback.LargeMessageSent = true;
 
-    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(large_buffer),
-                                                        preparedMessage);
+    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(large_buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = secureSessionMgr.SendPreparedMessage(localToRemoteSession, preparedMessage);
@@ -211,8 +210,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     callback.LargeMessageSent = true;
 
-    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(extra_large_buffer),
-                                                        preparedMessage);
+    err = secureSessionMgr.PrepareMessage(localToRemoteSession, payloadHeader, std::move(extra_large_buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_MESSAGE_TOO_LONG);
 }
 

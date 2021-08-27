@@ -135,7 +135,7 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
 
     // Clear pending packet in CRMP
-    ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
     ReliableMessageContext * rc = context->GetReliableMessageContext();
     rm->ClearRetransTable(rc);
 

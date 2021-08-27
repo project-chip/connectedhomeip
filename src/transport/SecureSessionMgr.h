@@ -192,8 +192,8 @@ public:
      *    3. Encode the packet header and prepend it to message.
      *   Returns a encrypted message in encryptedMessage.
      */
-    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader,
-                                            System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle & encryptedMessage);
+    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
+                              EncryptedPacketBufferHandle & encryptedMessage);
 
     /**
      * @brief
@@ -263,11 +263,11 @@ public:
      */
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
 
-
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress)
     {
         Transport::UnauthenticatedSession * session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
-        if (session == nullptr) return Optional<SessionHandle>::Missing();
+        if (session == nullptr)
+            return Optional<SessionHandle>::Missing();
 
         return Optional<SessionHandle>::Value(SessionHandle(Transport::UnauthenticatedSessionHandle(*session)));
     }

@@ -110,7 +110,7 @@ public:
 
     CHIP_ERROR VerifyOrTrustFirst(uint32_t counter)
     {
-        switch(mStatus)
+        switch (mStatus)
         {
         case Status::NotSynced:
             // Trust and set the counter when not synced
