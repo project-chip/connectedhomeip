@@ -31,14 +31,15 @@
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVUtilities.hpp>
 #include <protocols/Protocols.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
 
 CHIP_ERROR AdditionalDataPayloadParser::populatePayload(SetupPayloadData::AdditionalDataPayload & outPayload)
 {
-    TLV::TLVReader reader;
-    TLV::TLVReader innerReader;
+    TLV::ContiguousBufferTLVReader reader;
+    TLV::ContiguousBufferTLVReader innerReader;
 
     reader.Init(mPayloadBufferData, mPayloadBufferLength);
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag));
@@ -49,9 +50,12 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(SetupPayloadData::Additi
     ReturnErrorOnFailure(innerReader.Next(TLV::kTLVType_UTF8String, TLV::ContextTag(SetupPayloadData::kRotatingDeviceIdTag)));
 
     // Get the value of the rotating device id
-    char rotatingDeviceId[SetupPayloadData::kRotatingDeviceIdLength];
-    ReturnErrorOnFailure(innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId)));
-    outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
+    Span<const char> rotatingDeviceId;
+    ReturnErrorOnFailure(innerReader.GetStringView(rotatingDeviceId));
+
+    // This test uses <, not <=, because kHexMaxLength includes the null-terminator.
+    VerifyOrReturnError(rotatingDeviceId.size() < RotatingDeviceId::kHexMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
+    outPayload.rotatingDeviceId = std::string(rotatingDeviceId.data(), rotatingDeviceId.size());
 
     // Verify the end of the container
     ReturnErrorOnFailure(reader.VerifyEndOfContainer());
