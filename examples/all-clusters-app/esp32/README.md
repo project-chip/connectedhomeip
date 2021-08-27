@@ -204,8 +204,12 @@ commissioning and cluster control.
          - chip-device-ctrl > close-ble
 
 -   Resolve DNS-SD name and update address of the node in the device controller.
+    Get fabric ID using `getfabricid` and use the decimal value of compressed
+    fabric id.
 
-         - chip-device-ctrl > resolve 0 135246
+         - chip-device-ctrl > getfabricid
+
+         - chip-device-ctrl > resolve <Compressed Fabric ID> 135246
 
 ### Cluster control
 
