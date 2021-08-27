@@ -29,8 +29,10 @@
 
 namespace chip {
 
-/// InPlace is disambiguation tags that can be passed to the constructors to indicate that the contained object should be constructed in-place
-struct InPlaceType {
+/// InPlace is disambiguation tags that can be passed to the constructors to indicate that the contained object should be
+/// constructed in-place
+struct InPlaceType
+{
     explicit InPlaceType() = default;
 };
 constexpr InPlaceType InPlace{};

@@ -49,7 +49,7 @@ struct Count
 
     static void ResetCounter()
     {
-        created = 0;
+        created   = 0;
         destroyed = 0;
     }
 
@@ -158,7 +158,7 @@ static void TestMove(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, !testDst.HasValue());
 
         auto testSrc = MakeOptional<CountMovable>(401);
-        testDst = std::move(testSrc);
+        testDst      = std::move(testSrc);
         NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 3);
         NL_TEST_ASSERT(inSuite, testDst.HasValue() && testDst.Value().m == 401);
     }
