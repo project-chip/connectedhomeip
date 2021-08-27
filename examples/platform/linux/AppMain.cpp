@@ -150,6 +150,13 @@ int ChipLinuxAppInit(int argc, char ** argv)
         {
             ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
         }
+
+        if (rendezvousFlags.Has(RendezvousInformationFlag::kSoftAP) &&
+            chip::DeviceLayer::ConnectivityMgrImpl().IsWiFiStationProvisioned() == false)
+        {
+            ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
+            ChipLogProgress(NotSpecified, "SoftAp enabled.");
+        }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 

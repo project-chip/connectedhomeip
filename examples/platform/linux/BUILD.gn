@@ -40,8 +40,8 @@ source_set("app-main") {
     defines += [ "PW_RPC_ENABLED" ]
   }
   if (chip_ip_commissioning) {
-    # BLE and on-network. Code defaults to BLE if this is not set.
-    defines += [ "CONFIG_RENDEZVOUS_MODE=6" ]
+    # SoftAp, BLE and on-network. Code defaults to BLE if this is not set.
+    defines += [ "CONFIG_RENDEZVOUS_MODE=7" ]
   }
   if (chip_build_libshell) {
     defines += [ "ENABLE_CHIP_SHELL" ]
