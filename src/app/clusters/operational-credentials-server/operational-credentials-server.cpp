@@ -117,13 +117,12 @@ CHIP_ERROR writeFabricsIntoFabricsListAttribute()
     for (auto & pairing : GetGlobalFabricTable())
     {
         NodeId nodeId               = pairing.GetPeerId().GetNodeId();
-        uint64_t compressedabricId  = pairing.GetPeerId().GetCompressedFabricId();
         uint64_t fabricId           = pairing.GetFabricId();
         uint16_t vendorId           = pairing.GetVendorId();
         const uint8_t * fabricLabel = pairing.GetFabricLabel();
 
         // Skip over uninitialized fabrics
-        if (nodeId == kUndefinedNodeId || compressedabricId == kUndefinedCompressedFabricId || vendorId == kUndefinedVendorId)
+        if (nodeId == kUndefinedNodeId || vendorId == kUndefinedVendorId)
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                            "OpCreds: Skipping over uninitialized fabric with fabricId 0x" ChipLogFormatX64
