@@ -110,7 +110,9 @@ void vPortSetupTimerInterrupt(void)
     tickless_init();
 
 #if gApp_SystemClockCalibration
-    /* start calibration - suppose 32MHz crystal is running and FRO48M running */
+    /* calibration on the internal FRO48MHz clock - this clock is inaccurate (2%),
+     * so it needs calibration if we want the systick to be accurate to less
+     * than 500pp. */
     tickless_StartFroCalibration();
 #endif
 
