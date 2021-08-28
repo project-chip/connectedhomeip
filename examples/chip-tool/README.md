@@ -12,7 +12,8 @@ An example application that uses CHIP to send messages to a CHIP server.
 
 ## Building the Example Application
 
-Building the example application is quite straightforward.  It can either be done as part of an overall "build everything" build:
+Building the example application is quite straightforward. It can either be done
+as part of an overall "build everything" build:
 
 ```
 ./gn_build.sh
@@ -28,21 +29,21 @@ which puts the binary at `SOME-PATH/chip-tool`.
 
 ## Using the Client to commission a device
 
-In order to send commands to a device, it must be commissioned with
-the client.  chip-tool currently only supports commissioning and
-remembering one device at a time.  The configuration state is stored
-in `/tmp/chip_tool_config.ini`; deleting this and other `.ini` files
-in `/tmp` can sometimes resolve issues due to stale configuration.
+In order to send commands to a device, it must be commissioned with the client.
+chip-tool currently only supports commissioning and remembering one device at a
+time. The configuration state is stored in `/tmp/chip_tool_config.ini`; deleting
+this and other `.ini` files in `/tmp` can sometimes resolve issues due to stale
+configuration.
 
 #### Commission a device
 
-To initiate a client commissioning request to a device, run the built executable and
-choose the pairing mode.
+To initiate a client commissioning request to a device, run the built executable
+and choose the pairing mode.
 
 ##### Commission a device configured to bypass Rendezvous
 
-The command below commissions a device with the provided IP address and port of the
-server to talk to.
+The command below commissions a device with the provided IP address and port of
+the server to talk to.
 
     $ chip-tool pairing bypass 192.168.0.30 5540
 
@@ -58,9 +59,11 @@ the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
 where:
 
-* ssid is the Wi-Fi SSID either as a string, or in the form hex:XXXXXXXX where the bytes of the SSID are encoded as two-digit hex numbers.
-* paswword is the Wi-Fi password, again either as a string or as hex data
-* The 0 is the fabric id, until more compelete support for multiple fabrics is implemented in our commissioning process.
+-   ssid is the Wi-Fi SSID either as a string, or in the form hex:XXXXXXXX where
+    the bytes of the SSID are encoded as two-digit hex numbers.
+-   paswword is the Wi-Fi password, again either as a string or as hex data
+-   The 0 is the fabric id, until more compelete support for multiple fabrics is
+    implemented in our commissioning process.
 
 For example:
 
