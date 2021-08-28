@@ -26,6 +26,9 @@ import urllib.request
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../../..'))
 
+# By default, we take zap from third_party/zap/repo, but you can override
+# this via ZAP_LOCATION, which is useful if you have zap cloned separately
+ZAP_DIR = os.getenv('ZAP_LOCATION', 'third_party/zap/repo')
 
 def checkPythonVersion():
     if sys.version_info[0] < 3:
@@ -94,7 +97,7 @@ def runArgumentsParser():
 
 
 def runGeneration(zap_file, zcl_file, templates_file, output_dir):
-    generator_dir = getDirPath('third_party/zap/repo')
+    generator_dir = getDirPath(ZAP_DIR)
     os.chdir(generator_dir)
     subprocess.check_call(['node', './src-script/zap-generate.js', '-z',
                           zcl_file, '-g', templates_file, '-i', zap_file, '-o', output_dir])

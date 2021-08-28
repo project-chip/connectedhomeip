@@ -16,6 +16,11 @@
 # limitations under the License.
 #
 
+ZAP_DIR=$ZAP_LOCATION
+if [ -z "$ZAP_DIR" ]; then
+    ZAP_DIR="third_party/zap/repo"
+fi
+
 function _get_fullpath() {
     cd "$(dirname "$1")" && echo "$PWD/$(basename "$1")"
 }
@@ -36,7 +41,7 @@ CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/run_zaptool.sh}"
     cd "$CHIP_ROOT" &&
         git submodule update --init third_party/zap/repo
 
-    cd "third_party/zap/repo"
+    cd $ZAP_DIR
     if ! npm list installed-check &>/dev/null; then
         npm install installed-check
     fi
