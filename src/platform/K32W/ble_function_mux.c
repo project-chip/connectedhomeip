@@ -67,7 +67,6 @@ typedef struct sizeCounterStruct_tag
 /*! *********************************************************************************
  *  BLE Stack Configuration
  ********************************************************************************** */
-#define gMaxBondedDevices_c 1
 
 /* Security Manager */
 #define smpEdiv 0x1F99
@@ -83,11 +82,6 @@ typedef struct
     bleBondDataDeviceInfoBlob_t aBondingDataDeviceInfo;
     bleBondDataDescriptorBlob_t aBondingDataDescriptor[gcGapMaximumSavedCccds_c];
 } bleBondDeviceEntry;
-
-#if (gMaxBondedDevices_c > 0)
-static bleBondDeviceEntry bondEntries[gMaxBondedDevices_c];
-static osaMutexId_t bondingMutex;
-#endif
 
 /* LTK */
 static uint8_t smpLtk[gcSmpMaxLtkSize_c] = { 0xD6, 0x93, 0xE8, 0xA4, 0x23, 0x55, 0x48, 0x99,
@@ -177,67 +171,11 @@ uint16_t GattDb_GetIndexOfHandle(uint16_t handle)
     return gGattDbInvalidHandleIndex_d;
 }
 
-void App_NvmInit(void)
-{
-#if (gMaxBondedDevices_c > 0)
-    {
-        /* Init the bonded device list */
-        uint16_t i = 0;
-
-        FLib_MemSet(bondEntries, 0, sizeof(bondEntries));
-        bondingMutex = OSA_MutexCreate();
-        assert(bondingMutex != NULL);
-        for (i = 0; i < gMaxBondedDevices_c; i++)
-        {
-            bondEntries[i].pdmId      = i;
-            bondEntries[i].nbRamWrite = 0;
-        }
-    }
-#endif
-}
+void App_NvmInit(void) {}
 
 void App_NvmRead(uint8_t mEntryIdx, void * pBondHeader, void * pBondDataDynamic, void * pBondDataStatic, void * pBondDataDeviceInfo,
                  void * pBondDataDescriptor, uint8_t mDescriptorIndex)
 {
-#if (gMaxBondedDevices_c > 0)
-
-    {
-        OSA_MutexLock(bondingMutex, osaWaitForever_c);
-        if (mEntryIdx < (uint8_t) gMaxBondedDevices_c)
-        {
-            if (pBondHeader != NULL)
-            {
-                FLib_MemCpy(pBondHeader, (void *) &bondEntries[mEntryIdx].aBondingHeader,
-                            sizeof(bondEntries[mEntryIdx].aBondingHeader));
-            }
-
-            if (pBondDataDynamic != NULL)
-            {
-                FLib_MemCpy(pBondDataDynamic, (void *) &bondEntries[mEntryIdx].aBondingDataDynamic,
-                            sizeof(bondEntries[mEntryIdx].aBondingDataDynamic));
-            }
-
-            if (pBondDataStatic != NULL)
-            {
-                FLib_MemCpy(pBondDataStatic, (void *) &bondEntries[mEntryIdx].aBondingDataStatic,
-                            sizeof(bondEntries[mEntryIdx].aBondingDataStatic));
-            }
-
-            if (pBondDataDeviceInfo != NULL)
-            {
-                FLib_MemCpy(pBondDataDeviceInfo, (void *) &bondEntries[mEntryIdx].aBondingDataDeviceInfo,
-                            sizeof(bondEntries[mEntryIdx].aBondingDataDeviceInfo));
-            }
-
-            if (pBondDataDescriptor != NULL && mDescriptorIndex < gcGapMaximumSavedCccds_c)
-            {
-                FLib_MemCpy(pBondDataDescriptor, (void *) &bondEntries[mEntryIdx].aBondingDataDescriptor[mDescriptorIndex],
-                            gBleBondDataDescriptorSize_c);
-            }
-        }
-        OSA_MutexUnlock(bondingMutex);
-    }
-#else
     NOT_USED(mEntryIdx);
     NOT_USED(pBondHeader);
     NOT_USED(pBondDataDynamic);
@@ -245,55 +183,11 @@ void App_NvmRead(uint8_t mEntryIdx, void * pBondHeader, void * pBondDataDynamic,
     NOT_USED(pBondDataDeviceInfo);
     NOT_USED(pBondDataDescriptor);
     NOT_USED(mDescriptorIndex);
-#endif
 }
 
 void App_NvmWrite(uint8_t mEntryIdx, void * pBondHeader, void * pBondDataDynamic, void * pBondDataStatic,
                   void * pBondDataDeviceInfo, void * pBondDataDescriptor, uint8_t mDescriptorIndex)
 {
-#if (gMaxBondedDevices_c > 0)
-    {
-        OSA_MutexLock(bondingMutex, osaWaitForever_c);
-        if (mEntryIdx < (uint8_t) gMaxBondedDevices_c)
-        {
-            if (pBondHeader != NULL)
-            {
-                FLib_MemCpy((void *) &bondEntries[mEntryIdx].aBondingHeader, pBondHeader,
-                            sizeof(bondEntries[mEntryIdx].aBondingHeader));
-                bondEntries[mEntryIdx].nbRamWrite++;
-            }
-
-            if (pBondDataDynamic != NULL)
-            {
-                FLib_MemCpy((void *) &bondEntries[mEntryIdx].aBondingDataDynamic, pBondDataDynamic,
-                            sizeof(bondEntries[mEntryIdx].aBondingDataDynamic));
-                bondEntries[mEntryIdx].nbRamWrite++;
-            }
-
-            if (pBondDataStatic != NULL)
-            {
-                FLib_MemCpy((void *) &bondEntries[mEntryIdx].aBondingDataStatic, pBondDataStatic,
-                            sizeof(bondEntries[mEntryIdx].aBondingDataStatic));
-                bondEntries[mEntryIdx].nbRamWrite++;
-            }
-
-            if (pBondDataDeviceInfo != NULL)
-            {
-                FLib_MemCpy((void *) &bondEntries[mEntryIdx].aBondingDataDeviceInfo, pBondDataDeviceInfo,
-                            sizeof(bondEntries[mEntryIdx].aBondingDataDeviceInfo));
-                bondEntries[mEntryIdx].nbRamWrite++;
-            }
-
-            if (pBondDataDescriptor != NULL && mDescriptorIndex < gcGapMaximumSavedCccds_c)
-            {
-                FLib_MemCpy((void *) &bondEntries[mEntryIdx].aBondingDataDescriptor[mDescriptorIndex], pBondDataDescriptor,
-                            gBleBondDataDescriptorSize_c);
-                bondEntries[mEntryIdx].nbRamWrite++;
-            }
-        }
-        OSA_MutexUnlock(bondingMutex);
-    }
-#else
     NOT_USED(mEntryIdx);
     NOT_USED(pBondHeader);
     NOT_USED(pBondDataDynamic);
@@ -301,40 +195,9 @@ void App_NvmWrite(uint8_t mEntryIdx, void * pBondHeader, void * pBondDataDynamic
     NOT_USED(pBondDataDeviceInfo);
     NOT_USED(pBondDataDescriptor);
     NOT_USED(mDescriptorIndex);
-#endif
 }
 
 void App_NvmErase(uint8_t mEntryIdx)
 {
-#if (gMaxBondedDevices_c > 0)
-    {
-        OSA_MutexLock(bondingMutex, osaWaitForever_c);
-        if (mEntryIdx < (uint8_t) gMaxBondedDevices_c)
-        {
-            /* Check if a write is required */
-            if (!FLib_MemCmpToVal(&bondEntries[mEntryIdx].aBondingHeader, 0, sizeof(bondEntries[mEntryIdx].aBondingHeader)) ||
-                !FLib_MemCmpToVal(&bondEntries[mEntryIdx].aBondingDataDynamic, 0,
-                                  sizeof(bondEntries[mEntryIdx].aBondingDataDynamic)) ||
-                !FLib_MemCmpToVal(&bondEntries[mEntryIdx].aBondingDataStatic, 0,
-                                  sizeof(bondEntries[mEntryIdx].aBondingDataStatic)) ||
-                !FLib_MemCmpToVal(&bondEntries[mEntryIdx].aBondingDataDeviceInfo, 0,
-                                  sizeof(bondEntries[mEntryIdx].aBondingDataDeviceInfo)) ||
-                !FLib_MemCmpToVal(&bondEntries[mEntryIdx].aBondingDataDescriptor[0], 0,
-                                  sizeof(bondEntries[mEntryIdx].aBondingDataDescriptor)))
-            {
-                FLib_MemSet(&bondEntries[mEntryIdx].aBondingHeader, 0, sizeof(bondEntries[mEntryIdx].aBondingHeader));
-                FLib_MemSet(&bondEntries[mEntryIdx].aBondingDataDynamic, 0, sizeof(bondEntries[mEntryIdx].aBondingDataDynamic));
-                FLib_MemSet(&bondEntries[mEntryIdx].aBondingDataStatic, 0, sizeof(bondEntries[mEntryIdx].aBondingDataStatic));
-                FLib_MemSet(&bondEntries[mEntryIdx].aBondingDataDeviceInfo, 0,
-                            sizeof(bondEntries[mEntryIdx].aBondingDataDeviceInfo));
-                FLib_MemSet(&bondEntries[mEntryIdx].aBondingDataDescriptor[0], 0,
-                            sizeof(bondEntries[mEntryIdx].aBondingDataDescriptor));
-                bondEntries[mEntryIdx].nbRamWrite++;
-            }
-        }
-        OSA_MutexUnlock(bondingMutex);
-    }
-#else
     NOT_USED(mEntryIdx);
-#endif
 }

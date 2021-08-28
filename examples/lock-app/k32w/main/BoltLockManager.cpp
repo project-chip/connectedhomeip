@@ -178,8 +178,9 @@ void BoltLockManager::TimerEventHandler(TimerHandle_t xTimer)
     }
 }
 
-void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
+void BoltLockManager::AutoReLockTimerEventHandler(void * aGenericEvent)
 {
+    AppEvent * aEvent      = (AppEvent *) aGenericEvent;
     BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
     int32_t actor          = 0;
 
@@ -196,8 +197,9 @@ void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
     lock->InitiateAction(actor, LOCK_ACTION);
 }
 
-void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
+void BoltLockManager::ActuatorMovementTimerEventHandler(void * aGenericEvent)
 {
+    AppEvent * aEvent        = (AppEvent *) aGenericEvent;
     Action_t actionCompleted = INVALID_ACTION;
 
     BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);

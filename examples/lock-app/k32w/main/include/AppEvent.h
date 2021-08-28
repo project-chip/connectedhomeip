@@ -19,7 +19,7 @@
 #pragma once
 
 struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+typedef void (*EventHandler)(void *);
 
 struct AppEvent
 {
@@ -29,6 +29,9 @@ struct AppEvent
         kEventType_Timer,
         kEventType_Lock,
         kEventType_Install,
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+        kEventType_Lp,
+#endif
     };
 
     uint16_t Type;
@@ -52,4 +55,8 @@ struct AppEvent
     };
 
     EventHandler Handler;
+
+#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+    void * param;
+#endif
 };

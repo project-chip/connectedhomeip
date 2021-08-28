@@ -7,6 +7,7 @@
 #include <src/lib/support/CodeUtils.h>
 #include <support/logging/Constants.h>
 
+#include "fsl_debug_console.h"
 #include <cstring>
 
 #define K32W_LOG_MODULE_NAME chip
@@ -26,7 +27,6 @@ static constexpr uint8_t category_max_len_bytes = 3;
 
 static bool isLogInitialized;
 extern uint8_t gOtLogUartInstance;
-extern "C" void K32WWriteBlocking(const uint8_t * aBuf, uint32_t len);
 extern "C" uint32_t otPlatAlarmMilliGetNow(void);
 
 namespace chip {
@@ -120,7 +120,7 @@ void GenericLog(const char * format, va_list arg, const char * module, uint8_t c
     VerifyOrDie(writtenLen > 0);
     memcpy(formattedMsg + prefixLen + writtenLen, EOL_CHARS, EOL_CHARS_LEN);
 
-    K32WWriteBlocking((const uint8_t *) formattedMsg, strlen(formattedMsg));
+    PRINTF("%s", formattedMsg);
 
     // Let the application know that a log message has been emitted.
     chip::DeviceLayer::OnLogOutput();
