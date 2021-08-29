@@ -16,88 +16,88 @@
  */
 
 // Import helpers from zap core
-const zapPath = "../../../../../third_party/zap/repo/dist/src-electron/";
-const templateUtil = require(zapPath + "generator/template-util.js");
-const zclHelper = require(zapPath + "generator/helper-zcl.js");
-const iteratorUtil = require(zapPath + "util/iterator-util.js");
+const zapPath = '../../../../../third_party/zap/repo/dist/src-electron/'
+const templateUtil = require(zapPath + 'generator/template-util.js')
+const zclHelper = require(zapPath + 'generator/helper-zcl.js')
+const iteratorUtil = require(zapPath + 'util/iterator-util.js')
 
 const {
     Clusters,
     asBlocks,
     asPromise,
-} = require("../../common/ClustersHelper.js");
-const StringHelper = require("../../common/StringHelper.js");
-const ChipTypesHelper = require("../../common/ChipTypesHelper.js");
+} = require('../../common/ClustersHelper.js')
+const StringHelper = require('../../common/StringHelper.js')
+const ChipTypesHelper = require('../../common/ChipTypesHelper.js')
 
 function throwErrorIfUndefined(item, errorMsg, conditions) {
     conditions.forEach(condition => {
         if (condition == undefined) {
-            console.log(item);
-            console.log(errorMsg);
-            throw error;
+            console.log(item)
+            console.log(errorMsg)
+            throw error
         }
-    });
+    })
 }
 
 function checkIsInsideClusterBlock(context, name) {
-    const clusterName = context.name;
-    const clusterSide = context.side;
-    const errorMsg = name + ": Not inside a ({#chip_server_clusters}} block.";
+    const clusterName = context.name
+    const clusterSide = context.side
+    const errorMsg = name + ': Not inside a ({#chip_server_clusters}} block.'
 
-    throwErrorIfUndefined(context, errorMsg, [clusterName, clusterSide]);
+    throwErrorIfUndefined(context, errorMsg, [clusterName, clusterSide])
 
-    return { clusterName, clusterSide };
+    return { clusterName, clusterSide }
 }
 
 function checkIsInsideCommandBlock(context, name) {
-    const clusterName = context.clusterName;
-    const clusterSide = context.clusterSide;
-    const commandId = context.id;
-    const errorMsg = name + ": Not inside a ({#chip_cluster_commands}} block.";
+    const clusterName = context.clusterName
+    const clusterSide = context.clusterSide
+    const commandId = context.id
+    const errorMsg = name + ': Not inside a ({#chip_cluster_commands}} block.'
 
     throwErrorIfUndefined(context, errorMsg, [
         commandId,
         clusterName,
         clusterSide,
-    ]);
+    ])
 
-    return commandId;
+    return commandId
 }
 
 function checkIsInsideAttributeBlock(context, name) {
-    const code = context.code;
-    const errorMsg = name + ": Not inside a ({#chip_server_attributes}} block.";
+    const code = context.code
+    const errorMsg = name + ': Not inside a ({#chip_server_attributes}} block.'
 
-    throwErrorIfUndefined(context, errorMsg, [code]);
+    throwErrorIfUndefined(context, errorMsg, [code])
 }
 
 function checkIsChipType(context, name) {
-    const type = context.chipType;
-    const errorMsg = name + ": Could not find chipType";
+    const type = context.chipType
+    const errorMsg = name + ': Could not find chipType'
 
-    throwErrorIfUndefined(context, errorMsg, [type]);
+    throwErrorIfUndefined(context, errorMsg, [type])
 
-    return type;
+    return type
 }
 
 function getCommands(methodName) {
     const { clusterName, clusterSide } = checkIsInsideClusterBlock(
         this,
         methodName,
-    );
-    return clusterSide == "client"
+    )
+    return clusterSide == 'client'
         ? Clusters.getClientCommands(clusterName)
-        : Clusters.getServerCommands(clusterName);
+        : Clusters.getServerCommands(clusterName)
 }
 
 function getResponses(methodName) {
     const { clusterName, clusterSide } = checkIsInsideClusterBlock(
         this,
         methodName,
-    );
-    return clusterSide == "client"
+    )
+    return clusterSide == 'client'
         ? Clusters.getClientResponses(clusterName)
-        : Clusters.getServerResponses(clusterName);
+        : Clusters.getServerResponses(clusterName)
 }
 
 /**
@@ -106,7 +106,7 @@ function getResponses(methodName) {
  * @param {*} options
  */
 function chip_server_clusters(options) {
-    return asBlocks.call(this, Clusters.getServerClusters(), options);
+    return asBlocks.call(this, Clusters.getServerClusters(), options)
 }
 
 /**
@@ -117,7 +117,7 @@ function chip_has_server_clusters(options) {
     return asPromise.call(
         this,
         Clusters.getServerClusters().then(clusters => !!clusters.length),
-    );
+    )
 }
 
 /**
@@ -126,7 +126,7 @@ function chip_has_server_clusters(options) {
  * @param {*} options
  */
 function chip_client_clusters(options) {
-    return asBlocks.call(this, Clusters.getClientClusters(), options);
+    return asBlocks.call(this, Clusters.getClientClusters(), options)
 }
 
 /**
@@ -137,7 +137,7 @@ function chip_has_client_clusters(options) {
     return asPromise.call(
         this,
         Clusters.getClientClusters().then(clusters => !!clusters.length),
-    );
+    )
 }
 
 /**
@@ -146,7 +146,7 @@ function chip_has_client_clusters(options) {
  * @param {*} options
  */
 function chip_clusters(options) {
-    return asBlocks.call(this, Clusters.getClusters(), options);
+    return asBlocks.call(this, Clusters.getClusters(), options)
 }
 
 /**
@@ -157,7 +157,7 @@ function chip_has_clusters(options) {
     return asPromise.call(
         this,
         Clusters.getClusters().then(clusters => !!clusters.length),
-    );
+    )
 }
 
 /**
@@ -167,32 +167,32 @@ function chip_has_clusters(options) {
  */
 function chip_server_global_responses(options) {
     const sorter = (a, b) =>
-        a.chipCallback.name.localeCompare(b.chipCallback.name, "en", {
+        a.chipCallback.name.localeCompare(b.chipCallback.name, 'en', {
             numeric: true,
-        });
+        })
 
     const reducer = (unique, item) => {
         const { type, size, isList, chipCallback, chipType } =
-            item.response.arguments[0];
+            item.response.arguments[0]
 
         // List-typed elements have a dedicated callback
         if (isList) {
-            return unique;
+            return unique
         }
 
         if (unique.find(item => item.chipCallback.name == chipCallback.name)) {
-            return unique;
+            return unique
         }
 
-        return [...unique, { chipCallback, chipType, size }];
-    };
+        return [...unique, { chipCallback, chipType, size }]
+    }
 
-    const filter = attributes => attributes.reduce(reducer, []).sort(sorter);
+    const filter = attributes => attributes.reduce(reducer, []).sort(sorter)
     return asBlocks.call(
         this,
-        Clusters.getAttributesByClusterSide("server").then(filter),
+        Clusters.getAttributesByClusterSide('server').then(filter),
         options,
-    );
+    )
 }
 
 /**
@@ -204,9 +204,9 @@ function chip_server_global_responses(options) {
  * @param {*} options
  */
 function chip_cluster_commands(options) {
-    const commands = getCommands.call(this, "chip_cluster_commands");
+    const commands = getCommands.call(this, 'chip_cluster_commands')
 
-    return asBlocks.call(this, commands, options);
+    return asBlocks.call(this, commands, options)
 }
 
 /**
@@ -218,9 +218,9 @@ function chip_cluster_commands(options) {
  * @param {*} options
  */
 function chip_cluster_responses(options) {
-    const responses = getResponses.call(this, "chip_cluster_responses");
+    const responses = getResponses.call(this, 'chip_cluster_responses')
 
-    return asBlocks.call(this, responses, options);
+    return asBlocks.call(this, responses, options)
 }
 
 /**
@@ -234,19 +234,19 @@ function chip_cluster_responses(options) {
 function chip_cluster_command_arguments(options) {
     const commandId = checkIsInsideCommandBlock(
         this,
-        "chip_cluster_command_arguments",
-    );
+        'chip_cluster_command_arguments',
+    )
     const commands = getCommands.call(
         this.parent,
-        "chip_cluster_commands_argments",
-    );
+        'chip_cluster_commands_argments',
+    )
 
-    const filter = command => command.id == commandId;
+    const filter = command => command.id == commandId
     return asBlocks.call(
         this,
         commands.then(items => items.find(filter).arguments),
         options,
-    );
+    )
 }
 
 /**
@@ -260,19 +260,19 @@ function chip_cluster_command_arguments(options) {
 function chip_cluster_response_arguments(options) {
     const commandId = checkIsInsideCommandBlock(
         this,
-        "chip_cluster_response_arguments",
-    );
+        'chip_cluster_response_arguments',
+    )
     const responses = getResponses.call(
         this.parent,
-        "chip_cluster_responses_argments",
-    );
+        'chip_cluster_responses_argments',
+    )
 
-    const filter = command => command.id == commandId;
+    const filter = command => command.id == commandId
     return asBlocks.call(
         this,
         responses.then(items => items.find(filter).arguments),
         options,
-    );
+    )
 }
 
 /**
@@ -286,15 +286,15 @@ function chip_cluster_response_arguments(options) {
 function chip_server_has_list_attributes(options) {
     const { clusterName } = checkIsInsideClusterBlock(
         this,
-        "chip_server_has_list_attributes",
-    );
-    const attributes = Clusters.getServerAttributes(clusterName);
+        'chip_server_has_list_attributes',
+    )
+    const attributes = Clusters.getServerAttributes(clusterName)
 
-    const filter = attribute => attribute.isList;
+    const filter = attribute => attribute.isList
     return asPromise.call(
         this,
         attributes.then(items => items.find(filter)),
-    );
+    )
 }
 
 /**
@@ -308,15 +308,15 @@ function chip_server_has_list_attributes(options) {
 function chip_client_has_list_attributes(options) {
     const { clusterName } = checkIsInsideClusterBlock(
         this,
-        "chip_client_has_list_attributes",
-    );
-    const attributes = Clusters.getClientAttributes(clusterName);
+        'chip_client_has_list_attributes',
+    )
+    const attributes = Clusters.getClientAttributes(clusterName)
 
-    const filter = attribute => attribute.isList;
+    const filter = attribute => attribute.isList
     return asPromise.call(
         this,
         attributes.then(items => items.find(filter)),
-    );
+    )
 }
 
 /**
@@ -331,16 +331,16 @@ function chip_client_has_list_attributes(options) {
 function chip_server_cluster_attributes(options) {
     const { clusterName } = checkIsInsideClusterBlock(
         this,
-        "chip_server_cluster_attributes",
-    );
-    const attributes = Clusters.getServerAttributes(clusterName);
+        'chip_server_cluster_attributes',
+    )
+    const attributes = Clusters.getServerAttributes(clusterName)
 
-    return asBlocks.call(this, attributes, options);
+    return asBlocks.call(this, attributes, options)
 }
 
 function chip_attribute_list_entryTypes(options) {
-    checkIsInsideAttributeBlock(this, "chip_attribute_list_entry_types");
-    return templateUtil.collectBlocks(this.items, options, this);
+    checkIsInsideAttributeBlock(this, 'chip_attribute_list_entry_types')
+    return templateUtil.collectBlocks(this.items, options, this)
 }
 
 /**
@@ -353,8 +353,8 @@ function chip_attribute_list_entryTypes(options) {
 function chip_available_cluster_commands(options) {
     const { clusterName, clusterSide } = checkIsInsideClusterBlock(
         this,
-        "chip_available_cluster_commands",
-    );
+        'chip_available_cluster_commands',
+    )
     let promise = iteratorUtil.all_user_cluster_commands_helper
         .call(this, options)
         .then(endpointCommands =>
@@ -369,30 +369,30 @@ function chip_available_cluster_commands(options) {
                         command.name,
                     ) &&
                     /* exclude MfgSpecificPing */ !command.mfgCode
-                );
+                )
             }),
         )
         .then(filteredCommands =>
             templateUtil.collectBlocks(filteredCommands, options, this),
-        );
-    return promise;
+        )
+    return promise
 }
 
 //
 // Module exports
 //
-exports.chip_clusters = chip_clusters;
-exports.chip_has_clusters = chip_has_clusters;
-exports.chip_client_clusters = chip_client_clusters;
-exports.chip_has_client_clusters = chip_has_client_clusters;
-exports.chip_server_clusters = chip_server_clusters;
-exports.chip_has_server_clusters = chip_has_server_clusters;
-exports.chip_cluster_commands = chip_cluster_commands;
-exports.chip_cluster_command_arguments = chip_cluster_command_arguments;
-exports.chip_server_global_responses = chip_server_global_responses;
-exports.chip_cluster_responses = chip_cluster_responses;
-exports.chip_cluster_response_arguments = chip_cluster_response_arguments;
-exports.chip_attribute_list_entryTypes = chip_attribute_list_entryTypes;
-exports.chip_server_cluster_attributes = chip_server_cluster_attributes;
-exports.chip_server_has_list_attributes = chip_server_has_list_attributes;
-exports.chip_available_cluster_commands = chip_available_cluster_commands;
+exports.chip_clusters = chip_clusters
+exports.chip_has_clusters = chip_has_clusters
+exports.chip_client_clusters = chip_client_clusters
+exports.chip_has_client_clusters = chip_has_client_clusters
+exports.chip_server_clusters = chip_server_clusters
+exports.chip_has_server_clusters = chip_has_server_clusters
+exports.chip_cluster_commands = chip_cluster_commands
+exports.chip_cluster_command_arguments = chip_cluster_command_arguments
+exports.chip_server_global_responses = chip_server_global_responses
+exports.chip_cluster_responses = chip_cluster_responses
+exports.chip_cluster_response_arguments = chip_cluster_response_arguments
+exports.chip_attribute_list_entryTypes = chip_attribute_list_entryTypes
+exports.chip_server_cluster_attributes = chip_server_cluster_attributes
+exports.chip_server_has_list_attributes = chip_server_has_list_attributes
+exports.chip_available_cluster_commands = chip_available_cluster_commands

@@ -15,14 +15,13 @@
  *    limitations under the License.
  */
 
-const kType = 'STRUCT';
+const kType = 'STRUCT'
 
-function isStruct(type)
-{
-  return type.toUpperCase() == kType;
+function isStruct(type) {
+    return type.toUpperCase() == kType
 }
 
 //
 // Module exports
 //
-exports.isStruct = isStruct;
+exports.isStruct = isStruct
