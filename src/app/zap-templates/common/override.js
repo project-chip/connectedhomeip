@@ -107,5 +107,16 @@ function atomicType(arg) {
             return defaultAtomicType(arg);
     }
 }
+/**
+ * Returns the name of a fall-through non-atomic type.
+ * This method will be used unless the override is
+ * providing a different implementation.
+ *
+ * @param {*} arg
+ */
+function nonAtomicType(arg = { name: "unknown", isStruct: false }) {
+    return `EmberAf${arg.name}`;
+}
 
 exports.atomicType = atomicType;
+exports.nonAtomicType = nonAtomicType;
