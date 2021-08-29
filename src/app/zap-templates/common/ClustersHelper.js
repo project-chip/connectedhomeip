@@ -16,7 +16,7 @@
  */
 
 // Import helpers from zap core
-const zapPath           = '../../../../third_party/zap/repo/src-electron/';
+const zapPath           = '../../../../third_party/zap/repo/dist/src-electron/';
 const queryConfig       = require(zapPath + 'db/query-config.js')
 const queryCommand      = require(zapPath + 'db/query-command.js')
 const queryEndpoint     = require(zapPath + 'db/query-endpoint.js')

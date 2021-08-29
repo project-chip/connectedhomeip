@@ -16,57 +16,55 @@
  */
 
 // Import helpers from zap core
-const zapPath      = '../../../../third_party/zap/repo/src-electron/';
-const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const zapPath = "../../../../third_party/zap/repo/dist/src-electron/";
+const templateUtil = require(zapPath + "generator/template-util.js");
+const zclHelper = require(zapPath + "generator/helper-zcl.js");
 
-const ChipTypesHelper = require('../../../../src/app/zap-templates/common/ChipTypesHelper.js');
+const ChipTypesHelper = require("../../../../src/app/zap-templates/common/ChipTypesHelper.js");
 
-function asPythonType(zclType)
-{
-  const type = ChipTypesHelper.asBasicType(zclType);
-  switch (type) {
-  case 'bool':
-    return 'bool';
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-  case 'uint8_t':
-  case 'uint16_t':
-  case 'uint32_t':
-  case 'uint64_t':
-    return 'int';
-  case 'char *':
-    return 'str';
-  case 'uint8_t *':
-  case 'chip::ByteSpan':
-    return 'bytes'
-  }
+function asPythonType(zclType) {
+    const type = ChipTypesHelper.asBasicType(zclType);
+    switch (type) {
+        case "bool":
+            return "bool";
+        case "int8_t":
+        case "int16_t":
+        case "int32_t":
+        case "int64_t":
+        case "uint8_t":
+        case "uint16_t":
+        case "uint32_t":
+        case "uint64_t":
+            return "int";
+        case "char *":
+            return "str";
+        case "uint8_t *":
+        case "chip::ByteSpan":
+            return "bytes";
+    }
 }
 
-function asPythonCType(zclType)
-{
-  const type = ChipTypesHelper.asBasicType(zclType);
-  switch (type) {
-  case 'bool':
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-  case 'uint8_t':
-  case 'uint16_t':
-  case 'uint32_t':
-  case 'uint64_t':
-    return 'c_' + type.replace('_t', '');
-  case 'char *':
-  case 'uint8_t *':
-    return 'c_char_p';
-  }
+function asPythonCType(zclType) {
+    const type = ChipTypesHelper.asBasicType(zclType);
+    switch (type) {
+        case "bool":
+        case "int8_t":
+        case "int16_t":
+        case "int32_t":
+        case "int64_t":
+        case "uint8_t":
+        case "uint16_t":
+        case "uint32_t":
+        case "uint64_t":
+            return "c_" + type.replace("_t", "");
+        case "char *":
+        case "uint8_t *":
+            return "c_char_p";
+    }
 }
 
 //
 // Module exports
 //
-exports.asPythonType  = asPythonType;
+exports.asPythonType = asPythonType;
 exports.asPythonCType = asPythonCType;
