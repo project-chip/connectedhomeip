@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import 'pw_protobuf_protos/common.proto';
+
+package chip.rpc;
+
+message EchoMessage {
+  string msg = 1;
+}
+
+service Echo {
+  rpc Send(EchoMessage) returns (EchoMessage){}
+}

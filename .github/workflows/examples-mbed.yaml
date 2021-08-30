@@ -82,9 +82,19 @@ jobs:
                     examples/lighting-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-lighting-app-example.elf \
                     /tmp/bloat_reports/
 
+            - name: Build pigweed-app example
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/mbed_example.sh -a=pigweed-app -b=$APP_TARGET -p=$APP_PROFILE
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    mbed $APP_TARGET+$APP_PROFILE pigweed-app \
+                    examples/lighting-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-pigweed-app-example.elf \
+                    /tmp/bloat_reports/
+
             - name: Build unit tests
               timeout-minutes: 10
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
+            
 
             - name: Copy aside build products
               run: |
@@ -93,6 +103,8 @@ jobs:
                      /tmp/output_binaries/$BUILD_TYPE-build/lock-app-$APP_TARGET-$APP_PROFILE.hex
                   cp examples/lighting-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-lighting-app-example.hex \
                      /tmp/output_binaries/$BUILD_TYPE-build/lighting-app-$APP_TARGET-$APP_PROFILE.hex
+                  cp examples/pigweed-app/mbed/build-$APP_TARGET/$APP_PROFILE/chip-mbed-pigweed-app-example.hex \
+                     /tmp/output_binaries/$BUILD_TYPE-build/pigweed-app-$APP_TARGET-$APP_PROFILE.hex
 
             - name: Binary artifacts suffix
               id: outsuffix
