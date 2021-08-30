@@ -53,7 +53,6 @@ namespace chip {
 namespace app {
 
 static constexpr size_t kMaxSecureSduLengthBytes = 1024;
-static constexpr FieldId kRootFieldId            = 0;
 
 /**
  * @class InteractionModelEngine
