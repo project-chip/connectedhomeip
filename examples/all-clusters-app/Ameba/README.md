@@ -19,7 +19,6 @@ control.
 The CHIP demo application is supported on
 [Ameba RTL8722DM Board](https://www.amebaiot.com/en/amebad).
 
-
 ## Building the Example Application
 
 Building the example application requires
