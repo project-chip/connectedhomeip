@@ -83,7 +83,7 @@ class DLL_EXPORT Object
     friend class ObjectPool;
 
 public:
-    Object() : mSystemLayer(nullptr)
+    Object() : mRefCount(0)
     {
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
         mNext = nullptr;
@@ -93,8 +93,8 @@ public:
 
     virtual ~Object() {}
 
-    /** Test whether this object is retained by \c aLayer. Concurrency safe. */
-    bool IsRetained(const Layer & aLayer) const;
+    /** Test whether this object is retained. Concurrency safe. */
+    bool IsRetained() const;
 
     void Retain();
     void Release();
@@ -110,7 +110,7 @@ protected:
         kReleaseDeferralErrorTactic_Die,     /**< Die with message. */
     };
 
-    void DeferredRelease(ReleaseDeferralErrorTactic aTactic);
+    void DeferredRelease(Layer * aSystemLayer, ReleaseDeferralErrorTactic aTactic);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:
@@ -123,11 +123,10 @@ private:
     std::mutex * mMutexRef;
 #endif
 
-    Layer * volatile mSystemLayer; /**< Pointer to the layer object that owns this object. */
-    unsigned int mRefCount;        /**< Count of remaining calls to Release before object is dead. */
+    unsigned int mRefCount; /**< Count of remaining calls to Release before object is dead. */
 
-    /** If not already retained, attempt initial retention of this object for \c aLayer and zero up to \c aOctets. */
-    bool TryCreate(Layer & aLayer, size_t aOctets);
+    /** If not already retained, attempt initial retention of this object and zero up to \c aOctets. */
+    bool TryCreate(size_t aOctets);
 
 public:
     void * AppState; /**< Generic pointer to app-specific data associated with the object. */
@@ -135,16 +134,16 @@ public:
 
 /**
  *  @brief
- *      Tests whether this object is retained by \c aLayer.
+ *      Tests whether this object is retained.
  *
  *  @note
  *      No memory barrier is applied. If this returns \c false in one thread context, then it does not imply that another thread
- *      cannot have previously retained the object for \c aLayer. If it returns \c true, then the logic using \c aLayer is
+ *      cannot have previously retained the object for \c aLayer. If it returns \c true, then the logic using \c mRefCount is
  *      responsible for ensuring concurrency safety for this object.
  */
-inline bool Object::IsRetained(const Layer & aLayer) const
+inline bool Object::IsRetained() const
 {
-    return this->mSystemLayer == &aLayer;
+    return this->mRefCount > 0;
 }
 
 /**
@@ -154,16 +153,6 @@ inline bool Object::IsRetained(const Layer & aLayer) const
 inline void Object::Retain()
 {
     __sync_fetch_and_add(&this->mRefCount, 1);
-}
-
-/**
- *  @brief
- *      Returns a reference to the CHIP System Layer object provided when the object was initially retained from its corresponding
- *      object pool instance. The object is assumed to be live.
- */
-inline Layer & Object::SystemLayer() const
-{
-    return *this->mSystemLayer;
 }
 
 /**
@@ -193,7 +182,7 @@ class ObjectPool
 public:
     void Reset();
 
-    T * TryCreate(Layer & aLayer);
+    T * TryCreate();
     void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
 
     /**
@@ -270,17 +259,17 @@ inline void ObjectPool<T, N>::Reset()
 
 /**
  *  @brief
- *      Tries to initially retain the first object in the pool that is not retained by any layer.
+ *      Tries to initially retain the first object in the pool that is not retained.
  */
 template <class T, unsigned int N>
-inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
+inline T * ObjectPool<T, N>::TryCreate()
 {
     T * lReturn = nullptr;
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     T * newNode = new T();
 
-    if (newNode->TryCreate(aLayer, sizeof(T)))
+    if (newNode->TryCreate(sizeof(T)))
     {
         std::lock_guard<std::mutex> lock(mMutex);
         Object * p = &mDummyHead;
@@ -305,7 +294,7 @@ inline T * ObjectPool<T, N>::TryCreate(Layer & aLayer)
     {
         T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
 
-        if (lObject.TryCreate(aLayer, sizeof(T)))
+        if (lObject.TryCreate(sizeof(T)))
         {
             lReturn = &lObject;
             break;
@@ -352,7 +341,7 @@ inline bool ObjectPool<T, N>::ForEachActiveObjectInner(void * context, Lambda la
     {
         T & lObject = reinterpret_cast<T *>(mArena.uMemory)[i];
 
-        if (lObject.mSystemLayer != nullptr)
+        if (lObject.IsRetained())
         {
             if (!lambda(context, static_cast<void *>(&lObject)))
                 return false;
@@ -392,7 +381,7 @@ inline void ObjectPool<T, N>::GetNumObjectsInUse(unsigned int aStartIndex, unsig
     {
         T & lObject = reinterpret_cast<T *>(mArena.uMemory)[lIndex];
 
-        if (lObject.mSystemLayer != nullptr)
+        if (lObject.IsRetained())
         {
             count++;
         }

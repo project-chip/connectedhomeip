@@ -310,10 +310,10 @@ void AsyncDNSResolverSockets::DNSResultEventHandler(chip::System::Layer * aLayer
 void AsyncDNSResolverSockets::NotifyChipThread(DNSResolver * resolver)
 {
     // Post work item via Timer Event for the CHIP thread
-    chip::System::Layer & lSystemLayer = resolver->SystemLayer();
+    chip::System::Layer * lSystemLayer = resolver->Layer().SystemLayer();
 
     ChipLogDetail(Inet, "Posting DNS completion event to CHIP thread.");
-    lSystemLayer.ScheduleWork(AsyncDNSResolverSockets::DNSResultEventHandler, resolver);
+    lSystemLayer->ScheduleWork(AsyncDNSResolverSockets::DNSResultEventHandler, resolver);
 }
 
 void * AsyncDNSResolverSockets::AsyncDNSThreadRun(void * args)
