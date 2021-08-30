@@ -88,7 +88,7 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 static bool EnsureWifiIsStarted()
 {
-    for (int cnt = 0; cnt < kWifiStartCheckAttempts; cnt++) 
+    for (int cnt = 0; cnt < kWifiStartCheckAttempts; cnt++)
     {
         if (chip::DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
         {
