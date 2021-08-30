@@ -45,16 +45,16 @@
     EmberEventControl emberAfLevelControlClusterServerTickCallbackControl1;                                                        \
     EmberEventControl emberAfBarrierControlClusterServerTickCallbackControl1;                                                      \
     EmberEventControl emberAfIasZoneClusterServerTickCallbackControl1;                                                             \
-    extern EmberEventControl emberAfPluginColorControlServerHueSatTransitionEventControl;                                          \
-    extern EmberEventControl emberAfPluginColorControlServerTempTransitionEventControl;                                            \
-    extern EmberEventControl emberAfPluginColorControlServerXyTransitionEventControl;                                              \
+    extern EmberEventControl emberAfPluginColorControlServerHueSatTransitionEventControl[];                                        \
+    extern EmberEventControl emberAfPluginColorControlServerTempTransitionEventControl[];                                          \
+    extern EmberEventControl emberAfPluginColorControlServerXyTransitionEventControl[];                                            \
     extern EmberEventControl emberAfPluginDoorLockServerLockoutEventControl;                                                       \
     extern EmberEventControl emberAfPluginDoorLockServerRelockEventControl;                                                        \
     extern EmberEventControl emberAfPluginIasZoneServerManageQueueEventControl;                                                    \
     extern EmberEventControl emberAfPluginReportingTickEventControl;                                                               \
-    extern void emberAfPluginColorControlServerHueSatTransitionEventHandler(void);                                                 \
-    extern void emberAfPluginColorControlServerTempTransitionEventHandler(void);                                                   \
-    extern void emberAfPluginColorControlServerXyTransitionEventHandler(void);                                                     \
+    extern void emberAfPluginColorControlServerHueSatTransitionEventHandler(chip::EndpointId endpoint);                            \
+    extern void emberAfPluginColorControlServerTempTransitionEventHandler(chip::EndpointId endpoint);                              \
+    extern void emberAfPluginColorControlServerXyTransitionEventHandler(chip::EndpointId endpoint);                                \
     extern void emberAfPluginDoorLockServerLockoutEventHandler(void);                                                              \
     extern void emberAfPluginDoorLockServerRelockEventHandler(void);                                                               \
     extern void emberAfPluginIasZoneServerManageQueueEventHandler(void);                                                           \
@@ -83,6 +83,28 @@
     void emberAfIasZoneClusterServerTickCallbackWrapperFunction1(void)                                                             \
     {                                                                                                                              \
         clusterTickWrapper(&emberAfIasZoneClusterServerTickCallbackControl1, emberAfIasZoneClusterServerTickCallback, 1);          \
+    }                                                                                                                              \
+    /*to finish*/                                                                                                                  \
+    static void colorControlEventHandlerWrapper(EmberEventControl * control, EmberAfTickFunction callback,                         \
+                                                chip::EndpointId endpoint)                                                         \
+    {                                                                                                                              \
+        /* emberEventControlSetInactive(control);    TODO check if necessary */                                                    \
+        (*callback)(endpoint);                                                                                                     \
+    }                                                                                                                              \
+    void emberWrapperFunctionHueStatTransitionEventHandlerWrapper1(void)                                                           \
+    {                                                                                                                              \
+        colorControlEventHandlerWrapper(&emberAfPluginColorControlServerHueSatTransitionEventControl[0],                           \
+                                        emberAfPluginColorControlServerHueSatTransitionEventHandler, 1);                           \
+    }                                                                                                                              \
+    void emberWrapperFunctionXyTransitionEventHandlerWrapper1(void)                                                                \
+    {                                                                                                                              \
+        colorControlEventHandlerWrapper(&emberAfPluginColorControlServerHueSatTransitionEventControl[0],                           \
+                                        emberAfPluginColorControlServerXyTransitionEventHandler, 1);                               \
+    }                                                                                                                              \
+    void emberWrapperFunctionTempTransitionEventHandlerWrapper1(void)                                                              \
+    {                                                                                                                              \
+        colorControlEventHandlerWrapper(&emberAfPluginColorControlServerTempTransitionEventControl[0],                             \
+                                        emberAfPluginColorControlServerTempTransitionEventHandler, 1);                             \
     }
 
 // EmberEventData structs used to populate the EmberEventData table
@@ -92,10 +114,10 @@
         { &emberAfBarrierControlClusterServerTickCallbackControl1,                                                                 \
           emberAfBarrierControlClusterServerTickCallbackWrapperFunction1 },                                                        \
         { &emberAfIasZoneClusterServerTickCallbackControl1, emberAfIasZoneClusterServerTickCallbackWrapperFunction1 },             \
-        { &emberAfPluginColorControlServerHueSatTransitionEventControl,                                                            \
-          emberAfPluginColorControlServerHueSatTransitionEventHandler },                                                           \
-        { &emberAfPluginColorControlServerTempTransitionEventControl, emberAfPluginColorControlServerTempTransitionEventHandler }, \
-        { &emberAfPluginColorControlServerXyTransitionEventControl, emberAfPluginColorControlServerXyTransitionEventHandler },     \
+        { &emberAfPluginColorControlServerHueSatTransitionEventControl[0],                                                         \
+          emberWrapperFunctionHueStatTransitionEventHandlerWrapper1 },                                                             \
+        { &emberAfPluginColorControlServerTempTransitionEventControl[0], emberWrapperFunctionTempTransitionEventHandlerWrapper1 }, \
+        { &emberAfPluginColorControlServerXyTransitionEventControl[0], emberWrapperFunctionXyTransitionEventHandlerWrapper1 },     \
         { &emberAfPluginDoorLockServerLockoutEventControl, emberAfPluginDoorLockServerLockoutEventHandler },                       \
         { &emberAfPluginDoorLockServerRelockEventControl, emberAfPluginDoorLockServerRelockEventHandler },                         \
         { &emberAfPluginIasZoneServerManageQueueEventControl, emberAfPluginIasZoneServerManageQueueEventHandler },                 \

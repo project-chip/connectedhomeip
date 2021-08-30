@@ -54,9 +54,9 @@
 using namespace chip;
 using namespace app::Clusters;
 
-#define COLOR_TEMP_CONTROL emberAfPluginColorControlServerTempTransitionEventControl
-#define COLOR_XY_CONTROL emberAfPluginColorControlServerXyTransitionEventControl
-#define COLOR_HSV_CONTROL emberAfPluginColorControlServerHueSatTransitionEventControl
+#define COLOR_TEMP_CONTROL(index) emberAfPluginColorControlServerTempTransitionEventControl[index]
+#define COLOR_XY_CONTROL(index) emberAfPluginColorControlServerXyTransitionEventControl[index]
+#define COLOR_HSV_CONTROL(index) emberAfPluginColorControlServerHueSatTransitionEventControl[index]
 
 // move mode
 enum
@@ -86,9 +86,9 @@ enum
     TEMPERATURE_TO_TEMPERATURE = 0x22
 };
 
-EmberEventControl emberAfPluginColorControlServerTempTransitionEventControl;
-EmberEventControl emberAfPluginColorControlServerXyTransitionEventControl;
-EmberEventControl emberAfPluginColorControlServerHueSatTransitionEventControl;
+EmberEventControl emberAfPluginColorControlServerTempTransitionEventControl[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+EmberEventControl emberAfPluginColorControlServerXyTransitionEventControl[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+EmberEventControl emberAfPluginColorControlServerHueSatTransitionEventControl[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 #define UPDATE_TIME_MS 100
 #define TRANSITION_TIME_1S 10
@@ -127,7 +127,7 @@ typedef struct
     bool isEnhancedHue;
 } ColorHueTransitionState;
 
-static ColorHueTransitionState colorHueTransitionState;
+static ColorHueTransitionState colorHueTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 typedef struct
 {
@@ -141,16 +141,16 @@ typedef struct
     EndpointId endpoint;
 } Color16uTransitionState;
 
-static Color16uTransitionState colorXTransitionState;
-static Color16uTransitionState colorYTransitionState;
+static Color16uTransitionState colorXTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+static Color16uTransitionState colorYTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
-static Color16uTransitionState colorTempTransitionState;
+static Color16uTransitionState colorTempTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
-static Color16uTransitionState colorSaturationTransitionState;
+static Color16uTransitionState colorSaturationTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 // Forward declarations:
 static bool computeNewColor16uValue(Color16uTransitionState * p);
-static void stopAllColorTransitions(void);
+static void stopAllColorTransitions(EndpointId endpoint);
 static void handleModeSwitch(EndpointId endpoint, uint8_t newColorMode);
 static bool shouldExecuteIfOff(EndpointId endpoint, uint8_t optionMask, uint8_t optionOverride);
 
@@ -159,7 +159,12 @@ static uint8_t addHue(uint8_t hue1, uint8_t hue2);
 static uint8_t subtractHue(uint8_t hue1, uint8_t hue2);
 static uint8_t addSaturation(uint8_t saturation1, uint8_t saturation2);
 static uint8_t subtractSaturation(uint8_t saturation1, uint8_t saturation2);
-static void initHueSat(EndpointId endpoint);
+static void initHueSat(EndpointId endpoint, ColorHueTransitionState * colorHueTransitionState,
+                       Color16uTransitionState * colorSaturationTransitionState);
+
+static ColorHueTransitionState * getColorHueTransitionState(EndpointId endpoint);
+static Color16uTransitionState * getSaturationTransitionState(EndpointId endpoint);
+
 static uint8_t readSaturation(EndpointId endpoint);
 static uint16_t addEnhancedHue(uint16_t hue1, uint16_t hue2);
 static uint16_t subtractEnhancedHue(uint16_t hue1, uint16_t hue2);
@@ -175,6 +180,12 @@ static bool stepHue(uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
 static uint16_t findNewColorValueFromStep(uint16_t oldValue, int16_t step);
+static Color16uTransitionState * getXTransitionState(EndpointId endpoint);
+static Color16uTransitionState * getYTransitionState(EndpointId endpoint);
+#endif
+
+#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+static Color16uTransitionState * getTempTransitionState(EndpointId endpoint);
 #endif
 
 static uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState * p, uint16_t rate);
@@ -184,7 +195,7 @@ static uint16_t readColorTemperatureCoupleToLevelMin(EndpointId endpoint)
 {
     uint16_t colorTemperatureCoupleToLevelMin;
     EmberAfStatus status;
-            
+
     status = ColorControl::Attributes::GetCoupleColorTempToLevelMinMireds(endpoint, &colorTemperatureCoupleToLevelMin);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -200,26 +211,52 @@ static uint16_t readColorTemperatureCoupleToLevelMin(EndpointId endpoint)
 // ****** callback section *******
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+/**
+ * @brief Get the Color Hue Transition State object
+ *
+ * @param endpoint
+ * @return ColorHueTransitionState*
+ */
+static ColorHueTransitionState * getColorHueTransitionState(EndpointId endpoint)
+{
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    return index == 0xFFFF ? NULL : &colorHueTransitionStates[index];
+}
+
+/**
+ * @brief Get the Saturation Transition State object
+ *
+ * @param endpoint
+ * @return ColorHueTransitionState*
+ */
+static Color16uTransitionState * getSaturationTransitionState(EndpointId endpoint)
+{
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    return index == 0xFFFF ? NULL : &colorSaturationTransitionStates[index];
+}
+
 static bool moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
                                    uint8_t optionsOverride, bool isEnhanced)
 {
     // If isEnhanced is True this function was called by EnhancedMoveToHueAndSaturation command and the hue is a uint16
     // If isEnhanced is False this function was called by MoveToHueAndSaturation command and the hue is are a uint8
 
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint                                      = emberAfCurrentEndpoint();
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
+    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
 
     uint16_t currentHue = 0;
-    if(isEnhanced)
+    if (isEnhanced)
     {
         ColorControl::Attributes::GetEnhancedCurrentHue(endpoint, &currentHue);
     }
     else
-    { 
+    {
         uint8_t current8bitHue = 0;
         ColorControl::Attributes::GetCurrentHue(endpoint, &current8bitHue);
 
-        currentHue = static_cast<uint16_t> (current8bitHue);
-    }   
+        currentHue = static_cast<uint16_t>(current8bitHue);
+    }
 
     bool moveUp;
 
@@ -254,47 +291,48 @@ static bool moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t tr
     }
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
     handleModeSwitch(endpoint, COLOR_MODE_HSV);
 
     // now, kick off the state machine.
-    initHueSat(endpoint);
-    colorHueTransitionState.isEnhancedHue = isEnhanced;
+    initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
+    colorHueTransitionState->isEnhancedHue = isEnhanced;
 
     if (isEnhanced)
     {
-        colorHueTransitionState.initialEnhancedHue = currentHue;
-        colorHueTransitionState.currentEnhancedHue = currentHue;
-        colorHueTransitionState.finalEnhancedHue   = hue;
+        colorHueTransitionState->initialEnhancedHue = currentHue;
+        colorHueTransitionState->currentEnhancedHue = currentHue;
+        colorHueTransitionState->finalEnhancedHue   = hue;
     }
     else
     {
-        colorHueTransitionState.initialHue = static_cast<uint8_t>(currentHue);
-        colorHueTransitionState.currentHue = static_cast<uint8_t>(currentHue);
-        colorHueTransitionState.finalHue   = static_cast<uint8_t>(hue);
+        colorHueTransitionState->initialHue = static_cast<uint8_t>(currentHue);
+        colorHueTransitionState->currentHue = static_cast<uint8_t>(currentHue);
+        colorHueTransitionState->finalHue   = static_cast<uint8_t>(hue);
     }
 
-    colorHueTransitionState.stepsRemaining = transitionTime;
-    colorHueTransitionState.stepsTotal     = transitionTime;
-    colorHueTransitionState.endpoint       = endpoint;
-    colorHueTransitionState.up             = moveUp;
-    colorHueTransitionState.repeat         = false;
+    colorHueTransitionState->stepsRemaining = transitionTime;
+    colorHueTransitionState->stepsTotal     = transitionTime;
+    colorHueTransitionState->endpoint       = endpoint;
+    colorHueTransitionState->up             = moveUp;
+    colorHueTransitionState->repeat         = false;
 
-    colorSaturationTransitionState.initialValue   = readSaturation(endpoint);
-    colorSaturationTransitionState.currentValue   = readSaturation(endpoint);
-    colorSaturationTransitionState.finalValue     = saturation;
-    colorSaturationTransitionState.stepsRemaining = transitionTime;
-    colorSaturationTransitionState.stepsTotal     = transitionTime;
-    colorSaturationTransitionState.endpoint       = endpoint;
-    colorSaturationTransitionState.lowLimit       = MIN_SATURATION_VALUE;
-    colorSaturationTransitionState.highLimit      = MAX_SATURATION_VALUE;
+    colorSaturationTransitionState->initialValue   = readSaturation(endpoint);
+    colorSaturationTransitionState->currentValue   = readSaturation(endpoint);
+    colorSaturationTransitionState->finalValue     = saturation;
+    colorSaturationTransitionState->stepsRemaining = transitionTime;
+    colorSaturationTransitionState->stepsTotal     = transitionTime;
+    colorSaturationTransitionState->endpoint       = endpoint;
+    colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
+    colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
 
     ColorControl::Attributes::SetRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL(index), UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -324,6 +362,9 @@ static bool moveHue(uint8_t moveMode, uint16_t rate, uint8_t optionsMask, uint8_
     uint16_t currentEnhancedHue = 0;
     EndpointId endpoint         = emberAfCurrentEndpoint();
 
+    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
+
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
@@ -331,7 +372,7 @@ static bool moveHue(uint8_t moveMode, uint16_t rate, uint8_t optionsMask, uint8_
     }
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     if (moveMode == EMBER_ZCL_HUE_MOVE_MODE_STOP)
     {
@@ -343,65 +384,66 @@ static bool moveHue(uint8_t moveMode, uint16_t rate, uint8_t optionsMask, uint8_
     handleModeSwitch(endpoint, COLOR_MODE_HSV);
 
     // now, kick off the state machine.
-    initHueSat(endpoint);
-    colorHueTransitionState.isEnhancedHue = isEnhanced;
+    initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
+    colorHueTransitionState->isEnhancedHue = isEnhanced;
 
     if (isEnhanced)
     {
         ColorControl::Attributes::GetEnhancedCurrentHue(endpoint, &currentEnhancedHue);
-        colorHueTransitionState.initialEnhancedHue = currentEnhancedHue;
-        colorHueTransitionState.currentEnhancedHue = currentEnhancedHue;
+        colorHueTransitionState->initialEnhancedHue = currentEnhancedHue;
+        colorHueTransitionState->currentEnhancedHue = currentEnhancedHue;
     }
     else
     {
         ColorControl::Attributes::GetCurrentHue(endpoint, &currentHue);
-        colorHueTransitionState.initialHue = currentHue;
-        colorHueTransitionState.currentHue = currentHue;
+        colorHueTransitionState->initialHue = currentHue;
+        colorHueTransitionState->currentHue = currentHue;
     }
 
     if (moveMode == EMBER_ZCL_HUE_MOVE_MODE_UP)
     {
         if (isEnhanced)
         {
-            colorHueTransitionState.finalEnhancedHue = addEnhancedHue(currentEnhancedHue, rate);
+            colorHueTransitionState->finalEnhancedHue = addEnhancedHue(currentEnhancedHue, rate);
         }
         else
         {
-            colorHueTransitionState.finalHue = addHue(currentHue, static_cast<uint8_t>(rate));
+            colorHueTransitionState->finalHue = addHue(currentHue, static_cast<uint8_t>(rate));
         }
 
-        colorHueTransitionState.up = true;
+        colorHueTransitionState->up = true;
     }
     else if (moveMode == EMBER_ZCL_HUE_MOVE_MODE_DOWN)
     {
         if (isEnhanced)
         {
-            colorHueTransitionState.finalEnhancedHue = subtractEnhancedHue(currentEnhancedHue, rate);
+            colorHueTransitionState->finalEnhancedHue = subtractEnhancedHue(currentEnhancedHue, rate);
         }
         else
         {
-            colorHueTransitionState.finalHue = subtractHue(currentHue, static_cast<uint8_t>(rate));
+            colorHueTransitionState->finalHue = subtractHue(currentHue, static_cast<uint8_t>(rate));
         }
 
-        colorHueTransitionState.up = false;
+        colorHueTransitionState->up = false;
     }
     else
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
         return true;
     }
-    colorHueTransitionState.stepsRemaining = TRANSITION_TIME_1S;
-    colorHueTransitionState.stepsTotal     = TRANSITION_TIME_1S;
-    colorHueTransitionState.endpoint       = endpoint;
-    colorHueTransitionState.repeat         = true;
+    colorHueTransitionState->stepsRemaining = TRANSITION_TIME_1S;
+    colorHueTransitionState->stepsTotal     = TRANSITION_TIME_1S;
+    colorHueTransitionState->endpoint       = endpoint;
+    colorHueTransitionState->repeat         = true;
     // hue movement can last forever.  Indicate this with a remaining time of
     // maxint.
     ColorControl::Attributes::SetRemainingTime(endpoint, MAX_INT16U_VALUE);
 
-    colorSaturationTransitionState.stepsRemaining = 0;
+    colorSaturationTransitionState->stepsRemaining = 0;
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberAfEndpointEventControlSetDelayMS(&COLOR_HSV_CONTROL(index), endpoint, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -416,7 +458,9 @@ bool emberAfColorControlClusterMoveHueCallback(EndpointId endpoint, app::Command
 bool emberAfColorControlClusterMoveSaturationCallback(EndpointId aEndpoint, app::CommandHandler * commandObj, uint8_t moveMode,
                                                       uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint                                      = emberAfCurrentEndpoint();
+    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -427,7 +471,7 @@ bool emberAfColorControlClusterMoveSaturationCallback(EndpointId aEndpoint, app:
     uint16_t transitionTime;
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     if (moveMode == EMBER_ZCL_SATURATION_MOVE_MODE_STOP || rate == 0)
     {
@@ -439,33 +483,34 @@ bool emberAfColorControlClusterMoveSaturationCallback(EndpointId aEndpoint, app:
     handleModeSwitch(endpoint, COLOR_MODE_HSV);
 
     // now, kick off the state machine.
-    initHueSat(endpoint);
+    initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
 
-    colorHueTransitionState.stepsRemaining = 0;
+    colorHueTransitionState->stepsRemaining = 0;
 
-    colorSaturationTransitionState.initialValue = readSaturation(endpoint);
-    colorSaturationTransitionState.currentValue = readSaturation(endpoint);
+    colorSaturationTransitionState->initialValue = readSaturation(endpoint);
+    colorSaturationTransitionState->currentValue = readSaturation(endpoint);
     if (moveMode == EMBER_ZCL_SATURATION_MOVE_MODE_UP)
     {
-        colorSaturationTransitionState.finalValue = MAX_SATURATION_VALUE;
+        colorSaturationTransitionState->finalValue = MAX_SATURATION_VALUE;
     }
     else
     {
-        colorSaturationTransitionState.finalValue = MIN_SATURATION_VALUE;
+        colorSaturationTransitionState->finalValue = MIN_SATURATION_VALUE;
     }
 
-    transitionTime = computeTransitionTimeFromStateAndRate(&colorSaturationTransitionState, rate);
+    transitionTime = computeTransitionTimeFromStateAndRate(colorSaturationTransitionState, rate);
 
-    colorSaturationTransitionState.stepsRemaining = transitionTime;
-    colorSaturationTransitionState.stepsTotal     = transitionTime;
-    colorSaturationTransitionState.endpoint       = endpoint;
-    colorSaturationTransitionState.lowLimit       = MIN_SATURATION_VALUE;
-    colorSaturationTransitionState.highLimit      = MAX_SATURATION_VALUE;
+    colorSaturationTransitionState->stepsRemaining = transitionTime;
+    colorSaturationTransitionState->stepsTotal     = transitionTime;
+    colorSaturationTransitionState->endpoint       = endpoint;
+    colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
+    colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
 
     ColorControl::Attributes::SetRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL(index), UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -476,7 +521,9 @@ static bool moveToHue(uint16_t hue, uint8_t hueMoveMode, uint16_t transitionTime
 {
     // If isEnhanced is True this function was called by EnhancedMoveToHue and hue is a uint16 value
     // If isEnhanced is False this function was called by MoveToHue command and hue is are a uint8 value
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint                                      = emberAfCurrentEndpoint();
+    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -485,18 +532,18 @@ static bool moveToHue(uint16_t hue, uint8_t hueMoveMode, uint16_t transitionTime
     }
 
     uint16_t currentHue = 0;
-    if(isEnhanced)
+    if (isEnhanced)
     {
         ColorControl::Attributes::GetEnhancedCurrentHue(endpoint, &currentHue);
     }
     else
-    { 
+    {
         uint8_t current8bitHue = 0;
         ColorControl::Attributes::GetCurrentHue(endpoint, &current8bitHue);
 
-        currentHue = static_cast<uint16_t> (current8bitHue);
-    }   
-    
+        currentHue = static_cast<uint16_t>(current8bitHue);
+    }
+
     uint8_t direction;
 
     if (transitionTime == 0)
@@ -551,42 +598,43 @@ static bool moveToHue(uint16_t hue, uint8_t hueMoveMode, uint16_t transitionTime
     }
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
     handleModeSwitch(endpoint, COLOR_MODE_HSV);
 
     // now, kick off the state machine.
-    initHueSat(endpoint);
-    colorHueTransitionState.isEnhancedHue = isEnhanced;
+    initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
+    colorHueTransitionState->isEnhancedHue = isEnhanced;
 
     if (isEnhanced)
     {
-        ColorControl::Attributes::GetEnhancedCurrentHue(endpoint, &(colorHueTransitionState.initialEnhancedHue));
-        ColorControl::Attributes::GetEnhancedCurrentHue(endpoint, &(colorHueTransitionState.currentEnhancedHue));
+        ColorControl::Attributes::GetEnhancedCurrentHue(endpoint, &(colorHueTransitionState->initialEnhancedHue));
+        ColorControl::Attributes::GetEnhancedCurrentHue(endpoint, &(colorHueTransitionState->currentEnhancedHue));
 
-        colorHueTransitionState.finalEnhancedHue   = hue;
+        colorHueTransitionState->finalEnhancedHue = hue;
     }
     else
     {
-        ColorControl::Attributes::GetCurrentHue(endpoint, &(colorHueTransitionState.initialHue));
-        ColorControl::Attributes::GetCurrentHue(endpoint, &(colorHueTransitionState.currentHue));
+        ColorControl::Attributes::GetCurrentHue(endpoint, &(colorHueTransitionState->initialHue));
+        ColorControl::Attributes::GetCurrentHue(endpoint, &(colorHueTransitionState->currentHue));
 
-        colorHueTransitionState.finalHue   = static_cast<uint8_t>(hue);
+        colorHueTransitionState->finalHue = static_cast<uint8_t>(hue);
     }
 
-    colorHueTransitionState.stepsRemaining = transitionTime;
-    colorHueTransitionState.stepsTotal     = transitionTime;
-    colorHueTransitionState.endpoint       = endpoint;
-    colorHueTransitionState.up             = (direction == MOVE_MODE_UP);
-    colorHueTransitionState.repeat         = false;
+    colorHueTransitionState->stepsRemaining = transitionTime;
+    colorHueTransitionState->stepsTotal     = transitionTime;
+    colorHueTransitionState->endpoint       = endpoint;
+    colorHueTransitionState->up             = (direction == MOVE_MODE_UP);
+    colorHueTransitionState->repeat         = false;
 
-    colorSaturationTransitionState.stepsRemaining = 0;
+    colorSaturationTransitionState->stepsRemaining = 0;
 
     ColorControl::Attributes::SetRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL(index), UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -602,7 +650,9 @@ bool emberAfColorControlClusterMoveToHueCallback(EndpointId endpoint, app::Comma
 bool emberAfColorControlClusterMoveToSaturationCallback(EndpointId aEndpoint, app::CommandHandler * commandObj, uint8_t saturation,
                                                         uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint                                      = emberAfCurrentEndpoint();
+    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -624,29 +674,30 @@ bool emberAfColorControlClusterMoveToSaturationCallback(EndpointId aEndpoint, ap
     }
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
     handleModeSwitch(endpoint, COLOR_MODE_HSV);
 
     // now, kick off the state machine.
-    initHueSat(endpoint);
+    initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
 
-    colorHueTransitionState.stepsRemaining = 0;
+    colorHueTransitionState->stepsRemaining = 0;
 
-    colorSaturationTransitionState.initialValue   = readSaturation(endpoint);
-    colorSaturationTransitionState.currentValue   = readSaturation(endpoint);
-    colorSaturationTransitionState.finalValue     = saturation;
-    colorSaturationTransitionState.stepsRemaining = transitionTime;
-    colorSaturationTransitionState.stepsTotal     = transitionTime;
-    colorSaturationTransitionState.endpoint       = endpoint;
-    colorSaturationTransitionState.lowLimit       = MIN_SATURATION_VALUE;
-    colorSaturationTransitionState.highLimit      = MAX_SATURATION_VALUE;
+    colorSaturationTransitionState->initialValue   = readSaturation(endpoint);
+    colorSaturationTransitionState->currentValue   = readSaturation(endpoint);
+    colorSaturationTransitionState->finalValue     = saturation;
+    colorSaturationTransitionState->stepsRemaining = transitionTime;
+    colorSaturationTransitionState->stepsTotal     = transitionTime;
+    colorSaturationTransitionState->endpoint       = endpoint;
+    colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
+    colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
 
     ColorControl::Attributes::SetRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL(index), UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -658,7 +709,9 @@ static bool stepHue(uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime
     // If isEnhanced is True this function was called by EnhancedStepHue and hue is a uint16 value
     // If isEnhanced is False this function was called by StepHue command and hue is are a uint8 value
 
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint                                      = emberAfCurrentEndpoint();
+    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -672,7 +725,7 @@ static bool stepHue(uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime
     }
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     if (stepMode == MOVE_MODE_STOP)
     {
@@ -684,53 +737,54 @@ static bool stepHue(uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime
     handleModeSwitch(endpoint, COLOR_MODE_HSV);
 
     // now, kick off the state machine.
-    initHueSat(endpoint);
-    colorHueTransitionState.isEnhancedHue = isEnhanced;
+    initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
+    colorHueTransitionState->isEnhancedHue = isEnhanced;
 
     if (isEnhanced)
     {
-        ColorControl::Attributes::GetEnhancedCurrentHue(endpoint, &(colorHueTransitionState.currentEnhancedHue));
-        colorHueTransitionState.initialEnhancedHue = colorHueTransitionState.currentEnhancedHue;
-        
+        ColorControl::Attributes::GetEnhancedCurrentHue(endpoint, &(colorHueTransitionState->currentEnhancedHue));
+        colorHueTransitionState->initialEnhancedHue = colorHueTransitionState->currentEnhancedHue;
+
         if (stepMode == MOVE_MODE_UP)
         {
-            colorHueTransitionState.finalEnhancedHue = addEnhancedHue(colorHueTransitionState.currentEnhancedHue, stepSize);
-            colorHueTransitionState.up               = true;
+            colorHueTransitionState->finalEnhancedHue = addEnhancedHue(colorHueTransitionState->currentEnhancedHue, stepSize);
+            colorHueTransitionState->up               = true;
         }
         else
         {
-            colorHueTransitionState.finalEnhancedHue = subtractEnhancedHue(colorHueTransitionState.currentEnhancedHue, stepSize);
-            colorHueTransitionState.up               = false;
+            colorHueTransitionState->finalEnhancedHue = subtractEnhancedHue(colorHueTransitionState->currentEnhancedHue, stepSize);
+            colorHueTransitionState->up               = false;
         }
     }
     else
     {
-        ColorControl::Attributes::GetCurrentHue(endpoint, &(colorHueTransitionState.currentHue));
-        colorHueTransitionState.initialHue = colorHueTransitionState.currentHue;
+        ColorControl::Attributes::GetCurrentHue(endpoint, &(colorHueTransitionState->currentHue));
+        colorHueTransitionState->initialHue = colorHueTransitionState->currentHue;
 
         if (stepMode == MOVE_MODE_UP)
         {
-            colorHueTransitionState.finalHue = addHue(colorHueTransitionState.currentHue, static_cast<uint8_t>(stepSize));
-            colorHueTransitionState.up       = true;
+            colorHueTransitionState->finalHue = addHue(colorHueTransitionState->currentHue, static_cast<uint8_t>(stepSize));
+            colorHueTransitionState->up       = true;
         }
         else
         {
-            colorHueTransitionState.finalHue = subtractHue(colorHueTransitionState.currentHue, static_cast<uint8_t>(stepSize));
-            colorHueTransitionState.up       = false;
+            colorHueTransitionState->finalHue = subtractHue(colorHueTransitionState->currentHue, static_cast<uint8_t>(stepSize));
+            colorHueTransitionState->up       = false;
         }
     }
 
-    colorHueTransitionState.stepsRemaining = transitionTime;
-    colorHueTransitionState.stepsTotal     = transitionTime;
-    colorHueTransitionState.endpoint       = endpoint;
-    colorHueTransitionState.repeat         = false;
+    colorHueTransitionState->stepsRemaining = transitionTime;
+    colorHueTransitionState->stepsTotal     = transitionTime;
+    colorHueTransitionState->endpoint       = endpoint;
+    colorHueTransitionState->repeat         = false;
 
-    colorSaturationTransitionState.stepsRemaining = 0;
+    colorSaturationTransitionState->stepsRemaining = 0;
 
     ColorControl::Attributes::SetRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL(index), UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -748,7 +802,9 @@ bool emberAfColorControlClusterStepSaturationCallback(EndpointId aEndpoint, app:
                                                       uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
                                                       uint8_t optionsOverride)
 {
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint                                      = emberAfCurrentEndpoint();
+    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -764,7 +820,7 @@ bool emberAfColorControlClusterStepSaturationCallback(EndpointId aEndpoint, app:
     }
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     if (stepMode == MOVE_MODE_STOP)
     {
@@ -776,31 +832,32 @@ bool emberAfColorControlClusterStepSaturationCallback(EndpointId aEndpoint, app:
     handleModeSwitch(endpoint, COLOR_MODE_HSV);
 
     // now, kick off the state machine.
-    initHueSat(endpoint);
+    initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
 
-    colorHueTransitionState.stepsRemaining = 0;
+    colorHueTransitionState->stepsRemaining = 0;
 
-    colorSaturationTransitionState.initialValue = currentSaturation;
-    colorSaturationTransitionState.currentValue = currentSaturation;
+    colorSaturationTransitionState->initialValue = currentSaturation;
+    colorSaturationTransitionState->currentValue = currentSaturation;
 
     if (stepMode == MOVE_MODE_UP)
     {
-        colorSaturationTransitionState.finalValue = addSaturation(currentSaturation, stepSize);
+        colorSaturationTransitionState->finalValue = addSaturation(currentSaturation, stepSize);
     }
     else
     {
-        colorSaturationTransitionState.finalValue = subtractSaturation(currentSaturation, stepSize);
+        colorSaturationTransitionState->finalValue = subtractSaturation(currentSaturation, stepSize);
     }
-    colorSaturationTransitionState.stepsRemaining = transitionTime;
-    colorSaturationTransitionState.stepsTotal     = transitionTime;
-    colorSaturationTransitionState.endpoint       = endpoint;
-    colorSaturationTransitionState.lowLimit       = MIN_SATURATION_VALUE;
-    colorSaturationTransitionState.highLimit      = MAX_SATURATION_VALUE;
+    colorSaturationTransitionState->stepsRemaining = transitionTime;
+    colorSaturationTransitionState->stepsTotal     = transitionTime;
+    colorSaturationTransitionState->endpoint       = endpoint;
+    colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
+    colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
 
     ColorControl::Attributes::SetRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL(index), UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -834,18 +891,19 @@ static uint8_t subtractSaturation(uint8_t saturation1, uint8_t saturation2)
 // any time we call a hue or saturation transition, we need to assume certain
 // things about the hue and saturation data structures.  This function will
 // properly initialize them.
-static void initHueSat(EndpointId endpoint)
+static void initHueSat(EndpointId endpoint, ColorHueTransitionState * colorHueTransitionState,
+                       Color16uTransitionState * colorSaturationTransitionState)
 {
-    colorHueTransitionState.stepsRemaining = 0;
-    ColorControl::Attributes::GetCurrentHue(endpoint, &(colorHueTransitionState.currentHue));
-    colorHueTransitionState.endpoint       = endpoint;
+    colorHueTransitionState->stepsRemaining = 0;
+    ColorControl::Attributes::GetCurrentHue(endpoint, &(colorHueTransitionState->currentHue));
+    colorHueTransitionState->endpoint = endpoint;
 
-    ColorControl::Attributes::GetEnhancedCurrentHue(endpoint, &(colorHueTransitionState.currentEnhancedHue));
-    colorHueTransitionState.isEnhancedHue      = false;
+    ColorControl::Attributes::GetEnhancedCurrentHue(endpoint, &(colorHueTransitionState->currentEnhancedHue));
+    colorHueTransitionState->isEnhancedHue = false;
 
-    colorSaturationTransitionState.stepsRemaining = 0;
-    colorSaturationTransitionState.currentValue   = readSaturation(endpoint);
-    colorSaturationTransitionState.endpoint       = endpoint;
+    colorSaturationTransitionState->stepsRemaining = 0;
+    colorSaturationTransitionState->currentValue   = readSaturation(endpoint);
+    colorSaturationTransitionState->endpoint       = endpoint;
 }
 
 static uint8_t readSaturation(EndpointId endpoint)
@@ -860,11 +918,25 @@ static uint8_t readSaturation(EndpointId endpoint)
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
 
+static Color16uTransitionState * getXTransitionState(EndpointId endpoint)
+{
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    return index == 0xFFFF ? NULL : &colorXTransitionStates[index];
+}
+
+static Color16uTransitionState * getYTransitionState(EndpointId endpoint)
+{
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    return index == 0xFFFF ? NULL : &colorYTransitionStates[index];
+}
+
 bool emberAfColorControlClusterMoveToColorCallback(EndpointId aEndpoint, app::CommandHandler * commandObj, uint16_t colorX,
                                                    uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask,
                                                    uint8_t optionsOverride)
 {
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint                             = emberAfCurrentEndpoint();
+    Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
+    Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -878,35 +950,35 @@ bool emberAfColorControlClusterMoveToColorCallback(EndpointId aEndpoint, app::Co
     }
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
     handleModeSwitch(endpoint, COLOR_MODE_CIE_XY);
 
     // now, kick off the state machine.
-    ColorControl::Attributes::GetCurrentX(endpoint, &(colorXTransitionState.initialValue));
-    ColorControl::Attributes::GetCurrentX(endpoint, &(colorXTransitionState.currentValue));
-    colorXTransitionState.finalValue     = colorX;
-    colorXTransitionState.stepsRemaining = transitionTime;
-    colorXTransitionState.stepsTotal     = transitionTime;
-    colorXTransitionState.endpoint       = endpoint;
-    colorXTransitionState.lowLimit       = MIN_CIE_XY_VALUE;
-    colorXTransitionState.highLimit      = MAX_CIE_XY_VALUE;
+    ColorControl::Attributes::GetCurrentX(endpoint, &(colorXTransitionState->initialValue));
+    ColorControl::Attributes::GetCurrentX(endpoint, &(colorXTransitionState->currentValue));
+    colorXTransitionState->finalValue     = colorX;
+    colorXTransitionState->stepsRemaining = transitionTime;
+    colorXTransitionState->stepsTotal     = transitionTime;
+    colorXTransitionState->endpoint       = endpoint;
+    colorXTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
+    colorXTransitionState->highLimit      = MAX_CIE_XY_VALUE;
 
-
-    ColorControl::Attributes::GetCurrentY(endpoint, &(colorYTransitionState.initialValue));
-    ColorControl::Attributes::GetCurrentY(endpoint, &(colorYTransitionState.currentValue));
-    colorYTransitionState.finalValue     = colorY;
-    colorYTransitionState.stepsRemaining = transitionTime;
-    colorYTransitionState.stepsTotal     = transitionTime;
-    colorYTransitionState.endpoint       = endpoint;
-    colorYTransitionState.lowLimit       = MIN_CIE_XY_VALUE;
-    colorYTransitionState.highLimit      = MAX_CIE_XY_VALUE;
+    ColorControl::Attributes::GetCurrentY(endpoint, &(colorYTransitionState->initialValue));
+    ColorControl::Attributes::GetCurrentY(endpoint, &(colorYTransitionState->currentValue));
+    colorYTransitionState->finalValue     = colorY;
+    colorYTransitionState->stepsRemaining = transitionTime;
+    colorYTransitionState->stepsTotal     = transitionTime;
+    colorYTransitionState->endpoint       = endpoint;
+    colorYTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
+    colorYTransitionState->highLimit      = MAX_CIE_XY_VALUE;
 
     ColorControl::Attributes::SetRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_XY_CONTROL, UPDATE_TIME_MS);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberEventControlSetDelayMS(&COLOR_XY_CONTROL(index), UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -915,7 +987,9 @@ bool emberAfColorControlClusterMoveToColorCallback(EndpointId aEndpoint, app::Co
 bool emberAfColorControlClusterMoveColorCallback(EndpointId aEndpoint, app::CommandHandler * commandObj, int16_t rateX,
                                                  int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint                             = emberAfCurrentEndpoint();
+    Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
+    Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -927,7 +1001,7 @@ bool emberAfColorControlClusterMoveColorCallback(EndpointId aEndpoint, app::Comm
     uint16_t unsignedRate;
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     if (rateX == 0 && rateY == 0)
     {
@@ -939,43 +1013,43 @@ bool emberAfColorControlClusterMoveColorCallback(EndpointId aEndpoint, app::Comm
     handleModeSwitch(endpoint, COLOR_MODE_CIE_XY);
 
     // now, kick off the state machine.
-    ColorControl::Attributes::GetCurrentX(endpoint, &(colorXTransitionState.initialValue));
-    colorXTransitionState.currentValue = colorXTransitionState.initialValue;
+    ColorControl::Attributes::GetCurrentX(endpoint, &(colorXTransitionState->initialValue));
+    colorXTransitionState->currentValue = colorXTransitionState->initialValue;
     if (rateX > 0)
     {
-        colorXTransitionState.finalValue = MAX_CIE_XY_VALUE;
-        unsignedRate                     = (uint16_t) rateX;
+        colorXTransitionState->finalValue = MAX_CIE_XY_VALUE;
+        unsignedRate                      = (uint16_t) rateX;
     }
     else
     {
-        colorXTransitionState.finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                     = (uint16_t)(rateX * -1);
+        colorXTransitionState->finalValue = MIN_CIE_XY_VALUE;
+        unsignedRate                      = (uint16_t)(rateX * -1);
     }
-    transitionTimeX                      = computeTransitionTimeFromStateAndRate(&colorXTransitionState, unsignedRate);
-    colorXTransitionState.stepsRemaining = transitionTimeX;
-    colorXTransitionState.stepsTotal     = transitionTimeX;
-    colorXTransitionState.endpoint       = endpoint;
-    colorXTransitionState.lowLimit       = MIN_CIE_XY_VALUE;
-    colorXTransitionState.highLimit      = MAX_CIE_XY_VALUE;
+    transitionTimeX                       = computeTransitionTimeFromStateAndRate(colorXTransitionState, unsignedRate);
+    colorXTransitionState->stepsRemaining = transitionTimeX;
+    colorXTransitionState->stepsTotal     = transitionTimeX;
+    colorXTransitionState->endpoint       = endpoint;
+    colorXTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
+    colorXTransitionState->highLimit      = MAX_CIE_XY_VALUE;
 
-    ColorControl::Attributes::GetCurrentY(endpoint, &(colorYTransitionState.initialValue));
-    colorYTransitionState.currentValue = colorYTransitionState.initialValue;
+    ColorControl::Attributes::GetCurrentY(endpoint, &(colorYTransitionState->initialValue));
+    colorYTransitionState->currentValue = colorYTransitionState->initialValue;
     if (rateY > 0)
     {
-        colorYTransitionState.finalValue = MAX_CIE_XY_VALUE;
-        unsignedRate                     = (uint16_t) rateY;
+        colorYTransitionState->finalValue = MAX_CIE_XY_VALUE;
+        unsignedRate                      = (uint16_t) rateY;
     }
     else
     {
-        colorYTransitionState.finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                     = (uint16_t)(rateY * -1);
+        colorYTransitionState->finalValue = MIN_CIE_XY_VALUE;
+        unsignedRate                      = (uint16_t)(rateY * -1);
     }
-    transitionTimeY                      = computeTransitionTimeFromStateAndRate(&colorYTransitionState, unsignedRate);
-    colorYTransitionState.stepsRemaining = transitionTimeY;
-    colorYTransitionState.stepsTotal     = transitionTimeY;
-    colorYTransitionState.endpoint       = endpoint;
-    colorYTransitionState.lowLimit       = MIN_CIE_XY_VALUE;
-    colorYTransitionState.highLimit      = MAX_CIE_XY_VALUE;
+    transitionTimeY                       = computeTransitionTimeFromStateAndRate(colorYTransitionState, unsignedRate);
+    colorYTransitionState->stepsRemaining = transitionTimeY;
+    colorYTransitionState->stepsTotal     = transitionTimeY;
+    colorYTransitionState->endpoint       = endpoint;
+    colorYTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
+    colorYTransitionState->highLimit      = MAX_CIE_XY_VALUE;
 
     if (transitionTimeX < transitionTimeY)
     {
@@ -987,7 +1061,8 @@ bool emberAfColorControlClusterMoveColorCallback(EndpointId aEndpoint, app::Comm
     }
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_XY_CONTROL, UPDATE_TIME_MS);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberEventControlSetDelayMS(&COLOR_XY_CONTROL(index), UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -997,7 +1072,9 @@ bool emberAfColorControlClusterStepColorCallback(EndpointId aEndpoint, app::Comm
                                                  int16_t stepY, uint16_t transitionTime, uint8_t optionsMask,
                                                  uint8_t optionsOverride)
 {
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint                             = emberAfCurrentEndpoint();
+    Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
+    Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1020,34 +1097,35 @@ bool emberAfColorControlClusterStepColorCallback(EndpointId aEndpoint, app::Comm
     }
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
     handleModeSwitch(endpoint, COLOR_MODE_CIE_XY);
 
     // now, kick off the state machine.
-    colorXTransitionState.initialValue   = currentColorX;
-    colorXTransitionState.currentValue   = currentColorX;
-    colorXTransitionState.finalValue     = colorX;
-    colorXTransitionState.stepsRemaining = transitionTime;
-    colorXTransitionState.stepsTotal     = transitionTime;
-    colorXTransitionState.endpoint       = endpoint;
-    colorXTransitionState.lowLimit       = MIN_CIE_XY_VALUE;
-    colorXTransitionState.highLimit      = MAX_CIE_XY_VALUE;
+    colorXTransitionState->initialValue   = currentColorX;
+    colorXTransitionState->currentValue   = currentColorX;
+    colorXTransitionState->finalValue     = colorX;
+    colorXTransitionState->stepsRemaining = transitionTime;
+    colorXTransitionState->stepsTotal     = transitionTime;
+    colorXTransitionState->endpoint       = endpoint;
+    colorXTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
+    colorXTransitionState->highLimit      = MAX_CIE_XY_VALUE;
 
-    colorYTransitionState.initialValue   = currentColorY;
-    colorYTransitionState.currentValue   = currentColorY;
-    colorYTransitionState.finalValue     = colorY;
-    colorYTransitionState.stepsRemaining = transitionTime;
-    colorYTransitionState.stepsTotal     = transitionTime;
-    colorYTransitionState.endpoint       = endpoint;
-    colorYTransitionState.lowLimit       = MIN_CIE_XY_VALUE;
-    colorYTransitionState.highLimit      = MAX_CIE_XY_VALUE;
+    colorYTransitionState->initialValue   = currentColorY;
+    colorYTransitionState->currentValue   = currentColorY;
+    colorYTransitionState->finalValue     = colorY;
+    colorYTransitionState->stepsRemaining = transitionTime;
+    colorYTransitionState->stepsTotal     = transitionTime;
+    colorYTransitionState->endpoint       = endpoint;
+    colorYTransitionState->lowLimit       = MIN_CIE_XY_VALUE;
+    colorYTransitionState->highLimit      = MAX_CIE_XY_VALUE;
 
     ColorControl::Attributes::SetRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_XY_CONTROL, UPDATE_TIME_MS);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberEventControlSetDelayMS(&COLOR_XY_CONTROL(index), UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -1079,11 +1157,26 @@ static uint16_t findNewColorValueFromStep(uint16_t oldValue, int16_t step)
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-static void moveToColorTemp(EndpointId endpoint, uint16_t colorTemperature, uint16_t transitionTime)
+/**
+ * @brief Get the Temp Transition State object
+ *
+ * @param endpoint
+ * @return Color16uTransitionState*
+ */
+static Color16uTransitionState * getTempTransitionState(EndpointId endpoint)
 {
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    return index == 0xFFFF ? NULL : &colorTempTransitionStates[index];
+}
+
+static void moveToColorTemp(EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime)
+{
+    EndpointId endpoint                                = emberAfCurrentEndpoint();
+    Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
+
     uint16_t temperatureMin = MIN_TEMPERATURE_VALUE;
     ColorControl::Attributes::GetColorTempPhysicalMin(endpoint, &temperatureMin);
- 
+
     uint16_t temperatureMax = MAX_TEMPERATURE_VALUE;
     ColorControl::Attributes::GetColorTempPhysicalMax(endpoint, &temperatureMax);
 
@@ -1093,7 +1186,7 @@ static void moveToColorTemp(EndpointId endpoint, uint16_t colorTemperature, uint
     }
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
     handleModeSwitch(endpoint, COLOR_MODE_TEMPERATURE);
@@ -1109,18 +1202,19 @@ static void moveToColorTemp(EndpointId endpoint, uint16_t colorTemperature, uint
     }
 
     // now, kick off the state machine.
-    ColorControl::Attributes::GetColorTemperature(endpoint, &(colorTempTransitionState.initialValue));
-    ColorControl::Attributes::GetColorTemperature(endpoint, &(colorTempTransitionState.currentValue));
+    ColorControl::Attributes::GetColorTemperature(endpoint, &(colorTempTransitionState->initialValue));
+    ColorControl::Attributes::GetColorTemperature(endpoint, &(colorTempTransitionState->currentValue));
 
-    colorTempTransitionState.finalValue     = colorTemperature;
-    colorTempTransitionState.stepsRemaining = transitionTime;
-    colorTempTransitionState.stepsTotal     = transitionTime;
-    colorTempTransitionState.endpoint       = endpoint;
-    colorTempTransitionState.lowLimit       = temperatureMin;
-    colorTempTransitionState.highLimit      = temperatureMax;
+    colorTempTransitionState->finalValue     = colorTemperature;
+    colorTempTransitionState->stepsRemaining = transitionTime;
+    colorTempTransitionState->stepsTotal     = transitionTime;
+    colorTempTransitionState->endpoint       = endpoint;
+    colorTempTransitionState->lowLimit       = temperatureMin;
+    colorTempTransitionState->highLimit      = temperatureMax;
 
-    // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
+    // kick off the state machine
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL(index), UPDATE_TIME_MS);
 }
 
 bool emberAfColorControlClusterMoveToColorTemperatureCallback(EndpointId aEndpoint, app::CommandHandler * commandObj,
@@ -1146,7 +1240,8 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(EndpointId aEndpoint
                                                             uint16_t colorTemperatureMaximum, uint8_t optionsMask,
                                                             uint8_t optionsOverride)
 {
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint                                = emberAfCurrentEndpoint();
+    Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1163,7 +1258,7 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(EndpointId aEndpoint
     uint16_t transitionTime;
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     if (moveMode == MOVE_MODE_STOP)
     {
@@ -1190,43 +1285,44 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(EndpointId aEndpoint
     handleModeSwitch(endpoint, COLOR_MODE_TEMPERATURE);
 
     // now, kick off the state machine.
-    colorTempTransitionState.initialValue = 0;
-    ColorControl::Attributes::GetColorTemperature(endpoint, &colorTempTransitionState.initialValue);
-    colorTempTransitionState.currentValue = colorTempTransitionState.initialValue;
+    colorTempTransitionState->initialValue = 0;
+    ColorControl::Attributes::GetColorTemperature(endpoint, &colorTempTransitionState->initialValue);
+    colorTempTransitionState->currentValue = colorTempTransitionState->initialValue;
 
     if (moveMode == MOVE_MODE_UP)
     {
         if (tempPhysicalMax > colorTemperatureMaximum)
         {
-            colorTempTransitionState.finalValue = colorTemperatureMaximum;
+            colorTempTransitionState->finalValue = colorTemperatureMaximum;
         }
         else
         {
-            colorTempTransitionState.finalValue = tempPhysicalMax;
+            colorTempTransitionState->finalValue = tempPhysicalMax;
         }
     }
     else
     {
         if (tempPhysicalMin < colorTemperatureMinimum)
         {
-            colorTempTransitionState.finalValue = colorTemperatureMinimum;
+            colorTempTransitionState->finalValue = colorTemperatureMinimum;
         }
         else
         {
-            colorTempTransitionState.finalValue = tempPhysicalMin;
+            colorTempTransitionState->finalValue = tempPhysicalMin;
         }
     }
-    transitionTime                          = computeTransitionTimeFromStateAndRate(&colorTempTransitionState, rate);
-    colorTempTransitionState.stepsRemaining = transitionTime;
-    colorTempTransitionState.stepsTotal     = transitionTime;
-    colorTempTransitionState.endpoint       = endpoint;
-    colorTempTransitionState.lowLimit       = colorTemperatureMinimum;
-    colorTempTransitionState.highLimit      = colorTemperatureMaximum;
+    transitionTime                           = computeTransitionTimeFromStateAndRate(colorTempTransitionState, rate);
+    colorTempTransitionState->stepsRemaining = transitionTime;
+    colorTempTransitionState->stepsTotal     = transitionTime;
+    colorTempTransitionState->endpoint       = endpoint;
+    colorTempTransitionState->lowLimit       = colorTemperatureMinimum;
+    colorTempTransitionState->highLimit      = colorTemperatureMaximum;
 
     ColorControl::Attributes::SetRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL(index), UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -1237,7 +1333,8 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(EndpointId aEndpoint
                                                             uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
                                                             uint8_t optionsMask, uint8_t optionsOverride)
 {
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint                                = emberAfCurrentEndpoint();
+    Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1257,7 +1354,7 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(EndpointId aEndpoint
     }
 
     // New command.  Need to stop any active transitions.
-    stopAllColorTransitions();
+    stopAllColorTransitions(endpoint);
 
     if (stepMode == MOVE_MODE_STOP)
     {
@@ -1278,44 +1375,45 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(EndpointId aEndpoint
     handleModeSwitch(endpoint, COLOR_MODE_TEMPERATURE);
 
     // now, kick off the state machine.
-    colorTempTransitionState.initialValue = 0;
-    ColorControl::Attributes::GetColorTemperature(endpoint, &colorTempTransitionState.initialValue);
-    colorTempTransitionState.currentValue = colorTempTransitionState.initialValue;
+    colorTempTransitionState->initialValue = 0;
+    ColorControl::Attributes::GetColorTemperature(endpoint, &colorTempTransitionState->initialValue);
+    colorTempTransitionState->currentValue = colorTempTransitionState->initialValue;
 
     if (stepMode == MOVE_MODE_UP)
     {
-        uint32_t finalValue32u = static_cast<uint32_t>(colorTempTransitionState.initialValue) + static_cast<uint32_t>(stepSize);
+        uint32_t finalValue32u = static_cast<uint32_t>(colorTempTransitionState->initialValue) + static_cast<uint32_t>(stepSize);
         if (finalValue32u > UINT16_MAX)
         {
-            colorTempTransitionState.finalValue = UINT16_MAX;
+            colorTempTransitionState->finalValue = UINT16_MAX;
         }
         else
         {
-            colorTempTransitionState.finalValue = static_cast<uint16_t>(finalValue32u);
+            colorTempTransitionState->finalValue = static_cast<uint16_t>(finalValue32u);
         }
     }
     else
     {
-        uint32_t finalValue32u = static_cast<uint32_t>(colorTempTransitionState.initialValue) - static_cast<uint32_t>(stepSize);
+        uint32_t finalValue32u = static_cast<uint32_t>(colorTempTransitionState->initialValue) - static_cast<uint32_t>(stepSize);
         if (finalValue32u > UINT16_MAX)
         {
-            colorTempTransitionState.finalValue = 0;
+            colorTempTransitionState->finalValue = 0;
         }
         else
         {
-            colorTempTransitionState.finalValue = static_cast<uint16_t>(finalValue32u);
+            colorTempTransitionState->finalValue = static_cast<uint16_t>(finalValue32u);
         }
     }
-    colorTempTransitionState.stepsRemaining = transitionTime;
-    colorTempTransitionState.stepsTotal     = transitionTime;
-    colorTempTransitionState.endpoint       = endpoint;
-    colorTempTransitionState.lowLimit       = colorTemperatureMinimum;
-    colorTempTransitionState.highLimit      = colorTemperatureMaximum;
+    colorTempTransitionState->stepsRemaining = transitionTime;
+    colorTempTransitionState->stepsTotal     = transitionTime;
+    colorTempTransitionState->endpoint       = endpoint;
+    colorTempTransitionState->lowLimit       = colorTemperatureMinimum;
+    colorTempTransitionState->highLimit      = colorTemperatureMaximum;
 
     ColorControl::Attributes::SetRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL(index), UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -1359,17 +1457,17 @@ void emberAfPluginLevelControlCoupledColorTempChangeCallback(EndpointId endpoint
         return;
     }
 
-    uint8_t colorMode  = 0;
+    uint8_t colorMode = 0;
     ColorControl::Attributes::GetColorMode(endpoint, &colorMode);
 
     if (colorMode == COLOR_MODE_TEMPERATURE)
     {
         uint16_t tempCoupleMin = readColorTemperatureCoupleToLevelMin(endpoint);
 
-        uint8_t currentLevel   = 0x7F;
+        uint8_t currentLevel = 0x7F;
         LevelControl::Attributes::GetCurrentLevel(endpoint, &currentLevel);
 
-        uint16_t tempPhysMax   = MAX_TEMPERATURE_VALUE;
+        uint16_t tempPhysMax = MAX_TEMPERATURE_VALUE;
         ColorControl::Attributes::GetColorTempPhysicalMax(endpoint, &tempPhysMax);
 
         // Scale color temp setting between the coupling min and the physical max.
@@ -1406,7 +1504,7 @@ bool emberAfColorControlClusterStopMoveStepCallback(EndpointId aEndpoint, app::C
 
     if (shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
-        stopAllColorTransitions();
+        stopAllColorTransitions(endpoint);
     }
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
@@ -1415,6 +1513,9 @@ bool emberAfColorControlClusterStopMoveStepCallback(EndpointId aEndpoint, app::C
 
 static void startColorLoop(EndpointId endpoint, uint8_t startFromStartHue)
 {
+    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
+
     uint8_t direction = 0;
     ColorControl::Attributes::GetColorLoopDirection(endpoint, &direction);
 
@@ -1437,38 +1538,42 @@ static void startColorLoop(EndpointId endpoint, uint8_t startFromStartHue)
     ColorControl::Attributes::SetColorLoopStoredEnhancedHue(endpoint, currentHue);
     ColorControl::Attributes::SetColorLoopActive(endpoint, true);
 
-    initHueSat(endpoint);
+    initHueSat(endpoint, colorHueTransitionState, colorSaturationTransitionState);
 
-    colorHueTransitionState.isEnhancedHue = true;
+    colorHueTransitionState->isEnhancedHue = true;
 
-    colorHueTransitionState.initialEnhancedHue = startHue;
-    colorHueTransitionState.currentEnhancedHue = currentHue;
+    colorHueTransitionState->initialEnhancedHue = startHue;
+    colorHueTransitionState->currentEnhancedHue = currentHue;
 
     if (direction)
     {
-        colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(startHue - 1);
+        colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(startHue - 1);
     }
     else
     {
-        colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(startHue + 1);
+        colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(startHue + 1);
     }
 
-    colorHueTransitionState.up     = direction;
-    colorHueTransitionState.repeat = true;
+    colorHueTransitionState->up     = direction;
+    colorHueTransitionState->repeat = true;
 
-    colorHueTransitionState.stepsRemaining = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
-    colorHueTransitionState.stepsTotal     = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
-    colorHueTransitionState.endpoint       = endpoint;
+    colorHueTransitionState->stepsRemaining = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
+    colorHueTransitionState->stepsTotal     = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
+    colorHueTransitionState->endpoint       = endpoint;
 
-    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
     ColorControl::Attributes::SetRemainingTime(endpoint, MAX_INT16U_VALUE);
+
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+    emberAfEndpointEventControlSetDelayMS(&COLOR_HSV_CONTROL(index), endpoint, UPDATE_TIME_MS);
+    // emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 }
 
-bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, chip::app::CommandHandler * commandObj,
-                                                    uint8_t updateFlags, uint8_t action, uint8_t direction, uint16_t time,
-                                                    uint16_t startHue, uint8_t optionsMask, uint8_t optionsOverride)
+bool emberAfColorControlClusterColorLoopSetCallback(EndpointId aEndpoint, app::CommandHandler * commandObj, uint8_t updateFlags,
+                                                    uint8_t action, uint8_t direction, uint16_t time, uint16_t startHue,
+                                                    uint8_t optionsMask, uint8_t optionsOverride)
 {
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint                               = emberAfCurrentEndpoint();
+    ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1489,18 +1594,18 @@ bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, 
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
         {
-            colorHueTransitionState.up                 = direction;
-            colorHueTransitionState.initialEnhancedHue = colorHueTransitionState.currentEnhancedHue;
+            colorHueTransitionState->up                 = direction;
+            colorHueTransitionState->initialEnhancedHue = colorHueTransitionState->currentEnhancedHue;
 
             if (direction)
             {
-                colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState.initialEnhancedHue - 1);
+                colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState->initialEnhancedHue - 1);
             }
             else
             {
-                colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState.initialEnhancedHue + 1);
+                colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState->initialEnhancedHue + 1);
             }
-            colorHueTransitionState.stepsRemaining = colorHueTransitionState.stepsTotal;
+            colorHueTransitionState->stepsRemaining = colorHueTransitionState->stepsTotal;
         }
     }
 
@@ -1511,18 +1616,18 @@ bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, 
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
         {
-            colorHueTransitionState.stepsTotal         = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
-            colorHueTransitionState.initialEnhancedHue = colorHueTransitionState.currentEnhancedHue;
+            colorHueTransitionState->stepsTotal         = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
+            colorHueTransitionState->initialEnhancedHue = colorHueTransitionState->currentEnhancedHue;
 
-            if (colorHueTransitionState.up)
+            if (colorHueTransitionState->up)
             {
-                colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState.initialEnhancedHue - 1);
+                colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState->initialEnhancedHue - 1);
             }
             else
             {
-                colorHueTransitionState.finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState.initialEnhancedHue + 1);
+                colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState->initialEnhancedHue + 1);
             }
-            colorHueTransitionState.stepsRemaining = colorHueTransitionState.stepsTotal;
+            colorHueTransitionState->stepsRemaining = colorHueTransitionState->stepsTotal;
         }
     }
 
@@ -1537,7 +1642,7 @@ bool emberAfColorControlClusterColorLoopSetCallback(chip::EndpointId aEndpoint, 
         {
             if (isColorLoopActive)
             {
-                stopAllColorTransitions();
+                stopAllColorTransitions(endpoint);
 
                 ColorControl::Attributes::SetColorLoopActive(endpoint, false);
 
@@ -1599,16 +1704,19 @@ bool emberAfColorControlClusterEnhancedStepHueCallback(EndpointId endpoint, app:
 
 // **************** transition state machines ***********
 
-static void stopAllColorTransitions(void)
+static void stopAllColorTransitions(EndpointId endpoint)
 {
-    emberEventControlSetInactive(&COLOR_TEMP_CONTROL);
-    emberEventControlSetInactive(&COLOR_XY_CONTROL);
-    emberEventControlSetInactive(&COLOR_HSV_CONTROL);
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+
+    emberEventControlSetInactive(&COLOR_TEMP_CONTROL(index));
+    emberEventControlSetInactive(&COLOR_XY_CONTROL(index));
+    emberEventControlSetInactive(&COLOR_HSV_CONTROL(index));
 }
 
 void emberAfPluginColorControlServerStopTransition(void)
 {
-    stopAllColorTransitions();
+    EndpointId endpoint = emberAfCurrentEndpoint();
+    stopAllColorTransitions(endpoint);
 }
 
 // The specification says that if we are transitioning from one color mode
@@ -1830,43 +1938,47 @@ static uint16_t subtractEnhancedHue(uint16_t hue1, uint16_t hue2)
     return static_cast<uint16_t>(hue1 - hue2);
 }
 
-void emberAfPluginColorControlServerHueSatTransitionEventHandler(void)
+void emberAfPluginColorControlServerHueSatTransitionEventHandler(EndpointId endpoint)
 {
-    EndpointId endpoint = colorHueTransitionState.endpoint;
     bool limitReached1, limitReached2;
 
-    limitReached1 = computeNewHueValue(&colorHueTransitionState);
-    limitReached2 = computeNewColor16uValue(&colorSaturationTransitionState);
+    ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
+
+    limitReached1 = computeNewHueValue(colorHueTransitionState);
+    limitReached2 = computeNewColor16uValue(colorSaturationTransitionState);
 
     if (limitReached1 || limitReached2)
     {
-        stopAllColorTransitions();
+        stopAllColorTransitions(endpoint);
     }
     else
     {
-        emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+        uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+        emberEventControlSetDelayMS(&COLOR_HSV_CONTROL(index), UPDATE_TIME_MS);
     }
 
-    if (colorHueTransitionState.isEnhancedHue)
+    if (colorHueTransitionState->isEnhancedHue)
     {
-        ColorControl::Attributes::SetEnhancedCurrentHue(endpoint, colorHueTransitionState.currentEnhancedHue);
-        ColorControl::Attributes::SetCurrentHue(endpoint, static_cast<uint8_t>(colorHueTransitionState.currentEnhancedHue >> 8)); 
+        ColorControl::Attributes::SetEnhancedCurrentHue(endpoint, colorHueTransitionState->currentEnhancedHue);
+        ColorControl::Attributes::SetCurrentHue(endpoint, static_cast<uint8_t>(colorHueTransitionState->currentEnhancedHue >> 8));
     }
     else
     {
-        ColorControl::Attributes::SetCurrentHue(colorHueTransitionState.endpoint, colorHueTransitionState.currentHue);
+        ColorControl::Attributes::SetCurrentHue(colorHueTransitionState->endpoint, colorHueTransitionState->currentHue);
     }
 
-    ColorControl::Attributes::SetCurrentSaturation(colorSaturationTransitionState.endpoint, (uint8_t) colorSaturationTransitionState.currentValue);
-    if (colorHueTransitionState.isEnhancedHue)
+    ColorControl::Attributes::SetCurrentSaturation(colorSaturationTransitionState->endpoint,
+                                                   (uint8_t) colorSaturationTransitionState->currentValue);
+    if (colorHueTransitionState->isEnhancedHue)
     {
-        emberAfColorControlClusterPrintln("Enhanced Hue %d Saturation %d endpoint %d", colorHueTransitionState.currentEnhancedHue,
-                                          colorSaturationTransitionState.currentValue, endpoint);
+        emberAfColorControlClusterPrintln("Enhanced Hue %d Saturation %d endpoint %d", colorHueTransitionState->currentEnhancedHue,
+                                          colorSaturationTransitionState->currentValue, endpoint);
     }
     else
     {
-        emberAfColorControlClusterPrintln("Hue %d Saturation %d endpoint %d", colorHueTransitionState.currentHue,
-                                          colorSaturationTransitionState.currentValue, endpoint);
+        emberAfColorControlClusterPrintln("Hue %d Saturation %d endpoint %d", colorHueTransitionState->currentHue,
+                                          colorSaturationTransitionState->currentValue, endpoint);
     }
     emberAfPluginColorControlServerComputePwmFromHsvCallback(endpoint);
 }
@@ -1957,54 +2069,57 @@ static uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState * 
     return (uint16_t) transitionTime;
 }
 
-void emberAfPluginColorControlServerXyTransitionEventHandler(void)
+void emberAfPluginColorControlServerXyTransitionEventHandler(EndpointId endpoint)
 {
-    EndpointId endpoint = colorXTransitionState.endpoint;
+    Color16uTransitionState * colorXTransitionState = getXTransitionState(endpoint);
+    Color16uTransitionState * colorYTransitionState = getYTransitionState(endpoint);
     bool limitReachedX, limitReachedY;
 
     // compute new values for X and Y.
-    limitReachedX = computeNewColor16uValue(&colorXTransitionState);
+    limitReachedX = computeNewColor16uValue(colorXTransitionState);
 
-    limitReachedY = computeNewColor16uValue(&colorYTransitionState);
+    limitReachedY = computeNewColor16uValue(colorYTransitionState);
 
     if (limitReachedX || limitReachedY)
     {
-        stopAllColorTransitions();
+        stopAllColorTransitions(endpoint);
     }
     else
     {
-        emberEventControlSetDelayMS(&COLOR_XY_CONTROL, UPDATE_TIME_MS);
+        uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+        emberEventControlSetDelayMS(&COLOR_XY_CONTROL(index), UPDATE_TIME_MS);
     }
 
     // update the attributes
-    ColorControl::Attributes::SetCurrentX(colorXTransitionState.endpoint, colorXTransitionState.currentValue);
-    ColorControl::Attributes::SetCurrentY(colorXTransitionState.endpoint, colorYTransitionState.currentValue);
+    ColorControl::Attributes::SetCurrentX(endpoint, colorXTransitionState->currentValue);
+    ColorControl::Attributes::SetCurrentY(endpoint, colorYTransitionState->currentValue);
 
-    emberAfColorControlClusterPrintln("Color X %d Color Y %d", colorXTransitionState.currentValue,
-                                      colorYTransitionState.currentValue);
+    emberAfColorControlClusterPrintln("Color X %d Color Y %d", colorXTransitionState->currentValue,
+                                      colorYTransitionState->currentValue);
 
     emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint);
 }
 
-void emberAfPluginColorControlServerTempTransitionEventHandler(void)
+void emberAfPluginColorControlServerTempTransitionEventHandler(EndpointId endpoint)
 {
-    EndpointId endpoint = colorTempTransitionState.endpoint;
+    Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     bool limitReached;
 
-    limitReached = computeNewColor16uValue(&colorTempTransitionState);
+    limitReached = computeNewColor16uValue(colorTempTransitionState);
 
     if (limitReached)
     {
-        stopAllColorTransitions();
+        stopAllColorTransitions(endpoint);
     }
     else
     {
-        emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
+        uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID);
+        emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL(index), UPDATE_TIME_MS);
     }
 
-    ColorControl::Attributes::SetColorTemperature(colorTempTransitionState.endpoint, colorTempTransitionState.currentValue);
+    ColorControl::Attributes::SetColorTemperature(endpoint, colorTempTransitionState->currentValue);
 
-    emberAfColorControlClusterPrintln("Color Temperature %d", colorTempTransitionState.currentValue);
+    emberAfColorControlClusterPrintln("Color Temperature %d", colorTempTransitionState->currentValue);
 
     emberAfPluginColorControlServerComputePwmFromTempCallback(endpoint);
 }

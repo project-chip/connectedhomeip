@@ -42,12 +42,12 @@
 // Code used to configure the cluster event mechanism
 #define EMBER_AF_GENERATED_EVENT_CODE                                                                                              \
     EmberEventControl emberAfLevelControlClusterServerTickCallbackControl1;                                                        \
-    extern EmberEventControl emberAfPluginColorControlServerHueSatTransitionEventControl;                                          \
-    extern EmberEventControl emberAfPluginColorControlServerTempTransitionEventControl;                                            \
-    extern EmberEventControl emberAfPluginColorControlServerXyTransitionEventControl;                                              \
-    extern void emberAfPluginColorControlServerHueSatTransitionEventHandler(void);                                                 \
-    extern void emberAfPluginColorControlServerTempTransitionEventHandler(void);                                                   \
-    extern void emberAfPluginColorControlServerXyTransitionEventHandler(void);                                                     \
+    extern EmberEventControl emberAfPluginColorControlServerHueSatTransitionEventControl[];                                        \
+    extern EmberEventControl emberAfPluginColorControlServerTempTransitionEventControl[];                                          \
+    extern EmberEventControl emberAfPluginColorControlServerXyTransitionEventControl[];                                            \
+    extern void emberAfPluginColorControlServerHueSatTransitionEventHandler(chip::EndpointId endpoint);                            \
+    extern void emberAfPluginColorControlServerTempTransitionEventHandler(chip::EndpointId endpoint);                              \
+    extern void emberAfPluginColorControlServerXyTransitionEventHandler(chip::EndpointId endpoint);                                \
     static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)                    \
     {                                                                                                                              \
         /* emberAfPushEndpointNetworkIndex(endpoint); */                                                                           \
@@ -55,20 +55,38 @@
         (*callback)(endpoint);                                                                                                     \
         /* emberAfPopNetworkIndex(); */                                                                                            \
     }                                                                                                                              \
-                                                                                                                                   \
     void emberAfLevelControlClusterServerTickCallbackWrapperFunction1(void)                                                        \
     {                                                                                                                              \
         clusterTickWrapper(&emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallback,    \
                            1);                                                                                                     \
+    }                                                                                                                              \
+    static void colorControlEventHandlerWrapper(EmberEventControl * control, EmberAfTickFunction callback,                         \
+                                                chip::EndpointId endpoint)                                                         \
+    {                                                                                                                              \
+        (*callback)(endpoint);                                                                                                     \
+    }                                                                                                                              \
+    void emberWrapperFunctionHueStatTransitionEventHandlerWrapper1(void)                                                           \
+    {                                                                                                                              \
+        colorControlEventHandlerWrapper(&emberAfPluginColorControlServerHueSatTransitionEventControl[0],                           \
+                                        emberAfPluginColorControlServerHueSatTransitionEventHandler, 1);                           \
+    }                                                                                                                              \
+    void emberWrapperFunctionXyTransitionEventHandlerWrapper1(void)                                                                \
+    {                                                                                                                              \
+        colorControlEventHandlerWrapper(&emberAfPluginColorControlServerHueSatTransitionEventControl[0],                           \
+                                        emberAfPluginColorControlServerXyTransitionEventHandler, 1);                               \
+    }                                                                                                                              \
+    void emberWrapperFunctionTempTransitionEventHandlerWrapper1(void)                                                              \
+    {                                                                                                                              \
+        colorControlEventHandlerWrapper(&emberAfPluginColorControlServerTempTransitionEventControl[0],                             \
+                                        emberAfPluginColorControlServerTempTransitionEventHandler, 1);                             \
     }
-
 // EmberEventData structs used to populate the EmberEventData table
 #define EMBER_AF_GENERATED_EVENTS                                                                                                  \
     { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },       \
-        { &emberAfPluginColorControlServerHueSatTransitionEventControl,                                                            \
-          emberAfPluginColorControlServerHueSatTransitionEventHandler },                                                           \
-        { &emberAfPluginColorControlServerTempTransitionEventControl, emberAfPluginColorControlServerTempTransitionEventHandler }, \
-        { &emberAfPluginColorControlServerXyTransitionEventControl, emberAfPluginColorControlServerXyTransitionEventHandler },
+        { &emberAfPluginColorControlServerHueSatTransitionEventControl[0],                                                         \
+          emberWrapperFunctionHueStatTransitionEventHandlerWrapper1 },                                                             \
+        { &emberAfPluginColorControlServerTempTransitionEventControl[0], emberWrapperFunctionTempTransitionEventHandlerWrapper1 }, \
+        { &emberAfPluginColorControlServerXyTransitionEventControl[0], emberWrapperFunctionXyTransitionEventHandlerWrapper1 },
 
 #define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
     "Level Control Cluster Server EP 1", "Color Control Cluster Server Plugin HueSatTransition",                                   \
