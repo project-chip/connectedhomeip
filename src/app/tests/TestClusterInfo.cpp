@@ -95,12 +95,16 @@ void TestAttributePathIncludedDifferentClusterId(nlTestSuite * apSuite, void * a
 } // namespace chip
 
 namespace {
-const nlTest sTests[] = { NL_TEST_DEF("TestDirty", chip::app::TestClusterInfo::TestDirty),
-                          NL_TEST_DEF("TestAttributePathIncludedSameFieldId", chip::app::TestClusterInfo::TestAttributePathIncludedSameFieldId),
-                          NL_TEST_DEF("TestAttributePathIncludedDifferentFieldId", chip::app::TestClusterInfo::TestAttributePathIncludedDifferentFieldId),
-                          NL_TEST_DEF("TestAttributePathIncludedDifferentEndpointId", chip::app::TestClusterInfo::TestAttributePathIncludedDifferentEndpointId),
-                          NL_TEST_DEF("TestAttributePathIncludedDifferentClusterId", chip::app::TestClusterInfo::TestAttributePathIncludedDifferentClusterId),
-                          NL_TEST_SENTINEL() };
+const nlTest sTests[] = {
+    NL_TEST_DEF("TestDirty", chip::app::TestClusterInfo::TestDirty),
+    NL_TEST_DEF("TestAttributePathIncludedSameFieldId", chip::app::TestClusterInfo::TestAttributePathIncludedSameFieldId),
+    NL_TEST_DEF("TestAttributePathIncludedDifferentFieldId", chip::app::TestClusterInfo::TestAttributePathIncludedDifferentFieldId),
+    NL_TEST_DEF("TestAttributePathIncludedDifferentEndpointId",
+                chip::app::TestClusterInfo::TestAttributePathIncludedDifferentEndpointId),
+    NL_TEST_DEF("TestAttributePathIncludedDifferentClusterId",
+                chip::app::TestClusterInfo::TestAttributePathIncludedDifferentClusterId),
+    NL_TEST_SENTINEL()
+};
 }
 
 int TestClusterInfo()
