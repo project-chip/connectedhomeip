@@ -92,7 +92,7 @@ private:
     {
         Uninitialized = 0, ///< The client has not been initialized
         Initialized,       ///< The client has been initialized and is ready for a SendReadRequest
-        AwaitingResponse,  ///< The client has sent out the read request message
+        AwaitingReport,  ///< The client is wanting for report
     };
 
     /**
@@ -121,7 +121,7 @@ private:
      *
      */
     bool IsFree() const { return mState == ClientState::Uninitialized; }
-
+    bool IsAwaitingReport() const { return mState == ClientState::AwaitingReport; }
     CHIP_ERROR GenerateEventPathList(EventPathList::Builder & aEventPathListBuilder, EventPathParams * apEventPathParamsList,
                                      size_t aEventPathParamsListSize);
     CHIP_ERROR GenerateAttributePathList(AttributePathList::Builder & aAttributeathListBuilder,
@@ -141,12 +141,14 @@ private:
      * our exchange and don't need to manually close it.
      */
     void ShutdownInternal(CHIP_ERROR aError);
-
+    void ClearInitialReport() { mInitialReport = false; }
+    bool IsInitialReport() { return mInitialReport; }
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
     uint64_t mAppIdentifier                    = 0;
+    bool mInitialReport = true;
 };
 
 }; // namespace app

@@ -31,16 +31,18 @@
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate, Messaging::ExchangeContext * apExchangeContext)
+CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, Messaging::ExchangeContext * apExchangeContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
     VerifyOrReturnError(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    mpExchangeMgr = apExchangeMgr;
     mpExchangeCtx              = apExchangeContext;
     mSuppressResponse          = true;
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
+    mInitialReport             = true;
     MoveToState(HandlerState::Initialized);
     mpDelegate = apDelegate;
     if (apExchangeContext != nullptr)
@@ -51,8 +53,17 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate, Messaging::E
     return err;
 }
 
-void ReadHandler::Shutdown()
+void ReadHandler::Shutdown(ShutdownOptions aOptions)
 {
+    if (aOptions == ShutdownOptions::AbortCurrentExchange)
+    {
+        if (mpExchangeCtx != nullptr)
+        {
+            mpExchangeCtx->Abort();
+            mpExchangeCtx = nullptr;
+        }
+    }
+
     if (IsReporting())
     {
         InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
@@ -64,6 +75,7 @@ void ReadHandler::Shutdown()
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
+    mInitialReport             = false;
     mpDelegate                 = nullptr;
 }
 
@@ -78,7 +90,6 @@ CHIP_ERROR ReadHandler::OnReadRequest(System::PacketBufferHandle && aPayload)
         ChipLogFunctError(err);
         Shutdown();
     }
-
     return err;
 }
 
@@ -102,24 +113,11 @@ exit:
 
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(IsReportable(), err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
+    VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    MoveToState(HandlerState::Reporting);
+    return mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
-    if (err == CHIP_NO_ERROR)
-    {
-        MoveToState(HandlerState::Reporting);
-    }
-
-exit:
-    ChipLogFunctError(err);
-    if (err != CHIP_NO_ERROR)
-    {
-        Shutdown();
-    }
-    return err;
 }
 
 CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
@@ -150,6 +148,10 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive status response from Exchange: %d",
                     apExchangeContext->GetExchangeId());
+    if (IsReporting())
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
     Shutdown();
 }
 

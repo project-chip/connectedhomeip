@@ -50,6 +50,12 @@ namespace app {
 class ReadHandler : public Messaging::ExchangeDelegate
 {
 public:
+    enum class ShutdownOptions
+    {
+        KeepCurrentExchange,
+        AbortCurrentExchange,
+    };
+
     /**
      *  Initialize the ReadHandler. Within the lifetime
      *  of this instance, this method is invoked once after object
@@ -61,14 +67,14 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(InteractionModelDelegate * apDelegate, Messaging::ExchangeContext * apExchangeContext);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, Messaging::ExchangeContext * apExchangeContext);
 
     /**
      *  Shut down the ReadHandler. This terminates this instance
      *  of the object and releases all held resources.
      *
      */
-    void Shutdown();
+    void Shutdown(ShutdownOptions aOptions = ShutdownOptions::KeepCurrentExchange);
     /**
      *  Process a read request.  Parts of the processing may end up being asynchronous, but the ReadHandler
      *  guarantees that it will call Shutdown on itself when processing is done (including if OnReadRequest
@@ -153,6 +159,7 @@ private:
 
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
+    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate = nullptr;
     bool mInitialReport                   = false;
 };
