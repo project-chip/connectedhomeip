@@ -52,7 +52,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     int64_t id    = 0x100;
     uint16_t port = 2000;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    constexpr Inet::InterfaceId iface = nullptr ;
+    constexpr Inet::InterfaceId iface = nullptr;
 #else
     constexpr Inet::InterfaceId iface = 2;
 #endif
