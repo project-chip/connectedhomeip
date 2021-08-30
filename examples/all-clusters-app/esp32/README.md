@@ -203,7 +203,9 @@ commissioning and cluster control.
 
          - chip-device-ctrl > close-ble
 
--   Resolve DNS-SD name and update address of the node in the device controller. Get fabric ID using `getfabricid` and use the decimal value of comparessed fabric id.
+-   Resolve DNS-SD name and update address of the node in the device controller.
+    Get fabric ID using `getfabricid` and use the decimal value of comparessed
+    fabric id.
 
          - chip-device-ctrl > getfabricid
 
