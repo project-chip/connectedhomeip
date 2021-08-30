@@ -293,7 +293,9 @@
                 "shell",
                 "temperature-measurement",
                 "thermostat",
-                "window-covering"
+                "window-covering",
+                "pump",
+                "pump-controller"
             ],
             "default": "build"
         },
