@@ -102,6 +102,10 @@ struct ControllerInitParams
     ByteSpan controllerRCAC;
 
     uint16_t controllerVendorId;
+
+    /* The port used by the controller to listen for and send messages.
+     * The default value of `0` will pick any available port. */
+    uint16_t listenPort = 0;
 };
 
 enum CommissioningStage : uint8_t
