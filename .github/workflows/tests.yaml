@@ -16,7 +16,11 @@ name: Tests
 
 on:
     push:
+        paths:
+            - '!**.md'
     pull_request:
+        paths:
+            - '!**.md'
     workflow_dispatch:
 
 concurrency:

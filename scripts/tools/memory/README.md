@@ -12,7 +12,7 @@ The following options are common to _most_ of the scripts, where applicable:
 -   `--verbose`, `-v` Show informational messages; repeat for debugging
     messages.
 -   `--config-file` _FILE_ Read configuration _FILE_. Typically this is a file
-    from the `plaform/` subdirectory providing platform-specific option
+    from the `platform/` subdirectory providing platform-specific option
     defaults. Command line options override the configuration file.
 
 ### input options:
@@ -36,7 +36,7 @@ The following options are common to _most_ of the scripts, where applicable:
 ## output options:
 
 -   `--output-file` _FILENAME_, `--output` _FILENAME_, `-O` _FILENAME_ Output
-    file. Defautls to standard output. For `csv` and `tsv` formats, this is
+    file. Defaults to standard output. For `csv` and `tsv` formats, this is
     actually an output file name prefix.
 -   `--output-format` _FORMAT_, `--to` _FORMAT_, `-t` _FORMAT_ Output format.
     One of:
