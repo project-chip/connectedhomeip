@@ -632,9 +632,9 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     attributePathParams[0].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReadPrepareParams readPrepareParams;
-    readPrepareParams.mSessionHandle           = ctx.GetSessionLocalToPeer();
-    readPrepareParams.mpEventPathParamsList    = eventPathParams;
-    readPrepareParams.mEventPathParamsListSize = 2;
+    readPrepareParams.mSessionHandle               = ctx.GetSessionLocalToPeer();
+    readPrepareParams.mpEventPathParamsList        = eventPathParams;
+    readPrepareParams.mEventPathParamsListSize     = 2;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams);
@@ -678,8 +678,8 @@ void TestReadInteraction::TestReadInvalidAttributePathRoundtrip(nlTestSuite * ap
     attributePathParams[0].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     ReadPrepareParams readPrepareParams;
-    readPrepareParams.mSessionHandle              = ctx.GetSessionLocalToPeer();
-    readPrepareParams.mpAttributePathParamsList   = attributePathParams;
+    readPrepareParams.mSessionHandle               = ctx.GetSessionLocalToPeer();
+    readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
