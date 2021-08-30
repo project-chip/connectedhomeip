@@ -65,6 +65,9 @@ using namespace chip::Transport;
 using chip::Shell::Engine;
 #endif
 
+static constexpr useconds_t kWifiStartCheckTime = 100*1000; // 100 ms
+static constexpr uint8_t kWifiStartCheckAttempts = 5;
+
 namespace {
 void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
@@ -80,6 +83,7 @@ int ChipLinuxAppInit(int argc, char ** argv)
 {
     CHIP_ERROR err                                   = CHIP_NO_ERROR;
     chip::RendezvousInformationFlags rendezvousFlags = chip::RendezvousInformationFlag::kBLE;
+    int counter                                      = 0;
 
 #ifdef CONFIG_RENDEZVOUS_MODE
     rendezvousFlags = static_cast<chip::RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
@@ -120,6 +124,16 @@ int ChipLinuxAppInit(int argc, char ** argv)
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
         chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+        while (chip::DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted() == false)
+        {
+            usleep(kWifiStartCheckTime);
+            counter++;
+            if (counter == kWifiStartCheckAttempts)
+            {
+                ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start.");
+                break;
+            }
+        }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
