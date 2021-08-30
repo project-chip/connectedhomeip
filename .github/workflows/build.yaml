@@ -242,7 +242,7 @@ jobs:
             #   uses: github/codeql-action/analyze@v1
     build_darwin:
         name: Build on Darwin (clang, python_lib)
-        timeout-minutes: 75
+        timeout-minutes: 90
 
         env:
             BUILD_TYPE: clang
