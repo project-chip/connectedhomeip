@@ -19509,9 +19509,19 @@ private:
             return;
         }
 
-        if (supportedFabrics != 16)
+        ChipLogError(chipTool, "Warning: supportedFabrics type checking is not implemented yet. Expected type: '%s'", "uint8");
+
+        if (supportedFabrics < 5)
         {
-            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "16");
+            ChipLogError(chipTool, "Error: supportedFabrics is lower than expected. Min value is 5 but got '%d'", supportedFabrics);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        if (supportedFabrics > 255)
+        {
+            ChipLogError(chipTool, "Error: supportedFabrics is higher than expected. Max value is 255 but got '%d'",
+                         supportedFabrics);
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
@@ -19573,9 +19583,12 @@ private:
             return;
         }
 
-        if (commissionedFabrics != 1)
+        ChipLogError(chipTool, "Warning: commissionedFabrics type checking is not implemented yet. Expected type: '%s'", "uint8");
+
+        if (commissionedFabrics < 1)
         {
-            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "1");
+            ChipLogError(chipTool, "Error: commissionedFabrics is lower than expected. Min value is 1 but got '%d'",
+                         commissionedFabrics);
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }

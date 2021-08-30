@@ -5132,7 +5132,8 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Read number of supported fabrics Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 16);
+        XCTAssertGreaterThanOrEqual([values[@"value"] unsignedCharValue], 5);
+        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 255);
         [expectation fulfill];
     }];
 
@@ -5150,7 +5151,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         NSLog(@"Read number of commissioned fabrics Error: %@", err);
 
         XCTAssertEqual(err.code, 0);
-        XCTAssertEqual([values[@"value"] unsignedCharValue], 1);
+        XCTAssertGreaterThanOrEqual([values[@"value"] unsignedCharValue], 1);
         [expectation fulfill];
     }];
 
