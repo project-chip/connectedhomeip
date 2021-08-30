@@ -103,7 +103,7 @@ struct ControllerInitParams
 
     uint16_t controllerVendorId;
 
-    /* The port used by the controller to listen for and send messages.
+    /* The port used for operational communication to listen for and send messages over UDP/TCP.
      * The default value of `0` will pick any available port. */
     uint16_t listenPort = 0;
 };
