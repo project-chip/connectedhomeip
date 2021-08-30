@@ -242,7 +242,7 @@ jobs:
             #   uses: github/codeql-action/analyze@v1
     build_darwin:
         name: Build on Darwin (clang, python_lib)
-        timeout-minutes: 75
+        timeout-minutes: 90
 
         env:
             BUILD_TYPE: clang
@@ -277,7 +277,7 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Setup Build, Run Build and Run Tests
-              timeout-minutes: 50
+              timeout-minutes: 75
               # Just go ahead and do the "all" build; on Darwin that's fairly
               # fast.  If this ever becomes slow, we can think about ways to do
               # the examples-linux-standalone.yaml tests on darwin without too
