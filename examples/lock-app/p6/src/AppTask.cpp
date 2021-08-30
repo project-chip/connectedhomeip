@@ -102,7 +102,7 @@ CHIP_ERROR AppTask::Init()
         },
         0);
     // Init ZCL Data Model
-    chip::Server::GetServer().Init();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

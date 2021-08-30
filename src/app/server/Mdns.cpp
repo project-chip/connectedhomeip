@@ -42,7 +42,7 @@ namespace {
 bool HaveOperationalCredentials()
 {
     // Look for any fabric info that has a useful operational identity.
-    for (const Transport::FabricInfo & fabricInfo : Server::GetServer().GetFabricTable())
+    for (const Transport::FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
     {
         if (fabricInfo.IsInitialized())
         {
@@ -110,7 +110,7 @@ CHIP_ERROR GetCommissionableInstanceName(char * buffer, size_t bufferLen)
 /// Set MDNS operational advertisement
 CHIP_ERROR AdvertiseOperational()
 {
-    for (const Transport::FabricInfo & fabricInfo : Server::GetServer().GetFabricTable())
+    for (const Transport::FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
     {
         if (fabricInfo.IsInitialized())
         {

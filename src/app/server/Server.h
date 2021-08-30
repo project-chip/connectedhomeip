@@ -17,15 +17,19 @@
 
 #pragma once
 
+#include "transport/TransportMgrBase.h"
 #include <app/server/AppDelegate.h>
+#include <app/server/CommissionManager.h>
 #include <app/server/RendezvousServer.h>
 #include <inet/InetConfig.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+#include <pthread.h>
 #include <transport/FabricTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
@@ -36,32 +40,18 @@ namespace chip {
 
 constexpr size_t kMaxBlePendingPackets = 1;
 
-using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
+using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_IPV4
-                                            ,
-                                            chip::Transport::UDP
+                                              ,
+                                              chip::Transport::UDP
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-                                            ,
-                                            chip::Transport::BLE<kMaxBlePendingPackets>
+                                              ,
+                                              chip::Transport::BLE<kMaxBlePendingPackets>
 #endif
-                                            >;
+                                              >;
 
-enum class ResetFabrics
-{
-    kYes,
-    kNo,
-};
-
-enum class PairingWindowAdvertisement
-{
-    kBle,
-    kMdns,
-};
-
-constexpr uint16_t kNoCommissioningTimeout = UINT16_MAX;
-
-class Server : public RendezvousAdvertisementDelegate, public PersistentStorageDelegate, public Messaging::ExchangeDelegate
+class Server : public Messaging::ExchangeDelegate
 {
 public:
     CHIP_ERROR Init(AppDelegate * delegate = nullptr, uint16_t secureServicePort = CHIP_PORT,
@@ -71,24 +61,7 @@ public:
     CHIP_ERROR SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    /**
-     * Open the pairing window using default configured parameters.
-     */
-    CHIP_ERROR OpenBasicCommissioningWindow(ResetFabrics resetFabrics,
-                                            uint16_t commissioningTimeoutSeconds         = kNoCommissioningTimeout,
-                                            PairingWindowAdvertisement advertisementMode = chip::PairingWindowAdvertisement::kBle);
-
-    CHIP_ERROR OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                               PASEVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
-                                               uint16_t passcodeID);
-
     CHIP_ERROR AddTestCommissioning();
-
-    void ClosePairingWindow();
-
-    bool IsPairingWindowOpen();
-
-    void SetBLE(bool ble) { mIsBLE = ble; }
 
     void SetFabricIndex(FabricIndex id) { mFabricIndex = id; }
 
@@ -100,10 +73,16 @@ public:
 
     SecureSessionMgr & GetSecureSessionManager() { return mSessions; }
 
-    static Server & GetServer() { return sServer; }
+    RendezvousServer & GetRendezvousServer() { return mRendezvousServer; }
+
+    TransportMgrBase & GetTransportManager() { return mTransports; }
+
+    CommissionManager & GetCommissionManager() { return mCommissionManager; }
+
+    static Server & GetInstance() { return sServer; }
 
 private:
-    Server() {}
+    Server() : mCommissionManager(this) {}
 
     static Server sServer;
 
@@ -119,23 +98,35 @@ private:
         uint16_t mOriginalDiscriminator   = 0;
     };
 
-    /// PersistentStorageDelegate implementation
-    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
-    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
-    CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
+    class ServerStorageDelegate : public PersistentStorageDelegate
+    {
+        CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
+        {
+            ChipLogProgress(AppServer, "Retrieved value from server storage.");
+            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
+        }
 
-    /// RendezvousAdvertisementDelegate implementation
-    CHIP_ERROR StartAdvertisement() override;
-    CHIP_ERROR StopAdvertisement() override;
+        CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
+        {
+            ChipLogProgress(AppServer, "Stored value in server storage");
+            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
+        }
+
+        CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+        {
+            ChipLogProgress(AppServer, "Delete value in server storage");
+            return DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
+        }
+    };
 
     // Messaging::ExchangeDelegate
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
                                  const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    AppDelegate * mAppDelgate;
+    AppDelegate * mAppDelegate = nullptr;
 
-    DemoTransportMgr mTransports;
+    ServerTransportMgr mTransports;
     SecureSessionMgr mSessions;
     RendezvousServer mRendezvousServer;
     CASEServer mCASEServer;
@@ -149,12 +140,13 @@ private:
     SecurePairingUsingTestSecret mTestPairing;
 
     DeviceDiscriminatorCache mDeviceDiscriminatorCache;
+    ServerStorageDelegate mServerStorage;
+    CommissionManager mCommissionManager;
 
+    // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;
     uint16_t mUnsecuredServicePort;
-    bool mPairingWindowOpen = false;
     FabricIndex mFabricIndex;
-    bool mIsBLE = true;
 };
 
 } // namespace chip
