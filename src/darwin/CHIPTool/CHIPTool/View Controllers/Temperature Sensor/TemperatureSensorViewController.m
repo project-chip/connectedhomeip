@@ -153,14 +153,14 @@
 
 - (void)updateTempInUI:(int)newTemp
 {
-    double tempInCelsius = (double)newTemp / 100;
-    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-    [formatter setNumberStyle: NSNumberFormatterDecimalStyle];
+    double tempInCelsius = (double) newTemp / 100;
+    NSNumberFormatter * formatter = [[NSNumberFormatter alloc] init];
+    [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
     formatter.minimumFractionDigits = 0;
     formatter.maximumFractionDigits = 2;
     [formatter setRoundingMode:NSNumberFormatterRoundFloor];
-    _temperatureLabel.text = [NSString stringWithFormat:@"%@ °C",
-                              [formatter stringFromNumber:[NSNumber numberWithFloat:tempInCelsius]]];
+    _temperatureLabel.text =
+        [NSString stringWithFormat:@"%@ °C", [formatter stringFromNumber:[NSNumber numberWithFloat:tempInCelsius]]];
     NSLog(@"Status: Updated temp in UI to %@", _temperatureLabel.text);
 }
 
