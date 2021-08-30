@@ -70,24 +70,29 @@ struct VariantCurry<Index>
     inline static void Copy(std::size_t that_t, const void * that_v, void * this_v) {}
 };
 
-template<typename T, typename TupleType>
-class TupleIndexOfType {
+template <typename T, typename TupleType>
+class TupleIndexOfType
+{
 private:
-    template<std::size_t Index>
-    static constexpr typename std::enable_if<std::is_same<T, typename std::tuple_element<Index, TupleType>::type>::value, std::size_t>::type
-    calculate() {
+    template <std::size_t Index>
+    static constexpr
+        typename std::enable_if<std::is_same<T, typename std::tuple_element<Index, TupleType>::type>::value, std::size_t>::type
+        calculate()
+    {
         return Index;
     }
 
-    template<std::size_t Index>
-    static constexpr typename std::enable_if<!std::is_same<T, typename std::tuple_element<Index, TupleType>::type>::value, std::size_t>::type
-    calculate() {
+    template <std::size_t Index>
+    static constexpr
+        typename std::enable_if<!std::is_same<T, typename std::tuple_element<Index, TupleType>::type>::value, std::size_t>::type
+        calculate()
+    {
         return calculate<Index + 1>();
     }
+
 public:
     static constexpr std::size_t value = calculate<0>();
 };
-
 
 } // namespace Internal
 
