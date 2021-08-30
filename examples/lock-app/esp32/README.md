@@ -178,7 +178,7 @@ commissioning and cluster control.
 
 -   Resolve DNS-SD name and update address of the node in the device controller.
     Get fabric ID using `getfabricid` and use the decimal value of compressed
-    fabric id. 
+    fabric id.
 
          - chip-device-ctrl > getfabricid
 
