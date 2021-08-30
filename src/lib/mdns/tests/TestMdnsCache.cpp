@@ -51,7 +51,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     PeerId peerId;
     int64_t id              = 0x100;
     uint16_t port           = 2000;
-    Inet::InterfaceId iface = 2;
+    Inet::InterfaceId iface = (Inet::InterfaceId) 2;
     Inet::IPAddress addr;
     Inet::IPAddress addrV6;
     const int ttl = 2; /* seconds */
