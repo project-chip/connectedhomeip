@@ -65,7 +65,7 @@ void ReadClient::ShutdownInternal(CHIP_ERROR aError)
         mpDelegate->ReadDone(this, aError);
         mpDelegate = nullptr;
     }
-    mInitialReport  = true;
+    mInitialReport = true;
     MoveToState(ClientState::Uninitialized);
 }
 
@@ -189,7 +189,8 @@ CHIP_ERROR ReadClient::SendStatusReport(CHIP_ERROR aError, bool aExpectResponse)
         protocolCode = to_underlying(Protocols::InteractionModel::ProtocolCode::InvalidSubscription);
     }
 
-    ChipLogProgress(DataManagement, "SendStatusReport with error %s and %s", ErrorStr(aError), aExpectResponse ? "Expect Reponse": "Not Expect response");
+    ChipLogProgress(DataManagement, "SendStatusReport with error %s and %s", ErrorStr(aError),
+                    aExpectResponse ? "Expect Reponse" : "Not Expect response");
     Protocols::SecureChannel::StatusReport report(generalCode, protocolId, protocolCode);
 
     Encoding::LittleEndian::PacketBufferWriter buf(System::PacketBufferHandle::New(kMaxSecureSduLengthBytes));

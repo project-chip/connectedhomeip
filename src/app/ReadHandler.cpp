@@ -31,12 +31,13 @@
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, Messaging::ExchangeContext * apExchangeContext)
+CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                             Messaging::ExchangeContext * apExchangeContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
     VerifyOrReturnError(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeMgr = apExchangeMgr;
+    mpExchangeMgr              = apExchangeMgr;
     mpExchangeCtx              = apExchangeContext;
     mSuppressResponse          = true;
     mpAttributeClusterInfoList = nullptr;
@@ -117,7 +118,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     MoveToState(HandlerState::Reporting);
     return mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
 }
 
 CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,

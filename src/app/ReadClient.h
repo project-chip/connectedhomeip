@@ -92,7 +92,7 @@ private:
     {
         Uninitialized = 0, ///< The client has not been initialized
         Initialized,       ///< The client has been initialized and is ready for a SendReadRequest
-        AwaitingReport,  ///< The client is wanting for report
+        AwaitingReport,    ///< The client is wanting for report
     };
 
     /**
@@ -148,7 +148,7 @@ private:
     InteractionModelDelegate * mpDelegate      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
     uint64_t mAppIdentifier                    = 0;
-    bool mInitialReport = true;
+    bool mInitialReport                        = true;
 };
 
 }; // namespace app

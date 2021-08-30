@@ -67,7 +67,8 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate, Messaging::ExchangeContext * apExchangeContext);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
+                    Messaging::ExchangeContext * apExchangeContext);
 
     /**
      *  Shut down the ReadHandler. This terminates this instance
@@ -160,8 +161,8 @@ private:
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    InteractionModelDelegate * mpDelegate = nullptr;
-    bool mInitialReport                   = false;
+    InteractionModelDelegate * mpDelegate      = nullptr;
+    bool mInitialReport                        = false;
 };
 } // namespace app
 } // namespace chip
