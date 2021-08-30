@@ -109,7 +109,7 @@ DeviceController::DeviceController()
     mExchangeMgr              = nullptr;
     mStorageDelegate          = nullptr;
     mPairedDevicesInitialized = false;
-    mListenPort               = CHIP_PORT;
+    mListenPort               = 0;
 }
 
 CHIP_ERROR DeviceController::Init(ControllerInitParams params)
