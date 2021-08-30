@@ -19511,9 +19511,9 @@ private:
 
         ChipLogError(chipTool, "Warning: supportedFabrics type checking is not implemented yet. Expected type: '%s'", "uint8");
 
-        if (supportedFabrics < 5)
+        if (supportedFabrics < 4)
         {
-            ChipLogError(chipTool, "Error: supportedFabrics is lower than expected. Min value is 5 but got '%d'", supportedFabrics);
+            ChipLogError(chipTool, "Error: supportedFabrics is lower than expected. Min value is 4 but got '%d'", supportedFabrics);
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
