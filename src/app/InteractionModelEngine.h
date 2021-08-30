@@ -53,7 +53,6 @@ namespace chip {
 namespace app {
 
 static constexpr size_t kMaxSecureSduLengthBytes = 1024;
-static constexpr FieldId kRootFieldId            = 0;
 
 /**
  * @class InteractionModelEngine
@@ -157,8 +156,8 @@ private:
      * Called when Interaction Model receives a Read Request message.  Errors processing
      * the Read Request are handled entirely within this function.
      */
-    CHIP_ERROR OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
-                             const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
