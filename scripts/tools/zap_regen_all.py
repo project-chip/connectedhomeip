@@ -52,10 +52,12 @@ def getGlobalTemplatesTargets():
 
         targets.append([str(filepath), '-o', output_dir])
 
-    targets.extend([[str(filepath)]
-                   for filepath in Path('./src/darwin').rglob('*.zap')])
-    targets.extend([[str(filepath)] for filepath in Path(
-        './src/controller/data_model').rglob('*.zap')])
+    targets.extend([
+        [
+            './src/controller/data_model/controller-clusters.zap',
+            '-o',
+            os.path.join('zzz_generated/controller-clusters/zap-generated')]])
+
     return targets
 
 
