@@ -26,6 +26,8 @@
 #ifndef GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_IPP
 #define GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_IPP
 
+#include <cassert>
+
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
 #include <openthread/joiner.h>
