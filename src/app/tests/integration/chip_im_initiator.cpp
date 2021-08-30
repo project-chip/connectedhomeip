@@ -198,10 +198,12 @@ CHIP_ERROR SendReadRequest()
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    readPrepareParams.mSessionHandle           = chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex);
-    readPrepareParams.mTimeout                 = gMessageTimeoutMsec;
-    readPrepareParams.mpEventPathParamsList    = eventPathParams;
-    readPrepareParams.mEventPathParamsListSize = 2;
+    readPrepareParams.mSessionHandle               = chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex);
+    readPrepareParams.mTimeout                     = gMessageTimeoutMsec;
+    readPrepareParams.mpAttributePathParamsList    = &attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 1;
+    readPrepareParams.mpEventPathParamsList        = eventPathParams;
+    readPrepareParams.mEventPathParamsListSize     = 2;
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, gMessageTimeoutMsec);
     SuccessOrExit(err);
 
