@@ -24,10 +24,12 @@ limitations under the License.
     <tag name="LF" description="Lift Control"/>
     <tag name="TL" description="Tilt Control"/>
     <tag name="PA" description="Position Aware"/>
+    <tag name="ABS" description="Absolute Positioning"/>
     <globalAttribute side="server" code="0xFFFC" value="0x0001">
       <featureBit tag="LF" bit="0">true</featureBit>
       <featureBit tag="TL" bit="1">false</featureBit>
       <featureBit tag="PA" bit="2">false</featureBit>
+      <featureBit tag="ABS" bit="3">false</featureBit>
     </globalAttribute>
     <globalAttribute side="either" code="0xFFFD" value="5"/>
     <!-- Window Covering Information Attribute Set -->
