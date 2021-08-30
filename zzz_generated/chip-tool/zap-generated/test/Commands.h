@@ -19518,14 +19518,6 @@ private:
             return;
         }
 
-        if (supportedFabrics > 255)
-        {
-            ChipLogError(chipTool, "Error: supportedFabrics is higher than expected. Max value is 255 but got '%d'",
-                         supportedFabrics);
-            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
-            return;
-        }
-
         runner->NextTest();
     }
 

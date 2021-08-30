@@ -5133,7 +5133,6 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
         XCTAssertEqual(err.code, 0);
         XCTAssertGreaterThanOrEqual([values[@"value"] unsignedCharValue], 4);
-        XCTAssertLessThanOrEqual([values[@"value"] unsignedCharValue], 255);
         [expectation fulfill];
     }];
 
