@@ -51,8 +51,17 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate, Messaging::E
     return err;
 }
 
-void ReadHandler::Shutdown()
+void ReadHandler::Shutdown(bool aAbort)
 {
+    if (aAbort)
+    {
+        if (mpExchangeCtx != nullptr)
+        {
+            mpExchangeCtx->Abort();
+            mpExchangeCtx = nullptr;
+        }
+    }
+
     if (IsReporting())
     {
         InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
@@ -78,7 +87,6 @@ CHIP_ERROR ReadHandler::OnReadRequest(System::PacketBufferHandle && aPayload)
         ChipLogFunctError(err);
         Shutdown();
     }
-
     return err;
 }
 
@@ -103,22 +111,11 @@ exit:
 CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(IsReportable(), err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
+    VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    MoveToState(HandlerState::Reporting);
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
-    if (err == CHIP_NO_ERROR)
-    {
-        MoveToState(HandlerState::Reporting);
-    }
-
-exit:
-    ChipLogFunctError(err);
-    if (err != CHIP_NO_ERROR)
-    {
-        Shutdown();
-    }
     return err;
 }
 
@@ -150,6 +147,10 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive status response from Exchange: %d",
                     apExchangeContext->GetExchangeId());
+    if (IsReporting())
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+    }
     Shutdown();
 }
 

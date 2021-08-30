@@ -292,7 +292,7 @@ exit:
     ChipLogFunctError(err);
     if (err != CHIP_NO_ERROR)
     {
-        apReadHandler->Shutdown();
+        apReadHandler->Shutdown(true/*abort*/);
     }
     return err;
 }

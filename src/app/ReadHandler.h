@@ -68,7 +68,7 @@ public:
      *  of the object and releases all held resources.
      *
      */
-    void Shutdown();
+    void Shutdown(bool aAbort=false);
     /**
      *  Process a read request.  Parts of the processing may end up being asynchronous, but the ReadHandler
      *  guarantees that it will call Shutdown on itself when processing is done (including if OnReadRequest
