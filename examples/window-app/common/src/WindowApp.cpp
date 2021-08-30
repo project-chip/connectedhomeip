@@ -69,7 +69,7 @@ WindowApp::Cover * WindowApp::GetCover(chip::EndpointId endpoint)
 CHIP_ERROR WindowApp::Init()
 {
     // Init ZCL Data Model
-    chip::Server::GetServer().Init();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

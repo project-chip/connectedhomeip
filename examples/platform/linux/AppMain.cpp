@@ -275,7 +275,7 @@ void ChipLinuxAppMainLoop()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     // Init ZCL Data Model and CHIP App Server
-    chip::Server::GetServer().Init(nullptr, securePort, unsecurePort);
+    chip::Server::GetInstance().Init(nullptr, securePort, unsecurePort);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

@@ -46,7 +46,7 @@ static CHIP_ERROR SendUDC(bool printHeader, chip::Transport::PeerAddress commiss
         streamer_printf(sout, "SendUDC:        ");
     }
 
-    Server::GetServer().SendUserDirectedCommissioningRequest(commissioner);
+    Server::GetInstance().SendUserDirectedCommissioningRequest(commissioner);
 
     streamer_printf(sout, "done\r\n");
 

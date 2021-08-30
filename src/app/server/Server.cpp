@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "core/CHIPError.h"
 #include <app/server/Server.h>
 
 #include <app/InteractionModelEngine.h>
@@ -65,12 +66,6 @@ constexpr bool isRendezvousBypassed()
 #endif
 }
 
-void HandlePairingWindowTimeout(chip::System::Layer * aSystemLayer, void * aAppState)
-{
-    chip::Server * server = static_cast<chip::Server *>(aAppState);
-    server->ClosePairingWindow();
-}
-
 } // namespace
 
 namespace chip {
@@ -79,7 +74,7 @@ Server Server::sServer;
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
 {
-    mAppDelgate           = delegate;
+    mAppDelegate          = delegate;
     mSecuredServicePort   = secureServicePort;
     mUnsecuredServicePort = unsecureServicePort;
 
@@ -87,6 +82,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     chip::Platform::MemoryInit();
 
+    mCommissionManager.SetAppDelegate(delegate);
     InitDataModelHandler(&mExchangeMgr);
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -96,10 +92,10 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 #endif
 
-    err = mRendezvousServer.Init(mAppDelgate, &mSessionIDAllocator);
+    err = mRendezvousServer.Init(mAppDelegate, &mSessionIDAllocator);
     SuccessOrExit(err);
 
-    err = mFabrics.Init(this);
+    err = mFabrics.Init(&mServerStorage);
     SuccessOrExit(err);
 
     // Init transport before operations with secure session mgr.
@@ -151,7 +147,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     else
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
-        SuccessOrExit(err = OpenBasicCommissioningWindow(ResetFabrics::kYes));
+        SuccessOrExit(err = mCommissionManager.OpenBasicCommissioningWindow(ResetFabrics::kYes));
 #endif
     }
 
@@ -159,16 +155,20 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     app::Mdns::SetSecuredPort(mSecuredServicePort);
     app::Mdns::SetUnsecuredPort(mUnsecuredServicePort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
-// ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
+
+    // TODO @bzbarsky-apple @cecille Move to examples
+    // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED
     // StartServer only enables commissioning mode if device has not been commissioned
     app::Mdns::StartServer();
 #endif
 
+    // TODO @pan-apple Use IM protocol ID.
     // Register to receive unsolicited legacy ZCL messages from the exchange manager.
     err = mExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
     SuccessOrExit(err);
 
+    // TODO @pan-apple Remove service provisioniong, maybe multi-admin?
     // Register to receive unsolicited Service Provisioning messages from the exchange manager.
     err = mExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, this);
     SuccessOrExit(err);
@@ -227,92 +227,6 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-CHIP_ERROR Server::OpenBasicCommissioningWindow(ResetFabrics resetFabrics, uint16_t commissioningTimeoutSeconds,
-                                                PairingWindowAdvertisement advertisementMode)
-{
-    // TODO(cecille): If this is re-called when the window is already open, what should happen?
-    mDeviceDiscriminatorCache.RestoreDiscriminator();
-
-    uint32_t pinCode;
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
-
-    RendezvousParameters params;
-
-    params.SetSetupPINCode(pinCode);
-    SetBLE(false);
-#if CONFIG_NETWORK_LAYER_BLE
-    SetBLE(advertisementMode == chip::PairingWindowAdvertisement::kBle);
-    params.SetAdvertisementDelegate(this);
-    if (advertisementMode == chip::PairingWindowAdvertisement::kBle)
-    {
-        params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(Transport::PeerAddress::BLE());
-    }
-#endif // CONFIG_NETWORK_LAYER_BLE
-
-    if (resetFabrics == ResetFabrics::kYes)
-    {
-        mFabrics.DeleteAllFabrics();
-        // Only resetting gNextAvailableFabricIndex at reboot otherwise previously paired device with fabricID 0
-        // can continue sending messages to accessory as next available fabric will also be 0.
-        // This logic is not up to spec, will be implemented up to spec once AddOptCert is implemented.
-        mFabrics.Reset();
-    }
-
-    ReturnErrorOnFailure(mRendezvousServer.WaitForPairing(
-        std::move(params), kSpake2p_Iteration_Count,
-        ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), 0, &mExchangeMgr,
-        &mTransports, &mSessions));
-
-    if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
-    {
-        ReturnErrorOnFailure(
-            DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, this));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Server::OpenEnhancedCommissioningWindow(uint16_t commissioningTimeoutSeconds, uint16_t discriminator,
-                                                   PASEVerifier & verifier, uint32_t iterations, ByteSpan salt, uint16_t passcodeID)
-{
-    RendezvousParameters params;
-
-    ReturnErrorOnFailure(mDeviceDiscriminatorCache.UpdateDiscriminator(discriminator));
-
-    SetBLE(false);
-#if CONFIG_NETWORK_LAYER_BLE
-    SetBLE(true);
-    params.SetAdvertisementDelegate(this);
-    params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(Transport::PeerAddress::BLE());
-#endif
-    params.SetPASEVerifier(verifier).SetAdvertisementDelegate(this);
-
-    ReturnErrorOnFailure(
-        mRendezvousServer.WaitForPairing(std::move(params), iterations, salt, passcodeID, &mExchangeMgr, &mTransports, &mSessions));
-
-    if (commissioningTimeoutSeconds != kNoCommissioningTimeout)
-    {
-        ReturnErrorOnFailure(
-            DeviceLayer::SystemLayer.StartTimer(commissioningTimeoutSeconds * 1000, HandlePairingWindowTimeout, this));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void Server::ClosePairingWindow()
-{
-    if (mPairingWindowOpen)
-    {
-        ChipLogProgress(AppServer, "Closing pairing window");
-        mRendezvousServer.Cleanup();
-    }
-}
-
-bool Server::IsPairingWindowOpen()
-{
-    return mPairingWindowOpen;
-}
-
 CHIP_ERROR Server::AddTestCommissioning()
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
@@ -340,75 +254,23 @@ exit:
     return err;
 }
 
-CHIP_ERROR Server::SyncGetKeyValue(const char * key, void * buffer, uint16_t & size)
-{
-    ChipLogDetail(AppServer, "Retrieved value from server storage.");
-    return KeyValueStoreMgr().Get(key, buffer, size);
-}
-
-CHIP_ERROR Server::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
-{
-    ChipLogDetail(AppServer, "Stored value in server storage");
-    return KeyValueStoreMgr().Put(key, value, size);
-}
-
-CHIP_ERROR Server::SyncDeleteKeyValue(const char * key)
-{
-    ChipLogDetail(AppServer, "Delete value in server storage");
-    return KeyValueStoreMgr().Delete(key);
-}
-
-CHIP_ERROR Server::StartAdvertisement()
-{
-    if (mIsBLE)
-    {
-        ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
-    }
-    if (mAppDelgate != nullptr)
-    {
-        mAppDelgate->OnPairingWindowOpened();
-    }
-    mPairingWindowOpen = true;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Server::StopAdvertisement()
-{
-    mDeviceDiscriminatorCache.RestoreDiscriminator();
-
-    mPairingWindowOpen = false;
-
-    if (mIsBLE)
-    {
-        ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false));
-    }
-
-    if (mAppDelgate != nullptr)
-    {
-        mAppDelgate->OnPairingWindowClosed();
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR Server::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
                                      const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    // as soon as a client connects, assume it is connected
-    VerifyOrExit(!buffer.IsNull(), ChipLogError(AppServer, "Received data but couldn't process it..."));
+    VerifyOrReturnError(!buffer.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    // TODO: BDX messages will also be possible in the future.
     HandleDataModelMessage(exchangeContext, std::move(buffer));
 
-exit:
     return err;
 }
 
 void Server::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
     ChipLogProgress(AppServer, "Failed to receive response");
-    if (mAppDelgate != nullptr)
+    if (mAppDelegate != nullptr)
     {
-        mAppDelgate->OnReceiveError();
+        mAppDelegate->OnReceiveError();
     }
 }
 

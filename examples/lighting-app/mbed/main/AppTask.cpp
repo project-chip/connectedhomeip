@@ -116,7 +116,7 @@ int AppTask::Init()
     chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server
-    chip::Server::GetServer().Init();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

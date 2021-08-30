@@ -348,7 +348,7 @@ public:
         if (i == 0)
         {
             ConnectivityMgr().ClearWiFiStationProvision();
-            chip::Server::GetServer().OpenBasicCommissioningWindow(ResetFabrics::kYes);
+            chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(ResetFabrics::kYes);
         }
         else if (i == 1)
         {
@@ -357,14 +357,14 @@ public:
         else if (i == 2)
         {
             app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledBasic);
-            chip::Server::GetServer().OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout,
-                                                                   PairingWindowAdvertisement::kMdns);
+            chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(
+                ResetFabrics::kYes, kNoCommissioningTimeout, CommissioningWindowAdvertisement::kMdns);
         }
         else if (i == 3)
         {
             app::Mdns::AdvertiseCommissionableNode(app::Mdns::CommissioningMode::kEnabledEnhanced);
-            chip::Server::GetServer().OpenBasicCommissioningWindow(ResetFabrics::kYes, kNoCommissioningTimeout,
-                                                                   PairingWindowAdvertisement::kMdns);
+            chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(
+                ResetFabrics::kYes, kNoCommissioningTimeout, CommissioningWindowAdvertisement::kMdns);
         }
     }
 
@@ -636,7 +636,7 @@ extern "C" void app_main()
 
     // Init ZCL Data Model and CHIP App Server
     AppCallbacks callbacks;
-    chip::Server::GetServer().Init(&callbacks);
+    chip::Server::GetInstance().Init(&callbacks);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

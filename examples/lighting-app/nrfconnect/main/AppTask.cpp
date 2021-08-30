@@ -106,7 +106,7 @@ int AppTask::Init()
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Init ZCL Data Model and start server
-    chip::Server::GetServer().Init();
+    chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -352,7 +352,7 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
         return;
 
-    if (chip::Server::GetServer().AddTestCommissioning() != CHIP_NO_ERROR)
+    if (chip::Server::GetInstance().AddTestCommissioning() != CHIP_NO_ERROR)
     {
         LOG_ERR("Failed to add test pairing");
     }
@@ -386,7 +386,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
         return;
     }
 
-    if (chip::Server::GetServer().OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) != CHIP_NO_ERROR)
+    if (chip::Server::GetInstance().GetCommissionManager().OpenBasicCommissioningWindow(chip::ResetFabrics::kNo) != CHIP_NO_ERROR)
     {
         LOG_ERR("OpenBasicCommissioningWindow() failed");
     }
