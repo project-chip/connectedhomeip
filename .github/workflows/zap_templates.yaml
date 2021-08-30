@@ -16,11 +16,7 @@ name: ZAP
 
 on:
     push:
-        paths:
-            - '!**.md'
     pull_request:
-        paths:
-            - '!**.md'
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}

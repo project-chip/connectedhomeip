@@ -297,7 +297,7 @@ class ConfigurationManagerImpl final
 };
 ```
 
-In many cases, the generic implementation base class itself will directly provide
+In many cases, the generic implementation base class itself will directy provide
 some or all of the implementation methods needed to satisfy the component’s
 interface. The rules of C++ method resolution are such that calls to a
 forwarding method on the interface class are mapped directly to the base class

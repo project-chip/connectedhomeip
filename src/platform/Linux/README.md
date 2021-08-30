@@ -35,7 +35,7 @@ code will have parallels in any new adaptation.
 -   Concrete implementation of ThreadStackManager interface
 -   Supports Thread stack initialization and core event loop processing
 -   Relies on GenericThreadStackManagerImpl_OpenThread/POSIX<> classes to
-    implement most API functionality
+    implement most API functionaltiy
 
 `include/platform/Linux/BLEManagerImpl.h`<br>`Linux/BLEManagerImpl.cpp`
 
