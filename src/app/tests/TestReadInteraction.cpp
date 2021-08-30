@@ -56,15 +56,15 @@ uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
-chip::NodeId kTestNodeId           = 1;
-chip::ClusterId kTestClusterId     = 6;
-chip::ClusterId kInvalidTestClusterId     = 7;
-chip::EndpointId kTestEndpointId   = 1;
-chip::EventId kTestEventIdDebug    = 1;
-chip::EventId kTestEventIdCritical = 2;
-uint8_t kTestFieldValue1         = 1;
-uint64_t kTestEventTag             = 1;
-using TestContext                  = chip::Test::MessagingContext;
+chip::NodeId kTestNodeId              = 1;
+chip::ClusterId kTestClusterId        = 6;
+chip::ClusterId kInvalidTestClusterId = 7;
+chip::EndpointId kTestEndpointId      = 1;
+chip::EventId kTestEventIdDebug       = 1;
+chip::EventId kTestEventIdCritical    = 2;
+uint8_t kTestFieldValue1              = 1;
+uint64_t kTestEventTag                = 1;
+using TestContext                     = chip::Test::MessagingContext;
 TestContext sContext;
 
 void InitializeEventLogging(chip::Messaging::ExchangeManager & aExchangeManager)
@@ -154,8 +154,8 @@ public:
         return err;
     }
 
-    void OnReportData(const chip::app::ReadClient * apReadClient, const chip::app::ClusterInfo & aPath, chip::TLV::TLVReader * apData,
-                      chip::Protocols::InteractionModel::ProtocolCode status) override
+    void OnReportData(const chip::app::ReadClient * apReadClient, const chip::app::ClusterInfo & aPath,
+                      chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::ProtocolCode status) override
     {
         mGotAttributeResponse = true;
     }
@@ -174,8 +174,8 @@ public:
     }
 
     bool mGotEventResponse      = false;
-    bool mGotAttributeResponse = false;
-    bool mGotReport = false;
+    bool mGotAttributeResponse  = false;
+    bool mGotReport             = false;
     bool mGotReadStatusResponse = false;
 };
 } // namespace
@@ -194,7 +194,7 @@ CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * ap
     SuccessOrExit(err);
     err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
 
-    exit:
+exit:
     ChipLogFunctError(err);
     return err;
 }
@@ -212,6 +212,7 @@ public:
     static void TestReadHandlerInvalidAttributePath(nlTestSuite * apSuite, void * apContext);
     static void TestReadRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestReadInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext);
+
 private:
     static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
                                    bool aNeedInvalidReport = false);
@@ -634,8 +635,8 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     attributePathParams[0].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
     SessionHandle session = ctx.GetSessionLocalToPeer();
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(ctx.GetDestinationNodeId(), ctx.GetFabricIndex(),
-                                                                            &session, eventPathParams, 2, attributePathParams, 1, 0);
+    err                   = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
+        ctx.GetDestinationNodeId(), ctx.GetFabricIndex(), &session, eventPathParams, 2, attributePathParams, 1, 0);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
