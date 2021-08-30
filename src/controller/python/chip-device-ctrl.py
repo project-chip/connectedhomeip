@@ -209,6 +209,8 @@ class DeviceMgrCmd(Cmd):
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
 
+        "open-commissioning-window",
+
         "get-fabricid",
     ]
 
@@ -854,6 +856,46 @@ class DeviceMgrCmd(Cmd):
         Removed, use network commissioning cluster instead.
         """
         print("Pairing Thread Credential is nolonger available, use NetworkCommissioning cluster instead.")
+
+    def do_opencommissioningwindow(self, line):
+        """
+        open-commissioning-window <nodeid> [options]
+
+        Options:
+          -t  Timeout (in seconds)     
+          -o  Option  [OriginalSetupCode = 0, TokenWithRandomPIN = 1, TokenWithProvidedPIN = 2]
+          -d  Discriminator Value
+          -i  Iteration
+
+          This command is used by a current Administrator to instruct a Node to go into commissioning mode
+        """
+        try:
+            arglist = shlex.split(line)
+
+            if len(arglist) <= 1:
+                print("Usage:")
+                self.do_help("open-commissioning-window")
+                return
+            parser = argparse.ArgumentParser()
+            parser.add_argument(
+                "-t", type=int, default=0, dest='timeout')
+            parser.add_argument(
+                "-o", type=int, default=0, dest='option')
+            parser.add_argument(
+                "-i", type=int, default=0, dest='iteration')
+            parser.add_argument(
+                "-d", type=int, default=0, dest='discriminator')
+            args = parser.parse_args(arglist[1:])
+
+            self.devCtrl.OpenCommissioningWindow(
+                int(arglist[0]), args.timeout, args.iteration, args.discriminator, args.option)
+
+        except exceptions.ChipStackException as ex:
+            print(str(ex))
+            return
+        except:
+            self.do_help("open-commissioning-window")
+            return
 
     def do_getfabricid(self, line):
         """

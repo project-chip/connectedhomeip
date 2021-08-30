@@ -272,6 +272,15 @@ class ChipDeviceController(object):
                 self.devCtrl)
         )
 
+    def OpenCommissioningWindow(self, nodeid, timeout, iteration, discriminator, option):
+        res = self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_OpenCommissioningWindow(
+                self.devCtrl, nodeid, timeout, iteration, discriminator, option)
+        )
+
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+
     def GetCompressedFabricId(self):
         fabricid = c_uint64(0)
 
@@ -486,3 +495,7 @@ class ChipDeviceController(object):
             self._dmLib.pychip_DeviceController_GetCompressedFabricId.argtypes = [
                 c_void_p, POINTER(c_uint64)]
             self._dmLib.pychip_DeviceController_GetCompressedFabricId.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
+                c_void_p, c_uint64, c_uint16, c_uint16, c_uint16, c_uint8]
+            self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = c_uint32
