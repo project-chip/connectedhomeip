@@ -42,7 +42,7 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interact
     mpDelegate     = apDelegate;
     mState         = ClientState::Initialized;
     mAppIdentifier = aAppIdentifier;
-
+    mInitialReport = true;
     AbortExistingExchangeContext();
 
 exit:
@@ -65,6 +65,7 @@ void ReadClient::ShutdownInternal(CHIP_ERROR aError)
         mpDelegate->ReadDone(this, aError);
         mpDelegate = nullptr;
     }
+    mInitialReport = true;
     MoveToState(ClientState::Uninitialized);
 }
 
@@ -77,8 +78,8 @@ const char * ReadClient::GetStateStr() const
         return "UNINIT";
     case ClientState::Initialized:
         return "INIT";
-    case ClientState::AwaitingResponse:
-        return "AwaitingResponse";
+    case ClientState::AwaitingReport:
+        return "AwaitingReport";
     }
 #endif // CHIP_DETAIL_LOGGING
     return "N/A";
@@ -154,7 +155,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
-    MoveToState(ClientState::AwaitingResponse);
+    MoveToState(ClientState::AwaitingReport);
 
 exit:
     ChipLogFunctError(err);
@@ -180,7 +181,8 @@ CHIP_ERROR ReadClient::SendStatusReport(CHIP_ERROR aError, bool aExpectResponse)
         protocolCode = to_underlying(Protocols::InteractionModel::ProtocolCode::InvalidSubscription);
     }
 
-    ChipLogProgress(DataManagement, "SendStatusReport with error %s", ErrorStr(aError));
+    ChipLogProgress(DataManagement, "SendStatusReport with error %s and %s", ErrorStr(aError),
+                    aExpectResponse ? "Expect Reponse" : "Not Expect response");
     Protocols::SecureChannel::StatusReport report(generalCode, protocolId, protocolCode);
 
     Encoding::LittleEndian::PacketBufferWriter buf(System::PacketBufferHandle::New(kMaxSecureSduLengthBytes));
@@ -329,6 +331,10 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
+    if (IsInitialReport())
+    {
+        ChipLogProgress(DataManagement, "ProcessReportData handles the initial report");
+    }
     err = report.GetMoreChunkedMessages(&moreChunkedMessages);
     if (CHIP_END_OF_TLV == err)
     {
@@ -374,6 +380,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
 
 exit:
+    ClearInitialReport();
     ChipLogFunctError(err);
     return err;
 }
@@ -384,7 +391,7 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
                     apExchangeContext->GetExchangeId());
     if (nullptr != mpDelegate)
     {
-        if (ClientState::AwaitingResponse == mState)
+        if (IsAwaitingReport())
         {
             mpDelegate->ReadError(this, CHIP_ERROR_TIMEOUT);
         }
