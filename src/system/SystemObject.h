@@ -192,9 +192,7 @@ class ObjectPool
 {
 public:
     void Reset();
-    size_t Size();
 
-    T * Get(const Layer & aLayer, size_t aIndex);
     T * TryCreate(Layer & aLayer);
     void GetStatistics(chip::System::Stats::count_t & aNumInUse, chip::System::Stats::count_t & aHighWatermark);
 
@@ -265,67 +263,9 @@ inline void ObjectPool<T, N>::Reset()
     memset(mArena.uMemory, 0, N * sizeof(T));
 
 #if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    mHighWatermark = 0;
+    mHighWatermark      = 0;
 #endif
 #endif
-}
-
-/**
- *  @brief
- *      Returns the number of objects that can be simultaneously retained from a pool.
- */
-template <class T, unsigned int N>
-inline size_t ObjectPool<T, N>::Size()
-{
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    size_t count = 0;
-    std::lock_guard<std::mutex> lock(mMutex);
-    Object * p = mDummyHead.mNext;
-
-    while (p)
-    {
-        count++;
-        p = p->mNext;
-    }
-
-    return count;
-#else
-    return N;
-#endif
-}
-
-/**
- *  @brief
- *      Returns a pointer the object at \c aIndex or \c NULL if the object is not retained by \c aLayer.
- */
-template <class T, unsigned int N>
-inline T * ObjectPool<T, N>::Get(const Layer & aLayer, size_t aIndex)
-{
-    T * lReturn = nullptr;
-
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    {
-        std::lock_guard<std::mutex> lock(mMutex);
-        Object * p = mDummyHead.mNext;
-
-        while (aIndex > 0)
-        {
-            if (p == nullptr)
-                break;
-            p = p->mNext;
-            aIndex--;
-        }
-
-        lReturn = static_cast<T *>(p);
-    }
-#else
-    if (aIndex < N)
-        lReturn = &reinterpret_cast<T *>(mArena.uMemory)[aIndex];
-#endif
-
-    (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
-
-    return (lReturn != nullptr) && lReturn->IsRetained(aLayer) ? lReturn : nullptr;
 }
 
 /**

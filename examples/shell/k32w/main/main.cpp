@@ -37,7 +37,7 @@
 #include <support/CHIPPlatformMemory.h>
 #include <support/logging/CHIPLogging.h>
 
-#include "FreeRtosMbedtlsUtils.h"
+#include "FreeRtosHooks.h"
 #include "app_config.h"
 
 #include "radio.h"

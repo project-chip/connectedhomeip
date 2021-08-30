@@ -438,9 +438,9 @@ public:
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR ReportProcessed(const chip::app::ReadClient * apReadClient) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR ReportError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    CHIP_ERROR ReadError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
     {
-        printf("ReportError with err %" CHIP_ERROR_FORMAT, aError.Format());
+        printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format());
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR ReadDone(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override

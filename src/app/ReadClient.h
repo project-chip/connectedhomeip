@@ -66,7 +66,7 @@ public:
     /**
      *  Send a Read Request.  There can be one Read Request outstanding on a given ReadClient.
      *  If SendReadRequest returns success, no more Read Requests can be sent on this ReadClient
-     *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReportError
+     *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReadError
      *  call happens with guarantee.
      *
      *  Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
@@ -120,13 +120,16 @@ private:
      *  Check if current read client is being used
      *
      */
-    bool IsFree() const { return mState == ClientState::Uninitialized; };
+    bool IsFree() const { return mState == ClientState::Uninitialized; }
 
-    CHIP_ERROR GenerateEventPathList(ReadRequest::Builder & aRequest, EventPathParams * apEventPathParamsList,
-                                     size_t aEventPathParamsListSize, EventNumber & aEventNumber);
-    CHIP_ERROR GenerateAttributePathList(ReadRequest::Builder & aRequest, AttributePathParams * apAttributePathParamsList,
-                                         size_t aAttributePathParamsListSize);
+    CHIP_ERROR GenerateEventPathList(EventPathList::Builder & aEventPathListBuilder, EventPathParams * apEventPathParamsList,
+                                     size_t aEventPathParamsListSize);
+    CHIP_ERROR GenerateAttributePathList(AttributePathList::Builder & aAttributeathListBuilder,
+                                         AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
     CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
+
+    void SetExchangeContext(Messaging::ExchangeContext * apExchangeContext) { mpExchangeCtx = apExchangeContext; }
+    void ClearExchangeContext() { mpExchangeCtx = nullptr; }
 
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);

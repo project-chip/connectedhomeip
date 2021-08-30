@@ -52,14 +52,14 @@ private:
 
     void DispatchEvent(AppEvent * event);
 
-    static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void FunctionTimerEventHandler(void * aGenericEvent);
     static void KBD_Callback(uint8_t events);
     static void HandleKeyboard(void);
-    static void JoinHandler(AppEvent * aEvent);
-    static void BleHandler(AppEvent * aEvent);
-    static void LockActionEventHandler(AppEvent * aEvent);
-    static void ResetActionEventHandler(AppEvent * aEvent);
-    static void InstallEventHandler(AppEvent * aEvent);
+    static void JoinHandler(void * aGenericEvent);
+    static void BleHandler(void * aGenericEvent);
+    static void LockActionEventHandler(void * aGenericEvent);
+    static void ResetActionEventHandler(void * aGenericEvent);
+    static void InstallEventHandler(void * aGenericEvent);
 
     static void ButtonEventHandler(uint8_t pin_no, uint8_t button_action);
     static void TimerEventHandler(TimerHandle_t xTimer);

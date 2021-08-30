@@ -2,10 +2,10 @@ pip-tools
 virtualenv
 
 # esp-idf
--r requirements.esp32.txt ; platform_machine != 'aarch64'
+-r requirements.esp32.txt
 
 # mbed-os
--r requirements.mbed.txt ; platform_machine != 'aarch64'
+-r requirements.mbed.txt
 
 # cirque tests
 requests>=2.24.0
