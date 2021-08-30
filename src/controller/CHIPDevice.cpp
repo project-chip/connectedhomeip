@@ -38,6 +38,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include <app/CommandSender.h>
+#include <app/ReadPrepareParams.h>
 #include <app/util/DataModelHandler.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
@@ -678,6 +679,7 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeI
 CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
                                             Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter)
 {
+    chip::app::ReadPrepareParams readPrepareParams;
     bool loadedSecureSession = false;
     uint8_t seqNum           = GetNextSequenceNumber();
     aPath.mNodeId            = GetDeviceId();
@@ -690,9 +692,11 @@ CHIP_ERROR Device::SendReadAttributeRequest(app::AttributePathParams aPath, Call
     }
     // The application context is used to identify different requests from client applicaiton the type of it is intptr_t, here we
     // use the seqNum.
-    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(
-        GetDeviceId(), 0, &mSecureSession, nullptr /*event path params list*/, 0, &aPath, 1, 0 /* event number */,
-        seqNum /* application context */);
+    readPrepareParams.mSessionHandle               = mSecureSession;
+    readPrepareParams.mpAttributePathParamsList    = &aPath;
+    readPrepareParams.mAttributePathParamsListSize = 1;
+    CHIP_ERROR err =
+        chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, seqNum /* application context */);
     if (err != CHIP_NO_ERROR)
     {
         CancelResponseHandler(seqNum);
