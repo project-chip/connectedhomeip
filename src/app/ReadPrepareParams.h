@@ -40,37 +40,37 @@ struct ReadPrepareParams
     uint16_t mMaxIntervalSeconds                    = 0;
 
     ReadPrepareParams() {}
-    ReadPrepareParams(ReadPrepareParams&& other)
+    ReadPrepareParams(ReadPrepareParams && other)
     {
-        mSessionHandle = other.mSessionHandle;
-        mpEventPathParamsList         = other.mpEventPathParamsList;
-        mEventPathParamsListSize                 = other.mEventPathParamsListSize;
-        mpAttributePathParamsList = other.mpAttributePathParamsList;
-        mAttributePathParamsListSize             = other.mAttributePathParamsListSize;
-        mEventNumber                        = other.mEventNumber;
-        mMinIntervalSeconds                    = other.mMinIntervalSeconds;
-        mMaxIntervalSeconds                 = other.mMaxIntervalSeconds;
-        mTimeout                            = other.mTimeout;
+        mSessionHandle                     = other.mSessionHandle;
+        mpEventPathParamsList              = other.mpEventPathParamsList;
+        mEventPathParamsListSize           = other.mEventPathParamsListSize;
+        mpAttributePathParamsList          = other.mpAttributePathParamsList;
+        mAttributePathParamsListSize       = other.mAttributePathParamsListSize;
+        mEventNumber                       = other.mEventNumber;
+        mMinIntervalSeconds                = other.mMinIntervalSeconds;
+        mMaxIntervalSeconds                = other.mMaxIntervalSeconds;
+        mTimeout                           = other.mTimeout;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;
         other.mAttributePathParamsListSize = 0;
     }
 
-    ReadPrepareParams& operator=(ReadPrepareParams&& other)
+    ReadPrepareParams & operator=(ReadPrepareParams && other)
     {
         if (&other == this)
             return *this;
 
-        mSessionHandle = other.mSessionHandle;
-        mpEventPathParamsList         = other.mpEventPathParamsList;
-        mEventPathParamsListSize                 = other.mEventPathParamsListSize;
-        mpAttributePathParamsList = other.mpAttributePathParamsList;
-        mAttributePathParamsListSize             = other.mAttributePathParamsListSize;
-        mEventNumber                        = other.mEventNumber;
-        mMinIntervalSeconds                 = other.mMinIntervalSeconds;
-        mMaxIntervalSeconds                 = other.mMaxIntervalSeconds;
-        mTimeout                            = other.mTimeout;
+        mSessionHandle                     = other.mSessionHandle;
+        mpEventPathParamsList              = other.mpEventPathParamsList;
+        mEventPathParamsListSize           = other.mEventPathParamsListSize;
+        mpAttributePathParamsList          = other.mpAttributePathParamsList;
+        mAttributePathParamsListSize       = other.mAttributePathParamsListSize;
+        mEventNumber                       = other.mEventNumber;
+        mMinIntervalSeconds                = other.mMinIntervalSeconds;
+        mMaxIntervalSeconds                = other.mMaxIntervalSeconds;
+        mTimeout                           = other.mTimeout;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;
