@@ -51,7 +51,7 @@ class NrfApp(Enum):
             return 'chip-nrf-shell'
         elif self == NrfApp.PUMP:
             return 'chip-nrf-pump-example'
-        elif self == NrfApp.CONTROLLER:
+        elif self == NrfApp.PUMP_CONTROLLER:
             return 'chip-nrf-pump-controller-example'
         else:
             raise Exception('Unknown app type: %r' % self)
