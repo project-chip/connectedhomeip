@@ -44,7 +44,14 @@ struct ClusterInfo
             return true;
         }
 
-        if (mFlags.Has(Flags::kFieldIdValid) && other.mFlags.Has(Flags::kFieldIdValid) && (mFieldId == other.mFieldId))
+        if (mFlags.Has(Flags::kFieldIdValid) && !mFlags.Has(Flags::kListIndexValid) && other.mFlags.Has(Flags::kFieldIdValid) &&
+            (mFieldId == other.mFieldId))
+        {
+            return true;
+        }
+
+        if (mFlags.Has(Flags::kFieldIdValid) && mFlags.Has(Flags::kListIndexValid) && other.mFlags.Has(Flags::kListIndexValid) &&
+            other.mFlags.Has(Flags::kListIndexValid) && (mFieldId == other.mFieldId) && (mListIndex == other.mListIndex))
         {
             return true;
         }
