@@ -25,13 +25,10 @@ namespace {
 
 struct Simple
 {
-    static constexpr const std::size_t VariantId = 1;
 };
 
 struct Pod
 {
-    static constexpr const std::size_t VariantId = 2;
-
     Pod(int v1, int v2) : m1(v1), m2(v2) {}
 
     int m1;
@@ -40,8 +37,6 @@ struct Pod
 
 struct Movable
 {
-    static constexpr const std::size_t VariantId = 3;
-
     Movable(int v1, int v2) : m1(v1), m2(v2) {}
 
     Movable(Movable &) = delete;
@@ -56,8 +51,6 @@ struct Movable
 
 struct Count
 {
-    static constexpr const std::size_t VariantId = 4;
-
     Count() { ++created; }
     ~Count() { ++destroyed; }
 
