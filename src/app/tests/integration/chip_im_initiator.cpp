@@ -200,6 +200,8 @@ CHIP_ERROR SendReadRequest()
 
     readPrepareParams.mSessionHandle           = chip::SessionHandle(chip::kTestDeviceNodeId, 0, 0, gFabricIndex);
     readPrepareParams.mTimeout                 = gMessageTimeoutMsec;
+    readPrepareParams.mpAttributePathParamsList    = &attributePathParams;
+    readPrepareParams.mAttributePathParamsListSize = 1;
     readPrepareParams.mpEventPathParamsList    = eventPathParams;
     readPrepareParams.mEventPathParamsListSize = 2;
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, gMessageTimeoutMsec);
