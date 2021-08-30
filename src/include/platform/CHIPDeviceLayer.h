@@ -30,6 +30,7 @@
 #include <platform/GeneralUtils.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
+#include <system/SystemLayerImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 #include <platform/SoftwareUpdateManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
@@ -44,7 +45,7 @@ namespace chip {
 namespace DeviceLayer {
 
 struct ChipDeviceEvent;
-extern chip::System::Layer SystemLayer;
+extern chip::System::LayerImpl SystemLayer;
 extern Inet::InetLayer InetLayer;
 
 } // namespace DeviceLayer

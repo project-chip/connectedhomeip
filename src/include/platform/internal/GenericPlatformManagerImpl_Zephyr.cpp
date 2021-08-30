@@ -82,7 +82,7 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_UnlockChipStack(void)
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(uint32_t aMilliseconds)
 {
-    // Let WatchableEventManager.PrepareEvents() handle timers.
+    // Let Systemlayer.PrepareEvents() handle timers.
     return CHIP_NO_ERROR;
 }
 
@@ -106,7 +106,7 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDeviceEv
     // k_msgq_put takes `void*` instead of `const void*`. Nonetheless, it should be safe to
     // const_cast here and there are components in Zephyr itself which do the same.
     if (k_msgq_put(&mChipEventQueue, const_cast<ChipDeviceEvent *>(event), K_NO_WAIT) == 0)
-        SystemLayer.WatchableEventsManager().Signal(); // Trigger wake on CHIP thread
+        SystemLayer.Signal(); // Trigger wake on CHIP thread
     else
         ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
 }
@@ -125,21 +125,20 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
 {
     Impl()->LockChipStack();
 
-    System::WatchableEventManager & watchState = SystemLayer.WatchableEventsManager();
-    watchState.EventLoopBegins();
+    SystemLayer.EventLoopBegins();
     while (true)
     {
-        watchState.PrepareEvents();
+        SystemLayer.PrepareEvents();
 
         Impl()->UnlockChipStack();
-        watchState.WaitForEvents();
+        SystemLayer.WaitForEvents();
         Impl()->LockChipStack();
 
-        watchState.HandleEvents();
+        SystemLayer.HandleEvents();
 
         ProcessDeviceEvents();
     }
-    watchState.EventLoopEnds();
+    SystemLayer.EventLoopEnds();
 
     Impl()->UnlockChipStack();
 }

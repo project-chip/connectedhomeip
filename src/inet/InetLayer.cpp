@@ -118,7 +118,7 @@ InetLayer::InetLayer()
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-chip::System::LwIPEventHandlerDelegate InetLayer::sInetEventHandlerDelegate;
+chip::System::LayerLwIP::EventHandlerDelegate InetLayer::sInetEventHandlerDelegate;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if INET_CONFIG_MAX_DROPPABLE_EVENTS && CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -274,7 +274,7 @@ CHIP_ERROR InetLayer::Init(chip::System::Layer & aSystemLayer, void * aContext)
     err = InitQueueLimiter();
     SuccessOrExit(err);
 
-    mSystemLayer->AddEventHandlerDelegate(sInetEventHandlerDelegate);
+    static_cast<System::LayerLwIP *>(mSystemLayer)->AddEventHandlerDelegate(sInetEventHandlerDelegate);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     State = kState_Initialized;

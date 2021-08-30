@@ -35,6 +35,7 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
+#include <system/SystemLayerImpl.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
@@ -43,7 +44,7 @@
 #include <nlunit-test.h>
 
 namespace {
-static chip::System::Layer gSystemLayer;
+static chip::System::LayerImpl gSystemLayer;
 static chip::SecureSessionMgr gSessionManager;
 static chip::Messaging::ExchangeManager gExchangeManager;
 static chip::secure_channel::MessageCounterManager gMessageCounterManager;

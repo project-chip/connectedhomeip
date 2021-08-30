@@ -36,7 +36,7 @@
 #define SYSTEM_OBJECT_HWM_TEST_HOOK() do { chip::test_utils::SleepMillis(1); } while(0)
 // clang-format on
 
-#include <system/SystemLayer.h>
+#include <system/SystemLayerImpl.h>
 
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -138,7 +138,7 @@ struct TestContext sContext;
 void TestObject::CheckIteration(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
-    Layer lLayer;
+    LayerImpl lLayer;
     unsigned int i;
 
     lLayer.Init();
@@ -179,7 +179,7 @@ void TestObject::CheckIteration(nlTestSuite * inSuite, void * aContext)
 void TestObject::CheckRetention(nlTestSuite * inSuite, void * aContext)
 {
     TestContext & lContext = *static_cast<TestContext *>(aContext);
-    Layer lLayer;
+    LayerImpl lLayer;
     unsigned int i;
 
     lLayer.Init();
@@ -238,7 +238,7 @@ void * TestObject::CheckConcurrencyThread(void * aContext)
     const unsigned int kNumObjects = kPoolSize / kNumThreads;
     TestObject * lObject           = nullptr;
     TestContext & lContext         = *static_cast<TestContext *>(aContext);
-    Layer lLayer;
+    LayerImpl lLayer;
     unsigned int i;
 
     lLayer.Init();
@@ -358,7 +358,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
     const int kNumObjects  = kPoolSize;
     TestObject * lObject   = nullptr;
     TestContext & lContext = *static_cast<TestContext *>(aContext);
-    Layer lLayer;
+    LayerImpl lLayer;
     chip::System::Stats::count_t lNumInUse;
     chip::System::Stats::count_t lHighWatermark;
 

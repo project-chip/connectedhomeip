@@ -58,6 +58,8 @@ namespace System {
 
 // Forward class and class template declarations
 class Layer;
+class LayerSockets;
+class LayerLwIP;
 template <class T, unsigned int N>
 class ObjectPool;
 

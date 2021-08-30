@@ -148,6 +148,20 @@ struct pbuf
  */
 class DLL_EXPORT PacketBuffer : private pbuf
 {
+public:
+    static constexpr uint16_t h(const char * s)
+    {
+        uint16_t r = 0;
+        while (*s)
+            r = static_cast<uint16_t>((((r & 1) << 15) | (r >> 1)) + *s++);
+        return r;
+    }
+    void log(char tag, uint16_t file, uint16_t line)
+    {
+        ChipLogProgress(chipSystemLayer, "PB%c %04X %05u %8p %8p %d", tag, file, line, this, next, ref);
+    }
+#define PBLOG(c) log((c), ::chip::PacketBuffer::h(__FILE__), static_cast<uint16_t>(__LINE__))
+
 private:
     // The effective size of the packet buffer structure.
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

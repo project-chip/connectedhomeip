@@ -55,7 +55,7 @@
 using namespace chip;
 using namespace chip::Inet;
 
-System::Layer gSystemLayer;
+System::LayerImpl gSystemLayer;
 
 Inet::InetLayer gInet;
 

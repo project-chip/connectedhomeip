@@ -54,7 +54,7 @@ inline int SetNonBlockingMode(int fd)
 }
 } // anonymous namespace
 
-CHIP_ERROR WakeEvent::Open(Layer & systemLayer)
+CHIP_ERROR WakeEvent::Open(LayerSockets & systemLayer)
 {
     enum
     {
@@ -82,7 +82,7 @@ CHIP_ERROR WakeEvent::Open(Layer & systemLayer)
     return CHIP_NO_ERROR;
 }
 
-void WakeEvent::Close(Layer & systemLayer)
+void WakeEvent::Close(LayerSockets & systemLayer)
 {
     systemLayer.StopWatchingSocket(&mReadWatch);
     VerifyOrDie(::close(mReadFD) == 0);
@@ -121,7 +121,7 @@ CHIP_ERROR WakeEvent::Notify()
 
 #else // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
 
-CHIP_ERROR WakeEvent::Open(Layer & systemLayer)
+CHIP_ERROR WakeEvent::Open(LayerSockets & systemLayer)
 {
     mReadFD = ::eventfd(0, 0);
     if (mReadFD == -1)
@@ -136,7 +136,7 @@ CHIP_ERROR WakeEvent::Open(Layer & systemLayer)
     return CHIP_NO_ERROR;
 }
 
-void WakeEvent::Close(Layer & systemLayer)
+void WakeEvent::Close(LayerSockets & systemLayer)
 {
     systemLayer.StopWatchingSocket(&mReadWatch);
     VerifyOrDie(::close(mReadFD) == 0);

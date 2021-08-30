@@ -86,8 +86,8 @@ DLL_EXPORT bool Object::TryCreate(Layer & aLayer, size_t aOctets)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 void Object::DeferredRelease(Object::ReleaseDeferralErrorTactic aTactic)
 {
-    Layer & lSystemLayer = *this->mSystemLayer;
-    CHIP_ERROR lError    = lSystemLayer.PostEvent(*this, chip::System::kEvent_ReleaseObj, 0);
+    LayerLwIP & lSystemLayer = *static_cast<LayerLwIP *>(this->mSystemLayer);
+    CHIP_ERROR lError        = lSystemLayer.PostEvent(*this, chip::System::kEvent_ReleaseObj, 0);
 
     if (lError != CHIP_NO_ERROR)
     {

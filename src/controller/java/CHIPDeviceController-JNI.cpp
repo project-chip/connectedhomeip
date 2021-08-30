@@ -48,6 +48,7 @@
 #include <support/SafeInt.h>
 #include <support/ThreadOperationalDataset.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/SystemLayerImpl.h>
 
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
@@ -91,7 +92,7 @@ constexpr uint64_t kBreadcrumb     = 0;
 constexpr uint32_t kZclTimeoutMs   = 10000;
 
 JavaVM * sJVM;
-System::Layer sSystemLayer;
+System::LayerImpl sSystemLayer;
 Inet::InetLayer sInetLayer;
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -208,7 +209,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     if (sIOThread != PTHREAD_NULL)
     {
         sShutdown = true;
-        sSystemLayer.WatchableEventsManager().Signal();
+        sSystemLayer.Signal();
 
         StackUnlockGuard unlockGuard(JniReferences::GetInstance().GetStackLock());
         pthread_join(sIOThread, NULL);
@@ -1043,18 +1044,17 @@ void * IOThreadMain(void * arg)
     // Lock the stack to prevent collisions with Java threads.
     pthread_mutex_lock(JniReferences::GetInstance().GetStackLock());
 
-    System::WatchableEventManager & watchState = sSystemLayer.WatchableEventsManager();
-    watchState.EventLoopBegins();
+    sSystemLayer.EventLoopBegins();
 
     // Loop until we are told to exit.
     while (!quit.load(std::memory_order_relaxed))
     {
-        watchState.PrepareEvents();
+        sSystemLayer.PrepareEvents();
 
         // Unlock the stack so that Java threads can make API calls.
         pthread_mutex_unlock(JniReferences::GetInstance().GetStackLock());
 
-        watchState.WaitForEvents();
+        sSystemLayer.WaitForEvents();
 
         // Break the loop if requested to shutdown.
         // if (sShutdown)
@@ -1063,9 +1063,9 @@ void * IOThreadMain(void * arg)
         // Re-lock the stack.
         pthread_mutex_lock(JniReferences::GetInstance().GetStackLock());
 
-        watchState.HandleEvents();
+        sSystemLayer.HandleEvents();
     }
-    watchState.EventLoopEnds();
+    sSystemLayer.EventLoopEnds();
 
     // Detach the thread from the JVM.
     sJVM->DetachCurrentThread();

@@ -95,7 +95,7 @@ buildconfig_header("system_buildconfig") {
     ]
   }
 
-  defines += [ "CHIP_SYSTEM_WATCHABLE_EVENT_MANAGER_CONFIG_FILE=<system/WatchableEventManager${chip_system_config_event_loop}.h>" ]
+  defines += [ "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=<system/SystemLayerImpl${chip_system_config_event_loop}.h>" ]
 }
 
 config("system_config") {
@@ -131,8 +131,10 @@ static_library("system") {
     "SystemError.h",
     "SystemEvent.h",
     "SystemFaultInjection.h",
-    "SystemLayer.cpp",
     "SystemLayer.h",
+    "SystemLayerImpl${chip_system_config_event_loop}.cpp",
+    "SystemLayerImpl${chip_system_config_event_loop}.h",
+    "SystemLayerImpl.h",
     "SystemLayerPrivate.h",
     "SystemMutex.cpp",
     "SystemMutex.h",
@@ -149,9 +151,6 @@ static_library("system") {
     "TimeSource.h",
     "WakeEvent.cpp",
     "WakeEvent.h",
-    "WatchableEventManager${chip_system_config_event_loop}.cpp",
-    "WatchableEventManager${chip_system_config_event_loop}.h",
-    "WatchableEventManager.h",
   ]
 
   cflags = [ "-Wconversion" ]
