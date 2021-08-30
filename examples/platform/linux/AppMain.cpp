@@ -65,7 +65,7 @@ using namespace chip::Transport;
 using chip::Shell::Engine;
 #endif
 
-static constexpr useconds_t kWifiStartCheckTime = 100*1000; // 100 ms
+static constexpr useconds_t kWifiStartCheckTime  = 100 * 1000; // 100 ms
 static constexpr uint8_t kWifiStartCheckAttempts = 5;
 
 namespace {
