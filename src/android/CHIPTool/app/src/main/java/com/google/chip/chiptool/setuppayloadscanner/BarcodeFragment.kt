@@ -40,8 +40,10 @@ import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.SelectActionFragment
 import com.google.chip.chiptool.util.FragmentUtil
 import java.io.IOException
+import kotlinx.android.synthetic.main.barcode_fragment.view.inputAddressBtn
 
 /** Launches the camera to scan for QR code. */
 class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListener {
@@ -65,6 +67,12 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
     ): View {
         return inflater.inflate(R.layout.barcode_fragment, container, false).apply {
             cameraSourceView = findViewById(R.id.camera_view)
+            inputAddressBtn.setOnClickListener {
+                FragmentUtil.getHost(
+                    this@BarcodeFragment,
+                    SelectActionFragment.Callback::class.java
+                )?.onShowDeviceAddressInput()
+            }
         }
     }
 
