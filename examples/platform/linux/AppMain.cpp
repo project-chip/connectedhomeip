@@ -88,13 +88,13 @@ int ChipLinuxAppInit(int argc, char ** argv)
     err = chip::Platform::MemoryInit();
     SuccessOrExit(err);
 
+    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
+    SuccessOrExit(err);
+
     err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
     SuccessOrExit(err);
 
     err = ParseArguments(argc, argv);
-    SuccessOrExit(err);
-
-    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
     ConfigurationMgr().LogDeviceConfig();
