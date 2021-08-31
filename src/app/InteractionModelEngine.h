@@ -140,7 +140,8 @@ public:
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
     void ReleaseClusterInfoList(ClusterInfo *& aClusterInfo);
-    CHIP_ERROR PushFront(ClusterInfo *& aClusterInfoLisst, ClusterInfo & aClusterInfo);
+    CHIP_ERROR PushFront(ClusterInfo *& aClusterInfoList, ClusterInfo & aClusterInfo);
+    void ReleaseClearClusterInfoList(ClusterInfo *& aClusterInfo);
 
 private:
     friend class reporting::Engine;

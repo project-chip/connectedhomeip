@@ -361,6 +361,40 @@ void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
     aClusterInfo               = nullptr;
 }
 
+void InteractionModelEngine::ReleaseClearClusterInfoList(ClusterInfo *& aClusterInfo)
+{
+    ClusterInfo * updateList = nullptr;
+    ClusterInfo * runner = aClusterInfo;
+    if (aClusterInfo == nullptr)
+    {
+        return;
+    }
+    while(runner != nullptr)
+    {
+        ClusterInfo * next = runner->mpNext;
+        if (runner->IsDirty())
+        {
+            if(updateList != nullptr)
+            {
+                runner->mpNext = updateList;
+                updateList = runner;
+            }
+            else
+            {
+                updateList = runner;
+            }
+        }
+        else
+        {
+            runner->mpNext = mpNextAvailableClusterInfo;
+            mpNextAvailableClusterInfo = runner;
+        }
+        runner = next;
+    }
+
+    aClusterInfo = updateList;
+}
+
 CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfoList, ClusterInfo & aClusterInfo)
 {
     ClusterInfo * last = aClusterInfoList;

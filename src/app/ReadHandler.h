@@ -142,6 +142,7 @@ private:
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
+    void FilterOverlappedPath(ClusterInfo *& aClusterInfoList);
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
 

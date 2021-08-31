@@ -630,12 +630,20 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     attributePathParams[0].mListIndex  = 0;
     attributePathParams[0].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
+    attributePathParams[1].mNodeId     = chip::kTestDeviceNodeId;
+    attributePathParams[1].mEndpointId = kTestEndpointId;
+    attributePathParams[1].mClusterId  = kTestClusterId;
+    attributePathParams[1].mFieldId    = 1;
+    attributePathParams[1].mListIndex  = 1;
+    attributePathParams[1].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    attributePathParams[1].mFlags.Set(chip::app::AttributePathParams::Flags::kListIndexValid);
+
     ReadPrepareParams readPrepareParams;
     readPrepareParams.mSessionHandle               = ctx.GetSessionLocalToPeer();
     readPrepareParams.mpEventPathParamsList        = eventPathParams;
     readPrepareParams.mEventPathParamsListSize     = 2;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-    readPrepareParams.mAttributePathParamsListSize = 1;
+    readPrepareParams.mAttributePathParamsListSize = 2;
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 

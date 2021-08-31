@@ -295,9 +295,37 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         err = CHIP_NO_ERROR;
     }
 
+    FilterOverlappedPath(mpAttributeClusterInfoList);
+
 exit:
     ChipLogFunctError(err);
     return err;
+}
+
+void ReadHandler::FilterOverlappedPath(ClusterInfo *& aClusterInfoList)
+{
+    ClusterInfo * runner1 = aClusterInfoList;
+    ClusterInfo * runner2 = aClusterInfoList;
+    while (runner1 != nullptr)
+    {
+        runner2 = aClusterInfoList;
+        while(runner2 != nullptr)
+        {
+            if (runner1 == runner2)
+            {
+                runner2 = runner2->mpNext;
+                continue;
+            }
+            if (runner2->IsAttributePathSupersetOf(*runner1))
+            {
+                runner1->ClearDirty();
+                break;
+            }
+            runner2 = runner2->mpNext;
+        }
+        runner1 = runner1->mpNext;
+    }
+    InteractionModelEngine::GetInstance()->ReleaseClearClusterInfoList(aClusterInfoList);
 }
 
 CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathListParser)
