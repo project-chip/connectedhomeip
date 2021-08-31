@@ -12,6 +12,9 @@ An example application that uses CHIP to send messages to a CHIP server.
 
 ## Building the Example Application
 
+See [the build guide](../../docs/guides/BUILDING.md#prerequisites) for general
+background on build prerequisites.
+
 Building the example application is quite straightforward. It can either be done
 as part of an overall "build everything" build:
 
