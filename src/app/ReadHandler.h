@@ -142,6 +142,7 @@ private:
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
+    bool MergeOverlappedAttributePath(ClusterInfo & aTargetAttributePath);
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
 

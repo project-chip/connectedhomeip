@@ -284,6 +284,11 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         }
         SuccessOrExit(err);
 
+        if (MergeOverlappedAttributePath(clusterInfo))
+        {
+            continue;
+        }
+
         err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
         SuccessOrExit(err);
         mpAttributeClusterInfoList->SetDirty();
@@ -298,6 +303,31 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
 exit:
     ChipLogFunctError(err);
     return err;
+}
+
+
+bool ReadHandler::MergeOverlappedAttributePath(ClusterInfo & aTargetAttributePath)
+{
+    ClusterInfo * runner = mpAttributeClusterInfoList;
+    while (runner != nullptr)
+    {
+        // If overlapped, we would skip this target path,
+        // --If targetPath is part of previous path, return true
+        // --If previous path is part of target path, update filedid and listindex and mflags with target path, return true
+        if (runner->IsAttributePathSupersetOf(aTargetAttributePath))
+        {
+            return true;
+        }
+        if (aTargetAttributePath.IsAttributePathSupersetOf(*runner))
+        {
+            runner->mListIndex = aTargetAttributePath.mListIndex;
+            runner->mFieldId = aTargetAttributePath.mFieldId;
+            runner->mFlags = aTargetAttributePath.mFlags;
+            return true;
+        }
+        runner = runner->mpNext;
+    }
+    return false;
 }
 
 CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathListParser)

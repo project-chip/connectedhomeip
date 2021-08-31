@@ -156,7 +156,7 @@ public:
     void OnReportData(const chip::app::ReadClient * apReadClient, const chip::app::ClusterInfo & aPath,
                       chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::ProtocolCode status) override
     {
-        mGotAttributeResponse = true;
+        mNumAttributeResponse ++;
     }
 
     CHIP_ERROR ReportProcessed(const chip::app::ReadClient * apReadClient) override
@@ -175,7 +175,7 @@ public:
     }
 
     bool mGotEventResponse      = false;
-    bool mGotAttributeResponse  = false;
+    int mNumAttributeResponse  = 0;
     bool mGotReport             = false;
     bool mGotReadStatusResponse = false;
 };
@@ -630,18 +630,26 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     attributePathParams[0].mListIndex  = 0;
     attributePathParams[0].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
 
+    attributePathParams[1].mNodeId     = chip::kTestDeviceNodeId;
+    attributePathParams[1].mEndpointId = kTestEndpointId;
+    attributePathParams[1].mClusterId  = kTestClusterId;
+    attributePathParams[1].mFieldId    = 1;
+    attributePathParams[1].mListIndex  = 1;
+    attributePathParams[1].mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    attributePathParams[1].mFlags.Set(chip::app::AttributePathParams::Flags::kListIndexValid);
+
     ReadPrepareParams readPrepareParams;
     readPrepareParams.mSessionHandle               = ctx.GetSessionLocalToPeer();
     readPrepareParams.mpEventPathParamsList        = eventPathParams;
     readPrepareParams.mEventPathParamsListSize     = 2;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-    readPrepareParams.mAttributePathParamsListSize = 1;
+    readPrepareParams.mAttributePathParamsListSize = 2;
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
-    NL_TEST_ASSERT(apSuite, delegate.mGotAttributeResponse);
+    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
 
     // By now we should have closed all exchanges and sent all pending acks, so
