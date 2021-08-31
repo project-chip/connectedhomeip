@@ -51,11 +51,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     PeerId peerId;
     int64_t id    = 0x100;
     uint16_t port = 2000;
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    constexpr Inet::InterfaceId iface = nullptr;
-#else
-    constexpr Inet::InterfaceId iface = 2;
-#endif
+    constexpr Inet::InterfaceId iface = INET_NULL_INTERFACEID;
 
     Inet::IPAddress addr;
     Inet::IPAddress addrV6;
