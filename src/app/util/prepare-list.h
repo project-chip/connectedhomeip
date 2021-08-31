@@ -22,27 +22,4 @@
 #include <core/CHIPTLV.h>
 #include <lib/support/SafeInt.h>
 
-static EmberAfStatus PrepareListFromTLV(chip::TLV::TLVReader * tlvData, const uint8_t *& message, uint16_t & messageLen)
-{
-    CHIP_ERROR tlvError = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
-    chip::TLV::TLVType type;
-    reader.Init(*tlvData);
-    reader.EnterContainer(type);
-    tlvError = reader.Next();
-    if (tlvError != CHIP_NO_ERROR && tlvError != CHIP_END_OF_TLV && chip::CanCastTo<uint16_t>(reader.GetLength()))
-    {
-        return EMBER_ZCL_STATUS_INVALID_VALUE;
-    }
-    if (tlvError == CHIP_NO_ERROR)
-    {
-        tlvError   = reader.GetDataPtr(message);
-        messageLen = static_cast<uint16_t>(reader.GetLength());
-    }
-    if (tlvError != CHIP_NO_ERROR)
-    {
-        return EMBER_ZCL_STATUS_INVALID_VALUE;
-    }
-    reader.ExitContainer(type);
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
+EmberAfStatus PrepareListFromTLV(chip::TLV::TLVReader * tlvData, const uint8_t *& message, uint16_t & messageLen);
