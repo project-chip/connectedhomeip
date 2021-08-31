@@ -37,14 +37,17 @@ line tool provided by the [mcumgr](https://github.com/zephyrproject-rtos/mcumgr)
 project.
 
 > **_WARNING:_**
-> - The mcumgr tool using Bluetooth LE is available only for Linux and
->   macOS systems. On Windows, there is no support for Device Firmware Upgrade
->   over Bluetooth LE yet.
-> - It might not be possible to connect to the nRF device when using the mcumgr on Linux with the Bluetooth LE adapter.
->   In such cases, you can use Zephyr's Bluetooth HCI USB sample and program it to your device.
->   For example, to build the sample for the nRF52840 DK, use the following command:
 >
->       cd zephyr/samples/bluetooth/hci_usb && west build -b nrf52840dk_nrf52840 – -DCONFIG_BT_LL_SW_SPLIT=y
+> -   The mcumgr tool using Bluetooth LE is available only for Linux and macOS
+>     systems. On Windows, there is no support for Device Firmware Upgrade over
+>     Bluetooth LE yet.
+> -   It might not be possible to connect to the nRF device when using the
+>     mcumgr on Linux with the built-in Bluetooth LE adapter. In such cases, you can use
+>     Zephyr's Bluetooth HCI USB sample and program it to a Nordic Semiconductor's development kit to form an external Bluetooth LE adapter.
+>     For example, to build the sample for the nRF52840 DK, use the following
+>     command:
+>
+>         cd zephyr/samples/bluetooth/hci_usb && west build -b nrf52840dk_nrf52840 -- -DCONFIG_BT_LL_SW_SPLIT=y
 
 Complete the following steps to perform DFU using mcumgr:
 
@@ -59,9 +62,9 @@ Complete the following steps to perform DFU using mcumgr:
     functionality (if it is not enabled by default) and start the Bluetooth LE
     advertising of SMP service. See the user interface section in the example
     documentation to check the button number.
-3.  Observe that the LED on the device is flashing (short flash on), which means that the Bluetooth LE
-    advertising has started. See the user interface section in the example documentation to
-    check the LED number.
+3.  Observe that the LED on the device is flashing (short flash on), which means
+    that the Bluetooth LE advertising has started. See the user interface
+    section in the example documentation to check the LED number.
 4.  Upload the firmware image to the device by running the following command in
     your example directory:
 
