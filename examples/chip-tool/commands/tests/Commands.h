@@ -19410,6 +19410,185 @@ private:
     }
 };
 
+class OperationalCredentialsCluster : public TestCommand
+{
+public:
+    OperationalCredentialsCluster() : TestCommand("OperationalCredentialsCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, "OperationalCredentialsCluster: Test complete");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+        }
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            err = TestSendClusterOperationalCredentialsCommandReadAttribute_0();
+            break;
+        case 1:
+            err = TestSendClusterOperationalCredentialsCommandReadAttribute_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogProgress(chipTool, "OperationalCredentialsCluster: %s", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    //
+    // Tests methods
+    //
+
+    // Test Read number of supported fabrics
+    using SuccessCallback_0 = void (*)(void * context, uint8_t supportedFabrics);
+    chip::Callback::Callback<SuccessCallback_0> mOnSuccessCallback_0{
+        OnTestSendClusterOperationalCredentialsCommandReadAttribute_0_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_0{
+        OnTestSendClusterOperationalCredentialsCommandReadAttribute_0_FailureResponse, this
+    };
+    bool mIsFailureExpected_0 = 0;
+
+    CHIP_ERROR TestSendClusterOperationalCredentialsCommandReadAttribute_0()
+    {
+        ChipLogProgress(chipTool, "Operational Credentials - Read number of supported fabrics: Sending command...");
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeSupportedFabrics(mOnSuccessCallback_0.Cancel(), mOnFailureCallback_0.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterOperationalCredentialsCommandReadAttribute_0_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Operational Credentials - Read number of supported fabrics: Failure Response");
+
+        OperationalCredentialsCluster * runner = reinterpret_cast<OperationalCredentialsCluster *>(context);
+
+        if (runner->mIsFailureExpected_0 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterOperationalCredentialsCommandReadAttribute_0_SuccessResponse(void * context,
+                                                                                              uint8_t supportedFabrics)
+    {
+        ChipLogProgress(chipTool, "Operational Credentials - Read number of supported fabrics: Success Response");
+
+        OperationalCredentialsCluster * runner = reinterpret_cast<OperationalCredentialsCluster *>(context);
+
+        if (runner->mIsFailureExpected_0 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: supportedFabrics type checking is not implemented yet. Expected type: '%s'", "uint8");
+
+        if (supportedFabrics < 4)
+        {
+            ChipLogError(chipTool, "Error: supportedFabrics is lower than expected. Min value is 4 but got '%d'", supportedFabrics);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    // Test Read number of commissioned fabrics
+    using SuccessCallback_1 = void (*)(void * context, uint8_t commissionedFabrics);
+    chip::Callback::Callback<SuccessCallback_1> mOnSuccessCallback_1{
+        OnTestSendClusterOperationalCredentialsCommandReadAttribute_1_SuccessResponse, this
+    };
+    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback_1{
+        OnTestSendClusterOperationalCredentialsCommandReadAttribute_1_FailureResponse, this
+    };
+    bool mIsFailureExpected_1 = 0;
+
+    CHIP_ERROR TestSendClusterOperationalCredentialsCommandReadAttribute_1()
+    {
+        ChipLogProgress(chipTool, "Operational Credentials - Read number of commissioned fabrics: Sending command...");
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(mDevice, 0);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        err = cluster.ReadAttributeCommissionedFabrics(mOnSuccessCallback_1.Cancel(), mOnFailureCallback_1.Cancel());
+
+        return err;
+    }
+
+    static void OnTestSendClusterOperationalCredentialsCommandReadAttribute_1_FailureResponse(void * context, uint8_t status)
+    {
+        ChipLogProgress(chipTool, "Operational Credentials - Read number of commissioned fabrics: Failure Response");
+
+        OperationalCredentialsCluster * runner = reinterpret_cast<OperationalCredentialsCluster *>(context);
+
+        if (runner->mIsFailureExpected_1 == false)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a success callback. Got failure callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+
+    static void OnTestSendClusterOperationalCredentialsCommandReadAttribute_1_SuccessResponse(void * context,
+                                                                                              uint8_t commissionedFabrics)
+    {
+        ChipLogProgress(chipTool, "Operational Credentials - Read number of commissioned fabrics: Success Response");
+
+        OperationalCredentialsCluster * runner = reinterpret_cast<OperationalCredentialsCluster *>(context);
+
+        if (runner->mIsFailureExpected_1 == true)
+        {
+            ChipLogError(chipTool, "Error: The test was expecting a failure callback. Got success callback");
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        ChipLogError(chipTool, "Warning: commissionedFabrics type checking is not implemented yet. Expected type: '%s'", "uint8");
+
+        if (commissionedFabrics < 1)
+        {
+            ChipLogError(chipTool, "Error: commissionedFabrics is lower than expected. Min value is 1 but got '%d'",
+                         commissionedFabrics);
+            runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+            return;
+        }
+
+        runner->NextTest();
+    }
+};
+
 void registerCommandsTests(Commands & commands)
 {
     const char * clusterName = "Tests";
@@ -19443,6 +19622,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_FLW_1_1>(),
         make_unique<Test_TC_TM_1_1>(),
         make_unique<Test_TC_OCC_1_1>(),
+        make_unique<OperationalCredentialsCluster>(),
     };
 
     commands.Register(clusterName, clusterCommands);
