@@ -109,7 +109,6 @@ DeviceController::DeviceController()
     mExchangeMgr              = nullptr;
     mStorageDelegate          = nullptr;
     mPairedDevicesInitialized = false;
-    mListenPort               = CHIP_PORT;
 }
 
 CHIP_ERROR DeviceController::Init(ControllerInitParams params)
@@ -120,6 +119,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     {
         mSystemLayer = params.systemLayer;
         mInetLayer   = params.inetLayer;
+        mListenPort  = params.listenPort;
     }
     else
     {
