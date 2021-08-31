@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "core/CHIPError.h"
 #include <app/server/Server.h>
 
 #include <app/InteractionModelEngine.h>

@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include "transport/TransportMgrBase.h"
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissionManager.h>
 #include <app/server/RendezvousServer.h>
@@ -29,10 +28,10 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
-#include <pthread.h>
 #include <transport/FabricTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
+#include <transport/TransportMgrBase.h>
 #include <transport/raw/BLE.h>
 #include <transport/raw/UDP.h>
 
