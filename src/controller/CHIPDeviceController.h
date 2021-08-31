@@ -503,12 +503,10 @@ public:
      * @param[in] timeout         The pairing mode should terminate after this much time.
      * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
      *                            PAKE passcode verifier to be used for this commissioning.
+     * @param[in] discriminator   The long discriminator for the DNS-SD advertisement.
      * @param[in] option          The pairing window can be opened using the original setup code, or an
      *                            onboarding token can be generated using a random setup PIN code (or with
      *                            the PIN code provied in the setupPayload).
-     * @param[in] salt            The PAKE Salt associated with the PAKE Passcode ID and ephemeral PAKE passcode
-     *                            verifier to be used for this commissioning.
-     * @param[out] setupPayload   The setup payload corresponding to the generated onboarding token.
      *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */

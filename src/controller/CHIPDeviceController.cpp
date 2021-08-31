@@ -1044,8 +1044,6 @@ CHIP_ERROR DeviceCommissioner::OperationalDiscoveryComplete(NodeId remoteDeviceI
 CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration,
                                                        uint16_t discriminator, uint8_t option)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID %" PRIu64, deviceId);
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1076,20 +1074,18 @@ CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    err = device->OpenCommissioningWindow(timeout, iteration, pairingWindowOption, salt, payload);
+    ReturnErrorOnFailure(device->OpenCommissioningWindow(timeout, iteration, pairingWindowOption, salt, payload));
 
-    if (err == CHIP_NO_ERROR && pairingWindowOption != Device::PairingWindowOption::kOriginalSetupCode)
+    if (pairingWindowOption != Device::PairingWindowOption::kOriginalSetupCode)
     {
-        err = ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        ReturnErrorOnFailure(ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode));
         ChipLogProgress(Controller, "Manual pairing code: [%s]", manualPairingCode.c_str());
 
-        err = QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        ReturnErrorOnFailure(QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode));
         ChipLogProgress(Controller, "SetupQRCode: [%s]", QRCode.c_str());
     }
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void DeviceCommissioner::FreeRendezvousSession()
