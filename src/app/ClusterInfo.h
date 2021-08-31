@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <assert.h>
 #include <app/AttributePathParams.h>
 #include <app/util/basic-types.h>
+#include <assert.h>
 #include <core/Optional.h>
 
 namespace chip {
@@ -56,7 +56,7 @@ struct ClusterInfo
                                                                                       : Optional<ListIndex>::Missing();
 
         // If list index exists, field index must exist
-        //Field 0xFFFFFFF (any) &  listindex set is invalid
+        // Field 0xFFFFFFF (any) &  listindex set is invalid
         assert(!(myListIndex.HasValue() && !myFieldId.HasValue()));
         assert(!(otherListIndex.HasValue() && !otherFieldId.HasValue()));
         assert(!(myFieldId == Optional<AttributeId>::Value(kRootAttributeId) && myListIndex.HasValue()));
