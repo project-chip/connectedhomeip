@@ -42,8 +42,9 @@ project.
 >     systems. On Windows, there is no support for Device Firmware Upgrade over
 >     Bluetooth LE yet.
 > -   It might not be possible to connect to the nRF device when using the
->     mcumgr on Linux with the built-in Bluetooth LE adapter. In such cases, you can use
->     Zephyr's Bluetooth HCI USB sample and program it to a Nordic Semiconductor's development kit to form an external Bluetooth LE adapter.
+>     mcumgr on Linux with the built-in Bluetooth LE adapter. In such cases, you
+>     can use Zephyr's Bluetooth HCI USB sample and program it to a Nordic
+>     Semiconductor's development kit to form an external Bluetooth LE adapter.
 >     For example, to build the sample for the nRF52840 DK, use the following
 >     command:
 >
