@@ -56,34 +56,34 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Update nRF Connect SDK revision to the currently recommended.
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow"
             - name: Build example nRF Connect SDK Lock App on nRF52840 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh lock-app nrf52840dk_nrf52840
             - name: Build example nRF Connect SDK Lighting App on nRF52840 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840
             - name: Build example nRF Connect SDK Lighting App on nRF52840 DK with RPC
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840 -DOVERLAY_CONFIG=rpc.overlay
             - name: Build example nRF Connect SDK Shell on nRF52840 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh shell nrf52840dk_nrf52840
             - name: Build example nRF Connect SDK Pigweed on nRF52840 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh pigweed-app nrf52840dk_nrf52840
             - name: Build example nRF Connect SDK Lock App on nRF5340 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh lock-app nrf5340dk_nrf5340_cpuapp
             - name: Build example nRF Connect SDK Lighting App on nRF5340 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh lighting-app nrf5340dk_nrf5340_cpuapp
             - name: Build example nRF Connect SDK Shell on nRF5340 DK
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: scripts/examples/nrfconnect_example.sh shell nrf5340dk_nrf5340_cpuapp
             - name: Run unit tests for Zephyr native_posix_64 platform
-              timeout-minutes: 5
+              timeout-minutes: 10
               run:
                   scripts/run_in_build_env.sh "scripts/tests/nrfconnect_native_posix_tests.sh native_posix_64"
             - name: Copy aside build products

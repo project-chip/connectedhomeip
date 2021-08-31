@@ -143,7 +143,7 @@ CHIP_ERROR WatchableEventManager::AddEventHandlerDelegate(LwIPEventHandlerDelega
 
 CHIP_ERROR WatchableEventManager::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
-    VerifyOrReturnError(mSystemLayer->State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     // Sanity check that this instance and the target layer haven't been "crossed".
     VerifyOrDieWithMsg(aTarget.IsRetained(*mSystemLayer), chipSystemLayer, "wrong poster! [target %p != this %p]",
@@ -165,7 +165,7 @@ CHIP_ERROR WatchableEventManager::PostEvent(Object & aTarget, EventType aEventTy
  */
 CHIP_ERROR WatchableEventManager::DispatchEvents()
 {
-    VerifyOrReturnError(mSystemLayer->State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return PlatformEventing::DispatchEvents(*mSystemLayer);
 }
 
@@ -181,7 +181,7 @@ CHIP_ERROR WatchableEventManager::DispatchEvents()
  */
 CHIP_ERROR WatchableEventManager::DispatchEvent(Event aEvent)
 {
-    VerifyOrReturnError(mSystemLayer->State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return PlatformEventing::DispatchEvent(*mSystemLayer, aEvent);
 }
 
@@ -198,7 +198,7 @@ CHIP_ERROR WatchableEventManager::DispatchEvent(Event aEvent)
  */
 CHIP_ERROR WatchableEventManager::HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
 {
-    VerifyOrReturnError(mSystemLayer->State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     // Sanity check that this instance and the target layer haven't been "crossed".
     VerifyOrDieWithMsg(aTarget.IsRetained(*mSystemLayer), chipSystemLayer, "wrong handler! [target %p != this %p]",
@@ -244,7 +244,7 @@ CHIP_ERROR WatchableEventManager::HandleEvent(Object & aTarget, EventType aEvent
  */
 CHIP_ERROR WatchableEventManager::StartPlatformTimer(uint32_t aDelayMilliseconds)
 {
-    VerifyOrReturnError(mSystemLayer->State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return PlatformEventing::StartTimer(*mSystemLayer, aDelayMilliseconds);
 }
 
@@ -265,7 +265,7 @@ CHIP_ERROR WatchableEventManager::StartPlatformTimer(uint32_t aDelayMilliseconds
  */
 CHIP_ERROR WatchableEventManager::HandlePlatformTimer()
 {
-    VerifyOrReturnError(mSystemLayer->State() == LayerState::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
     // Expire each timer in turn until an unexpired timer is reached or the timerlist is emptied.  We set the current expiration
     // time outside the loop; that way timers set after the current tick will not be executed within this expiration window

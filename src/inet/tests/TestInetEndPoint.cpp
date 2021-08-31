@@ -96,8 +96,11 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
     // Deinit system layer and network
-    ShutdownSystemLayer();
     ShutdownNetwork();
+    if (gSystemLayer.IsInitialized())
+    {
+        ShutdownSystemLayer();
+    }
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
     err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRawEP);
@@ -589,6 +592,8 @@ static int TestSetup(void * inContext)
  */
 static int TestTeardown(void * inContext)
 {
+    ShutdownNetwork();
+    ShutdownSystemLayer();
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }

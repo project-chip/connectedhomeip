@@ -96,7 +96,6 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
 {
-    VerifyOrDieWithMsg(false, DeviceLayer, "Shutdown is not implemented");
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
