@@ -150,6 +150,8 @@ void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, co
 
 void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
 {
+    // grab port
+    mDiscoveredNodeData.port = srv.GetPort();
     // Host name is the first part of the qname
     mdns::Minimal::SerializedQNameIterator it = srv.GetName();
     if (it.Next())

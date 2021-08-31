@@ -18,18 +18,12 @@
 #pragma once
 
 #include <core/CHIPError.h>
+#include <mdns/Advertiser.h>
 #include <stddef.h>
 
 namespace chip {
 namespace app {
 namespace Mdns {
-
-enum class CommissioningMode
-{
-    kDisabled,       // Commissioning Mode is disabled, CM=0, AC=0 in DNS-SD key/value pairs
-    kEnabledBasic,   // Basic Commissioning Mode, CM=1, AC=0 in DNS-SD key/value pairs
-    kEnabledEnhanced // Enhanced Commissioning Mode, CM=1, AC=1 in DNS-SD key/value pairs
-};
 
 /// Sets the secure Matter port
 void SetSecuredPort(uint16_t port);
@@ -43,19 +37,21 @@ void SetUnsecuredPort(uint16_t port);
 /// Gets the unsecure Matter port
 uint16_t GetUnsecuredPort();
 
+/// Sets the factory-new state commissionable node discovery timeout
+void SetDiscoveryTimeoutSecs(int16_t secs);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+/// Sets the extended discovery timeout
+void SetExtendedDiscoveryTimeoutSecs(int16_t secs);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+
 /// Start operational advertising
 CHIP_ERROR AdvertiseOperational();
-
-/// Set MDNS commissioner advertisement
-CHIP_ERROR AdvertiseCommissioner();
-
-/// Set MDNS commissionable node advertisement
-CHIP_ERROR AdvertiseCommissionableNode(CommissioningMode mode);
 
 /// (Re-)starts the minmdns server
 /// - if device has not yet been commissioned, then commissioning mode will show as enabled (CM=1, AC=0)
 /// - if device has been commissioned, then commissioning mode will reflect the state of mode argument
-void StartServer(CommissioningMode mode = CommissioningMode::kDisabled);
+void StartServer(chip::Mdns::CommissioningMode mode = chip::Mdns::CommissioningMode::kDisabled);
 
 CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 

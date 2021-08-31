@@ -1099,6 +1099,17 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
+ *
+ * Time in seconds that a factory new device will advertise commissionable node discovery.
+ *
+ * Only valid when CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY==1
+ */
+#ifndef CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS 15 * 60
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES
  *
  * Maximum number of CHIP Commissioners or Commissionable Nodes that can be discovered
@@ -1153,6 +1164,18 @@
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 0
 #endif
+
+/**
+ * CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS
+ *
+ * Default time in seconds that a device will advertise commissionable node discovery
+ * after commissioning mode ends. This value can be overridden by the user.
+ *
+ * Only valid when CCHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY==1
+ */
+#define CHIP_DEVICE_CONFIG_DISCOVERY_DISABLED 0
+#define CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT -1
+#define CHIP_DEVICE_CONFIG_EXTENDED_DISCOVERY_TIMEOUT_SECS CHIP_DEVICE_CONFIG_DISCOVERY_NO_TIMEOUT
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE

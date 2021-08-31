@@ -81,11 +81,11 @@ struct DiscoveredNodeData
     // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
     static constexpr int kMaxIPAddresses = 5;
     char hostName[kMaxHostNameSize + 1];
+    uint8_t port;
     char instanceName[kMaxInstanceNameSize + 1];
     uint16_t longDiscriminator;
     uint16_t vendorId;
     uint16_t productId;
-    uint8_t additionalPairing;
     uint8_t commissioningMode;
     // TODO: possibly 32-bit - see spec issue #3226
     uint16_t deviceType;
@@ -103,11 +103,11 @@ struct DiscoveredNodeData
     void Reset()
     {
         memset(hostName, 0, sizeof(hostName));
+        port = 0;
         memset(instanceName, 0, sizeof(instanceName));
         longDiscriminator = 0;
         vendorId          = 0;
         productId         = 0;
-        additionalPairing = 0;
         commissioningMode = 0;
         deviceType        = 0;
         memset(deviceName, 0, sizeof(deviceName));
@@ -148,7 +148,6 @@ enum class DiscoveryFilterType : uint8_t
     kVendor,
     kDeviceType,
     kCommissioningMode,
-    kCommissioningModeFromCommand,
     kInstanceName,
     kCommissioner
 };
@@ -158,6 +157,7 @@ struct DiscoveryFilter
     uint16_t code;
     const char * instanceName;
     DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
+    DiscoveryFilter(DiscoveryFilterType newType) : type(newType) {}
     DiscoveryFilter(DiscoveryFilterType newType, uint16_t newCode) : type(newType), code(newCode) {}
     DiscoveryFilter(DiscoveryFilterType newType, const char * newInstanceName) : type(newType), instanceName(newInstanceName) {}
 };
