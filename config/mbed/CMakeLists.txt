@@ -355,7 +355,6 @@ target_sources(${APP_TARGET} PRIVATE
     ${CHIP_ROOT}/examples/common/pigweed/RpcService.cpp
     ${CHIP_ROOT}/examples/common/pigweed/mbed/PigweedLoggerMutex.cpp
     ${MBED_COMMON}/util/PigweedLogger.cpp
-    ${APP_ROOT}/mbed/main/Rpc.cpp
 )
 
 target_include_directories(${APP_TARGET} PRIVATE
@@ -385,22 +384,19 @@ target_include_directories(${APP_TARGET} PRIVATE
                     ${PIGWEED_ROOT}/pw_varint/public
                     ${PIGWEED_ROOT}/pw_function/public
                     ${PIGWEED_ROOT}/pw_preprocessor/public
-                ${PIGWEED_ROOT}/pw_rpc/system_server/public
+                    ${PIGWEED_ROOT}/pw_rpc/system_server/public
                     ${CHIP_ROOT}/third_party/nanopb/repo
 
                     ${CHIP_ROOT}/examples/common
                     ${CHIP_ROOT}/examples//common/pigweed/mbed
                     ${MBED_COMMON}/pw_sys_io/public
-
-                    ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/common_protos.proto_library/nanopb
-                    ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/common_protos.proto_library/nanopb_rpc
-                    ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/pwpb
 )
 
 if (CONFIG_CHIP_PW_RPC_ECHO_PROTO)
     target_include_directories(${APP_TARGET} PRIVATE
-        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/echo_service.proto_library/nanopb
-        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/examples/common/pigweed/echo_service.proto_library/nanopb_rpc
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb_rpc
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb
+        ${CMAKE_CURRENT_BINARY_DIR}/protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/pwpb
     )
 endif(CONFIG_CHIP_PW_RPC_ECHO_PROTO)
 

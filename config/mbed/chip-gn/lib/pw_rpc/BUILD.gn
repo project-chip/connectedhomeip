@@ -34,7 +34,7 @@ static_library("pw_rpc") {
   ]
 
   if (chip_build_pw_rpc_echo_proto) {
-    deps += [ "${chip_root}/examples/common/pigweed:echo_service.nanopb_rpc" ]
+    deps += [ "$dir_pw_rpc/nanopb:echo_service" ]
   }
 
   deps += pw_build_LINK_DEPS

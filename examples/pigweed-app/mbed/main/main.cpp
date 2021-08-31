@@ -19,7 +19,8 @@
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
 
-#include "Rpc.h"
+#include "pw_rpc/echo_service_nanopb.h"
+#include "pw_rpc/server.h"
 #include "pw_sys_io/sys_io.h"
 #include "pw_sys_io_mbed/init.h"
 
@@ -30,13 +31,30 @@
 #include "rtos/Thread.h"
 
 using namespace chip::rpc;
+using namespace ::chip::DeviceLayer;
+
+static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
+
+namespace {
 
 #define RPC_THREAD_NAME "RPC"
 #define RPC_STACK_SIZE (4 * 1024)
 
 rtos::Thread rpcThread{ osPriorityNormal, RPC_STACK_SIZE, /* memory provided */ nullptr, RPC_THREAD_NAME };
 
-static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
+pw::rpc::EchoService echo_service;
+
+void RegisterServices(pw::rpc::Server & server)
+{
+    server.RegisterService(echo_service);
+}
+
+void RunRpcService()
+{
+    Start(RegisterServices, &logger_mutex);
+}
+
+} // namespace
 
 int main()
 {
