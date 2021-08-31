@@ -49,8 +49,8 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     const int sizeOfCache = 5;
     MdnsCache<sizeOfCache> tMdnsCache;
     PeerId peerId;
-    int64_t id    = 0x100;
-    uint16_t port = 2000;
+    int64_t id                        = 0x100;
+    uint16_t port                     = 2000;
     constexpr Inet::InterfaceId iface = INET_NULL_INTERFACEID;
 
     Inet::IPAddress addr;
