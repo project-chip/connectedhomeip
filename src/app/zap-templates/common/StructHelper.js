@@ -17,8 +17,9 @@
 
 const kType = 'STRUCT'
 
-function isStruct(type) {
-    return type.toUpperCase() == kType
+function isStruct(type)
+{
+  return type.toUpperCase() == kType
 }
 
 //

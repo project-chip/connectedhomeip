@@ -15,17 +15,18 @@
  *    limitations under the License.
  */
 
-function Deferred() {
-    let resolve, reject
+function Deferred()
+{
+  let resolve, reject
 
     let promise = new Promise((_resolve, _reject) => {
         resolve = _resolve
         reject = _reject
     })
 
-    promise.resolve = resolve
-    promise.reject = reject
-    return promise
+        promise.resolve = resolve
+        promise.reject  = reject
+        return promise
 }
 
 //

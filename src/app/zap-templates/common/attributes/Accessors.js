@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-const ListHelper = require('../../common/ListHelper.js')
+const ListHelper   = require('../../common/ListHelper.js')
 const StringHelper = require('../../common/StringHelper.js')
 const StructHelper = require('../../common/StructHelper.js')
 
@@ -23,42 +23,43 @@ const StructHelper = require('../../common/StructHelper.js')
 // The specification allow non-standard signed and unsigned integer with a width of 24, 40, 48 or 56, but those types does not have
 // proper support yet into the codebase and the resulting generated code can not be built with them.
 // Once they are supported, the following method could be removed.
-const unsupportedTypes = [
-    'INT24S',
-    'INT40S',
-    'INT48S',
-    'INT56S',
-    'INT24U',
-    'INT40U',
-    'INT48U',
-    'INT56U',
-    'EUI64',
-]
-function isUnsupportedType(type) {
-    return unsupportedTypes.includes(type.toUpperCase())
-}
-
-function canHaveSimpleAccessors(type) {
-    if (StringHelper.isString(type)) {
-        return false
+const unsupportedTypes =
+    [
+      'INT24S',
+      'INT40S',
+      'INT48S',
+      'INT56S',
+      'INT24U',
+      'INT40U',
+      'INT48U',
+      'INT56U',
+      'EUI64',
+    ] function isUnsupportedType(type) {
+      return unsupportedTypes.includes(type.toUpperCase())
     }
 
-    if (ListHelper.isList(type)) {
+    function canHaveSimpleAccessors(type) {
+      if (StringHelper.isString(type)) {
         return false
+      }
+
+      if (ListHelper.isList(type)) {
+        return false
+      }
+
+      if (StructHelper.isStruct(type)) {
+        return false
+      }
+
+      if (isUnsupportedType(type)) {
+        return false
+      }
+
+      return true
     }
 
-    if (StructHelper.isStruct(type)) {
-        return false
-    }
-
-    if (isUnsupportedType(type)) {
-        return false
-    }
-
-    return true
-}
-
-//
-// Module exports
-//
-exports.canHaveSimpleAccessors = canHaveSimpleAccessors
+    //
+    // Module exports
+    //
+    exports.canHaveSimpleAccessors
+    = canHaveSimpleAccessors

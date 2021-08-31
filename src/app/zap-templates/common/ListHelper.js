@@ -17,8 +17,9 @@
 
 const listType = 'ARRAY'
 
-function isList(type) {
-    return type.toUpperCase() == listType
+function isList(type)
+{
+  return type.toUpperCase() == listType
 }
 
 //

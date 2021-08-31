@@ -16,26 +16,27 @@
  */
 
 // Import helpers from zap core
-const zapPath = '../../../../third_party/zap/repo/dist/src-electron/'
-const queryConfig = require(zapPath + 'db/query-config.js')
-const queryCommand = require(zapPath + 'db/query-command.js')
-const queryEndpoint = require(zapPath + 'db/query-endpoint.js')
+const zapPath           = '../../../../third_party/zap/repo/dist/src-electron/'
+const queryConfig       = require(zapPath + 'db/query-config.js')
+const queryCommand      = require(zapPath + 'db/query-command.js')
+const queryEndpoint     = require(zapPath + 'db/query-endpoint.js')
 const queryEndpointType = require(zapPath + 'db/query-endpoint-type.js')
-const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper = require(zapPath + 'generator/helper-zcl.js')
-const zclQuery = require(zapPath + 'db/query-zcl.js')
+const templateUtil      = require(zapPath + 'generator/template-util.js')
+const zclHelper         = require(zapPath + 'generator/helper-zcl.js')
+const zclQuery          = require(zapPath + 'db/query-zcl.js')
 
-const { Deferred } = require('./Deferred.js')
-const ListHelper = require('./ListHelper.js')
-const StringHelper = require('./StringHelper.js')
-const StructHelper = require('./StructHelper.js')
+const { Deferred }    = require('./Deferred.js')
+const ListHelper      = require('./ListHelper.js')
+const StringHelper    = require('./StringHelper.js')
+const StructHelper    = require('./StructHelper.js')
 const ChipTypesHelper = require('./ChipTypesHelper.js')
 
 //
 // Load Step 1
 //
-function loadAtomics(packageId) {
-    const { db, sessionId } = this.global
+function loadAtomics(packageId)
+{
+  const { db, sessionId } = this.global
     const options = { hash: {} }
 
     const resolveZclTypes = atomics =>
@@ -50,21 +51,24 @@ function loadAtomics(packageId) {
             }),
         )
 
-    return zclQuery.selectAllAtomics(db, packageId).then(resolveZclTypes)
+                        return zclQuery.selectAllAtomics(db, packageId).then(resolveZclTypes)
 }
 
-function loadBitmaps(packageId) {
-    const { db, sessionId } = this.global
-    return zclQuery.selectAllBitmaps(db, packageId)
+function loadBitmaps(packageId)
+{
+  const { db, sessionId } = this.global
+  return zclQuery.selectAllBitmaps(db, packageId)
 }
 
-function loadEnums(packageId) {
-    const { db, sessionId } = this.global
-    return zclQuery.selectAllEnums(db, packageId)
+function loadEnums(packageId)
+{
+  const { db, sessionId } = this.global
+  return zclQuery.selectAllEnums(db, packageId)
 }
 
-function loadStructItems(struct, packageId) {
-    const { db, sessionId } = this.global
+function loadStructItems(struct, packageId)
+{
+  const { db, sessionId } = this.global
     return zclQuery
         .selectAllStructItemsById(db, struct.id)
         .then(structItems => {
@@ -73,34 +77,35 @@ function loadStructItems(struct, packageId) {
         })
 }
 
-function loadStructs(packageId) {
-    const { db, sessionId } = this.global
-    return zclQuery
-        .selectAllStructsWithItemCount(db, packageId)
-        .then(structs =>
-            Promise.all(
-                structs.map(struct =>
-                    loadStructItems.call(this, struct, packageId),
-                ),
-            ),
-        )
+function loadStructs(packageId)
+{
+  const { db, sessionId } = this.global
+  return zclQuery.selectAllStructsWithItemCount(db, packageId)
+      .then(
+          structs => Promise.all(
+              structs.map(
+                  struct => loadStructItems.call(this, struct, packageId),
+                  ),
+              ),
+      )
 }
 
-function loadClusters() {
-    const { db, sessionId } = this.global
-    return queryEndpointType
-        .selectEndpointTypeIds(db, sessionId)
-        .then(endpointTypes =>
-            queryEndpointType.selectAllClustersDetailsFromEndpointTypes(
-                db,
-                endpointTypes,
-            ),
-        )
-        .then(clusters => clusters.filter(cluster => cluster.enabled == 1))
+function loadClusters()
+{
+  const { db, sessionId } = this.global
+  return queryEndpointType.selectEndpointTypeIds(db, sessionId)
+      .then(
+          endpointTypes => queryEndpointType.selectAllClustersDetailsFromEndpointTypes(
+              db,
+              endpointTypes,
+              ),
+          )
+      .then(clusters => clusters.filter(cluster => cluster.enabled == 1))
 }
 
-function loadCommandArguments(command, packageId) {
-    const { db, sessionId } = this.global
+function loadCommandArguments(command, packageId)
+{
+  const { db, sessionId } = this.global
     return queryCommand
         .selectCommandArgumentsByCommandId(db, command.id, packageId)
         .then(commandArguments => {
@@ -109,74 +114,74 @@ function loadCommandArguments(command, packageId) {
         })
 }
 
-function loadCommands(packageId) {
-    const { db, sessionId } = this.global
-    return queryEndpointType
-        .selectEndpointTypeIds(db, sessionId)
-        .then(endpointTypes =>
-            queryEndpointType.selectClustersAndEndpointDetailsFromEndpointTypes(
-                db,
-                endpointTypes,
-            ),
-        )
-        .then(endpointTypesAndClusters =>
-            queryCommand.selectCommandDetailsFromAllEndpointTypesAndClusters(
-                db,
-                endpointTypesAndClusters,
-                true,
-            ),
-        )
-        .then(commands =>
-            Promise.all(
-                commands.map(command =>
-                    loadCommandArguments.call(this, command, packageId),
-                ),
-            ),
-        )
+function loadCommands(packageId)
+{
+  const { db, sessionId } = this.global
+  return queryEndpointType.selectEndpointTypeIds(db, sessionId)
+      .then(
+          endpointTypes => queryEndpointType.selectClustersAndEndpointDetailsFromEndpointTypes(
+              db,
+              endpointTypes,
+              ),
+          )
+      .then(
+          endpointTypesAndClusters => queryCommand.selectCommandDetailsFromAllEndpointTypesAndClusters(
+              db,
+              endpointTypesAndClusters,
+              true,
+              ),
+          )
+      .then(
+          commands => Promise.all(
+              commands.map(
+                  command => loadCommandArguments.call(this, command, packageId),
+                  ),
+              ),
+      )
 }
 
-function loadAttributes(packageId) {
-    // The 'server' side is enforced here, because the list of attributes is used to generate client global
-    // commands to retrieve server side attributes.
-    const { db, sessionId } = this.global
-    return queryEndpointType
-        .selectEndpointTypeIds(db, sessionId)
-        .then(endpointTypes =>
-            Promise.all(
-                endpointTypes.map(({ endpointTypeId }) =>
-                    queryEndpoint.selectEndpointClusters(db, endpointTypeId),
-                ),
-            ),
-        )
-        .then(clusters => clusters.flat())
-        .then(clusters =>
-            Promise.all(
-                clusters.map(({ clusterId, side, endpointTypeId }) =>
-                    queryEndpoint.selectEndpointClusterAttributes(
-                        db,
-                        clusterId,
-                        'server',
-                        endpointTypeId,
-                    ),
-                ),
-            ),
-        )
-        .then(attributes => attributes.flat())
-        .then(attributes =>
-            attributes.filter(attribute => attribute.isIncluded),
-        )
-        .then(attributes => attributes.sort((a, b) => a.code - b.code))
-    //.then(attributes => Promise.all(attributes.map(attribute => types.typeSizeAttribute(db, packageId, attribute))
+function loadAttributes(packageId)
+{
+  // The 'server' side is enforced here, because the list of attributes is used to generate client global
+  // commands to retrieve server side attributes.
+  const { db, sessionId } = this.global
+  return queryEndpointType.selectEndpointTypeIds(db, sessionId)
+      .then(
+          endpointTypes => Promise.all(
+              endpointTypes.map(
+                  ({ endpointTypeId }) => queryEndpoint.selectEndpointClusters(db, endpointTypeId),
+                  ),
+              ),
+          )
+      .then(clusters => clusters.flat())
+      .then(
+          clusters => Promise.all(
+              clusters.map(
+                  ({ clusterId, side, endpointTypeId }) => queryEndpoint.selectEndpointClusterAttributes(
+                      db,
+                      clusterId,
+                      'server',
+                      endpointTypeId,
+                      ),
+                  ),
+              ),
+          )
+      .then(attributes => attributes.flat())
+      .then(
+          attributes => attributes.filter(attribute => attribute.isIncluded),
+          )
+      .then(attributes => attributes.sort((a, b) => a.code - b.code))
+  //.then(attributes => Promise.all(attributes.map(attribute => types.typeSizeAttribute(db, packageId, attribute))
 }
 
-function loadGlobalAttributes(packageId) {
-    const { db, sessionId } = this.global
-    return zclQuery
-        .selectAllAttributes(db, packageId)
-        .then(attributes =>
-            attributes.filter(attribute => attribute.clusterRef == null),
-        )
-        .then(attributes => attributes.map(attribute => attribute.code))
+function loadGlobalAttributes(packageId)
+{
+  const { db, sessionId } = this.global
+  return zclQuery.selectAllAttributes(db, packageId)
+      .then(
+          attributes => attributes.filter(attribute => attribute.clusterRef == null),
+          )
+      .then(attributes => attributes.map(attribute => attribute.code))
 }
 
 //
@@ -190,12 +195,14 @@ function loadGlobalAttributes(packageId) {
  * Not all types are supported at the moment, so if there is any unsupported type
  * that we are trying to convert, it will throw an error.
  */
-function asPutLength(zclType) {
-    const type = ChipTypesHelper.asBasicType(zclType)
-    switch (type) {
-        case 'bool':
-            return '8'
-        case 'int8_t':
+function asPutLength(zclType)
+{
+  const type = ChipTypesHelper.asBasicType(zclType)
+  switch (type)
+  {
+  case 'bool':
+    return '8'
+    case 'int8_t':
         case 'int16_t':
         case 'int32_t':
         case 'int64_t':
@@ -206,227 +213,246 @@ function asPutLength(zclType) {
             return type.replace(/[^0-9]/g, '')
         default:
             throw (error = 'asPutLength: Unhandled type: ' + zclType)
-    }
+  }
 }
 
-function asPutCastType(zclType) {
-    const type = ChipTypesHelper.asBasicType(zclType)
-    switch (type) {
-        case 'bool':
-            return 'uint8_t'
-        case 'int8_t':
-        case 'int16_t':
-        case 'int32_t':
-        case 'int64_t':
-            return 'u' + type
-        case 'uint8_t':
-        case 'uint16_t':
-        case 'uint32_t':
-        case 'uint64_t':
-            return type
-        default:
-            throw (error = 'asPutCastType: Unhandled type: ' + zclType)
-    }
+function asPutCastType(zclType)
+{
+  const type = ChipTypesHelper.asBasicType(zclType)
+  switch (type)
+  {
+  case 'bool':
+    return 'uint8_t'
+    case 'int8_t': case 'int16_t': case 'int32_t': case 'int64_t': return 'u' + type
+    case 'uint8_t': case 'uint16_t': case 'uint32_t': case 'uint64_t': return type default: throw (
+        error = 'asPutCastType: Unhandled type: ' + zclType)
+  }
 }
 
-function asChipCallback(item) {
-    if (StringHelper.isOctetString(item.type)) {
-        return { name: 'OctetString', type: 'const chip::ByteSpan' }
+function asChipCallback(item)
+{
+  if (StringHelper.isOctetString(item.type)) {
+    return
+    {
+      name: 'OctetString', type: 'const chip::ByteSpan'
     }
+  }
 
-    if (StringHelper.isCharString(item.type)) {
-        return { name: 'CharString', type: 'const chip::ByteSpan' }
+  if (StringHelper.isCharString(item.type)) {
+    return
+    {
+      name: 'CharString', type: 'const chip::ByteSpan'
     }
+  }
 
-    if (ListHelper.isList(item.type)) {
-        return { name: 'List', type: null }
+  if (ListHelper.isList(item.type)) {
+    return
+    {
+      name: 'List', type: null
     }
+  }
 
-    if (item.type == 'boolean') {
-        return { name: 'Boolean', type: 'bool' }
+  if (item.type == 'boolean') {
+    return
+    {
+      name: 'Boolean', type: 'bool'
     }
+  }
 
-    const basicType = ChipTypesHelper.asBasicType(item.chipType)
-    switch (basicType) {
-        case 'int8_t':
-        case 'int16_t':
-        case 'int32_t':
-        case 'int64_t':
-            return {
-                name: 'Int' + basicType.replace(/[^0-9]/g, '') + 's',
-                type: basicType,
-            }
-        case 'uint8_t':
-        case 'uint16_t':
-        case 'uint32_t':
-        case 'uint64_t':
-            return {
-                name: 'Int' + basicType.replace(/[^0-9]/g, '') + 'u',
-                type: basicType,
-            }
-        default:
-            return { name: 'Unsupported', type: null }
+  const basicType = ChipTypesHelper.asBasicType(item.chipType)
+  switch (basicType)
+  {
+  case 'int8_t':
+  case 'int16_t':
+  case 'int32_t':
+  case 'int64_t':
+    return
+    {
+      name: 'Int' + basicType.replace(/[^0-9]/g, '') + 's', type: basicType,
     }
+  case 'uint8_t':
+  case 'uint16_t':
+  case 'uint32_t':
+  case 'uint64_t':
+    return
+    {
+      name: 'Int' + basicType.replace(/[^0-9]/g, '') + 'u', type: basicType,
+    }
+  default:
+    return
+    {
+      name: 'Unsupported', type: null
+    }
+  }
 }
 
-function getAtomic(atomics, type) {
-    return atomics.find(atomic => atomic.name == type.toLowerCase())
+function getAtomic(atomics, type)
+{
+  return atomics.find(atomic => atomic.name == type.toLowerCase())
 }
 
-function getBitmap(bitmaps, type) {
-    return bitmaps.find(bitmap => bitmap.label == type)
+function getBitmap(bitmaps, type)
+{
+  return bitmaps.find(bitmap => bitmap.label == type)
 }
 
-function getEnum(enums, type) {
-    return enums.find(enumItem => enumItem.label == type)
+function getEnum(enums, type)
+{
+  return enums.find(enumItem => enumItem.label == type)
 }
 
-function getStruct(structs, type) {
-    return structs.find(struct => struct.label == type)
+function getStruct(structs, type)
+{
+  return structs.find(struct => struct.label == type)
 }
 
-function handleString(item, [atomics, enums, bitmaps, structs]) {
-    if (!StringHelper.isString(item.type)) {
-        return false
-    }
-
-    const atomic = getAtomic(atomics, item.type)
-    if (!atomic) {
-        return false
-    }
-
-    const kLengthSizeInBytes = 2
-
-    item.atomicTypeId = atomic.atomicId
-    item.chipType = 'chip::ByteSpan'
-    item.size = kLengthSizeInBytes + item.maxLength
-    item.name = item.name || item.label
-    return true
-}
-
-function handleList(item, [atomics, enums, bitmaps, structs]) {
-    if (!ListHelper.isList(item.type)) {
-        return false
-    }
-
-    const entryType = item.entryType
-    if (!entryType) {
-        console.log(item)
-        throw new Error(item.label, 'List[T] is missing type "T" information')
-    }
-
-    item.isList = true
-    item.type = entryType
-    enhancedItem(item, [atomics, enums, bitmaps, structs])
-
-    return true
-}
-
-function handleStruct(item, [atomics, enums, bitmaps, structs]) {
-    const struct = getStruct(structs, item.type)
-    if (!struct) {
-        return false
-    }
-
-    // Add a leading `_` before the name of struct to match what is done in the af-structs.zapt template.
-    // For instance structs are declared as "typedef struct _{{asType label}}".
-    item.chipType = '_' + item.type
-    item.isStruct = true
-
-    struct.items.map(structItem =>
-        enhancedItem(structItem, [atomics, enums, bitmaps, structs]),
-    )
-    item.items = struct.items
-    item.size = struct.items
-        .map(type => type.size)
-        .reduce((accumulator, currentValue) => accumulator + currentValue, 0)
-    return true
-}
-
-function handleBasic(item, [atomics, enums, bitmaps, structs]) {
-    let itemType = item.type
-
-    const enumItem = getEnum(enums, itemType)
-    if (enumItem) {
-        itemType = enumItem.type
-    }
-
-    const bitmap = getBitmap(bitmaps, itemType)
-    if (bitmap) {
-        itemType = bitmap.type
-    }
-
-    const atomic = getAtomic(atomics, itemType)
-    if (atomic) {
-        item.name = item.name || item.label
-        item.isStruct = false
-        item.atomicTypeId = atomic.atomicId
-        item.isAnalog = atomic.isDiscrete == false && atomic.isString == false
-        item.size = atomic.size
-        item.chipType = atomic.chipType
-        item.chipTypePutLength = asPutLength(atomic.chipType)
-        item.chipTypePutCastType = asPutCastType(atomic.chipType)
-        return true
-    }
-
+function handleString(item, [ atomics, enums, bitmaps, structs ])
+{
+  if (!StringHelper.isString(item.type)) {
     return false
+  }
+
+  const atomic = getAtomic(atomics, item.type)
+  if (!atomic)
+  {
+    return false
+  }
+
+  const kLengthSizeInBytes = 2
+
+  item.atomicTypeId = atomic.atomicId
+  item.chipType     = 'chip::ByteSpan'
+  item.size         = kLengthSizeInBytes + item.maxLength
+  item.name         = item.name || item.label
+  return true
 }
 
-function enhancedItem(item, types) {
-    if (handleString(item, types)) {
-        return
-    }
+function handleList(item, [ atomics, enums, bitmaps, structs ])
+{
+  if (!ListHelper.isList(item.type)) {
+    return false
+  }
 
-    if (handleList(item, types)) {
-        return
-    }
-
-    if (handleStruct(item, types)) {
-        return
-    }
-
-    if (handleBasic(item, types)) {
-        return
-    }
-
+  const entryType = item.entryType
+  if (!entryType)
+  {
     console.log(item)
-    throw new Error(item.type + ' not found.')
+    throw new Error(item.label, 'List[T] is missing type "T" information')
+  }
+
+  item.isList = true
+  item.type   = entryType
+  enhancedItem(item, [ atomics, enums, bitmaps, structs ])
+
+  return true
 }
 
-function inlineStructItems(args) {
-    const allArguments = []
-    args.forEach(argument => {
-        if (!argument.isStruct) {
-            allArguments.push(argument)
-            return
-        }
+function handleStruct(item, [ atomics, enums, bitmaps, structs ])
+{
+  const struct = getStruct(structs, item.type)
+  if (!struct)
+  {
+    return false
+  }
 
-        argument.items.forEach(item => {
-            allArguments.push(item)
-        })
-    })
+  // Add a leading `_` before the name of struct to match what is done in the af-structs.zapt template.
+  // For instance structs are declared as "typedef struct _{{asType label}}".
+  item.chipType = '_' + item.type
+  item.isStruct = true
 
-    return allArguments
+  struct.items.map(
+      structItem => enhancedItem(structItem, [ atomics, enums, bitmaps, structs ]),
+  )
+  item.items = struct.items
+  item.size  = struct.items.map(type => type.size).reduce((accumulator, currentValue) => accumulator + currentValue, 0)
+  return true
 }
 
-function enhancedCommands(commands, types) {
-    commands.forEach(command => {
-        command.arguments.forEach(argument => {
-            enhancedItem(argument, types)
-        })
-    })
+function handleBasic(item, [ atomics, enums, bitmaps, structs ])
+{
+  let itemType = item.type
+
+  const enumItem = getEnum(enums, itemType)
+  if (enumItem)
+  {
+    itemType = enumItem.type
+  }
+
+  const bitmap = getBitmap(bitmaps, itemType)
+  if (bitmap)
+  {
+    itemType = bitmap.type
+  }
+
+  const atomic = getAtomic(atomics, itemType)
+  if (atomic)
+  {
+    item.name                = item.name || item.label
+    item.isStruct            = false
+    item.atomicTypeId        = atomic.atomicId
+    item.isAnalog            = atomic.isDiscrete == false && atomic.isString == false
+    item.size                = atomic.size
+    item.chipType            = atomic.chipType
+    item.chipTypePutLength   = asPutLength(atomic.chipType)
+    item.chipTypePutCastType = asPutCastType(atomic.chipType)
+    return true
+  }
+
+  return false
+}
+
+function enhancedItem(item, types)
+{
+  if (handleString(item, types)) {
+    return
+  }
+
+  if (handleList(item, types)) {
+    return
+  }
+
+  if (handleStruct(item, types)) {
+    return
+  }
+
+  if (handleBasic(item, types)) {
+    return
+  }
+
+  console.log(item)
+  throw new Error(item.type + ' not found.')
+}
+
+function inlineStructItems(args)
+{
+  const allArguments = []
+  args.forEach(argument => {
+    if (!argument.isStruct) {
+      allArguments.push(argument)
+      return
+    }
+
+    argument.items.forEach(item => { allArguments.push(item) })
+  })
+
+  return allArguments
+}
+
+function enhancedCommands(commands, types)
+{
+  commands.forEach(command => { command.arguments.forEach(argument => { enhancedItem(argument, types) }) })
 
     commands.forEach(command => {
         command.isResponse = command.name.includes('Response')
         command.isManufacturerSpecificCommand = !!this.mfgCode
     })
 
-    commands.forEach(command => {
-        // This filter uses the assumption that a response to a command has a well defined name, such as
-        // (response name) == (command name + 'Response') or s/Request/Response. This is very often the case,
-        // but this is not always true since some clusters use the same response to answer different commands, such as the
-        // operational cluster.
-        const automaticFilter = response => {
+        commands.forEach(command => {
+          // This filter uses the assumption that a response to a command has a well defined name, such as
+          // (response name) == (command name + 'Response') or s/Request/Response. This is very often the case,
+          // but this is not always true since some clusters use the same response to answer different commands, such as the
+          // operational cluster.
+          const automaticFilter = response => {
             if (!response.isResponse) {
                 return false
             }
@@ -459,46 +485,50 @@ function enhancedCommands(commands, types) {
         const filter = response =>
             automaticFilter(response) || manualFilter(response)
 
-        const response = commands.find(filter)
-        if (response) {
+          const response = commands.find(filter)
+          if (response)
+          {
             command.hasSpecificResponse = true
-            command.responseName = response.name
-            command.response = response
-        } else {
+            command.responseName        = response.name
+            command.response            = response
+          }
+          else
+          {
             command.hasSpecificResponse = false
-            command.responseName = 'DefaultSuccess'
-            command.response = { arguments: [] }
-        }
-    })
+            command.responseName        = 'DefaultSuccess'
+            command.response            = { arguments : [] }
+          }
+        })
 
-    // Filter unused responses
-    commands = commands.filter(command => {
-        if (!command.isResponse) {
+        // Filter unused responses
+        commands = commands.filter(command => {
+          if (!command.isResponse) {
             return true
-        }
+          }
 
-        const responseName = command.name
-        return commands.find(command => command.responseName == responseName)
-    })
+          const responseName = command.name
+          return commands.find(command => command.responseName == responseName)
+        })
 
-    // At this stage, 'command.arguments' may contains 'struct'. But controllers does not know (yet) how
-    // to handle them. So those needs to be inlined.
-    commands.forEach(command => {
-        if (command.isResponse) {
+        // At this stage, 'command.arguments' may contains 'struct'. But controllers does not know (yet) how
+        // to handle them. So those needs to be inlined.
+        commands.forEach(command => {
+          if (command.isResponse) {
             return
-        }
+          }
 
-        command.arguments = inlineStructItems(command.arguments)
-    })
-    return commands
+          command.arguments = inlineStructItems(command.arguments)
+        })
+        return commands
 }
 
-function enhancedAttributes(attributes, globalAttributes, types) {
+function enhancedAttributes(attributes, globalAttributes, types)
+{
     attributes.forEach(attribute => {
         enhancedItem(attribute, types)
-        attribute.isGlobalAttribute = globalAttributes.includes(attribute.code)
-        attribute.isWritableAttribute = attribute.isWritable === 1
-        attribute.isReportableAttribute = attribute.includedReportable === 1
+    attribute.isGlobalAttribute     = globalAttributes.includes(attribute.code)
+    attribute.isWritableAttribute   = attribute.isWritable === 1
+    attribute.isReportableAttribute = attribute.includedReportable === 1
         attribute.chipCallback = asChipCallback(attribute)
     })
 
@@ -512,18 +542,17 @@ function enhancedAttributes(attributes, globalAttributes, types) {
             chipCallback: attribute.chipCallback,
         }
         attribute.arguments = [argument]
-        attribute.response = { arguments: [argument] }
+        attribute.response = {
+    arguments: [ argument ] }
     })
 
-    // At this stage, the 'attributes' array contains all attributes enabled for all endpoints. It means
-    // that a lot of attributes are duplicated if a cluster is enabled on multiple endpoints but that's
-    // not what the templates expect. So let's deduplicate them.
-    const compare = (a, b) =>
-        a.name == b.name && a.clusterId == b.clusterId && a.side == b.side
-    return attributes.filter(
-        (att, index) =>
-            attributes.findIndex(att2 => compare(att, att2)) == index,
-    )
+        // At this stage, the 'attributes' array contains all attributes enabled for all endpoints. It means
+        // that a lot of attributes are duplicated if a cluster is enabled on multiple endpoints but that's
+        // not what the templates expect. So let's deduplicate them.
+        const compare = (a, b) => a.name == b.name && a.clusterId == b.clusterId && a.side == b.side
+        return attributes.filter(
+            (att, index) => attributes.findIndex(att2 => compare(att, att2)) == index,
+        )
 }
 
 const Clusters = {
@@ -733,5 +762,5 @@ Clusters.getServerAttributes = function (name) {
 // Module exports
 //
 exports.Clusters = Clusters
-exports.asBlocks = asBlocks
+exports.asBlocks  = asBlocks
 exports.asPromise = asPromise
