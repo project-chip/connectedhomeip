@@ -81,11 +81,7 @@ class CHIPToolActivity :
   }
 
   override fun onCommissioningComplete(code: Int) {
-    if (code == 0) {
-      showFragment(OnOffClientFragment.newInstance(), false)
-    } else {
-      showFragment(SelectActionFragment.newInstance(), false)
-    }
+    showFragment(SelectActionFragment.newInstance(), false)
   }
 
   override fun handleScanQrCodeClicked() {

@@ -185,22 +185,22 @@ device successfully joins the Thread network.
 
 ## Sending CHIP commands
 
-Once the device is commissioned, the following screen appears:
-
-![CHIPTool device control screen](./images/CHIPTool_device_commissioned.jpg)
-
-The two textboxes at the top contain **Fabric ID** and **Node ID** of the last
-commissioned device.
+Once the device is commissioned, the main application screen appears.
 
 Check the IPv6 connectivity with the device using the following steps:
 
-1. Tap **UPDATE ADDRESS** to learn or refresh the IPv6 address of the device.
+1. Tap **LIGHT ON/OFF & LEVEL CLUSTER**. The following screen appears:
+
+   ![CHIPTool device control screen](./images/CHIPTool_device_commissioned.jpg)
+
+   The two textboxes at the top contain **Fabric ID** and **Node ID** of the
+   last commissioned device.
+2. Tap **UPDATE ADDRESS** to learn or refresh the IPv6 address of the device.
    CHIPTool will use a built-in DNS-SD client to resolve **Fabric ID** and
    **Node ID** of the device to its IPv6 address. The result of the operation,
    be it the address or an error message, will be displayed at the bottom of the
    screen.
-
-2. Tap the following buttons to change the lock state of the nRF Connect door
+3. Tap the following buttons to change the lock state of the nRF Connect door
    lock example application referenced in this guide:
 
     - **ON** and **OFF** buttons lock and unlock the door, respectively.
