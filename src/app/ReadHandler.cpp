@@ -284,10 +284,17 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         }
         SuccessOrExit(err);
 
-        err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
-        SuccessOrExit(err);
-        mpAttributeClusterInfoList->SetDirty();
-        SetInitialReport();
+        if (MergeOverlappedAttributePath(clusterInfo))
+        {
+            continue;
+        }
+        else
+        {
+            err = InteractionModelEngine::GetInstance()->PushFront(mpAttributeClusterInfoList, clusterInfo);
+            SuccessOrExit(err);
+            mpAttributeClusterInfoList->SetDirty();
+            SetInitialReport();
+        }
     }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
@@ -298,6 +305,31 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
 exit:
     ChipLogFunctError(err);
     return err;
+}
+
+bool ReadHandler::MergeOverlappedAttributePath(ClusterInfo & aAttributePath)
+{
+    ClusterInfo * runner = mpAttributeClusterInfoList;
+    while (runner != nullptr)
+    {
+        // If overlapped, we would skip this target path,
+        // --If targetPath is part of previous path, return true
+        // --If previous path is part of target path, update filedid and listindex and mflags with target path, return true
+        if (runner->IsAttributePathSupersetOf(aAttributePath))
+        {
+            return true;
+        }
+        if (aAttributePath.IsAttributePathSupersetOf(*runner))
+        {
+            runner->mListIndex = aAttributePath.mListIndex;
+            runner->mFieldId   = aAttributePath.mFieldId;
+            runner->mFlags     = aAttributePath.mFlags;
+            runner->SetDirty();
+            return true;
+        }
+        runner = runner->mpNext;
+    }
+    return false;
 }
 
 CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathListParser)
