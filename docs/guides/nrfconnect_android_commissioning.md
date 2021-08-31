@@ -191,10 +191,11 @@ Check the IPv6 connectivity with the device using the following steps:
 
 1. Tap **LIGHT ON/OFF & LEVEL CLUSTER**. The following screen appears:
 
-   ![CHIPTool device control screen](./images/CHIPTool_device_commissioned.jpg)
+    ![CHIPTool device control screen](./images/CHIPTool_device_commissioned.jpg)
 
-   The two textboxes at the top contain **Fabric ID** and **Node ID** of the
-   last commissioned device.
+    The two textboxes at the top contain **Fabric ID** and **Node ID** of the
+    last commissioned device.
+
 2. Tap **UPDATE ADDRESS** to learn or refresh the IPv6 address of the device.
    CHIPTool will use a built-in DNS-SD client to resolve **Fabric ID** and
    **Node ID** of the device to its IPv6 address. The result of the operation,
