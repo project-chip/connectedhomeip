@@ -20,48 +20,44 @@ import("${chip_root}/config/tizen/chip-gn/args.gni")
 import("${build_root}/config/linux/pkg_config.gni")
 import("${chip_root}/src/platform/device.gni")
 
-config("tizen_sdk_config") {
-  pkg_config("dlog") {
-    packages = [ "dlog" ]
-  }
+pkg_config("dlog") {
+  packages = [ "dlog" ]
+}
 
-  pkg_config("capi-appfw-preference") {
-    packages = [ "capi-appfw-preference" ]
-  }
+pkg_config("capi-appfw-preference") {
+  packages = [ "capi-appfw-preference" ]
+}
 
-  pkg_config("glib") {
-    packages = [
-      "glib-2.0",
-      "gio-unix-2.0",
-    ]
-  }
+pkg_config("glib") {
+  packages = [
+    "glib-2.0",
+    "gio-unix-2.0",
+  ]
+}
 
-  if (chip_mdns == "platform") {
-    pkg_config("nsd-dns-sd") {
-      packages = [ "nsd-dns-sd" ]
-    }
+if (chip_mdns == "platform") {
+  pkg_config("nsd-dns-sd") {
+    packages = [ "nsd-dns-sd" ]
   }
+}
 
-  if (chip_enable_wifi) {
-    pkg_config("capi-network-wifi-manager") {
-      packages = [ "capi-network-wifi-manager" ]
-    }
-    pkg_config("capi-network-softap") {
-      packages = [ "capi-network-softap" ]
-    }
+if (chip_enable_wifi) {
+  pkg_config("capi-network-wifi-manager") {
+    packages = [ "capi-network-wifi-manager" ]
   }
+  pkg_config("capi-network-softap") {
+    packages = [ "capi-network-softap" ]
+  }
+}
 
-  if (chip_enable_ble) {
-    pkg_config("capi-network-bluetooth") {
-      packages = [ "capi-network-bluetooth" ]
-    }
+if (chip_enable_ble) {
+  pkg_config("capi-network-bluetooth") {
+    packages = [ "capi-network-bluetooth" ]
   }
 }
 
 source_set("tizen") {
-  public_configs = [ ":tizen_sdk_config" ]
-
-  public_configs += [
+  public_configs = [
     ":dlog",
     ":glib",
     ":capi-appfw-preference",

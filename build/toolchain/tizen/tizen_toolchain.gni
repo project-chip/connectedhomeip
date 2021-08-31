@@ -29,8 +29,8 @@ template("tizen_toolchain") {
 
   gcc_toolchain(target_name) {
     toolchain_args = _tizen_toolchain_args
-    ar = "$tizen_home/bin/arm-linux-gnueabi-ar"
-    cc = "$tizen_home/bin/arm-linux-gnueabi-gcc"
-    cxx = "$tizen_home/bin/arm-linux-gnueabi-g++"
+    ar = "$tizen_sdk/bin/arm-linux-gnueabi-ar"
+    cc = "$tizen_sdk/bin/arm-linux-gnueabi-gcc"
+    cxx = "$tizen_sdk/bin/arm-linux-gnueabi-g++"
   }
 }
