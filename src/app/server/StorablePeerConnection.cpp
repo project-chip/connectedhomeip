@@ -28,6 +28,7 @@ StorablePeerConnection::StorablePeerConnection(PASESession & session, FabricInde
     mKeyId           = session.GetLocalKeyId();
 }
 
+#pragma GCC diagnostic ignored "-Wstack-usage="
 CHIP_ERROR StorablePeerConnection::StoreIntoKVS(PersistentStorageDelegate & kvs)
 {
     char key[KeySize()];
