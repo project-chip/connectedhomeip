@@ -28,6 +28,7 @@
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequest.h>
+#include <app/ReadPrepareParams.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <messaging/ExchangeContext.h>
@@ -66,7 +67,7 @@ public:
     /**
      *  Send a Read Request.  There can be one Read Request outstanding on a given ReadClient.
      *  If SendReadRequest returns success, no more Read Requests can be sent on this ReadClient
-     *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReportError
+     *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReadError
      *  call happens with guarantee.
      *
      *  Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
@@ -75,10 +76,7 @@ public:
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(NodeId aNodeId, FabricIndex aFabricIndex, SessionHandle * aSecureSession,
-                               EventPathParams * apEventPathParamsList, size_t aEventPathParamsListSize,
-                               AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize,
-                               EventNumber aEventNumber, uint32_t timeout = kImMessageTimeoutMsec);
+    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
 
     uint64_t GetAppIdentifier() const { return mAppIdentifier; }
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
@@ -120,13 +118,16 @@ private:
      *  Check if current read client is being used
      *
      */
-    bool IsFree() const { return mState == ClientState::Uninitialized; };
+    bool IsFree() const { return mState == ClientState::Uninitialized; }
 
-    CHIP_ERROR GenerateEventPathList(ReadRequest::Builder & aRequest, EventPathParams * apEventPathParamsList,
-                                     size_t aEventPathParamsListSize, EventNumber & aEventNumber);
-    CHIP_ERROR GenerateAttributePathList(ReadRequest::Builder & aRequest, AttributePathParams * apAttributePathParamsList,
-                                         size_t aAttributePathParamsListSize);
+    CHIP_ERROR GenerateEventPathList(EventPathList::Builder & aEventPathListBuilder, EventPathParams * apEventPathParamsList,
+                                     size_t aEventPathParamsListSize);
+    CHIP_ERROR GenerateAttributePathList(AttributePathList::Builder & aAttributeathListBuilder,
+                                         AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
     CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
+
+    void SetExchangeContext(Messaging::ExchangeContext * apExchangeContext) { mpExchangeCtx = apExchangeContext; }
+    void ClearExchangeContext() { mpExchangeCtx = nullptr; }
 
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);

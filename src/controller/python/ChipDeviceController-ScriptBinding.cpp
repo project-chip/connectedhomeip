@@ -209,7 +209,7 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
 
-    (*outDevCtrl)->SetUdpListenPort(CHIP_PORT + 1);
+    (*outDevCtrl)->SetUdpListenPort(0);
     err = (*outDevCtrl)->Init(initParams);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
 

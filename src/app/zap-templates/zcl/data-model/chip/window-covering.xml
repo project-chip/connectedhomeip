@@ -163,7 +163,6 @@ limitations under the License.
     <field mask="0x0100" name="MotorJammed"/>
     <field mask="0x0200" name="HardwareFailure"/>
     <field mask="0x0400" name="ManualOperation"/>
-    <field mask="0x0800" name="RainProtection"/>
-    <field mask="0x1000" name="WindProtection"/>
+    <field mask="0x0800" name="Protection"/>
   </bitmap>
 </configurator>

@@ -113,8 +113,10 @@ void ServiceEvents(struct ::timeval & aSleepTime)
     FD_ZERO(&exceptFDs);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    if (gSystemLayer.State() == System::LayerState::kInitialized)
+    if (gSystemLayer.IsInitialized())
+    {
         gSystemLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, aSleepTime);
+    }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -130,7 +132,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-    if (gSystemLayer.State() == System::LayerState::kInitialized)
+    if (gSystemLayer.IsInitialized())
     {
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

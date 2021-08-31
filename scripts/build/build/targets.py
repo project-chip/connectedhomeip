@@ -92,6 +92,8 @@ class Application(IntEnum):
     BRIDGE = auto()
     TEMPERATURE_MEASUREMENT = auto()
     THERMOSTAT = auto()
+    PUMP = auto()
+    PUMP_CONTROLLER = auto()
 
     @property
     def ArgName(self):

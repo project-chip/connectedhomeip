@@ -27,6 +27,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPTLV.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
@@ -894,6 +895,40 @@ exit:
     ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
 
     return err;
+}
+
+CHIP_ERROR ContiguousBufferTLVReader::OpenContainer(ContiguousBufferTLVReader & containerReader)
+{
+    // We are going to initialize containerReader by calling our superclass
+    // OpenContainer method.  The superclass only knows how to initialize
+    // members the superclass knows about, so we assert that we don't have any
+    // extra members that need initializing.  If such members ever get added,
+    // they would need to be initialized in this method.
+    static_assert(sizeof(ContiguousBufferTLVReader) == sizeof(TLVReader), "We have state the superclass is not initializing?");
+    return TLVReader::OpenContainer(containerReader);
+}
+
+CHIP_ERROR ContiguousBufferTLVReader::GetStringView(Span<const char> & data)
+{
+    if (!TLVTypeIsUTF8String(ElementType()))
+    {
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+    }
+
+    const uint8_t * bytes;
+    ReturnErrorOnFailure(GetDataPtr(bytes)); // Does length sanity checks
+    data = Span<const char>(Uint8::to_const_char(bytes), GetLength());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ContiguousBufferTLVReader::GetByteView(ByteSpan & data)
+{
+    if (!TLVTypeIsByteString(ElementType()))
+    {
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+    }
+
+    return Get(data);
 }
 
 } // namespace TLV

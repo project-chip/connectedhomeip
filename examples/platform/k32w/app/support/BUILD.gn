@@ -39,8 +39,8 @@ config("support_config") {
 
 source_set("freertos_mbedtls_utils") {
   sources = [
-    "FreeRtosMbedtlsUtils.c",
-    "FreeRtosMbedtlsUtils.h",
+    "FreeRtosHooks.c",
+    "FreeRtosHooks.h",
     "Memconfig.cpp",
   ]
 

@@ -66,10 +66,7 @@ uint32_t EncryptedPacketBufferHandle::GetMsgId() const
 
 SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
 
-SecureSessionMgr::~SecureSessionMgr()
-{
-    CancelExpiryTimer();
-}
+SecureSessionMgr::~SecureSessionMgr() {}
 
 CHIP_ERROR SecureSessionMgr::Init(System::Layer * systemLayer, TransportMgrBase * transportMgr, Transport::FabricTable * fabrics,
                                   Transport::MessageCounterManagerInterface * messageCounterManager)
