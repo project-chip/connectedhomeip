@@ -75,8 +75,8 @@ k32w_executable("lock_app") {
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${chip_root}/third_party/simw-top-mini:se05x",
     "${k32w_platform_dir}/app/support:freertos_mbedtls_utils",
-    "${openthread_root}:libopenthread-cli-ftd",
-    "${openthread_root}:libopenthread-ftd",
+    "${openthread_root}:libopenthread-cli-mtd",
+    "${openthread_root}:libopenthread-mtd",
   ]
 
   cflags = [ "-Wconversion" ]
