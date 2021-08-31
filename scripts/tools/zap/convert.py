@@ -27,6 +27,7 @@ CHIP_ROOT_DIR = os.path.realpath(
 # this via ZAP_LOCATION, which is useful if you have zap cloned separately
 ZAP_DIR = os.getenv('ZAP_LOCATION', 'third_party/zap/repo')
 
+
 def checkPythonVersion():
     if sys.version_info[0] < 3:
         print('Must use Python 3. Current version is ' +
