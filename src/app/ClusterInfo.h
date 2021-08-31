@@ -43,29 +43,24 @@ struct ClusterInfo
         }
 
         Optional<AttributeId> myFieldId =
-                mFlags.Has(Flags::kFieldIdValid)
-                ? Optional<AttributeId>::Value(mFieldId)
-                : Optional<AttributeId>::Missing();
+            mFlags.Has(Flags::kFieldIdValid) ? Optional<AttributeId>::Value(mFieldId) : Optional<AttributeId>::Missing();
 
-        Optional<AttributeId> otherFieldId =other.mFlags.Has(Flags::kFieldIdValid)
-                ? Optional<AttributeId>::Value(other.mFieldId)
-                : Optional<AttributeId>::Missing();
+        Optional<AttributeId> otherFieldId = other.mFlags.Has(Flags::kFieldIdValid) ? Optional<AttributeId>::Value(other.mFieldId)
+                                                                                    : Optional<AttributeId>::Missing();
 
         Optional<ListIndex> myListIndex =
-                mFlags.Has(Flags::kListIndexValid)
-                ? Optional<ListIndex>::Value(mListIndex)
-                : Optional<ListIndex>::Missing();
+            mFlags.Has(Flags::kListIndexValid) ? Optional<ListIndex>::Value(mListIndex) : Optional<ListIndex>::Missing();
 
-        Optional<ListIndex> otherListIndex =
-                other.mFlags.Has(Flags::kListIndexValid)
-                ? Optional<ListIndex>::Value(other.mListIndex)
-                : Optional<ListIndex>::Missing();
+        Optional<ListIndex> otherListIndex = other.mFlags.Has(Flags::kListIndexValid) ? Optional<ListIndex>::Value(other.mListIndex)
+                                                                                      : Optional<ListIndex>::Missing();
 
-        if (myFieldId == Optional<AttributeId>::Value(kRootAttributeId)) {
+        if (myFieldId == Optional<AttributeId>::Value(kRootAttributeId))
+        {
             return true;
         }
 
-        if (myFieldId != otherFieldId) {
+        if (myFieldId != otherFieldId)
+        {
             return false;
         }
 
