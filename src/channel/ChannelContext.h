@@ -136,7 +136,6 @@ private:
     // mPreparing is pretty big, consider move it outside
     struct PrepareVars
     {
-        static constexpr const size_t VariantId = 1;
         PrepareState mState;
         Inet::IPAddressType mAddressType;
         Inet::IPAddress mAddress;
@@ -146,7 +145,6 @@ private:
 
     struct ReadyVars
     {
-        static constexpr const size_t VariantId = 2;
         ReadyVars(SessionHandle session) : mSession(session) {}
         const SessionHandle mSession;
     };
