@@ -258,6 +258,26 @@ CHIP_ERROR DeviceController::Shutdown()
         mActiveDevices[i].Reset();
     }
 
+    mState = State::NotInitialized;
+
+    // Shut down the interaction model before we try shuttting down the exchange
+    // manager.
+    app::InteractionModelEngine::GetInstance()->Shutdown();
+
+    // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
+    // if (mExchangeMgr != nullptr)
+    // {
+    //     mExchangeMgr->Shutdown();
+    // }
+    if (mSessionMgr != nullptr)
+    {
+        mSessionMgr->Shutdown();
+    }
+
+    mStorageDelegate = nullptr;
+
+    ReleaseAllDevices();
+
 #if CONFIG_DEVICE_LAYER
     //
     // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
@@ -278,26 +298,6 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mSystemLayer = nullptr;
     mInetLayer   = nullptr;
-
-    mState = State::NotInitialized;
-
-    // Shut down the interaction model before we try shuttting down the exchange
-    // manager.
-    app::InteractionModelEngine::GetInstance()->Shutdown();
-
-    // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
-    // if (mExchangeMgr != nullptr)
-    // {
-    //     mExchangeMgr->Shutdown();
-    // }
-    if (mSessionMgr != nullptr)
-    {
-        mSessionMgr->Shutdown();
-    }
-
-    mStorageDelegate = nullptr;
-
-    ReleaseAllDevices();
 
     if (mMessageCounterManager != nullptr)
     {

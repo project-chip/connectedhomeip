@@ -486,6 +486,7 @@ int TestConfigurationMgr_Setup(void * inContext)
  */
 int TestConfigurationMgr_Teardown(void * inContext)
 {
+    PlatformMgr().Shutdown();
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }

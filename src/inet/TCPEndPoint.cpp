@@ -1569,13 +1569,17 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
     else
         State = kState_Closed;
 
-    // Stop the Connect timer in case it is still running.
-
-    StopConnectTimer();
+    if (oldState != kState_Closed)
+    {
+        // Stop the Connect timer in case it is still running.
+        StopConnectTimer();
+    }
 
     // If not making a state transition, return immediately.
     if (State == oldState)
+    {
         return CHIP_NO_ERROR;
+    }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -2755,7 +2759,9 @@ void TCPEndPoint::HandleIncomingConnection()
     if (conEP != nullptr)
     {
         if (conEP->State == kState_Connected)
+        {
             conEP->Release();
+        }
         conEP->Release();
     }
     if (OnAcceptError != nullptr)
