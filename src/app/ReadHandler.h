@@ -160,7 +160,6 @@ private:
 
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
-    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
     bool mInitialReport                        = false;
 };

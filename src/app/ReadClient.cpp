@@ -42,7 +42,6 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interact
     mpDelegate     = apDelegate;
     mState         = ClientState::Initialized;
     mAppIdentifier = aAppIdentifier;
-    mInitialReport = true;
     AbortExistingExchangeContext();
 
 exit:
@@ -65,7 +64,6 @@ void ReadClient::ShutdownInternal(CHIP_ERROR aError)
         mpDelegate->ReadDone(this, aError);
         mpDelegate = nullptr;
     }
-    mInitialReport = true;
     MoveToState(ClientState::Uninitialized);
 }
 
@@ -331,10 +329,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
-    if (IsInitialReport())
-    {
-        ChipLogProgress(DataManagement, "ProcessReportData handles the initial report");
-    }
     err = report.GetMoreChunkedMessages(&moreChunkedMessages);
     if (CHIP_END_OF_TLV == err)
     {
@@ -380,7 +374,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
 
 exit:
-    ClearInitialReport();
     ChipLogFunctError(err);
     return err;
 }

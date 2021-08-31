@@ -139,14 +139,11 @@ private:
      * our exchange and don't need to manually close it.
      */
     void ShutdownInternal(CHIP_ERROR aError);
-    void ClearInitialReport() { mInitialReport = false; }
-    bool IsInitialReport() { return mInitialReport; }
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
     uint64_t mAppIdentifier                    = 0;
-    bool mInitialReport                        = true;
 };
 
 }; // namespace app

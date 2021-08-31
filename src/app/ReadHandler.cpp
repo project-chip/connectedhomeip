@@ -37,7 +37,6 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
     VerifyOrReturnError(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeMgr              = apExchangeMgr;
     mpExchangeCtx              = apExchangeContext;
     mSuppressResponse          = true;
     mpAttributeClusterInfoList = nullptr;
