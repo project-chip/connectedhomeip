@@ -76,7 +76,7 @@
 
     // Temperature label
     _temperatureLabel = [UILabel new];
-    _temperatureLabel.text = @"°F";
+    _temperatureLabel.text = @"°C";
     _temperatureLabel.textColor = UIColor.blackColor;
     _temperatureLabel.textAlignment = NSTextAlignmentCenter;
     _temperatureLabel.font = [UIFont systemFontOfSize:50 weight:UIFontWeightThin];
@@ -153,7 +153,14 @@
 
 - (void)updateTempInUI:(int)newTemp
 {
-    _temperatureLabel.text = [NSString stringWithFormat:@"%@ °F", @(newTemp)];
+    double tempInCelsius = (double) newTemp / 100;
+    NSNumberFormatter * formatter = [[NSNumberFormatter alloc] init];
+    [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+    formatter.minimumFractionDigits = 0;
+    formatter.maximumFractionDigits = 2;
+    [formatter setRoundingMode:NSNumberFormatterRoundFloor];
+    _temperatureLabel.text =
+        [NSString stringWithFormat:@"%@ °C", [formatter stringFromNumber:[NSNumber numberWithFloat:tempInCelsius]]];
     NSLog(@"Status: Updated temp in UI to %@", _temperatureLabel.text);
 }
 
