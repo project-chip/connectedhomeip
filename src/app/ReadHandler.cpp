@@ -108,15 +108,15 @@ CHIP_ERROR ReadHandler::OnStatusReport(Messaging::ExchangeContext * apExchangeCo
                  err = CHIP_ERROR_INVALID_ARGUMENT);
     switch (mState)
     {
-        case HandlerState::Reporting:
-            Shutdown();
-            break;
-        case HandlerState::Reportable:
-        case HandlerState::Initialized:
-        case HandlerState::Uninitialized:
-        default:
-            err = CHIP_ERROR_INCORRECT_STATE;
-            break;
+    case HandlerState::Reporting:
+        Shutdown();
+        break;
+    case HandlerState::Reportable:
+    case HandlerState::Initialized:
+    case HandlerState::Uninitialized:
+    default:
+        err = CHIP_ERROR_INCORRECT_STATE;
+        break;
     }
 exit:
     if (err != CHIP_NO_ERROR)

@@ -173,7 +173,7 @@ CHIP_ERROR ReadClient::SendStatusReport(CHIP_ERROR aError)
     Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
     uint32_t protocolId                                     = Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm();
     uint16_t protocolCode                                   = to_underlying(Protocols::InteractionModel::ProtocolCode::Success);
-    bool expectResponse = false;
+    bool expectResponse                                     = false;
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     if (aError != CHIP_NO_ERROR)
@@ -189,8 +189,9 @@ CHIP_ERROR ReadClient::SendStatusReport(CHIP_ERROR aError)
     System::PacketBufferHandle msgBuf = buf.Finalize();
     VerifyOrReturnLogError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
 
-    ReturnLogErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msgBuf),
-                                                       Messaging::SendFlags(expectResponse ? Messaging::SendMessageFlags::kExpectResponse : Messaging::SendMessageFlags::kNone)));
+    ReturnLogErrorOnFailure(mpExchangeCtx->SendMessage(
+        Protocols::SecureChannel::MsgType::StatusReport, std::move(msgBuf),
+        Messaging::SendFlags(expectResponse ? Messaging::SendMessageFlags::kExpectResponse : Messaging::SendMessageFlags::kNone)));
     return CHIP_NO_ERROR;
 }
 
