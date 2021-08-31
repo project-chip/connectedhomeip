@@ -35,7 +35,7 @@ class AppTask
 public:
     int StartApp();
 
-    void PostLockActionRequest(int32_t aActor, PumpManager::Action_t aAction);
+    void PostStartActionRequest(int32_t aActor, PumpManager::Action_t aAction);
     void PostEvent(AppEvent * event);
     void UpdateClusterState();
 
@@ -54,7 +54,7 @@ private:
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
     static void StartThreadHandler(AppEvent * aEvent);
-    static void LockActionEventHandler(AppEvent * aEvent);
+    static void StartActionEventHandler(AppEvent * aEvent);
     static void StartBLEAdvertisementHandler(AppEvent * aEvent);
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
