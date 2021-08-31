@@ -65,6 +65,7 @@ using namespace chip::Transport;
 using chip::Shell::Engine;
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 /*
  * The device shall check every kWifiStartCheckTimeUsec whether Wi-Fi management
  * has been fully initialized. If after kWifiStartCheckAttempts Wi-Fi management
@@ -73,6 +74,7 @@ using chip::Shell::Engine;
  */
 static constexpr useconds_t kWifiStartCheckTimeUsec = 100 * 1000; // 100 ms
 static constexpr uint8_t kWifiStartCheckAttempts    = 5;
+#endif
 
 namespace {
 void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
