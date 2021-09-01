@@ -140,7 +140,8 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload)
                                       Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
 }
 
-CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                                          System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

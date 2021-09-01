@@ -229,7 +229,8 @@ exit:
 }
 
 CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeContext * apExchangeContext,
-                                                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+                                                        const PayloadHeader & aPayloadHeader,
+                                                        System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
