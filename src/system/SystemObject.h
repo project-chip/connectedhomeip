@@ -125,7 +125,29 @@ private:
 
     unsigned int mRefCount; /**< Count of remaining calls to Release before object is dead. */
 
-    /** If not already retained, attempt initial retention of this object and zero up to \c aOctets. */
+    /**
+     *  @brief
+     *      Attempts to perform an initial retention of this object, in a THREAD-SAFE manner.
+     *
+     *  @note
+     *      If reference count is non-zero, tryCreate will fail and return false.
+     *      If reference count is zero, then:
+     *         - reference count will be set to  1
+     *         - The size of the created object (assumed to be derived from SystemObject) is aOctects.
+     *           the method will memset to 0 the bytes following sizeof(SystemObject).
+     *
+     *       Typical usage is like:
+     *           class Foo: public SystemObject {...}
+     *           ....
+     *           Foo foo;
+     *           foo.TryCreate(sizeof(foo));
+     *
+     *       IMPORTANT inheritance precondition:
+     *           0 memset assumes that SystemObject is the top of the inheritance. This will NOT work properly:
+     *           class Bar: public Baz, SystemObject {...}
+     *           Bar bar;
+     *           bar.TryCreate(sizeof(bar)); /// NOT safe: this will clear sizeof(Baz) extra bytes in unallocated space.
+     */
     bool TryCreate(size_t aOctets);
 
 public:
@@ -265,6 +287,8 @@ template <class T, unsigned int N>
 inline T * ObjectPool<T, N>::TryCreate()
 {
     T * lReturn = nullptr;
+
+    (void) static_cast<Object *>(lReturn); /* In C++-11, this would be a static_assert that T inherits Object. */
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     T * newNode = new T();

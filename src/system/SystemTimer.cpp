@@ -110,8 +110,8 @@ void Timer::Clear()
     VerifyOrReturn(__sync_bool_compare_and_swap(&mOnComplete, lOnComplete, nullptr));
 
     // Since this thread changed the state of mOnComplete, release the timer.
-    AppState = nullptr;
-	mSystemLayer = nullptr;
+    AppState     = nullptr;
+    mSystemLayer = nullptr;
 }
 
 void Timer::HandleComplete()
@@ -127,8 +127,8 @@ void Timer::HandleComplete()
     VerifyOrReturn(__sync_bool_compare_and_swap(&this->mOnComplete, lOnComplete, nullptr), );
 
     // Since this thread changed the state of mOnComplete, release the timer.
-    AppState = nullptr;
-	mSystemLayer = nullptr;
+    AppState     = nullptr;
+    mSystemLayer = nullptr;
     this->Release();
 
     // Invoke the app's callback, if it's still valid.

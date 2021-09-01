@@ -67,16 +67,15 @@ DLL_EXPORT void Object::Release()
 
 DLL_EXPORT bool Object::TryCreate(size_t aOctets)
 {
-    bool lReturn = false;
-
-    if (__sync_bool_compare_and_swap(&this->mRefCount, 0, 1))
+    if (!__sync_bool_compare_and_swap(&this->mRefCount, 0, 1))
     {
-        this->AppState = nullptr;
-        memset(reinterpret_cast<char *>(this) + sizeof(*this), 0, aOctets - sizeof(*this));
-        lReturn = true;
+        return false; // object already in use
     }
 
-    return lReturn;
+    this->AppState = nullptr;
+    memset(reinterpret_cast<char *>(this) + sizeof(*this), 0, aOctets - sizeof(*this));
+
+    return true;
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
