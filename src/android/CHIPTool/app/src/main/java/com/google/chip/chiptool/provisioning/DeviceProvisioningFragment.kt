@@ -175,19 +175,6 @@ class DeviceProvisioningFragment : Fragment() {
       Log.d(TAG, "onPairingDeleted: $code")
     }
 
-    override fun onNetworkCommissioningComplete(code: Int) {
-      Log.d(TAG, "onNetworkCommissioningComplete: $code")
-
-      if (code == 0) {
-        showMessage(R.string.rendezvous_over_ble_commissioning_success_text)
-      } else {
-        showMessage(R.string.rendezvous_over_ble_commissioning_failure_text)
-      }
-
-      FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
-          ?.onCommissioningComplete(code)
-    }
-
     override fun onCloseBleComplete() {
       Log.d(TAG, "onCloseBleComplete")
     }
