@@ -512,7 +512,7 @@ public:
      */
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
                                        uint8_t option);
-     
+
     /**
      *  This function call indicates commissioning complete and sends commissioining complete
      *  complete event to the application.
