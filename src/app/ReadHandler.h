@@ -143,6 +143,9 @@ private:
 
     const char * GetStateStr() const;
 
+    // Merges aAttributePath inside the existing internal mpAttributeClusterInfoList
+    bool MergeOverlappedAttributePath(ClusterInfo & aAttributePath);
+
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
 
     // Don't need the response for report data if true
