@@ -37,6 +37,7 @@
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 #include <openssl/x509.h>
+#include <openssl/x509v3.h>
 
 #include <core/CHIPSafeCasts.h>
 #include <support/BufferWriter.h>
@@ -1660,6 +1661,74 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
 
 exit:
     EVP_PKEY_free(pkey);
+    X509_free(x509certificate);
+
+    return err;
+}
+
+CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid)
+{
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    X509 * x509certificate               = nullptr;
+    const unsigned char * pCertificate   = certificate.data();
+    const unsigned char ** ppCertificate = &pCertificate;
+    const ASN1_OCTET_STRING * akidString = nullptr;
+
+    x509certificate = d2i_X509(NULL, ppCertificate, static_cast<long>(certificate.size()));
+    VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    akidString = X509_get0_authority_key_id(x509certificate);
+
+    VerifyOrExit(akidString->length == static_cast<int>(akid.size()), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    memcpy(akid.data(), akidString->data, static_cast<size_t>(akidString->length));
+
+exit:
+    X509_free(x509certificate);
+
+    return err;
+}
+
+CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
+{
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    X509 * x509certificate               = nullptr;
+    const unsigned char * pCertificate   = certificate.data();
+    const unsigned char ** ppCertificate = &pCertificate;
+    constexpr char vidNeedle[]           = "1.3.6.1.4.1.37244.2.1";
+    constexpr size_t vidNeedleSize       = sizeof(vidNeedle);
+    char buff[vidNeedleSize]             = { 0 };
+    X509_NAME * subject                  = nullptr;
+
+    vid = VendorId::NotSpecified;
+
+    x509certificate = d2i_X509(NULL, ppCertificate, static_cast<long>(certificate.size()));
+    VerifyOrExit(x509certificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    subject = X509_get_subject_name(x509certificate);
+    VerifyOrExit(subject != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    for (int i = 0; i < X509_NAME_entry_count(subject); ++i)
+    {
+        X509_NAME_ENTRY * name_entry = X509_NAME_get_entry(subject, i);
+        VerifyOrExit(name_entry != nullptr, err = CHIP_ERROR_INTERNAL);
+        ASN1_OBJECT * object = X509_NAME_ENTRY_get_object(name_entry);
+        VerifyOrExit(object != nullptr, err = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(OBJ_obj2txt(buff, sizeof(buff), object, 0) != 0, err = CHIP_ERROR_INTERNAL);
+
+        if (memcmp(vidNeedle, buff, vidNeedleSize) == 0)
+        {
+            ASN1_STRING * data_entry = X509_NAME_ENTRY_get_data(name_entry);
+            VerifyOrExit(data_entry != nullptr, err = CHIP_ERROR_INTERNAL);
+            unsigned char * str = ASN1_STRING_data(data_entry);
+            VerifyOrExit(str != nullptr, err = CHIP_ERROR_INTERNAL);
+
+            vid = static_cast<VendorId>(strtoul(reinterpret_cast<const char *>(str), NULL, 16));
+            break;
+        }
+    }
+
+exit:
     X509_free(x509certificate);
 
     return err;

@@ -71,6 +71,7 @@ enum class TestCertLoadFlags : uint8_t
 extern CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags, ByteSpan & cert);
 extern const char * GetTestCertName(uint8_t certType);
 extern CHIP_ERROR GetTestCertPubkey(uint8_t certType, const uint8_t ** certPubkey, uint32_t & certPubkeyLen);
+extern CHIP_ERROR GetTestCertAKID(uint8_t certType, ByteSpan & akid);
 extern CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags,
                                BitFlags<CertDecodeFlags> decodeFlags);
 
@@ -89,6 +90,8 @@ extern const uint8_t sTestCert_Root01_PrivateKey[];
 extern const uint8_t sTestCert_Root01_PrivateKey_Len;
 extern const uint8_t sTestCert_Root01_SubjectKeyId[];
 extern const uint8_t sTestCert_Root01_SubjectKeyId_Len;
+extern const uint8_t sTestCert_Root01_AuthorityKeyId[];
+extern const uint8_t sTestCert_Root01_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_Root02_Chip[];
 extern const uint32_t sTestCert_Root02_Chip_Len;
@@ -100,6 +103,8 @@ extern const uint8_t sTestCert_Root02_PrivateKey[];
 extern const uint8_t sTestCert_Root02_PrivateKey_Len;
 extern const uint8_t sTestCert_Root02_SubjectKeyId[];
 extern const uint8_t sTestCert_Root02_SubjectKeyId_Len;
+extern const uint8_t sTestCert_Root02_AuthorityKeyId[];
+extern const uint8_t sTestCert_Root02_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_ICA01_Chip[];
 extern const uint32_t sTestCert_ICA01_Chip_Len;
@@ -111,6 +116,8 @@ extern const uint8_t sTestCert_ICA01_PrivateKey[];
 extern const uint8_t sTestCert_ICA01_PrivateKey_Len;
 extern const uint8_t sTestCert_ICA01_SubjectKeyId[];
 extern const uint8_t sTestCert_ICA01_SubjectKeyId_Len;
+extern const uint8_t sTestCert_ICA01_AuthorityKeyId[];
+extern const uint8_t sTestCert_ICA01_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_ICA02_Chip[];
 extern const uint32_t sTestCert_ICA02_Chip_Len;
@@ -122,6 +129,8 @@ extern const uint8_t sTestCert_ICA02_PrivateKey[];
 extern const uint8_t sTestCert_ICA02_PrivateKey_Len;
 extern const uint8_t sTestCert_ICA02_SubjectKeyId[];
 extern const uint8_t sTestCert_ICA02_SubjectKeyId_Len;
+extern const uint8_t sTestCert_ICA02_AuthorityKeyId[];
+extern const uint8_t sTestCert_ICA02_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_ICA01_1_Chip[];
 extern const uint32_t sTestCert_ICA01_1_Chip_Len;
@@ -133,6 +142,8 @@ extern const uint8_t sTestCert_ICA01_1_PrivateKey[];
 extern const uint8_t sTestCert_ICA01_1_PrivateKey_Len;
 extern const uint8_t sTestCert_ICA01_1_SubjectKeyId[];
 extern const uint8_t sTestCert_ICA01_1_SubjectKeyId_Len;
+extern const uint8_t sTestCert_ICA01_1_AuthorityKeyId[];
+extern const uint8_t sTestCert_ICA01_1_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_FWSign01_Chip[];
 extern const uint32_t sTestCert_FWSign01_Chip_Len;
@@ -144,6 +155,8 @@ extern const uint8_t sTestCert_FWSign01_PrivateKey[];
 extern const uint8_t sTestCert_FWSign01_PrivateKey_Len;
 extern const uint8_t sTestCert_FWSign01_SubjectKeyId[];
 extern const uint8_t sTestCert_FWSign01_SubjectKeyId_Len;
+extern const uint8_t sTestCert_FWSign01_AuthorityKeyId[];
+extern const uint8_t sTestCert_FWSign01_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_Node01_01_Chip[];
 extern const uint32_t sTestCert_Node01_01_Chip_Len;
@@ -155,6 +168,8 @@ extern const uint8_t sTestCert_Node01_01_PrivateKey[];
 extern const uint8_t sTestCert_Node01_01_PrivateKey_Len;
 extern const uint8_t sTestCert_Node01_01_SubjectKeyId[];
 extern const uint8_t sTestCert_Node01_01_SubjectKeyId_Len;
+extern const uint8_t sTestCert_Node01_01_AuthorityKeyId[];
+extern const uint8_t sTestCert_Node01_01_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_Node01_02_Chip[];
 extern const uint32_t sTestCert_Node01_02_Chip_Len;
@@ -166,6 +181,8 @@ extern const uint8_t sTestCert_Node01_02_PrivateKey[];
 extern const uint8_t sTestCert_Node01_02_PrivateKey_Len;
 extern const uint8_t sTestCert_Node01_02_SubjectKeyId[];
 extern const uint8_t sTestCert_Node01_02_SubjectKeyId_Len;
+extern const uint8_t sTestCert_Node01_02_AuthorityKeyId[];
+extern const uint8_t sTestCert_Node01_02_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_Node02_01_Chip[];
 extern const uint32_t sTestCert_Node02_01_Chip_Len;
@@ -177,6 +194,8 @@ extern const uint8_t sTestCert_Node02_01_PrivateKey[];
 extern const uint8_t sTestCert_Node02_01_PrivateKey_Len;
 extern const uint8_t sTestCert_Node02_01_SubjectKeyId[];
 extern const uint8_t sTestCert_Node02_01_SubjectKeyId_Len;
+extern const uint8_t sTestCert_Node02_01_AuthorityKeyId[];
+extern const uint8_t sTestCert_Node02_01_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_Node02_02_Chip[];
 extern const uint32_t sTestCert_Node02_02_Chip_Len;
@@ -188,6 +207,8 @@ extern const uint8_t sTestCert_Node02_02_PrivateKey[];
 extern const uint8_t sTestCert_Node02_02_PrivateKey_Len;
 extern const uint8_t sTestCert_Node02_02_SubjectKeyId[];
 extern const uint8_t sTestCert_Node02_02_SubjectKeyId_Len;
+extern const uint8_t sTestCert_Node02_02_AuthorityKeyId[];
+extern const uint8_t sTestCert_Node02_02_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_Node02_03_Chip[];
 extern const uint32_t sTestCert_Node02_03_Chip_Len;
@@ -199,6 +220,8 @@ extern const uint8_t sTestCert_Node02_03_PrivateKey[];
 extern const uint8_t sTestCert_Node02_03_PrivateKey_Len;
 extern const uint8_t sTestCert_Node02_03_SubjectKeyId[];
 extern const uint8_t sTestCert_Node02_03_SubjectKeyId_Len;
+extern const uint8_t sTestCert_Node02_03_AuthorityKeyId[];
+extern const uint8_t sTestCert_Node02_03_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_Node02_04_Chip[];
 extern const uint32_t sTestCert_Node02_04_Chip_Len;
@@ -210,6 +233,8 @@ extern const uint8_t sTestCert_Node02_04_PrivateKey[];
 extern const uint8_t sTestCert_Node02_04_PrivateKey_Len;
 extern const uint8_t sTestCert_Node02_04_SubjectKeyId[];
 extern const uint8_t sTestCert_Node02_04_SubjectKeyId_Len;
+extern const uint8_t sTestCert_Node02_04_AuthorityKeyId[];
+extern const uint8_t sTestCert_Node02_04_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_Node02_05_Chip[];
 extern const uint32_t sTestCert_Node02_05_Chip_Len;
@@ -221,6 +246,8 @@ extern const uint8_t sTestCert_Node02_05_PrivateKey[];
 extern const uint8_t sTestCert_Node02_05_PrivateKey_Len;
 extern const uint8_t sTestCert_Node02_05_SubjectKeyId[];
 extern const uint8_t sTestCert_Node02_05_SubjectKeyId_Len;
+extern const uint8_t sTestCert_Node02_05_AuthorityKeyId[];
+extern const uint8_t sTestCert_Node02_05_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_Node02_06_Chip[];
 extern const uint32_t sTestCert_Node02_06_Chip_Len;
@@ -232,6 +259,8 @@ extern const uint8_t sTestCert_Node02_06_PrivateKey[];
 extern const uint8_t sTestCert_Node02_06_PrivateKey_Len;
 extern const uint8_t sTestCert_Node02_06_SubjectKeyId[];
 extern const uint8_t sTestCert_Node02_06_SubjectKeyId_Len;
+extern const uint8_t sTestCert_Node02_06_AuthorityKeyId[];
+extern const uint8_t sTestCert_Node02_06_AuthorityKeyId_Len;
 
 extern const uint8_t sTestCert_Node02_07_Chip[];
 extern const uint32_t sTestCert_Node02_07_Chip_Len;
@@ -243,6 +272,8 @@ extern const uint8_t sTestCert_Node02_07_PrivateKey[];
 extern const uint8_t sTestCert_Node02_07_PrivateKey_Len;
 extern const uint8_t sTestCert_Node02_07_SubjectKeyId[];
 extern const uint8_t sTestCert_Node02_07_SubjectKeyId_Len;
+extern const uint8_t sTestCert_Node02_07_AuthorityKeyId[];
+extern const uint8_t sTestCert_Node02_07_AuthorityKeyId_Len;
 
 } // namespace TestCerts
 } // namespace chip
