@@ -35,23 +35,23 @@ extern "C" ChipError::StorageType pychip_SetupPayload_PrintOnboardingCodes(uint3
     SetupPayload payload;
     RendezvousInformationFlags rendezvousFlags = RendezvousInformationFlag::kNone;
 
-    payload.version               = version;
-    payload.setUpPINCode          = passcode;
-    payload.vendorID              = vendorId;
-    payload.productID             = productId;
-    payload.discriminator         = discriminator;
-    payload.rendezvousInformation = rendezvousFlags.SetRaw(capabilities);
+    payload.mPayloadContents.version               = version;
+    payload.mPayloadContents.setUpPINCode          = passcode;
+    payload.mPayloadContents.vendorID              = vendorId;
+    payload.mPayloadContents.productID             = productId;
+    payload.mPayloadContents.discriminator         = discriminator;
+    payload.mPayloadContents.rendezvousInformation = rendezvousFlags.SetRaw(capabilities);
 
     switch (customFlow)
     {
     case 0:
-        payload.commissioningFlow = CommissioningFlow::kStandard;
+        payload.mPayloadContents.commissioningFlow = CommissioningFlow::kStandard;
         break;
     case 1:
-        payload.commissioningFlow = CommissioningFlow::kUserActionRequired;
+        payload.mPayloadContents.commissioningFlow = CommissioningFlow::kUserActionRequired;
         break;
     case 2:
-        payload.commissioningFlow = CommissioningFlow::kCustom;
+        payload.mPayloadContents.commissioningFlow = CommissioningFlow::kCustom;
         break;
     default:
         ChipLogError(SetupPayload, "Invalid Custom Flow");

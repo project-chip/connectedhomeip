@@ -34,13 +34,13 @@ using VendorAttributeVisitor = void (*)(uint8_t tag, const char * attrValue);
 void YieldSetupPayloadAttributes(const SetupPayload & payload, AttributeVisitor attrVisitor,
                                  VendorAttributeVisitor vendorAttrVisitor)
 {
-    attrVisitor("Version", std::to_string(payload.version).c_str());
-    attrVisitor("VendorID", std::to_string(payload.vendorID).c_str());
-    attrVisitor("ProductID", std::to_string(payload.productID).c_str());
-    attrVisitor("CommissioningFlow", std::to_string(static_cast<uint8_t>(payload.commissioningFlow)).c_str());
-    attrVisitor("RendezvousInformation", std::to_string(payload.rendezvousInformation.Raw()).c_str());
-    attrVisitor("Discriminator", std::to_string(payload.discriminator).c_str());
-    attrVisitor("SetUpPINCode", std::to_string(payload.setUpPINCode).c_str());
+    attrVisitor("Version", std::to_string(payload.mPayloadContents.version).c_str());
+    attrVisitor("VendorID", std::to_string(payload.mPayloadContents.vendorID).c_str());
+    attrVisitor("ProductID", std::to_string(payload.mPayloadContents.productID).c_str());
+    attrVisitor("CommissioningFlow", std::to_string(static_cast<uint8_t>(payload.mPayloadContents.commissioningFlow)).c_str());
+    attrVisitor("RendezvousInformation", std::to_string(payload.mPayloadContents.rendezvousInformation.Raw()).c_str());
+    attrVisitor("Discriminator", std::to_string(payload.mPayloadContents.discriminator).c_str());
+    attrVisitor("SetUpPINCode", std::to_string(payload.mPayloadContents.setUpPINCode).c_str());
 
     std::string serialNumber;
 

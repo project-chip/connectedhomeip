@@ -103,6 +103,25 @@ enum class CommissioningFlow : uint8_t
     kCustom,             ///< Commissioning steps should be retrieved from the distributed compliance ledger
 };
 
+/**
+ * A structure to hold onboarding payload contents without optional info
+ * for compatibility with devices that don't support std::string or STL.
+ */
+struct PayloadContents
+{
+    uint8_t version                                  = 0;
+    uint16_t vendorID                                = 0;
+    uint16_t productID                               = 0;
+    CommissioningFlow commissioningFlow              = CommissioningFlow::kStandard;
+    RendezvousInformationFlags rendezvousInformation = RendezvousInformationFlag::kNone;
+    uint16_t discriminator                           = 0;
+    uint32_t setUpPINCode                            = 0;
+
+    bool isValidQRCodePayload();
+    bool isValidManualCode();
+    bool operator==(PayloadContents & input);
+};
+
 enum optionalQRCodeInfoType
 {
     optionalQRCodeInfoTypeUnknown,
@@ -153,13 +172,7 @@ class SetupPayload
     friend class QRCodeSetupPayloadParser;
 
 public:
-    uint8_t version                                  = 0;
-    uint16_t vendorID                                = 0;
-    uint16_t productID                               = 0;
-    CommissioningFlow commissioningFlow              = CommissioningFlow::kStandard;
-    RendezvousInformationFlags rendezvousInformation = RendezvousInformationFlag::kNone;
-    uint16_t discriminator                           = 0;
-    uint32_t setUpPINCode                            = 0;
+    PayloadContents mPayloadContents = {};
 
     /** @brief A function to add an optional vendor data
      * @param tag 7 bit [0-127] tag number
@@ -209,8 +222,8 @@ public:
      **/
     CHIP_ERROR removeSerialNumber();
 
-    bool isValidQRCodePayload();
-    bool isValidManualCode();
+    bool isValidQRCodePayload() { return mPayloadContents.isValidQRCodePayload(); }
+    bool isValidManualCode() { return mPayloadContents.isValidManualCode(); }
     bool operator==(SetupPayload & input);
 
 private:

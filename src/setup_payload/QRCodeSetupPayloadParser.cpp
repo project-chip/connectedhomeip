@@ -335,33 +335,33 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kVersionFieldLengthInBits));
     static_assert(kVersionFieldLengthInBits <= 8, "Won't fit in uint8_t");
-    outPayload.version = static_cast<uint8_t>(dest);
+    outPayload.mPayloadContents.version = static_cast<uint8_t>(dest);
 
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kVendorIDFieldLengthInBits));
     static_assert(kVendorIDFieldLengthInBits <= 16, "Won't fit in uint16_t");
-    outPayload.vendorID = static_cast<uint16_t>(dest);
+    outPayload.mPayloadContents.vendorID = static_cast<uint16_t>(dest);
 
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kProductIDFieldLengthInBits));
     static_assert(kProductIDFieldLengthInBits <= 16, "Won't fit in uint16_t");
-    outPayload.productID = static_cast<uint16_t>(dest);
+    outPayload.mPayloadContents.productID = static_cast<uint16_t>(dest);
 
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kCommissioningFlowFieldLengthInBits));
     static_assert(kCommissioningFlowFieldLengthInBits <= std::numeric_limits<std::underlying_type_t<CommissioningFlow>>::digits,
                   "Won't fit in CommissioningFlow");
-    outPayload.commissioningFlow = static_cast<CommissioningFlow>(dest);
+    outPayload.mPayloadContents.commissioningFlow = static_cast<CommissioningFlow>(dest);
 
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits));
     static_assert(kRendezvousInfoFieldLengthInBits <= 8 * sizeof(RendezvousInformationFlag),
                   "Won't fit in RendezvousInformationFlags");
-    outPayload.rendezvousInformation = RendezvousInformationFlags(static_cast<RendezvousInformationFlag>(dest));
+    outPayload.mPayloadContents.rendezvousInformation = RendezvousInformationFlags(static_cast<RendezvousInformationFlag>(dest));
 
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits));
     static_assert(kPayloadDiscriminatorFieldLengthInBits <= 16, "Won't fit in uint16_t");
-    outPayload.discriminator = static_cast<uint16_t>(dest);
+    outPayload.mPayloadContents.discriminator = static_cast<uint16_t>(dest);
 
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kSetupPINCodeFieldLengthInBits));
     static_assert(kSetupPINCodeFieldLengthInBits <= 32, "Won't fit in uint32_t");
-    outPayload.setUpPINCode = static_cast<uint32_t>(dest);
+    outPayload.mPayloadContents.setUpPINCode = static_cast<uint32_t>(dest);
 
     ReturnErrorOnFailure(readBits(buf, indexToReadFrom, dest, kPaddingFieldLengthInBits));
 

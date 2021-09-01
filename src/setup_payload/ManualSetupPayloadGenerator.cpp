@@ -31,7 +31,7 @@
 
 namespace chip {
 
-static uint32_t chunk1PayloadRepresentation(const SetupPayload & payload)
+static uint32_t chunk1PayloadRepresentation(const PayloadContents & payload)
 {
     /* <1 digit> Represents:
      *     - <bits 1..0> Discriminator <bits 11.10>
@@ -54,7 +54,7 @@ static uint32_t chunk1PayloadRepresentation(const SetupPayload & payload)
     return result;
 }
 
-static uint32_t chunk2PayloadRepresentation(const SetupPayload & payload)
+static uint32_t chunk2PayloadRepresentation(const PayloadContents & payload)
 {
     /* <5 digits> Represents:
      *     - <bits 13..0> PIN Code <bits 13..0>
@@ -73,7 +73,7 @@ static uint32_t chunk2PayloadRepresentation(const SetupPayload & payload)
     return result;
 }
 
-static uint32_t chunk3PayloadRepresentation(const SetupPayload & payload)
+static uint32_t chunk3PayloadRepresentation(const PayloadContents & payload)
 {
     /* <4 digits> Represents:
      *     - <bits 12..0> PIN Code <bits 26..14>
@@ -87,57 +87,78 @@ static uint32_t chunk3PayloadRepresentation(const SetupPayload & payload)
     return result;
 }
 
-// TODO: issue #3663 - Unbounded stack in src/setup_payload
-#if !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif
-
-static std::string decimalStringWithPadding(uint32_t number, int minLength)
+static void decimalStringWithPadding(char * buf, size_t len, uint32_t number)
 {
-    char buf[minLength + 1];
-    snprintf(buf, sizeof(buf), "%0*" PRIu32, minLength, number);
-    return std::string(buf);
+    snprintf(buf, len + 1, "%0*" PRIu32, static_cast<int>(len), number);
 }
 
-#if !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif
-
-CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::string & outDecimalString)
+CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(MutableCharSpan & outBuffer)
 {
-    if (!mSetupPayload.isValidManualCode())
-    {
-        ChipLogError(SetupPayload, "Failed encoding invalid payload");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
     static_assert(kManualSetupCodeChunk1CharLength + kManualSetupCodeChunk2CharLength + kManualSetupCodeChunk3CharLength ==
                       kManualSetupShortCodeCharLength,
-                  "Manual code length mismatch");
+                  "Manual code length mismatch (short)");
+    static_assert(kManualSetupShortCodeCharLength + kManualSetupVendorIdCharLength + kManualSetupProductIdCharLength ==
+                      kManualSetupLongCodeCharLength,
+                  "Manual code length mismatch (long)");
     static_assert(kManualSetupChunk1DiscriminatorMsbitsLength + kManualSetupChunk2DiscriminatorLsbitsLength ==
                       kManualSetupDiscriminatorFieldLengthInBits,
                   "Discriminator won't fit");
     static_assert(kManualSetupChunk2PINCodeLsbitsLength + kManualSetupChunk3PINCodeMsbitsLength == kSetupPINCodeFieldLengthInBits,
                   "PIN code won't fit");
 
-    uint32_t chunk1 = chunk1PayloadRepresentation(mSetupPayload);
-    uint32_t chunk2 = chunk2PayloadRepresentation(mSetupPayload);
-    uint32_t chunk3 = chunk3PayloadRepresentation(mSetupPayload);
-
-    std::string decimalString = decimalStringWithPadding(chunk1, kManualSetupCodeChunk1CharLength);
-    decimalString += decimalStringWithPadding(chunk2, kManualSetupCodeChunk2CharLength);
-    decimalString += decimalStringWithPadding(chunk3, kManualSetupCodeChunk3CharLength);
-
-    if (mSetupPayload.commissioningFlow == CommissioningFlow::kCustom)
+    if (!mPayloadContents.isValidManualCode())
     {
-        decimalString += decimalStringWithPadding(mSetupPayload.vendorID, kManualSetupVendorIdCharLength);
-        decimalString += decimalStringWithPadding(mSetupPayload.productID, kManualSetupProductIdCharLength);
+        ChipLogError(SetupPayload, "Failed encoding invalid payload");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
 
-    outDecimalString = decimalString;
+    bool useLongCode = (mPayloadContents.commissioningFlow == CommissioningFlow::kCustom);
+
+    if ((useLongCode && outBuffer.size() < kManualSetupLongCodeCharLength + 2) ||
+        (!useLongCode && outBuffer.size() < kManualSetupShortCodeCharLength + 2))
+    {
+        ChipLogError(SetupPayload, "Failed encoding payload to buffer");
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    uint32_t chunk1 = chunk1PayloadRepresentation(mPayloadContents);
+    uint32_t chunk2 = chunk2PayloadRepresentation(mPayloadContents);
+    uint32_t chunk3 = chunk3PayloadRepresentation(mPayloadContents);
+
+    char * stringPtr = outBuffer.data();
+
+    decimalStringWithPadding(stringPtr, kManualSetupCodeChunk1CharLength, chunk1);
+    stringPtr += kManualSetupCodeChunk1CharLength;
+    decimalStringWithPadding(stringPtr, kManualSetupCodeChunk2CharLength, chunk2);
+    stringPtr += kManualSetupCodeChunk2CharLength;
+    decimalStringWithPadding(stringPtr, kManualSetupCodeChunk3CharLength, chunk3);
+    stringPtr += kManualSetupCodeChunk3CharLength;
+
+    if (useLongCode)
+    {
+        decimalStringWithPadding(stringPtr, kManualSetupVendorIdCharLength, mPayloadContents.vendorID);
+        stringPtr += kManualSetupVendorIdCharLength;
+        decimalStringWithPadding(stringPtr, kManualSetupProductIdCharLength, mPayloadContents.productID);
+        stringPtr += kManualSetupProductIdCharLength;
+    }
+
+    snprintf(stringPtr, 2, "%c", Verhoeff10::ComputeCheckChar(outBuffer.data()));
+
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::string & outDecimalString)
+{
+    CHIP_ERROR err;
+
+    // One extra char for the check digit, another for the null terminator.
+    char decimalString[kManualSetupLongCodeCharLength + 1 + 1] = "";
+    MutableCharSpan outBuffer(decimalString);
+
+    err = payloadDecimalStringRepresentation(outBuffer);
+    outDecimalString.assign(decimalString);
+
+    return err;
 }
 
 } // namespace chip

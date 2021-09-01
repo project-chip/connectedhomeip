@@ -1056,7 +1056,7 @@ CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t
     Device::PairingWindowOption pairingWindowOption;
     ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
 
-    payload.discriminator = discriminator;
+    payload.mPayloadContents.discriminator = discriminator;
 
     switch (option)
     {

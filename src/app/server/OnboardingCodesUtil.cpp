@@ -90,7 +90,7 @@ void PrintOnboardingCodes(const chip::SetupPayload & payload)
         ChipLogError(AppServer, "Getting QR code failed!");
     }
 
-    if (GetManualPairingCode(manualPairingCode, payload) == CHIP_NO_ERROR)
+    if (GetManualPairingCode(manualPairingCode, payload.mPayloadContents) == CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "Manual pairing code: [%s]", manualPairingCode.c_str());
     }
@@ -111,34 +111,34 @@ void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags)
 }
 #endif
 
-CHIP_ERROR GetSetupPayload(chip::SetupPayload & aSetupPayload, chip::RendezvousInformationFlags aRendezvousFlags)
+CHIP_ERROR GetPayloadContents(chip::PayloadContents & aPayloadContents, chip::RendezvousInformationFlags aRendezvousFlags)
 {
-    CHIP_ERROR err                      = CHIP_NO_ERROR;
-    aSetupPayload.version               = 0;
-    aSetupPayload.rendezvousInformation = aRendezvousFlags;
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    aPayloadContents.version               = 0;
+    aPayloadContents.rendezvousInformation = aRendezvousFlags;
 
-    err = ConfigurationMgr().GetSetupPinCode(aSetupPayload.setUpPINCode);
+    err = ConfigurationMgr().GetSetupPinCode(aPayloadContents.setUpPINCode);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err));
         return err;
     }
 
-    err = ConfigurationMgr().GetSetupDiscriminator(aSetupPayload.discriminator);
+    err = ConfigurationMgr().GetSetupDiscriminator(aPayloadContents.discriminator);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
         return err;
     }
 
-    err = ConfigurationMgr().GetVendorId(aSetupPayload.vendorID);
+    err = ConfigurationMgr().GetVendorId(aPayloadContents.vendorID);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "ConfigurationMgr().GetVendorId() failed: %s", chip::ErrorStr(err));
         return err;
     }
 
-    err = ConfigurationMgr().GetProductId(aSetupPayload.productID);
+    err = ConfigurationMgr().GetProductId(aPayloadContents.productID);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "ConfigurationMgr().GetProductId() failed: %s", chip::ErrorStr(err));
@@ -152,10 +152,10 @@ CHIP_ERROR GetQRCode(std::string & aQRCode, chip::RendezvousInformationFlags aRe
 {
     chip::SetupPayload payload;
 
-    CHIP_ERROR err = GetSetupPayload(payload, aRendezvousFlags);
+    CHIP_ERROR err = GetPayloadContents(payload.mPayloadContents, aRendezvousFlags);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
+        ChipLogProgress(AppServer, "GetPayloadContents() failed: %s", chip::ErrorStr(err));
         return err;
     }
 
@@ -199,12 +199,12 @@ CHIP_ERROR GetQRCodeUrl(char * aQRCodeUrl, size_t aUrlMaxSize, const std::string
 
 CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, chip::RendezvousInformationFlags aRendezvousFlags)
 {
-    chip::SetupPayload payload;
+    chip::PayloadContents payload;
 
-    CHIP_ERROR err = GetSetupPayload(payload, aRendezvousFlags);
+    CHIP_ERROR err = GetPayloadContents(payload, aRendezvousFlags);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "GetSetupPayload() failed: %s", chip::ErrorStr(err));
+        ChipLogProgress(AppServer, "GetPayloadContents() failed: %s", chip::ErrorStr(err));
         return err;
     }
 
@@ -218,7 +218,7 @@ CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, chip::Rendezvo
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, const chip::SetupPayload & payload)
+CHIP_ERROR GetManualPairingCode(std::string & aManualPairingCode, const chip::PayloadContents & payload)
 {
     CHIP_ERROR err = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(aManualPairingCode);
     if (err != CHIP_NO_ERROR)

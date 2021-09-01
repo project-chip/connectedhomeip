@@ -108,32 +108,32 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, const SetupPayloadPa
     {
     case SetupPayloadKey_Version:
         ChipLogDetail(SetupPayload, "Loaded version: %u", (uint8_t) parameter.uintValue);
-        setupPayload.version = static_cast<uint8_t>(parameter.uintValue);
+        setupPayload.mPayloadContents.version = static_cast<uint8_t>(parameter.uintValue);
         break;
     case SetupPayloadKey_VendorID:
         ChipLogDetail(SetupPayload, "Loaded vendorID: %u", (uint16_t) parameter.uintValue);
-        setupPayload.vendorID = static_cast<uint16_t>(parameter.uintValue);
+        setupPayload.mPayloadContents.vendorID = static_cast<uint16_t>(parameter.uintValue);
         break;
     case SetupPayloadKey_ProductID:
         ChipLogDetail(SetupPayload, "Loaded productID: %u", (uint16_t) parameter.uintValue);
-        setupPayload.productID = static_cast<uint16_t>(parameter.uintValue);
+        setupPayload.mPayloadContents.productID = static_cast<uint16_t>(parameter.uintValue);
         break;
     case SetupPayloadKey_CommissioningFlow:
         ChipLogDetail(SetupPayload, "Commissioning flow: %u", (uint8_t) parameter.uintValue);
-        setupPayload.commissioningFlow = static_cast<CommissioningFlow>(parameter.uintValue);
+        setupPayload.mPayloadContents.commissioningFlow = static_cast<CommissioningFlow>(parameter.uintValue);
         break;
     case SetupPayloadKey_RendezVousInformation:
         ChipLogDetail(SetupPayload, "Loaded rendezvousInfo: %u", (uint16_t) parameter.uintValue);
-        setupPayload.rendezvousInformation =
+        setupPayload.mPayloadContents.rendezvousInformation =
             RendezvousInformationFlags(static_cast<RendezvousInformationFlag>(parameter.uintValue));
         break;
     case SetupPayloadKey_Discriminator:
         ChipLogDetail(SetupPayload, "Loaded discriminator: %u", (uint16_t) parameter.uintValue);
-        setupPayload.discriminator = static_cast<uint16_t>(parameter.uintValue);
+        setupPayload.mPayloadContents.discriminator = static_cast<uint16_t>(parameter.uintValue);
         break;
     case SetupPayloadKey_SetupPINCode:
         ChipLogDetail(SetupPayload, "Loaded setupPinCode: %lu", (unsigned long) parameter.uintValue);
-        setupPayload.setUpPINCode = static_cast<uint32_t>(parameter.uintValue);
+        setupPayload.mPayloadContents.setUpPINCode = static_cast<uint32_t>(parameter.uintValue);
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;

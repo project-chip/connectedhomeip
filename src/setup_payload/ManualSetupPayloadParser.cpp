@@ -181,18 +181,18 @@ CHIP_ERROR ManualSetupPayloadParser::populatePayload(SetupPayload & outPayload)
         {
             return CHIP_ERROR_INVALID_INTEGER_VALUE;
         }
-        outPayload.vendorID = static_cast<uint16_t>(vendorID);
+        outPayload.mPayloadContents.vendorID = static_cast<uint16_t>(vendorID);
         if (!CanCastTo<uint16_t>(productID))
         {
             return CHIP_ERROR_INVALID_INTEGER_VALUE;
         }
-        outPayload.productID = static_cast<uint16_t>(productID);
+        outPayload.mPayloadContents.productID = static_cast<uint16_t>(productID);
     }
-    outPayload.commissioningFlow = isLongCode ? CommissioningFlow::kCustom : CommissioningFlow::kStandard;
+    outPayload.mPayloadContents.commissioningFlow = isLongCode ? CommissioningFlow::kCustom : CommissioningFlow::kStandard;
     static_assert(kSetupPINCodeFieldLengthInBits <= 32, "Won't fit in uint32_t");
-    outPayload.setUpPINCode = static_cast<uint32_t>(setUpPINCode);
+    outPayload.mPayloadContents.setUpPINCode = static_cast<uint32_t>(setUpPINCode);
     static_assert(kManualSetupDiscriminatorFieldLengthInBits <= 16, "Won't fit in uint16_t");
-    outPayload.discriminator = static_cast<uint16_t>(discriminator);
+    outPayload.mPayloadContents.discriminator = static_cast<uint16_t>(discriminator);
 
     return result;
 }

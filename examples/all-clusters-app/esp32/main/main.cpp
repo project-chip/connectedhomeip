@@ -507,12 +507,12 @@ std::string createSetupPayload()
     }
 
     SetupPayload payload;
-    payload.version               = 0;
-    payload.discriminator         = discriminator;
-    payload.setUpPINCode          = setupPINCode;
-    payload.rendezvousInformation = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
-    payload.vendorID              = vendorId;
-    payload.productID             = productId;
+    payload.mPayloadContents.version               = 0;
+    payload.mPayloadContents.discriminator         = discriminator;
+    payload.mPayloadContents.setUpPINCode          = setupPINCode;
+    payload.mPayloadContents.rendezvousInformation = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
+    payload.mPayloadContents.vendorID              = vendorId;
+    payload.mPayloadContents.productID             = productId;
 
     if (!isRendezvousBLE())
     {
@@ -545,8 +545,8 @@ std::string createSetupPayload()
             ESP_LOGE(TAG, "Failed to get decimal setup code");
         }
 
-        payload.commissioningFlow = CommissioningFlow::kCustom;
-        generator                 = ManualSetupPayloadGenerator(payload);
+        payload.mPayloadContents.commissioningFlow = CommissioningFlow::kCustom;
+        generator = ManualSetupPayloadGenerator(payload);
 
         if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR)
         {

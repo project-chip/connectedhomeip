@@ -39,27 +39,27 @@ void TestRendezvousFlags(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload inPayload = GetDefaultPayload();
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kNone);
+    inPayload.mPayloadContents.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kNone);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
+    inPayload.mPayloadContents.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
+    inPayload.mPayloadContents.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
+    inPayload.mPayloadContents.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation =
+    inPayload.mPayloadContents.rendezvousInformation =
         RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation =
+    inPayload.mPayloadContents.rendezvousInformation =
         RendezvousInformationFlags(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags(
+    inPayload.mPayloadContents.rendezvousInformation = RendezvousInformationFlags(
         RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 }
@@ -68,13 +68,13 @@ void TestCommissioningFlow(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload inPayload = GetDefaultPayload();
 
-    inPayload.commissioningFlow = CommissioningFlow::kStandard;
+    inPayload.mPayloadContents.commissioningFlow = CommissioningFlow::kStandard;
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.commissioningFlow = CommissioningFlow::kUserActionRequired;
+    inPayload.mPayloadContents.commissioningFlow = CommissioningFlow::kUserActionRequired;
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.commissioningFlow = CommissioningFlow::kCustom;
+    inPayload.mPayloadContents.commissioningFlow = CommissioningFlow::kCustom;
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 }
 
@@ -82,14 +82,14 @@ void TestMaximumValues(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload inPayload = GetDefaultPayload();
 
-    inPayload.version               = static_cast<uint8_t>((1 << kVersionFieldLengthInBits) - 1);
-    inPayload.vendorID              = 0xFFFF;
-    inPayload.productID             = 0xFFFF;
-    inPayload.commissioningFlow     = CommissioningFlow::kCustom;
-    inPayload.rendezvousInformation = RendezvousInformationFlags(
+    inPayload.mPayloadContents.version               = static_cast<uint8_t>((1 << kVersionFieldLengthInBits) - 1);
+    inPayload.mPayloadContents.vendorID              = 0xFFFF;
+    inPayload.mPayloadContents.productID             = 0xFFFF;
+    inPayload.mPayloadContents.commissioningFlow     = CommissioningFlow::kCustom;
+    inPayload.mPayloadContents.rendezvousInformation = RendezvousInformationFlags(
         RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
-    inPayload.discriminator = static_cast<uint16_t>((1 << kPayloadDiscriminatorFieldLengthInBits) - 1);
-    inPayload.setUpPINCode  = static_cast<uint32_t>((1 << kSetupPINCodeFieldLengthInBits) - 1);
+    inPayload.mPayloadContents.discriminator = static_cast<uint16_t>((1 << kPayloadDiscriminatorFieldLengthInBits) - 1);
+    inPayload.mPayloadContents.setUpPINCode  = static_cast<uint32_t>((1 << kSetupPINCodeFieldLengthInBits) - 1);
 
     NL_TEST_ASSERT(inSuite, inPayload.isValidQRCodePayload());
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
@@ -273,16 +273,16 @@ void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, payload.isValidQRCodePayload() == true);
 
     // test invalid commissioning flow
-    SetupPayload test_payload      = payload;
-    test_payload.commissioningFlow = CommissioningFlow::kCustom;
+    SetupPayload test_payload                       = payload;
+    test_payload.mPayloadContents.commissioningFlow = CommissioningFlow::kCustom;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload());
 
-    test_payload.commissioningFlow = static_cast<CommissioningFlow>(1 << kCommissioningFlowFieldLengthInBits);
+    test_payload.mPayloadContents.commissioningFlow = static_cast<CommissioningFlow>(1 << kCommissioningFlowFieldLengthInBits);
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid version
-    test_payload         = payload;
-    test_payload.version = 1 << kVersionFieldLengthInBits;
+    test_payload                          = payload;
+    test_payload.mPayloadContents.version = 1 << kVersionFieldLengthInBits;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid rendezvousInformation
@@ -290,17 +290,17 @@ void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
     RendezvousInformationFlags invalid = RendezvousInformationFlags(
         RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
     invalid.SetRaw(static_cast<uint8_t>(invalid.Raw() + 1));
-    test_payload.rendezvousInformation = invalid;
+    test_payload.mPayloadContents.rendezvousInformation = invalid;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid discriminator
-    test_payload               = payload;
-    test_payload.discriminator = 1 << kPayloadDiscriminatorFieldLengthInBits;
+    test_payload                                = payload;
+    test_payload.mPayloadContents.discriminator = 1 << kPayloadDiscriminatorFieldLengthInBits;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid stetup PIN
-    test_payload              = payload;
-    test_payload.setUpPINCode = 1 << kSetupPINCodeFieldLengthInBits;
+    test_payload                               = payload;
+    test_payload.mPayloadContents.setUpPINCode = 1 << kSetupPINCodeFieldLengthInBits;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 }
 
@@ -342,9 +342,9 @@ void TestPayloadInEquality(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload = GetDefaultPayload();
 
-    SetupPayload unequalPayload  = GetDefaultPayload();
-    unequalPayload.discriminator = 28;
-    unequalPayload.setUpPINCode  = 121233;
+    SetupPayload unequalPayload                   = GetDefaultPayload();
+    unequalPayload.mPayloadContents.discriminator = 28;
+    unequalPayload.mPayloadContents.setUpPINCode  = 121233;
 
     NL_TEST_ASSERT(inSuite, !(payload == unequalPayload));
 }

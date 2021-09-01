@@ -57,13 +57,13 @@
 {
     if (self = [super init]) {
         _chipSetupPayload = setupPayload;
-        _version = [NSNumber numberWithUnsignedChar:setupPayload.version];
-        _vendorID = [NSNumber numberWithUnsignedShort:setupPayload.vendorID];
-        _productID = [NSNumber numberWithUnsignedShort:setupPayload.productID];
-        _commissioningFlow = [self convertCommissioningFlow:setupPayload.commissioningFlow];
-        _rendezvousInformation = [self convertRendezvousFlags:setupPayload.rendezvousInformation];
-        _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.discriminator];
-        _setUpPINCode = [NSNumber numberWithUnsignedInt:setupPayload.setUpPINCode];
+        _version = [NSNumber numberWithUnsignedChar:setupPayload.mPayloadContents.version];
+        _vendorID = [NSNumber numberWithUnsignedShort:setupPayload.mPayloadContents.vendorID];
+        _productID = [NSNumber numberWithUnsignedShort:setupPayload.mPayloadContents.productID];
+        _commissioningFlow = [self convertCommissioningFlow:setupPayload.mPayloadContents.commissioningFlow];
+        _rendezvousInformation = [self convertRendezvousFlags:setupPayload.mPayloadContents.rendezvousInformation];
+        _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.mPayloadContents.discriminator];
+        _setUpPINCode = [NSNumber numberWithUnsignedInt:setupPayload.mPayloadContents.setUpPINCode];
 
         [self getSerialNumber:setupPayload];
     }

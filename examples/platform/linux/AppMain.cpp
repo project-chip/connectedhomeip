@@ -119,7 +119,7 @@ int ChipLinuxAppInit(int argc, char ** argv)
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    err = GetSetupPayload(LinuxDeviceOptions::GetInstance().payload, rendezvousFlags);
+    err = GetPayloadContents(LinuxDeviceOptions::GetInstance().payload.mPayloadContents, rendezvousFlags);
     SuccessOrExit(err);
 
     err = ParseArguments(argc, argv);

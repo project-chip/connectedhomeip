@@ -49,13 +49,13 @@ CHIP_ERROR SetupPayloadParseCommand::Print(chip::SetupPayload payload)
     std::vector<OptionalQRCodeInfo> optionalVendorData;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(SetupPayload, "CommissioningFlow: %" PRIu8, to_underlying(payload.commissioningFlow));
-    ChipLogProgress(SetupPayload, "VendorID: %u", payload.vendorID);
-    ChipLogProgress(SetupPayload, "Version: %u", payload.version);
-    ChipLogProgress(SetupPayload, "ProductID: %u", payload.productID);
-    ChipLogProgress(SetupPayload, "Discriminator: %u", payload.discriminator);
-    ChipLogProgress(SetupPayload, "SetUpPINCode: %u", payload.setUpPINCode);
-    ChipLogProgress(SetupPayload, "RendezvousInformation: %u", payload.rendezvousInformation.Raw());
+    ChipLogProgress(SetupPayload, "CommissioningFlow: %" PRIu8, to_underlying(payload.mPayloadContents.commissioningFlow));
+    ChipLogProgress(SetupPayload, "VendorID: %u", payload.mPayloadContents.vendorID);
+    ChipLogProgress(SetupPayload, "Version: %u", payload.mPayloadContents.version);
+    ChipLogProgress(SetupPayload, "ProductID: %u", payload.mPayloadContents.productID);
+    ChipLogProgress(SetupPayload, "Discriminator: %u", payload.mPayloadContents.discriminator);
+    ChipLogProgress(SetupPayload, "SetUpPINCode: %u", payload.mPayloadContents.setUpPINCode);
+    ChipLogProgress(SetupPayload, "RendezvousInformation: %u", payload.mPayloadContents.rendezvousInformation.Raw());
 
     if (payload.getSerialNumber(serialNumber) == CHIP_NO_ERROR)
     {

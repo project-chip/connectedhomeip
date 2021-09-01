@@ -107,7 +107,7 @@ CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
     SetupPayload payload;
     ReturnErrorOnFailure(QRCodeSetupPayloadParser(mOnboardingPayload).populatePayload(payload));
 
-    chip::RendezvousInformationFlags rendezvousInformation = payload.rendezvousInformation;
+    chip::RendezvousInformationFlags rendezvousInformation = payload.mPayloadContents.rendezvousInformation;
     ReturnErrorCodeIf(rendezvousInformation != RendezvousInformationFlag::kBLE, CHIP_ERROR_INVALID_ARGUMENT);
 
     return PairWithCode(remoteId, payload);
@@ -123,8 +123,8 @@ CHIP_ERROR PairingCommand::PairWithManualCode(NodeId remoteId)
 CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId, SetupPayload payload)
 {
     RendezvousParameters params = RendezvousParameters()
-                                      .SetSetupPINCode(payload.setUpPINCode)
-                                      .SetDiscriminator(payload.discriminator)
+                                      .SetSetupPINCode(payload.mPayloadContents.setUpPINCode)
+                                      .SetDiscriminator(payload.mPayloadContents.discriminator)
                                       .SetPeerAddress(PeerAddress::BLE());
 
     return GetExecContext()->commissioner->PairDevice(remoteId, params);

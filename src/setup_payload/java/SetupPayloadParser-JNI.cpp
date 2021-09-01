@@ -95,14 +95,14 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
     jfieldID setUpPinCode          = env->GetFieldID(setupPayloadClass, "setupPinCode", "J");
     jfieldID discoveryCapabilities = env->GetFieldID(setupPayloadClass, "discoveryCapabilities", "Ljava/util/Set;");
 
-    env->SetIntField(setupPayload, version, payload.version);
-    env->SetIntField(setupPayload, vendorId, payload.vendorID);
-    env->SetIntField(setupPayload, productId, payload.productID);
-    env->SetIntField(setupPayload, commissioningFlow, static_cast<int>(payload.commissioningFlow));
-    env->SetIntField(setupPayload, discriminator, payload.discriminator);
-    env->SetLongField(setupPayload, setUpPinCode, payload.setUpPINCode);
+    env->SetIntField(setupPayload, version, payload.mPayloadContents.version);
+    env->SetIntField(setupPayload, vendorId, payload.mPayloadContents.vendorID);
+    env->SetIntField(setupPayload, productId, payload.mPayloadContents.productID);
+    env->SetIntField(setupPayload, commissioningFlow, static_cast<int>(payload.mPayloadContents.commissioningFlow));
+    env->SetIntField(setupPayload, discriminator, payload.mPayloadContents.discriminator);
+    env->SetLongField(setupPayload, setUpPinCode, payload.mPayloadContents.setUpPINCode);
 
-    env->SetObjectField(setupPayload, discoveryCapabilities, CreateCapabilitiesHashSet(env, payload.rendezvousInformation));
+    env->SetObjectField(setupPayload, discoveryCapabilities, CreateCapabilitiesHashSet(env, payload.mPayloadContents.rendezvousInformation));
 
     jmethodID addOptionalInfoMid =
         env->GetMethodID(setupPayloadClass, "addOptionalQRCodeInfo", "(Lchip/setuppayload/OptionalQRCodeInfo;)V");

@@ -437,11 +437,11 @@ CHIP_ERROR PrintQRCodeContent()
     err = ConfigurationMgr().GetProductId(productId);
     SuccessOrExit(err);
 
-    payload.version       = 0;
-    payload.vendorID      = vendorId;
-    payload.productID     = productId;
-    payload.setUpPINCode  = setUpPINCode;
-    payload.discriminator = setUpDiscriminator;
+    payload.mPayloadContents.version       = 0;
+    payload.mPayloadContents.vendorID      = vendorId;
+    payload.mPayloadContents.productID     = productId;
+    payload.mPayloadContents.setUpPINCode  = setUpPINCode;
+    payload.mPayloadContents.discriminator = setUpDiscriminator;
 
     // Wrap it so SuccessOrExit can work
     {

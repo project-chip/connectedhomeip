@@ -374,7 +374,7 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
         PASEVerifier verifier;
 
         ReturnErrorOnFailure(
-            PASESession::GeneratePASEVerifier(verifier, iteration, salt, randomSetupPIN, setupPayload.setUpPINCode));
+            PASESession::GeneratePASEVerifier(verifier, iteration, salt, randomSetupPIN, setupPayload.mPayloadContents.setUpPINCode));
 
         uint8_t serializedVerifier[2 * kSpake2p_WS_Length];
         VerifyOrReturnError(sizeof(serializedVerifier) == sizeof(verifier), CHIP_ERROR_INTERNAL);
@@ -384,15 +384,15 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
 
         ReturnErrorOnFailure(cluster.OpenCommissioningWindow(successCallback, failureCallback, timeout,
                                                              ByteSpan(serializedVerifier, sizeof(serializedVerifier)),
-                                                             setupPayload.discriminator, iteration, salt, mPAKEVerifierID++));
+                                                             setupPayload.mPayloadContents.discriminator, iteration, salt, mPAKEVerifierID++));
     }
     else
     {
         ReturnErrorOnFailure(cluster.OpenBasicCommissioningWindow(successCallback, failureCallback, timeout));
     }
 
-    setupPayload.version               = 0;
-    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
+    setupPayload.mPayloadContents.version               = 0;
+    setupPayload.mPayloadContents.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
 
     return CHIP_NO_ERROR;
 }

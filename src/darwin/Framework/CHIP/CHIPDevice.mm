@@ -105,11 +105,11 @@
         }
         return nil;
     } else {
-        setupPayload.discriminator = (uint16_t) discriminator;
+        setupPayload.mPayloadContents.discriminator = (uint16_t) discriminator;
     }
 
     setupPIN &= ((1 << chip::kSetupPINCodeFieldLengthInBits) - 1);
-    setupPayload.setUpPINCode = (uint32_t) setupPIN;
+    setupPayload.mPayloadContents.setUpPINCode = (uint32_t) setupPIN;
 
     [self.lock lock];
     err = self.cppDevice->OpenPairingWindow(

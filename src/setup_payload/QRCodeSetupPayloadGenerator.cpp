@@ -152,7 +152,7 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR generateBitSet(SetupPayload & payload, MutableByteSpan & bits, uint8_t * tlvDataStart,
+static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bits, uint8_t * tlvDataStart,
                                  size_t tlvDataLengthInBytes)
 {
     size_t offset                 = 0;
@@ -179,11 +179,11 @@ static CHIP_ERROR generateBitSet(SetupPayload & payload, MutableByteSpan & bits,
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR payloadBase38RepresentationWithTLV(SetupPayload & setupPayload, MutableCharSpan & outBuffer, MutableByteSpan bits,
+static CHIP_ERROR payloadBase38RepresentationWithTLV(PayloadContents & payload, MutableCharSpan & outBuffer, MutableByteSpan bits,
                                                      uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
 {
     memset(bits.data(), 0, bits.size());
-    ReturnErrorOnFailure(generateBitSet(setupPayload, bits, tlvDataStart, tlvDataLengthInBytes));
+    ReturnErrorOnFailure(generateBitSet(payload, bits, tlvDataStart, tlvDataLengthInBytes));
 
     CHIP_ERROR err   = CHIP_NO_ERROR;
     size_t prefixLen = strlen(kQRCodePrefix);
@@ -222,13 +222,13 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string 
     std::vector<char> buffer(base38EncodedLength(bits.capacity()) + strlen(kQRCodePrefix));
     MutableCharSpan bufferSpan(buffer.data(), buffer.capacity());
 
-    ReturnErrorOnFailure(payloadBase38RepresentationWithTLV(mPayload, bufferSpan, bitsSpan, tlvDataStart, tlvDataLengthInBytes));
+    ReturnErrorOnFailure(payloadBase38RepresentationWithTLV(mPayload.mPayloadContents, bufferSpan, bitsSpan, tlvDataStart, tlvDataLengthInBytes));
 
     base38Representation.assign(bufferSpan.data());
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38RepresentationWithoutOptional(MutableCharSpan & outBuffer)
+CHIP_ERROR QRCodeBasicSetupPayloadGenerator::payloadBase38Representation(MutableCharSpan & outBuffer)
 {
     uint8_t bits[kTotalPayloadDataSizeInBytes];
     VerifyOrReturnError(mPayload.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);

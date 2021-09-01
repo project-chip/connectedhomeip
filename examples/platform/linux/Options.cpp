@@ -145,31 +145,31 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
 
     case kDeviceOption_Version:
-        LinuxDeviceOptions::GetInstance().payload.version = static_cast<uint8_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.mPayloadContents.version = static_cast<uint8_t>(atoi(aValue));
         break;
 
     case kDeviceOption_VendorID:
-        LinuxDeviceOptions::GetInstance().payload.vendorID = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.mPayloadContents.vendorID = static_cast<uint16_t>(atoi(aValue));
         break;
 
     case kDeviceOption_ProductID:
-        LinuxDeviceOptions::GetInstance().payload.productID = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.mPayloadContents.productID = static_cast<uint16_t>(atoi(aValue));
         break;
 
     case kDeviceOption_CustomFlow:
-        LinuxDeviceOptions::GetInstance().payload.commissioningFlow = static_cast<CommissioningFlow>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.mPayloadContents.commissioningFlow = static_cast<CommissioningFlow>(atoi(aValue));
         break;
 
     case kDeviceOption_Capabilities:
-        LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.SetRaw(static_cast<uint8_t>(atoi(aValue)));
+        LinuxDeviceOptions::GetInstance().payload.mPayloadContents.rendezvousInformation.SetRaw(static_cast<uint8_t>(atoi(aValue)));
         break;
 
     case kDeviceOption_Discriminator:
-        LinuxDeviceOptions::GetInstance().payload.discriminator = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.mPayloadContents.discriminator = static_cast<uint16_t>(atoi(aValue));
         break;
 
     case kDeviceOption_Passcode:
-        LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().payload.mPayloadContents.setUpPINCode = static_cast<uint32_t>(atoi(aValue));
         break;
 
     case kDeviceOption_SecuredDevicePort:

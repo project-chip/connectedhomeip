@@ -43,13 +43,13 @@ inline SetupPayload GetDefaultPayload()
 {
     SetupPayload payload;
 
-    payload.version               = 5;
-    payload.vendorID              = 12;
-    payload.productID             = 1;
-    payload.commissioningFlow     = CommissioningFlow::kStandard;
-    payload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
-    payload.discriminator         = 128;
-    payload.setUpPINCode          = 2048;
+    payload.mPayloadContents.version               = 5;
+    payload.mPayloadContents.vendorID              = 12;
+    payload.mPayloadContents.productID             = 1;
+    payload.mPayloadContents.commissioningFlow     = CommissioningFlow::kStandard;
+    payload.mPayloadContents.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
+    payload.mPayloadContents.discriminator         = 128;
+    payload.mPayloadContents.setUpPINCode          = 2048;
 
     return payload;
 }
