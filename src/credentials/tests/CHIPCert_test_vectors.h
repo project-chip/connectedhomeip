@@ -26,7 +26,6 @@
 
 #pragma once
 
-#include <lib/asn1/ASN1OID.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>

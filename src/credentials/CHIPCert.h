@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string.h>
 
 #include <crypto/CHIPCryptoPAL.h>
