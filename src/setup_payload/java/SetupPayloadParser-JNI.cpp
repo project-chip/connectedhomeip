@@ -102,7 +102,8 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
     env->SetIntField(setupPayload, discriminator, payload.mPayloadContents.discriminator);
     env->SetLongField(setupPayload, setUpPinCode, payload.mPayloadContents.setUpPINCode);
 
-    env->SetObjectField(setupPayload, discoveryCapabilities, CreateCapabilitiesHashSet(env, payload.mPayloadContents.rendezvousInformation));
+    env->SetObjectField(setupPayload, discoveryCapabilities,
+                        CreateCapabilitiesHashSet(env, payload.mPayloadContents.rendezvousInformation));
 
     jmethodID addOptionalInfoMid =
         env->GetMethodID(setupPayloadClass, "addOptionalQRCodeInfo", "(Lchip/setuppayload/OptionalQRCodeInfo;)V");

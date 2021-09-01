@@ -546,7 +546,7 @@ std::string createSetupPayload()
         }
 
         payload.mPayloadContents.commissioningFlow = CommissioningFlow::kCustom;
-        generator = ManualSetupPayloadGenerator(payload);
+        generator                                  = ManualSetupPayloadGenerator(payload);
 
         if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR)
         {

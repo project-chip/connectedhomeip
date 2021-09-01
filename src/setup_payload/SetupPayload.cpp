@@ -110,8 +110,7 @@ bool PayloadContents::isValidManualCode()
 bool PayloadContents::operator==(PayloadContents & input)
 {
     return (this->version == input.version && this->vendorID == input.vendorID && this->productID == input.productID &&
-            this->commissioningFlow == input.commissioningFlow &&
-            this->rendezvousInformation == input.rendezvousInformation &&
+            this->commissioningFlow == input.commissioningFlow && this->rendezvousInformation == input.rendezvousInformation &&
             this->discriminator == input.discriminator && this->setUpPINCode == input.setUpPINCode);
 }
 

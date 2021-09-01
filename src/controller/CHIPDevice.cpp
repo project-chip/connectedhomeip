@@ -373,8 +373,8 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
         bool randomSetupPIN = (option == PairingWindowOption::kTokenWithRandomPIN);
         PASEVerifier verifier;
 
-        ReturnErrorOnFailure(
-            PASESession::GeneratePASEVerifier(verifier, iteration, salt, randomSetupPIN, setupPayload.mPayloadContents.setUpPINCode));
+        ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, iteration, salt, randomSetupPIN,
+                                                               setupPayload.mPayloadContents.setUpPINCode));
 
         uint8_t serializedVerifier[2 * kSpake2p_WS_Length];
         VerifyOrReturnError(sizeof(serializedVerifier) == sizeof(verifier), CHIP_ERROR_INTERNAL);
@@ -382,9 +382,9 @@ CHIP_ERROR Device::OpenCommissioningWindow(uint16_t timeout, uint32_t iteration,
         memcpy(serializedVerifier, verifier.mW0, kSpake2p_WS_Length);
         memcpy(&serializedVerifier[kSpake2p_WS_Length], verifier.mL, kSpake2p_WS_Length);
 
-        ReturnErrorOnFailure(cluster.OpenCommissioningWindow(successCallback, failureCallback, timeout,
-                                                             ByteSpan(serializedVerifier, sizeof(serializedVerifier)),
-                                                             setupPayload.mPayloadContents.discriminator, iteration, salt, mPAKEVerifierID++));
+        ReturnErrorOnFailure(cluster.OpenCommissioningWindow(
+            successCallback, failureCallback, timeout, ByteSpan(serializedVerifier, sizeof(serializedVerifier)),
+            setupPayload.mPayloadContents.discriminator, iteration, salt, mPAKEVerifierID++));
     }
     else
     {

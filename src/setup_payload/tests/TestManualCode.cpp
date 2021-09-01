@@ -340,7 +340,7 @@ void assertEmptyPayloadWithError(nlTestSuite * inSuite, CHIP_ERROR actualError, 
     NL_TEST_ASSERT(inSuite, actualError == expectedError);
     NL_TEST_ASSERT(inSuite,
                    payload.mPayloadContents.setUpPINCode == 0 && payload.mPayloadContents.discriminator == 0 &&
-                   payload.mPayloadContents.productID == 0 && payload.mPayloadContents.vendorID == 0);
+                       payload.mPayloadContents.productID == 0 && payload.mPayloadContents.vendorID == 0);
 }
 
 void TestPayloadParser_InvalidEntry(nlTestSuite * inSuite, void * inContext)

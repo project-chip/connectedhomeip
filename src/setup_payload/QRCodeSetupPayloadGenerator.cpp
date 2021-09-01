@@ -222,7 +222,8 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string 
     std::vector<char> buffer(base38EncodedLength(bits.capacity()) + strlen(kQRCodePrefix));
     MutableCharSpan bufferSpan(buffer.data(), buffer.capacity());
 
-    ReturnErrorOnFailure(payloadBase38RepresentationWithTLV(mPayload.mPayloadContents, bufferSpan, bitsSpan, tlvDataStart, tlvDataLengthInBytes));
+    ReturnErrorOnFailure(
+        payloadBase38RepresentationWithTLV(mPayload.mPayloadContents, bufferSpan, bitsSpan, tlvDataStart, tlvDataLengthInBytes));
 
     base38Representation.assign(bufferSpan.data());
     return CHIP_NO_ERROR;
