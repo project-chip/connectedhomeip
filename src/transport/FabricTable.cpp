@@ -43,6 +43,7 @@ CHIP_ERROR FabricInfo::SetFabricLabel(const uint8_t * fabricLabel)
     return CHIP_NO_ERROR;
 }
 
+#pragma GCC diagnostic ignored "-Wstack-usage="
 CHIP_ERROR FabricInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

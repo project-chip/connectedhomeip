@@ -12,6 +12,9 @@ An example application that uses CHIP to send messages to a CHIP server.
 
 ## Building the Example Application
 
+See [the build guide](../../docs/guides/BUILDING.md#prerequisites) for general
+background on build prerequisites.
+
 Building the example application is quite straightforward. It can either be done
 as part of an overall "build everything" build:
 
@@ -72,6 +75,13 @@ For example:
 or equivalently:
 
     $ chip-tool pairing ble-wifi hex:787980 hex:736563726574 0 20202021 3840
+
+#### Pair a device over IP
+
+The command below will pair to a localhost device (`::1`) running the
+`all-clusters-app` on the default port (`5540`) over IPv6:
+
+    $ chip-tool pairing onnetwork 0 20202021 3840 ::1 5540
 
 ### Forget the currently-commissioned device
 
@@ -140,6 +150,10 @@ To get the list of parameters for a specific command, run the built executable
 with the target cluster name and the target command name
 
     $ chip-tool onoff on
+
+### Run a test suite against a paired peer device
+
+    $ chip-tool tests Test_TC_OO_1_1
 
 ## Using the Client for Setup Payload
 

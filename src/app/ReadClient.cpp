@@ -36,13 +36,13 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interact
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
     VerifyOrExit(apExchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     mpExchangeMgr  = apExchangeMgr;
     mpDelegate     = apDelegate;
     mState         = ClientState::Initialized;
     mAppIdentifier = aAppIdentifier;
-
+    mInitialReport = true;
     AbortExistingExchangeContext();
 
 exit:
@@ -65,6 +65,7 @@ void ReadClient::ShutdownInternal(CHIP_ERROR aError)
         mpDelegate->ReadDone(this, aError);
         mpDelegate = nullptr;
     }
+    mInitialReport = true;
     MoveToState(ClientState::Uninitialized);
 }
 
@@ -77,8 +78,8 @@ const char * ReadClient::GetStateStr() const
         return "UNINIT";
     case ClientState::Initialized:
         return "INIT";
-    case ClientState::AwaitingResponse:
-        return "AwaitingResponse";
+    case ClientState::AwaitingInitialReport:
+        return "AwaitingInitialReport";
     }
 #endif // CHIP_DETAIL_LOGGING
     return "N/A";
@@ -154,7 +155,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
-    MoveToState(ClientState::AwaitingResponse);
+    MoveToState(ClientState::AwaitingInitialReport);
 
 exit:
     ChipLogFunctError(err);
@@ -167,11 +168,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadClient::SendStatusReport(CHIP_ERROR aError, bool aExpectResponse)
+CHIP_ERROR ReadClient::SendStatusReport(CHIP_ERROR aError)
 {
     Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
     uint32_t protocolId                                     = Protocols::InteractionModel::Id.ToFullyQualifiedSpecForm();
     uint16_t protocolCode                                   = to_underlying(Protocols::InteractionModel::ProtocolCode::Success);
+    bool expectResponse                                     = false;
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     if (aError != CHIP_NO_ERROR)
@@ -180,7 +182,6 @@ CHIP_ERROR ReadClient::SendStatusReport(CHIP_ERROR aError, bool aExpectResponse)
         protocolCode = to_underlying(Protocols::InteractionModel::ProtocolCode::InvalidSubscription);
     }
 
-    ChipLogProgress(DataManagement, "SendStatusReport with error %s", ErrorStr(aError));
     Protocols::SecureChannel::StatusReport report(generalCode, protocolId, protocolCode);
 
     Encoding::LittleEndian::PacketBufferWriter buf(System::PacketBufferHandle::New(kMaxSecureSduLengthBytes));
@@ -188,16 +189,9 @@ CHIP_ERROR ReadClient::SendStatusReport(CHIP_ERROR aError, bool aExpectResponse)
     System::PacketBufferHandle msgBuf = buf.Finalize();
     VerifyOrReturnLogError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
 
-    if (aExpectResponse)
-    {
-        ReturnLogErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msgBuf),
-                                                           Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
-    }
-    else
-    {
-        ReturnLogErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msgBuf)));
-    }
-
+    ReturnLogErrorOnFailure(mpExchangeCtx->SendMessage(
+        Protocols::SecureChannel::MsgType::StatusReport, std::move(msgBuf),
+        Messaging::SendFlags(expectResponse ? Messaging::SendMessageFlags::kExpectResponse : Messaging::SendMessageFlags::kNone)));
     return CHIP_NO_ERROR;
 }
 
@@ -265,15 +259,11 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     {
         err = ProcessReportData(std::move(aPayload));
         SuccessOrExit(err);
-        mpDelegate->ReportProcessed(this);
     }
     else
     {
         err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
-
-    SuccessOrExit(err);
-    err = SendStatusReport(err, false);
 
 exit:
     ChipLogFunctError(err);
@@ -329,6 +319,10 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
+    if (IsInitialReport())
+    {
+        ChipLogProgress(DataManagement, "ProcessReportData handles the initial report");
+    }
     err = report.GetMoreChunkedMessages(&moreChunkedMessages);
     if (CHIP_END_OF_TLV == err)
     {
@@ -373,7 +367,13 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         // are multiple reports
     }
 
+    if (err == CHIP_NO_ERROR)
+    {
+        mpDelegate->ReportProcessed(this);
+    }
 exit:
+    SendStatusReport(err);
+    ClearInitialReport();
     ChipLogFunctError(err);
     return err;
 }
@@ -384,10 +384,7 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
                     apExchangeContext->GetExchangeId());
     if (nullptr != mpDelegate)
     {
-        if (ClientState::AwaitingResponse == mState)
-        {
-            mpDelegate->ReadError(this, CHIP_ERROR_TIMEOUT);
-        }
+        mpDelegate->ReadError(this, CHIP_ERROR_TIMEOUT);
     }
     ShutdownInternal(CHIP_ERROR_TIMEOUT);
 }
