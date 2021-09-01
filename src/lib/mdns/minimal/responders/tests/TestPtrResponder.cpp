@@ -18,9 +18,9 @@
 
 #include <vector>
 
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/mdns/minimal/Parser.h>
 #include <lib/mdns/minimal/RecordData.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

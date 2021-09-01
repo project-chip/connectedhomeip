@@ -29,8 +29,8 @@
 
 #include <string.h>
 
-#include <lib/asn1/ASN1.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/asn1/ASN1.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/PeerId.h>

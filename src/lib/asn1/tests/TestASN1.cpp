@@ -30,10 +30,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <lib/support/UnitTestRegistration.h>
+#include <asn1/ASN1OID.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
-#include <asn1/ASN1OID.h>
+#include <lib/support/UnitTestRegistration.h>
 
 using namespace chip;
 using namespace chip::ASN1;

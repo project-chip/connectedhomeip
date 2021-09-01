@@ -17,9 +17,9 @@
 
 #include "TestStreamerStdio.h"
 
+#include <lib/shell/Engine.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
-#include <lib/shell/Engine.h>
 
 #include <inttypes.h>
 #include <stdarg.h>

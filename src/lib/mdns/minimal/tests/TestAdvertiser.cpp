@@ -19,7 +19,6 @@
 #include <string>
 #include <utility>
 
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/mdns/Advertiser.h>
 #include <lib/mdns/MinimalMdnsServer.h>
 #include <lib/mdns/minimal/Query.h>
@@ -29,6 +28,7 @@
 #include <lib/mdns/minimal/records/Srv.h>
 #include <lib/mdns/minimal/records/Txt.h>
 #include <lib/mdns/minimal/tests/CheckOnlyServer.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 
 #include <nlunit-test.h>

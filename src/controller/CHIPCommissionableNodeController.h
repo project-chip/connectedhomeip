@@ -19,8 +19,8 @@
 #pragma once
 
 #include <controller/AbstractMdnsDiscoveryController.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/mdns/Resolver.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 
 namespace chip {

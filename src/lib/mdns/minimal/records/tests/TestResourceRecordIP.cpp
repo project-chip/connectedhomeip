@@ -15,8 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/mdns/minimal/records/IP.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

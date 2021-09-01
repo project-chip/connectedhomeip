@@ -22,8 +22,6 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <lib/support/CHIPMem.h>
 #include <lib/mdns/ServiceNaming.h>
 #include <lib/mdns/minimal/QueryBuilder.h>
 #include <lib/mdns/minimal/ResponseSender.h>
@@ -33,6 +31,8 @@
 #include <lib/mdns/minimal/responders/Ptr.h>
 #include <lib/mdns/minimal/responders/Srv.h>
 #include <lib/mdns/minimal/responders/Txt.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
 

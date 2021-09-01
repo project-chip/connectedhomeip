@@ -29,9 +29,9 @@
 #include <inttypes.h>
 #include <stddef.h>
 
+#include <credentials/CHIPCert.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
-#include <credentials/CHIPCert.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>

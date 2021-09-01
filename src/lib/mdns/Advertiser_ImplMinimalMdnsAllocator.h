@@ -17,8 +17,6 @@
 #include <inttypes.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/mdns/minimal/core/FlatAllocatedQName.h>
 #include <lib/mdns/minimal/core/QName.h>
 #include <lib/mdns/minimal/responders/IP.h>
@@ -27,6 +25,8 @@
 #include <lib/mdns/minimal/responders/RecordResponder.h>
 #include <lib/mdns/minimal/responders/Srv.h>
 #include <lib/mdns/minimal/responders/Txt.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Mdns {

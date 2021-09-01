@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <lib/support/Span.h>
 #include <lib/mdns/Resolver.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 
 namespace chip {

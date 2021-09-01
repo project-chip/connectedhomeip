@@ -21,8 +21,8 @@
 #include <limits>
 #include <string.h>
 
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/mdns/Resolver.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

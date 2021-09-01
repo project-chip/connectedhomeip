@@ -23,9 +23,6 @@
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
 
-#include <lib/support/CHIPMem.h>
-#include <lib/support/RandUtils.h>
-#include <lib/support/StringBuilder.h>
 #include <lib/mdns/Advertiser_ImplMinimalMdnsAllocator.h>
 #include <lib/mdns/minimal/ResponseSender.h>
 #include <lib/mdns/minimal/Server.h>
@@ -35,6 +32,9 @@
 #include <lib/mdns/minimal/responders/QueryResponder.h>
 #include <lib/mdns/minimal/responders/Srv.h>
 #include <lib/mdns/minimal/responders/Txt.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/StringBuilder.h>
 
 // Enable detailed mDNS logging for received queries
 #undef DETAIL_LOGGING

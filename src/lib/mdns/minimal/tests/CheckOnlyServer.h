@@ -22,14 +22,14 @@
 #include <string>
 #include <vector>
 
-#include <lib/support/CHIPMemString.h>
-#include <lib/support/UnitTestRegistration.h>
 #include <lib/mdns/MinimalMdnsServer.h>
 #include <lib/mdns/minimal/RecordData.h>
 #include <lib/mdns/minimal/Server.h>
 #include <lib/mdns/minimal/records/Ptr.h>
 #include <lib/mdns/minimal/records/Srv.h>
 #include <lib/mdns/minimal/records/Txt.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <system/SystemMutex.h>
 
 #include <nlunit-test.h>

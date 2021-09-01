@@ -29,10 +29,10 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/mdns/ServiceNaming.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/mdns/ServiceNaming.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
