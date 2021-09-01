@@ -25,14 +25,14 @@
 #include "QRCodeSetupPayloadGenerator.h"
 #include "Base38Encode.h"
 
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <core/CHIPTLVData.hpp>
-#include <core/CHIPTLVDebug.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPTLVData.hpp>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/RandUtils.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
 
 #include <stdlib.h>
 #include <string.h>

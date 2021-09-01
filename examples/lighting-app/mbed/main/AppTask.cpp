@@ -30,7 +30,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #undef sleep
 
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 // ZAP -- ZCL Advanced Platform
 #include <app-common/zap-generated/attribute-id.h>

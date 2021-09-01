@@ -23,18 +23,18 @@
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
 
-#include <mdns/Advertiser_ImplMinimalMdnsAllocator.h>
-#include <mdns/minimal/ResponseSender.h>
-#include <mdns/minimal/Server.h>
-#include <mdns/minimal/core/FlatAllocatedQName.h>
-#include <mdns/minimal/responders/IP.h>
-#include <mdns/minimal/responders/Ptr.h>
-#include <mdns/minimal/responders/QueryResponder.h>
-#include <mdns/minimal/responders/Srv.h>
-#include <mdns/minimal/responders/Txt.h>
-#include <support/CHIPMem.h>
-#include <support/RandUtils.h>
-#include <support/StringBuilder.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/StringBuilder.h>
+#include <lib/mdns/Advertiser_ImplMinimalMdnsAllocator.h>
+#include <lib/mdns/minimal/ResponseSender.h>
+#include <lib/mdns/minimal/Server.h>
+#include <lib/mdns/minimal/core/FlatAllocatedQName.h>
+#include <lib/mdns/minimal/responders/IP.h>
+#include <lib/mdns/minimal/responders/Ptr.h>
+#include <lib/mdns/minimal/responders/QueryResponder.h>
+#include <lib/mdns/minimal/responders/Srv.h>
+#include <lib/mdns/minimal/responders/Txt.h>
 
 // Enable detailed mDNS logging for received queries
 #undef DETAIL_LOGGING

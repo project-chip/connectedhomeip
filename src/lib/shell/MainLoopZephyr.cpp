@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <init.h>
-#include <shell/shell.h>
+#include <lib/shell/shell.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/shell/Engine.h>

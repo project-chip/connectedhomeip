@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <mdns/minimal/core/QName.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/mdns/minimal/core/QName.h>
 
 #include <nlunit-test.h>
 

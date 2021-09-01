@@ -50,19 +50,19 @@
 #include <openssl/x509v3.h>
 
 #include <CHIPVersion.h>
-#include <asn1/ASN1.h>
+#include <lib/asn1/ASN1.h>
 #include <asn1/ASN1OID.h>
-#include <core/CHIPConfig.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPSafeCasts.h>
 #include <credentials/CHIPCert.h>
-#include <support/Base64.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/SafeInt.h>
-#include <support/TimeUtils.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/Base64.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/TimeUtils.h>
 
 using chip::ASN1::OID;
 

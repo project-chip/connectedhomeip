@@ -24,16 +24,16 @@
 #include <errno.h>
 #include <nlunit-test.h>
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 
 #include <protocols/secure_channel/PASESession.h>
 #include <transport/FabricTable.h>
 #include <transport/SecureSession.h>
 #include <transport/SessionHandle.h>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <stdarg.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
 
 using namespace chip;
 

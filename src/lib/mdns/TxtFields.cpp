@@ -26,11 +26,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <mdns/Advertiser.h>
-#include <mdns/Resolver.h>
-#include <support/BytesToHex.h>
-#include <support/CHIPMemString.h>
-#include <support/SafeInt.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/SafeInt.h>
+#include <lib/mdns/Advertiser.h>
+#include <lib/mdns/Resolver.h>
 
 namespace chip {
 namespace Mdns {

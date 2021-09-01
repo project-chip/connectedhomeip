@@ -19,8 +19,8 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <map>
 #include <string>

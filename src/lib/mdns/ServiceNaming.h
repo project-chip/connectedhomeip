@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
-#include <core/PeerId.h>
-#include <mdns/Resolver.h>
-#include <support/Span.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/PeerId.h>
+#include <lib/support/Span.h>
+#include <lib/mdns/Resolver.h>
 
 #include <cstddef>
 #include <cstdint>

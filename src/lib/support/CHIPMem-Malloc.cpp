@@ -23,8 +23,8 @@
  *
  */
 
-#include <core/CHIPConfig.h>
-#include <support/CHIPMem.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/CHIPMem.h>
 
 #include <stdlib.h>
 
@@ -35,7 +35,7 @@
 
 #if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 #include <dmalloc.h>
-#include <support/SafeInt.h>
+#include <lib/support/SafeInt.h>
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 
 #if CHIP_CONFIG_MEMORY_MGMT_MALLOC

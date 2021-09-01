@@ -27,8 +27,8 @@
 // common private
 #include "SystemLayerPrivate.h"
 
-#include <support/CodeUtils.h>
-#include <support/TimeUtils.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/TimeUtils.h>
 #include <system/SystemError.h>
 
 #include <stdint.h>

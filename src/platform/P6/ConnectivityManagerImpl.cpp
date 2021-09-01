@@ -25,10 +25,10 @@
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
 
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/P6/P6Utils.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>

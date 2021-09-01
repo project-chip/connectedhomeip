@@ -16,8 +16,8 @@
  */
 
 #include <app/server/StorablePeerConnection.h>
-#include <core/CHIPEncoding.h>
-#include <support/SafeInt.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 

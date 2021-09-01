@@ -24,10 +24,10 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <new>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
 
 #include <cassert>
 #include <type_traits>

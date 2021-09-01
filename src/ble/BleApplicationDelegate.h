@@ -26,7 +26,7 @@
 
 #include <ble/BleConfig.h>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 namespace Ble {

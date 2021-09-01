@@ -23,8 +23,8 @@
  */
 
 #pragma once
-#include <core/CHIPError.h>
-#include <support/BitFlags.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {

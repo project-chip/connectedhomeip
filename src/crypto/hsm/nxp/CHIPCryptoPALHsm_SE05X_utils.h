@@ -23,11 +23,11 @@
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #include <type_traits>
 
-#include <core/CHIPSafeCasts.h>
 #include <crypto/hsm/CHIPCryptoPALHsm_config.h>
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemMutex.h>
 
 /* se05x includes */

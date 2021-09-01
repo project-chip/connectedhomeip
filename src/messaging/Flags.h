@@ -23,8 +23,8 @@
 
 #pragma once
 
+#include <lib/support/BitFlags.h>
 #include <stdint.h>
-#include <support/BitFlags.h>
 
 namespace chip {
 namespace Messaging {

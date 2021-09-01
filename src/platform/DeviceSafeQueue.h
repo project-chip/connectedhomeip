@@ -27,7 +27,7 @@
 #include <mutex>
 #include <queue>
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 

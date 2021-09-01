@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 
 #include <controller/CHIPDeviceController.h>
-#include <core/ReferenceCounted.h>
+#include <lib/core/ReferenceCounted.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

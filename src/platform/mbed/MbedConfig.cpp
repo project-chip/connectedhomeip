@@ -27,11 +27,11 @@
 
 #include <platform/mbed/MbedConfig.h>
 
-#include <core/CHIPEncoding.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "kvstore_global_api/kvstore_global_api.h"
 #include "platform/mbed_error.h"

@@ -25,7 +25,7 @@
 
 #include "AdditionalDataPayload.h"
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <stdint.h>
 
 namespace chip {

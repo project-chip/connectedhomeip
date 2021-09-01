@@ -31,9 +31,12 @@
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
-#include <core/CHIPCallback.h>
-#include <core/CHIPCore.h>
 #include <credentials/CHIPOperationalCredentials.h>
+#include <lib/core/CHIPCallback.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/Base64.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
@@ -42,9 +45,6 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/Base64.h>
-#include <support/DLLUtil.h>
-#include <support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>

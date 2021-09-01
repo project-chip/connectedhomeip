@@ -17,8 +17,8 @@
  */
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPOperationalCredentials.h>
-#include <support/CHIPMem.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

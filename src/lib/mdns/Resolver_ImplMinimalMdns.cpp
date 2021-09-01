@@ -22,13 +22,13 @@
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
 
-#include <mdns/TxtFields.h>
-#include <mdns/minimal/Parser.h>
-#include <mdns/minimal/QueryBuilder.h>
-#include <mdns/minimal/RecordData.h>
-#include <mdns/minimal/core/FlatAllocatedQName.h>
-#include <support/CHIPMemString.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <lib/mdns/TxtFields.h>
+#include <lib/mdns/minimal/Parser.h>
+#include <lib/mdns/minimal/QueryBuilder.h>
+#include <lib/mdns/minimal/RecordData.h>
+#include <lib/mdns/minimal/core/FlatAllocatedQName.h>
 
 // MDNS servers will receive all broadcast packets over the network.
 // Disable 'invalid packet' messages because the are expected and common

@@ -23,7 +23,7 @@
 
 #include "AppEvent.h"
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/timers.h" // provides FreeRTOS timer support

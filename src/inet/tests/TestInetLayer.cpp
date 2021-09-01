@@ -38,7 +38,7 @@
 #include <CHIPVersion.h>
 
 #include <inet/InetArgParser.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #include "TestInetCommon.h"
 #include "TestInetCommonOptions.h"

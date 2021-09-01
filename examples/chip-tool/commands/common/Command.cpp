@@ -25,12 +25,12 @@
 #include <sys/types.h>
 
 #include <lib/core/CHIPSafeCasts.h>
-#include <support/BytesToHex.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 bool Command::InitArguments(int argc, char ** argv)
 {

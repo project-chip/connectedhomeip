@@ -29,15 +29,15 @@
 #include <string.h>
 #include <vector>
 
-#include <core/CHIPCore.h>
-#include <core/CHIPError.h>
-#include <core/CHIPTLVData.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLVData.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
 
 namespace chip {
 

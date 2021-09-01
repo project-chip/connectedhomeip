@@ -23,7 +23,7 @@
 
 #include <commands/clusters/ModelCommand.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <support/BytesToHex.h>
+#include <lib/support/BytesToHex.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 

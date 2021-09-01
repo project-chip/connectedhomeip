@@ -29,12 +29,12 @@
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
 #include <chrono>
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/TypeTraits.h>
 #include <mutex>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/ErrorStr.h>
-#include <support/TypeTraits.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>

@@ -17,10 +17,10 @@
 
 #include <protocols/secure_channel/CASEServer.h>
 
-#include <core/CHIPError.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <transport/SecureSessionMgr.h>
 
 using namespace ::chip::Inet;

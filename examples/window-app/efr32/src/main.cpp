@@ -22,11 +22,11 @@
 #include <WindowApp.h>
 #include <app/server/Server.h>
 #include <init_efrPlatform.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 #include <mbedtls/threading.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <mbedtls/platform.h>

@@ -15,21 +15,21 @@
  *    limitations under the License.
  */
 
-#include "Discovery_ImplPlatform.h"
+#include <lib/mdns/Discovery_ImplPlatform.h>
 
 #include <inttypes.h>
 
-#include "ServiceNaming.h"
-#include "lib/core/CHIPSafeCasts.h"
-#include "lib/mdns/TxtFields.h"
-#include "lib/mdns/platform/Mdns.h"
-#include "lib/support/logging/CHIPLogging.h"
-#include "platform/CHIPDeviceConfig.h"
-#include "platform/CHIPDeviceLayer.h"
-#include "support/CHIPMemString.h"
-#include "support/CodeUtils.h"
-#include "support/ErrorStr.h"
-#include "support/RandUtils.h"
+#include <lib/mdns/ServiceNaming.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/mdns/TxtFields.h>
+#include <lib/mdns/platform/Mdns.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/RandUtils.h>
 
 namespace chip {
 namespace Mdns {

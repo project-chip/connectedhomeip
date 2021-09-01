@@ -29,7 +29,7 @@
 
 #include "chip-cert.h"
 
-#include <support/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
 namespace {
 

@@ -26,19 +26,19 @@
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
-#include <core/CHIPCircularTLVBuffer.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
-#include <core/CHIPTLVData.hpp>
-#include <core/CHIPTLVDebug.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPCircularTLVBuffer.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/core/CHIPTLVData.hpp>
+#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
 
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
-#include <support/ScopedBuffer.h>
-#include <support/UnitTestRegistration.h>
-#include <support/UnitTestUtils.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/UnitTestUtils.h>
 
 #include <system/TLVPacketBufferBackingStore.h>
 

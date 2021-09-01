@@ -19,16 +19,16 @@
 
 #include <inttypes.h>
 
-#include <core/Optional.h>
-#include <mdns/Advertiser.h>
-#include <mdns/ServiceNaming.h>
+#include <lib/core/Optional.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <lib/mdns/Advertiser.h>
+#include <lib/mdns/ServiceNaming.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
-#include <support/Span.h>
-#include <support/logging/CHIPLogging.h>
 #include <transport/FabricTable.h>
 
 #include <app/server/Server.h>

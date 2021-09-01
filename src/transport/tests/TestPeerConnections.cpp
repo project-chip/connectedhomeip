@@ -22,9 +22,9 @@
  *      the PeerConnections class within the transport layer
  *
  */
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <transport/PeerConnections.h>
 
 #include <nlunit-test.h>

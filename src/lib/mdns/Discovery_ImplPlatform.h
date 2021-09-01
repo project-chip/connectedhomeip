@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
 #include <inet/InetInterface.h>
+#include <lib/core/CHIPError.h>
 #include <lib/mdns/Advertiser.h>
 #include <lib/mdns/Resolver.h>
 #include <lib/mdns/platform/Mdns.h>

@@ -28,7 +28,7 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 #endif
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 /* Include a project-specific configuration file, if defined.
  *

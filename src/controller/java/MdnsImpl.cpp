@@ -22,10 +22,10 @@
 #include "JniTypeWrappers.h"
 
 #include <lib/mdns/platform/Mdns.h>
-#include <support/CHIPMemString.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <string>
 

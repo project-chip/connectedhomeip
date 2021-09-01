@@ -23,8 +23,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
-#include <core/CHIPEncoding.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Controller {

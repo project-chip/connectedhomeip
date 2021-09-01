@@ -29,14 +29,14 @@
 #include <inttypes.h>
 #include <stddef.h>
 
-#include <asn1/ASN1.h>
-#include <asn1/ASN1Macros.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPSafeCasts.h>
+#include <lib/asn1/ASN1.h>
+#include <lib/asn1/ASN1Macros.h>
 #include <credentials/CHIPCert.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
 
 namespace chip {
 namespace Credentials {

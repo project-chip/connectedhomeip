@@ -16,9 +16,9 @@
  */
 
 #include <chip/internal/ChipThreadWork.h>
-#include <mdns/Resolver.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/mdns/Resolver.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CodeUtils.h>
 
 #include <type_traits>
 

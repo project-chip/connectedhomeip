@@ -23,8 +23,8 @@
  */
 #include <transport/raw/UDP.h>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>

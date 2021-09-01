@@ -32,15 +32,15 @@
 // collisions between the threads that call it.
 
 // clang-format off
-#include <support/UnitTestUtils.h>
+#include <lib/support/UnitTestUtils.h>
 #define SYSTEM_OBJECT_HWM_TEST_HOOK() do { chip::test_utils::SleepMillis(1); } while(0)
 // clang-format on
 
 #include <system/SystemLayer.h>
 
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

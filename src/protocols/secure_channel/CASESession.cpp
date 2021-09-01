@@ -28,14 +28,14 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include <core/CHIPEncoding.h>
-#include <core/CHIPSafeCasts.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
-#include <support/TypeTraits.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
 

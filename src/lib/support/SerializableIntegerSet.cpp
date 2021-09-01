@@ -18,7 +18,7 @@
 
 #include "SerializableIntegerSet.h"
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {

@@ -38,12 +38,12 @@
 #include <openssl/sha.h>
 #include <openssl/x509.h>
 
-#include <core/CHIPSafeCasts.h>
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/SafePointerCast.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/SafePointerCast.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <string.h>
 

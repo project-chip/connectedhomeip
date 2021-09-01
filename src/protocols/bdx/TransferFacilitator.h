@@ -21,11 +21,11 @@
  *  This file defines interfaces for connecting the BDX state machine (TransferSession) to the messaging layer.
  */
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <protocols/bdx/BdxTransferSession.h>
-#include <support/BitFlags.h>
 #include <system/SystemLayer.h>
 
 #pragma once

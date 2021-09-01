@@ -22,7 +22,7 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/RandUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <ChipShellCollection.h>
 #include <lib/support/CHIPMem.h>
