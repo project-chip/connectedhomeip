@@ -28,10 +28,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <nlunit-test.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
+#include <nlunit-test.h>
 #include <system/SystemClock.h>
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>

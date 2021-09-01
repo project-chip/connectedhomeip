@@ -50,12 +50,12 @@
 #include <openssl/x509v3.h>
 
 #include <CHIPVersion.h>
+#include <credentials/CHIPCert.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1OID.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <credentials/CHIPCert.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>

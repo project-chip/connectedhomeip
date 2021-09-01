@@ -27,9 +27,9 @@
 
 #include <vector>
 
-#include <lib/core/CHIPCore.h>
 #include <inet/InetArgParser.h>
 #include <inet/InetLayer.h>
+#include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <system/SystemLayer.h>
 

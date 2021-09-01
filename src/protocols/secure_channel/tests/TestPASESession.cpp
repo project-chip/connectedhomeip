@@ -26,13 +26,13 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <messaging/tests/MessagingContext.h>
-#include <protocols/secure_channel/PASESession.h>
-#include <stdarg.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
+#include <messaging/tests/MessagingContext.h>
+#include <protocols/secure_channel/PASESession.h>
+#include <stdarg.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
 using namespace chip;

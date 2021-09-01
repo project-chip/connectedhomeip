@@ -31,9 +31,9 @@
 #include <lib/mdns/minimal/responders/Ptr.h>
 #include <lib/mdns/minimal/responders/Srv.h>
 #include <lib/mdns/minimal/responders/Txt.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 #include "AllInterfaceListener.h"

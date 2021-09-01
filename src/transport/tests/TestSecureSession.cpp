@@ -27,9 +27,9 @@
 #include <lib/core/CHIPCore.h>
 #include <transport/SecureSession.h>
 
-#include <stdarg.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <stdarg.h>
 
 using namespace chip;
 using namespace Crypto;

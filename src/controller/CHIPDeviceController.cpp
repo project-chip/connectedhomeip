@@ -46,17 +46,12 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/error-mapping.h>
+#include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <credentials/CHIPCert.h>
-#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/NodeId.h>
-#include <messaging/ExchangeContext.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
-#include <setup_payload/ManualSetupPayloadGenerator.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
@@ -67,6 +62,11 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ExchangeContext.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>

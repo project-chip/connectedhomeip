@@ -25,8 +25,8 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <platform/internal/DeviceNetworkInfo.h>
 #include <lib/support/TimeUtils.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController

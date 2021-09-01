@@ -27,8 +27,8 @@
 #include <app/tests/integration/common.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/ErrorStr.h>
+#include <platform/CHIPDeviceLayer.h>
 
 chip::Messaging::ExchangeManager gExchangeManager;
 chip::SecureSessionMgr gSessionManager;

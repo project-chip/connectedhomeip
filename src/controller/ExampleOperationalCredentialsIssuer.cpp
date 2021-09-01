@@ -17,8 +17,8 @@
  */
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <lib/core/CHIPTLV.h>
 #include <credentials/CHIPCert.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentStorageMacros.h>

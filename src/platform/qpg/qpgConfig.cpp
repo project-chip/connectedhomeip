@@ -27,9 +27,9 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include "FreeRTOS.h"
 #include "qvCHIP.h"

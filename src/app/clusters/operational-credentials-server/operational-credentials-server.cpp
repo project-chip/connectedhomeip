@@ -34,11 +34,11 @@
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/PeerId.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <string.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <string.h>
 #include <transport/FabricTable.h>
 
 using namespace chip;

@@ -28,11 +28,11 @@
 #include <openthread/heap.h>
 
 #include <lib/core/CHIPError.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/ThreadStackManager.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/ThreadStackManager.h>
 
 #include "FreeRtosHooks.h"
 #include "app_config.h"

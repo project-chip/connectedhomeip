@@ -28,13 +28,13 @@
 #include "UDCClients.h"
 #include <lib/core/CHIPCore.h>
 #include <lib/mdns/Resolver.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/DLLUtil.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <transport/TransportMgr.h>
 
 namespace chip {

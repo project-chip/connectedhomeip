@@ -18,10 +18,10 @@
 #include <ota-provider-common/BdxOtaSender.h>
 
 #include <lib/core/CHIPError.h>
-#include <messaging/ExchangeContext.h>
-#include <protocols/bdx/BdxTransferSession.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMemString.h>
+#include <messaging/ExchangeContext.h>
+#include <protocols/bdx/BdxTransferSession.h>
 
 #include <fstream>
 

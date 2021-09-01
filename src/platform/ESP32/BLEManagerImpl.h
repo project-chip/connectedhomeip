@@ -31,10 +31,10 @@
 
 #if CONFIG_BT_BLUEDROID_ENABLED
 
-#include <lib/core/CHIPCallback.h>
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
+#include <lib/core/CHIPCallback.h>
 #elif CONFIG_BT_NIMBLE_ENABLED
 
 /* min max macros in NimBLE can cause build issues with generic min max

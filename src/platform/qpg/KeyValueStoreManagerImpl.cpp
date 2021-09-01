@@ -22,8 +22,8 @@
  *          for Qorvo QPG platforms
  */
 
-#include <platform/KeyValueStoreManager.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/KeyValueStoreManager.h>
 
 namespace chip {
 namespace DeviceLayer {

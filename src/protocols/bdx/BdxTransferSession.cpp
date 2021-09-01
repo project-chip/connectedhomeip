@@ -6,14 +6,14 @@
 
 #include <protocols/bdx/BdxTransferSession.h>
 
-#include <protocols/Protocols.h>
-#include <protocols/bdx/BdxMessages.h>
-#include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/StatusReport.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <protocols/Protocols.h>
+#include <protocols/bdx/BdxMessages.h>
+#include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/StatusReport.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 

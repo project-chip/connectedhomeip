@@ -24,11 +24,11 @@
 
 #include <assert.h>
 #include <inet/InetLayer.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/temp_zcl/TempZCL.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
 using namespace chip;

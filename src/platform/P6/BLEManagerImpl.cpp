@@ -29,9 +29,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <ble/CHIPBleServiceData.h>
-#include <platform/internal/BLEManager.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/internal/BLEManager.h>
 
 extern "C" {
 #include "app_platform_cfg.h"

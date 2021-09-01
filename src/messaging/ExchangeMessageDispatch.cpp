@@ -31,11 +31,11 @@
 #include <inttypes.h>
 #include <memory>
 
+#include <lib/support/CodeUtils.h>
 #include <messaging/ExchangeMessageDispatch.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/secure_channel/Constants.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace Messaging {

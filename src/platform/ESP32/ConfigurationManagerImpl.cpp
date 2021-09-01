@@ -26,10 +26,10 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <lib/core/CHIPKeyIds.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
-#include <lib/support/CodeUtils.h>
 
 #include "esp_wifi.h"
 #include "nvs.h"

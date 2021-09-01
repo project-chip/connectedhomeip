@@ -28,9 +28,9 @@
 #include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/Linux/CHIPLinuxStorage.h>
 #include <platform/Linux/PosixConfig.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

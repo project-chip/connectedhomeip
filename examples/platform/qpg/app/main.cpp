@@ -33,10 +33,10 @@
 #include "qvCHIP.h"
 
 // CHIP includes
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 
 // Application level logic
 #include "AppTask.h"

@@ -31,12 +31,12 @@
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <lib/support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>

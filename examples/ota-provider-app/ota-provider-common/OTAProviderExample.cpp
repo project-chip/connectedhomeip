@@ -24,9 +24,9 @@
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <app/util/af.h>
 #include <lib/core/CHIPTLV.h>
-#include <protocols/secure_channel/PASESession.h> // For chip::kTestDeviceNodeId
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/RandUtils.h>
+#include <protocols/secure_channel/PASESession.h> // For chip::kTestDeviceNodeId
 
 #include <string.h>
 

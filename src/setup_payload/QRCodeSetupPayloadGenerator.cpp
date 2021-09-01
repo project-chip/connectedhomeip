@@ -30,9 +30,9 @@
 #include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
-#include <protocols/Protocols.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/RandUtils.h>
+#include <protocols/Protocols.h>
 
 #include <stdlib.h>
 #include <string.h>

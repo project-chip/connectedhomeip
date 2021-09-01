@@ -21,9 +21,9 @@
 
 #include <channel/Channel.h>
 #include <channel/ChannelContext.h>
-#include <messaging/ExchangeMgr.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Pool.h>
+#include <messaging/ExchangeMgr.h>
 
 namespace chip {
 namespace Messaging {

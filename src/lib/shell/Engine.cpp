@@ -26,9 +26,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/shell/Commands.h>
 #include <lib/support/CHIPMem.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include <assert.h>
 #include <ctype.h>

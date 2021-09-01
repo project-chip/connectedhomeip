@@ -22,10 +22,10 @@
  *      the Message Header class within the transport layer
  *
  */
-#include <protocols/Protocols.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <protocols/Protocols.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <nlunit-test.h>

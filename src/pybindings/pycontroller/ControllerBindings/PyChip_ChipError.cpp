@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 #include <lib/core/CHIPError.h>
-#include <sstream>
 #include <lib/support/TypeTraits.h>
+#include <sstream>
 
 #include <functional>
 #include <pybind11/pybind11.h>

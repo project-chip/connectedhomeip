@@ -23,8 +23,8 @@
  */
 
 #include <app/CommandPathParams.h>
-#include <nlunit-test.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <nlunit-test.h>
 
 namespace chip {
 namespace app {

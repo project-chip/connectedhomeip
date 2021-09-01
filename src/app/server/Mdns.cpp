@@ -22,13 +22,13 @@
 #include <lib/core/Optional.h>
 #include <lib/mdns/Advertiser.h>
 #include <lib/mdns/ServiceNaming.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
-#include <lib/support/Span.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <transport/FabricTable.h>
 
 #include <app/server/Server.h>

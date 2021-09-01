@@ -25,20 +25,20 @@
 #include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/mdns/ServiceNaming.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/SetupPayload.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>

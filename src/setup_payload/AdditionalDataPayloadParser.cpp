@@ -30,9 +30,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/support/CodeUtils.h>
 #include <protocols/Protocols.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip {
 

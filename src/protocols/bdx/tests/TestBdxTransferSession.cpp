@@ -7,12 +7,12 @@
 #include <nlunit-test.h>
 
 #include <lib/core/CHIPTLV.h>
-#include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/StatusReport.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/StatusReport.h>
 #include <system/SystemPacketBuffer.h>
 
 using namespace ::chip;

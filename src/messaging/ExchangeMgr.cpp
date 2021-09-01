@@ -35,13 +35,13 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
-#include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
-#include <protocols/Protocols.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/RandUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
+#include <protocols/Protocols.h>
 
 using namespace chip::Encoding;
 using namespace chip::Inet;

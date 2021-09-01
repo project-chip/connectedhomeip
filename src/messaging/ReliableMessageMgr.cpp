@@ -25,14 +25,14 @@
 
 #include <messaging/ReliableMessageMgr.h>
 
-#include <messaging/ErrorCategory.h>
-#include <messaging/ExchangeMessageDispatch.h>
-#include <messaging/Flags.h>
-#include <messaging/ReliableMessageContext.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ErrorCategory.h>
+#include <messaging/ExchangeMessageDispatch.h>
+#include <messaging/Flags.h>
+#include <messaging/ReliableMessageContext.h>
 
 namespace chip {
 namespace Messaging {

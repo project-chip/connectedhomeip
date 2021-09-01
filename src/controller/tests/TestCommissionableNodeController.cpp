@@ -17,8 +17,8 @@
  */
 
 #include <controller/CHIPCommissionableNodeController.h>
-#include <nlunit-test.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <nlunit-test.h>
 
 using namespace chip;
 using namespace chip::Mdns;

@@ -28,12 +28,12 @@
 #include <platform/ESP32/ESP32Config.h>
 
 #include <lib/core/CHIPEncoding.h>
-#include <platform/ESP32/ESP32Utils.h>
-#include <platform/ESP32/ScopedNvsHandle.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/ESP32/ESP32Utils.h>
+#include <platform/ESP32/ScopedNvsHandle.h>
 
 #include "nvs.h"
 #include "nvs_flash.h"

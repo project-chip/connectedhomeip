@@ -34,15 +34,15 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <protocols/Protocols.h>
-#include <protocols/secure_channel/Constants.h>
-#include <setup_payload/SetupPayload.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
+#include <protocols/Protocols.h>
+#include <protocols/secure_channel/Constants.h>
+#include <setup_payload/SetupPayload.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {

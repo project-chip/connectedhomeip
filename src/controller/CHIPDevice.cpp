@@ -43,8 +43,6 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <protocols/Protocols.h>
-#include <protocols/service_provisioning/ServiceProvisioning.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -53,6 +51,8 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <protocols/Protocols.h>
+#include <protocols/service_provisioning/ServiceProvisioning.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>

@@ -30,16 +30,16 @@
 
 #include <stddef.h>
 
+#include <credentials/CHIPCert.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
-#include <credentials/CHIPCert.h>
-#include <protocols/Protocols.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <protocols/Protocols.h>
 
 namespace chip {
 namespace Credentials {

@@ -31,11 +31,11 @@
 
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPKeyIds.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <protocols/secure_channel/Constants.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/Constants.h>
 #include <transport/FabricTable.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>

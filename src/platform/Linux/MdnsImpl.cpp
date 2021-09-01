@@ -25,10 +25,10 @@
 
 #include <netinet/in.h>
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using chip::Mdns::kMdnsTypeMaxSize;
 using chip::Mdns::MdnsServiceProtocol;

@@ -29,9 +29,9 @@
 #include <stdio.h>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;

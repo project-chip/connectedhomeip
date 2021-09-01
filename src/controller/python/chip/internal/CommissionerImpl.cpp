@@ -18,12 +18,12 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/KeyValueStoreManager.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/KeyValueStoreManager.h>
 
 #include "ChipThreadWork.h"
 

@@ -25,8 +25,8 @@
 
 #pragma once
 
-#include <lib/core/CHIPCore.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPCore.h>
 #include <lib/support/Span.h>
 #include <transport/raw/MessageHeader.h>
 

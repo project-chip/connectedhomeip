@@ -30,13 +30,13 @@
 #include <string>
 #include <unistd.h>
 
-#include <platform/Linux/CHIPLinuxStorage.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/Linux/CHIPLinuxStorage.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {

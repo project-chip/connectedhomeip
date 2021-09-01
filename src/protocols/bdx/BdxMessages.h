@@ -24,10 +24,10 @@
 
 #pragma once
 
-#include <protocols/Protocols.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
+#include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 namespace chip {
 namespace bdx {

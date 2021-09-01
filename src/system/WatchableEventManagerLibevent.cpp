@@ -20,8 +20,8 @@
  *      This file implements WatchableEventManager using libevent.
  */
 
-#include <platform/CHIPDeviceBuildConfig.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceBuildConfig.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 #include <system/WatchableEventManager.h>

@@ -39,12 +39,12 @@
 #include <errno.h>
 #include <getopt.h>
 #include <inttypes.h>
+#include <lib/support/SafeInt.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
 #include <strings.h>
-#include <lib/support/SafeInt.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>

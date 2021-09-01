@@ -24,8 +24,8 @@
 
 #pragma once
 
-#include <messaging/ExchangeMessageDispatch.h>
 #include <lib/support/CodeUtils.h>
+#include <messaging/ExchangeMessageDispatch.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {

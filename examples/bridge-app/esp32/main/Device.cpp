@@ -18,8 +18,8 @@
 #include "Device.h"
 
 #include <cstdio>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CHIPMemString.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip::Platform;
 

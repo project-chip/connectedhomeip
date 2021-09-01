@@ -38,9 +38,9 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#include <lib/support/ErrorStr.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <lib/support/ErrorStr.h>
 #include <system/SystemClock.h>
 
 #include <logging/log.h>

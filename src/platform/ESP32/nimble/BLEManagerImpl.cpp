@@ -31,9 +31,9 @@
 #if CONFIG_BT_NIMBLE_ENABLED
 
 #include <ble/CHIPBleServiceData.h>
-#include <platform/internal/BLEManager.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/internal/BLEManager.h>
 #include <system/SystemTimer.h>
 
 #include "esp_log.h"

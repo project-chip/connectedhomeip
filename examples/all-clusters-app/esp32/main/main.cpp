@@ -56,11 +56,11 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/shell/Engine.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/ErrorStr.h>
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>

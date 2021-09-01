@@ -18,8 +18,8 @@
 #include "PersistentStorage.h"
 
 #include <lib/core/CHIPEncoding.h>
-#include <protocols/secure_channel/PASESession.h>
 #include <lib/support/Base64.h>
+#include <protocols/secure_channel/PASESession.h>
 
 #include <fstream>
 #include <memory>

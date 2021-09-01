@@ -31,9 +31,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
-#include <protocols/Protocols.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/TypeTraits.h>
+#include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {

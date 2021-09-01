@@ -26,9 +26,9 @@
 #include <platform/Zephyr/ZephyrConfig.h>
 
 #include <lib/core/CHIPEncoding.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <settings/settings.h>
 

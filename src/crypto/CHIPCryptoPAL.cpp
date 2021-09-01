@@ -21,11 +21,11 @@
  */
 
 #include "CHIPCryptoPAL.h"
-#include <string.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <string.h>
 
 using chip::ByteSpan;
 using chip::MutableByteSpan;

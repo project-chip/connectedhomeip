@@ -27,9 +27,9 @@
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
 
-#include <platform/internal/BLEManager.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/internal/BLEManager.h>
 
 #include <type_traits>
 

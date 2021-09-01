@@ -46,14 +46,14 @@
 #endif
 
 #include <lib/core/CHIPEncoding.h>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
-#include <platform/OpenThread/OpenThreadUtils.h>
-#include <platform/ThreadStackManager.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FixedBufferAllocator.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <limits>
 

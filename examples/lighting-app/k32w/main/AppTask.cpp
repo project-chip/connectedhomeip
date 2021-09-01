@@ -18,15 +18,15 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
-#include <lib/support/ErrorStr.h>
 #include <app/server/Server.h>
+#include <lib/support/ErrorStr.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <lib/support/ThreadOperationalDataset.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
