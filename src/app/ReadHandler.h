@@ -143,7 +143,7 @@ private:
 
     const char * GetStateStr() const;
 
-    //Merges aAttributePath inside the existing internal mpAttributeClusterInfoList
+    // Merges aAttributePath inside the existing internal mpAttributeClusterInfoList
     bool MergeOverlappedAttributePath(ClusterInfo & aAttributePath);
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
