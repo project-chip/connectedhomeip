@@ -22,8 +22,8 @@
  */
 
 #include <platform/KeyValueStoreManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <logging/log.h>
 #include <settings/settings.h>

@@ -30,10 +30,10 @@
 // Include common private header
 #include "SystemLayerPrivate.h"
 
-#include <support/DLLUtil.h>
-#include <support/ErrorStr.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/ErrorStr.h>
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 // Include local headers
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

@@ -24,7 +24,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <support/crypto/CHIPRNG.h>
+#include <lib/support/crypto/CHIPRNG.h>
 
 #include <mbedtls/entropy_poll.h>
 

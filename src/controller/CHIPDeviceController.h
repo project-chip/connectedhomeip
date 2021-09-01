@@ -33,9 +33,9 @@
 #include <controller/AbstractMdnsDiscoveryController.h>
 #include <controller/CHIPDevice.h>
 #include <controller/OperationalCredentialsDelegate.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPPersistentStorageDelegate.h>
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPTLV.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <lib/support/Span.h>
 #include <messaging/ExchangeMgr.h>
@@ -43,8 +43,8 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
-#include <support/DLLUtil.h>
-#include <support/SerializableIntegerSet.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/SerializableIntegerSet.h>
 #include <transport/FabricTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
@@ -59,7 +59,7 @@
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <controller/DeviceAddressUpdateDelegate.h>
-#include <mdns/Resolver.h>
+#include <lib/mdns/Resolver.h>
 #endif
 
 namespace chip {

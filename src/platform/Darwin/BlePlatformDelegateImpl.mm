@@ -30,7 +30,7 @@
 #include <ble/BleLayer.h>
 #include <ble/BleUUID.h>
 #include <platform/Darwin/BlePlatformDelegate.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #import "UUIDHelper.h"
 

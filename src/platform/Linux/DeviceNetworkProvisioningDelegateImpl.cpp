@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "DeviceNetworkProvisioningDelegateImpl.h"
 

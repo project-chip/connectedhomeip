@@ -27,13 +27,13 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
-#include <core/CHIPTLVTags.h>
-#include <core/CHIPTLVTypes.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLVTags.h>
+#include <lib/core/CHIPTLVTypes.h>
 
-#include <support/DLLUtil.h>
-#include <support/Span.h>
-#include <support/TypeTraits.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
 
 #include <stdarg.h>
 #include <stdlib.h>

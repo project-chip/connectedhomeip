@@ -40,7 +40,7 @@
 #include <sys/time.h>
 
 #include <inet/InetLayer.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 #include <system/SystemLayer.h>
 
 #define CHIP_TOOL_COPYRIGHT "Copyright (c) 2020 Project CHIP Authors\nAll rights reserved.\n"

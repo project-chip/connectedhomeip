@@ -30,11 +30,11 @@
 #pragma once
 
 #include <controller/OperationalCredentialsDelegate.h>
-#include <core/CHIPError.h>
-#include <core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <support/CodeUtils.h>
-#include <support/Span.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace Controller {

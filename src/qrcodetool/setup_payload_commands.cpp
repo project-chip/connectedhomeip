@@ -19,7 +19,7 @@
 
 #include <setup_payload/SetupPayloadHelper.h>
 #include <stdio.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <unistd.h>
 
 using namespace chip;

@@ -27,7 +27,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

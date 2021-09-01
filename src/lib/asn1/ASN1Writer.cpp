@@ -33,12 +33,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <asn1/ASN1.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <core/CHIPTLV.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
+#include <lib/asn1/ASN1.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPTLV.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace ASN1 {

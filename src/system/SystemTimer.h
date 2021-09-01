@@ -31,7 +31,7 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #include <system/SystemClock.h>
 #include <system/SystemError.h>

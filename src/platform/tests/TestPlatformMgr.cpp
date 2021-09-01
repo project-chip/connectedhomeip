@@ -29,10 +29,10 @@
 #include <string.h>
 
 #include <nlunit-test.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
-#include <support/UnitTestUtils.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/UnitTestUtils.h>
 
 #include <platform/CHIPDeviceLayer.h>
 

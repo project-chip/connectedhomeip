@@ -19,11 +19,11 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <core/CHIPCallback.h>
-#include <core/PeerId.h>
+#include <lib/core/CHIPCallback.h>
+#include <lib/core/PeerId.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <support/DLLUtil.h>
-#include <support/Span.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {

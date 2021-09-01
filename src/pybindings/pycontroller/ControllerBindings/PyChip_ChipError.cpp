@@ -14,9 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <sstream>
-#include <support/TypeTraits.h>
+#include <lib/support/TypeTraits.h>
 
 #include <functional>
 #include <pybind11/pybind11.h>

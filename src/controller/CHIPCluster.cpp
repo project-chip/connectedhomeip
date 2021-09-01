@@ -27,7 +27,7 @@
 #include <app/InteractionModelEngine.h>
 #include <controller/CHIPCluster.h>
 #include <protocols/temp_zcl/TempZCL.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace Controller {

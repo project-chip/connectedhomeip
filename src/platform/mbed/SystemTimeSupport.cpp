@@ -26,8 +26,8 @@
 #include <inttypes.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <support/TimeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/TimeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "platform/mbed_rtc_time.h"
 #include <Kernel.h>

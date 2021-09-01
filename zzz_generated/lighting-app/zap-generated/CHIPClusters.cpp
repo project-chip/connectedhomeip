@@ -21,9 +21,9 @@
 
 #include <cstdint>
 
-#include <support/BufferWriter.h>
-#include <support/SafeInt.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>

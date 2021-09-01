@@ -29,10 +29,10 @@
 #include <messaging/ExchangeMessageDispatch.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
-#include <support/BitFlags.h>
-#include <support/CHIPFaultInjection.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/CHIPFaultInjection.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Messaging {

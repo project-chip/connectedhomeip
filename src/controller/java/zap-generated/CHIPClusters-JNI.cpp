@@ -24,10 +24,10 @@
 #include <controller/java/JniReferences.h>
 #include <controller/java/JniTypeWrappers.h>
 #include <controller/java/StackLock.h>
-#include <core/CHIPSafeCasts.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <jni.h>
 #include <lib/support/Span.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME

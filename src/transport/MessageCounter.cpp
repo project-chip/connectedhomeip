@@ -23,7 +23,7 @@
 #include <transport/MessageCounter.h>
 
 #include <platform/CHIPDeviceLayer.h>
-#include <support/RandUtils.h>
+#include <lib/support/RandUtils.h>
 
 namespace chip {
 

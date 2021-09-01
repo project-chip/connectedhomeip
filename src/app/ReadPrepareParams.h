@@ -21,8 +21,8 @@
 #include <app/AttributePathParams.h>
 #include <app/EventPathParams.h>
 #include <app/util/basic-types.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
 
 namespace chip {

@@ -20,8 +20,8 @@
 
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

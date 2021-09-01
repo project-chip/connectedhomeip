@@ -18,7 +18,7 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "support/ErrorStr.h"
+#include <lib/support/ErrorStr.h>
 #include <app/server/Server.h>
 
 #include <app/server/OnboardingCodesUtil.h>
@@ -26,7 +26,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <support/ThreadOperationalDataset.h>
+#include <lib/support/ThreadOperationalDataset.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>

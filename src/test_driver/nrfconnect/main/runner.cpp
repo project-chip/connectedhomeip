@@ -16,9 +16,9 @@
  */
 
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestRegistration.h>
 
 #include <logging/log.h>
 #include <settings/settings.h>

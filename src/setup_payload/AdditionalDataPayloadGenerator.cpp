@@ -25,15 +25,15 @@
 #include "AdditionalDataPayloadGenerator.h"
 #include "AdditionalDataPayload.h"
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <core/CHIPSafeCasts.h>
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/CHIPTLV.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <stdlib.h>
-#include <support/BufferWriter.h>
-#include <support/BytesToHex.h>
-#include <support/CHIPMem.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMem.h>
 
 using namespace chip;
 using namespace chip::System;

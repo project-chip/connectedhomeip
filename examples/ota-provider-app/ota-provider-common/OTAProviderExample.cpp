@@ -23,10 +23,10 @@
 #include <app/CommandPathParams.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <app/util/af.h>
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPTLV.h>
 #include <protocols/secure_channel/PASESession.h> // For chip::kTestDeviceNodeId
-#include <support/CHIPMemString.h>
-#include <support/RandUtils.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/RandUtils.h>
 
 #include <string.h>
 

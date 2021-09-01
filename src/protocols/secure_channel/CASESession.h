@@ -36,7 +36,7 @@
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
-#include <support/Base64.h>
+#include <lib/support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/FabricTable.h>
 #include <transport/PairingSession.h>

@@ -27,7 +27,7 @@
 #include <platform/Darwin/BleApplicationDelegate.h>
 #include <platform/Darwin/BleConnectionDelegate.h>
 #include <platform/Darwin/BlePlatformDelegate.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <new>
 

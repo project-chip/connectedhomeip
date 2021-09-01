@@ -21,7 +21,7 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <map>
 #include <string>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 CHIP_ERROR MediaInputManager::Init()
 {

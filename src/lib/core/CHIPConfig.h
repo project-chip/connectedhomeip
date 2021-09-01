@@ -36,7 +36,7 @@
 #pragma once
 
 #if CHIP_HAVE_CONFIG_H
-#include <core/CHIPBuildConfig.h>
+#include <lib/core/CHIPBuildConfig.h>
 #endif
 
 #include <ble/BleConfig.h>

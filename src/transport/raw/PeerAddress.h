@@ -25,7 +25,7 @@
 
 #include <stdio.h>
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 

@@ -26,8 +26,8 @@
 
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
-#include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <thread>
 

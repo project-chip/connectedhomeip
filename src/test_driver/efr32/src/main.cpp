@@ -27,9 +27,9 @@
 #include <pigweed/RpcService.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <task.h>
 
 extern "C" int printf(const char * format, ...)

@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <transport/SecureSession.h>
 
 namespace chip {

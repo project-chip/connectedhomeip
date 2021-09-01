@@ -1,6 +1,6 @@
 {{> header}}
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>

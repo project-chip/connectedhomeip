@@ -52,15 +52,15 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <inet/IPAddress.h>
-#include <mdns/Resolver.h>
+#include <lib/mdns/Resolver.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
-#include <support/BytesToHex.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/ScopedBuffer.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::Ble;

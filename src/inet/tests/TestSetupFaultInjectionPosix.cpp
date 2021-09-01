@@ -30,9 +30,9 @@
 #include "TestSetupFaultInjection.h"
 #include <inet/InetFaultInjection.h>
 #include <stdio.h>
-#include <support/CHIPFaultInjection.h>
-#include <support/CodeUtils.h>
-#include <support/ScopedBuffer.h>
+#include <lib/support/CHIPFaultInjection.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
 #include <system/SystemFaultInjection.h>
 
 struct RestartCallbackContext

@@ -31,18 +31,18 @@
 
 #include <stddef.h>
 
-#include <asn1/ASN1.h>
-#include <asn1/ASN1Macros.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPSafeCasts.h>
-#include <core/CHIPTLV.h>
+#include <lib/asn1/ASN1.h>
+#include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/CHIPTLV.h>
 #include <credentials/CHIPCert.h>
 #include <protocols/Protocols.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
-#include <support/TimeUtils.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
+#include <lib/support/TimeUtils.h>
 
 namespace chip {
 namespace Credentials {

@@ -1,6 +1,6 @@
 #include <platform/logging/LogV.h>
 #include <stdio.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

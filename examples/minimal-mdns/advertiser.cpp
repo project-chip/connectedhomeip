@@ -20,11 +20,11 @@
 #include <arpa/inet.h>
 #include <strings.h>
 
-#include <mdns/Advertiser.h>
+#include <lib/mdns/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/Span.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/Span.h>
 
 using namespace chip;
 

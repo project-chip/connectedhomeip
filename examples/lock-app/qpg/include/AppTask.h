@@ -28,7 +28,7 @@
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/BLEEndPoint.h>
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
 // Application-defined error codes in the CHIP_ERROR space.

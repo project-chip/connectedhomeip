@@ -34,7 +34,7 @@
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
 
-#include <support/CHIPPlatformMemory.h>
+#include <lib/support/CHIPPlatformMemory.h>
 
 namespace chip {
 namespace DeviceLayer {

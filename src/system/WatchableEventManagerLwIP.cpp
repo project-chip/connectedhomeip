@@ -21,7 +21,7 @@
  *      This file implements WatchableEventManager using LwIP.
  */
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 #include <system/LwIPEventSupport.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>

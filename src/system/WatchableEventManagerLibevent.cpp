@@ -21,7 +21,7 @@
  */
 
 #include <platform/CHIPDeviceBuildConfig.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 #include <system/WatchableEventManager.h>

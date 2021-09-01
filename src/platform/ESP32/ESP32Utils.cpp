@@ -25,9 +25,9 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ESP32/ESP32Utils.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "esp_event.h"
 #include "esp_netif.h"

@@ -27,9 +27,9 @@
 #include "CHIPDeviceManager.h"
 #include <app/util/basic-types.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
 
 using namespace ::chip;
 

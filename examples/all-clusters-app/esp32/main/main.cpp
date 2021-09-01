@@ -59,8 +59,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <support/CHIPMem.h>
-#include <support/ErrorStr.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/ErrorStr.h>
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>

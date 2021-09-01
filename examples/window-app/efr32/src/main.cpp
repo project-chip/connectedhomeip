@@ -25,8 +25,8 @@
 #include <mbedtls/threading.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <mbedtls/platform.h>

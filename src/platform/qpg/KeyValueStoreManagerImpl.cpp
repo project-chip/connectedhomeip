@@ -23,7 +23,7 @@
  */
 
 #include <platform/KeyValueStoreManager.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -21,8 +21,8 @@
 
 #include "mbedtls/platform.h"
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #ifdef MBED_CONF_MBED_TRACE_ENABLE
 #include "mbed-trace/mbed_trace.h"
