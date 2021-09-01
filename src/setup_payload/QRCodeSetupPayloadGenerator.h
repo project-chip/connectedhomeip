@@ -82,10 +82,26 @@ public:
      */
     CHIP_ERROR payloadBase38Representation(std::string & base38Representation, uint8_t * tlvDataStart, uint32_t tlvDataStartSize);
 
+private:
+    CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,
+                                           size_t & tlvDataLengthInBytes);
+};
+
+/**
+ * A minimal QR code setup payload generator that omits any optional data,
+ * for compatibility with devices that don't support std::string or STL.
+ */
+class QRCodeBasicSetupPayloadGenerator
+{
+private:
+    PayloadContents mPayload;
+
+public:
+    QRCodeBasicSetupPayloadGenerator(const PayloadContents & payload) : mPayload(payload) {}
+
     /**
      * This function is called to encode the binary data of a payload to a
-     * base38 null-terminated string. The payload's optional data is ignored
-     * for compatibility with devices that don't support std::string or STL.
+     * base38 null-terminated string.
      *
      * @param[out] outBuffer
      *                  The buffer to copy the base38 to.
@@ -97,11 +113,7 @@ public:
      *               that an error occurred preventing the function from
      *               producing the requested string.
      */
-    CHIP_ERROR payloadBase38RepresentationWithoutOptional(MutableCharSpan & outBuffer);
-
-private:
-    CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,
-                                           size_t & tlvDataLengthInBytes);
+    CHIP_ERROR payloadBase38Representation(MutableCharSpan & outBuffer);
 };
 
 } // namespace chip
