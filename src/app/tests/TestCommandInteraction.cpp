@@ -97,14 +97,6 @@ bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCom
     return (aEndPointId == kTestEndpointId && aClusterId == kTestClusterId && aCommandId == kTestCommandId);
 }
 
-CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter * apWriter, bool * apDataExists)
-{
-    // We do not really care about the value, just return a not found status code.
-    VerifyOrReturnError(apWriter != nullptr, CHIP_NO_ERROR);
-    return apWriter->Put(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Status),
-                         static_cast<uint16_t>(Protocols::InteractionModel::ProtocolCode::UnsupportedAttribute));
-}
-
 class TestCommandInteraction
 {
 public:
