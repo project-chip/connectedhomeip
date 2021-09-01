@@ -364,20 +364,20 @@ void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
 void InteractionModelEngine::ReleaseClearClusterInfoList(ClusterInfo *& aClusterInfo)
 {
     ClusterInfo * updateList = nullptr;
-    ClusterInfo * runner = aClusterInfo;
+    ClusterInfo * runner     = aClusterInfo;
     if (aClusterInfo == nullptr)
     {
         return;
     }
-    while(runner != nullptr)
+    while (runner != nullptr)
     {
         ClusterInfo * next = runner->mpNext;
         if (runner->IsDirty())
         {
-            if(updateList != nullptr)
+            if (updateList != nullptr)
             {
                 runner->mpNext = updateList;
-                updateList = runner;
+                updateList     = runner;
             }
             else
             {
@@ -386,7 +386,7 @@ void InteractionModelEngine::ReleaseClearClusterInfoList(ClusterInfo *& aCluster
         }
         else
         {
-            runner->mpNext = mpNextAvailableClusterInfo;
+            runner->mpNext             = mpNextAvailableClusterInfo;
             mpNextAvailableClusterInfo = runner;
         }
         runner = next;

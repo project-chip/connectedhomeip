@@ -309,7 +309,7 @@ void ReadHandler::FilterOverlappedPath(ClusterInfo *& aClusterInfoList)
     while (runner1 != nullptr)
     {
         runner2 = aClusterInfoList;
-        while(runner2 != nullptr)
+        while (runner2 != nullptr)
         {
             if (runner1 == runner2)
             {
