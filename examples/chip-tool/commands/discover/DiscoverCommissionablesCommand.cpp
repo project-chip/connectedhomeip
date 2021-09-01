@@ -43,6 +43,7 @@ void DiscoverCommissionablesCommand::Shutdown()
 
         ChipLogProgress(Discovery, "Commissionable Node %d", i);
         ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->hostName);
+        ChipLogProgress(Discovery, "\tPort:\t\t\t%u", dnsSdInfo->port);
         ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->longDiscriminator);
         ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->vendorId);
         ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", dnsSdInfo->productId);

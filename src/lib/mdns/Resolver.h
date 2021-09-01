@@ -152,54 +152,50 @@ struct DiscoveredNodeData
 #endif // CHIP_ENABLE_ROTATING_DEVICE_ID
         if (strlen(deviceName) != 0)
         {
-            ChipLogDetail(Discovery, "Device Name: %s", deviceName);
+            ChipLogDetail(Discovery, "\tDevice Name: %s", deviceName);
         }
         if (vendorId > 0)
         {
-            ChipLogDetail(Discovery, "Vendor ID: %u", vendorId);
+            ChipLogDetail(Discovery, "\tVendor ID: %u", vendorId);
         }
         if (productId > 0)
         {
-            ChipLogDetail(Discovery, "Product ID: %u", productId);
+            ChipLogDetail(Discovery, "\tProduct ID: %u", productId);
         }
         if (deviceType > 0)
         {
-            ChipLogDetail(Discovery, "Device Type: %u", deviceType);
+            ChipLogDetail(Discovery, "\tDevice Type: %u", deviceType);
         }
         if (longDiscriminator > 0)
         {
-            ChipLogDetail(Discovery, "Long Discriminator: %u", longDiscriminator);
-        }
-        if (additionalPairing > 0)
-        {
-            ChipLogDetail(Discovery, "Additional Pairing: %u", additionalPairing);
+            ChipLogDetail(Discovery, "\tLong Discriminator: %u", longDiscriminator);
         }
         if (strlen(pairingInstruction) != 0)
         {
-            ChipLogDetail(Discovery, "Pairing Instruction: %s", pairingInstruction);
+            ChipLogDetail(Discovery, "\tPairing Instruction: %s", pairingInstruction);
         }
         if (pairingHint > 0)
         {
-            ChipLogDetail(Discovery, "Pairing Hint: 0x%x", pairingHint);
+            ChipLogDetail(Discovery, "\tPairing Hint: 0x%x", pairingHint);
         }
         if (!IsHost(""))
         {
-            ChipLogDetail(Discovery, "Hostname: %s", hostName);
+            ChipLogDetail(Discovery, "\tHostname: %s", hostName);
         }
         for (int j = 0; j < numIPs; j++)
         {
 #if CHIP_DETAIL_LOGGING
             char buf[Inet::kMaxIPAddressStringLength];
             char * ipAddressOut = ipAddress[j].ToString(buf);
-            ChipLogDetail(Discovery, "IP Address #%d: %s", j + 1, ipAddressOut);
+            ChipLogDetail(Discovery, "\tIP Address #%d: %s", j + 1, ipAddressOut);
             (void) ipAddressOut;
 #endif // CHIP_DETAIL_LOGGING
         }
         if (port > 0)
         {
-            ChipLogDetail(Discovery, "Port: %u", port);
+            ChipLogDetail(Discovery, "\tPort: %u", port);
         }
-        ChipLogDetail(Discovery, "Commissioning Mode: %u", commissioningMode);
+        ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
     }
 };
 
