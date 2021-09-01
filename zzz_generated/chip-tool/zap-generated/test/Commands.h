@@ -18017,9 +18017,9 @@ private:
             return;
         }
 
-        if (clusterRevision != 3U)
+        if (clusterRevision != 5U)
         {
-            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "3");
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "5");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
@@ -18080,9 +18080,9 @@ private:
             return;
         }
 
-        if (clusterRevision != 3U)
+        if (clusterRevision != 5U)
         {
-            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "3");
+            ChipLogError(chipTool, "Error: Value mismatch. Expected: '%s'", "5");
             runner->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
             return;
         }
