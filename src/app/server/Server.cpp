@@ -438,8 +438,8 @@ void InitServer(AppDelegate * delegate)
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
     SuccessOrExit(err);
 
-    err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalFabricTable(),
-                                                    &gSessionIDAllocator);
+    err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
+                                                    &gSessions, &GetGlobalFabricTable(), &gSessionIDAllocator);
     SuccessOrExit(err);
 
 exit:

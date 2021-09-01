@@ -37,8 +37,8 @@ public:
     }
 
     CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                             SecureSessionMgr * sessionMgr, Transport::FabricTable * fabrics,
-                                             SessionIDAllocator * idAllocator);
+                                             Ble::BleLayer * bleLayer, SecureSessionMgr * sessionMgr,
+                                             Transport::FabricTable * fabrics, SessionIDAllocator * idAllocator);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -62,6 +62,7 @@ private:
     CASESession mPairingSession;
     uint16_t mSessionKeyId         = 0;
     SecureSessionMgr * mSessionMgr = nullptr;
+    Ble::BleLayer * mBleLayer      = nullptr;
 
     Transport::FabricTable * mFabrics = nullptr;
 
