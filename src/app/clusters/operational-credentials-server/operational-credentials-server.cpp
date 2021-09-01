@@ -90,25 +90,27 @@ EmberAfStatus writeFabric(FabricIndex fabricIndex, FabricId fabricId, NodeId nod
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    EmberAfFabricDescriptor fabricDescriptor;
+    EmberAfFabricDescriptor * fabricDescriptor = chip::Platform::New<EmberAfFabricDescriptor>();
+    VerifyOrReturnError(fabricDescriptor != nullptr, EMBER_ZCL_STATUS_FAILURE);
 
-    fabricDescriptor.FabricIndex   = fabricIndex;
-    fabricDescriptor.RootPublicKey = ByteSpan(rootPubkey.ConstBytes(), rootPubkey.Length());
+    fabricDescriptor->FabricIndex   = fabricIndex;
+    fabricDescriptor->RootPublicKey = ByteSpan(rootPubkey.ConstBytes(), rootPubkey.Length());
 
-    fabricDescriptor.VendorId = vendorId;
-    fabricDescriptor.FabricId = fabricId;
-    fabricDescriptor.NodeId   = nodeId;
+    fabricDescriptor->VendorId = vendorId;
+    fabricDescriptor->FabricId = fabricId;
+    fabricDescriptor->NodeId   = nodeId;
     if (fabricLabel != nullptr)
     {
-        size_t lengthToStore   = strnlen(Uint8::to_const_char(fabricLabel), kFabricLabelMaxLengthInBytes);
-        fabricDescriptor.Label = ByteSpan(fabricLabel, lengthToStore);
+        size_t lengthToStore    = strnlen(Uint8::to_const_char(fabricLabel), kFabricLabelMaxLengthInBytes);
+        fabricDescriptor->Label = ByteSpan(fabricLabel, lengthToStore);
     }
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                    "OpCreds: Writing fabric into attribute store at index %d: fabricId 0x" ChipLogFormatX64
                    ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
                    index, ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
-    status = writeFabricAttribute((uint8_t *) &fabricDescriptor, static_cast<int32_t>(index));
+    status = writeFabricAttribute((uint8_t *) fabricDescriptor, static_cast<int32_t>(index));
+    chip::Platform::Delete(fabricDescriptor);
     return status;
 }
 
