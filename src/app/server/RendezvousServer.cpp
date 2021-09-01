@@ -185,10 +185,7 @@ void RendezvousServer::OnSessionEstablished()
     }
     else
     {
-        // TODO: remove this once we move all tools / examples onto cluster-based IP commissioning.
-#if CONFIG_RENDEZVOUS_WAIT_FOR_COMMISSIONING_COMPLETE
         Cleanup();
-#endif
     }
 
     ChipLogProgress(AppServer, "Device completed Rendezvous process");

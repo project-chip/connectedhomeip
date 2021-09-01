@@ -54,6 +54,8 @@
 #include <lib/core/NodeId.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
@@ -1037,6 +1039,53 @@ CHIP_ERROR DeviceCommissioner::OperationalDiscoveryComplete(NodeId remoteDeviceI
     PersistNextKeyId();
 
     return GetConnectedDevice(remoteDeviceId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+}
+
+CHIP_ERROR DeviceCommissioner::OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration,
+                                                       uint16_t discriminator, uint8_t option)
+{
+    ChipLogProgress(Controller, "OperationalDiscoveryComplete for device ID %" PRIu64, deviceId);
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+
+    Device * device = nullptr;
+    ReturnErrorOnFailure(GetDevice(deviceId, &device));
+
+    std::string QRCode;
+    std::string manualPairingCode;
+    SetupPayload payload;
+    Device::PairingWindowOption pairingWindowOption;
+    ByteSpan salt(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt));
+
+    payload.discriminator = discriminator;
+
+    switch (option)
+    {
+    case 0:
+        pairingWindowOption = Device::PairingWindowOption::kOriginalSetupCode;
+        break;
+    case 1:
+        pairingWindowOption = Device::PairingWindowOption::kTokenWithRandomPIN;
+        break;
+    case 2:
+        pairingWindowOption = Device::PairingWindowOption::kTokenWithProvidedPIN;
+        break;
+    default:
+        ChipLogError(Controller, "Invalid Pairing Window option");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    ReturnErrorOnFailure(device->OpenCommissioningWindow(timeout, iteration, pairingWindowOption, salt, payload));
+
+    if (pairingWindowOption != Device::PairingWindowOption::kOriginalSetupCode)
+    {
+        ReturnErrorOnFailure(ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode));
+        ChipLogProgress(Controller, "Manual pairing code: [%s]", manualPairingCode.c_str());
+
+        ReturnErrorOnFailure(QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(QRCode));
+        ChipLogProgress(Controller, "SetupQRCode: [%s]", QRCode.c_str());
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 void DeviceCommissioner::FreeRendezvousSession()
