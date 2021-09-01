@@ -33,11 +33,11 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
-#include <protocols/Protocols.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/RandUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
+#include <protocols/Protocols.h>
 
 namespace chip {
 

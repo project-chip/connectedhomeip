@@ -26,10 +26,10 @@
 
 #include "CHIPDeviceManager.h"
 #include <app/util/basic-types.h>
-#include <setup_payload/SetupPayload.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
+#include <setup_payload/SetupPayload.h>
 
 using namespace ::chip;
 

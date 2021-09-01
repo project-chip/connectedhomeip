@@ -25,8 +25,8 @@
  */
 
 #include "chip-cert.h"
-#include <protocols/Protocols.h>
 #include <lib/support/BufferWriter.h>
+#include <protocols/Protocols.h>
 
 using namespace chip;
 using namespace chip::Protocols;

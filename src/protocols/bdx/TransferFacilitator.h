@@ -22,10 +22,10 @@
  */
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <protocols/bdx/BdxTransferSession.h>
-#include <lib/support/BitFlags.h>
 #include <system/SystemLayer.h>
 
 #pragma once

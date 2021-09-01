@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/ESP32/ESP32Utils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/ESP32/ESP32Utils.h>
 
 #include <algorithm>
 

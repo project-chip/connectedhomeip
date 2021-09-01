@@ -30,9 +30,9 @@
 #pragma once
 
 #include <controller/OperationalCredentialsDelegate.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 

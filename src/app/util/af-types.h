@@ -55,8 +55,8 @@
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.
 
-#include <messaging/ExchangeContext.h>
 #include <lib/support/Variant.h>
+#include <messaging/ExchangeContext.h>
 
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"

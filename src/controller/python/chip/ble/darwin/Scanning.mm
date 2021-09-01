@@ -1,8 +1,8 @@
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
-#include <platform/Darwin/UUIDHelper.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/Darwin/UUIDHelper.h>
 
 #import <CoreBluetooth/CoreBluetooth.h>
 

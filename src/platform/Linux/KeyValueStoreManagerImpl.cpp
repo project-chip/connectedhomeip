@@ -26,9 +26,9 @@
 #include <algorithm>
 #include <string.h>
 
-#include <platform/Linux/CHIPLinuxStorage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/Linux/CHIPLinuxStorage.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -28,9 +28,9 @@
 #include <platform/Zephyr/BLEManagerImpl.h>
 
 #include <ble/CHIPBleServiceData.h>
-#include <platform/internal/BLEManager.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/internal/BLEManager.h>
 
 #include <bluetooth/addr.h>
 #include <bluetooth/gatt.h>

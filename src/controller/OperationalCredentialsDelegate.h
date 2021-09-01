@@ -19,9 +19,9 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/PeerId.h>
-#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Span.h>
 #include <transport/raw/MessageHeader.h>

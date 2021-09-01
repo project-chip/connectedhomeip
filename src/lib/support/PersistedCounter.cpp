@@ -18,9 +18,9 @@
  */
 #include "PersistedCounter.h"
 
-#include <platform/PersistedStorage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PersistedStorage.h>
 
 #include <stdlib.h>
 #include <string.h>

@@ -24,15 +24,15 @@
 #pragma once
 
 #include <lib/core/ReferenceCounted.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/ReferenceCountedHandle.h>
+#include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeACL.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 #include <protocols/Protocols.h>
-#include <lib/support/BitFlags.h>
-#include <lib/support/DLLUtil.h>
-#include <lib/support/ReferenceCountedHandle.h>
-#include <lib/support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {

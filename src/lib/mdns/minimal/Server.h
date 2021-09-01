@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
 #include <inet/UDPEndPoint.h>
+#include <lib/core/CHIPError.h>
 
 #include <lib/mdns/minimal/core/BytesRange.h>
 

@@ -23,12 +23,12 @@
 
 #import "CHIPLogging.h"
 
-#include <lib/core/CHIPTLV.h>
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/support/TimeUtils.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/TimeUtils.h>
 
 constexpr const char kOperationalCredentialsRootCertificateStorage[] = "MatterCARootCert";
 

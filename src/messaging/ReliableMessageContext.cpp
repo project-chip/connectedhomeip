@@ -28,13 +28,13 @@
 #include <messaging/ReliableMessageContext.h>
 
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Defer.h>
 #include <messaging/ErrorCategory.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/Defer.h>
 
 namespace chip {
 namespace Messaging {

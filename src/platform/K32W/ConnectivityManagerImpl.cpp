@@ -19,10 +19,10 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/internal/BLEManager.h>
 
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>

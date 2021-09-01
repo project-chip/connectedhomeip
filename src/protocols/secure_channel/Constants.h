@@ -25,8 +25,8 @@
 
 #pragma once
 
-#include <protocols/Protocols.h>
 #include <lib/support/CodeUtils.h>
+#include <protocols/Protocols.h>
 
 /**
  *   @namespace chip::Protocols::SecureChannel

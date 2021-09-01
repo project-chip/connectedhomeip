@@ -41,10 +41,10 @@
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
 #include <lib/core/CHIPError.h>
-#include <nlunit-test.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <nlunit-test.h>
 
 #include <stdarg.h>
 #include <stdint.h>

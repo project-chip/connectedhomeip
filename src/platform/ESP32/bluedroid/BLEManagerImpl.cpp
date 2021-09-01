@@ -32,9 +32,9 @@
 #if CONFIG_BT_BLUEDROID_ENABLED
 
 #include <ble/CHIPBleServiceData.h>
-#include <platform/internal/BLEManager.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/internal/BLEManager.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"

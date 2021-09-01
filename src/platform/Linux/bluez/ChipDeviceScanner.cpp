@@ -24,8 +24,8 @@
 #include "Types.h"
 
 #include <errno.h>
-#include <pthread.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <pthread.h>
 
 namespace chip {
 namespace DeviceLayer {

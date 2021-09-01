@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <stdio.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <stdio.h>
 
 namespace {
 

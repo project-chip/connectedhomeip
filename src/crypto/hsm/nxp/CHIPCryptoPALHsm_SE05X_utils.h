@@ -23,8 +23,8 @@
 #include <crypto/hsm/CHIPCryptoPALHsm.h>
 #include <type_traits>
 
-#include <lib/core/CHIPSafeCasts.h>
 #include <crypto/hsm/CHIPCryptoPALHsm_config.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>

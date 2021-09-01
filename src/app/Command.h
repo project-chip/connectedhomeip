@@ -30,14 +30,14 @@
 #include <app/MessageDef/CommandList.h>
 #include <app/MessageDef/InvokeCommand.h>
 #include <lib/core/CHIPCore.h>
-#include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
-#include <messaging/Flags.h>
-#include <protocols/Protocols.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
+#include <messaging/Flags.h>
+#include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 

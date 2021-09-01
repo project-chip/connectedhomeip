@@ -25,11 +25,11 @@
 #include "TestMessagingLayer.h"
 
 #include <lib/core/CHIPCore.h>
+#include <lib/support/CodeUtils.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
-#include <lib/support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 

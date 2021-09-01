@@ -19,9 +19,9 @@
 
 #include <glib.h>
 
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 #include "BluezObjectIterator.h"
 

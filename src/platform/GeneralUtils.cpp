@@ -22,8 +22,8 @@
  *          General utility functions available on all platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -26,11 +26,11 @@
 #include <lib/support/CodeUtils.h>
 
 #include <lib/core/CHIPTLV.h>
-#include <platform/KeyValueStoreManager.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <platform/KeyValueStoreManager.h>
 
 using namespace chip;
 using namespace chip::Controller;

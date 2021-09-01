@@ -21,10 +21,10 @@
 #include <strings.h>
 
 #include <lib/mdns/Advertiser.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 

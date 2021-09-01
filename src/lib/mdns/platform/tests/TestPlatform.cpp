@@ -18,9 +18,9 @@
 
 #include <lib/core/PeerId.h>
 #include <lib/mdns/Discovery_ImplPlatform.h>
-#include <platform/fake/MdnsImpl.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/fake/MdnsImpl.h>
 
 #include <nlunit-test.h>
 

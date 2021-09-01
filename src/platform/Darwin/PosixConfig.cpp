@@ -28,8 +28,8 @@
 #include <platform/internal/testing/ConfigUnitTest.h>
 
 #include <lib/core/CHIPEncoding.h>
-#include <platform/Darwin/PosixConfig.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/Darwin/PosixConfig.h>
 
 namespace chip {
 namespace DeviceLayer {

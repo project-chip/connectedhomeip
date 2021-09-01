@@ -27,9 +27,9 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 

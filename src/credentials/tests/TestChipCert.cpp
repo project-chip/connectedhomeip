@@ -24,10 +24,10 @@
  *
  */
 
-#include <lib/core/CHIPTLV.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>

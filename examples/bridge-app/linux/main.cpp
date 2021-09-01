@@ -29,14 +29,14 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
-#include <lib/core/CHIPError.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/RandUtils.h>
 #include <lib/support/ZclString.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/RandUtils.h>
 
 #include "Device.h"
 #include "Options.h"

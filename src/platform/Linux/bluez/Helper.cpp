@@ -50,12 +50,12 @@
 
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <protocols/Protocols.h>
-#include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <protocols/Protocols.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <cassert>
@@ -67,8 +67,8 @@
 #include <unistd.h>
 #include <utility>
 
-#include <platform/Linux/BLEManagerImpl.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/Linux/BLEManagerImpl.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include "BluezObjectIterator.h"

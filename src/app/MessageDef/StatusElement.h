@@ -30,9 +30,9 @@
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
-#include <protocols/secure_channel/Constants.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <protocols/secure_channel/Constants.h>
 
 namespace chip {
 namespace app {

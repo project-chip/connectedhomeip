@@ -28,11 +28,11 @@
 #include <new>
 #include <utility>
 
-#include <lib/core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
 #include <inet/InetInterface.h>
 #include <inet/TCPEndPoint.h>
+#include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <transport/raw/Base.h>
 

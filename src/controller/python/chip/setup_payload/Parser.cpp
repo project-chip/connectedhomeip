@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
+#include <lib/support/CodeUtils.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
-#include <lib/support/CodeUtils.h>
 
 #include <string>
 #include <type_traits>

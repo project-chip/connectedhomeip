@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 #include <lib/core/CHIPError.h>
-#include <sstream>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
+#include <sstream>
 
 #include <functional>
 #include <pybind11/pybind11.h>

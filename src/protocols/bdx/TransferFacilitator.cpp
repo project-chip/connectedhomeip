@@ -18,11 +18,11 @@
 #include "TransferFacilitator.h"
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/bdx/BdxTransferSession.h>
-#include <lib/support/BitFlags.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
 

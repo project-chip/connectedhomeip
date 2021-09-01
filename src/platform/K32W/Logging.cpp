@@ -3,9 +3,9 @@
 #include <platform/logging/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <src/lib/support/CodeUtils.h>
-#include <lib/support/logging/Constants.h>
 
 #include "fsl_debug_console.h"
 #include <cstring>

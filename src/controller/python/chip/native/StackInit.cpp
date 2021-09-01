@@ -17,11 +17,11 @@
 #include <errno.h>
 #include <pthread.h>
 
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/PlatformManager.h>
 
 namespace {
 

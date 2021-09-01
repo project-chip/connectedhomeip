@@ -18,8 +18,8 @@
  */
 
 #include "AppConfig.h"
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #ifdef __cplusplus
 extern "C" {

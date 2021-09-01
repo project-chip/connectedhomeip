@@ -21,9 +21,9 @@
  *      This file implements WatchableEventManager using select().
  */
 
-#include <platform/LockTracker.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TimeUtils.h>
+#include <platform/LockTracker.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 #include <system/WatchableEventManager.h>

@@ -30,8 +30,8 @@
 #endif
 
 // Include configuration headers
-#include <lib/core/CHIPConfig.h>
 #include <inet/InetConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 // Include dependent headers
 #include <lib/support/DLLUtil.h>

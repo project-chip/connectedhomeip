@@ -24,10 +24,10 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PlatformManager.h>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
 
 #include <thread>
 

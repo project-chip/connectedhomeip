@@ -27,8 +27,8 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
 #endif
-#include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #include <lib/support/BitFlags.h>
+#include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 
 #include "esp_event.h"
 

@@ -18,8 +18,8 @@
 
 #include "AppTask.h"
 
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CHIPMem.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include <kernel.h>
 

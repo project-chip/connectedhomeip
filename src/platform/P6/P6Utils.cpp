@@ -26,10 +26,10 @@
 
 #include <cy_lwip.h>
 #include <cy_wcm.h>
-#include <platform/P6/P6Utils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/P6/P6Utils.h>
 
 #include "lwip/icmp.h"
 #include "lwip/inet.h"

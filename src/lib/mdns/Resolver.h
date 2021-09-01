@@ -21,12 +21,12 @@
 #include <limits>
 
 #include "lib/support/logging/CHIPLogging.h"
-#include <lib/core/CHIPError.h>
-#include <lib/core/Optional.h>
-#include <lib/core/PeerId.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/core/PeerId.h>
 #include <lib/support/BytesToHex.h>
 
 namespace chip {

@@ -22,8 +22,8 @@
  *          on the Linux platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <lib/support/crypto/CHIPRNG.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace ::chip;
 

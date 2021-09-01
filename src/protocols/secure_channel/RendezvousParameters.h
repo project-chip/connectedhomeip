@@ -23,8 +23,8 @@
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-#include <protocols/secure_channel/PASESession.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <protocols/secure_channel/PASESession.h>
 
 namespace chip {
 

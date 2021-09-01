@@ -18,9 +18,9 @@
 
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
+#include <inttypes.h>
 #include <lib/core/CHIPEventLoggingConfig.h>
 #include <lib/core/CHIPTLVUtilities.hpp>
-#include <inttypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>

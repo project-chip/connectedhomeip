@@ -21,8 +21,8 @@
 
 #include <logging/log.h>
 
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CHIPMem.h>
+#include <platform/CHIPDeviceLayer.h>
 
 LOG_MODULE_REGISTER(app);
 

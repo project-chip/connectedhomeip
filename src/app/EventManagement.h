@@ -32,8 +32,8 @@
 #include <app/MessageDef/EventDataElement.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCircularTLVBuffer.h>
-#include <messaging/ExchangeMgr.h>
 #include <lib/support/PersistedCounter.h>
+#include <messaging/ExchangeMgr.h>
 #include <system/SystemMutex.h>
 
 #define CHIP_CONFIG_EVENT_GLOBAL_PRIORITY PriorityLevel::Debug

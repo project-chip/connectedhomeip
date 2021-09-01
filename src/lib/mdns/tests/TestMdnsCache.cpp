@@ -22,14 +22,14 @@
 #include <lib/mdns/MdnsCache.h>
 
 #include <cstdint>
-#include <nlunit-test.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <nlunit-test.h>
 
-#include <lib/core/CHIPError.h>
-#include <lib/core/PeerId.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/PeerId.h>
 #include <system/SystemTimer.h>
 #include <system/TimeSource.h>
 

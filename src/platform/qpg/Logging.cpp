@@ -4,9 +4,9 @@
 #include "qvCHIP.h"
 
 #include <lib/core/CHIPConfig.h>
-#include <platform/CHIPDeviceConfig.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/logging/Constants.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #include <ctype.h>
 #include <string.h>

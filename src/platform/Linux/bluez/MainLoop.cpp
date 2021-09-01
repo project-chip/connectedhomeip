@@ -19,9 +19,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <errno.h>
-#include <pthread.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <pthread.h>
 
 namespace chip {
 namespace DeviceLayer {
