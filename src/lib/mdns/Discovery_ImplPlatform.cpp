@@ -245,8 +245,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
             subTypes[subTypeSize++] = longDiscriminatorSubtype;
         }
         if ((params.GetCommissioningMode != CommissioningMode::kDisabled) &&
-            ((commissioningModeSubType, sizeof(commissioningModeSubType),
-              DiscoveryFilter(DiscoveryFilterType::kCommissioningMode)) == CHIP_NO_ERROR))
+            (MakeServiceSubtype(commissioningModeSubType, sizeof(commissioningModeSubType),
+                                DiscoveryFilter(DiscoveryFilterType::kCommissioningMode, params.GetCommissioningMode() ? 1 : 0)) ==
+             CHIP_NO_ERROR))
         {
             subTypes[subTypeSize++] = commissioningModeSubType;
         }
