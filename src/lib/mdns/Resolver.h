@@ -81,7 +81,6 @@ struct DiscoveredNodeData
     // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
     static constexpr int kMaxIPAddresses = 5;
     char hostName[kMaxHostNameSize + 1];
-    uint8_t port;
     char instanceName[kMaxInstanceNameSize + 1];
     uint16_t longDiscriminator;
     uint16_t vendorId;
@@ -103,7 +102,6 @@ struct DiscoveredNodeData
     void Reset()
     {
         memset(hostName, 0, sizeof(hostName));
-        port = 0;
         memset(instanceName, 0, sizeof(instanceName));
         longDiscriminator = 0;
         vendorId          = 0;

@@ -122,7 +122,6 @@ uint64_t gExtendedDiscoveryExpirationMs = TIMEOUT_CLEARED;
 
 void SetExtendedDiscoveryTimeoutSecs(int16_t secs)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogDetail(Discovery, "SetExtendedDiscoveryTimeoutSecs %d", secs);
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kExtendedDiscoveryTimeoutKeypairStorage, &secs, sizeof(secs));
 }
