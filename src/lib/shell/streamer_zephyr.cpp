@@ -24,8 +24,8 @@
 
 #include <cassert>
 
-#include <lib/shell/shell.h>
-#include <lib/shell/shell_uart.h>
+#include <shell/shell.h>
+#include <shell/shell_uart.h>
 
 namespace chip {
 namespace Shell {

@@ -28,11 +28,11 @@
 #include <algorithm>
 #include <stdint.h>
 
-#include "inet/IPAddress.h"
-#include "inet/InetInterface.h"
-#include "lib/core/Optional.h"
-#include "lib/mdns/ServiceNaming.h"
+#include <inet/IPAddress.h>
+#include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/mdns/ServiceNaming.h>
 
 namespace chip {
 namespace Mdns {

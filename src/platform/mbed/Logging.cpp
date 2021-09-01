@@ -21,10 +21,10 @@
  *          Logging implementation for Mbed platform
  */
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/logging/Constants.h>
 #include <platform/logging/LogV.h>
-#include <support/logging/CHIPLogging.h>
-#include <support/logging/Constants.h>
 
 #include <stdio.h>
 #include <string.h>

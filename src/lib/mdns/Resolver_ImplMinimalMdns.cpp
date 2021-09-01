@@ -20,11 +20,9 @@
 
 #include <limits>
 
-#include "MinimalMdnsServer.h"
-#include "ServiceNaming.h"
-
 #include <lib/core/CHIPConfig.h>
-
+#include <lib/mdns/MinimalMdnsServer.h>
+#include <lib/mdns/ServiceNaming.h>
 #include <lib/mdns/TxtFields.h>
 #include <lib/mdns/minimal/Parser.h>
 #include <lib/mdns/minimal/QueryBuilder.h>

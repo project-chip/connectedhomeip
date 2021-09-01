@@ -48,7 +48,7 @@ namespace chip {
 namespace ASN1 {
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
-#include <lib/asn1/ASN1OID.h>
+#include <asn1/ASN1OID.h>
 #endif
 
 static constexpr size_t kMaxConstructedAndEncapsulatedTypesDepth = 10;

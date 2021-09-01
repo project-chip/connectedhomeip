@@ -52,7 +52,6 @@
 #include <CHIPVersion.h>
 #include <credentials/CHIPCert.h>
 #include <lib/asn1/ASN1.h>
-#include <lib/asn1/ASN1OID.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>

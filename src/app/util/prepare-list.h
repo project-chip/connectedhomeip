@@ -19,7 +19,7 @@
 
 #include <app/util/af-enums.h>
 
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/SafeInt.h>
 
 EmberAfStatus PrepareListFromTLV(chip::TLV::TLVReader * tlvData, const uint8_t *& message, uint16_t & messageLen);
