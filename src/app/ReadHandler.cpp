@@ -305,7 +305,6 @@ exit:
     return err;
 }
 
-
 bool ReadHandler::MergeOverlappedAttributePath(ClusterInfo & aTargetAttributePath)
 {
     ClusterInfo * runner = mpAttributeClusterInfoList;
@@ -321,8 +320,8 @@ bool ReadHandler::MergeOverlappedAttributePath(ClusterInfo & aTargetAttributePat
         if (aTargetAttributePath.IsAttributePathSupersetOf(*runner))
         {
             runner->mListIndex = aTargetAttributePath.mListIndex;
-            runner->mFieldId = aTargetAttributePath.mFieldId;
-            runner->mFlags = aTargetAttributePath.mFlags;
+            runner->mFieldId   = aTargetAttributePath.mFieldId;
+            runner->mFlags     = aTargetAttributePath.mFlags;
             return true;
         }
         runner = runner->mpNext;

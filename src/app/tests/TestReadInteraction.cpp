@@ -156,7 +156,7 @@ public:
     void OnReportData(const chip::app::ReadClient * apReadClient, const chip::app::ClusterInfo & aPath,
                       chip::TLV::TLVReader * apData, chip::Protocols::InteractionModel::ProtocolCode status) override
     {
-        mNumAttributeResponse ++;
+        mNumAttributeResponse++;
     }
 
     CHIP_ERROR ReportProcessed(const chip::app::ReadClient * apReadClient) override
@@ -175,7 +175,7 @@ public:
     }
 
     bool mGotEventResponse      = false;
-    int mNumAttributeResponse  = 0;
+    int mNumAttributeResponse   = 0;
     bool mGotReport             = false;
     bool mGotReadStatusResponse = false;
 };
