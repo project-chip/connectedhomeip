@@ -90,7 +90,7 @@ CHIP_ERROR ChipLinuxStorageIni::CommitConfig(const std::string & configFile)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
     std::ofstream ofs;
-    std::string tmpPath = configFile + '.' + std::to_string(gettid());
+    std::string tmpPath = configFile + '.' + std::to_string(gettid()) + ".tmp";
 
     ofs.open(tmpPath, std::ofstream::out | std::ofstream::trunc);
 
