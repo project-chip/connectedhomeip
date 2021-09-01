@@ -1263,8 +1263,8 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(pubkey.ConstBytes(), keypair.Pubkey().ConstBytes(), pubkey.Length()) == 0);
 
         // Let's corrupt the CSR buffer and make sure it fails to verify
-        csr[length - 2] = (uint8_t) (csr[length - 2] + 1);
-        csr[length - 1] = (uint8_t) (csr[length - 1] + 1);
+        csr[length - 2] = (uint8_t)(csr[length - 2] + 1);
+        csr[length - 1] = (uint8_t)(csr[length - 1] + 1);
 
         NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csr, length, pubkey) != CHIP_NO_ERROR);
     }
