@@ -50,6 +50,10 @@ function atomicType(arg)
     return 'chip::ByteSpan';
   case 'eui64':
     return 'chip::node_id';
+  case 'percent':
+    return 'chip::Percent';
+  case 'percent100ths':
+    return 'chip::Percent100ths';
   default:
     throw 'not overriding';
   }

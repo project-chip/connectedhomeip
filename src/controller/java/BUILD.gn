@@ -78,7 +78,7 @@ android_library("java") {
     "src/chip/devicecontroller/mdns/ChipMdnsCallbackImpl.java",
     "src/chip/devicecontroller/mdns/NsdManagerServiceResolver.java",
     "src/chip/devicecontroller/mdns/ServiceResolver.java",
-    "zap-generated/ChipClusters.java",
+    "zap-generated/chip/devicecontroller/ChipClusters.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

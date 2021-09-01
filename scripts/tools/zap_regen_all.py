@@ -103,7 +103,9 @@ def main():
 
     targets = getTargets()
     for target in targets:
-        subprocess.check_call(['./scripts/tools/zap/generate.py'] + target)
+        exec_list = ['./scripts/tools/zap/generate.py'] + target
+        logging.info("Generating target: %s" % " ".join(exec_list))
+        subprocess.check_call(exec_list)
 
 
 if __name__ == '__main__':
