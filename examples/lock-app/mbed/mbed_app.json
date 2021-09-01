@@ -30,9 +30,7 @@
                 "NL_ASSERT_EXPECT_FLAGS=NL_ASSERT_FLAG_LOG",
                 "WHD_PRINT_DISABLE"
             ],
-            "target.components_add": [
-                "capsense"
-            ],
+            "target.components_add": ["capsense"],
             "led-active-state": 0,
             "system-state-led": "LED1",
             "lock-state-led": "P9_6",
