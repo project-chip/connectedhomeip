@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <ble/BleLayer.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/CASESession.h>
