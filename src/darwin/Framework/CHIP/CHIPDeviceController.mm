@@ -33,7 +33,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <platform/PlatformManager.h>
-#include <support/CHIPMem.h>
+#include <lib/support/CHIPMem.h>
 
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device_id";
 

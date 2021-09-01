@@ -19,8 +19,8 @@
 
 #include <app/util/af-enums.h>
 
-#include <core/CHIPCallback.h>
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPCallback.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/FunctionTraits.h>
 
 typedef void (*DefaultSuccessCallback)(void * context);

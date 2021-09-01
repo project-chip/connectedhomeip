@@ -24,23 +24,23 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <core/CHIPError.h>
-#include <core/NodeId.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/NodeId.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/CHIPMem.h>
-#include <support/RandUtils.h>
-#include <support/ScopedBuffer.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/RandUtils.h>
+#include <lib/support/ScopedBuffer.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 #include <ControllerShellCommands.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/KeyValueStoreManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 

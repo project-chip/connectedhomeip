@@ -30,9 +30,9 @@
 #include <messaging/ExchangeMgrDelegate.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
-#include <support/DLLUtil.h>
-#include <support/Pool.h>
-#include <support/TypeTraits.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Pool.h>
+#include <lib/support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 

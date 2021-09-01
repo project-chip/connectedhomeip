@@ -43,7 +43,7 @@
 //
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/crypto/CHIPRNG.h>
+#include <lib/support/crypto/CHIPRNG.h>
 
 #include <openthread/platform/random.h>
 

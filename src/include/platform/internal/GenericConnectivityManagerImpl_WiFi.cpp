@@ -26,7 +26,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace DeviceLayer {

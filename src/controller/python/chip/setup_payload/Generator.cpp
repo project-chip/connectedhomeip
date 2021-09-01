@@ -17,7 +17,7 @@
 
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #include <string>
 #include <type_traits>

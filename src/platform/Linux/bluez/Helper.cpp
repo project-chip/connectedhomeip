@@ -53,9 +53,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
-#include <support/BitFlags.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <cassert>
@@ -68,7 +68,7 @@
 #include <utility>
 
 #include <platform/Linux/BLEManagerImpl.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include "BluezObjectIterator.h"

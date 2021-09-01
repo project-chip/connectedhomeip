@@ -21,7 +21,7 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include <platform/KeyValueStoreManager.h>
-#include <support/ErrorStr.h>
+#include <lib/support/ErrorStr.h>
 
 const char * TAG = "persistent-storage";
 

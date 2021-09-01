@@ -21,7 +21,7 @@
 #endif
 
 #include <drivers/gpio.h>
-#include <shell/shell.h>
+#include <lib/shell/shell.h>
 
 namespace {
 constexpr const char * kGPIOController = "GPIO_0";

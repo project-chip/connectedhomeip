@@ -24,8 +24,8 @@
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 

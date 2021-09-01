@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
-#include <core/CHIPTLV.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
 #include <system/SystemPacketBuffer.h>
 

@@ -24,12 +24,12 @@
 #include <errno.h>
 #include <nlunit-test.h>
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <transport/SecureSession.h>
 
 #include <stdarg.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 
 using namespace chip;
 using namespace Crypto;

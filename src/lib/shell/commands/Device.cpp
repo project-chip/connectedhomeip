@@ -15,16 +15,16 @@
  *    limitations under the License.
  */
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #endif
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
 
 using chip::DeviceLayer::ConnectivityMgr;
 

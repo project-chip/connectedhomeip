@@ -23,11 +23,11 @@
 
 #include "NetworkTestHelpers.h"
 
-#include <core/CHIPCore.h>
-#include <core/CHIPEncoding.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/UnitTestRegistration.h>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestRegistration.h>
 #include <system/SystemLayer.h>
 #include <system/SystemObject.h>
 #include <transport/TransportMgr.h>

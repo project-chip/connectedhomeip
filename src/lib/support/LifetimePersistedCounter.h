@@ -27,7 +27,7 @@
 #pragma once
 
 #include <platform/PersistedStorage.h>
-#include <support/CHIPCounter.h>
+#include <lib/support/CHIPCounter.h>
 
 namespace chip {
 

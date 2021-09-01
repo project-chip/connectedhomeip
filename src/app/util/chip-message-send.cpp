@@ -28,7 +28,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/temp_zcl/TempZCL.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
 using namespace chip;

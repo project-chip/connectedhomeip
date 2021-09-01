@@ -19,7 +19,7 @@
 
 #include <cstdio>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMemString.h>
+#include <lib/support/CHIPMemString.h>
 
 using namespace ::chip::Platform;
 

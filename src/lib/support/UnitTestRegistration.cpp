@@ -17,8 +17,8 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <support/UnitTestRegistration.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 

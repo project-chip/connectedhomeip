@@ -26,7 +26,7 @@
 
 #include <cstdint>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <setup_payload/SetupPayload.h>
 
 struct LinuxDeviceOptions

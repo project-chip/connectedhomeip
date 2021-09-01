@@ -21,7 +21,7 @@
  */
 #pragma once
 
-#include <support/PersistedCounter.h>
+#include <lib/support/PersistedCounter.h>
 
 namespace chip {
 

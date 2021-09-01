@@ -28,7 +28,7 @@
 #include <inet/InetLayer.h>
 #include <inet/InetLayerEvents.h>
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 #include <string.h>
 

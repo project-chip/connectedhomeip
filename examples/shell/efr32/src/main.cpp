@@ -33,8 +33,8 @@
 #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 
 #include <AppConfig.h>
 #include <app/server/Server.h>

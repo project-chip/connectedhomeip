@@ -29,8 +29,8 @@
 #include <ble/CHIPBleServiceData.h>
 #include <platform/internal/BLEManager.h>
 
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::Ble;

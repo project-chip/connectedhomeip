@@ -21,7 +21,7 @@
 #include <app/AttributePathParams.h>
 #include <app/util/basic-types.h>
 #include <assert.h>
-#include <core/Optional.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace app {

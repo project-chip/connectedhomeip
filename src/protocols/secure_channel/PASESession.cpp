@@ -32,17 +32,17 @@
 #include <inttypes.h>
 #include <string.h>
 
-#include <core/CHIPEncoding.h>
-#include <core/CHIPSafeCasts.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <setup_payload/SetupPayload.h>
-#include <support/BufferWriter.h>
-#include <support/CHIPMem.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/SafeInt.h>
-#include <support/TypeTraits.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/TypeTraits.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {

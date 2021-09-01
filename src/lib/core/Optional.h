@@ -23,7 +23,7 @@
  */
 #pragma once
 
-#include <core/CHIPCore.h>
+#include <lib/core/CHIPCore.h>
 #include <lib/core/InPlace.h>
 #include <lib/support/Variant.h>
 

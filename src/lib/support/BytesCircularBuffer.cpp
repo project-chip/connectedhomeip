@@ -16,14 +16,14 @@
  *    limitations under the License.
  */
 
-#include <support/BytesCircularBuffer.h>
+#include <lib/support/BytesCircularBuffer.h>
 
 #include <algorithm>
 #include <limits>
 #include <nlassert.h>
 #include <string.h>
 
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 

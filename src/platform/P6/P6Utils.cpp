@@ -27,9 +27,9 @@
 #include <cy_lwip.h>
 #include <cy_wcm.h>
 #include <platform/P6/P6Utils.h>
-#include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "lwip/icmp.h"
 #include "lwip/inet.h"

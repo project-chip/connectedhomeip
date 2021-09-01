@@ -27,15 +27,15 @@
 #include <app/ClusterInfo.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelDelegate.h>
-#include <core/CHIPCore.h>
-#include <core/CHIPTLVDebug.hpp>
+#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPTLVDebug.hpp>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <support/CodeUtils.h>
-#include <support/DLLUtil.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {

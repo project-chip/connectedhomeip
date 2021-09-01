@@ -2,10 +2,10 @@
 
 #include <platform/logging/LogV.h>
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <src/lib/support/CodeUtils.h>
-#include <support/logging/Constants.h>
+#include <lib/support/logging/Constants.h>
 
 #include "fsl_debug_console.h"
 #include <cstring>

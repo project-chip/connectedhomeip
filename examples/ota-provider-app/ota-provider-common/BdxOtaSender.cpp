@@ -17,11 +17,11 @@
 
 #include <ota-provider-common/BdxOtaSender.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/bdx/BdxTransferSession.h>
-#include <support/BitFlags.h>
-#include <support/CHIPMemString.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/CHIPMemString.h>
 
 #include <fstream>
 

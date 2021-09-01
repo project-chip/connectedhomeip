@@ -28,10 +28,10 @@
 
 #include <messaging/ReliableMessageProtocolConfig.h>
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <inet/InetLayer.h>
 #include <lib/core/ReferenceCounted.h>
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/MessageHeader.h>
 

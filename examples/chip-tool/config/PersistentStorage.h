@@ -21,7 +21,7 @@
 #include <app/util/basic-types.h>
 #include <controller/CHIPDeviceController.h>
 #include <inipp/inipp.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 class PersistentStorage : public chip::PersistentStorageDelegate
 {

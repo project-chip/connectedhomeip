@@ -22,9 +22,9 @@
  *
  */
 
-#include <core/CHIPEncoding.h>
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 

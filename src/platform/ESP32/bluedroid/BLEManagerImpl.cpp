@@ -33,8 +33,8 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "esp_bt.h"
 #include "esp_bt_main.h"

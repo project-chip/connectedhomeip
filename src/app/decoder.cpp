@@ -29,7 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <stdio.h>
 #include <string.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * outApsFrame)
 {

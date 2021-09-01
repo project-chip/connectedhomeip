@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <mdns/Resolver.h>
+#include <lib/mdns/Resolver.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 

@@ -34,9 +34,9 @@
 
 // CHIP includes
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPPlatformMemory.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 // Application level logic
 #include "AppTask.h"

@@ -19,7 +19,7 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <protocols/secure_channel/PASESession.h>
-#include <support/Base64.h>
+#include <lib/support/Base64.h>
 
 #include <fstream>
 #include <memory>

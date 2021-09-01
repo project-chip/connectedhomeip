@@ -28,8 +28,8 @@
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
 
 #include <platform/internal/BLEManager.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <type_traits>
 

@@ -22,12 +22,12 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
-#include <mdns/minimal/QueryBuilder.h>
-#include <mdns/minimal/Server.h>
-#include <mdns/minimal/core/QName.h>
+#include <lib/mdns/minimal/QueryBuilder.h>
+#include <lib/mdns/minimal/Server.h>
+#include <lib/mdns/minimal/core/QName.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPArgParser.hpp>
-#include <support/CHIPMem.h>
+#include <lib/support/CHIPArgParser.hpp>
+#include <lib/support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
 
 #include "AllInterfaceListener.h"

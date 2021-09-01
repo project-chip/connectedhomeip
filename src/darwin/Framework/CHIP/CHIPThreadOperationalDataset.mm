@@ -18,8 +18,8 @@
 #import "CHIPThreadOperationalDataset.h"
 
 #include "CHIPLogging.h"
-#include <support/Span.h>
-#include <support/ThreadOperationalDataset.h>
+#include <lib/support/Span.h>
+#include <lib/support/ThreadOperationalDataset.h>
 
 size_t const CHIPSizeThreadNetworkName = chip::Thread::kSizeNetworkName;
 size_t const CHIPSizeThreadExtendedPanId = chip::Thread::kSizeExtendedPanId;

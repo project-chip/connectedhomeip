@@ -23,7 +23,7 @@
 #include <platform/Linux/dbus/openthread/introspect.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <support/ThreadOperationalDataset.h>
+#include <lib/support/ThreadOperationalDataset.h>
 
 namespace chip {
 namespace DeviceLayer {

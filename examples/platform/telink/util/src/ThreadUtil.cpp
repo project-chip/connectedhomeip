@@ -20,7 +20,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <support/ThreadOperationalDataset.h>
+#include <lib/support/ThreadOperationalDataset.h>
 
 #include <zephyr.h>
 

@@ -20,7 +20,7 @@
  *      This file provides implementation of Application Channel class.
  */
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 

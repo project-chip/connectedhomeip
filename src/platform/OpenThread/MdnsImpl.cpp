@@ -19,7 +19,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace ::chip::DeviceLayer;
 

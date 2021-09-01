@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/server/AppDelegate.h>
-#include <core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/RendezvousParameters.h>

@@ -29,12 +29,12 @@
 
 #include <platform/P6/P6Config.h>
 
-#include <core/CHIPEncoding.h>
+#include <lib/core/CHIPEncoding.h>
 #include <platform/P6/P6Utils.h>
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {

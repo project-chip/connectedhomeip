@@ -19,8 +19,8 @@
 
 #include <cstdint>
 
-#include <core/CHIPError.h>
-#include <core/PeerId.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/PeerId.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>

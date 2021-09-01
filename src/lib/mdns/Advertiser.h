@@ -20,13 +20,13 @@
 #include <algorithm>
 #include <cstdint>
 
-#include <core/CHIPError.h>
-#include <core/Optional.h>
-#include <core/PeerId.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/Optional.h>
+#include <lib/core/PeerId.h>
 #include <inet/InetLayer.h>
 #include <lib/support/Span.h>
-#include <support/CHIPMemString.h>
-#include <support/SafeString.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/SafeString.h>
 
 namespace chip {
 namespace Mdns {

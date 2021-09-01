@@ -16,7 +16,7 @@
  *
  */
 
-#include <core/CHIPConfig.h>
+#include <lib/core/CHIPConfig.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 

@@ -24,7 +24,7 @@
 #include <app-common/zap-generated/ids/Commands.h>
 
 #include <controller/CHIPCluster.h>
-#include <core/CHIPCallback.h>
+#include <lib/core/CHIPCallback.h>
 #include <lib/support/Span.h>
 
 namespace chip {

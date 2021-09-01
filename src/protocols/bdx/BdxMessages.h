@@ -25,9 +25,9 @@
 #pragma once
 
 #include <protocols/Protocols.h>
-#include <support/BitFlags.h>
-#include <support/BufferWriter.h>
-#include <support/CodeUtils.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/BufferWriter.h>
+#include <lib/support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 namespace chip {
 namespace bdx {

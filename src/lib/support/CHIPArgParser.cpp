@@ -44,10 +44,10 @@
 #include <stdint.h>
 #include <string.h>
 #include <strings.h>
-#include <support/SafeInt.h>
+#include <lib/support/SafeInt.h>
 
-#include <support/CHIPMem.h>
-#include <support/CHIPMemString.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 
 /*
  * TODO: Revisit these if and when fabric ID and node ID support has

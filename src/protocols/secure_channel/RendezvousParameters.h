@@ -24,7 +24,7 @@
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #include <protocols/secure_channel/PASESession.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 

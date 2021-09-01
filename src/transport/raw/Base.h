@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include <core/CHIPError.h>
+#include <lib/core/CHIPError.h>
 #include <inet/IPAddress.h>
 #include <inet/UDPEndPoint.h>
 #include <system/SystemPacketBuffer.h>

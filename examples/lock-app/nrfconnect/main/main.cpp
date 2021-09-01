@@ -22,7 +22,7 @@
 #include <logging/log.h>
 
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
+#include <lib/support/CHIPMem.h>
 
 LOG_MODULE_REGISTER(app);
 

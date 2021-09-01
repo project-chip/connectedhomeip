@@ -27,7 +27,7 @@
 #include <string.h>
 #include <type_traits>
 
-#include <support/DLLUtil.h>
+#include <lib/support/DLLUtil.h>
 
 #include <inet/InetLayer.h>
 

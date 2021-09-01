@@ -27,7 +27,7 @@
 
 #include <inipp/inipp.h>
 #include <platform/PersistedStorage.h>
-#include <support/ScopedBuffer.h>
+#include <lib/support/ScopedBuffer.h>
 
 namespace chip {
 namespace DeviceLayer {

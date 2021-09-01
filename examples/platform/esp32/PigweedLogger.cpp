@@ -19,7 +19,7 @@
 #include "esp_log.h"
 #include "pw_sys_io_esp32/init.h"
 #include "semphr.h"
-#include "support/logging/CHIPLogging.h"
+#include <lib/support/logging/CHIPLogging.h>
 #include <pw_hdlc/encoder.h>
 #include <pw_stream/sys_io_stream.h>
 

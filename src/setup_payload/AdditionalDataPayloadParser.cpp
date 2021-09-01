@@ -27,12 +27,12 @@
 #include <string.h>
 #include <vector>
 
-#include <core/CHIPError.h>
-#include <core/CHIPTLVData.hpp>
-#include <core/CHIPTLVUtilities.hpp>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLVData.hpp>
+#include <lib/core/CHIPTLVUtilities.hpp>
 #include <protocols/Protocols.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 

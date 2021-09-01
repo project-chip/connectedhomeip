@@ -23,7 +23,7 @@
 #include <app/server/EchoHandler.h>
 
 #include <protocols/echo/Echo.h>
-#include <support/ErrorStr.h>
+#include <lib/support/ErrorStr.h>
 
 namespace {
 

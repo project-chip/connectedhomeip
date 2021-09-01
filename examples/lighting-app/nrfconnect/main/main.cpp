@@ -20,7 +20,7 @@
 #include "Rpc.h"
 
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
+#include <lib/support/CHIPMem.h>
 #include <system/SystemError.h>
 
 #include <kernel.h>

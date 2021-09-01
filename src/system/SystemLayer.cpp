@@ -25,7 +25,7 @@
 #include <system/SystemLayer.h>
 
 #include <platform/LockTracker.h>
-#include <support/CodeUtils.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace System {
