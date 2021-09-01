@@ -98,6 +98,13 @@ public:
     static constexpr Key kConfigKey_RegulatoryLocation          = EFR32ConfigKey(kChipConfig_KeyBase, 0x0D);
     static constexpr Key kConfigKey_CountryCode                 = EFR32ConfigKey(kChipConfig_KeyBase, 0x0E);
     static constexpr Key kConfigKey_Breadcrumb                  = EFR32ConfigKey(kChipConfig_KeyBase, 0x0F);
+    static constexpr Key kConfigKey_VendorName                  = EFR32ConfigKey(kChipConfig_KeyBase, 0x10);
+    static constexpr Key kConfigKey_VendorId                    = EFR32ConfigKey(kChipConfig_KeyBase, 0x11);
+    static constexpr Key kConfigKey_ProductName                 = EFR32ConfigKey(kChipConfig_KeyBase, 0x12);
+    static constexpr Key kConfigKey_ProductId                   = EFR32ConfigKey(kChipConfig_KeyBase, 0x13);
+    static constexpr Key kConfigKey_ProductRevisionString       = EFR32ConfigKey(kChipConfig_KeyBase, 0x14);
+    static constexpr Key kConfigKey_FirmwareRevision            = EFR32ConfigKey(kChipConfig_KeyBase, 0x15);
+    static constexpr Key kConfigKey_FirmwareRevisionString      = EFR32ConfigKey(kChipConfig_KeyBase, 0x16);
 
     static constexpr Key kConfigKey_GroupKeyBase = EFR32ConfigKey(kChipConfig_KeyBase, 0x10);
     static constexpr Key kConfigKey_GroupKeyMax  = EFR32ConfigKey(kChipConfig_KeyBase, 0x1F); // Allows 16 Group Keys to be created.

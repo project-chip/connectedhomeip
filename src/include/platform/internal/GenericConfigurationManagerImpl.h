@@ -54,14 +54,21 @@ public:
 
     CHIP_ERROR _Init();
     CHIP_ERROR _GetVendorName(char * buf, size_t bufSize);
+    CHIP_ERROR _StoreVendorName(const char * buf, size_t bufSize);
     CHIP_ERROR _GetVendorId(uint16_t & vendorId);
+    CHIP_ERROR _StoreVendorId(uint16_t vendorId);
     CHIP_ERROR _GetProductName(char * buf, size_t bufSize);
+    CHIP_ERROR _StoreProductName(const char * buf, size_t bufSize);
     CHIP_ERROR _GetProductId(uint16_t & productId);
+    CHIP_ERROR _StoreProductId(uint16_t productId);
     CHIP_ERROR _GetProductRevisionString(char * buf, size_t bufSize);
+    CHIP_ERROR _StoreProductRevisionString(const char * buf, size_t bufSize);
     CHIP_ERROR _GetProductRevision(uint16_t & productRev);
     CHIP_ERROR _StoreProductRevision(uint16_t productRev);
     CHIP_ERROR _GetFirmwareRevisionString(char * buf, size_t bufSize);
+    CHIP_ERROR _StoreFirmwareRevisionString(const char * buf, size_t bufSize);
     CHIP_ERROR _GetFirmwareRevision(uint32_t & firmwareRev);
+    CHIP_ERROR _StoreFirmwareRevision(uint32_t firmwareRev);
     CHIP_ERROR _GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
                                      uint8_t & second);
     CHIP_ERROR _GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen);
@@ -170,27 +177,6 @@ private:
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
 extern template class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetVendorId(uint16_t & vendorId)
-{
-    vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
-    return CHIP_NO_ERROR;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductId(uint16_t & productId)
-{
-    productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
-    return CHIP_NO_ERROR;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevision(uint32_t & firmwareRev)
-{
-    firmwareRev = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
-    return CHIP_NO_ERROR;
-}
 
 template <class ImplClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceType(uint16_t & deviceType)

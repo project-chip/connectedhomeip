@@ -48,18 +48,25 @@ const char P6Config::kConfigNamespace_ChipConfig[]   = "chip-config";
 const char P6Config::kConfigNamespace_ChipCounters[] = "chip-counters";
 
 // Keys stored in the chip-factory namespace
-const P6Config::Key P6Config::kConfigKey_SerialNum           = { kConfigNamespace_ChipFactory, "serial-num" };
-const P6Config::Key P6Config::kConfigKey_MfrDeviceId         = { kConfigNamespace_ChipFactory, "device-id" };
-const P6Config::Key P6Config::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
-const P6Config::Key P6Config::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
-const P6Config::Key P6Config::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
-const P6Config::Key P6Config::kConfigKey_ProductRevision     = { kConfigNamespace_ChipFactory, "product-rev" };
-const P6Config::Key P6Config::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
-const P6Config::Key P6Config::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
-const P6Config::Key P6Config::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
-const P6Config::Key P6Config::kConfigKey_RegulatoryLocation  = { kConfigNamespace_ChipConfig, "regulatory-location" };
-const P6Config::Key P6Config::kConfigKey_CountryCode         = { kConfigNamespace_ChipConfig, "country-code" };
-const P6Config::Key P6Config::kConfigKey_Breadcrumb          = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const P6Config::Key P6Config::kConfigKey_SerialNum              = { kConfigNamespace_ChipFactory, "serial-num" };
+const P6Config::Key P6Config::kConfigKey_MfrDeviceId            = { kConfigNamespace_ChipFactory, "device-id" };
+const P6Config::Key P6Config::kConfigKey_MfrDeviceCert          = { kConfigNamespace_ChipFactory, "device-cert" };
+const P6Config::Key P6Config::kConfigKey_MfrDeviceICACerts      = { kConfigNamespace_ChipFactory, "device-ca-certs" };
+const P6Config::Key P6Config::kConfigKey_MfrDevicePrivateKey    = { kConfigNamespace_ChipFactory, "device-key" };
+const P6Config::Key P6Config::kConfigKey_ProductRevision        = { kConfigNamespace_ChipFactory, "product-rev" };
+const P6Config::Key P6Config::kConfigKey_ManufacturingDate      = { kConfigNamespace_ChipFactory, "mfg-date" };
+const P6Config::Key P6Config::kConfigKey_SetupPinCode           = { kConfigNamespace_ChipFactory, "pin-code" };
+const P6Config::Key P6Config::kConfigKey_SetupDiscriminator     = { kConfigNamespace_ChipFactory, "discriminator" };
+const P6Config::Key P6Config::kConfigKey_RegulatoryLocation     = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const P6Config::Key P6Config::kConfigKey_CountryCode            = { kConfigNamespace_ChipConfig, "country-code" };
+const P6Config::Key P6Config::kConfigKey_Breadcrumb             = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const P6Config::Key P6Config::kConfigKey_VendorName             = { kConfigNamespace_ChipConfig, "vendor-name" };
+const P6Config::Key P6Config::kConfigKey_VendorId               = { kConfigNamespace_ChipConfig, "vendor-id" };
+const P6Config::Key P6Config::kConfigKey_ProductName            = { kConfigNamespace_ChipConfig, "product-name" };
+const P6Config::Key P6Config::kConfigKey_ProductId              = { kConfigNamespace_ChipConfig, "product-id" };
+const P6Config::Key P6Config::kConfigKey_ProductRevisionString  = { kConfigNamespace_ChipConfig, "product-rev-string" };
+const P6Config::Key P6Config::kConfigKey_FirmwareRevision       = { kConfigNamespace_ChipConfig, "firmware-rev" };
+const P6Config::Key P6Config::kConfigKey_FirmwareRevisionString = { kConfigNamespace_ChipConfig, "firmware-rev-string" };
 
 // Keys stored in the chip-config namespace
 const P6Config::Key P6Config::kConfigKey_FabricId                    = { kConfigNamespace_ChipConfig, "fabric-id" };
