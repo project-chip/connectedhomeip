@@ -30,8 +30,8 @@
 #include <asn1/ASN1OID.h>
 #endif
 
-#include <lib/support/DLLUtil.h>
 #include <lib/asn1/ASN1Error.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 namespace TLV {
