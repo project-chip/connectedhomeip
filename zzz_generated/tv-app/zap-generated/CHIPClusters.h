@@ -39,6 +39,7 @@ public:
     // Cluster Commands
     CHIP_ERROR ArmFailSafe(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                            uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR CommissioningComplete(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SetRegulatoryConfig(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                    uint8_t location, chip::ByteSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 
@@ -86,8 +87,12 @@ public:
     ~OperationalCredentialsCluster() {}
 
     // Cluster Commands
+    CHIP_ERROR AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan nOCArray,
+                      chip::ByteSpan iPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId);
     CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          chip::ByteSpan rootCertificate);
+    CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                            chip::ByteSpan cSRNonce);
     CHIP_ERROR RemoveFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             uint8_t fabricIndex);
     CHIP_ERROR UpdateFabricLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
