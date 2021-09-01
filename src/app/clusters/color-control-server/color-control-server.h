@@ -184,13 +184,12 @@ private:
     /**********************************************************
      * Functions Definitions
      *********************************************************/
+
     ColorControlServer() {}
     bool shouldExecuteIfOff(chip::EndpointId endpoint, uint8_t optionMask, uint8_t optionOverride);
     void handleModeSwitch(chip::EndpointId endpoint, uint8_t newColorMode);
     uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState * p, uint16_t rate);
-    EmberEventControl * getHSVEventControl(chip::EndpointId endpoint);
-    EmberEventControl * getXYEventControl(chip::EndpointId endpoint);
-    EmberEventControl * getTempEventControl(chip::EndpointId endpoint);
+    EmberEventControl * getEventControl(chip::EndpointId endpoint);
     void computePwmFromHsv(chip::EndpointId endpoint);
     void computePwmFromTemp(chip::EndpointId endpoint);
     void computePwmFromXy(chip::EndpointId endpoint);
@@ -210,18 +209,21 @@ private:
     void initHueSat(chip::EndpointId endpoint, ColorHueTransitionState * colorHueTransitionState,
                     Color16uTransitionState * colorSatTransitionState);
     bool computeNewHueValue(ColorHueTransitionState * p);
+    EmberEventControl * configureHSVEventControl(chip::EndpointId);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
     Color16uTransitionState * getXTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getYTransitionState(chip::EndpointId endpoint);
     uint16_t findNewColorValueFromStep(uint16_t oldValue, int16_t step);
+    EmberEventControl * configureXYEventControl(chip::EndpointId);
 #endif // #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     Color16uTransitionState * getTempTransitionState(chip::EndpointId endpoint);
     void moveToColorTemp(chip::EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime);
     uint16_t getTemperatureCoupleToLevelMin(chip::EndpointId endpoint);
+    EmberEventControl * configureTempEventControl(chip::EndpointId);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     /**********************************************************
@@ -243,9 +245,7 @@ private:
     static std::unordered_map<chip::EndpointId, Color16uTransitionState> colorTempTransitionStates;
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-    static std::unordered_map<chip::EndpointId, EmberEventControl> colorHSVEventControls;
-    static std::unordered_map<chip::EndpointId, EmberEventControl> colorXYEventControls;
-    static std::unordered_map<chip::EndpointId, EmberEventControl> colorTempEventControls;
+    static std::unordered_map<chip::EndpointId, EmberEventControl> eventControls;
 };
 
 /**********************************************************

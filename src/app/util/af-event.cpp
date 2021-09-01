@@ -101,14 +101,11 @@ void EventControlHandler(chip::System::Layer * systemLayer, void * appState)
     EmberEventControl * control = reinterpret_cast<EmberEventControl *>(appState);
     if (control->status != EMBER_EVENT_INACTIVE)
     {
-        for (auto & event : emAfEvents)
+        control->status = EMBER_EVENT_INACTIVE;
+
+        if (control->callback != NULL)
         {
-            if (event.control == control)
-            {
-                control->status = EMBER_EVENT_INACTIVE;
-                event.handler();
-                return;
-            }
+            (control->callback)(control->endpoint);
         }
     }
 }
