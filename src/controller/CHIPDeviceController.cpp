@@ -1197,12 +1197,10 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
     ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, device->GetCSRNonce()));
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
@@ -1305,13 +1303,11 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     Callback::Cancelable * successCallback = mNOCResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
     ReturnErrorOnFailure(
         cluster.AddNOC(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0), mLocalId.GetNodeId(), mVendorId));
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
@@ -1395,12 +1391,10 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device, const
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, 0);
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     Callback::Cancelable * successCallback = mRootCertResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnRootCertFailureCallback.Cancel();
 
     ReturnErrorOnFailure(cluster.AddTrustedRootCertificate(successCallback, failureCallback, rcac));
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     ChipLogProgress(Controller, "Sent root certificate to the device");
 
@@ -1632,18 +1626,14 @@ void DeviceControllerInteractionModelDelegate::OnReportData(const app::ReadClien
                                                             TLV::TLVReader * apData,
                                                             Protocols::InteractionModel::ProtocolCode status)
 {
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     IMReadReportAttributesResponseCallback(apReadClient, aPath, apData, status);
-#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 }
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::ReadError(const app::ReadClient * apReadClient, CHIP_ERROR aError)
 {
     app::ClusterInfo path;
     path.mNodeId = apReadClient->GetExchangeContext()->GetSecureSession().GetPeerNodeId();
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     IMReadReportAttributesResponseCallback(apReadClient, path, nullptr, Protocols::InteractionModel::ProtocolCode::Failure);
-#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     return CHIP_NO_ERROR;
 }
 
@@ -1652,28 +1642,22 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseStatus(
     const uint32_t aProtocolId, const uint16_t aProtocolCode, app::AttributePathParams & aAttributePathParams,
     uint8_t aCommandIndex)
 {
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     IMWriteResponseCallback(apWriteClient, chip::app::ToEmberAfStatus(Protocols::InteractionModel::ProtocolCode(aProtocolCode)));
-#endif
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseProtocolError(const app::WriteClient * apWriteClient,
                                                                                 uint8_t aAttributeIndex)
 {
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     // When WriteResponseProtocolError occurred, it means server returned an invalid packet.
     IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
-#endif
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::WriteResponseError(const app::WriteClient * apWriteClient, CHIP_ERROR aError)
 {
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     // When WriteResponseError occurred, it means we failed to receive the response from server.
     IMWriteResponseCallback(apWriteClient, EMBER_ZCL_STATUS_FAILURE);
-#endif
     return CHIP_NO_ERROR;
 }
 
@@ -1802,13 +1786,11 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 
     device = &mActiveDevices[mDeviceBeingPaired];
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
     // TODO(cecille): We probably want something better than this for breadcrumbs.
     uint64_t breadcrumb = static_cast<uint64_t>(nextStage);
 
     // TODO(cecille): This should be customized per command.
     constexpr uint32_t kCommandTimeoutMs = 3000;
-#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
     switch (nextStage)
     {
@@ -1820,10 +1802,8 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         GeneralCommissioningCluster genCom;
         // TODO: should get the endpoint information from the descriptor cluster.
         genCom.Associate(device, 0);
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
         uint16_t commissioningExpirySeconds = 5;
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
-#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     }
     break;
     case CommissioningStage::kConfigRegulatory: {
@@ -1864,10 +1844,8 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
         genCom.SetRegulatoryConfig(mSuccess.Cancel(), mFailure.Cancel(), static_cast<uint8_t>(regulatoryLocation), countryCode,
                                    breadcrumb, kCommandTimeoutMs);
-#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     }
     break;
     case CommissioningStage::kCheckCertificates: {
@@ -1901,12 +1879,10 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         // TODO: Once network credential sending is implemented, attempting to set wifi credential on an ethernet only device
         // will cause an error to be sent back. At that point, we should scan and we shoud see the proper ethernet network ID
         // returned in the scan results. For now, we use magic.
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
         char magicNetworkEnableCode[] = "ETH0";
         netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(),
                              ByteSpan(reinterpret_cast<uint8_t *>(&magicNetworkEnableCode), sizeof(magicNetworkEnableCode)),
                              breadcrumb, kCommandTimeoutMs);
-#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     }
     break;
     case CommissioningStage::kFindOperational: {
@@ -1923,9 +1899,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         ChipLogProgress(Controller, "Calling commissioning complete");
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);
-#if !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE // temporary - until example app clusters are updated (Issue 8347)
         genCom.CommissioningComplete(mSuccess.Cancel(), mFailure.Cancel());
-#endif // !CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     }
     break;
     case CommissioningStage::kCleanup:
