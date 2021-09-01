@@ -56,6 +56,8 @@ limitations under the License.
     <type id="0xE3" description="Epoch Microseconds"       name="epoch_us"          size="8"  analog="true"   />
     <type id="0xE4" description="Epoch Seconds"            name="epoch_s"           size="4"  analog="true"   />
     <type id="0xE5" description="System Time Microseconds" name="systime_us"        size="8"  analog="true"   />
+    <type id="0xE6" description="Percentage units 1%"      name="percent"           size="1"  analog="true"   />
+    <type id="0xE7" description="Percentage units 0.01%"   name="percent100ths"     size="2"  analog="true"   />
     <type id="0xE8" description="Cluster ID"               name="cluster_id"        size="4"  discrete="true" />
     <type id="0xE9" description="Attribute ID"             name="attrib_id"         size="4"  discrete="true" />
     <type id="0xEA" description="Field ID"                 name="field_id"          size="4"  discrete="true" />

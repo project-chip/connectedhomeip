@@ -18,7 +18,6 @@ cmake_minimum_required(VERSION 3.13.1)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(NLIO_ROOT ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
-get_filename_component(PUMPC_COMMON ${CHIP_ROOT}/examples/pump-controller-app/pump-controller-common REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
@@ -50,9 +49,8 @@ project(chip-nrfconnect-pump-controller-example)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/enable-gnu-std.cmake)
 
-target_include_directories(app PRIVATE 
-                           main/include 
-                           ${PUMPC_COMMON} 
+target_include_directories(app PRIVATE
+                           main/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/pump-controller-app
                            ${NLIO_ROOT}
@@ -69,8 +67,8 @@ target_sources(app PRIVATE
                ${GEN_DIR}/pump-controller-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
-               ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
                ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
+               ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
@@ -103,8 +101,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/pump-configuration-and-control-server/pump-configuration-and-control-server.cpp)
+               ${CHIP_ROOT}/src/app/clusters/pump-configuration-and-control-client/pump-configuration-and-control-client.cpp)
 
 if(BUILD_WITH_DFU)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/DFUOverSMP.cpp)

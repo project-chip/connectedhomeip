@@ -102,6 +102,10 @@ struct ControllerInitParams
     ByteSpan controllerRCAC;
 
     uint16_t controllerVendorId;
+
+    /* The port used for operational communication to listen for and send messages over UDP/TCP.
+     * The default value of `0` will pick any available port. */
+    uint16_t listenPort = 0;
 };
 
 enum CommissioningStage : uint8_t
@@ -489,6 +493,25 @@ public:
      *   will use secure session established via CASE handshake.
      */
     CHIP_ERROR OperationalDiscoveryComplete(NodeId remoteDeviceId);
+
+    /**
+     * @brief
+     *   Trigger a paired device to re-enter the pairing mode. The device will exit the pairing mode
+     *   after a successful pairing, or after the given `timeout` time.
+     *
+     * @param[in] deviceId        The device Id.
+     * @param[in] timeout         The pairing mode should terminate after this much time.
+     * @param[in] iteration       The PAKE iteration count associated with the PAKE Passcode ID and ephemeral
+     *                            PAKE passcode verifier to be used for this commissioning.
+     * @param[in] discriminator   The long discriminator for the DNS-SD advertisement.
+     * @param[in] option          The pairing window can be opened using the original setup code, or an
+     *                            onboarding token can be generated using a random setup PIN code (or with
+     *                            the PIN code provied in the setupPayload).
+     *
+     * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
+                                       uint8_t option);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;

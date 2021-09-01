@@ -35,6 +35,9 @@ buildconfig_header("chip_buildconfig") {
   chip_config_memory_management_platform =
       chip_config_memory_management == "platform"
 
+  chip_config_short_error_str =
+      chip_config_short_error_str || chip_target_style_embedded
+
   # TODO - Move CHIP_PROJECT_CONFIG_INCLUDE, CHIP_PLATFORM_CONFIG_INCLUDE here.
   # Currently those are also used from src/system.
   defines = [

@@ -33,6 +33,7 @@ import com.google.chip.chiptool.attestation.AttestationTestFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.clusterclient.SensorClientFragment
 import com.google.chip.chiptool.echoclient.EchoClientFragment
+import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
@@ -81,6 +82,7 @@ class CHIPToolActivity :
   }
 
   override fun onCommissioningComplete(code: Int) {
+    ChipClient.getDeviceController(this).close()
     if (code == 0) {
       showFragment(OnOffClientFragment.newInstance(), false)
     } else {
@@ -100,6 +102,10 @@ class CHIPToolActivity :
   override fun onProvisionThreadCredentialsClicked() {
     networkType = ProvisionNetworkType.THREAD
     showFragment(BarcodeFragment.newInstance(), false)
+  }
+
+  override fun onShowDeviceAddressInput() {
+    showFragment(AddressCommissioningFragment.newInstance(), false)
   }
 
   override fun handleEchoClientClicked() {
@@ -184,6 +190,7 @@ class CHIPToolActivity :
 
   companion object {
     private const val TAG = "CHIPToolActivity"
+    private const val ADDRESS_COMMISSIONING_FRAGMENT_TAG = "address_commissioning_fragment"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
 
     var REQUEST_CODE_COMMISSIONING = 0xB003

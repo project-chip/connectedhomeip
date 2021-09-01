@@ -108,6 +108,7 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void StartWiFiManagement();
+    bool IsWiFiManagementStarted();
 #endif
 
 private:
