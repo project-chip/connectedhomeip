@@ -246,18 +246,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         }
         if ((params.GetCommissioningMode != CommissioningMode::kDisabled) &&
             (MakeServiceSubtype(commissioningModeSubType, sizeof(commissioningModeSubType),
-                                DiscoveryFilter(DiscoveryFilterType::kCommissioningMode, params.GetCommissioningMode() ? 1 : 0)) ==
-             CHIP_NO_ERROR))
+                                DiscoveryFilter(DiscoveryFilterType::kCommissioningMode)) == CHIP_NO_ERROR))
         {
             subTypes[subTypeSize++] = commissioningModeSubType;
-        }
-        if (params.GetCommissioningMode() && params.GetAdditionalCommissioning())
-        {
-            if (MakeServiceSubtype(additionalCommissioningSubType, sizeof(additionalCommissioningSubType),
-                                   DiscoveryFilter(DiscoveryFilterType::kCommissioningModeFromCommand, 1)) == CHIP_NO_ERROR)
-            {
-                subTypes[subTypeSize++] = additionalCommissioningSubType;
-            }
         }
     }
 

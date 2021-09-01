@@ -87,10 +87,10 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
 
         ChipLogProgress(Discovery, "Commissioner %d", i);
         ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->hostName);
+        ChipLogProgress(Discovery, "\tPort:\t\t\t%u", dnsSdInfo->port);
         ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->longDiscriminator);
         ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->vendorId);
         ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", dnsSdInfo->productId);
-        ChipLogProgress(Discovery, "\tAdditional Pairing\t%u", dnsSdInfo->additionalPairing);
         ChipLogProgress(Discovery, "\tCommissioning Mode\t%u", dnsSdInfo->commissioningMode);
         ChipLogProgress(Discovery, "\tDevice Type\t\t%u", dnsSdInfo->deviceType);
         ChipLogProgress(Discovery, "\tDevice Name\t\t%s", dnsSdInfo->deviceName);
