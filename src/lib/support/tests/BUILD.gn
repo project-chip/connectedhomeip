@@ -48,7 +48,7 @@ chip_test_suite("tests") {
   ]
   sources = []
 
-  if (current_os != "mbed") { 
+  if (current_os != "mbed") {
     test_sources += [ "TestCHIPArgParser.cpp" ]
   }
 

@@ -16,7 +16,7 @@
 #    limitations under the License.
 #
 
-cd "$(dirname $0)/../../.."
+cd "$(dirname "$0")/../../.."
 CHIP_ROOT="$PWD"
 cd "$CHIP_ROOT/src/test_driver/mbed/"
 
@@ -32,25 +32,25 @@ COMMAND=build
 
 for i in "$@"; do
     case $i in
-    -b=* | --board=*)
-        TARGET_BOARD="${i#*=}"
-        shift
-        ;;
-    -t=* | --toolchain=*)
-        TOOLCHAIN="${i#*=}"
-        shift
-        ;;
-    -p=* | --profile=*)
-        PROFILE="${i#*=}"
-        shift
-        ;;
-    -c=* | --command=*)
-        COMMAND="${i#*=}"
-        shift
-        ;;
-    *)
-        # unknown option
-        ;;
+        -b=* | --board=*)
+            TARGET_BOARD="${i#*=}"
+            shift
+            ;;
+        -t=* | --toolchain=*)
+            TOOLCHAIN="${i#*=}"
+            shift
+            ;;
+        -p=* | --profile=*)
+            PROFILE="${i#*=}"
+            shift
+            ;;
+        -c=* | --command=*)
+            COMMAND="${i#*=}"
+            shift
+            ;;
+        *)
+            # unknown option
+            ;;
     esac
 done
 
