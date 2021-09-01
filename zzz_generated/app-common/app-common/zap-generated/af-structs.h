@@ -224,6 +224,33 @@ typedef struct _NeighborTable
     bool IsChild;
 } NeighborTable;
 
+// Struct for SimpleStruct
+typedef struct _SimpleStruct
+{
+    /* TYPE WARNING: unknown defaults to */ uint8_t * a;
+    bool b;
+    uint8_t c;
+    chip::ByteSpan d;
+    uint8_t * e;
+} EmberAfSimpleStruct;
+
+// Struct for NestedStruct
+typedef struct _NestedStruct
+{
+    /* TYPE WARNING: unknown defaults to */ uint8_t * a;
+    bool b;
+    _SimpleStruct c;
+} EmberAfNestedStruct;
+
+// Struct for NestedStructList
+typedef struct _NestedStructList
+{
+    /* TYPE WARNING: unknown defaults to */ uint8_t * a;
+    bool b;
+    _SimpleStruct c;
+    _SimpleStruct d;
+} EmberAfNestedStructList;
+
 // Struct for NetworkInterfaceType
 typedef struct _NetworkInterfaceType
 {
@@ -356,6 +383,7 @@ typedef struct _SecurityPolicy
     uint16_t RotationTime;
     uint8_t Flags;
 } SecurityPolicy;
+
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet

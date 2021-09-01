@@ -15,7 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
-
+import("${chip_root}/src/app/chip_data_model.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
@@ -33,12 +33,14 @@ chip_test_suite("tests") {
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
     "TestWriteInteraction.cpp",
+    "TestClusterObjectUtils.cpp"
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/messaging/tests:helpers",
@@ -47,3 +49,4 @@ chip_test_suite("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 }
+
