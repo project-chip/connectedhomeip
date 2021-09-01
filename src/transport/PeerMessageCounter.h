@@ -119,20 +119,19 @@ public:
         case Status::SyncInProcess:
             VerifyOrDie(false);
             return CHIP_ERROR_INTERNAL;
-        case Status::Synced:
+        case Status::Synced: {
+            CHIP_ERROR err = Verify(counter);
+            if (err == CHIP_ERROR_MESSAGE_ID_OUT_OF_WINDOW)
             {
-                CHIP_ERROR err = Verify(counter);
-                if (err == CHIP_ERROR_MESSAGE_ID_OUT_OF_WINDOW)
-                {
-                    // According to chip spec, when global unencrypted message
-                    // counter is out of window, the peer may have reset and is
-                    // using another randomize initial value. Trust the new
-                    // counter here.
-                    SetCounter(counter);
-                    err = CHIP_NO_ERROR;
-                }
-                return err;
+                // According to chip spec, when global unencrypted message
+                // counter is out of window, the peer may have reset and is
+                // using another randomize initial value. Trust the new
+                // counter here.
+                SetCounter(counter);
+                err = CHIP_NO_ERROR;
             }
+            return err;
+        }
         default:
             VerifyOrDie(false);
             return CHIP_ERROR_INTERNAL;
