@@ -76,6 +76,13 @@ const ESP32Config::Key ESP32Config::kConfigKey_OperationalDevicePrivateKey = { k
 const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation          = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
 const ESP32Config::Key ESP32Config::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const ESP32Config::Key ESP32Config::kConfigKey_VendorName                  = { kConfigNamespace_ChipConfig, "vendor-name" };
+const ESP32Config::Key ESP32Config::kConfigKey_VendorId                    = { kConfigNamespace_ChipConfig, "vendor-id" };
+const ESP32Config::Key ESP32Config::kConfigKey_ProductName                 = { kConfigNamespace_ChipConfig, "product-name" };
+const ESP32Config::Key ESP32Config::kConfigKey_ProductId                   = { kConfigNamespace_ChipConfig, "product-id" };
+const ESP32Config::Key ESP32Config::kConfigKey_ProductRevisionString       = { kConfigNamespace_ChipConfig, "product-rev-string" };
+const ESP32Config::Key ESP32Config::kConfigKey_FirmwareRevision            = { kConfigNamespace_ChipConfig, "firmware-rev" };
+const ESP32Config::Key ESP32Config::kConfigKey_FirmwareRevisionString      = { kConfigNamespace_ChipConfig, "firmware-rev-string" };
 
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char ESP32Config::kGroupKeyNamePrefix[] = "gk-";

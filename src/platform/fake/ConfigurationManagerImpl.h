@@ -34,14 +34,21 @@ class ConfigurationManagerImpl final : public ConfigurationManager
 private:
     CHIP_ERROR _Init() { return CHIP_NO_ERROR; }
     CHIP_ERROR _GetVendorName(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _StoreVendorName(const char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetVendorId(uint16_t & vendorId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _StoreVendorId(uint16_t vendorId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetProductName(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _StoreProductName(const char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetProductId(uint16_t & productId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _StoreProductId(uint16_t productId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetProductRevisionString(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _StoreProductRevisionString(const char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetProductRevision(uint16_t & productRev) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _StoreProductRevision(uint16_t productRev) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetFirmwareRevisionString(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _StoreFirmwareRevisionString(const char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetFirmwareRevision(uint32_t & firmwareRev) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _StoreFirmwareRevision(uint32_t firmwareRev) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR _GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
                                      uint8_t & second)
     {

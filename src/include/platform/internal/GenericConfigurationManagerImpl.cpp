@@ -133,25 +133,136 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetVendorName(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err;
+    size_t vlen;
+
+    err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_VendorName, buf, bufSize, vlen);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
+    }
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreVendorName(const char *vname, size_t vsize)
+{
+    return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_VendorName, vname, vsize);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetVendorId(uint16_t & vendorId)
+{
+    CHIP_ERROR err;
+    uint32_t val;
+
+    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_VendorId, val);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        vendorId = static_cast<uint16_t>(val);
+    }
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreVendorId(uint16_t vendorId)
+{
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_VendorId, static_cast<uint32_t>(vendorId));
 }
 
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductName(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err;
+    size_t len;
+
+    err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_ProductName, buf, bufSize, len);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
+        return CHIP_NO_ERROR;
+    }
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreProductName(const char * pname, size_t psize)
+{
+    return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_ProductName, pname, psize);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductId(uint16_t & productId)
+{
+    CHIP_ERROR err;
+    uint32_t val;
+
+    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_ProductId, val);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        productId = static_cast<uint16_t>(val);
+    }
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreProductId(uint16_t productId)
+{
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_ProductId, static_cast<uint32_t>(productId));
 }
 
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevisionString(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err;
+    size_t vlen;
+
+    err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_FirmwareRevisionString, buf, bufSize, vlen);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
+        return CHIP_NO_ERROR;
+    }
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreFirmwareRevisionString(const char * buf, size_t bufSize)
+{
+    return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_FirmwareRevisionString, buf, bufSize);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevision(uint32_t & firmwareRev)
+{
+    CHIP_ERROR err;
+
+    err = Impl()->ReadConfigValue(ImplClass::kConfigKey_FirmwareRevision, firmwareRev);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        firmwareRev = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
+        return CHIP_NO_ERROR;
+    }
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreFirmwareRevision(uint32_t firmwareRev)
+{
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_FirmwareRevision, firmwareRev);
 }
 
 template <class ImplClass>
@@ -251,9 +362,23 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePrimary802154MACAdd
 template <class ImplClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductRevisionString(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING);
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err;
+    size_t vlen;
+
+    err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_ProductRevisionString, buf, bufSize, vlen);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING);
+        return CHIP_NO_ERROR;
+    }
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreProductRevisionString(const char * vname, size_t vsize)
+{
+    return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_ProductRevisionString, vname, vsize);
 }
 
 template <class ImplClass>

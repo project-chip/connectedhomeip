@@ -76,6 +76,13 @@ public:
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_VendorName;
+    static const Key kConfigKey_VendorId;
+    static const Key kConfigKey_ProductName;
+    static const Key kConfigKey_ProductId;
+    static const Key kConfigKey_ProductRevisionString;
+    static const Key kConfigKey_FirmwareRevision;
+    static const Key kConfigKey_FirmwareRevisionString;
 
     // Config value accessors.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);

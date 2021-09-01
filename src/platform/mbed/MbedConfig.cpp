@@ -85,6 +85,13 @@ const MbedConfig::Key MbedConfig::kConfigKey_OperationalDevicePrivateKey = { CON
 const MbedConfig::Key MbedConfig::kConfigKey_RegulatoryLocation          = { CONFIG_KEY("regulatory-location") };
 const MbedConfig::Key MbedConfig::kConfigKey_CountryCode                 = { CONFIG_KEY("country-code") };
 const MbedConfig::Key MbedConfig::kConfigKey_Breadcrumb                  = { CONFIG_KEY("breadcrumb") };
+const MbedConfig::Key MbedConfig::kConfigKey_VendorName                  = { CONFIG_KEY("vendor-name") };
+const MbedConfig::Key MbedConfig::kConfigKey_VendorId                    = { CONFIG_KEY("vendor-id") };
+const MbedConfig::Key MbedConfig::kConfigKey_ProductName                 = { CONFIG_KEY("product-name") };
+const MbedConfig::Key MbedConfig::kConfigKey_ProductId                   = { CONFIG_KEY("product-id") };
+const MbedConfig::Key MbedConfig::kConfigKey_ProductRevisionString       = { CONFIG_KEY("product-rev-string") };
+const MbedConfig::Key MbedConfig::kConfigKey_FirmwareRevision            = { CONFIG_KEY("firmware-rev") };
+const MbedConfig::Key MbedConfig::kConfigKey_FirmwareRevisionString      = { CONFIG_KEY("firmware-rev-string") };
 
 CHIP_ERROR MbedConfig::ReadConfigValue(Key key, bool & val)
 {

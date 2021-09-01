@@ -75,6 +75,13 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_OperationalDevicePrivateKey = C
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation          = CONFIG_KEY(NAMESPACE_CONFIG "regulatory-location");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode                 = CONFIG_KEY(NAMESPACE_CONFIG "country-code");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_Breadcrumb                  = CONFIG_KEY(NAMESPACE_CONFIG "breadcrumb");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_VendorName                  = CONFIG_KEY(NAMESPACE_CONFIG "vendor-name");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_VendorId                    = CONFIG_KEY(NAMESPACE_CONFIG "vendor-id");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_ProductName                 = CONFIG_KEY(NAMESPACE_CONFIG "product-name");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_ProductId                   = CONFIG_KEY(NAMESPACE_CONFIG "product-id");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_ProductRevisionString       = CONFIG_KEY(NAMESPACE_CONFIG "product-rev-string");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_FirmwareRevision            = CONFIG_KEY(NAMESPACE_CONFIG "firmware-rev");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_FirmwareRevisionString      = CONFIG_KEY(NAMESPACE_CONFIG "firmware-rev-string");
 namespace {
 
 constexpr const char * sAllResettableConfigKeys[] = { ZephyrConfig::kConfigKey_FabricId,
@@ -91,7 +98,14 @@ constexpr const char * sAllResettableConfigKeys[] = { ZephyrConfig::kConfigKey_F
                                                       ZephyrConfig::kConfigKey_OperationalDevicePrivateKey,
                                                       ZephyrConfig::kConfigKey_RegulatoryLocation,
                                                       ZephyrConfig::kConfigKey_CountryCode,
-                                                      ZephyrConfig::kConfigKey_Breadcrumb };
+                                                      ZephyrConfig::kConfigKey_Breadcrumb,
+                                                      ZephyrConfig::kConfigKey_VendorName,
+                                                      ZephyrConfig::kConfigKey_VendorId,
+                                                      ZephyrConfig::kConfigKey_ProductName,
+                                                      ZephyrConfig::kConfigKey_ProductId,
+                                                      ZephyrConfig::kConfigKey_ProductRevisionString,
+                                                      ZephyrConfig::kConfigKey_FirmwareRevision,
+                                                      ZephyrConfig::kConfigKey_FirmwareRevisionString };
 
 // Data structure to be passed as a parameter of Zephyr's settings_load_subtree_direct() function
 struct ReadRequest
