@@ -479,7 +479,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         case 0x0001: // fabrics list
         {
-            entryLength = 55;
+            entryLength = 120;
             if (((index - 1) * entryLength) > (am->size - entryLength))
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
@@ -492,13 +492,13 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                            &entryOffset, sizeof(entry->FabricIndex)); // INT8U
             ByteSpan * RootPublicKeySpan = &entry->RootPublicKey;     // OCTET_STRING
             if (CHIP_NO_ERROR !=
-                (write ? WriteByteSpan(dest + entryOffset, 2, RootPublicKeySpan)
-                       : ReadByteSpan(src + entryOffset, 2, RootPublicKeySpan)))
+                (write ? WriteByteSpan(dest + entryOffset, 67, RootPublicKeySpan)
+                       : ReadByteSpan(src + entryOffset, 67, RootPublicKeySpan)))
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
                 return 0;
             }
-            entryOffset = static_cast<uint16_t>(entryOffset + 2);
+            entryOffset = static_cast<uint16_t>(entryOffset + 67);
             copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
                            &entryOffset, sizeof(entry->VendorId)); // INT16U
             copyListMember(write ? dest : (uint8_t *) &entry->FabricId, write ? (uint8_t *) &entry->FabricId : src, write,
@@ -981,7 +981,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
             break;
         case 0x0001: // fabrics list
             // Struct _FabricDescriptor
-            entryLength = 55;
+            entryLength = 120;
             break;
         case 0x0004: // TrustedRootCertificates
             // chip::ByteSpan

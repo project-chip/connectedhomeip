@@ -863,9 +863,9 @@ void OperationalCredentialsClusterFabricsListListAttributeFilter(TLV::TLVReader 
         CHECK_MESSAGE_LENGTH_VOID(1);
         data[i].FabricIndex = emberAfGetInt8u(message, 0, 1);
         message += 1;
-        CHECK_STATUS_VOID(ReadByteSpan(message, 2, &data[i].RootPublicKey));
-        messageLen = static_cast<uint16_t>(messageLen - 2);
-        message += 2;
+        CHECK_STATUS_VOID(ReadByteSpan(message, 67, &data[i].RootPublicKey));
+        messageLen = static_cast<uint16_t>(messageLen - 67);
+        message += 67;
         CHECK_MESSAGE_LENGTH_VOID(2);
         data[i].VendorId = emberAfGetInt16u(message, 0, 2);
         message += 2;
