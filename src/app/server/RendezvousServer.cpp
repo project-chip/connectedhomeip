@@ -62,6 +62,15 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
     {
         app::Mdns::AdvertiseOperational();
         ChipLogError(Discovery, "Operational advertising enabled");
+#if CONFIG_NETWORK_LAYER_BLE
+        // Close all BLE connections now since the operational network is available.
+        Ble::BleLayer * bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
+        if (bleLayer != nullptr)
+        {
+            ChipLogProgress(Discovery, "Closing all BLE Connections");
+            bleLayer->CloseAllBleConnections();
+        }
+#endif
     }
 }
 
