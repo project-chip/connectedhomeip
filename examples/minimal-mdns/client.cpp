@@ -327,6 +327,8 @@ int main(int argc, char ** args)
 
     BroadcastPacket(&mdnsServer);
 
+    // the below does not compile so commented out and added "No shutdown timer" printout below
+    //
     // err = DeviceLayer::SystemLayer.StartTimer(
     //     gOptions.runtimeMs,
     //     [](System::Layer *, void *, CHIP_ERROR err2) {
